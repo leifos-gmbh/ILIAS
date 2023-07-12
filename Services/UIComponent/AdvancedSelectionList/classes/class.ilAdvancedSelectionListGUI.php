@@ -488,6 +488,8 @@ class ilAdvancedSelectionListGUI implements ilToolbarItem
                     continue;
                 }
 
+                $item["value"] = htmlspecialchars($item["value"] ?? '', ENT_QUOTES);
+
                 if ($this->getUseImages()) {
                     if ($item["img"]) {
                         $tpl->setCurrentBlock("image");

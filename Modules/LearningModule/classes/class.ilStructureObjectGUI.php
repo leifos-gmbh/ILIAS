@@ -634,7 +634,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
             $chap->setTitle($lng->txt("cont_new_chap"));
             $chap->setLMId($this->content_object->getId());
             $chap->create();
-            ilLMObject::putInTree($chap, $parent_id, $target);
+            ilLMObject::putInTree($chap, (int) $parent_id, (int) $target);
         }
 
         $ilCtrl->redirect($this, "view");
@@ -700,7 +700,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
                 $this->content_object,
                 $chap["id"],
                 $parent_id,
-                $target,
+                (int) $target,
                 (string) ($chap["insert_time"] ?? ""),
                 $copied_nodes,
                 (ilEditClipboard::getAction() == "copy")

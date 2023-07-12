@@ -196,7 +196,7 @@ class ilObjectDataSet extends ilDataSet
                 $ti = new ilObjectTileImage(
                     $DIC->filesystem()->web(),
                     $DIC->upload(),
-                    $id
+                    (int) $id
                 );
 
                 if ($ti->exists()) {
@@ -238,17 +238,13 @@ class ilObjectDataSet extends ilDataSet
     ): array {
         $rec["ObjId"] = $rec["ObjId"] ?? null;
         switch ($entity) {
-            case "common":
+            case 'common':
                 return [
-                    "transl" => ["ids" => $rec["ObjId"]],
-                    "service_settings" => ["ids" => $rec["ObjId"]],
-                    "tile" => ["ids" => $rec["ObjId"]],
-                    "icon" => ["ids" => $rec["ObjId"]]
-                ];
-
-            case "transl":
-                return [
-                    "transl_entry" => ["ids" => $rec["ObjId"]]
+                    'transl' => ['ids' => $rec['ObjId']],
+                    'transl_entry' => ['ids' => $rec['ObjId']],
+                    'service_settings' => ['ids' => $rec['ObjId']],
+                    'tile' => ['ids' => $rec['ObjId']],
+                    'icon' => ['ids' => $rec['ObjId']]
                 ];
         }
 

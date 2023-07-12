@@ -84,8 +84,8 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
     protected function getEditAnswersSingleLine($checkonly = false): bool
     {
         if ($checkonly) {
-            // form posting is checked
-            return (!isset($_POST['types']) || $_POST['types'] == 0) ? true : false;
+            $types = $_POST['types'] ?? '0';
+            return $types === '0' ? true : false;
         }
 
         $lastChange = $this->object->getLastChange();
@@ -112,8 +112,8 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
         $form->setFormAction($this->ctrl->getFormAction($this));
         $form->setTitle($this->outQuestionType());
-        $isSingleline = $this->getEditAnswersSingleLine($checkonly);
-        if ($isSingleline) {
+        $is_singleline = $this->getEditAnswersSingleLine($checkonly);
+        if ($is_singleline) {
             $form->setMultipart(true);
         } else {
             $form->setMultipart(false);
@@ -122,8 +122,8 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $form->setId("asssinglechoice");
 
         $this->addBasicQuestionFormProperties($form);
-        $this->populateQuestionSpecificFormPart($form);
-        $this->populateAnswerSpecificFormPart($form);
+        $this->populateQuestionSpecificFormPart($form, $is_singleline);
+        $this->populateAnswerSpecificFormPart($form, $is_singleline);
 
 
         $this->populateTaxonomyFormSection($form);
@@ -406,7 +406,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             $template->setVariable("ANSWER_TEXT", $this->object->prepareTextareaOutput($answer->getAnswertext(), true));
 
             if (is_object($this->getPreviewSession())) {
-                $user_solution = $this->getPreviewSession()->getParticipantsSolution();
+                $user_solution = $this->getPreviewSession()->getParticipantsSolution() ?? '';
                 if (strcmp($user_solution, $answer_id) == 0) {
                     $template->setVariable("CHECKED_ANSWER", " checked=\"checked\"");
                 }
@@ -550,20 +550,24 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
     public function writeQuestionSpecificPostData(ilPropertyFormGUI $form): void
     {
+        $types = $_POST["types"] ?? '0';
+
         $this->object->setShuffle($_POST["shuffle"] ?? '0');
-        $this->object->setMultilineAnswerSetting($_POST["types"] ?? '0');
-        if (isset($_POST['choice']) && isset($_POST['choice']['imagename']) && is_array($_POST['choice']['imagename']) && $_POST["types"] == 1) {
+        $this->object->setMultilineAnswerSetting($types);
+
+        if (isset($_POST['choice']) && isset($_POST['choice']['imagename']) && is_array($_POST['choice']['imagename']) && $types === '1') {
             $this->object->setIsSingleline(true);
             $this->tpl->setOnScreenMessage('info', $this->lng->txt('info_answer_type_change'), true);
         } else {
-            $this->object->setIsSingleline($_POST["types"] == 0 ? true : false);
+            $this->object->setIsSingleline($types === '0' ? true : false);
         }
-        $this->object->setThumbSize((isset($_POST["thumb_size"]) && strlen($_POST["thumb_size"])) ? $_POST["thumb_size"] : "");
+        if (isset($_POST["thumb_size"])) {
+            $this->object->setThumbSize((int) $_POST["thumb_size"]);
+        }
     }
 
-    public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form): ilPropertyFormGUI
+    public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form, bool $is_singleline = false): ilPropertyFormGUI
     {
-        $isSingleline = $this->getEditAnswersSingleLine();
         // shuffle
         $shuffle = new ilCheckboxInputGUI($this->lng->txt("shuffle_answers"), "shuffle");
         $shuffle->setValue(1);
@@ -581,7 +585,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             // Answer types
             $types = new ilSelectInputGUI($this->lng->txt("answer_types"), "types");
             $types->setRequired(false);
-            $types->setValue(($isSingleline) ? 0 : 1);
+            $types->setValue(($is_singleline) ? 0 : 1);
             $types->setOptions(
                 array(
                                     0 => $this->lng->txt('answers_singleline'),
@@ -591,18 +595,22 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             $form->addItem($types);
         }
 
-        if ($isSingleline) {
+        if ($is_singleline) {
             // thumb size
             $thumb_size = new ilNumberInputGUI($this->lng->txt("thumb_size"), "thumb_size");
             $thumb_size->setSuffix($this->lng->txt("thumb_size_unit_pixel"));
-            $thumb_size->setMinValue(20);
+            $thumb_size->setMinValue($this->object->getMinimumThumbSize());
             $thumb_size->setDecimals(0);
             $thumb_size->setSize(6);
             $thumb_size->setInfo($this->lng->txt('thumb_size_info'));
             $thumb_size->setValue($this->object->getThumbSize());
-            $thumb_size->setRequired(false);
-            $form->addItem($thumb_size);
+            $thumb_size->setRequired(true);
+        } else {
+            $thumb_size = new ilHiddenInputGUI('thumb_size');
+            $thumb_size->setValue($this->object->getThumbSize());
         }
+        $form->addItem($thumb_size);
+
         return $form;
     }
 
@@ -624,11 +632,11 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
     {
         // Delete all existing answers and create new answers from the form data
         $this->object->flushAnswers();
+        $choice = $this->cleanupAnswerText($_POST['choice'], $this->object->isSingleline() === false);
         if ($this->object->isSingleline()) {
-            foreach ($_POST['choice']['answer'] as $index => $answertext) {
-                $answertext = ilUtil::secureString(htmlentities($answertext));
-
-                $picturefile = $_POST['choice']['imagename'][$index] ?? '';
+            foreach ($choice['answer'] as $index => $answertext) {
+                $answertext = htmlentities($answertext);
+                $picturefile = $choice['imagename'][$index] ?? '';
                 $file_org_name = $_FILES['choice']['name']['image'][$index] ?? '';
                 $file_temp_name = $_FILES['choice']['tmp_name']['image'][$index] ?? '';
 
@@ -644,24 +652,34 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
                         }
                     }
                 }
-                $this->object->addAnswer($answertext, $_POST['choice']['points'][$index], $index, $picturefile);
+                $points = (float) str_replace(',', '.', $choice['points'][$index]);
+                $this->object->addAnswer(
+                    $answertext,
+                    $points,
+                    $index,
+                    $picturefile,
+                    $choice['answer_id'][$index]
+                );
             }
         } else {
-            foreach ($_POST['choice']['answer'] as $index => $answer) {
+            foreach ($choice['answer'] as $index => $answer) {
                 $answertext = $answer;
-                $this->object->addAnswer($answertext, $_POST['choice']['points'][$index], $index);
+                $this->object->addAnswer(
+                    $answertext,
+                    $choice['points'][$index],
+                    $index,
+                    $choice['answer_id'][$index]
+                );
             }
         }
     }
 
-    public function populateAnswerSpecificFormPart(\ilPropertyFormGUI $form): ilPropertyFormGUI
+    public function populateAnswerSpecificFormPart(\ilPropertyFormGUI $form, bool $is_singleline = false): ilPropertyFormGUI
     {
-        $isSingleline = $this->getEditAnswersSingleLine();
-
         $choices = new ilSingleChoiceWizardInputGUI($this->lng->txt("answers"), "choice");
         $choices->setRequired(true);
         $choices->setQuestionObject($this->object);
-        $choices->setSingleline($isSingleline);
+        $choices->setSingleline($is_singleline);
         $choices->setAllowMove(false);
         if ($this->object->getSelfAssessmentEditingMode()) {
             $choices->setSize(40);

@@ -49,7 +49,12 @@ class Service
 
     public function data(): NewsItemManager
     {
-        return new NewsItemManager();
+        $i = $this->internal();
+        return new NewsItemManager(
+            $i->data(),
+            $i->repo(),
+            $i->domain()
+        );
     }
 
     /**
@@ -75,5 +80,10 @@ class Service
         $obj_id = $this->obj_adapter->getObjIdForRefId($ref_id);
         $obj_type = $this->obj_adapter->getTypeForObjId($obj_id);
         return new \ilNewsContext($obj_id, $obj_type, $subid, $subtype);
+    }
+
+    public function isGloballyActivated(): bool
+    {
+        return (bool) $this->DIC->settings()->get("block_activated_news");
     }
 }

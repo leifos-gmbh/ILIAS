@@ -334,11 +334,19 @@ class ilTestServiceGUI
         $counter = 1;
         // output of questions with solutions
         foreach ($result_array as $question_data) {
-            if ((array_key_exists('workedthrough', $question_data) && $question_data["workedthrough"] == 1) ||
-                ($only_answered_questions == false)) {
+            if (!array_key_exists('workedthrough', $question_data)) {
+                $question_data['workedthrough'] = 0;
+            }
+            if (!array_key_exists('qid', $question_data)) {
+                $question_data['qid'] = -1;
+            }
+
+            if (($question_data["workedthrough"] == 1) || ($only_answered_questions == false)) {
                 $template = new ilTemplate("tpl.il_as_qpl_question_printview.html", true, true, "Modules/TestQuestionPool");
                 $question_id = $question_data["qid"] ?? null;
-                if (is_numeric($question_id)) {
+                if ($question_id !== null
+                    && $question_id !== -1
+                    && is_numeric($question_id)) {
                     $maintemplate->setCurrentBlock("printview_question");
                     $question_gui = $this->object->createQuestionGUI("", $question_id);
                     $question_gui->object->setShuffler($this->buildQuestionAnswerShuffler(
@@ -658,7 +666,7 @@ class ilTestServiceGUI
 
         $invited_user = array_pop($this->object->getInvitedUsers($user_id));
         $title_client = '';
-        if ($invited_user != null && strlen($invited_user["clientip"])) {
+        if ($invited_user["clientip"] !== null && strlen($invited_user["clientip"])) {
             $template->setCurrentBlock("client_ip");
             $template->setVariable("TXT_CLIENT_IP", $this->lng->txt("client_ip"));
             $template->setVariable("VALUE_CLIENT_IP", $invited_user["clientip"]);
@@ -760,6 +768,10 @@ class ilTestServiceGUI
             $uname = $this->object->userLookupFullName($user_id, true);
         }
 
+        if ($this->object->getAnonymity()) {
+            $uname = $this->lng->txt('anonymous');
+        }
+
         if ((($this->testrequest->isset('pass')) && (strlen($this->testrequest->raw("pass")) > 0)) || (!is_null($pass))) {
             if (is_null($pass)) {
                 $pass = $this->testrequest->raw("pass");
@@ -768,7 +780,6 @@ class ilTestServiceGUI
 
         if (!is_null($pass)) {
             $testResultHeaderLabelBuilder = new ilTestResultHeaderLabelBuilder($this->lng, $ilObjDataCache);
-
             $objectivesList = null;
 
             if ($this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired()) {

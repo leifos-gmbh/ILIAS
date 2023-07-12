@@ -16,6 +16,10 @@
  *
  *********************************************************************/
 
+use ILIAS\HTTP\Wrapper\RequestWrapper;
+use GuzzleHttp\Psr7\Request;
+use ILIAS\Refinery\Factory as Refinery;
+
 /**
  * Class ilMarkSchemaGUI
  * @author  Michael Jansen <mjansen@databay.de>
@@ -23,7 +27,9 @@
  */
 class ilMarkSchemaGUI
 {
-    private \ILIAS\Test\InternalRequestService $testrequest;
+    private RequestWrapper $post_wrapper;
+    private Request $request;
+    private Refinery $refinery;
 
     /**
      * @var ilMarkSchemaAware|ilEctsGradesEnabled
@@ -39,6 +45,7 @@ class ilMarkSchemaGUI
      */
     public function __construct($object)
     {
+        /** @var ILIAS\DI\Container $DIC */
         global $DIC;
 
         $this->ctrl = $DIC['ilCtrl'];
@@ -46,7 +53,9 @@ class ilMarkSchemaGUI
         $this->tpl = $DIC['tpl'];
         $this->toolbar = $DIC['ilToolbar'];
         $this->object = $object;
-        $this->testrequest = $DIC->test()->internal()->request();
+        $this->post_wrapper = $DIC->http()->wrapper()->post();
+        $this->request = $DIC->http()->request();
+        $this->refinery = $DIC->refinery();
     }
 
     public function executeCommand(): void
@@ -78,15 +87,19 @@ class ilMarkSchemaGUI
     {
         $this->ensureMarkSchemaCanBeEdited();
 
-        $this->saveMarkSchemaFormData();
-        $this->object->getMarkSchema()->addMarkStep();
+        if ($this->saveMarkSchemaFormData()) {
+            $this->object->getMarkSchema()->addMarkStep();
+        } else {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('mark_schema_invalid'), true);
+        }
         $this->showMarkSchema();
     }
 
-    protected function saveMarkSchemaFormData(): void
+    protected function saveMarkSchemaFormData(): bool
     {
+        $no_save_error = true;
         $this->object->getMarkSchema()->flush();
-        $postdata = $this->testrequest->getParsedBody();
+        $postdata = $this->request->getParsedBody();
         foreach ($postdata as $key => $value) {
             if (preg_match('/mark_short_(\d+)/', $key, $matches)) {
                 $passed = "0";
@@ -97,14 +110,22 @@ class ilMarkSchemaGUI
                 //replace , with . for float values
                 $value = str_replace(',', '.', $value);
 
+                $percentage = str_replace(',', '.', ilUtil::stripSlashes($postdata["mark_percentage_$matches[1]"]));
+                if (!is_numeric($percentage)) {
+                    $percentage = 0;
+                    $no_save_error = false;
+                }
+
                 $this->object->getMarkSchema()->addMarkStep(
                     ilUtil::stripSlashes($postdata["mark_short_$matches[1]"]),
                     ilUtil::stripSlashes($postdata["mark_official_$matches[1]"]),
-                    str_replace(',', '.', ilUtil::stripSlashes($postdata["mark_percentage_$matches[1]"])),
-                    ilUtil::stripSlashes($passed)
+                    (float) $percentage,
+                    (int) ilUtil::stripSlashes($passed)
                 );
             }
         }
+
+        return $no_save_error;
     }
 
     protected function addSimpleMarkSchema(): void
@@ -127,25 +148,44 @@ class ilMarkSchemaGUI
 
     protected function deleteMarkSteps(): void
     {
-        $this->ensureMarkSchemaCanBeEdited();
+        $marks_trafo = $this->refinery->custom()->transformation(
+            function ($vs): ?array {
+                if ($vs === null || !is_array($vs)) {
+                    return null;
+                }
+                return $vs;
+            }
+        );
+        $deleted_mark_steps = null;
+        if ($this->post_wrapper->has('marks')) {
+            $deleted_mark_steps = $this->post_wrapper->retrieve(
+                'marks',
+                $marks_trafo
+            );
+        }
 
-        if (!isset($_POST['marks']) || !is_array($_POST['marks'])) {
+        $this->ensureMarkSchemaCanBeEdited();
+        if (!isset($deleted_mark_steps) || !is_array($deleted_mark_steps)) {
             $this->showMarkSchema();
             return;
         }
 
-        $this->saveMarkSchemaFormData();
-        $delete_mark_steps = array();
-        foreach ($_POST['marks'] as $mark_step_id) {
-            $delete_mark_steps[] = $mark_step_id;
+        // test delete
+        $schema = clone $this->object->getMarkSchema();
+        $schema->deleteMarkSteps($deleted_mark_steps);
+        $check_result = $schema->checkMarks();
+        if (is_string($check_result)) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt($check_result), true);
+            $this->showMarkSchema();
+            return;
         }
 
-        if (count($delete_mark_steps)) {
-            $this->object->getMarkSchema()->deleteMarkSteps($delete_mark_steps);
+        //  actual delete
+        if (!empty($deleted_mark_steps)) {
+            $this->object->getMarkSchema()->deleteMarkSteps($deleted_mark_steps);
         } else {
             $this->tpl->setOnScreenMessage('info', $this->lng->txt('tst_delete_missing_mark'));
         }
-
         $this->object->getMarkSchema()->saveToDb($this->object->getTestId());
 
         $this->showMarkSchema();
@@ -155,11 +195,10 @@ class ilMarkSchemaGUI
     {
         $this->ensureMarkSchemaCanBeEdited();
 
-        try {
-            $this->saveMarkSchemaFormData();
+        if ($this->saveMarkSchemaFormData()) {
             $result = $this->object->checkMarks();
-        } catch (Exception $e) {
-            $result = $this->lng->txt('mark_schema_invalid');
+        } else {
+            $result = 'mark_schema_invalid';
         }
 
         if (is_string($result)) {
@@ -168,9 +207,11 @@ class ilMarkSchemaGUI
             $this->object->getMarkSchema()->saveToDb($this->object->getMarkSchemaForeignId());
             $this->object->onMarkSchemaSaved();
             $this->tpl->setOnScreenMessage('success', $this->lng->txt('saved_successfully'), true);
+            $this->object->getMarkSchema()->flush();
+            $this->object->getMarkSchema()->loadFromDb($this->object->getTestId());
         }
 
-        $this->ctrl->redirect($this);
+        $this->showMarkSchema();
     }
 
     private function objectSupportsEctsGrades(): bool

@@ -559,10 +559,7 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
         }
 
         if (!$a_get_html) {
-            $tpl->setPermanentLink("git", $term_id, "", ILIAS_HTTP_PATH .
-                "/goto.php?target=" .
-                "git" .
-                "_" . $term_id . "_" . $ref_id . "&client_id=" . CLIENT_ID);
+            $tpl->setPermanentLink("git", null, $term_id . "_" . $ref_id);
 
             // show taxonomy
             $this->showTaxonomy();
@@ -688,6 +685,7 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
 
         $params = array('mode' => $mode, 'enlarge_path' => $enlarge_path,
             'link_params' => "ref_id=" . $this->requested_ref_id,'fullscreen_link' => $fullscreen_link,
+                        'enable_html_mob' => ilObjMediaObject::isTypeAllowed("html") ? "y" : "n",
             'ref_id' => $this->requested_ref_id, 'pg_frame' => "", 'webspace_path' => $wb_path);
         $output = $this->xsl->process($xml, $params);
 

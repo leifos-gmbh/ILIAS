@@ -344,6 +344,7 @@ class ilObjMediaPoolGUI extends ilObject2GUI
                 $this->prepareOutput();
                 $this->addHeaderAction();
                 $perm_gui = new ilPermissionGUI($this);
+                $ilTabs->activateTab("perm_settings");
                 $this->ctrl->forwardCommand($perm_gui);
                 $this->tpl->printToStdout();
                 break;
@@ -352,6 +353,7 @@ class ilObjMediaPoolGUI extends ilObject2GUI
                 $this->checkPermission("write");
                 $this->prepareOutput();
                 $this->addHeaderAction();
+                $ilTabs->activateTab("export");
                 $exp_gui = new ilExportGUI($this);
                 $exp_gui->addFormat("xml");
                 $ot = ilObjectTranslation::getInstance($this->object->getId());
@@ -816,6 +818,7 @@ class ilObjMediaPoolGUI extends ilObject2GUI
             $this->ctrl->getLinkTarget($this, "showFullscreen", "", false, false);
         $params = array('mode' => $mode, 'enlarge_path' => $enlarge_path,
             'link_params' => "ref_id=" . $this->requested_ref_id,'fullscreen_link' => $fullscreen_link,
+                        'enable_html_mob' => ilObjMediaObject::isTypeAllowed("html") ? "y" : "n",
             'ref_id' => $this->requested_ref_id, 'pg_frame' => $pg_frame, 'webspace_path' => $wb_path);
         $output = $this->xsl->process($xml, $params);
 

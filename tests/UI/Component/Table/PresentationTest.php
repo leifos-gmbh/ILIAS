@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 require_once("libs/composer/vendor/autoload.php");
 require_once(__DIR__ . "/../../Base.php");
 
@@ -33,7 +33,11 @@ class PresentationTest extends ILIAS_UI_TestBase
     private function getFactory(): I\Component\Table\Factory
     {
         return new I\Component\Table\Factory(
-            new I\Component\SignalGenerator()
+            new I\Component\SignalGenerator(),
+            new \ILIAS\Data\Factory(),
+            new I\Component\Table\Column\Factory(),
+            new I\Component\Table\Action\Factory(),
+            new I\Component\Table\DataRowBuilder()
         );
     }
 
@@ -108,6 +112,8 @@ class PresentationTest extends ILIAS_UI_TestBase
     public function getUIFactory(): NoUIFactory
     {
         $factory = new class () extends NoUIFactory {
+            public I\Component\SignalGenerator $sig_gen;
+
             public function button(): C\Button\Factory
             {
                 return new I\Component\Button\Factory(
@@ -173,10 +179,7 @@ class PresentationTest extends ILIAS_UI_TestBase
             </div>
 
             <div class="il-table-presentation-row-contents">
-                <div class="il-table-presentation-actions">
-                    <button class="btn btn-default" data-action="#" id="id_5">do</button>
-                    <br />
-                </div>
+                <div class="il-table-presentation-actions"><button class="btn btn-default" data-action="#" id="id_5">do</button><br /></div>
                 <div class="il-table-presentation-row-header">
                     <h4 class="il-table-presentation-row-header-headline" onClick="$(document).trigger('il_signal...');">some title<br /><small>some type</small>
                     </h4>

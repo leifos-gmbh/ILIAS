@@ -441,7 +441,7 @@ class ilTestScoringGUI extends ilTestServiceGUI
 
             $text = new ilTextInputGUI($lng->txt('tst_change_points_for_question'), "question__{$questionId}__points");
             if ($initValues) {
-                $text->setValue(assQuestion::_getReachedPoints($activeId, $questionId, $pass));
+                $text->setValue((string) assQuestion::_getReachedPoints($activeId, $questionId, $pass));
             }
             if ($disabled) {
                 $text->setDisabled($disabled);
@@ -511,17 +511,17 @@ class ilTestScoringGUI extends ilTestServiceGUI
         if ($withData) {
             $participantStatusFilterValue = $table->getFilterItemByPostVar('participant_status')->getValue();
 
-            $participantList = new ilTestParticipantList($this->object);
+            $participant_list = new ilTestParticipantList($this->object);
 
-            $participantList->initializeFromDbRows(
+            $participant_list->initializeFromDbRows(
                 $this->object->getTestParticipantsForManualScoring($participantStatusFilterValue)
             );
 
-            $participantList = $participantList->getAccessFilteredList(
+            $filtered_participant_list = $participant_list->getAccessFilteredList(
                 ilTestParticipantAccessFilter::getScoreParticipantsUserFilter($this->ref_id)
             );
 
-            $table->setData($participantList->getParticipantsTableRows());
+            $table->setData($filtered_participant_list->getParticipantsTableRows());
         }
 
         return $table;

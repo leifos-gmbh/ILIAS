@@ -58,6 +58,7 @@ class ilMembershipGUI
         $this->lng->loadLanguageModule($this->getParentObject()->getType());
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->ctrl = $DIC->ctrl();
+        $this->lng->loadLanguageModule('trac');
         $this->logger = $DIC->logger()->mmbr();
         $this->access = $DIC->access();
         $this->user = $DIC->user();
@@ -247,14 +248,16 @@ class ilMembershipGUI
                     $rep_search->setCallback(
                         $this,
                         'assignMembers',
-                        $this->getParentGUI()->getLocalRoles()
+                        $this->getParentGUI()->getLocalRoles(),
+                        (string) $this->getDefaultRole()
                     );
                 } else {
                     //#18445 excludes admin role
                     $rep_search->setCallback(
                         $this,
                         'assignMembers',
-                        $this->getLocalRoles()
+                        $this->getLocalRoles(),
+                        (string) $this->getDefaultRole()
                     );
                 }
 
@@ -773,12 +776,12 @@ class ilMembershipGUI
         $participants = [];
         if ($this->http->wrapper()->post()->has('participants')) {
             $participants = $this->initParticipantsFromPost();
-        } elseif ($this->http->wrapper()->query()->has('member_id')) {
-            $participants = [$this->initMemberIdFromGet()];
         } elseif ($this->http->wrapper()->post()->has('subscribers')) {
             $participants = $this->initSubscribersFromPost();
         } elseif ($this->http->wrapper()->post()->has('waiting')) {
             $participants = $this->initWaitingListIdsFromPost();
+        } elseif ($this->http->wrapper()->query()->has('member_id')) {
+            $participants = [$this->initMemberIdFromGet()];
         }
         if (!count($participants)) {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt("no_checkbox"), true);

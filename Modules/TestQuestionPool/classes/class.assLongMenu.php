@@ -394,7 +394,6 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
             $this->setIdenticalScoring($data["identical_scoring"]);
             $this->setOwner($data["owner"]);
             $this->setQuestion(ilRTE::_replaceMediaObjectImageSrc((string) $data['question_text'], 1));
-            $this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
             $this->setLongMenuTextValue(ilRTE::_replaceMediaObjectImageSrc((string) $data['long_menu_text'], 1));
             $this->loadCorrectAnswerData($question_id);
             $this->setMinAutoComplete($data["min_auto_complete"]);
@@ -803,10 +802,10 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
                             if ($value == -1) {
                                 $value = '';
                             }
-                            $worksheet->setCell($startrow + $i, $col + 1, $value);
+                            $worksheet->setCell($startrow + $i, $col + 2, $value);
                             break;
                         case self::ANSWER_TYPE_TEXT_VAL:
-                            $worksheet->setCell($startrow + $i, $col + 1, $solutionvalue["value2"]);
+                            $worksheet->setCell($startrow + $i, $col + 2, $solutionvalue["value2"]);
                             break;
                     }
                 }

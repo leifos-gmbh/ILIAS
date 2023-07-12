@@ -29,6 +29,11 @@ use ILIAS\Repository\Modal\ModalAdapterGUI;
 use Slim\Http\Stream;
 use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\Repository\Filter\FilterAdapterGUI;
+use ILIAS\Repository\Button\ButtonAdapterGUI;
+use ILIAS\Repository\Link\LinkAdapterGUI;
+use ILIAS\Repository\Symbol\SymbolAdapterGUI;
+use ILIAS\Repository\Listing\ListingAdapterGUI;
+use ILIAS\Repository\HTTP\HTTPUtil;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -61,6 +66,11 @@ trait GlobalDICGUIServices
     public function http(): HTTP\Services
     {
         return $this->DIC->http();
+    }
+
+    public function httpUtil(): HTTPUtil
+    {
+        return new HTTPUtil($this->DIC->http());
     }
 
     public function mainTemplate(): \ilGlobalTemplateInterface
@@ -119,7 +129,8 @@ trait GlobalDICGUIServices
     ): ModalAdapterGUI {
         return new ModalAdapterGUI(
             $title,
-            $cancel_label
+            $cancel_label,
+            $this->httpUtil()
         );
     }
 
@@ -152,6 +163,40 @@ trait GlobalDICGUIServices
             $cmd,
             $activated,
             $expanded
+        );
+    }
+
+    public function button(
+        string $caption,
+        string $cmd
+    ): ButtonAdapterGUI {
+        return new ButtonAdapterGUI(
+            $caption,
+            $cmd
+        );
+    }
+
+    public function link(
+        string $caption,
+        string $href,
+        bool $new_viewport = false
+    ): LinkAdapterGUI {
+        return new LinkAdapterGUI(
+            $caption,
+            $href,
+            $new_viewport
+        );
+    }
+
+    public function symbol(
+    ): SymbolAdapterGUI {
+        return new SymbolAdapterGUI(
+        );
+    }
+
+    public function listing(
+    ): ListingAdapterGUI {
+        return new ListingAdapterGUI(
         );
     }
 }

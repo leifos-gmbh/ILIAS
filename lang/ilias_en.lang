@@ -117,13 +117,13 @@ administration#:#adm_pub_section_domain_filter_info#:#Domain filters granting an
 administration#:#adm_rep_shorten_description#:#Limited Length of Descriptions
 administration#:#adm_rep_shorten_description_info#:#If activated all descriptions in object lists are presented with a maximum number of characters.
 administration#:#adm_rep_shorten_description_length#:#Maximum number of characters
-administration#:#adm_rep_tree_all_types#:#All Resource Types
-administration#:#adm_rep_tree_all_types_info#:#All types of resources are listed in the tree.
-administration#:#adm_rep_tree_limit_grp_crs#:#Show limited context tree in courses and groups.
-administration#:#adm_rep_tree_limit_grp_crs_info#:#This relies on and automatically activates the ‘Synchronize Tree Frame’ feature.
-administration#:#adm_rep_tree_only_cntr#:#Container Only
-administration#:#adm_rep_tree_only_cntr_info#:#Only categories, courses and groups are listed.
-administration#:#adm_rep_tree_presentation#:#Repository Tree Presentation
+administration#:#adm_rep_tree_all_types#:#All Object Types
+administration#:#adm_rep_tree_all_types_info#:#All object types are presented in the Tree View (Slate).
+administration#:#adm_rep_tree_limit_grp_crs#:#Show only in courses and groups.
+administration#:#adm_rep_tree_limit_grp_crs_info#:#The Tree View shows all objects only within courses and groups. Outside courses and groups, only container objects are presented.
+administration#:#adm_rep_tree_only_cntr#:#Container Objects Only
+administration#:#adm_rep_tree_only_cntr_info#:#Only objects of type Study Programme, Category, Course, Group and Learning Sequence are presented in the Tree View.
+administration#:#adm_rep_tree_presentation#:#Tree View of Repository
 administration#:#adm_repository_and_objects#:#Repository and Objects
 administration#:#adm_search_and_find#:#Search and Find
 administration#:#adm_show_comments_tagging_in_lists#:#Show Number of Notes, Comments and Tags in Object Lists
@@ -399,7 +399,6 @@ adve#:#adve_autosave#:#Automatic Saving Intervall
 adve#:#adve_autosave_info#:#Auto-save for text content. With shorter intervals, the server load increases and the performance of the system decreases.
 adve#:#adve_autosave_info_min_10#:#Please choose a value of minimal 10 seconds if you activated this feature.
 adve#:#adve_blocking_mode#:#Edit Lock
-adve#:#adve_char_selector_settings#:#Character Selector
 adve#:#adve_excass_settings#:#Exercise Assignments
 adve#:#adve_grp_copa#:#Content Pages
 adve#:#adve_grp_frm#:#Forums
@@ -418,45 +417,6 @@ adve#:#adve_text_content_features#:#Text Content Menu
 adve#:#adve_use_physical#:#Use b/i/u instead of str/emp/imp
 adve#:#adve_use_physical_info#:#This setting replaces the semantic style class buttons for ‘strong’, ‘emphatic’ and ‘important’ with physical attribute buttons ‘b’ (bold), ‘i’ (italic) and ‘u’ (underline). Please note, that this may result in inconsistencies if the style editor is used and other physical attributes are assigned to the strong/emphatic/important style classes.
 adve#:#adve_use_tiny_mce#:#Enable TinyMCE for WYSIWYG Editing
-adve#:#char_selector_admin#:#Menu for Selecting Special Characters (Unicode) in Tests and Question Pools
-adve#:#char_selector_blocks#:#Available Special Character Sets (Unicode)
-adve#:#char_selector_blocks_info#:#All characters of the selected blocks will be listed, but not all of them may be supported by the current browser font.
-adve#:#char_selector_custom_items#:#Custom Selection
-adve#:#char_selector_custom_items_info1#:#The custom selection will be listed before the selected blocks. Please add your characters in the following style:
-adve#:#char_selector_custom_items_info2a#:#A B C
-adve#:#char_selector_custom_items_info2b#:#Characters are separated by space, generating separate selector buttons
-adve#:#char_selector_custom_items_info3a#:#A BC D
-adve#:#char_selector_custom_items_info3b#:#It is possible to put more characters on one button
-adve#:#char_selector_custom_items_info4a#:#A-Z
-adve#:#char_selector_custom_items_info4b#:#Ranges of characters can be defined with a ‘-’
-adve#:#char_selector_custom_items_info5a#:#U+00C0
-adve#:#char_selector_custom_items_info5b#:#A character can also be defined in Unicode notation (case insensitive)
-adve#:#char_selector_custom_items_info6a#:#U+00C0-U+00CF
-adve#:#char_selector_custom_items_info6b#:#Ranges are also possible in Unicode notation
-adve#:#char_selector_disabled_admin#:#Ω-Button for Activating the Menu for Selecting Special Characters is displayed only if switched on
-adve#:#char_selector_disabled_info_admin#:#The menu for selecting special characters (Unicode) in tests and question pools is activated but the Ω-Button has to be switched on by users in their settings and or in individual tests or questions pools. Test Settings will override user settings.
-adve#:#char_selector_disabled_info_test#:#Regardless of a user's individual setting the special character selector is switched off for taking this test.
-adve#:#char_selector_disabled_info_user#:#A menu for selecting special characters will be not be displayed in tests. Individual tests, however, can override this setting and force the display of the special character menu.
-adve#:#char_selector_disabled_test#:#Special Character Selector is Off
-adve#:#char_selector_disabled_user#:#Disable Menu for Selecting Special Characters
-adve#:#char_selector_enabled_admin#:#Ω-Button for Activating the Menu for Selecting Special Characters is Displayed by Default
-adve#:#char_selector_enabled_info_admin#:#The menu for selecting special characters (Unicode) is activated in tests and question pools. It will present users with the selection of Unicode blocks composed below. Users can make individual settings in their personal settings and the setting can be switched on for individual tests or questions pools.
-adve#:#char_selector_enabled_info_test#:#Regardless of a user's individual setting the Ω-button for switching on the special character selector will be displayed in the test. Special characters can be entered.
-adve#:#char_selector_enabled_info_user#:#A menu for selecting special characters will be displayed in tests. Individual tests can, however,  override this setting and prevent the display of the special character menu.
-adve#:#char_selector_enabled_test#:#Special Character Selector is On
-adve#:#char_selector_enabled_user#:#Enable Menu for Selecting Special Characters
-adve#:#char_selector_inactive_admin#:#Globally Deactivate the Menu for Selecting Special Characters
-adve#:#char_selector_inactive_info_admin#:#The menu for selecting special characters is deactivated for the whole system. Users cannot make individual settings in their personal settings nor can individual tests or questions pools switch on the setting.
-adve#:#char_selector_inherit_info_test#:#Depending on the settings made in the platforms' administration or those made by individual users in their settings the Ω-button is displayed in the test or not.
-adve#:#char_selector_inherit_info_user#:#Use the standard global settings as set by the administrator of your platform.
-adve#:#char_selector_inherit_test#:#Settings made either Globally by Administrators or Individually by Users are Applied
-adve#:#char_selector_inherit_user#:#Use Standard Settings
-adve#:#char_selector_menu_close#:#Close Special Character Selector###fau: testNav
-adve#:#char_selector_menu_open#:#Open Special Character Selector###fau: testNav
-adve#:#char_selector_msg_blocks_or_custom_needed#:#When you activate the selector, please choose a character block or enter a special selection!
-adve#:#char_selector_test#:#Selector Special Characters (Unicode)
-adve#:#char_selector_unicode_all#:#All Unicode Blocks
-adve#:#char_selector_user#:#Menu for Selecting Special Characters (Unicode) in Tests
 assessment#:#action#:#Action
 assessment#:#addSuggestedSolution#:#Add Content for Recapitulation
 assessment#:#add_answers#:#Add answers
@@ -599,7 +559,6 @@ assessment#:#categories#:#Categories
 assessment#:#category#:#Category
 assessment#:#changeSuggestedSolution#:#Select type of content for recapitulation
 assessment#:#change_adm_categories_not_allowed#:#You do not have any permissions concerning this category.
-assessment#:#char_selector_btn_label#:#&nbsp;Ω&nbsp;
 assessment#:#checkbox_checked#:#Checked
 assessment#:#checkbox_unchecked#:#Unchecked
 assessment#:#circle#:#Circle
@@ -886,6 +845,7 @@ assessment#:#log_user_not_entered_values#:#User did not enter values
 assessment#:#log_user_solution_willingly_deleted#:#User deleted the answer.
 assessment#:#log_wrong_test_password_entered#:#Participant entered wrong test password.
 assessment#:#longmenu#:#Longmenu
+assessment#:#longmenu_answeroptions_differ#:#This question does not work correctly, as there are not the same amount of gaps in the text as in the correction options.
 assessment#:#longmenu_text#:#Long Menu Text
 assessment#:#mailnottype#:#Send a notification every time a test attempt is completed.
 assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.
@@ -1087,6 +1047,7 @@ assessment#:#qpl_skl_sub_tab_quest_assign#:#Question/Competence Assignment
 assessment#:#qpl_skl_sub_tab_usages#:#Assignment Frequency
 assessment#:#qpl_sync_quest_skl_assigns_confirmation#:#The question was inserted from another repository object. Should the question's original be updated with the current config of competence assignments?
 assessment#:#qpl_tab_competences#:#Competences
+assessment#:#qst_error_text_too_long#:#One or more text elements marked as erroneous are too long. The maximum size for a text element marked as erroneous is 150 characters:
 assessment#:#qst_essay_allready_written_words#:#Already entered words:
 assessment#:#qst_essay_chars_remaining#:#Remaining characters:
 assessment#:#qst_essay_wordcounter_enabled#:#Count Words
@@ -1264,10 +1225,8 @@ assessment#:#text_wrong#:#Wrong Text
 assessment#:#textsize#:#Text Size
 assessment#:#textsize_errortext_info#:#Enter the text size of the error text in percent if you want another size than 100 percent.
 assessment#:#textsize_info#:#Enter the text size of the ordering text in percent if you want another size than 100 percent.
-assessment#:#thumb_geometry#:#Thumbnail Geometry
-assessment#:#thumb_geometry_info#:#The image thumbnails will be created with a maximum values of height and width given, aspect ratio preserved.
 assessment#:#thumb_size#:#Thumbnail Size
-assessment#:#thumb_size_info#:#If you enter a thumbnail size, a thumbnail of this size will be generated for uploaded images. If you do not enter a thumbnail size, the original image size will be used.
+assessment#:#thumb_size_info#:#The image thumbnails will be created with a maximum values of height and width given, aspect ratio preserved.
 assessment#:#thumb_size_unit_pixel#:#Pixel
 assessment#:#time_format#:#HH MM SS
 assessment#:#timing#:#Extra Time
@@ -1412,8 +1371,6 @@ assessment#:#tst_eval_total_passed#:#Total passed tests
 assessment#:#tst_eval_total_passed_average_points#:#Average points of passed tests
 assessment#:#tst_eval_total_passed_average_time#:#Average processing time of all passed tests
 assessment#:#tst_eval_total_persons#:#Total number of participants who started the test
-assessment#:#tst_exp_sc_short#:#Item Analysis Export for Pure Single Choice Tests
-assessment#:#tst_exp_sc_short_desc#:#In the ‘Statistics’-tab an additional export option is offered. It generates a spreadsheet for item analysis outside of ILIAS. This option only works for tests purely composed of Single Choice Questions.
 assessment#:#tst_extratime_added#:#The working time of the participant has been increased by %s minutes.
 assessment#:#tst_extratime_info#:#If you want to add the working time multiple times for the same participant, please insert the total amount of time you want to add.
 assessment#:#tst_extratime_notavailable#:#Extra time can be added only for tests with one pass and a maximum processing time.
@@ -2001,7 +1958,7 @@ assessment#:#values#:#Values
 assessment#:#variable_x#:#Variable %s
 assessment#:#variables#:#Variables
 assessment#:#wait_for_next_pass_hint_msg#:#Additional pass is possible on time: %s
-assessment#:#warning_question_not_complete#:#The question is not complete!
+assessment#:#warning_question_not_complete#:#Question is incomplete!
 assessment#:#width#:#Width
 assessment#:#with_solutions_participants#:#Participants with solutions
 assessment#:#without_solutions_participants#:#Participants without solutions
@@ -2021,6 +1978,8 @@ auth#:#auth_allow_local_info#:#If enabled a local authentication against the ILI
 auth#:#auth_auth_settings#:#Settings
 auth#:#auth_cas_ldap#:#Synchronization using LDAP
 auth#:#auth_cas_ldap_info#:#If enabled, the synchronization of user accounts and role assignments is done using an existing LDAP configuration.
+auth#:#auth_cron_destroy_expired_sessions#:#Deletion of Expired Sessions
+auth#:#auth_cron_destroy_expired_sessions_desc#:#This job deletes expires sessions.
 auth#:#auth_err_expired#:#Your session has been deactivated due to inactivity.
 auth#:#auth_err_invalid_user_account#:#Authentication failed due to an internal failure.
 auth#:#auth_err_ldap_exception#:#Authentication failed due to an internal authentication failure (LDAP).
@@ -2034,7 +1993,7 @@ auth#:#auth_oidc_failed#:#Login via OpenID Connect failed
 auth#:#auth_oidc_login_element_info#:#Login to ILIAS via OpenID Connect
 auth#:#auth_oidc_mapping_table#:#Mapping ILIAS User Information to OpenID Connect Attributes
 auth#:#auth_oidc_profile#:#User Profile Mapping
-auth#:#auth_oidc_role_info#:#OpenID Connect Attribute::Value (e.g: "roles::employee").
+auth#:#auth_oidc_role_info#:#OpenID Connect Attribute::Value (e.g: ‘roles::employee‘).
 auth#:#auth_oidc_role_mapping_table#:#Mapping ILIAS Roles to OpenID Connect Attributes.
 auth#:#auth_oidc_roles#:#Role Assignment
 auth#:#auth_oidc_settings#:#Server Settings
@@ -2050,23 +2009,23 @@ auth#:#auth_oidc_settings_discovery_error#:#Retrieving the Discovery URL failed 
 auth#:#auth_oidc_settings_discovery_url#:#Discovery URL of the provider
 auth#:#auth_oidc_settings_img#:#Image
 auth#:#auth_oidc_settings_img_file_info#:#Upload an image that you would like to have shown on the login page. The image will link automatically to the OpenID Connect login script.
-auth#:#auth_oidc_settings_invalid_scopes#:#The following values are not valid Scopes: %s
+auth#:#auth_oidc_settings_invalid_scopes#:#The following values are not valid scopes: %s
 auth#:#auth_oidc_settings_le#:#Visual Presentation of Login Page
 auth#:#auth_oidc_settings_login_option_default#:#Login Not Required
 auth#:#auth_oidc_settings_login_option_default_info#:#Users are not required to log in via the OpenID Connect server if a valid session is in progress.
 auth#:#auth_oidc_settings_login_option_enforce#:#Login Required
-auth#:#auth_oidc_settings_login_option_enforce_info#:#Users are always required to log in via the OpenId Connect Server – even if there is already a valid session in progress.
+auth#:#auth_oidc_settings_login_option_enforce_info#:#Users are always required to log in via the OpenID Connect Server – even if there is already a valid session in progress.
 auth#:#auth_oidc_settings_login_options#:#Login Options
 auth#:#auth_oidc_settings_logout_scope#:#Logout Options
 auth#:#auth_oidc_settings_logout_scope_global#:#Log Out Globally
 auth#:#auth_oidc_settings_logout_scope_global_info#:#When a users logs out, they end both their OpenID Connect session and their ILIAS session.
 auth#:#auth_oidc_settings_logout_scope_local#:#Log Out of ILIAS ONLY
 auth#:#auth_oidc_settings_logout_scope_local_info#:#When a user logs out, they only end their session in  ILIAS, not their OpenID Connect session.
-auth#:#auth_oidc_settings_provider#:#Provider Url
+auth#:#auth_oidc_settings_provider#:#Provider URL
 auth#:#auth_oidc_settings_secret#:#Client Key
 auth#:#auth_oidc_settings_section_user_sync#:#User Synchronisation Settings
 auth#:#auth_oidc_settings_session_duration#:#Duration
-auth#:#auth_oidc_settings_title#:#Configure OpenID Connect Authentification
+auth#:#auth_oidc_settings_title#:#Configure OpenID Connect Authentication
 auth#:#auth_oidc_settings_txt#:#Text
 auth#:#auth_oidc_settings_txt_val_info#:#Enter a text to be displayed on the login page. The text will link automatically to the OpenID Connect login script.
 auth#:#auth_oidc_settings_user_attr#:#Attribute name of user accounts
@@ -2532,7 +2491,7 @@ book#:#book_notification_cron_not_active#:#Note: The corresponding cron job "Sen
 book#:#book_notification_info#:#Send a list of reservations of the next day to users (own reservations) and admins (if activated).
 book#:#book_nr_of_preferences#:#Number of Preferences
 book#:#book_nr_of_preferences_info#:#Number of preferences each participant can indicate.
-book#:#book_nr_preferences#:#Prefences
+book#:#book_nr_preferences#:#Preferences
 book#:#book_obj_select#:#Select
 book#:#book_object_added#:#A booking object has been added.
 book#:#book_object_deleted#:#The booking object has been deleted.
@@ -2578,7 +2537,7 @@ book#:#book_reservation_failed_overbooked#:#The booking failed because the objec
 book#:#book_reservation_filter_period#:#Period for the reservation list
 book#:#book_reservation_filter_period_info#:#The default value for the period-filter in days from the current date.
 book#:#book_reservation_fix_info#:#The reservation can only be done for fixed hours.
-book#:#book_reservation_overview#:#Reservation Overviews
+book#:#book_reservation_overview#:#Reservation Overview
 book#:#book_reservation_status_5#:#Cancelled
 book#:#book_reservation_title#:#Booking Reservation for
 book#:#book_reservations_list#:#Reservations
@@ -2772,6 +2731,7 @@ certificate#:#certificate_settings#:#Certificate Settings
 certificate#:#certificate_short_name#:#Certificate file short title
 certificate#:#certificate_short_name_description#:#Please enter a short title for the certificate name. The short title will be part of the certificate name: YYMMDD_[surname]_[SHORT_TITLE]_certificate.pdf.
 certificate#:#certificate_text#:#Certificate Text
+certificate#:#certificate_text_info#:#Please enter the certificate text. If the WYSIWYG editor is disabled in the ILIAS administration, you can still use valid XHTML to format the text.
 certificate#:#certificate_unit_description#:#Enter units of measure as VALUE[cm|mm|in|pt|pc|px|em], e.g. 10mm or 3in
 certificate#:#certificate_usage#:#Please note that the usage of certificates is only available if the ILIAS Java-Server is running. The configuration for Java-Server is available in Administration » General Settings » Server, sub-tab Java-Server.
 certificate#:#certificate_var_max_points#:#46
@@ -2880,7 +2840,6 @@ chatroom#:#chat_osc_conversations#:#Conversations
 chatroom#:#chat_osc_doesnt_accept_msg#:#Conversations not possible
 chatroom#:#chat_osc_dont_accept_msg#:#You currently cannot be invited to conversations. If desired you can change this in your %s.
 chatroom#:#chat_osc_dont_accept_msg_link_txt#:#'Personal Settings'
-chatroom#:#chat_osc_emoticons#:#Emoticons
 chatroom#:#chat_osc_head_grp_x_persons#:#%s Users
 chatroom#:#chat_osc_invite_to_conversation#:#Add to Conversation
 chatroom#:#chat_osc_leave_grp_conv#:#Leave Conversation
@@ -2923,7 +2882,6 @@ chatroom#:#chatroom_client_name_info#:#Please enter a name for this ILIAS client
 chatroom#:#chatroom_enable_osc#:#Enable On-Screen-Chat
 chatroom#:#chatroom_enable_osc_info#:#If activated, the On-Screen Chat will be available for each user. But every user can decided whether or not he/she would like to be contacted by others. Conversations could be started in the ‘Who is online?’-Tool.
 chatroom#:#chatroom_log#:#Chatserver Log
-chatroom#:#chatroom_smiley_keyword#:#Keyword
 chatroom#:#chatserver_address#:#IP-Address/FQN of Chat Server
 chatroom#:#chatserver_port#:#Port of Chat Server
 chatroom#:#chtr_activation_limited_visibility_info#:#If checked, the title of the chat will be visible even outside of the given availability. The chat however can not be accessed.
@@ -2946,12 +2904,10 @@ chatroom#:#display_past_msgs#:#Number of Past Messages
 chatroom#:#display_past_msgs_suffix#:#Messages
 chatroom#:#duration_from#:#From
 chatroom#:#duration_to#:#To
-chatroom#:#enable_smilies#:#Enable Smileys
 chatroom#:#end_whisper#:#Cancel
 chatroom#:#enter#:#Enter Chat Room
 chatroom#:#error_log#:#Chatserver Error-Log
 chatroom#:#hint_display_past_msgs#:#Number of previous messages shown when chat room is entered. A value of ‘0’ disables this feature.
-chatroom#:#hint_enable_smilies#:#If activated, configured text sequences are replaced with an icon. See Smileys tab for configuration.
 chatroom#:#history_by_day#:#Daily History
 chatroom#:#history_by_session#:#Session History
 chatroom#:#history_byday_title#:#Show Conversation per Day
@@ -3007,21 +2963,6 @@ chatroom#:#welcome_to_chat#:#Welcome to the chat room
 chatroom#:#whisper_to#:#Whisper to <b>#user#</b>
 chatroom_adm#:#chat_cannot_connect_to_server#:#ILIAS cannot build a socket connection to the chat server.
 chatroom_adm#:#chat_enabled#:#Enable Chat
-chatroom_adm#:#chat_smilies_dir_not_exists#:#Smilies directory does not exist.
-chatroom_adm#:#chat_smilies_initialized#:#Chat smileys initialized
-chatroom_adm#:#chatroom_add_smiley#:#Add Smiley
-chatroom_adm#:#chatroom_available_smilies#:#Available Smileys
-chatroom_adm#:#chatroom_confirm_delete_smiley#:#Are you sure you want to delete the selected smiley?
-chatroom_adm#:#chatroom_current_smiley_image#:#Current Smiley Icon
-chatroom_adm#:#chatroom_current_smiley_image_path#:#Current Smiley
-chatroom_adm#:#chatroom_delete_selected#:#Delete Selected Smileys
-chatroom_adm#:#chatroom_edit_smiley#:#Edit Smiley
-chatroom_adm#:#chatroom_image_path#:#Path to Smiley
-chatroom_adm#:#chatroom_smiley_image#:#Smiley
-chatroom_adm#:#chatroom_smiley_image_only_if_changed#:#Choose a new smiley icon only if the current one is to be replaced.
-chatroom_adm#:#chatroom_smiley_keywords#:#Keywords
-chatroom_adm#:#chatroom_smiley_keywords_one_per_line_note#:#One Keyword per Line
-chatroom_adm#:#chatroom_upload_smiley#:#Upload Smiley
 chatroom_adm#:#chatserver_settings_title#:#Chatserver Settings
 chatroom_adm#:#client_settings#:#General Settings
 chatroom_adm#:#general_settings_title#:#General Chat Settings
@@ -3036,7 +2977,6 @@ chatroom_adm#:#public_chat_permissions#:#Public Chat Room Permissions
 chatroom_adm#:#public_chat_settings#:#Public Chat Room Settings
 chatroom_adm#:#server_settings#:#Chatserver Settings
 chatroom_adm#:#settings_has_been_saved#:#Settings has been saved
-chatroom_adm#:#smiley#:#Smilies
 classification#:#clsfct_back_to_cat#:#Back to Category
 classification#:#clsfct_block_info#:#Your Selection filters the objects.
 classification#:#clsfct_block_title#:#Selection by Topics
@@ -3607,6 +3547,7 @@ common#:#bm#:#Bookmark
 common#:#bm_add_to_ilias#:#Add to ILIAS Bookmarks
 common#:#bmf#:#Bookmark Folder
 common#:#bold#:#Bold
+common#:#bold_action#:#Insert Bold - Click to insert bold text.
 common#:#bookings#:#Bookings
 common#:#bookmark_added#:#The Bookmark has been created.
 common#:#bookmark_folder_new#:#New Bookmark Folder
@@ -3626,6 +3567,7 @@ common#:#btn_undelete#:#Restore
 common#:#buddy_allow_to_contact_me_no#:#Doesn`t Receive Contact Requests
 common#:#buddy_allow_to_contact_me_yes#:#Receives Contact Requests
 common#:#building_export_file#:#Building Export File...
+common#:#bulletlist_action#:#Insert Bulletpoint-List - Click to insert a bulletpoint-list.
 common#:#by#:#By
 common#:#bytes#:#Bytes
 common#:#cal_from#:#From:
@@ -3781,6 +3723,7 @@ common#:#created#:#Creation Date
 common#:#cron_forum_notification#:#Send Forum Notifications
 common#:#cron_forum_notification_crob_desc#:#If enabled, all users who have enabled notifications for certain forums or forum threads will daily receive a notification mail about all new  or changed posts but no immediate notification for each submitted posting.
 common#:#cron_forum_notification_desc#:#If enabled, all users, who want to be informed about new posts in specified forum threads, will get notifications by mail.
+common#:#cron_forum_notification_disabled#:#Can't be disabled when the Cron Job is active.
 common#:#cron_jobs#:#Cron Jobs
 common#:#cron_lucene_index#:#Update Lucene search index
 common#:#cron_lucene_index_info#:#If enabled, the Lucene search index will be updated. Please configure the Lucene server in the Administration at 'Search and Find » Search', tab 'Lucene'.
@@ -4236,6 +4179,7 @@ common#:#grpr_edit#:#Edit Group Link
 common#:#grpr_edit_info#:#Please choose one group for creating a new group link.
 common#:#grpr_new#:#Create Group Link
 common#:#grpr_settings#:#Group Link Settings
+common#:#header_action#:#Insert Heading - Click to insert a heading.
 common#:#header_searchable#:#Searchable
 common#:#header_title#:#Header Title
 common#:#header_visible_registration#:#Visible in Registration
@@ -4377,6 +4321,7 @@ common#:#invisible_block#:#Invisible Block
 common#:#invisible_block_mess#:#You do not have the permission to view this block.
 common#:#ip_address#:#IP Address
 common#:#is_already_your#:#is already your
+common#:#italic_action#:#Insert Italic - Click to insert italic text.
 common#:#item#:#Item
 common#:#itgr_add#:#Add Item Group
 common#:#itgr_new#:#New Item Group
@@ -4439,6 +4384,7 @@ common#:#legend#:#Legend
 common#:#level#:#Level
 common#:#like#:#Like
 common#:#link#:#Link
+common#:#link_action#:#Insert Link - Click to insert a link.
 common#:#link_all#:#Link all
 common#:#link_check#:#Weblink Check
 common#:#link_check_message_b#:#If enabled, you will be informed about invalid links by mail.
@@ -4463,6 +4409,7 @@ common#:#links_user_name#:#ILIAS username
 common#:#links_value#:#Parameter Value
 common#:#list#:#List
 common#:#list_of_questions#:#List of Questions
+common#:#listaction_learning_progress_settings#:#Learning Progress Settings
 common#:#lm#:#Learning Module ILIAS
 common#:#lm_add#:#Add ILIAS Learning Module
 common#:#lm_added#:#ILIAS Learning Module added
@@ -4670,7 +4617,7 @@ common#:#msg_clear_clipboard#:#Clipboard cleared
 common#:#msg_cloned#:#Selected object(s) copied
 common#:#msg_copy_clipboard#:#Please select the location to which the selected objects should be pasted and click the button ‘Paste’.
 common#:#msg_copy_clipboard_container#:#Now, please select the desired location, where the selected objects should be pasted into and click the button ‘Continue’.
-common#:#msg_copy_clipboard_source#:#Now, please select the desired course or group, whose content should be copied and click the button ‘Continue’.
+common#:#msg_copy_clipboard_source#:#Now, please select the desired course or group, whose content should be copied and click the button ‘Next’.
 common#:#msg_cut_clipboard#:#Now, please select the desired location, where the selected objects should be pasted into and click the button ‘Paste’.
 common#:#msg_cut_copied#:#Selected object(s) moved.
 common#:#msg_deleted_export_files#:#Export file(s) deleted
@@ -4801,6 +4748,7 @@ common#:#notifications#:#Notifications
 common#:#nr_following_sessions#:#%1d following session(s)...
 common#:#num_of_selected_files#:#%s file(s) selected
 common#:#num_users#:#Number of Users
+common#:#numberedlist_action#:#Insert Numbered List - Click to insert a numbered list.
 common#:#obj#:#Object
 common#:#obj_accs#:#Accessibility
 common#:#obj_accs_desc#:#Settings for accessibility features.
@@ -5610,8 +5558,10 @@ common#:#soap_user_administration_desc#:#If enabled, ILIAS can be administrated 
 common#:#soap_wsdl_path#:#WSDL Path
 common#:#soap_wsdl_path_info#:#Please enter the path to the ilias wsdl file which should be used for the webservice. If you leave this field blank, the following path will be used per default:%s
 common#:#sort_ascending#:#Sort Ascending
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending
 common#:#sort_by_this_column#:#Sort by this column
 common#:#sort_descending#:#Sort Descending
+common#:#sort_descending_long#:#Change Sort Direction to Descending
 common#:#sort_inherit_prefix#:#Default
 common#:#sorting_asc#:#Ascending
 common#:#sorting_creation_header#:#By Creation Date
@@ -6013,6 +5963,7 @@ cont#:#cont_really_remove_skill_from_course#:#Do you really want to remove these
 cont#:#cont_select_fields#:#Select Fields
 cont#:#cont_show_more#:#Show More
 cont#:#cont_skill#:#Competence
+cont#:#cont_skill_ass_profiles#:#Assigned Profiles of Members
 cont#:#cont_skill_assigned_comp#:#Competence Selection
 cont#:#cont_skill_assigned_profiles#:#Profile Selection
 cont#:#cont_skill_deletion_not_possible#:#Deletion of global competence profiles is not possible. Please select only local competence profiles.
@@ -6022,7 +5973,7 @@ cont#:#cont_skill_no_profile_selected#:#Please select a profile.
 cont#:#cont_skill_no_skill#:#No value (Reset)
 cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".
 cont#:#cont_skill_profile#:#Profile
-cont#:#cont_skill_profiles#:#Assigned Profiles of Members
+cont#:#cont_skill_profiles#:#Competence Profiles
 cont#:#cont_skill_publish#:#Publish
 cont#:#cont_skill_publish_auto#:#Automatic
 cont#:#cont_skill_publish_auto_info#:#Competence assignments for members are immediately visible for members.
@@ -6032,8 +5983,8 @@ cont#:#cont_skill_really_delete_profile_from_list#:#Do you really want to delete
 cont#:#cont_skill_really_delete_profiles_from_list#:#Do you really want to delete these profiles?
 cont#:#cont_skill_really_remove_profile_from_list#:#Do you really want to remove this profile from the list?
 cont#:#cont_skill_really_remove_profiles_from_list#:#Do you really want to remove these profiles from the list?
+cont#:#cont_skill_records#:#Competence Records
 cont#:#cont_skill_removal_not_possible#:#Removing of local competence profiles is not possible. Please select only global competence profiles.
-cont#:#cont_skill_show#:#Show
 cont#:#cont_std_filter_title_1#:#Title
 cont#:#cont_std_filter_title_2#:#Description
 cont#:#cont_std_filter_title_3#:#Title/Description
@@ -6295,7 +6246,7 @@ content#:#cont_dir_deleted#:#Directory has been deleted.
 content#:#cont_dir_file#:#Directory/File
 content#:#cont_dir_renamed#:#Directory has been renamed.
 content#:#cont_disable_def_feedback#:#Disable Default Question Feedback
-content#:#cont_disable_def_feedback_info#:#If disabled, answered questions will not show any feedback for the learner. You need to provide custom feedbacks for your questions.
+content#:#cont_disable_def_feedback_info#:#The standard feedback for a question is not displayed after answering a question.
 content#:#cont_download#:#Download
 content#:#cont_download_no_download#:#Download will not be available to users, since the download feature is not activated.
 content#:#cont_download_no_menu#:#Download will not be available to users since the learning module menu is not activated.
@@ -6487,6 +6438,8 @@ content#:#cont_grid_width_s#:#Small
 content#:#cont_grid_width_s_info#:#E.g. smartphone
 content#:#cont_grid_width_xl#:#Extra Large
 content#:#cont_grid_width_xl_info#:#E.g. wide desktop
+content#:#cont_hacc_needs_height#:#Please set a content height for horizontal accordions.
+content#:#cont_hacc_needs_width#:#Please set a content width for horizontal accordions.
 content#:#cont_header#:#Header
 content#:#cont_height#:#Height in pixels
 content#:#cont_help_no_valid_tooltip_id#:#The tooltip ID you have entered was not valid.
@@ -6530,7 +6483,7 @@ content#:#cont_insert_mob#:#Insert Media Object
 content#:#cont_insert_my_courses#:#Insert My Courses
 content#:#cont_insert_page#:#Insert Page
 content#:#cont_insert_page_from_clip#:#Paste Pages from Clipboard
-content#:#cont_insert_pagelayout#:#Insert Template Page
+content#:#cont_insert_pagelayout#:#Insert Page from Template
 content#:#cont_insert_par#:#Insert Text
 content#:#cont_insert_profile#:#Publish Personal Data
 content#:#cont_insert_resources#:#Insert Resource List
@@ -6859,7 +6812,7 @@ content#:#cont_resource_type#:#type
 content#:#cont_resources#:#Resources
 content#:#cont_resources_of_type#:#Resources of Type
 content#:#cont_restrict_forw_nav#:#Restrict Forward Navigation
-content#:#cont_restrict_forw_nav_info#:#Learners cannot navigate to subsequent pages unless they answered all previous questions correctly.
+content#:#cont_restrict_forw_nav_info#:#A subsequent page can only be accessed when all test questions have been answered correctly on the current learning module page.
 content#:#cont_revision#:#Revision
 content#:#cont_right#:#Right
 content#:#cont_right_float#:#Right, Floating
@@ -7070,9 +7023,9 @@ content#:#cont_tree_fixed#:#Tree structure has been fixed.
 content#:#cont_tries#:#Question Behaviour
 content#:#cont_tries_remaining#:#Tries Remaining
 content#:#cont_tries_reset_on_visit#:#Reset on Page Visit
-content#:#cont_tries_reset_on_visit_info#:#Questions start with 0 number of tries each time a learner visits a page. Learner has to answer questions on every page visit.
+content#:#cont_tries_reset_on_visit_info#:#Each time a page with an embedded test question is called up, the maximum number of answer attempts is possible. The test questions can be answered again each time.
 content#:#cont_tries_store#:#Store Answer Status
-content#:#cont_tries_store_info#:#Number of tries are accumulated and stored. Correctly answered questions must not be answered again. Learners may run out of tries for questions.
+content#:#cont_tries_store_info#:#The number of answer attempts is recorded and saved. Correctly answered questions can no longer be answered. After reaching the maximum number of attempts, a further answer attempt is no longer possible.
 content#:#cont_trigger_area#:#Trigger Area
 content#:#cont_type#:#Type
 content#:#cont_type_not_allowed#:#Content type not allowed at this position
@@ -7410,12 +7363,12 @@ crs#:#crs_groupings#:#Course groupings
 crs#:#crs_groups_nr#:#Number of Memberships
 crs#:#crs_grp_added_grouping#:#Added new membership limitation.
 crs#:#crs_grp_already_assigned#:#You are already member of this grouping of courses.
-crs#:#crs_grp_assign_crs#:#Assign course
+crs#:#crs_grp_assign_crs#:#Assigned Objects of Membership Limitation
 crs#:#crs_grp_assignments#:#Assignments of Course Members to Groups
 crs#:#crs_grp_enter_title#:#Please enter a title.
 crs#:#crs_grp_info_reg#:#You can only register to one of this courses:
 crs#:#crs_grp_matriculation_required#:#This course grouping requires an unique matriculation number. <br />Please insert this value in your personal settings.
-crs#:#crs_grp_no_courses_assigned#:#No assigned courses.
+crs#:#crs_grp_no_courses_assigned#:#None
 crs#:#crs_grp_table_assigned_courses#:#Assigned courses
 crs#:#crs_header_archives#:#Course Archives
 crs#:#crs_header_delete_members#:#Would you like to remove the following members from this course?
@@ -7574,11 +7527,13 @@ crs#:#crs_member#:#Member
 crs#:#crs_member_administration#:#Edit Participants
 crs#:#crs_member_passed_status_changed#:#Passed Status Changed
 crs#:#crs_members#:#Members
-crs#:#crs_members_deleted#:#Deleted members
+crs#:#crs_members_deleted#:#Selected members were successfully removed from course.
 crs#:#crs_members_groups#:#Memberships in Groups
 crs#:#crs_members_map#:#Course Members Map
 crs#:#crs_members_print_title#:#Course members
 crs#:#crs_min_one_admin#:#There has to be at least one administrator assigned to this course.
+crs#:#crs_my_courses_groups_enabled#:#My Courses and Groups
+crs#:#crs_my_courses_groups_enabled_info#:#If activated, the section 'My Courses and Groups' is visible.
 crs#:#crs_new_status#:#Your new status is:
 crs#:#crs_new_subscription#:#User registered for course "%s"
 crs#:#crs_new_subscription_body#:#%s has registered for course "%s".
@@ -7980,6 +7935,8 @@ dash#:#dash_studyprogramme#:#My Study Programmes
 dash#:#dash_tile#:#Tile
 dash#:#dash_view_courses_groups#:#Section ‘My Courses and Groups’
 dash#:#dash_view_favourites#:#Section ‘Favourites’
+dash#:#favourites_disabled_info#:#Add to favorites is deactivated. You may change this inside the repository settings.
+dash#:#memberships_disabled_info#:#Subscriptions are deactivated. You may change this inside the course settings.
 dateplaner#:#Fr_long#:#Friday
 dateplaner#:#Fr_short#:#Fr
 dateplaner#:#Mo_long#:#Monday
@@ -8250,6 +8207,7 @@ dateplaner#:#cal_on_the#:#On the:
 dateplaner#:#cal_open_calendar#:#Open Calendar
 dateplaner#:#cal_origin#:#Origin
 dateplaner#:#cal_owner#:#Owner
+dateplaner#:#cal_period#:#Period
 dateplaner#:#cal_rec_err_limit#:#Please enter a valid number of appointments.
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.
 dateplaner#:#cal_recurrences#:#Recurrences
@@ -9476,6 +9434,10 @@ file#:#action_show#:#Redirect User to the Info Page
 file#:#add_icon#:#Add Icon
 file#:#amount_of_downloads#:#Downloads
 file#:#amount_of_downloads_since#:#%d times since %s
+file#:#copyright_custom#:#Custom
+file#:#copyright_custom_info#:#Choose a custom copyright which will be applied to all unzipped files of this archive.
+file#:#copyright_inherited#:#Inherited
+file#:#copyright_inherited_info#:#Apply the copyright of the zip archive to its unzipped files. <br \>Copyright of zip archive: %s.
 file#:#de_activate_icon#:#(De-)Activate
 file#:#download_ascii_filename#:#Use ASCII-only characters for downloaded filenames
 file#:#download_ascii_filename_info#:#Downloaded files should only have ASCII-characters in their filename. Deactivate to use all characters.
@@ -9522,7 +9484,6 @@ file#:#msg_success_icon_deactivated#:#Icon successfully deactivated.
 file#:#msg_success_icon_deletion#:#Icon successfully deleted.
 file#:#msg_success_icon_updated#:#Icon successfully updated.
 file#:#msg_unzip_success#:#Archive has been successfully unziped.
-file#:#not_yet_migrated#:#This file object has not yet been migrated and no new versions can be created. Please contact the administrators of the platform.
 file#:#on_click_action#:#Action on Click on Title
 file#:#preview_caption#:#Preview %sof %s
 file#:#preview_image_size_info#:#Maximum length of the preview images in px.
@@ -9530,6 +9491,7 @@ file#:#preview_persisting#:#Persist Preview Images
 file#:#preview_persisting_info#:#Generated previews will be stored, otherwise the previews will be generated on the fly
 file#:#replace_file_info#:#All previous file versions will be deleted.
 file#:#resource_id#:#Resource ID
+file#:#set_license_for_all_files#:#Set License for all Files
 file#:#show_amount_of_downloads#:#Show number of downloads
 file#:#show_amount_of_downloads_info#:#When active, the number of downloads will be visible on the info-page of a file object.
 file#:#storage_id#:#Storage ID
@@ -9758,10 +9720,6 @@ forum#:#frm_statistics_disabled_for_participants#:#Statistics are disabled for f
 forum#:#frm_statistics_enabled#:#Enable Statistics
 forum#:#frm_statistics_enabled_desc#:#Enable posting statistics for all participants
 forum#:#frm_statistics_ranking#:#Number of Postings
-forum#:#frm_sticky_threads_latest_at_top#:#‘Sticky Threads’ at Top
-forum#:#frm_sticky_threads_latest_at_top_info#:#‘Sticky Threads’ are always listed at the top of the list of threads. Within the ‘Sticky Threads’ the thread with the latest posting iss listed at top.
-forum#:#frm_sticky_threads_manual_sorting#:#Manual Sorting of ‘Sticky Threads’
-forum#:#frm_sticky_threads_manual_sorting_info#:#‘Sticky Threads’ are always listed at the top of the list of threads. The ‘Sticky Threads’ can be sorted manually.
 forum#:#frm_subject_setting#:#Subject setting
 forum#:#frm_sure_delete_threads#:#Are you sure you want to delete the following threads?
 forum#:#frm_sure_merge_threads#:#Are you sure you want to merge these threads? Warning: This action can not be undone.
@@ -9821,9 +9779,7 @@ forum#:#sort_by_date_desc#:#The thread is presented in a flat view. The postings
 forum#:#sort_by_posts#:#By Reply
 forum#:#sort_by_posts_desc#:#The thread is presented in a tree view. Replies to posts are shown in the order in which they relate to each other.
 forum#:#sorting#:#Sorting
-forum#:#sorting_manual_sticky#:#Manual sorting of sticky threads
 forum#:#sticky#:#Sticky
-forum#:#sticky_threads_sorting#:#Sticky Threads Sorting
 forum#:#sure_delete_drafts#:#Are you sure, you want to delete the selected drafts?
 forum#:#switch_threads_for_merge#:#The selected thread is older than the target thread. To ensure a successful merge, the source and target thread will be switched.
 forum#:#target_select#:#Select posting for limited view
@@ -9976,7 +9932,7 @@ grp#:#grp_mem_contacts#:#Tutorial Support
 grp#:#grp_mem_tbl_header#:#Group Participants
 grp#:#grp_member_administration#:#Edit Participants
 grp#:#grp_members#:#Members
-grp#:#grp_members_deleted#:#Deleted members
+grp#:#grp_members_deleted#:#Selected members were successfully removed from group.
 grp#:#grp_members_map#:#Group Members Map
 grp#:#grp_members_print_title#:#Group Members
 grp#:#grp_missing_grp_type#:#Please choose a group type.
@@ -10142,6 +10098,7 @@ iass#:#iass_record_template_explanation#:#Template for participant grading recor
 iass#:#iass_remove_user_qst#:#Should the participant really be removed?
 iass#:#iass_responsibility#:#Responsibility
 iass#:#iass_save_amend#:#Save Amended Record
+iass#:#iass_settings_availability#:#Availability
 iass#:#iass_settings_saved#:#Settings saved.
 iass#:#iass_sort_changetime_asc#:#Last Change ascending
 iass#:#iass_sort_changetime_desc#:#Last Change descending
@@ -10173,17 +10130,28 @@ init#:#init_error_redirect_info#:#Redirect not supported by context.
 irss#:#action_download#:#Download
 irss#:#action_goto#:#Open Resource
 irss#:#action_remove_resource#:#Delete Resource
+irss#:#action_remove_resource_msg#:#Do you want to delete the following Resource(s)?
 irss#:#action_show_revisions#:#Show Revisions
+irss#:#by_creation_date_asc#:#By Creation Date (Ascending)
+irss#:#by_creation_date_desc#:#By Creation Date (Descending)
+irss#:#by_size_asc#:#By File Size (Ascending)
+irss#:#by_size_desc#:#By File Size (Descending)
+irss#:#by_title_asc#:#By Title (Ascending)
+irss#:#by_title_desc#:#By Title (Descending)
 irss#:#creation_date#:#Creation Date (This Revision)
 irss#:#file_size#:#File Size (This Revision)
 irss#:#file_size_bigger_than#:#File Size greater than (MB)
 irss#:#full_size#:#Resource Size (All Revisions)
 irss#:#max_revision#:#Max. Revision
+irss#:#msg_upload#:#Drop Files to upload
 irss#:#resource_id#:#Resource ID
 irss#:#resource_no_stakeholder_uri#:#No Stakeholder provides a valid Link to the usage of this Resource.
 irss#:#resource_overview#:#Resource Overview
 irss#:#revision#:#Revision
 irss#:#revisions#:#Available Revisions
+irss#:#rid_deleted#:#File removed
+irss#:#rids_appended#:#Resource(s) added
+irss#:#rids_deleted#:#Resource(s) deleted
 irss#:#sorting#:#Default Ordering
 irss#:#sorting_1#:#By Title (Ascending)
 irss#:#sorting_2#:#By Title (Descending)
@@ -10195,6 +10163,8 @@ irss#:#stakeholders#:#Stakeholders
 irss#:#storage_id#:#Storage ID
 irss#:#storage_info#:#Storage Information
 irss#:#type#:#File Type
+irss#:#upload_field_title#:#Selected Files
+irss#:#upload_modal_title#:#Add Files
 itgr#:#itgr_always_open#:#Always Open
 itgr#:#itgr_assign_materials#:#Assign Materials
 itgr#:#itgr_assigned_materials#:#Assigned Materials
@@ -10481,12 +10451,14 @@ lso#:#first_access#:#First Access
 lso#:#last_access#:#Last Access
 lso#:#last_visited_step#:#Last visited Step
 lso#:#learner_view#:#Overview
+lso#:#lp_not_relevant_post_cond#:#currently not relevant for continuation
 lso#:#lso_activation_online_info#:#Set the Learning Sequence online to make it visible and available for Learning Sequence members. If not, only administrators and tutors will have access to it.
 lso#:#lso_at_least_one_admin#:#There has to be at least one learning sequence administrator.
 lso#:#lso_edit_permission#:#User can change permission settings
 lso#:#lso_header_delete_members#:#Would you like to remove the following members from this learning sequence?
 lso#:#lso_header_edit_members#:#Edit Members
 lso#:#lso_intropages_deprecationhint#:#You can edit the abstract and exit page in the tab "Content".
+lso#:#lso_legacy_info#:#The object will open in a new tab in your browser. Please return to this tab after processing/editing the contents. Reload the page if you have edited the content but the "Next" button remains disabled.
 lso#:#lso_mail_admission_new_bod#:#we are pleased to announce your registration for the learning sequence "%s".
 lso#:#lso_mail_admission_new_sub#:#Your registration for learning sequence "%s"
 lso#:#lso_mail_dismiss_bod#:#your membership in learning sequence "%s" has been terminated.
@@ -10516,7 +10488,7 @@ lso#:#lso_mainbar_button_label_curriculum#:#Learning Sequence
 lso#:#lso_mainbar_button_label_toc#:#Content
 lso#:#lso_mem_tbl_header#:#Learning Sequence Member
 lso#:#lso_member_administration#:#Edit Participants
-lso#:#lso_members_deleted#:#Deleted members
+lso#:#lso_members_deleted#:#Selected members were successfully removed from learning sequence.
 lso#:#lso_members_gallery#:#Learning Sequence Members Gallery
 lso#:#lso_members_print_title#:#Learning sequence members
 lso#:#lso_min_one_admin#:#There has to be at least one administrator assigned to this learning sequence.
@@ -10540,12 +10512,15 @@ lso#:#lso_print_list#:#Generate list
 lso#:#lso_read#:#User has read access to Learning Sequence
 lso#:#lso_search_users#:#Search Users
 lso#:#lso_settings_availability#:#Availability
+lso#:#lso_settings_availability_error#:#The end date can not be earlier than the start date
 lso#:#lso_settings_extro#:#Edit Exit Page
 lso#:#lso_settings_intro#:#Edit Intro Page
 lso#:#lso_settings_old_extro#:#View Old Exit Page
 lso#:#lso_settings_old_intro#:#View Old Intro Page
 lso#:#lso_show_members_info#:#Member Gallery available for users
 lso#:#lso_start_item#:#Open %s
+lso#:#lso_toast_completed_desc#:#You have completed this Learning Sequence. You might still keep looking through the content.
+lso#:#lso_toast_completed_title#:#Congratulations
 lso#:#lso_users_already_assigned#:#The user is already assigned to this learning sequence
 lso#:#mail_lso_roles#:#Send mails to roles of learning sequence.
 lso#:#manage#:#Manage
@@ -10553,9 +10528,11 @@ lso#:#manage_content_maintab#:#Content
 lso#:#members_gallery#:#Member Gallery
 lso#:#no_entries_selected_for_delete#:#There has to be at least one entry selected.
 lso#:#not_finished#:#Not Finished
+lso#:#notification_lso_completed_title#:#You completed the Learning Sequence %s.
 lso#:#participate#:#Subscribe
 lso#:#show_summary#:#Info
 lso#:#table_actions#:#Actions
+lso#:#table_lp_settings#:#Learning Progress Settings
 lso#:#table_may_proceed#:#User may proceed
 lso#:#table_online#:#Online
 lso#:#table_position#:#Position
@@ -10645,7 +10622,7 @@ lti#:#launch_method_own_win_info#:#The content is opened in the same window and 
 lti#:#launched#:#Resource was already launched.
 lti#:#learning_progress_options#:#Options for Learning Progress
 lti#:#lm_only_one_download_per_type#:#Only one file per type (XML, HTML, SCORM) can be released publicly.
-lti#:#lti13_hints#:#Hints
+lti#:#lti13_hints#:#If the tool was created without dynamic registration, the following data must be entered for the tool to run.
 lti#:#lti_13_client_id#:#Client-ID
 lti#:#lti_13_deployment_id#:#Deployment-ID
 lti#:#lti_13_platform_id#:#Platform-ID
@@ -10733,6 +10710,7 @@ lti#:#lti_con_tool_url#:#Login URL
 lti#:#lti_con_version#:#LTI Version
 lti#:#lti_con_version_1.1#:#Version 1.1
 lti#:#lti_con_version_1.3#:#Version 1.3
+lti#:#lti_con_version_1.3_before_id#:#If dynamic registration is not used, after entering the data provided by the tool, additional data will appear that must be entered with the tool.
 lti#:#lti_confirm_delete_providers#:#Are you sure that you want to delete the following provider(s)?
 lti#:#lti_consumer#:#Release for
 lti#:#lti_consumer_created#:#Consumer created
@@ -11099,7 +11077,7 @@ mail#:#send_mail_members#:#All Members
 mail#:#send_mail_to#:#Mail to
 mail#:#send_mail_tutors#:#All Tutors
 mail#:#show_mail_settings#:#Show Mail Settings
-mail#:#show_mail_settings_info#:#If enabled, the user's `Mail Settings` are accessible via the `Personal Settings` or `Mail` section.
+mail#:#show_mail_settings_info#:#'Mail Settings' are visible via the 'Personal Settings' or 'Mail' section. The permission to change these settings depends on the configuration of the user profile in ILIAS. If users do not have the permission to change these profile settings the global default is applied even if users were able to and did change their personal mail settings in the past.
 mail#:#system_notification_installation_changed_by#:#Changed By
 mail#:#usrFieldChange_second_mail_visible_in_personal_data#:#You have changed the attribute "%s" of the field "%s".<br>This leads to all accounts settings being reset to "receive on primary address" for external delivery,<br>not only for all new accounts but also dismissing the currently active settings made by users.
 maps#:#configure_geolocation#:#Please finish the geolocation configuration in the "Third Party Software" administration menu to enable address search.
@@ -12279,6 +12257,9 @@ notifications_adm#:#osd_vanish_desc#:#Visible time of a notification on the scre
 obj#:#cont_filter_empty#:#Please use the filter to see any objects.
 obj#:#cont_skll_published#:#All assignments have been published.
 obj#:#cont_skll_published_some_not#:#All given assignments have been published. Some users lacked competence assignments, thus no assignments could be published for them.
+obj#:#copy_container_page_no_label#:#Don't Copy Content Page
+obj#:#copy_container_page_yes_byline#:#The content page and corresponding style settings of the source object will be copied to this object. Pre-existing page elements will be overwritten.
+obj#:#copy_container_page_yes_label#:#Copy Content Page
 obj#:#custom_icon#:#Custom Icon
 obj#:#edit_questions#:#Edit Questions
 obj#:#obj_activate_content_lang#:#Activate Translation for Page Editing
@@ -12363,8 +12344,6 @@ orgu#:#employee#:#Employee
 orgu#:#ext_id#:#External ID
 orgu#:#ext_id_updated#:#The external ID has been updated successfully.
 orgu#:#form_title_org_default_permissions_update#:#Default Permissions
-orgu#:#il_orgu_employee#:#Employee
-orgu#:#il_orgu_superior#:#Superior
 orgu#:#import_failed#:#The import failed. Make sure your file is in the xml format and has a valid structure.
 orgu#:#import_successful#:#The import terminated successfully. Created: %s, edited/moved: %s, deleted: %s.
 orgu#:#import_terminated_with_errors#:#The import terminated with errors.
@@ -12649,6 +12628,7 @@ prg#:#auto_memberships#:#Membership Automation
 prg#:#category#:#Category
 prg#:#completion_date#:#Completion Date
 prg#:#confirm_to_remove_selected_assignments#:#Do you really want to remove the user assignment(s)?
+prg#:#cont_ed_insert_prgstatusinfo#:#Insert Study Progamme Statusinformation
 prg#:#content_automation#:#Content Automation
 prg#:#content_automation_title#:#Automatically add and remove Courses from these categories
 prg#:#could_not_add_users_no_permissons#:#Could not assign %d Users due to lacking permissions.
@@ -12703,6 +12683,13 @@ prg#:#obj_prg_select#:#-- Please select a study programme --
 prg#:#optgrp_label_restart#:#Restart
 prg#:#optgrp_label_validity#:#Expiry
 prg#:#orgu#:#Organisational Unit
+prg#:#pc_prgstatus_edit_qualification#:#Re-processing required from
+prg#:#pc_prgstatus_expiration_date#:#Expiry date
+prg#:#pc_prgstatus_qualification_headline#:#Status of your qualification
+prg#:#pc_prgstatus_status_no_qualification#:#No qualification
+prg#:#pc_prgstatus_status_valid_qualification#:#Valid
+prg#:#pc_prgstatus_text_no_qualification#:#Your qualification is not valid
+prg#:#pc_prgstatus_unlimited_validation#:#Unlimited validity
 prg#:#percentage#:#%
 prg#:#prg_access_by_orgu#:#Access Control by Organisation Unit Positions
 prg#:#prg_access_by_orgu_byline#:#If enabled, additional access control rules can be defined by positions in organisational units.
@@ -13138,6 +13125,7 @@ ps#:#ps_security_protection#:#Security Settings
 ps#:#ps_select_one#:#Please select one export file
 ps#:#ps_show_crs_access#:#Show last access time of course participants
 ps#:#ps_show_grp_access#:#Show last access time of group participants
+ps#:#ps_show_lso_access#:#Show last access time of learning sequence participants
 ps#:#ps_size#:#Files Size
 ps#:#ps_type_select#:#Select Field
 ps#:#ps_type_select_long#:#Selection Box (Fixed Values)
@@ -13366,7 +13354,9 @@ rbac#:#crs_visible#:#Course is visible
 rbac#:#crs_write#:#User can edit course settings and manage content
 rbac#:#crsr_copy#:#User can copy course link
 rbac#:#crsr_delete#:#User can move or delete course link
+rbac#:#crsr_edit_learning_progress#:#User can edit learning progress settings
 rbac#:#crsr_edit_permission#:#User can change permission settings
+rbac#:#crsr_read_learning_progress#:#User can view learning progress of other users
 rbac#:#crsr_visible#:#Course link is visible
 rbac#:#crsr_write#:#User can edit settings of course link
 rbac#:#crss_edit_permission#:#User can change permission settings in Course administration
@@ -13525,8 +13515,6 @@ rbac#:#iass_read_learning_progress#:#View learning progress information of an In
 rbac#:#iass_visible#:#Individual Assessment is visible
 rbac#:#iass_write#:#Edit an Individual Assessment
 rbac#:#il_lti_global_role#:#LTI User
-rbac#:#il_orgu_employee#:#Organisational Unit Employee
-rbac#:#il_orgu_superior#:#Organisational Unit Superior
 rbac#:#il_sess_participant#:#Session Participant
 rbac#:#il_sess_status_closed#:#Non-Participant Closed Session
 rbac#:#ilias_id#:#ILIAS-ID
@@ -14891,6 +14879,8 @@ skmg#:#skmg_confirm_level_resources_removal#:#Do you really want to remove the f
 skmg#:#skmg_confirm_remove_level_ass#:#So you really want to remove the following competence levels from the profile?
 skmg#:#skmg_confirm_user_removal#:#Do you really want to remove the following users from this profile?
 skmg#:#skmg_cont_profiles_info#:#In this view, you can select the competence profiles with competence entries, which are related to the currently open object (course/group). To get to the global view with all competence profiles you are assigned to and all competence entries, click on the link below.
+skmg#:#skmg_cont_profiles_info_empty#:#There are no competence profiles related to the currently open object.
+skmg#:#skmg_cont_records_info_empty#:#There are no competences related to the currently opened object.
 skmg#:#skmg_context_global#:#Global
 skmg#:#skmg_context_local#:#Local
 skmg#:#skmg_create_sctp#:#Create Template Category
@@ -14957,8 +14947,10 @@ skmg#:#skmg_previous_step#:#Previous Step
 skmg#:#skmg_profile#:#Profile
 skmg#:#skmg_really_delete_levels#:#Do you really want to delete the following competence levels?
 skmg#:#skmg_really_remove_skills#:#Do you really want to remove the following competences from your list?
-skmg#:#skmg_recommended_learning_material#:#Learning Materials for target achievement
-skmg#:#skmg_recommended_learning_material_info#:#Select exactly one of the following learning materials. Please work through it to achieve the competence target.
+skmg#:#skmg_recommended_learning_material_crs#:#Achieve your targets in this course
+skmg#:#skmg_recommended_learning_material_global#:#Achieve your targets
+skmg#:#skmg_recommended_learning_material_grp#:#Achieve your targets in this group
+skmg#:#skmg_recommended_learning_material_info#:#Please work through the following learning materials to achieve the competence target. Select exactly one learning material per competence level.
 skmg#:#skmg_refresh_view#:#Refresh
 skmg#:#skmg_remove_levels#:#Remove Levels
 skmg#:#skmg_remove_skill#:#Remove Competence
@@ -14994,7 +14986,8 @@ skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to se
 skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the competence target for the affected competences until a self-evaluation is done.
 skmg#:#skmg_skill_no_needs_impr#:#Competence target achieved!
 skmg#:#skmg_skill_no_needs_impr_info#:#You achieved the target for this competence.
-skmg#:#skmg_skill_profile_comparison#:#Profile Comparison
+skmg#:#skmg_skill_overview#:#Overview
+skmg#:#skmg_skill_profile_records#:#Competence Records
 skmg#:#skmg_skill_profiles#:#Competence Profiles
 skmg#:#skmg_skill_template#:#Competence Template
 skmg#:#skmg_skill_templates#:#Competence Templates
@@ -16646,6 +16639,11 @@ trac#:#user_total#:#User Total
 trac#:#view_mode#:#View Mode
 tstv#:#tstv_create#:#Create Test Certificate
 tstv#:#tstv_create_info#:#Select a completed test to generate a certificate for it.
+ui#:#datatable_multiactionmodal_actionlabel#:#operation
+ui#:#datatable_multiactionmodal_buttonlabel#:#Execute
+ui#:#datatable_multiactionmodal_listentry#:#apply to all objects
+ui#:#datatable_multiactionmodal_msg#:#<b>Caution!</b> multiple objects affected.
+ui#:#datatable_multiactionmodal_title#:#Operation on multiple objects
 ui#:#datetime_required#:#Time/Date required
 ui#:#duration_default_label_end#:#end
 ui#:#duration_default_label_start#:#start
@@ -16662,6 +16660,8 @@ ui#:#ui_file_input_invalid_size#:#File exceeds the maximum size of %s.
 ui#:#ui_invalid_url#:#Invalid URL-format
 ui#:#ui_link_label#:#Label
 ui#:#ui_link_url#:#URL
+ui#:#ui_md_input_edit#:#Edit
+ui#:#ui_md_input_view#:#View
 ui#:#ui_numeric_only#:#Please insert a whole number.
 ui#:#ui_tag_required#:#Please insert at least one tag.
 ui#:#ui_transcription#:#Transcript
@@ -16676,8 +16676,8 @@ user#:#clipboard_user_added#:#Added selected users to clipboard.
 user#:#confirm_delete_starting_point#:#Are you sure you want to delete this rule?
 user#:#create_starting_point#:#Create Rule
 user#:#criteria#:#Criteria
-user#:#del_mail_body#:#Hello %1$s, %2$s you haven't logged in for a long period of time, on %3$s. So your account will be probably deleted on %4$s. You have to login again to prevent the deletion of your account.
-user#:#del_mail_subject#:#(ILIAS) – Your account will be deleted
+user#:#del_mail_body#:#Hello %1$s, %2$s You have not logged in to %3$s for a long time. Therefore, your ILIAS account is expected to be deleted on %4$s. In order to keep your ILIAS account, you must log in again before the aforementioned date.
+user#:#del_mail_subject#:#Your ILIAS account will be deleted soon
 user#:#delete_inactive_user_accounts_frequency#:#Frequency
 user#:#delete_inactive_user_accounts_frequency_desc#:#Frequency, in which the deletion and e-mail distribution will be tested.
 user#:#editing_this_role#:#Role
@@ -16691,6 +16691,7 @@ user#:#interests_general#:#General Interests
 user#:#interests_help_looking#:#Looking For Help
 user#:#interests_help_offered#:#Offering Help
 user#:#msg_spoint_not_modified#:#Starting point not modified
+user#:#no_deactivate_yourself#:#You cannot deactivate your own user account.
 user#:#obj_ref_id_not_exist#:#The entered Reference-Id does not exist
 user#:#restrict_user_access#:#Restricted Access to User Accounts
 user#:#restrict_user_access_info#:#Access to local and global user accounts is restricted to roles that have the permission ‘Read Access to User Accounts’.

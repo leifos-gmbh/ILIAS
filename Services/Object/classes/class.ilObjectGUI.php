@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use Psr\Http\Message\ServerRequestInterface;
 use ILIAS\HTTP\Wrapper\ArrayBasedRequestWrapper;
@@ -290,11 +290,6 @@ class ilObjectGUI
                 $class = strtolower("ilObj" . $class_name . "GUI");
                 $class_path = $this->ctrl->lookupClassPath($class);
                 $class_name = $this->ctrl->getClassForClasspath($class_path);
-
-//                $parent_gui_obj = new $class_name($this->requested_ref_id, true, false); // TODO: this fails in many cases since the parameters of the constructor are not known
-                // the next line prevents the header action menu being shown
-//                $parent_gui_obj->setCreationMode(true);
-//                $parent_gui_obj->setTitleAndDescription();
             }
         } else {
             $this->setTitleAndDescription();
@@ -781,6 +776,19 @@ class ilObjectGUI
      */
     protected function addDidacticTemplateOptions(array &$a_options): void
     {
+    }
+
+    protected function addAdoptContentLinkToToolbar(): void
+    {
+        $this->toolbar->addComponent(
+            $this->ui->factory()->link()->standard(
+                $this->lng->txt('cntr_adopt_content'),
+                $this->ctrl->getLinkTargetByClass(
+                    'ilObjectCopyGUI',
+                    'adoptContent'
+                )
+            )
+        );
     }
 
     /**

@@ -61,8 +61,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                     sel = document.selection.createRange();
                     sel.text = code_start + sel.text + code_end;
                     this.focus();
-                }
-                else if (this.selectionStart || this.selectionStart == '0') {
+                } else if (this.selectionStart || this.selectionStart == '0') {
                     //For browsers like Firefox and Webkit based
                     var startPos = this.selectionStart;
                     var endPos = this.selectionEnd;
@@ -130,28 +129,28 @@ JS;
     {
         $hasErrors = (!$always) ? $this->editQuestion(true) : false;
         if (!$hasErrors) {
-            $cloze_text = $this->object->getHtmlQuestionContentPurifier()->purify($_POST['cloze_text']);
-
+            $cloze_text = $this->object->getHtmlQuestionContentPurifier()->purify(
+                $this->request->raw('cloze_text')
+            );
             $cloze_text = $this->removeIndizesFromGapText($cloze_text);
-            //$_POST['cloze_text'] = $cloze_text;
-            $this->object->setQuestion($_POST['question']);
+
+            $this->object->setQuestion(
+                $this->request->raw('question')
+            );
 
             $this->writeQuestionGenericPostData();
             $this->object->setClozeText($cloze_text);
-            $this->object->setTextgapRating($_POST["textgap_rating"]);
-            $this->object->setIdenticalScoring((bool) ($_POST["identical_scoring"] ?? false));
-            $this->object->setFixedTextLength((int) ($_POST["fixedTextLength"] ?? 0));
-            //$this->writeQuestionSpecificPostData(new ilPropertyFormGUI());
-            //$this->object->flushGaps();
+            $this->object->setTextgapRating($this->request->raw('textgap_rating'));
+            $this->object->setIdenticalScoring((bool) ($this->request->raw('identical_scoring') ?? false));
+            $this->object->setFixedTextLength(($this->request->int('fixedTextLength') ?? 0));
             $this->writeAnswerSpecificPostData(new ilPropertyFormGUI());
             $this->saveTaxonomyAssignments();
             return 0;
         }
 
-        $cloze_text = $_POST['cloze_text'];
-        $cloze_text = $this->applyIndizesToGapText($cloze_text);
-        // Mantis 33795 - Candidate
-        //$_POST['cloze_text'] = $cloze_text;
+        $cloze_text = $this->applyIndizesToGapText(
+            $this->request->raw('cloze_text')
+        );
         return 1;
     }
 
@@ -320,7 +319,6 @@ JS;
         $form->setTableWidth("100%");
         $form->setId("assclozetest");
 
-        // title, author, description, question, working time (assessment mode)
         $this->addBasicQuestionFormProperties($form);
         $this->populateQuestionSpecificFormPart($form);
         $this->populateAnswerSpecificFormPart($form);
@@ -346,7 +344,7 @@ JS;
         return $errors;
     }
 
-    public function addBasicQuestionFormProperties(ilPropertyFormGUI $form): int
+    public function addBasicQuestionFormProperties(ilPropertyFormGUI $form): void
     {
         // title
         $title = new ilTextInputGUI($this->lng->txt("title"), "title");
@@ -404,46 +402,7 @@ JS;
             $question->setUseTagsForRteOnly(false);
         }
         $form->addItem($question);
-
-        $nr_tries = 0;
-        if (!$this->object->getSelfAssessmentEditingMode()) {
-            // duration
-            $duration = new ilDurationInputGUI($this->lng->txt("working_time"), "Estimated");
-            $duration->setShowHours(true);
-            $duration->setShowMinutes(true);
-            $duration->setShowSeconds(true);
-            $ewt = $this->object->getEstimatedWorkingTime();
-            $duration->setHours($ewt["h"]);
-            $duration->setMinutes($ewt["m"]);
-            $duration->setSeconds($ewt["s"]);
-            $duration->setRequired(false);
-            $form->addItem($duration);
-        } else {
-            // number of tries
-            if (strlen($this->object->getNrOfTries())) {
-                $nr_tries = $this->object->getNrOfTries();
-            } else {
-                $nr_tries = $this->object->getDefaultNrOfTries();
-            }
-            /*if ($nr_tries <= 0)
-            {
-                $nr_tries = 1;
-            }*/
-
-            if ($nr_tries < 0) {
-                $nr_tries = 0;
-            }
-
-            $ni = new ilNumberInputGUI($this->lng->txt("qst_nr_of_tries"), "nr_of_tries");
-            $ni->setValue($nr_tries);
-            //$ni->setMinValue(1);
-            $ni->setMinValue(0);
-            $ni->setSize(5);
-            $ni->setMaxLength(5);
-            $ni->setRequired(true);
-            $form->addItem($ni);
-        }
-        return $nr_tries;
+        $this->addNumberOfTriesToFormIfNecessary($form);
     }
 
     public function populateQuestionSpecificFormPart(ilPropertyFormGUI $form): ilPropertyFormGUI
@@ -553,7 +512,7 @@ JS;
             $json = $this->populateJSON();
             $assClozeGapCombinationObject = new assClozeGapCombination();
             $combination_exists = $assClozeGapCombinationObject->combinationExistsForQid($this->object->getId());
-            $combinations = array();
+            $combinations = [];
             if ($combination_exists) {
                 $combinations = $assClozeGapCombinationObject->loadFromDb($this->object->getId());
             }
@@ -570,7 +529,7 @@ JS;
     protected function populateJSON(): array
     {
         $gap = $this->object->getGaps();
-        $array = array();
+        $array = [];
         if ($gap == null) {
             return $array;
         }
@@ -579,7 +538,7 @@ JS;
         foreach ($gap as $content) {
             $shuffle = false;
             $value = $content->getItemsRaw();
-            $items = array();
+            $items = [];
             for ($j = 0, $jMax = count($value); $j < $jMax; $j++) {
                 if ($content->isNumericGap()) {
                     $items[$j] = array(
@@ -861,7 +820,7 @@ JS;
      */
     public function getPreview($show_question_only = false, $showInlineFeedback = false): string
     {
-        $user_solution = is_object($this->getPreviewSession()) ? (array) $this->getPreviewSession()->getParticipantsSolution() : array();
+        $user_solution = is_object($this->getPreviewSession()) ? (array) $this->getPreviewSession()->getParticipantsSolution() : [];
 
         $template = new ilTemplate("tpl.il_as_qpl_cloze_question_output.html", true, true, "Modules/TestQuestionPool");
         $output = $this->object->getClozeTextHTML();
@@ -968,12 +927,12 @@ JS;
         $show_question_text = true
     ): string {
         // get the solution of the user for the active pass or from the last pass if allowed
-        $user_solution = array();
+        $user_solution = [];
         if (($active_id > 0) && (!$show_correct_solution)) {
             // get the solutions of a user
             $user_solution = $this->object->getSolutionValues($active_id, $pass);
             if (!is_array($user_solution)) {
-                $user_solution = array();
+                $user_solution = [];
             }
         }
 
@@ -984,7 +943,7 @@ JS;
 
         foreach ($this->object->getGaps() as $gap_index => $gap) {
             $gaptemplate = new ilTemplate("tpl.il_as_qpl_cloze_question_output_solution_gap.html", true, true, "Modules/TestQuestionPool");
-            $found = array();
+            $found = [];
             foreach ($user_solution as $solutionarray) {
                 if ($solutionarray["value1"] == $gap_index) {
                     $found = $solutionarray;
@@ -999,7 +958,7 @@ JS;
 
                     if (count($check_for_gap_combinations) != 0) {
                         $gaps_used_in_combination = $assClozeGapCombinationObject->getGapsWhichAreUsedInCombination($this->object->getId());
-                        $custom_user_solution = array();
+                        $custom_user_solution = [];
                         if (array_key_exists($gap_index, $gaps_used_in_combination)) {
                             $combination_id = $gaps_used_in_combination[$gap_index];
                             foreach ($gaps_used_in_combination as $key => $value) {
@@ -1007,7 +966,7 @@ JS;
                                 if ($value == $combination_id) {
                                     foreach ($user_solution as $solution_key => $solution_value) {
                                         if ($solution_value['value1'] == $key) {
-                                            $result_row = array();
+                                            $result_row = [];
                                             $result_row['gap_id'] = $solution_value['value1'];
                                             $result_row['value'] = $solution_value['value2'];
                                             array_push($custom_user_solution, $result_row);
@@ -1207,15 +1166,15 @@ JS;
 
     public function getTestOutput(
         $active_id,
-                // hey: prevPassSolutions - will be always available from now on
-                $pass,
-                // hey.
-                $is_postponed = false,
+        // hey: prevPassSolutions - will be always available from now on
+        $pass,
+        // hey.
+        $is_postponed = false,
         $use_post_solutions = false,
         $show_feedback = false
     ): string {
         // get the solution of the user for the active pass or from the last pass if allowed
-        $user_solution = array();
+        $user_solution = [];
         if ($use_post_solutions !== false) {
             $indexedSolution = $this->object->fetchSolutionSubmit($use_post_solutions);
             $user_solution = $this->object->fetchValuePairsFromIndexedValues($indexedSolution);
@@ -1223,7 +1182,7 @@ JS;
             $user_solution = $this->object->getTestOutputSolutions($active_id, $pass);
             // hey.
             if (!is_array($user_solution)) {
-                $user_solution = array();
+                $user_solution = [];
             }
         }
 
@@ -1344,7 +1303,7 @@ JS;
      */
     public function getAfterParticipationSuppressionAnswerPostVars(): array
     {
-        return array();
+        return [];
     }
 
     /**
@@ -1358,7 +1317,7 @@ JS;
      */
     public function getAfterParticipationSuppressionQuestionPostVars(): array
     {
-        return array();
+        return [];
     }
 
     /**
@@ -1369,8 +1328,8 @@ JS;
      */
     public function getAggregatedAnswersView(array $relevant_answers): string
     {
-        $overview = array();
-        $aggregation = array();
+        $overview = [];
+        $aggregation = [];
         foreach ($relevant_answers as $answer) {
             $overview[$answer['active_fi']][$answer['pass']][$answer['value1']] = $answer['value2'];
         }
@@ -1399,7 +1358,7 @@ JS;
             }
 
             if ($gap->type == CLOZE_TEXT) {
-                $present_elements = array();
+                $present_elements = [];
                 foreach ($gap->getItems($this->randomGroup->shuffleArray(new Seed\RandomSeed())) as $item) {
                     /** @var assAnswerCloze $item */
                     $present_elements[] = $item->getAnswertext();
@@ -1581,7 +1540,7 @@ JS;
 
     public function getAnswersFrequency($relevantAnswers, $questionIndex): array
     {
-        $answers = array();
+        $answers = [];
 
         foreach ($relevantAnswers as $row) {
             if ($row['value1'] != $questionIndex) {
@@ -1619,21 +1578,21 @@ JS;
 
     protected function getGapCombinations(): array
     {
-        $combinations = array();
+        $combinations = [];
 
         foreach ($this->object->getGapCombinations() as $c) {
             if (!isset($combinations[$c['cid']])) {
-                $combinations[$c['cid']] = array();
+                $combinations[$c['cid']] = [];
             }
 
             if (!isset($combinations[$c['cid']][$c['row_id']])) {
                 $combinations[$c['cid']][$c['row_id']] = array(
-                    'gaps' => array(), 'points' => $c['points'],
+                    'gaps' => [], 'points' => $c['points'],
                 );
             }
 
             if (!isset($combinations[$c['cid']][$c['row_id']]['gaps'][$c['gap_fi']])) {
-                $combinations[$c['cid']][$c['row_id']]['gaps'][$c['gap_fi']] = array();
+                $combinations[$c['cid']][$c['row_id']]['gaps'][$c['gap_fi']] = [];
             }
 
             $combinations[$c['cid']][$c['row_id']]['gaps'][$c['gap_fi']] = $c['answer'];
@@ -1784,16 +1743,16 @@ JS;
     {
         // please dont ask (!) -.-
 
-        $combinationPoints = array('points' => array(), 'select' => array());
-        $combinationValues = array();
+        $combinationPoints = array('points' => [], 'select' => []);
+        $combinationValues = [];
 
         foreach ($this->getGapCombinations() as $combiId => $combi) {
             $values = $form->getItemByPostVar('combination_' . $combiId)->getValues();
 
             if (!isset($combinationPoints['points'][$combiId])) {
-                $combinationPoints['points'][$combiId] = array();
-                $combinationPoints['select'][$combiId] = array();
-                $combinationValues[$combiId] = array();
+                $combinationPoints['points'][$combiId] = [];
+                $combinationPoints['select'][$combiId] = [];
+                $combinationValues[$combiId] = [];
             }
 
             foreach ($combi as $varId => $variant) {

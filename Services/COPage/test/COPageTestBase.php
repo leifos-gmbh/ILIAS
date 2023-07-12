@@ -23,6 +23,8 @@ use PHPUnit\Framework\TestCase;
  */
 class COPageTestBase extends TestCase
 {
+    protected int $pc_cnt;
+
     /**
      * @param mixed $value
      */
@@ -120,6 +122,58 @@ class COPageTestBase extends TestCase
             "refinery",
             $refinery_mock
         );
+
+        $this->pc_cnt = 1;
+    }
+
+    /**
+     * @return ContentIdGenerator|(ContentIdGenerator&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getIdGeneratorMock()
+    {
+        $gen = $this->createMock(\ILIAS\COPage\ID\ContentIdGenerator::class);
+        $gen->method("generate")
+            ->willReturnCallback(function () {
+                return str_pad(
+                    (string) $this->pc_cnt++,
+                    32,
+                    "0",
+                    STR_PAD_LEFT
+                );
+            });
+        return $gen;
+    }
+
+    protected function getPCDefinition(): ilUnitTestPCDefinition
+    {
+        return new ilUnitTestPCDefinition();
+    }
+
+    protected function setPCIdCnt(int $cnt): void
+    {
+        $this->pc_cnt = $cnt;
+    }
+
+    protected function getIDManager(\ilPageObject $page): \ILIAS\COPage\ID\ContentIdManager
+    {
+        return new \ILIAS\COPage\ID\ContentIdManager(
+            $page,
+            $this->getIdGeneratorMock()
+        );
+    }
+
+    protected function insertParagraphAt(
+        \ilPageObject $page,
+        string $hier_id,
+        string $text = ""
+    ) {
+        $pc = new \ilPCParagraph($page);
+        $pc->create($page, $hier_id);
+        $pc->setLanguage("en");
+        if ($text !== "") {
+            $pc->setText($text);
+        }
+        $page->addHierIDs();
     }
 
     protected function tearDown(): void
@@ -148,9 +202,36 @@ class COPageTestBase extends TestCase
     protected function getEmptyPageWithDom(): ilUnitTestPageObject
     {
         $page = new ilUnitTestPageObject(0);
+        $page->setContentIdManager($this->getIDManager($page));
         $page->setXMLContent("<PageObject></PageObject>");
         $page->buildDom();
         $page->addHierIDs();
         return $page;
+    }
+
+    // see saveJs in ilPCParagraph
+    protected function legacyHtmlToXml(string $content): string
+    {
+        $content = str_replace("<br>", "<br />", $content);
+        $content = ilPCParagraph::handleAjaxContent($content);
+        $content = ilPCParagraph::_input2xml($content["text"], true, false);
+        $content = ilPCParagraph::handleAjaxContentPost($content);
+        return $content;
+    }
+
+    /**
+     * @return (ilObjMediaObject&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getMediaObjectMock()
+    {
+        $media_item = new ilMediaItem();
+        $media_item->setWidth("100");
+        $media_item->setHeight("50");
+        $media_object = $this->getMockBuilder(ilObjMediaObject::class)
+                             ->disableOriginalConstructor()
+                             ->getMock();
+        $media_object->method("getMediaItem")
+                     ->willReturnCallback(fn () => $media_item);
+        return $media_object;
     }
 }

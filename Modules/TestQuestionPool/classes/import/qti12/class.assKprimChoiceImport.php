@@ -35,7 +35,6 @@ class assKprimChoiceImport extends assQuestionImport
 
         ilSession::clear('import_mob_xhtml');
 
-        $duration = $item->getDuration();
         $shuffle = 0;
         $answers = array();
 
@@ -198,13 +197,12 @@ class assKprimChoiceImport extends assQuestionImport
         $this->object->setOwner($ilUser->getId());
         $this->object->setQuestion($this->object->QTIMaterialToString($item->getQuestiontext()));
         $this->object->setObjId($questionpool_id);
-        $this->object->setEstimatedWorkingTime($duration["h"] ?? 0, $duration["m"] ?? 0, $duration["s"] ?? 0);
         $this->object->setShuffleAnswersEnabled($shuffle);
         $this->object->setAnswerType($item->getMetadataEntry("answer_type"));
         $this->object->setOptionLabel($item->getMetadataEntry("option_label_setting"));
         $this->object->setCustomTrueOptionLabel($item->getMetadataEntry("custom_true_option_label"));
         $this->object->setCustomFalseOptionLabel($item->getMetadataEntry("custom_false_option_label"));
-        $this->object->setThumbSize($item->getMetadataEntry("thumb_size"));
+        $this->object->setThumbSize((int) $item->getMetadataEntry("thumb_size"));
 
         $this->object->saveToDb();
 

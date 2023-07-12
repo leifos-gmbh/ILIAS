@@ -54,7 +54,6 @@ class assTextQuestionImport extends assQuestionImport
         ilSession::clear('import_mob_xhtml');
 
         $presentation = $item->getPresentation();
-        $duration = $item->getDuration();
         $now = getdate();
         $maxchars = 0;
         $maxpoints = 0;
@@ -130,9 +129,8 @@ class assTextQuestionImport extends assQuestionImport
         $this->object->setOwner($ilUser->getId());
         $this->object->setQuestion($this->object->QTIMaterialToString($item->getQuestiontext()));
         $this->object->setObjId($questionpool_id);
-        $this->object->setEstimatedWorkingTime($duration["h"] ?? 0, $duration["m"] ?? 0, $duration["s"] ?? 0);
         $this->object->setPoints($maxpoints);
-        $this->object->setMaxNumOfChars($maxchars);
+        $this->object->setMaxNumOfChars($maxchars ?? 0);
         $this->object->setWordCounterEnabled((bool) $item->getMetadataEntry('wordcounter'));
         $textrating = $item->getMetadataEntry("textrating");
         if (strlen($textrating)) {
@@ -156,8 +154,7 @@ class assTextQuestionImport extends assQuestionImport
         }
 
         $keywords = $item->getMetadataEntry("keywords");
-        if (strlen($keywords)) {
-            #$this->object->setKeywords($keywords);
+        if ($keywords !== null) {
             $answers = explode(' ', $keywords);
             foreach ($answers as $answer) {
                 $this->object->addAnswer($answer, 0);

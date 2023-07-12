@@ -51,7 +51,7 @@ class ilKprimChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
         $this->lng = $lng;
         $this->tpl = $tpl;
 
-        $this->files = array();
+        $this->files = [];
 
         $this->ignoreMissingUploadsEnabled = false;
     }
@@ -76,9 +76,12 @@ class ilKprimChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
         return $this->ignoreMissingUploadsEnabled;
     }
 
-    public function setValue($a_value): void
+    public function setValue($value): void
     {
-        $this->values = array();
+        $this->values = [];
+
+        $is_rte = isset($_POST["answer_type"]) && $_POST["answer_type"] == "multiLine";
+        $a_value = $this->cleanupAnswerText($value, $is_rte);
 
         if (is_array($a_value) && is_array($a_value['answer'])) {
             foreach ($a_value['answer'] as $index => $value) {
@@ -163,7 +166,8 @@ class ilKprimChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
 
             if ($this->getSingleline()) {
                 if (!$this->hideImages) {
-                    if (strlen($value->getImageFile())) {
+                    if ($value->getImageFile() !== null
+                        && $value->getImageFile() !== '') {
                         $imagename = $value->getImageWebPath();
 
                         if (($this->getSingleline()) && ($this->qstObject->getThumbSize())) {
@@ -226,12 +230,14 @@ class ilKprimChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
             }
             if ($this->getAllowMove()) {
                 $tpl->setCurrentBlock("move");
-                $tpl->setVariable("CMD_UP", "cmd[up" . $this->getFieldId() . "][{$value->getPosition()}]");
-                $tpl->setVariable("CMD_DOWN", "cmd[down" . $this->getFieldId() . "][{$value->getPosition()}]");
                 $tpl->setVariable("UP_ID", "up_{$this->getPostVar()}[{$value->getPosition()}]");
                 $tpl->setVariable("DOWN_ID", "down_{$this->getPostVar()}[{$value->getPosition()}]");
-                $tpl->setVariable("UP_BUTTON", ilGlyphGUI::get(ilGlyphGUI::UP));
-                $tpl->setVariable("DOWN_BUTTON", ilGlyphGUI::get(ilGlyphGUI::DOWN));
+                $tpl->setVariable("UP_BUTTON", $this->renderer->render(
+                    $this->glyph_factory->up()->withAction('#')
+                ));
+                $tpl->setVariable("DOWN_BUTTON", $this->renderer->render(
+                    $this->glyph_factory->down()->withAction('#')
+                ));
                 $tpl->parseCurrentBlock();
             }
 
@@ -306,16 +312,12 @@ class ilKprimChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
 
         $tpl->setVariable("OPTIONS_TEXT", $this->lng->txt('options'));
 
-        // winzards input column label values will be updated on document ready js
-        //$tpl->setVariable("TRUE_TEXT", $this->qstObject->getTrueOptionLabelTranslation($this->lng, $this->qstObject->getOptionLabel()));
-        //$tpl->setVariable("FALSE_TEXT", $this->qstObject->getFalseOptionLabelTranslation($this->lng, $this->qstObject->getOptionLabel()));
-
         $a_tpl->setCurrentBlock("prop_generic");
         $a_tpl->setVariable("PROP_GENERIC", $tpl->get());
         $a_tpl->parseCurrentBlock();
 
-        $this->tpl->addJavascript("./Services/Form/js/ServiceFormWizardInput.js");
-        $this->tpl->addJavascript("./Modules/TestQuestionPool/templates/default/kprimchoicewizard.js");
+        $this->tpl->addJavascript("Modules/TestQuestionPool/templates/default/answerwizardinput.js");
+        $this->tpl->addJavascript("Modules/TestQuestionPool/templates/default/kprimchoicewizard.js");
         $this->tpl->addJavascript('Modules/TestQuestionPool/js/ilAssKprimChoice.js');
     }
 
@@ -450,5 +452,30 @@ class ilKprimChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
                 'size' => $_FILES[$this->getPostVar()]['size']['image'][$index]
             );
         }
+    }
+
+    /**
+     * sk - 12.05.2023: This is one more of those that we need, but don't want.
+     * @deprecated
+     */
+    private function cleanupAnswerText(array $answer_text, bool $is_rte): array
+    {
+        if (!is_array($answer_text)) {
+            return [];
+        }
+
+        if ($is_rte) {
+            return ilArrayUtil::stripSlashesRecursive(
+                $answer_text,
+                false,
+                ilObjAdvancedEditing::_getUsedHTMLTagsAsString("assessment")
+            );
+        }
+
+        return ilArrayUtil::stripSlashesRecursive(
+            $answer_text,
+            true,
+            assQuestionGUI::ALLOWED_PLAIN_TEXT_TAGS
+        );
     }
 }

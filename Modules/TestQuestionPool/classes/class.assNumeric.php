@@ -128,7 +128,6 @@ class assNumeric extends assQuestion implements ilObjQuestionScoringAdjustable, 
             $this->setOwner($data["owner"]);
             $this->setQuestion(ilRTE::_replaceMediaObjectImageSrc((string) $data["question_text"], 1));
             $this->setMaxChars($data["maxnumofchars"]);
-            $this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
 
             try {
                 $this->setLifecycle(ilAssQuestionLifecycle::getInstance($data['lifecycle']));
@@ -628,7 +627,7 @@ class assNumeric extends assQuestion implements ilObjQuestionScoringAdjustable, 
         if (array_key_exists(0, $solutions) &&
             array_key_exists('value1', $solutions[0]) &&
             strlen($solutions[0]["value1"])) {
-            $worksheet->setCell($startrow + $i, $col + 1, $solutions[0]["value1"]);
+            $worksheet->setCell($startrow + $i, $col + 2, $solutions[0]["value1"]);
         }
         $i++;
 

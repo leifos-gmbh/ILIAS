@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -129,7 +130,6 @@ class assOrderingHorizontal extends assQuestion implements ilObjQuestionScoringA
             $this->setQuestion(ilRTE::_replaceMediaObjectImageSrc((string) $data["question_text"], 1));
             $this->setOrderText($data["ordertext"]);
             $this->setTextSize($data["textsize"]);
-            $this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
 
             try {
                 $this->setLifecycle(ilAssQuestionLifecycle::getInstance($data['lifecycle']));
@@ -469,7 +469,7 @@ class assOrderingHorizontal extends assQuestion implements ilObjQuestionScoringA
             $solutionvalue = str_replace("{::}", " ", $solutions[0]["value1"]);
         }
         $i = 1;
-        $worksheet->setCell($startrow + $i, $col, $solutionvalue);
+        $worksheet->setCell($startrow + $i, $col + 2, $solutionvalue);
         $i++;
 
         return $startrow + $i + 1;
@@ -598,40 +598,6 @@ class assOrderingHorizontal extends assQuestion implements ilObjQuestionScoringA
     public function setSeparator($a_value): void
     {
         $this->separator = $a_value;
-    }
-
-    public function __get($value)
-    {
-        switch ($value) {
-            case "ordertext":
-                return $this->getOrderText();
-                break;
-            case "textsize":
-                return $this->getTextSize();
-                break;
-            case "separator":
-                return $this->getSeparator();
-                break;
-        }
-        return null;
-    }
-
-    /**
-    * Object setter
-    */
-    public function __set($key, $value)
-    {
-        switch ($key) {
-            case "ordertext":
-                $this->setOrderText($value);
-                break;
-            case "textsize":
-                $this->setTextSize($value);
-                break;
-            case "separator":
-                $this->setSeparator($value);
-                break;
-        }
     }
 
     public function supportsJavascriptOutput(): bool

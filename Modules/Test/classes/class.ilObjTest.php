@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -235,10 +236,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 
     protected bool $sign_submission;
 
-    /** @var mixed availability of selector for special characters  */
-    protected $char_selector_availability;
-    protected ?string $char_selector_definition;
-
     protected bool $showGradingStatusEnabled;
     protected bool $showGradingMarkEnabled;
 
@@ -356,8 +353,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $this->redirection_url = null;
         $this->show_exam_id_in_test_pass_enabled = false;
         $this->sign_submission = false;
-        $this->char_selector_availability = 0;
-        $this->char_selector_definition = null;
 
         $this->showGradingStatusEnabled = true;
         $this->showGradingMarkEnabled = true;
@@ -547,11 +542,12 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 
     public static function _setImportDirectory($a_import_dir = null): void
     {
-        if (strlen($a_import_dir)) {
+        if ($a_import_dir !== null) {
             ilSession::set('tst_import_dir', $a_import_dir);
-        } else {
-            ilSession::clear('tst_import_dir');
+            return;
         }
+
+        ilSession::clear('tst_import_dir');
     }
 
     /**
@@ -861,8 +857,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                 'examid_in_test_pass' => array('integer', (int) $this->isShowExamIdInTestPassEnabled()),
                 'sign_submission' => array('integer', (int) $this->getSignSubmission()),
                 'question_set_type' => array('text', $this->getQuestionSetType()),
-                'char_selector_availability' => array('integer', $this->getCharSelectorAvailability()),
-                'char_selector_definition' => array('text', (string) $this->getCharSelectorDefinition()),
                 'skill_service' => array('integer', (int) $this->isSkillServiceEnabled()),
                 'result_tax_filters' => array('text', serialize($this->getResultFilterTaxIds())),
                 'follow_qst_answer_fixation' => array('integer', (int) $this->isFollowupQuestionAnswerFixationEnabled()),
@@ -957,8 +951,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                     'examid_in_test_pass' => array('integer', (int) $this->isShowExamIdInTestPassEnabled()),
                     'sign_submission' => array('integer', (int) $this->getSignSubmission()),
                     'question_set_type' => array('text', $this->getQuestionSetType()),
-                    'char_selector_availability' => array('integer', $this->getCharSelectorAvailability()),
-                    'char_selector_definition' => array('text', (string) $this->getCharSelectorDefinition()),
                     'skill_service' => array('integer', (int) $this->isSkillServiceEnabled()),
                     'result_tax_filters' => array('text', serialize($this->getResultFilterTaxIds())),
                     'show_grading_status' => array('integer', (int) $this->isShowGradingStatusEnabled()),
@@ -1362,7 +1354,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             $this->setResetProcessingTime($data->reset_processing_time);
             $this->setReportingDate($data->reporting_date);
             $this->setShuffleQuestions($data->shuffle_questions);
-            $this->setResultsPresentation($data->results_presentation);
             $this->setStartingTimeEnabled($data->starting_time_enabled);
             $this->setStartingTime($data->starting_time);
             $this->setEndingTimeEnabled($data->ending_time_enabled);
@@ -1402,8 +1393,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             $this->setShowExamIdInTestPassEnabled((bool) $data->examid_in_test_pass);
             $this->setSignSubmission((bool) $data->sign_submission);
             $this->setQuestionSetType($data->question_set_type);
-            $this->setCharSelectorAvailability((int) $data->char_selector_availability);
-            $this->setCharSelectorDefinition($data->char_selector_definition);
             $this->setSkillServiceEnabled((bool) $data->skill_service);
             $this->setShowGradingStatusEnabled((bool) $data->show_grading_status);
             $this->setShowGradingMarkEnabled((bool) $data->show_grading_mark);
@@ -2838,7 +2827,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     {
         global $DIC;
         $ilDB = $DIC['ilDB'];
-        #var_dump($question_id);
         if ($linkOnly) {
             $duplicate_id = $question_id;
         } else {
@@ -3283,7 +3271,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 
         $results = $this->getResultsForActiveId($active_id);
 
-        if (is_null($pass)) {
+        if ($pass === null) {
             $pass = $results['pass'];
         }
 
@@ -3315,7 +3303,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             }
         }
 
-        $arrResults = array();
+        $arrResults = [];
 
         $query = "
 			SELECT		tst_test_result.question_fi,
@@ -3365,7 +3353,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 
         $result = $ilDB->query($query);
 
-        $unordered = array();
+        $unordered = [];
 
         $key = 1;
 
@@ -3416,7 +3404,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $pass_hint_points = 0;
         $key = 1;
 
-        $found = array();
+        $found = [];
 
         foreach ($sequence as $qid) {
             // building pass point sums based on prepared data
@@ -4938,7 +4926,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                             // online exam
                             $this->setFixedParticipants(1);
                             $this->setListOfQuestionsSettings(7);
-                            $this->setShowSolutionPrintview(1);
                             break;
                         case 5:
                             // varying random test
@@ -5176,12 +5163,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                     break;
                 case 'sign_submission':
                     $this->setSignSubmission($metadata['entry']);
-                    break;
-                case 'char_selector_availability':
-                    $this->setCharSelectorAvailability($metadata['entry']);
-                    break;
-                case 'char_selector_definition':
-                    $this->setCharSelectorDefinition($metadata['entry']);
                     break;
                 case 'skill_service':
                     $this->setSkillServiceEnabled((bool) $metadata['entry']);
@@ -5432,7 +5413,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         // results presentation
         $a_xml_writer->xmlStartTag("qtimetadatafield");
         $a_xml_writer->xmlElement("fieldlabel", null, "results_presentation");
-        $a_xml_writer->xmlElement("fieldentry", null, sprintf("%d", $this->getResultsPresentation()));
+        $a_xml_writer->xmlElement("fieldentry", null, sprintf("%d", $this->getScoreSettings()->getResultDetailsSettings()->getResultsPresentation()));
         $a_xml_writer->xmlEndTag("qtimetadatafield");
 
         // examid in test pass
@@ -5619,18 +5600,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $a_xml_writer->xmlStartTag("qtimetadatafield");
         $a_xml_writer->xmlElement("fieldlabel", null, "sign_submission");
         $a_xml_writer->xmlElement("fieldentry", null, (int) $this->getSignSubmission());
-        $a_xml_writer->xmlEndTag("qtimetadatafield");
-
-        // char_selector_availability
-        $a_xml_writer->xmlStartTag("qtimetadatafield");
-        $a_xml_writer->xmlElement("fieldlabel", null, "char_selector_availability");
-        $a_xml_writer->xmlElement("fieldentry", null, sprintf("%d", $this->getCharSelectorAvailability()));
-        $a_xml_writer->xmlEndTag("qtimetadatafield");
-
-        // char_selector_definition
-        $a_xml_writer->xmlStartTag("qtimetadatafield");
-        $a_xml_writer->xmlElement("fieldlabel", null, "char_selector_definition");
-        $a_xml_writer->xmlElement("fieldentry", null, $this->getCharSelectorDefinition());
         $a_xml_writer->xmlEndTag("qtimetadatafield");
 
         // skill_service
@@ -5950,12 +5919,20 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     * export files of file itmes
     *
     */
-    public function exportFileItems($a_target_dir, &$expLog)
+    public function exportFileItems($target_dir, &$expLog)
     {
         foreach ($this->file_ids as $file_id) {
             $expLog->write(date("[y-m-d H:i:s] ") . "File Item " . $file_id);
+            $file_dir = $target_dir . '/objects/il_' . IL_INST_ID . '_file_' . $file_id;
+            ilFileUtils::makeDir($file_dir);
             $file_obj = new ilObjFile($file_id, false);
-            $file_obj->export($a_target_dir);
+            $source_file = $file_obj->getFile($file_obj->getVersion());
+            if (!is_file($source_file)) {
+                $source_file = $file_obj->getFile();
+            }
+            if (is_file($source_file)) {
+                copy($source_file, $file_dir . '/' . $file_obj->getFileName());
+            }
             unset($file_obj);
         }
     }
@@ -6333,8 +6310,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $newObj->setShowExamViewHtml($this->getShowExamviewHtml());
         $newObj->setEnableArchiving($this->getEnableArchiving());
         $newObj->setSignSubmission($this->getSignSubmission());
-        $newObj->setCharSelectorAvailability($this->getCharSelectorAvailability());
-        $newObj->setCharSelectorDefinition($this->getCharSelectorDefinition());
         $newObj->setSkillServiceEnabled($this->isSkillServiceEnabled());
         $newObj->setFollowupQuestionAnswerFixationEnabled($this->isFollowupQuestionAnswerFixationEnabled());
         $newObj->setInstantFeedbackAnswerFixationEnabled($this->isInstantFeedbackAnswerFixationEnabled());
@@ -7239,13 +7214,13 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             array('integer'),
             array($active_id)
         );
+
         if ($result->numRows()) {
             $row = $ilDB->fetchAssoc($result);
-            $max = $row["maxpass"];
-        } else {
-            $max = null;
+            return $row["maxpass"];
         }
-        return $max;
+
+        return null;
     }
 
     /**
@@ -7253,7 +7228,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
      * @param int $active_id
      * @return int|mixed
      */
-    public static function _getBestPass($active_id)
+    public static function _getBestPass($active_id): ?int
     {
         global $DIC;
         $ilDB = $DIC['ilDB'];
@@ -7263,29 +7238,30 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             array('integer'),
             array($active_id)
         );
-        if ($result->numRows()) {
-            $bestrow = null;
-            $bestfactor = 0;
-            while ($row = $ilDB->fetchAssoc($result)) {
-                if ($row["maxpoints"] > 0) {
-                    $factor = $row["points"] / $row["maxpoints"];
-                } else {
-                    $factor = 0;
-                }
 
-                if ($factor > $bestfactor) {
-                    $bestrow = $row;
-                    $bestfactor = $factor;
-                }
-            }
-            if (is_array($bestrow)) {
-                return $bestrow["pass"];
-            } else {
-                return 0;
-            }
-        } else {
-            return 0;
+        if (!$result->numRows()) {
+            return null;
         }
+
+        $bestrow = null;
+        $bestfactor = 0;
+        while ($row = $ilDB->fetchAssoc($result)) {
+            if ($row["maxpoints"] > 0) {
+                $factor = $row["points"] / $row["maxpoints"];
+            } else {
+                $factor = 0;
+            }
+            if ($factor > $bestfactor) {
+                $bestrow = $row;
+                $bestfactor = $factor;
+            }
+        }
+
+        if (is_array($bestrow)) {
+            return $bestrow["pass"];
+        }
+
+        return null;
     }
 
     /**
@@ -7664,23 +7640,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     }
 
     /**
-     * @return string
-     */
-    public function getFixedQuestionSetTotalWorkingTime(): string
-    {
-        $totalWorkingTime = '00:00:00';
-
-        foreach ($this->getTestQuestions() as $questionData) {
-            $totalWorkingTime = assQuestion::sumTimesInISO8601FormatH_i_s_Extended(
-                $totalWorkingTime,
-                $questionData['working_time']
-            );
-        }
-
-        return $totalWorkingTime;
-    }
-
-    /**
      * @return array
      */
     public function getPotentialRandomTestQuestions(): array
@@ -7912,17 +7871,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     }
 
     /**
-    * Returns the combined results presentation value
-    *
-    * @return integer The combined results presentation value
-    * @access public
-    */
-    public function getResultsPresentation(): int
-    {
-        return ($this->results_presentation) ? $this->results_presentation : 0;
-    }
-
-    /**
     * Returns if the pass details should be shown when a test is not finished
     */
     public function getShowPassDetails(): bool
@@ -7994,73 +7942,10 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         return $this->getScoreSettings()->getResultDetailsSettings()->getShowSolutionListComparison();
     }
 
-    /**
-    * Sets the combined results presentation value
-    *
-    * @param integer $a_results_presentation The combined results presentation value
-    * @access public
-    * @deprecated
-    */
-    public function setResultsPresentation($a_results_presentation = 3)
-    {
-        $this->results_presentation = $a_results_presentation;
-    }
-
-    public function getShowSolutionListOwnAnswers($user_id = null): bool
+    public function getShowSolutionListOwnAnswers(): bool
     {
         return $this->getScoreSettings()->getResultDetailsSettings()->getShowSolutionListOwnAnswers();
     }
-
-    /**
-     * -------------------------------------------------------------------------
-     * Those setters are @deprecated!
-     * They modify $results_presentation based on some parameter and fall back to
-     * repo-settings when called without.
-     * Calls are a.o. in class.ilObjTestGUI.php and here during import;
-     * I left it in place to not to break too many things now, but they should go.
-     * Soon.
-     **/
-
-    /**
-    * Sets if the the solution details should be presented to the user or not
-    *
-    * @param integer $a_details 1 if the solution details should be presented, 0 otherwise
-    * @access public
-    * @deprecated
-    */
-    public function setShowSolutionDetails($a_details = 1)
-    {
-        if ($a_details) {
-            $this->results_presentation = $this->results_presentation | 2;
-        } else {
-            if ($this->getShowSolutionDetails()) {
-                $this->results_presentation = $this->results_presentation ^ 2;
-            }
-        }
-    }
-
-    /**
-    * Sets if the the solution printview should be presented to the user or not
-    *
-    * @param boolean $a_details TRUE if the solution printview should be presented, FALSE otherwise
-    * @access public
-    * @deprecated
-    */
-    public function setShowSolutionPrintview($a_printview = 1)
-    {
-        if ($a_printview) {
-            $this->results_presentation = $this->results_presentation | 4;
-        } else {
-            if ($this->getShowSolutionPrintview()) {
-                $this->results_presentation = $this->results_presentation ^ 4;
-            }
-        }
-    }
-
-    /**
-     * -------------------------------------------------------------------------
-     */
-
 
     /**
      * @deprecated: use ilTestParticipantData instead
@@ -8242,16 +8127,19 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     * @param object $a_xml_writer Reference to the ILIAS XML writer
     * @param string $a_material plain text or html text containing the material
     */
-    public function addQTIMaterial(&$a_xml_writer, $a_material)
+    public function addQTIMaterial(&$a_xml_writer, $a_material = '')
     {
         $a_xml_writer->xmlStartTag("material");
+        $txt = $a_material;
         $attrs = array(
             "texttype" => "text/plain"
         );
         if ($this->isHTML($a_material)) {
             $attrs["texttype"] = "text/xhtml";
+            $txt = ilRTE::_replaceMediaObjectImageSrc($a_material, 0);
         }
-        $a_xml_writer->xmlElement("mattext", $attrs, ilRTE::_replaceMediaObjectImageSrc((string) $a_material, 0));
+
+        $a_xml_writer->xmlElement("mattext", $attrs, $txt);
 
         $mobs = ilObjMediaObject::_getMobsOfObject("tst:html", $this->getId());
         foreach ($mobs as $mob) {
@@ -8636,7 +8524,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             "InstantFeedbackSolution" => $this->getInstantFeedbackSolution(),
             "AnswerFeedback" => $this->getAnswerFeedback(),
             "AnswerFeedbackPoints" => $this->getAnswerFeedbackPoints(),
-            "ResultsPresentation" => $this->getResultsPresentation(),
+            "ResultsPresentation" => $this->getScoreSettings()->getResultDetailsSettings()->getResultsPresentation(),
             "Anonymity" => $this->getAnonymity(),
             "ShowCancel" => $this->getShowCancel(),
             "ShowMarker" => $this->getShowMarker(),
@@ -8667,8 +8555,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             'pass_deletion_allowed' => (int) $this->isPassDeletionAllowed(),
             'enable_examview' => $this->getEnableExamview(),
             'show_examview_html' => $this->getShowExamviewHtml(),
-            'char_selector_availability' => $this->getCharSelectorAvailability(),
-            'char_selector_definition' => $this->getCharSelectorDefinition(),
             'skill_service' => (int) $this->isSkillServiceEnabled(),
             'result_tax_filters' => $this->getResultFilterTaxIds(),
             'show_grading_status' => (int) $this->isShowGradingStatusEnabled(),
@@ -8750,7 +8636,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $this->setInstantFeedbackSolution($testsettings["InstantFeedbackSolution"]);
         $this->setAnswerFeedback($testsettings["AnswerFeedback"]);
         $this->setAnswerFeedbackPoints($testsettings["AnswerFeedbackPoints"]);
-        $this->setResultsPresentation($testsettings["ResultsPresentation"]);
         $this->setAnonymity($testsettings["Anonymity"]);
         $this->setShowCancel($testsettings["ShowCancel"]);
         $this->setShuffleQuestions($testsettings["Shuffle"]);
@@ -8799,8 +8684,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $this->setShowExamviewHtml($testsettings['show_examview_html']);
         $this->setEnableArchiving($testsettings['enable_archiving']);
         $this->setSignSubmission($testsettings['sign_submission']);
-        $this->setCharSelectorAvailability($testsettings['char_selector_availability']);
-        $this->setCharSelectorDefinition($testsettings['char_selector_definition']);
         $this->setSkillServiceEnabled((bool) $testsettings['skill_service']);
         $this->setShowGradingStatusEnabled((bool) $testsettings['show_grading_status']);
         $this->setShowGradingMarkEnabled((bool) $testsettings['show_grading_mark']);
@@ -8845,6 +8728,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             )
             ->withResultDetailsSettings(
                 $settings->getResultDetailsSettings()
+                ->withResultsPresentation($testsettings["ResultsPresentation"])
                 ->withPrintBestSolutionWithResult((bool) $testsettings['PrintBsWithRes'])
                 ->withShowExamIdInTestResults($exam_id_in_results)
                 ->withTaxonomyFilterIds((array) $testsettings['result_tax_filters'])
@@ -9167,13 +9051,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     public function getJavaScriptOutput(): bool
     {
         return true;
-
-        //		global $DIC;
-        //		$ilUser = $DIC['ilUser'];
-        //		if (strcmp($_GET["tst_javascript"], "0") == 0) return FALSE;
-        //		if ($this->getForceJS()) return TRUE;
-        //		$assessmentSetting = new ilSetting("assessment");
-        //		return ($ilUser->getPref("tst_javascript") === FALSE) ? $assessmentSetting->get("use_javascript") : $ilUser->getPref("tst_javascript");
     }
 
     public function &createTestSequence($active_id, $pass, $shuffle)
@@ -9479,7 +9356,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 
         $worksheet = (new ilExcelTestExport($this, ilTestEvaluationData::FILTER_BY_ACTIVE_ID, $active_id, $passedonly = false, true))
             ->withResultsPage()
-            ->withAllUsersPages()
             ->withUserPages()
             ->getContent();
         $file = ilFileUtils::ilTempnam();
@@ -9564,22 +9440,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             $this->exportsettings = $a_settings;
         } else {
             $this->exportsettings = 0;
-        }
-    }
-
-    public function getExportSettingsSingleChoiceShort(): bool
-    {
-        return $this->getScoreSettings()->getResultDetailsSettings()->getExportSettingsSingleChoiceShort();
-    }
-
-    public function setExportSettingsSingleChoiceShort($a_settings)
-    {
-        if ($a_settings) {
-            $this->exportsettings = $this->exportsettings | 1;
-        } else {
-            if ($this->getExportSettingsSingleChoiceShort()) {
-                $this->exportsettings = $this->exportsettings ^ 1;
-            }
         }
     }
 
@@ -10432,36 +10292,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     {
         return $this->sign_submission;
     }
-
-    public function setCharSelectorAvailability($availability)
-    {
-        $this->char_selector_availability = (int) $availability;
-    }
-
-    /**
-     * @return int	availability of the special character selector
-     */
-    public function getCharSelectorAvailability(): int
-    {
-        return (int) $this->char_selector_availability;
-    }
-
-    /**
-     * @param string	definition of the special character selector
-     */
-    public function setCharSelectorDefinition($definition = '')
-    {
-        $this->char_selector_definition = $definition;
-    }
-
-    /**
-     * @return string	definition of the special character selector
-     */
-    public function getCharSelectorDefinition(): ?string
-    {
-        return $this->char_selector_definition;
-    }
-
 
     /**
      * setter for question set type

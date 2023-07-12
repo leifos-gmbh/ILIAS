@@ -55,11 +55,6 @@ class assOrderingQuestionExport extends assQuestionExport
         $a_xml_writer->xmlStartTag("item", $attrs);
         // add question description
         $a_xml_writer->xmlElement("qticomment", null, $this->object->getComment());
-        // add estimated working time
-        $workingtime = $this->object->getEstimatedWorkingTime();
-        $duration = sprintf("P0Y0M0DT%dH%dM%dS", $workingtime["h"], $workingtime["m"], $workingtime["s"]);
-        $a_xml_writer->xmlElement("duration", null, $duration);
-        // add ILIAS specific metadata
         $a_xml_writer->xmlStartTag("itemmetadata");
         $a_xml_writer->xmlStartTag("qtimetadata");
         $a_xml_writer->xmlStartTag("qtimetadatafield");
@@ -81,7 +76,7 @@ class assOrderingQuestionExport extends assQuestionExport
 
         $a_xml_writer->xmlStartTag("qtimetadatafield");
         $a_xml_writer->xmlElement("fieldlabel", null, "thumb_geometry");
-        $a_xml_writer->xmlElement("fieldentry", null, $this->object->getThumbGeometry());
+        $a_xml_writer->xmlElement("fieldentry", null, $this->object->getThumbSize());
         $a_xml_writer->xmlEndTag("qtimetadatafield");
         $a_xml_writer->xmlStartTag("qtimetadatafield");
         $a_xml_writer->xmlElement("fieldlabel", null, "element_height");
@@ -125,7 +120,7 @@ class assOrderingQuestionExport extends assQuestionExport
             $attrs["output"] = "javascript";
         }
         $a_xml_writer->xmlStartTag("response_lid", $attrs);
-        $solution = $this->object->getSuggestedSolution(0);
+        $solution = $this->object->getSuggestedSolution(0) ?? [];
         if (count($solution)) {
             if (preg_match("/il_(\d*?)_(\w+)_(\d+)/", $solution["internal_link"], $matches)) {
                 $a_xml_writer->xmlStartTag("material");

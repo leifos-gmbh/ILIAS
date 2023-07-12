@@ -27,6 +27,8 @@ use ILIAS\UI\Renderer as RendererInterface;
 use ILIAS\UI\Component;
 use ILIAS\UI\Component\Modal\InterruptiveItem\InterruptiveItem;
 use ILIAS\UI\Implementation\Component\Input\Container\Form\FormWithoutSubmitButton;
+use ILIAS\UI\Component\Modal\LightboxPage;
+use ILIAS\UI\Implementation\Render\Template;
 
 /**
  * @author Stefan Wanzenried <sw@studer-raimann.ch>
@@ -128,7 +130,6 @@ class Renderer extends AbstractComponentRenderer
         $tpl->setVariable('FORM_ACTION', $value);
         $tpl->setVariable('TITLE', $modal->getTitle());
         $tpl->setVariable('MESSAGE', $modal->getMessage());
-        $tpl->setVariable('CLOSE_LABEL', $this->txt('close'));
 
         $standard_items = $this->renderInterruptiveItemsByClass(
             Component\Modal\InterruptiveItem\Standard::class,
@@ -152,6 +153,8 @@ class Renderer extends AbstractComponentRenderer
 
         $tpl->setVariable('ACTION_BUTTON_LABEL', $modal->getActionButtonLabel() ?? $this->txt('delete'));
         $tpl->setVariable('CANCEL_BUTTON_LABEL', $modal->getCancelButtonLabel() ?? $this->txt('cancel'));
+        $tpl->setVariable('CLOSE_LABEL', $modal->getCancelButtonLabel() ?? $this->txt('cancel'));
+
         return $tpl->get();
     }
 
@@ -243,20 +246,10 @@ class Renderer extends AbstractComponentRenderer
                 $tpl->parseCurrentBlock();
             }
         }
-        foreach ($pages as $i => $page) {
-            if ($page instanceof LightboxTextPage) {
-                $tpl->setCurrentBlock('pages');
-                $tpl->touchBlock('page_type_text');
-                $tpl->parseCurrentBlock();
-            }
-            $tpl->setCurrentBlock('pages');
-            $tpl->setVariable('CLASS_ACTIVE', ($i == 0) ? ' active' : '');
-            $tpl->setVariable('TITLE2', htmlentities($page->getTitle(), ENT_QUOTES, 'UTF-8'));
-            $tpl->setVariable('CONTENT', $default_renderer->render($page->getComponent()));
-            if ($page instanceof LightboxDescriptionEnabledPage) {
-                $tpl->setVariable('DESCRIPTION', $page->getDescription());
-            }
-            $tpl->parseCurrentBlock();
+        $first = true;
+        foreach ($pages as $page) {
+            $this->renderPage($page, $first, $tpl, $default_renderer);
+            $first = false;
         }
         if (count($pages) > 1) {
             $tpl->setCurrentBlock('controls');
@@ -277,5 +270,31 @@ class Renderer extends AbstractComponentRenderer
             Component\Modal\RoundTrip::class,
             Component\Modal\Lightbox::class,
         );
+    }
+
+    private function renderPage(LightboxPage $page, bool $first, Template $tpl, RendererInterface $default_renderer): void
+    {
+        $vertical = false;
+        $components = [$page->getComponent()];
+        if ($page instanceof LightboxTextPage) {
+            $tpl->setCurrentBlock('pages');
+            $tpl->touchBlock('page_type_text');
+            $tpl->parseCurrentBlock();
+        } elseif ($page instanceof LightboxCardPage) {
+            $components = array_merge(
+                $page->getComponent()->getSections(),
+                $page->getComponent()->getHiddenSections()
+            );
+            $vertical = true;
+        }
+        $tpl->setCurrentBlock('pages');
+        $tpl->setVariable('CLASS_ACTIVE', $first ? 'active' : '');
+        $tpl->setVariable('ORIENTATION', $vertical ? 'item-vertical' : '');
+        $tpl->setVariable('TITLE2', htmlentities($page->getTitle(), ENT_QUOTES, 'UTF-8'));
+        $tpl->setVariable('CONTENT', $default_renderer->render($components));
+        if ($page instanceof LightboxDescriptionEnabledPage) {
+            $tpl->setVariable('DESCRIPTION', $page->getDescription());
+        }
+        $tpl->parseCurrentBlock();
     }
 }

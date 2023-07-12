@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\UI\Renderer;
 use ILIAS\UI\Factory;
@@ -39,6 +39,7 @@ class ilRepositorySearchGUI
     private array $search_results = [];
 
     protected array $add_options = [];
+    protected string $default_option = '';
     protected bool $object_selection = false;
 
     protected bool $searchable_check = true;
@@ -203,6 +204,8 @@ class ilRepositorySearchGUI
         $ilCtrl = $DIC->ctrl();
         $tree = $DIC->repositoryTree();
         $user = $DIC->user();
+        $ui_factory = $DIC->ui()->factory();
+        $ui_renderer = $DIC->ui()->renderer();
 
         if (!$toolbar instanceof ilToolbarGUI) {
             $toolbar = $ilToolbar;
@@ -294,10 +297,11 @@ class ilRepositorySearchGUI
             $toolbar->addSeparator();
 
             if ($a_options['add_search']) {
-                $button = ilLinkButton::getInstance();
-                $button->setCaption("search_users");
-                $button->setUrl($ilCtrl->getLinkTargetByClass('ilRepositorySearchGUI', ''));
-                $toolbar->addButtonInstance($button);
+                $button = $ui_factory->button()->standard(
+                    $lng->txt('search_users'),
+                    $ilCtrl->getLinkTargetByClass(strtolower(self::class), '')
+                );
+                $toolbar->addComponent($button);
             }
 
             if (is_numeric($a_options['add_from_container'])) {
@@ -315,10 +319,11 @@ class ilRepositorySearchGUI
 
                     $ilCtrl->setParameterByClass('ilRepositorySearchGUI', "list_obj", ilObject::_lookupObjId($parent_container_ref_id));
 
-                    $button = ilLinkButton::getInstance();
-                    $button->setCaption("search_add_members_from_container_" . $parent_container_type);
-                    $button->setUrl($ilCtrl->getLinkTargetByClass(array(get_class($parent_object),'ilRepositorySearchGUI'), 'listUsers'));
-                    $toolbar->addButtonInstance($button);
+                    $button = $ui_factory->button()->standard(
+                        $lng->txt('search_add_members_from_container_' . $parent_container_type),
+                        $ilCtrl->getLinkTargetByClass(array(get_class($parent_object),'ilRepositorySearchGUI'), 'listUsers')
+                    );
+                    $toolbar->addComponent($button);
                 }
             }
         }
@@ -637,16 +642,32 @@ class ilRepositorySearchGUI
         }
     }
 
-    public function setCallback(object $class, string $method, array $a_add_options = array()): void
-    {
+    /**
+     * @param string[]  $a_add_options
+     */
+    public function setCallback(
+        object $class,
+        string $method,
+        array $a_add_options = [],
+        string $default_option = ''
+    ): void {
         $this->callback = array('class' => $class,'method' => $method);
         $this->add_options = $a_add_options;
+        $this->default_option = $default_option;
     }
 
-    public function setRoleCallback(object $class, string $method, array $a_add_options = array()): void
-    {
+    /**
+     * @param string[]  $a_add_options
+     */
+    public function setRoleCallback(
+        object $class,
+        string $method,
+        array $a_add_options = [],
+        string $default_option = ''
+    ): void {
         $this->role_callback = array('class' => $class,'method' => $method);
         $this->add_options = $a_add_options;
+        $this->default_option = $default_option;
     }
 
 
@@ -937,8 +958,7 @@ class ilRepositorySearchGUI
             }
             switch ($info['type']) {
                 case ilUserSearchOptions::FIELD_TYPE_UDF_SELECT:
-                    // Do a phrase query for select fields
-                    $query_parser = $this->__parseQueryString('"' . $query_string . '"');
+                    $query_parser = $this->__parseQueryString($query_string);
 
                     // no break
                 case ilUserSearchOptions::FIELD_TYPE_UDF_TEXT:
@@ -958,9 +978,7 @@ class ilRepositorySearchGUI
                         $this->__storeEntries($result_obj);
                         break;
                     }
-
-                    // Do a phrase query for select fields
-                    $query_parser = $this->__parseQueryString('"' . $query_string . '"', true, true);
+                    $query_parser = $this->__parseQueryString($query_string, true, true);
 
                     // no break
                 case ilUserSearchOptions::FIELD_TYPE_TEXT:
@@ -1180,12 +1198,14 @@ class ilRepositorySearchGUI
                 $this->refinery->kindlyTo()->string()
             );
         }
-        $is_in_admin = $base_class === ilAdministrationGUI::class;
+
+        // String value of 'baseClass' is in lower case
+        $is_in_admin = ($base_class === strtolower(ilAdministrationGUI::class));
+
         if ($is_in_admin) {
             // remember link target to admin search gui (this)
             ilSession::set('usr_search_link', $this->ctrl->getLinkTarget($this, 'show'));
         }
-
 
         $table = new ilRepositoryUserResultTableGUI($this, $a_parent_cmd, $is_in_admin);
         if (count($this->add_options)) {
@@ -1193,7 +1213,8 @@ class ilRepositorySearchGUI
                 'selectedCommand',
                 $this->add_options,
                 'handleMultiCommand',
-                $this->lng->txt('execute')
+                $this->lng->txt('execute'),
+                $this->default_option
             );
         } else {
             $table->addMultiCommand('addUser', $this->lng->txt('btn_add'));

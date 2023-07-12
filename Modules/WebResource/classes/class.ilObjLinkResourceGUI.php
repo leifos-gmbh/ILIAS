@@ -1087,12 +1087,22 @@ class ilObjLinkResourceGUI extends ilObject2GUI
                     $this->lng->txt('links_value'),
                     'val'
                 );
+                /*
                 $val->setOptions(array_map(
                     function ($s) {
                         return $this->lng->txt($s);
                     },
                     ilWebLinkBaseParameter::VALUES_TEXT
                 ));
+                */
+                $options = [];
+                foreach (ilWebLinkBaseParameter::VALUES as $name => $identifier) {
+                    if ($name === ilWebLinkBaseParameter::SESSION_ID_NAME) {
+                        continue;
+                    }
+                    $options[] = ilWebLinkBaseParameter::VALUES_TEXT[$identifier];
+                }
+                $val->setOptions($options);
                 $val->setValue(0);
                 $dyn->addSubItem($val);
 
@@ -1464,13 +1474,6 @@ class ilObjLinkResourceGUI extends ilObject2GUI
             0,
             $this->object->getType()
         );
-
-        if ($this->id_type == self::WORKSPACE_NODE_ID) {
-            $info->addProperty(
-                $this->lng->txt("perma_link"),
-                $this->getPermanentLinkWidget()
-            );
-        }
 
         // forward the command
         $this->ctrl->forwardCommand($info);

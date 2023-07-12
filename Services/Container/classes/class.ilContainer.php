@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\News\Service as News;
+
 /**
  * Class ilContainer
  *
@@ -25,6 +27,7 @@
  */
 class ilContainer extends ilObject
 {
+    protected News $news;
     // container view constants
     public const VIEW_SESSIONS = 0;
     public const VIEW_OBJECTIVE = 1;
@@ -92,6 +95,7 @@ class ilContainer extends ilObject
         $this->tree = $DIC->repositoryTree();
         $this->user = $DIC->user();
         $this->obj_definition = $DIC["objDefinition"];
+        $this->news = $DIC->news();
 
 
         $this->setting = $DIC["ilSetting"];
@@ -205,6 +209,9 @@ class ilContainer extends ilObject
 
     public function isNewsTimelineEffective(): bool
     {
+        if (!$this->news->isGloballyActivated()) {
+            return false;
+        }
         if ($this->getUseNews() && $this->getNewsTimeline()) {
             return true;
         }
@@ -415,7 +422,7 @@ class ilContainer extends ilObject
         // #20614 - copy style
         $style_id = $this->getStyleSheetId();
         if ($style_id > 0) {
-            if (ilObjStyleSheet::_lookupStandard($style_id)) {
+            if (!ilObjStyleSheet::_lookupStandard($style_id)) {
                 $style_obj = ilObjectFactory::getInstanceByObjId($style_id);
                 $new_id = $style_obj->ilClone();
                 $new_obj->setStyleSheetId($new_id);
@@ -887,7 +894,8 @@ class ilContainer extends ilObject
             ilObjectServiceSettingsGUI::NEWS_VISIBILITY,
             $this->setting->get('block_activated_news', '1')
         ));
-        $this->setUseNews((bool) self::_lookupContainerSetting($this->getId(), ilObjectServiceSettingsGUI::USE_NEWS, '1'));
+        $this->setUseNews((bool) self::_lookupContainerSetting($this->getId(), ilObjectServiceSettingsGUI::USE_NEWS, '1') &&
+        $this->news->isGloballyActivated());
     }
 
 

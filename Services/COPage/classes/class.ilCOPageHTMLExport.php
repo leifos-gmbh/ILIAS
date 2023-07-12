@@ -445,6 +445,8 @@ class ilCOPageHTMLExport
             }
         }
 
+        $this->exportQuestionFiles();
+
         // export all glossary terms
         $this->exportHTMLGlossaryTerms();
     }
@@ -488,6 +490,7 @@ class ilCOPageHTMLExport
         $params = [
             "mode" => "media",
             'enlarge_path' => ilUtil::getImagePath("enlarge.svg", false, "output", true),
+            'enable_html_mob' => ilObjMediaObject::isTypeAllowed("html") ? "y" : "n",
             'fullscreen_link' => $this->page_linker->getFullScreenLink()
         ];
         if ($this->ref_id > 0) {

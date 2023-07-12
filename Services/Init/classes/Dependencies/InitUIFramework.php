@@ -52,7 +52,8 @@ class InitUIFramework
                 $c["ui.factory.menu"],
                 $c["ui.factory.symbol"],
                 $c["ui.factory.toast"],
-                $c["ui.factory.legacy"]
+                $c["ui.factory.legacy"],
+                $c["ui.factory.launcher"]
             );
         };
         $c["ui.upload_limit_resolver"] = function ($c) {
@@ -132,7 +133,20 @@ class InitUIFramework
             );
         };
         $c["ui.factory.table"] = function ($c) {
-            return new ILIAS\UI\Implementation\Component\Table\Factory($c["ui.signal_generator"]);
+            $row_builder = new ILIAS\UI\Implementation\Component\Table\DataRowBuilder();
+            return new ILIAS\UI\Implementation\Component\Table\Factory(
+                $c["ui.signal_generator"],
+                $c["ui.data_factory"],
+                $c["ui.factory.table.column"],
+                $c["ui.factory.table.action"],
+                $row_builder
+            );
+        };
+        $c["ui.factory.table.column"] = function ($c) {
+            return new ILIAS\UI\Implementation\Component\Table\Column\Factory();
+        };
+        $c["ui.factory.table.action"] = function ($c) {
+            return new ILIAS\UI\Implementation\Component\Table\Action\Factory();
         };
         $c["ui.factory.messagebox"] = function ($c) {
             return new ILIAS\UI\Implementation\Component\MessageBox\Factory();
@@ -299,6 +313,12 @@ class InitUIFramework
 
         $c["ui.pathresolver"] = function ($c): ILIAS\UI\Implementation\Render\ImagePathResolver {
             return new ilImagePathResolver();
+        };
+
+        $c["ui.factory.launcher"] = function ($c): ILIAS\UI\Implementation\Component\Launcher\Factory {
+            return new ILIAS\UI\Implementation\Component\Launcher\Factory(
+                $c["ui.factory.modal"]
+            );
         };
     }
 }

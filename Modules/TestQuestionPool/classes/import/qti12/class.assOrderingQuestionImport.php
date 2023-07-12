@@ -53,12 +53,11 @@ class assOrderingQuestionImport extends assQuestionImport
         ilSession::clear('import_mob_xhtml');
 
         $presentation = $item->getPresentation();
-        $duration = $item->getDuration();
         $shuffle = 0;
         $now = getdate();
         $foundimage = false;
         $created = sprintf("%04d%02d%02d%02d%02d%02d", $now['year'], $now['mon'], $now['mday'], $now['hours'], $now['minutes'], $now['seconds']);
-        $answers = array();
+        $answers = [];
         $type = OQ_TERMS;
 
         foreach ($presentation->order as $entry) {
@@ -90,11 +89,11 @@ class assOrderingQuestionImport extends assQuestionImport
                                     for ($m = 0; $m < $mat->getMaterialCount(); $m++) {
                                         $foundmat = $mat->getMaterial($m);
 
-                                        if (strcmp($foundmat["material"]->getLabel(), "answerdepth") == 0) {
+                                        if (strcmp($foundmat["material"]->getLabel() ?? '', "answerdepth") == 0) {
                                             $answerdepth = $foundmat["material"]->getContent();
                                         }
                                         if (strcmp($foundmat["type"], "mattext") == 0
-                                        && strcmp($foundmat["material"]->getLabel(), "answerdepth") != 0) {
+                                        && strcmp($foundmat["material"]->getLabel() ?? '', "answerdepth") != 0) {
                                             $answertext .= $foundmat["material"]->getContent();
                                         }
                                         if (strcmp($foundmat["type"], "matimage") == 0
@@ -205,9 +204,11 @@ class assOrderingQuestionImport extends assQuestionImport
         $this->object->setQuestion($this->object->QTIMaterialToString($item->getQuestiontext()));
         $this->object->setOrderingType($type);
         $this->object->setObjId($questionpool_id);
-        $this->object->setThumbGeometry($item->getMetadataEntry("thumb_geometry"));
+        $thumb_size = (int) $item->getMetadataEntry("thumb_geometry");
+        if ($thumb_size !== null && $thumb_size >= $this->object->getMinimumThumbSize()) {
+            $this->object->setThumbSize($thumb_size);
+        }
         $this->object->setElementHeight($item->getMetadataEntry("element_height") ? (int) $item->getMetadataEntry("element_height") : null);
-        $this->object->setEstimatedWorkingTime($duration["h"] ?? 0, $duration["m"] ?? 0, $duration["s"] ?? 0);
         $this->object->setShuffle($shuffle);
         $this->object->setPoints(0);
         $this->object->saveQuestionDataToDb();
@@ -359,9 +360,7 @@ class assOrderingQuestionImport extends assQuestionImport
         $target_filepath = $this->object->getImagePath() . $target_filename;
         if (rename($tmp_path, $target_filepath)) {
             $thumb_path = $this->object->getImagePath() . $this->object->getThumbPrefix() . $target_filename;
-            if ($this->object->getThumbGeometry()) {
-                ilShellUtil::convertImage($target_filepath, $thumb_path, "JPEG", $this->object->getThumbGeometry());
-            }
+            ilShellUtil::convertImage($target_filepath, $thumb_path, "JPEG", $this->object->getThumbSize());
             return $target_filename;
         }
 

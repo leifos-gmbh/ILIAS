@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -48,6 +49,7 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
 
     protected RefineryFactory $refinery;
     protected HTTPServices $http;
+    protected ilHelpGUI $help;
 
     /**
      * ilStartUpGUI constructor.
@@ -90,12 +92,14 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
         $this->eventHandler = $DIC->event();
         $this->setting = $DIC->settings();
         $this->access = $DIC->access();
+        $this->help = $DIC->help();
 
         $this->http = $DIC->http();
         $this->refinery = $DIC->refinery();
 
         $this->ctrl->saveParameter($this, array("rep_ref_id", "lang", "target", "client_id"));
         $this->user->setLanguage($this->lng->getLangKey());
+        $this->help->setScreenIdComponent('init');
     }
 
     protected function initTargetFromQuery(): string
@@ -207,10 +211,14 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
         $ilAppEventHandler = $this->eventHandler;
 
         $force_login = false;
-        if (isset($_REQUEST['cmd']) &&
-            !is_array($_REQUEST['cmd']) &&
-            strcmp($_REQUEST['cmd'], 'force_login') === 0
-        ) {
+        $request_cmd = '';
+        if ($this->http->wrapper()->query()->has('cmd')) {
+            $request_cmd = $this->http->wrapper()->query()->retrieve(
+                'cmd',
+                $this->refinery->kindlyTo()->string()
+            );
+        }
+        if ($request_cmd === 'force_login') {
             $force_login = true;
         }
 
@@ -257,6 +265,8 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
     protected function showLoginPage(ilPropertyFormGUI $form = null): void
     {
         global $tpl;
+
+        $this->help->setSubScreenId('login');
 
         $this->getLogger()->debug('Showing login page');
 
@@ -358,6 +368,8 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
     {
         global $tpl;
 
+        $this->help->setSubScreenId('code_input');
+
         self::initStartUpTemplate("tpl.login_reactivate_code.html");
         $this->mainTemplate->setOnScreenMessage('failure', $this->lng->txt("time_limit_reached"));
         if (!$a_form) {
@@ -393,12 +405,18 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
      */
     protected function processCode(): ?bool
     {
-        $uname = $_POST["uname"];
+        $uname = '';
+        if ($this->http->wrapper()->post()->has('uname')) {
+            $uname = $this->http->wrapper()->post()->retrieve(
+                'uname',
+                $this->refinery->kindlyTo()->string()
+            );
+        }
         $form = $this->initCodeForm($uname);
         if ($uname && $form->checkInput()) {
             $code = $form->getInput("code");
-            if (ilAccountCode::isUnusedCode($code)) {
-                $valid_until = ilAccountCode::getCodeValidUntil($code);
+            if (ilRegistrationCode::isUnusedCode($code)) {
+                $valid_until = ilRegistrationCode::getCodeValidUntil($code);
                 if (!$user_id = ilObjUser::_lookupId($uname)) {
                     $this->showLoginPage();
                     return false;
@@ -434,11 +452,11 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
 
                 if (!$invalid_code) {
                     $user->setActive(true);
-                    ilAccountCode::useCode($code);
+                    ilRegistrationCode::useCode($code);
                     // apply registration code role assignments
-                    ilAccountCode::applyRoleAssignments($user, $code);
+                    ilRegistrationCode::applyRoleAssignments($user, $code);
                     // apply registration code tie limits
-                    ilAccountCode::applyAccessLimits($user, $code);
+                    ilRegistrationCode::applyAccessLimits($user, $code);
 
                     $user->update();
 
@@ -1119,6 +1137,8 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
      */
     public function showAccountMigration(string $message = ''): void
     {
+        $this->help->setSubScreenId('account_migration');
+
         $tpl = self::initStartUpTemplate('tpl.login_account_migration.html');
 
         $form = new ilPropertyFormGUI();
@@ -1327,6 +1347,8 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
 
         $ilIliasIniFile = $DIC['ilIliasIniFile'];
 
+        $this->help->setSubScreenId('logout');
+
         $tpl = self::initStartUpTemplate("tpl.logout.html");
         $client_id = '';
         if ($this->http->wrapper()->query()->has('client_id')) {
@@ -1514,6 +1536,8 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
      */
     protected function showTermsOfService(bool $accepted = false): void
     {
+        $this->help->setSubScreenId('terms_of_service');
+
         $back_to_login = ('getAcceptance' !== $this->ctrl->getCmd());
         $target = $this->initTargetFromQuery();
 
@@ -2182,6 +2206,9 @@ class ilStartUpGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
     protected function showSamlIdpSelection(ilSamlAuth $auth, array $idps): void
     {
         global $DIC;
+
+        $this->help->setSubScreenId('saml_idp_selection');
+
         self::initStartUpTemplate(array('tpl.saml_idp_selection.html', 'Services/Saml'));
 
         $factory = $DIC->ui()->factory();

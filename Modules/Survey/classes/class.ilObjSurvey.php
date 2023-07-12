@@ -260,11 +260,15 @@ class ilObjSurvey extends ilObject
 
     public function delete(): bool
     {
+        $this->svy_log->debug("Deleting Survey, ref id: " . $this->getRefId() . ", obj id: " .
+            $this->getId() . ", title: " . $this->getTitle());
+        $this->svy_log->debug("References: " . $this->countReferences());
         if ($this->countReferences() === 1) {
             $this->deleteMetaData();
 
             // Delete all survey questions, constraints and materials
             foreach ($this->questions as $question_id) {
+                $this->svy_log->debug("Remove question " . $question_id);
                 $this->removeQuestion($question_id);
             }
             $this->deleteSurveyRecord();
@@ -272,6 +276,7 @@ class ilObjSurvey extends ilObject
             ilFileUtils::delDir($this->getImportDirectory());
         }
 
+        $this->svy_log->debug("Call parent delete.");
         $remove = parent::delete();
 
         // always call parent delete function first!!
@@ -4667,7 +4672,6 @@ class ilObjSurvey extends ilObject
         string $a_code
     ): int {
         $ilDB = $this->db;
-
         $set = $ilDB->query("SELECT anonymous_id FROM svy_anonymous" .
                 " WHERE survey_fi = " . $ilDB->quote($this->getSurveyId(), "integer") .
                 " AND survey_key = " . $ilDB->quote($a_code, "text"));
@@ -4715,7 +4719,6 @@ class ilObjSurvey extends ilObject
     ): ?array {
         $ilUser = $this->user;
         $ilDB = $this->db;
-
         $user_id = $ilUser->getId();
         // code is obligatory?
         if (!$this->isAccessibleWithoutCode()) {
@@ -4735,11 +4738,14 @@ class ilObjSurvey extends ilObject
             }
         } elseif ($user_id === ANONYMOUS_USER_ID ||
             $this->getAnonymize() === self::ANONYMIZE_FREEACCESS) {
+            // self::ANONYMIZE_FREEACCESS: anonymized, no codes
+            // or anonymous user when no codes are used
             if (!$a_code) {
                 // auto-generate code
                 $code = $this->data_manager->code("")
                     ->withUserId($user_id);
-                $this->code_manager->add($code);
+                $code_id = $this->code_manager->add($code);
+                $a_code = $this->code_manager->getByCodeId($code_id);
             }
         } else {
             $a_code = null;

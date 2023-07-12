@@ -78,7 +78,7 @@ class assFormulaQuestionResult
         $this->tolerance = $tolerance;
         $this->unit = $unit;
         $this->formula = $formula;
-        $this->points = $points;
+        $this->setPoints($points);
         $this->precision = $precision;
         $this->rating_simple = $rating_simple;
         $this->rating_sign = $rating_sign;
@@ -539,7 +539,7 @@ class assFormulaQuestionResult
                 $points += ilMath::_mul($this->getPoints(), ilMath::_div($this->getRatingValue(), 100));
             }
             if (is_object($this->getUnit())) {
-                $base1 = $units[$unit];
+                $base1 = $units[$unit] ?? null;
                 if (is_object($base1)) {
                     $base1 = $units[$base1->getBaseUnit()];
                 }
@@ -699,7 +699,7 @@ class assFormulaQuestionResult
 
     public function setPoints($points): void
     {
-        $this->points = $points;
+        $this->points = (float) str_replace(",", ".", $points);
     }
 
     public function getPoints(): float

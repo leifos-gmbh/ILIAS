@@ -161,6 +161,14 @@ class PCParagraphTest extends COPageTestBase
             => 'xx <ExtLink Href="http://ilias.php?x=1&y=2">www</ExtLink> xxxx',
             'xx [xln url="http://ilias.de/my+document.pdf"]doc[/xln] xxxx'
             => 'xx <ExtLink Href="http://ilias.de/my+document.pdf">doc</ExtLink> xxxx',
+            'xx [xln url="http://ilias.de/my(document.pdf"]doc[/xln] xxxx'
+            => 'xx <ExtLink Href="http://ilias.de/my(document.pdf">doc</ExtLink> xxxx',
+            'xx [xln url="http://ilias.de/my)document.pdf"]doc[/xln] xxxx'
+            => 'xx <ExtLink Href="http://ilias.de/my)document.pdf">doc</ExtLink> xxxx',
+            'xx [xln url="http://ilias.de/my$document.pdf"]doc[/xln] xxxx'
+            => 'xx <ExtLink Href="http://ilias.de/my$document.pdf">doc</ExtLink> xxxx',
+            'xx [xln url="http://ilias.de/my*document.pdf"]doc[/xln] xxxx'
+            => 'xx <ExtLink Href="http://ilias.de/my*document.pdf">doc</ExtLink> xxxx',
 
             // anchor
             'xx [anc name="test"]test[/anc] xxxx'
@@ -174,11 +182,13 @@ class PCParagraphTest extends COPageTestBase
             "xx \n \xa0 xxxx"
             => "xx <br /> \xa0 xxxx",
 
+            'xx [xln url="http://ilias.de/my+document.pdf\xa0"]doc[/xln] xxxx'
+            => 'xx [error: xln url="http://ilias.de/my+document.pdf\xa0"]doc</ExtLink> xxxx',
 
-        /*'xx [iln cat="106"] xx'
-            => 'xx [iln cat="106"] xx',
-        'xx [/iln] xx'
-            => 'xx [/iln] xx'*/
+            /*'xx [iln cat="106"] xx'
+                => 'xx [iln cat="106"] xx',
+            'xx [/iln] xx'
+                => 'xx [/iln] xx'*/
         ];
 
         foreach ($cases as $in => $expected) {
@@ -245,6 +255,20 @@ class PCParagraphTest extends COPageTestBase
             ],
             // Standard, Sub
             '<div id="1:1238" class="ilc_text_block_Standard">xxx a<sub class="ilc_sub_Sub">2</sub> xxx</div>'
+            => [
+                "text" => 'xxx a[sub]2[/sub] xxx',
+                "id" => '1:1238',
+                "class" => 'Standard'
+            ],
+            // Standard, Sup (without class, e.g. coming from word)
+            '<div id="1:1237" class="ilc_text_block_Standard">xxx a<sup>b*c</sup> xxx</div>'
+            => [
+                "text" => 'xxx a[sup]b*c[/sup] xxx',
+                "id" => '1:1237',
+                "class" => 'Standard'
+            ],
+            // Standard, Sub (without class, e.g. coming from word)
+            '<div id="1:1238" class="ilc_text_block_Standard">xxx a<sub>2</sub> xxx</div>'
             => [
                 "text" => 'xxx a[sub]2[/sub] xxx',
                 "id" => '1:1238',
@@ -379,15 +403,6 @@ class PCParagraphTest extends COPageTestBase
     // test setTest using legacy (saveJS) way
     //
 
-    // see saveJs in ilPCParagraph
-    protected function legacyHtmlToXml(string $content): string
-    {
-        $content = str_replace("<br>", "<br />", $content);
-        $content = ilPCParagraph::handleAjaxContent($content);
-        $content = ilPCParagraph::_input2xml($content["text"], true, false);
-        $content = ilPCParagraph::handleAjaxContentPost($content);
-        return $content;
-    }
 
     public function testLegacyHtml2Text(): void
     {
@@ -423,5 +438,142 @@ class PCParagraphTest extends COPageTestBase
                 $page->getXMLFromDom()
             );
         }
+    }
+
+    public function testCharacteristic(): void
+    {
+        $page = $this->getEmptyPageWithDom();
+        $pc = new ilPCParagraph($page);
+        $pc->create($page, "pg");
+        $pc->setLanguage("en");
+        $pc->setCharacteristic("MyChar");
+
+        $this->assertEquals(
+            "MyChar",
+            $pc->getCharacteristic()
+        );
+        $page->stripHierIDs();
+
+        $expected = <<<EOT
+<PageObject><PageContent><Paragraph Language="en" Characteristic="MyChar"></Paragraph></PageContent></PageObject>
+EOT;
+        $this->assertXmlEquals(
+            $expected,
+            $page->getXMLFromDom()
+        );
+    }
+
+    public function testSubCharacteristic(): void
+    {
+        $page = $this->getEmptyPageWithDom();
+        $pc = new ilPCParagraph($page);
+        $pc->create($page, "pg");
+        $pc->setLanguage("en");
+        $pc->setSubCharacteristic("MySubChar");
+
+        $this->assertEquals(
+            "MySubChar",
+            $pc->getSubCharacteristic()
+        );
+        $page->stripHierIDs();
+
+        $expected = <<<EOT
+<PageObject><PageContent><Paragraph Language="en" SubCharacteristic="MySubChar"></Paragraph></PageContent></PageObject>
+EOT;
+        $this->assertXmlEquals(
+            $expected,
+            $page->getXMLFromDom()
+        );
+    }
+
+    public function testAutoIndent(): void
+    {
+        $page = $this->getEmptyPageWithDom();
+        $pc = new ilPCParagraph($page);
+        $pc->create($page, "pg");
+        $pc->setLanguage("en");
+        $pc->setAutoIndent("1");
+
+        $this->assertEquals(
+            "1",
+            $pc->getAutoIndent()
+        );
+        $page->stripHierIDs();
+
+        $expected = <<<EOT
+<PageObject><PageContent><Paragraph Language="en" AutoIndent="1"></Paragraph></PageContent></PageObject>
+EOT;
+        $this->assertXmlEquals(
+            $expected,
+            $page->getXMLFromDom()
+        );
+    }
+
+    public function testDownloadTitle(): void
+    {
+        $page = $this->getEmptyPageWithDom();
+        $pc = new ilPCParagraph($page);
+        $pc->create($page, "pg");
+        $pc->setLanguage("en");
+        $pc->setDownloadTitle("title.txt");
+
+        $this->assertEquals(
+            "title.txt",
+            $pc->getDownloadTitle()
+        );
+        $page->stripHierIDs();
+
+        $expected = <<<EOT
+<PageObject><PageContent><Paragraph Language="en" DownloadTitle="title.txt"></Paragraph></PageContent></PageObject>
+EOT;
+        $this->assertXmlEquals(
+            $expected,
+            $page->getXMLFromDom()
+        );
+    }
+
+    public function testShowLineNumbers(): void
+    {
+        $page = $this->getEmptyPageWithDom();
+        $pc = new ilPCParagraph($page);
+        $pc->create($page, "pg");
+        $pc->setLanguage("en");
+        $pc->setShowLineNumbers("y");
+
+        $this->assertEquals(
+            "y",
+            $pc->getShowLineNumbers()
+        );
+        $page->stripHierIDs();
+
+        $expected = <<<EOT
+<PageObject><PageContent><Paragraph Language="en" ShowLineNumbers="y"></Paragraph></PageContent></PageObject>
+EOT;
+        $this->assertXmlEquals(
+            $expected,
+            $page->getXMLFromDom()
+        );
+    }
+
+    public function testLanguage(): void
+    {
+        $page = $this->getEmptyPageWithDom();
+        $pc = new ilPCParagraph($page);
+        $pc->create($page, "pg");
+        $pc->setLanguage("en");
+
+        $this->assertEquals(
+            "en",
+            $pc->getLanguage()
+        );
+        $page->stripHierIDs();
+
+        $expected = <<<EOT
+<PageObject><PageContent><Paragraph Language="en"></Paragraph></PageContent></PageObject>
+EOT;
+        $this->assertXmlEquals(
+            $expected,
+            $page->getXMLFromDom()
+        );
     }
 }

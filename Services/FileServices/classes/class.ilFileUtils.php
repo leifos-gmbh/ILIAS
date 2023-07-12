@@ -527,10 +527,8 @@ class ilFileUtils
             }
             $upload_result = $upload->getResults()[$a_file] ?? null;
             if ($upload_result instanceof UploadResult) {
-                $processing_status = $upload_result->getStatus();
-                if ($processing_status->getCode(
-                ) === ProcessingStatus::REJECTED) {
-                    throw new ilException($processing_status->getMessage());
+                if (!$upload_result->isOK()) {
+                    throw new ilException($upload_result->getStatus()->getMessage());
                 }
             } else {
                 return false;
@@ -807,7 +805,7 @@ class ilFileUtils
     public static function unzip(string $a_file, bool $overwrite = false, bool $a_flat = false): bool
     {
         global $DIC;
-        return $DIC->legacyArchives()->unzip($a_file, null, $overwrite, $a_flat);
+        return $DIC->legacyArchives()->unzip($a_file, null, $overwrite, $a_flat, true);
     }
 
     /**
@@ -880,6 +878,14 @@ class ilFileUtils
                         strtolower($a_old_suffix)) {
                         $pos = strrpos($a_dir . "/" . $file, ".");
                         $new_name = substr($a_dir . "/" . $file, 0, $pos) . "." . $a_new_suffix;
+                        // check if file exists
+                        if (file_exists($new_name)) {
+                            if (is_dir($new_name)) {
+                                ilFileUtils::delDir($new_name);
+                            } else {
+                                unlink($new_name);
+                            }
+                        }
                         rename($a_dir . "/" . $file, $new_name);
                     }
                 }

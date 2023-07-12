@@ -83,7 +83,7 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
         $this->editQuestion();
     }
 
-    public function downkprim_answers(): void
+    public function downkprimanswers(): void
     {
         if (isset($_POST['cmd'][__FUNCTION__]) && count($_POST['cmd'][__FUNCTION__])) {
             $this->object->moveAnswerDown(key($_POST['cmd'][__FUNCTION__]));
@@ -93,7 +93,7 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
         $this->editQuestion();
     }
 
-    public function upkprim_answers(): void
+    public function upkprimanswers(): void
     {
         if (isset($_POST['cmd'][__FUNCTION__]) && count($_POST['cmd'][__FUNCTION__])) {
             $this->object->moveAnswerUp(key($_POST['cmd'][__FUNCTION__]));
@@ -112,7 +112,7 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
         $form->setValuesByPost();
 
         if ($always) {
-            $answersInput = $form->getItemByPostVar('kprim_answers');
+            $answersInput = $form->getItemByPostVar('kprimanswers');
             $answersInput->setIgnoreMissingUploadsEnabled(true);
 
             if (!$answersInput->checkUploads($_POST[$answersInput->getPostVar()])) {
@@ -177,17 +177,18 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
 
         if (!$this->object->getSelfAssessmentEditingMode() && $this->object->isSingleLineAnswerType($this->object->getAnswerType())) {
             // thumb size
-            $thumbSize = new ilNumberInputGUI($this->lng->txt('thumb_size'), 'thumb_size');
-            $thumbSize->setSuffix($this->lng->txt("thumb_size_unit_pixel"));
-            $thumbSize->setInfo($this->lng->txt('thumb_size_info'));
-            $thumbSize->setDecimals(false);
-            $thumbSize->setMinValue(20);
-            $thumbSize->setSize(6);
-            if ($this->object->getThumbSize() > 0) {
-                $thumbSize->setValue($this->object->getThumbSize());
-            }
-            $form->addItem($thumbSize);
+            $thumb_size = new ilNumberInputGUI($this->lng->txt('thumb_size'), 'thumb_size');
+            $thumb_size->setSuffix($this->lng->txt("thumb_size_unit_pixel"));
+            $thumb_size->setInfo($this->lng->txt('thumb_size_info'));
+            $thumb_size->setDecimals(false);
+            $thumb_size->setMinValue(20);
+            $thumb_size->setSize(6);
+            $thumb_size->setValue($this->object->getThumbSize());
+        } else {
+            $thumb_size = new ilHiddenInputGUI('thumb_size');
+            $thumb_size->setValue($this->object->getThumbSize());
         }
+        $form->addItem($thumb_size);
 
         // option label
         $optionLabel = new ilRadioGroupInputGUI($this->lng->txt('option_label'), 'option_label');
@@ -240,7 +241,7 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
      */
     public function writeQuestionSpecificPostData(ilPropertyFormGUI $form): void
     {
-        $oldAnswerType = $this->object->getAnswerType();
+        $old_answer_type = $this->object->getAnswerType();
 
         $this->object->setShuffleAnswersEnabled($form->getItemByPostVar('shuffle_answers_enabled')->getChecked());
 
@@ -250,8 +251,8 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
             $this->object->setAnswerType(assKprimChoice::ANSWER_TYPE_MULTI_LINE);
         }
 
-        if (!$this->object->getSelfAssessmentEditingMode() && $this->object->isSingleLineAnswerType($oldAnswerType)) {
-            $this->object->setThumbSize($form->getItemByPostVar('thumb_size')->getValue() ?? $this->object->getThumbSize());
+        if (!$this->object->getSelfAssessmentEditingMode() && $this->object->isSingleLineAnswerType($old_answer_type)) {
+            $this->object->setThumbSize((int) ($form->getItemByPostVar('thumb_size')->getValue() ?? $this->object->getThumbSize()));
         }
 
         $this->object->setOptionLabel($form->getItemByPostVar('option_label')->getValue());
@@ -276,7 +277,7 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
      */
     public function populateAnswerSpecificFormPart(ilPropertyFormGUI $form): ilPropertyFormGUI
     {
-        $kprimAnswers = new ilKprimChoiceWizardInputGUI($this->lng->txt('answers'), 'kprim_answers');
+        $kprimAnswers = new ilKprimChoiceWizardInputGUI($this->lng->txt('answers'), 'kprimanswers');
         $kprimAnswers->setInfo($this->lng->txt('kprim_answers_info'));
         $kprimAnswers->setSize(64);
         $kprimAnswers->setMaxLength(1000);
@@ -299,9 +300,9 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
      */
     public function writeAnswerSpecificPostData(ilPropertyFormGUI $form): void
     {
-        $answers = $form->getItemByPostVar('kprim_answers')->getValues();
+        $answers = $form->getItemByPostVar('kprimanswers')->getValues();
         $answers = $this->handleAnswerTextsSubmit($answers);
-        $files = $form->getItemByPostVar('kprim_answers')->getFiles();
+        $files = $form->getItemByPostVar('kprimanswers')->getFiles();
 
         $this->object->handleFileUploads($answers, $files);
         $this->object->setAnswers($answers);
@@ -365,7 +366,8 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
 
         foreach ($keys as $answer_id) {
             $answer = $this->object->getAnswer($answer_id);
-            if (strlen($answer->getImageFile())) {
+            if ($answer->getImageFile() !== null
+                && $answer->getImageFile() !== '') {
                 if ($this->object->getThumbSize()) {
                     $template->setCurrentBlock("preview");
                     $template->setVariable("URL_PREVIEW", $answer->getImageWebPath());
@@ -452,7 +454,8 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
 
         foreach ($keys as $answer_id) {
             $answer = $this->object->getAnswer($answer_id);
-            if (strlen($answer->getImageFile())) {
+            if ($answer->getImageFile() === 0
+                || $answer->getImageFile() === '') {
                 if ($this->object->getThumbSize()) {
                     $template->setCurrentBlock("preview");
                     $template->setVariable("URL_PREVIEW", $answer->getImageWebPath());
@@ -586,7 +589,8 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
                 $template->setVariable("ICON_OK", $correctness_icon);
                 $template->parseCurrentBlock();
             }
-            if (strlen($answer->getImageFile())) {
+            if ($answer->getImageFile() !== null
+                && $answer->getImageFile() !== '') {
                 $template->setCurrentBlock("answer_image");
                 if ($this->object->getThumbSize()) {
                     $template->setVariable("ANSWER_IMAGE_URL", $answer->getThumbWebPath());
@@ -895,7 +899,7 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
         $form->addItem($scorePartialSolution);
 
         // answers
-        $kprimAnswers = new ilKprimChoiceCorrectionsInputGUI($this->lng->txt('answers'), 'kprim_answers');
+        $kprimAnswers = new ilKprimChoiceCorrectionsInputGUI($this->lng->txt('answers'), 'kprimanswers');
         $kprimAnswers->setInfo($this->lng->txt('kprim_answers_info'));
         $kprimAnswers->setSize(64);
         $kprimAnswers->setMaxLength(1000);
@@ -919,7 +923,7 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
         );
 
         $this->object->setAnswers(
-            $form->getItemByPostVar('kprim_answers')->getValues()
+            $form->getItemByPostVar('kprimanswers')->getValues()
         );
     }
 }

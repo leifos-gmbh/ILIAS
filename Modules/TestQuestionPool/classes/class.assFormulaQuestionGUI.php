@@ -79,11 +79,6 @@ class assFormulaQuestionGUI extends assQuestionGUI
             $this->object->setComment($_POST["comment"]);
             $questiontext = ilUtil::stripOnlySlashes($_POST["question"]);
             $this->object->setQuestion($questiontext);
-            $this->object->setEstimatedWorkingTime(
-                $_POST["Estimated"]["hh"],
-                $_POST["Estimated"]["mm"],
-                $_POST["Estimated"]["ss"]
-            );
 
             $this->object->parseQuestionText();
             $found_vars = array();
@@ -104,12 +99,6 @@ class assFormulaQuestionGUI extends assQuestionGUI
             } catch (ilTestQuestionPoolInvalidArgumentException $e) {
             }
 
-            //			if(!$this->object->checkForDuplicateVariables())
-            //			{
-//
-            //				$this->addErrorMessage($this->lng->txt("err_duplicate_variables"));
-            //				$checked = FALSE;
-            //			}
             if (!$this->object->checkForDuplicateResults()) {
                 $this->addErrorMessage($this->lng->txt("err_duplicate_results"));
                 $checked = false;
@@ -117,7 +106,16 @@ class assFormulaQuestionGUI extends assQuestionGUI
 
             foreach ($found_vars as $variable) {
                 if ($this->object->getVariable($variable) != null) {
-                    $varObj = new assFormulaQuestionVariable($variable, $_POST["range_min_$variable"], $_POST["range_max_$variable"], $this->object->getUnitrepository()->getUnit($_POST["unit_$variable"]), $_POST["precision_$variable"], $_POST["intprecision_$variable"]);
+                    $varObj = new assFormulaQuestionVariable(
+                        $variable,
+                        $_POST["range_min_$variable"],
+                        $_POST["range_max_$variable"],
+                        isset($_POST["unit_$variable"]) ? $this->object->getUnitrepository()->getUnit(
+                            $_POST["unit_$variable"]
+                        ) : null,
+                        $_POST["precision_$variable"],
+                        $_POST["intprecision_$variable"]
+                    );
                     $varObj->setRangeMinTxt($_POST["range_min_$variable"]);
                     $varObj->setRangeMaxTxt($_POST["range_max_$variable"]);
                     $this->object->addVariable($varObj);
@@ -157,7 +155,7 @@ class assFormulaQuestionGUI extends assQuestionGUI
                 }
 
                 if ($this->object->getResult($result) != null) {
-                    $use_simple_rating = ($_POST["rating_advanced_$result"] == 1) ? false : true;
+                    $use_simple_rating = $this->request->int("rating_advanced_$result") !== 1;
                     $resObj = new assFormulaQuestionResult(
                         $result,
                         $_POST["range_min_$result"],
@@ -168,15 +166,17 @@ class assFormulaQuestionGUI extends assQuestionGUI
                         $_POST["points_$result"],
                         $_POST["precision_$result"],
                         $use_simple_rating,
-                        ($_POST["rating_advanced_$result"] == 1) ? $_POST["rating_sign_$result"] : "",
-                        ($_POST["rating_advanced_$result"] == 1) ? $_POST["rating_value_$result"] : "",
-                        ($_POST["rating_advanced_$result"] == 1) ? $_POST["rating_unit_$result"] : "",
-                        $_POST["result_type_$result"] != 0 ? $_POST["result_type_$result"] : 0
+                        $this->request->int("rating_advanced_$result") === 1 ? $_POST["rating_sign_$result"] : "",
+                        $this->request->int("rating_advanced_$result") === 1 ? $_POST["rating_value_$result"] : "",
+                        $this->request->int("rating_advanced_$result") === 1 ? $_POST["rating_unit_$result"] : "",
+                        $this->request->int("result_type_$result")
                     );
                     $resObj->setRangeMinTxt($_POST["range_min_$result"]);
                     $resObj->setRangeMaxTxt($_POST["range_max_$result"]);
                     $this->object->addResult($resObj);
-                    $this->object->addResultUnits($resObj, $_POST["units_$result"]);
+                    if (isset($_POST["units_$result"]) && is_array($_POST["units_$result"])) {
+                        $this->object->addResultUnits($resObj, $_POST["units_$result"]);
+                    }
                 }
             }
             if ($checked == false) {
@@ -223,7 +223,6 @@ class assFormulaQuestionGUI extends assQuestionGUI
         $form->setTableWidth('100%');
         $form->setId('assformulaquestion');
 
-        // title, author, description, question, working time (assessment mode)
         $this->addBasicQuestionFormProperties($form);
 
         // Add info text
@@ -769,7 +768,6 @@ class assFormulaQuestionGUI extends assQuestionGUI
                 $this->ctrl->redirect($this, "originalSyncForm");
             } elseif ($this->request->raw("calling_test")) {
                 $test = new ilObjTest($this->request->raw("calling_test"));
-                #var_dump(assQuestion::_questionExistsInTest($this->object->getId(), $test->getTestId()));
                 $q_id = $this->object->getId();
                 if (!assQuestion::_questionExistsInTest($this->object->getId(), $test->getTestId())) {
                     global $DIC;
@@ -777,22 +775,20 @@ class assFormulaQuestionGUI extends assQuestionGUI
                     $ilDB = $DIC['ilDB'];
                     $component_repository = $DIC['component.repository'];
 
-                    $_GET["ref_id"] = $this->request->raw("calling_test");
                     $test = new ilObjTest($this->request->raw("calling_test"), true);
 
                     $testQuestionSetConfigFactory = new ilTestQuestionSetConfigFactory($tree, $ilDB, $component_repository, $test);
 
-                    $new_id = $test->insertQuestion(
+                    $test->insertQuestion(
                         $testQuestionSetConfigFactory->getQuestionSetConfig(),
-                        $this->object->getId()
+                        $this->object->getId(),
+                        true
                     );
 
-                    $q_id = $new_id;
                     if ($this->request->isset('prev_qid')) {
-                        $test->moveQuestionAfter($this->object->getId() + 1, $this->request->raw('prev_qid'));
+                        $test->moveQuestionAfter($this->object->getId(), $this->request->raw('prev_qid'));
                     }
 
-                    $this->ctrl->setParameter($this, 'q_id', $new_id);
                     $this->ctrl->setParameter($this, 'calling_test', $this->request->raw("calling_test"));
                 }
                 $this->tpl->setOnScreenMessage('success', $this->lng->txt("msg_obj_modified"), true);

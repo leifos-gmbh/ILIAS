@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -149,7 +150,6 @@ class assFileUpload extends assQuestion implements ilObjQuestionScoringAdjustabl
             $this->setPoints($data["points"]);
 
             $this->setQuestion(ilRTE::_replaceMediaObjectImageSrc((string) $data["question_text"], 1));
-            $this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
             $this->setMaxSize(($data["maxsize"] ?? null) ? (int) $data["maxsize"] : null);
             $this->setAllowedExtensions($data["allowedextensions"]);
             $this->setCompletionBySubmission($data['compl_by_submission'] == 1 ? true : false);
@@ -946,8 +946,8 @@ class assFileUpload extends assQuestion implements ilObjQuestionScoringAdjustabl
             $worksheet->setCell($startrow + $i, $col, $this->lng->txt("result"));
             $worksheet->setBold($worksheet->getColumnCoord($col) . ($startrow + $i));
             if (strlen($solution["value1"])) {
-                $worksheet->setCell($startrow + $i, $col + 1, $solution["value1"]);
-                $worksheet->setCell($startrow + $i, $col + 2, $solution["value2"]);
+                $worksheet->setCell($startrow + $i, $col + 2, $solution["value1"]);
+                $worksheet->setCell($startrow + $i, $col + 3, $solution["value2"]);
             }
             $i++;
         }
@@ -1016,40 +1016,6 @@ class assFileUpload extends assQuestion implements ilObjQuestionScoringAdjustabl
     public function setAllowedExtensions($a_value): void
     {
         $this->allowedextensions = strtolower(trim($a_value));
-    }
-
-    public function __get($value)
-    {
-        switch ($value) {
-            case "maxsize":
-                return $this->getMaxSize();
-                break;
-            case "allowedextensions":
-                return $this->getAllowedExtensions();
-                break;
-            case 'completion_by_submission':
-                return $this->isCompletionBySubmissionEnabled();
-                break;
-        }
-        return null;
-    }
-
-    /**
-    * Object setter
-    */
-    public function __set($key, $value)
-    {
-        switch ($key) {
-            case "maxsize":
-                $this->setMaxSize($value ? (int) $value : null);
-                break;
-            case "allowedextensions":
-                $this->setAllowedExtensions($value);
-                break;
-            case 'completion_by_submission':
-                $this->setCompletionBySubmission($value);
-                break;
-        }
     }
 
     /**

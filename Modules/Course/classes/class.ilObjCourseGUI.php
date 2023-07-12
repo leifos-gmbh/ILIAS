@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=0);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,8 +16,11 @@ declare(strict_types=0);
  *
  *********************************************************************/
 
+declare(strict_types=0);
+
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory;
+use ILIAS\News\Service as News;
 
 /**
  * Class ilObjCourseGUI
@@ -47,6 +48,7 @@ class ilObjCourseGUI extends ilContainerGUI
     public const BREADCRUMB_DEFAULT = 0;
     public const BREADCRUMB_CRS_ONLY = 1;
     public const BREADCRUMB_FULL_PATH = 2;
+    protected News $news;
 
     private ?ilAdvancedMDRecordGUI $record_gui = null;
     private ?ilContainerStartObjects $start_obj = null;
@@ -74,6 +76,7 @@ class ilObjCourseGUI extends ilContainerGUI
 
         $this->http = $DIC->http();
         $this->refinery = $DIC->refinery();
+        $this->news = $DIC->news();
     }
 
     /**
@@ -112,6 +115,7 @@ class ilObjCourseGUI extends ilContainerGUI
         $this->checkPermission('read', 'view');
         if ($this->view_manager->isAdminView()) {
             parent::renderObject();
+            $this->addAdoptContentLinkToToolbar();
             return;
         }
 
@@ -652,6 +656,7 @@ class ilObjCourseGUI extends ilContainerGUI
 
             $file_info = $form->getInput('file');
             $file_name = $form->getItemByPostVar('file')->getFilename();
+            $file_name = ilFileUtils::getValidFilename($file_name);
 
             $file_obj = new ilCourseFile();
             $file_obj->setCourseId($this->object->getId());
@@ -882,18 +887,7 @@ class ilObjCourseGUI extends ilContainerGUI
         ilObjectServiceSettingsGUI::updateServiceSettingsForm(
             $this->object->getId(),
             $form,
-            array(
-                ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
-                ilObjectServiceSettingsGUI::USE_NEWS,
-                ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
-                ilObjectServiceSettingsGUI::TAG_CLOUD,
-                ilObjectServiceSettingsGUI::CUSTOM_METADATA,
-                ilObjectServiceSettingsGUI::BADGES,
-                ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
-                ilObjectServiceSettingsGUI::SKILLS,
-                ilObjectServiceSettingsGUI::BOOKING,
-                ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
-            )
+            $this->getSubServices()
         );
 
         ilChangeEvent::_recordWriteEvent($this->object->getId(), $this->user->getId(), 'update');
@@ -914,6 +908,26 @@ class ilObjCourseGUI extends ilContainerGUI
             return;
         }
         $this->afterUpdate();
+    }
+
+    protected function getSubServices(): array
+    {
+        $subs = array(
+            ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
+            ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
+            ilObjectServiceSettingsGUI::TAG_CLOUD,
+            ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+            ilObjectServiceSettingsGUI::BADGES,
+            ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
+            ilObjectServiceSettingsGUI::SKILLS,
+            ilObjectServiceSettingsGUI::BOOKING,
+            ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
+        );
+        if ($this->news->isGloballyActivated()) {
+            $subs[] = ilObjectServiceSettingsGUI::USE_NEWS;
+        }
+
+        return $subs;
     }
 
     protected function confirmLPSync(): void
@@ -1330,18 +1344,7 @@ class ilObjCourseGUI extends ilContainerGUI
         ilObjectServiceSettingsGUI::initServiceSettingsForm(
             $this->object->getId(),
             $form,
-            array(
-                ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
-                ilObjectServiceSettingsGUI::USE_NEWS,
-                ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
-                ilObjectServiceSettingsGUI::TAG_CLOUD,
-                ilObjectServiceSettingsGUI::CUSTOM_METADATA,
-                ilObjectServiceSettingsGUI::BADGES,
-                ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
-                ilObjectServiceSettingsGUI::SKILLS,
-                ilObjectServiceSettingsGUI::BOOKING,
-                ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
-            )
+            $this->getSubServices()
         );
 
         $mem = new ilCheckboxInputGUI($this->lng->txt('crs_show_members'), 'show_members');
@@ -2210,6 +2213,9 @@ class ilObjCourseGUI extends ilContainerGUI
 
                 $editor = new ilLOEditorGUI($this->object);
                 $this->ctrl->forwardCommand($editor);
+                if (strtolower($this->ctrl->getCmdClass()) === "illopagegui") {
+                    $header_action = false;
+                }
                 break;
 
             case 'ilcontainerstartobjectsgui':
@@ -2572,7 +2578,7 @@ class ilObjCourseGUI extends ilContainerGUI
         $location = [];
         if ($this->http->wrapper()->post()->has('location')) {
             $custom_transformer = $this->refinery->custom()->transformation(
-                fn ($array) => $array
+                fn($array) => $array
             );
             $location = $this->http->wrapper()->post()->retrieve(
                 'location',

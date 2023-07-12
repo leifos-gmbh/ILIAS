@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\Cron\Schedule\CronJobScheduleType;
+
 /**
  * Class ilCronFinishUnfinishedTestPasses
  * @author Guido Vollbach <gvollbach@databay.de>
@@ -77,9 +79,9 @@ class ilCronFinishUnfinishedTestPasses extends ilCronJob
         return $lng->txt("finish_unfinished_passes_desc");
     }
 
-    public function getDefaultScheduleType(): int
+    public function getDefaultScheduleType(): CronJobScheduleType
     {
-        return self::SCHEDULE_TYPE_DAILY;
+        return CronJobScheduleType::SCHEDULE_TYPE_DAILY;
     }
 
     public function getDefaultScheduleValue(): int
@@ -205,6 +207,19 @@ class ilCronFinishUnfinishedTestPasses extends ilCronJob
     protected function finishPassForUser($active_id, $obj_id): void
     {
         $processLocker = $this->processLockerFactory->withContextId((int) $active_id)->getLocker();
+
+        $testSession = new ilTestSession();
+        $testSession->loadFromDb($active_id);
+
+        $test = new ilObjTest($obj_id, false);
+
+        assQuestion::_updateTestPassResults(
+            $active_id,
+            $testSession->getPass(),
+            $test->areObligationsEnabled(),
+            null,
+            $obj_id
+        );
 
         $pass_finisher = new ilTestPassFinishTasks($active_id, $obj_id);
         $pass_finisher->performFinishTasks($processLocker);

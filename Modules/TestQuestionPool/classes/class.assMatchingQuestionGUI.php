@@ -104,7 +104,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
                     new assAnswerMatchingTerm(
                         ilUtil::stripSlashes(htmlentities($answer)),
                         $filename,
-                        $terms_identifiers[$index] ?? ''
+                        $terms_identifiers[$index] ?? 0
                     )
                 );
             }
@@ -136,7 +136,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
                     new assAnswerMatchingDefinition(
                         ilUtil::stripSlashes(htmlentities($answer)),
                         $filename,
-                        $definitions_identifiers[$index] ?? ''
+                        $definitions_identifiers[$index] ?? 0
                     )
                 );
             }
@@ -168,7 +168,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
             $this->object->setShuffle(1);
             $this->object->setShuffleMode(1);
         }
-        $this->object->setThumbGeometry($_POST["thumb_geometry"]);
+        $this->object->setThumbGeometry($_POST["thumb_geometry"] ?? 0);
         $this->object->setMatchingMode($_POST['matching_mode']);
     }
 
@@ -262,8 +262,6 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
         $form->setTableWidth("100%");
         $form->setId("matching");
 
-
-        // title, author, description, question, working time (assessment mode)
         $this->addBasicQuestionFormProperties($form);
         $this->populateQuestionSpecificFormPart($form);
         $this->populateAnswerSpecificFormPart($form);
@@ -409,13 +407,13 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
             $shuffle->setRequired(false);
             $form->addItem($shuffle);
 
-            $geometry = new ilNumberInputGUI($this->lng->txt("thumb_geometry"), "thumb_geometry");
+            $geometry = new ilNumberInputGUI($this->lng->txt('thumb_size'), 'thumb_geometry');
             $geometry->setValue($this->object->getThumbGeometry());
             $geometry->setRequired(true);
             $geometry->setMaxLength(6);
             $geometry->setMinValue(20);
             $geometry->setSize(6);
-            $geometry->setInfo($this->lng->txt("thumb_geometry_info"));
+            $geometry->setInfo($this->lng->txt('thumb_size_info'));
             $form->addItem($geometry);
         }
 

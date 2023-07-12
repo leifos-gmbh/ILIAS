@@ -173,13 +173,15 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
 
     protected function saveManScoringByQuestion(bool $ajax = false): void
     {
+        /** @var ILIAS\DI\Container $DIC **/
         global $DIC;
-        $ilAccess = $DIC->access();
+        $user = $DIC->user();
 
-        if (
-            false === $ilAccess->checkAccess("write", "", $this->ref_id) &&
-            false === $ilAccess->checkAccess("man_scoring_access", "", $this->ref_id)
-        ) {
+        $pass = key($_POST['scoring']);
+        $active_data = current($_POST['scoring']);
+        $active_ids = array_keys($active_data);
+
+        if (!$this->testAccess->checkScoreParticipantsAccessForActiveId(current($active_ids))) {
             if ($ajax) {
                 echo $this->lng->txt('cannot_edit_test');
                 exit();
@@ -195,21 +197,19 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
             return;
         }
 
-        $pass = key($_POST['scoring']);
-        $activeData = current($_POST['scoring']);
-        $participantData = new ilTestParticipantData($DIC->database(), $DIC->language());
+        $participantData = new ilTestParticipantData($this->db, $this->lng);
         $manPointsPost = [];
         $skipParticipant = [];
         $maxPointsByQuestionId = [];
 
-        $participantData->setActiveIdsFilter(array_keys($activeData));
+        $participantData->setActiveIdsFilter($active_ids);
         $participantData->setParticipantAccessFilter(
             ilTestParticipantAccessFilter::getScoreParticipantsUserFilter($this->ref_id)
         );
         $participantData->load($this->object->getTestId());
 
         foreach ($participantData->getActiveIds() as $active_id) {
-            $questions = $activeData[$active_id];
+            $questions = $active_data[$active_id];
 
             // check for existing test result data
             if (!$this->object->getTestResult($active_id, $pass)) {
@@ -242,7 +242,7 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
         $lastAndHopefullyCurrentQuestionId = null;
 
         foreach ($participantData->getActiveIds() as $active_id) {
-            $questions = $activeData[$active_id];
+            $questions = $active_data[$active_id];
             $update_participant = false;
             $qst_id = null;
 
@@ -308,8 +308,8 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
 
         if ($ajax && is_array($correction_feedback)) {
             $finalized_by_usr_id = $correction_feedback['finalized_by_usr_id'];
-            if (! $finalized_by_usr_id) {
-                $finalized_by_usr_id = $DIC['ilUser']->getId();
+            if (!$finalized_by_usr_id) {
+                $finalized_by_usr_id = $user->getId();
             }
             $correction_feedback['finalized_by'] = ilObjUser::_lookupFullname($finalized_by_usr_id);
             $correction_feedback['finalized_on_date'] = '';
@@ -524,15 +524,19 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
             $form->addItem($hidden_points);
         }
 
-        $tmp_tpl->setVariable('TINYMCE_ACTIVE', ilObjAdvancedEditing::_getRichTextEditor());
-        $text_area = new ilTextAreaInputGUI($this->lng->txt('set_manual_feedback'), 'm_feedback' . $post_var);
         $feedback_text = '';
         if (array_key_exists('feedback', $feedback)) {
             $feedback_text = $feedback['feedback'];
         }
-        $text_area->setDisabled($disable);
-        $text_area->setValue($feedback_text);
-        $form->addItem($text_area);
+
+        if ($disable) {
+            $feedback_input = new ilNonEditableValueGUI($this->lng->txt('set_manual_feedback'), 'm_feedback' . $post_var, true);
+        } else {
+            $tmp_tpl->setVariable('TINYMCE_ACTIVE', ilObjAdvancedEditing::_getRichTextEditor());
+            $feedback_input = new ilTextAreaInputGUI($this->lng->txt('set_manual_feedback'), 'm_feedback' . $post_var);
+        }
+        $feedback_input->setValue($feedback_text);
+        $form->addItem($feedback_input);
 
         $reached_points_form = new ilNumberInputGUI($this->lng->txt('tst_change_points_for_question'), $scoring_post_var);
         $reached_points_form->allowDecimals(true);

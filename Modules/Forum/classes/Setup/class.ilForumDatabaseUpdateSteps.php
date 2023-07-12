@@ -64,20 +64,36 @@ class ilForumDatabaseUpdateSteps implements ilDatabaseUpdateSteps
         }
     }
 
-    public function step4(): void
+    public function step_4(): void
     {
         if ($this->db->tableExists('frm_thread_access')) {
             $this->db->dropTable('frm_thread_access');
         }
     }
 
-    public function step5(): void
+    public function step_5(): void
     {
         if ($this->db->tableExists('settings')) {
             $this->db->manipulateF(
                 "DELETE FROM settings WHERE keyword = %s",
                 ['text'],
                 ['frm_new_deadline']
+            );
+        }
+    }
+
+    public function step_6(): void
+    {
+        if (!$this->db->tableColumnExists('frm_posts_drafts', 'rcid')) {
+            $this->db->addTableColumn(
+                'frm_posts_drafts',
+                'rcid',
+                [
+                    'type' => 'text',
+                    'notnull' => false,
+                    'length' => 64,
+                    'default' => ''
+                ]
             );
         }
     }

@@ -1,10 +1,10 @@
 <?php
 
 /**
-* This file is part of ILIAS, a powerful learning management system
-* published by ILIAS open source e-Learning e.V.
-*
-* ILIAS is licensed with the GPL-3.0,
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
  * see https://www.gnu.org/licenses/gpl-3.0.en.html
  * You should have received a copy of said license along with the
  * source code, too.
@@ -136,6 +136,9 @@ class NoUIFactory implements Factory
     {
     }
     public function player(): C\Player\Factory
+    {
+    }
+    public function launcher(): C\Launcher\Factory
     {
     }
     public function helpTopics(string ...$topic): array

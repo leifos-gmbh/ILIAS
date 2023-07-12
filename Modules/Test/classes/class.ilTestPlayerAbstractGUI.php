@@ -901,7 +901,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
         $component_repository = $DIC["component.repository"];
         return $component_repository->getPluginSlotById("tsig")->hasActivePlugins();
     }
-    
+
     public function redirectBackCmd()
     {
         $testPassesSelector = new ilTestPassesSelector($this->db, $this->object);
@@ -1093,10 +1093,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 
     protected function showQuestionEditable(assQuestionGUI $questionGui, $formAction, $isQuestionWorkedThrough, $instantResponse)
     {
-        $questionNavigationGUI = $this->buildEditableStateQuestionNavigationGUI(
-            $questionGui->object->getId(),
-            $this->populateCharSelectorIfRequired()
-        );
+        $questionNavigationGUI = $this->buildEditableStateQuestionNavigationGUI($questionGui->object->getId());
         if ($isQuestionWorkedThrough) {
             $questionNavigationGUI->setDiscardSolutionButtonEnabled(true);
             // fau: testNav - set answere status in question header
@@ -1404,7 +1401,22 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
         } else {
             $template->setVariable("REDIRECT_URL", "");
         }
+        $template->setVariable("CHECK_URL", $this->ctrl->getLinkTarget($this, 'checkWorkingTime', '', true));
         $this->tpl->addOnLoadCode($template->get());
+    }
+
+    /**
+     * This is asynchronously called by tpl.workingtime.js to check for
+     * changes in the user's processing time for a test. This includes
+     * extra time added during the test, as this is checked by
+     * ilObjTest::getProcessingTimeInSeconds(). The Javascript side
+     * then updates the test timer without needing to reload the test page.
+     */
+    public function checkWorkingTimeCmd(): void
+    {
+        $active_id = $this->testSession->getActiveId();
+        echo (string) $this->object->getProcessingTimeInSeconds($active_id);
+        exit;
     }
 
     protected function showSideList($presentationMode, $currentSequenceElement)
@@ -1765,11 +1777,22 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 
     protected function handlePasswordProtectionRedirect()
     {
+        /**
+         * The test password is only checked once per session
+         * to avoid errors during autosave if the password is
+         * changed during a running test.
+         * See Mantis #22536 for more details.
+         */
+        if ($this->testSession->isPasswordChecked() === true) {
+            return;
+        }
+
         if ($this->ctrl->getNextClass() == 'iltestpasswordprotectiongui') {
             return;
         }
 
         if (!$this->passwordChecker->isPasswordProtectionPageRedirectRequired()) {
+            $this->testSession->setPasswordChecked(true);
             return;
         }
 
@@ -1884,29 +1907,6 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
         }
     }
 
-    /**
-     * @return bool $charSelectorAvailable
-     */
-    protected function populateCharSelectorIfRequired(): bool
-    {
-        global $DIC;
-        $ilSetting = $DIC['ilSetting'];
-
-        if ($ilSetting->get('char_selector_availability') > 0) {
-            $char_selector = ilCharSelectorGUI::_getCurrentGUI($this->object);
-            if ($char_selector->getConfig()->getAvailability() == ilCharSelectorConfig::ENABLED) {
-                $char_selector->addToPage();
-                $this->tpl->setCurrentBlock('char_selector');
-                $this->tpl->setVariable("CHAR_SELECTOR_TEMPLATE", $char_selector->getSelectorHtml());
-                $this->tpl->parseCurrentBlock();
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     protected function getTestNavigationToolbarGUI(): ilTestNavigationToolbarGUI
     {
         global $DIC;
@@ -1953,7 +1953,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
         return $navigationGUI;
     }
 
-    protected function buildEditableStateQuestionNavigationGUI($questionId, $charSelectorAvailable): ilTestQuestionNavigationGUI
+    protected function buildEditableStateQuestionNavigationGUI($questionId): ilTestQuestionNavigationGUI
     {
         $navigationGUI = new ilTestQuestionNavigationGUI($this->lng);
 
@@ -2003,8 +2003,6 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
             }
         }
 
-        $navigationGUI->setCharSelectorEnabled($charSelectorAvailable);
-
         if ($this->object->getShowMarker()) {
             $solved_array = ilObjTest::_getSolvedQuestions($this->testSession->getActiveId(), $questionId);
             $solved = 0;
@@ -2053,6 +2051,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 
     protected function populateInstantResponseModal(assQuestionGUI $questionGui, $navUrl)
     {
+        $questionGui->setNavigationGUI(null);
         $questionGui->getQuestionHeaderBlockBuilder()->setQuestionAnswered(true);
 
         $answerFeedbackEnabled = $this->object->getSpecificAnswerFeedback();
@@ -2260,11 +2259,19 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
     }
 
     // fau: testNav - get the navigation url set by a submit from ilTestPlayerNavigationControl.js
-    protected function getNavigationUrlParameter()
+    protected function getNavigationUrlParameter(): ?string
     {
         if (isset($_POST['test_player_navigation_url'])) {
-            return $_POST['test_player_navigation_url'];
+            $navigation_url = $_POST['test_player_navigation_url'];
+
+            $navigation_url_parts = parse_url($navigation_url);
+            $ilias_url_parts = parse_url(ilUtil::_getHttpPath());
+
+            if (!isset($navigation_url_parts['host']) || ($ilias_url_parts['host'] === $navigation_url_parts['host'])) {
+                return $navigation_url;
+            }
         }
+
         return null;
     }
     // fau.
@@ -2677,7 +2684,6 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
         $forced_feeback_navigation_url = ilSession::get('forced_feedback_navigation_url');
         $forced_feeback_navigation_url[$this->testSession->getActiveId()] = $forcedFeedbackNavUrl;
         ilSession::set('forced_feedback_navigation_url', $forced_feeback_navigation_url);
-        //$_SESSION['forced_feedback_navigation_url'][$this->testSession->getActiveId()] = $forcedFeedbackNavUrl;
     }
 
     protected function getRegisteredForcedFeedbackNavUrl()

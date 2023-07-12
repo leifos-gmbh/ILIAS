@@ -110,7 +110,7 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
         return $this->answerType;
     }
 
-    public function setThumbSize($thumbSize): void
+    public function setThumbSize(int $thumbSize): void
     {
         $this->thumbSize = $thumbSize;
     }
@@ -225,7 +225,6 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
             $this->setAuthor($data['author']);
             $this->setPoints($data['points']);
             $this->setOwner($data['owner']);
-            $this->setEstimatedWorkingTimeFromDurationString($data['working_time']);
             $this->setLastChange($data['tstamp']);
             $this->setQuestion(ilRTE::_replaceMediaObjectImageSrc((string) $data['question_text'], 1));
 
@@ -599,7 +598,7 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
     {
         if ($this->isSingleLineAnswerType($this->getAnswerType()) && $this->getThumbSize()) {
             foreach ($this->getAnswers() as $answer) {
-                if (strlen($answer->getImageFile())) {
+                if ($answer->getImageFile() !== null) {
                     $this->generateThumbForFile($answer->getImageFsDir(), $answer->getImageFile());
                 }
             }
@@ -868,7 +867,7 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
         foreach ($this->getAnswers() as $answer) {
             $filename = $answer->getImageFile();
 
-            if (strlen($filename)) {
+            if ($filename !== null) {
                 if (!file_exists($targetPath)) {
                     ilFileUtils::makeDirParents($targetPath);
                 }
@@ -1032,7 +1031,7 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
                     break;
                 }
             }
-            $worksheet->setCell($startrow + $i, $col + 1, $correctness);
+            $worksheet->setCell($startrow + $i, $col + 2, $correctness);
             $i++;
         }
 

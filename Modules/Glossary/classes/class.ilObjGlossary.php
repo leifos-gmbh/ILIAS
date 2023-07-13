@@ -823,6 +823,10 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
             $cp_options->appendMapping($this->getRefId() . '_glo_terms', $term_mappings);
         }
 
+        // copy collection glossaries
+        foreach ($this->getGlossariesForCollection() as $glo_id) {
+            $new_obj->addGlossaryForCollection($glo_id);
+        }
 
         return $new_obj;
     }

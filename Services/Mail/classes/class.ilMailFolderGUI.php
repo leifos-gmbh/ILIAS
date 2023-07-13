@@ -659,14 +659,29 @@ class ilMailFolderGUI
         }
         $this->ctrl->clearParametersByClass(ilMailFormGUI::class);
 
-        $printBtn = ilLinkButton::getInstance();
-        $printBtn->setCaption('print');
+
         $this->ctrl->setParameter($this, 'mail_id', $mailId);
         $this->ctrl->setParameter($this, 'mobj_id', $mailData['folder_id']);
-        $printBtn->setUrl($this->ctrl->getLinkTarget($this, 'printMail'));
+        $print_url = $this->ctrl->getLinkTarget($this, 'printMail');
         $this->ctrl->clearParameters($this);
-        $printBtn->setTarget('_blank');
-        $this->toolbar->addButtonInstance($printBtn);
+        $print_btn = $this->ui_factory->button()
+                                      ->standard($this->lng->txt('print'), '#')
+                                      ->withOnLoadCode(static fn($id): string => "
+                document.getElementById('$id').addEventListener('click', function() {
+                    const frm = this.closest('form'),
+                        action = frm.action;
+
+                    frm.action = '$print_url';
+                    frm.target = '_blank';
+                    frm.submit();
+
+                    frm.action = action;
+                    frm.removeAttribute('target');
+
+                    return false;
+                });
+            ");
+        $this->toolbar->addComponent($print_btn);
 
         $deleteBtn = $this->ui_factory->button()
                                       ->standard($this->lng->txt('delete'), '#')
@@ -856,23 +871,27 @@ class ilMailFolderGUI
             $this->toolbar->addSeparator();
 
             if ($prevMail && $prevMail['mail_id']) {
-                $prevBtn = ilLinkButton::getInstance();
-                $prevBtn->setCaption('previous');
                 $this->ctrl->setParameter($this, 'mail_id', $prevMail['mail_id']);
                 $this->ctrl->setParameter($this, 'mobj_id', $this->currentFolderId);
-                $prevBtn->setUrl($this->ctrl->getLinkTarget($this, 'showMail'));
+                $prevBtn = $this->ui_factory->button()
+                                            ->standard(
+                                                $this->lng->txt('previous'),
+                                                $this->ctrl->getLinkTarget($this, 'showMail')
+                                            );
+                $this->toolbar->addComponent($prevBtn);
                 $this->ctrl->clearParameters($this);
-                $this->toolbar->addButtonInstance($prevBtn);
             }
 
             if ($nextMail && $nextMail['mail_id']) {
-                $nextBtn = ilLinkButton::getInstance();
-                $nextBtn->setCaption('next');
                 $this->ctrl->setParameter($this, 'mail_id', $nextMail['mail_id']);
                 $this->ctrl->setParameter($this, 'mobj_id', $this->currentFolderId);
-                $nextBtn->setUrl($this->ctrl->getLinkTarget($this, 'showMail'));
+                $nextBtn = $this->ui_factory->button()
+                                            ->standard(
+                                                $this->lng->txt('next'),
+                                                $this->ctrl->getLinkTarget($this, 'showMail')
+                                            );
+                $this->toolbar->addComponent($nextBtn);
                 $this->ctrl->clearParameters($this);
-                $this->toolbar->addButtonInstance($nextBtn);
             }
         }
 

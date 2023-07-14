@@ -252,8 +252,8 @@ export default class UI {
     const action = this.actionFactory;
     const tr = this.iimModel.getCurrentTrigger();
     this.toolSlate.setContent(this.uiModel.triggerProperties);
-    this.setInputValueByName('form_input_1', tr.title);
-    this.setInputValueByName('form_input_2', tr.area.shapeType);
+    this.setInputValueByName('#copg-iim-trigger-prop-form', 'form_input_1', tr.title);
+    this.setInputValueByName('#copg-iim-trigger-prop-form', 'form_input_2', tr.area.shapeType);
     this.initTriggerViewControl();
     this.initBackButton();
     model = this.iimModel;
@@ -291,13 +291,10 @@ export default class UI {
     return null;
   }
 
-  setInputValueByName(name, value) {
-    const path = "#copg-iim-trigger-prop-form input[name='" + name + "'],select[name='" + name + "']";
+  setInputValueByName(sel, name, value) {
+    const path = sel + " input[name='" + name + "'],select[name='" + name + "']";
     const el = document.querySelector(path);
     if (el) {
-      console.log("SETTING");
-      console.log(el);
-      console.log(value);
       el.value = value;
     }
   }
@@ -458,9 +455,48 @@ export default class UI {
   }
 
   showPopups() {
+    const action = this.actionFactory;
+    const dispatch = this.dispatcher;
     this.toolSlate.setContent(this.uiModel.popupOverview);
     this.initBackButton();
+    this.initPopupList();
+    document.querySelectorAll("[data-copg-ed-type='button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_TRIGGER_POPUP_ADD:
+            dispatch.dispatch(action.interactiveImage().editor().addTriggerPopup());
+            break;
+        }
+      });
+    });
   }
+
+  initPopupList() {
+    const popups = this.iimModel.getPopups();
+    const action = this.actionFactory;
+    let items = [];
+    popups.forEach((pop) => {
+      items.push({
+          placeholders: {
+            'item-title': pop.title,
+          },
+          actions: [
+            {
+              action: action.interactiveImage().editor().renamePopup(pop.nr),
+              txt: il.Language.txt('rename')
+            },
+            {
+              action: action.interactiveImage().editor().deletePopup(pop.nr),
+              txt: il.Language.txt('delete')
+            }
+          ]
+        }
+      );
+    });
+    this.fillItemList(items);
+  }
+
 
   showOverlayModal() {
     const action = this.actionFactory;
@@ -481,4 +517,30 @@ export default class UI {
         ));
       });
   }
+
+  showPopupModal(params = null, model = null) {
+    const action = this.actionFactory;
+    const dispatch = this.dispatcher;
+    const nr = (params) ? params.nr : '';
+    this.util.showModal(
+      this.uiModel.modal,
+      il.Language.txt("cont_add_popup"),
+      this.uiModel.popupForm,
+      il.Language.txt("save"),
+      (e) => {
+        const form = document.querySelector("#il-copg-ed-modal form");
+
+        //after_pcid, pcid, component, data
+        dispatch.dispatch(action.interactiveImage().editor().savePopup(
+          {
+            form:form
+          },
+          nr
+        ));
+      });
+    if (params) {
+      this.setInputValueByName('.modal-content', 'form_input_1', model.getPopupTitle(params.nr));
+    }
+  }
+
 }

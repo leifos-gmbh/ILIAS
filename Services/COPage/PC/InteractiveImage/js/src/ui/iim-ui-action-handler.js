@@ -117,6 +117,10 @@ export default class IIMUIActionHandler {
                     this.ui.showOverlays();
                     break;
 
+                case ACTIONS.E_SWITCH_POPUPS:
+                    this.ui.showPopups();
+                    break;
+
                 case ACTIONS.E_TRIGGER_PROPERTIES_SAVE:
                     this.sendSaveTriggerPropertiesCommand(
                       params,
@@ -126,6 +130,22 @@ export default class IIMUIActionHandler {
 
                 case ACTIONS.E_TRIGGER_OVERLAY_ADD:
                     this.ui.showOverlayModal();
+                    break;
+
+                case ACTIONS.E_TRIGGER_POPUP_ADD:
+                    this.ui.showPopupModal();
+                    break;
+
+                case ACTIONS.E_POPUP_SAVE:
+                    this.sendPopupSave(params, model);
+                    break;
+
+                case ACTIONS.E_POPUP_RENAME:
+                    this.ui.showPopupModal(params, model);
+                    break;
+
+                case ACTIONS.E_POPUP_DELETE:
+                    this.sendDeletePopup(params, model);
                     break;
 
                 case ACTIONS.E_OVERLAY_UPLOAD:
@@ -198,6 +218,34 @@ export default class IIMUIActionHandler {
         this.client.sendCommand(delete_action).then(result => {
             this.handleStandardResponse(result, model);
             dispatch.dispatch(af.interactiveImage().editor().switchOverlays());
+        });
+    }
+
+    sendPopupSave(params, model) {
+        const af = this.actionFactory;
+        const dispatch = this.dispatcher;
+        const util = this.util;
+        const data = new FormData(params.data.form);
+        data.append('nr', params.nr);
+        const save_action = af.interactiveImage().command().savePopup(
+          data
+        );
+        this.client.sendCommand(save_action).then(result => {
+            this.handleStandardResponse(result, model);
+            util.hideCurrentModal();
+            dispatch.dispatch(af.interactiveImage().editor().switchPopups());
+        });
+    }
+
+    sendDeletePopup(params, model) {
+        const af = this.actionFactory;
+        const dispatch = this.dispatcher;
+        const delete_action = af.interactiveImage().command().deletePopup(
+          params.nr
+        );
+        this.client.sendCommand(delete_action).then(result => {
+            this.handleStandardResponse(result, model);
+            dispatch.dispatch(af.interactiveImage().editor().switchPopups());
         });
     }
 

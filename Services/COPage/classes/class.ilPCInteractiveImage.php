@@ -173,10 +173,13 @@ class ilPCInteractiveImage extends ilPageContent
     /**
      * Add a tab
      */
-    public function addContentPopup() : void
+    public function addContentPopup(?string $title = null) : void
     {
         $lng = $this->lng;
 
+        if ($title === null) {
+            $title = $lng->txt("cont_new_popup");
+        }
         $max = 0;
         $popups = $this->getPopups();
         foreach ($popups as $p) {
@@ -184,7 +187,7 @@ class ilPCInteractiveImage extends ilPageContent
         }
 
         $new_item = $this->dom->create_element("ContentPopup");
-        $new_item->set_attribute("Title", $lng->txt("cont_new_popup"));
+        $new_item->set_attribute("Title", $title);
         $new_item->set_attribute("Nr", $max + 1);
         $new_item = $this->iim_node->append_child($new_item);
     }
@@ -247,6 +250,40 @@ class ilPCInteractiveImage extends ilPageContent
                     $a_hier_id == $childs[$i]->get_attribute("HierId")) {
                     $childs[$i]->unlink($childs[$i]);
                 }
+            }
+        }
+    }
+
+    public function saveContentPopupTitle(string $nr, string $title) : void
+    {
+        $childs = $this->iim_node->child_nodes();
+        $nodes = array();
+        for ($i = 0; $i < count($childs); $i++) {
+            if ($childs[$i]->node_name() == "ContentPopup") {
+                if ($nr == $childs[$i]->get_attribute("Nr")) {
+                    $childs[$i]->set_attribute("Title", $title);
+                }
+            }
+        }
+    }
+
+    public function deletePopupByNr(
+        string $nr
+    ) : void {
+        $childs = $this->iim_node->child_nodes();
+        $nodes = array();
+        for ($i = 0; $i < count($childs); $i++) {
+            if ($childs[$i]->node_name() == "ContentPopup") {
+                if ($nr == $childs[$i]->get_attribute("Nr")) {
+                    $childs[$i]->unlink($childs[$i]);
+                }
+            }
+        }
+        $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
+        for ($i = 0; $i < count($tr_nodes); $i++) {
+            $tr_node = $tr_nodes[$i];
+            if ($tr_node->get_attribute("PopupNr") === $nr) {
+                $tr_node->remove_attribute("PopupNr");
             }
         }
     }

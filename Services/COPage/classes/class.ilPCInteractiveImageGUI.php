@@ -773,4 +773,12 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
         );
     }
 
+    public function getPopupFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI {
+        $f = $this->gui->form(null, "#")
+                       ->text(
+                           "title",
+                           $this->lng->txt("title")
+                       );
+        return $f;
+    }
 }

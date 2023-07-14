@@ -147,4 +147,32 @@ export default class IIMEditorActionFactory {
     });
   }
 
+  renamePopup(nr) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_POPUP_RENAME, {
+      nr: nr
+    });
+  }
+
+  deletePopup(nr) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_POPUP_DELETE, {
+      nr: nr
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  addTriggerPopup(
+  ) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_POPUP_ADD, {
+    });
+  }
+
+  savePopup(data, nr) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_POPUP_SAVE, {
+      data: data,
+      nr: nr
+    });
+  }
+
 }

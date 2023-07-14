@@ -61,6 +61,12 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
             case "delete.overlay":
                 return $this->deleteOverlay($query['pc_id'], $body);
 
+            case "save.popup":
+                return $this->savePopup($query['pc_id'], $body);
+
+            case "delete.popup":
+                return $this->deletePopup($query['pc_id'], $body);
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
         }
@@ -143,9 +149,52 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
     protected function deleteOverlay(string $pc_id, array $body): Server\Response
     {
         $page = $this->page_gui->getPageObject();
-        /** @var \ilPCInteractiveImage $pc */
-        $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
+        $pc = $this->getPCInteractiveImage($pc_id);
         $pc->deleteOverlay($body["data"]["overlay"]);
+        $updated = $page->update();
+
+        return $this->getStandardResponse($updated, $pc);
+    }
+
+    protected function getPCInteractiveImage(string $pc_id): \ilPCInteractiveImage
+    {
+        $pg = $this->page_gui->getPageObject();
+        return $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
+    }
+
+    protected function getPCInteractiveImageGUI(string $pc_id): \ilPCInteractiveImageGUI
+    {
+        $pg = $this->page_gui->getPageObject();
+        $iim = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
+        $iim_gui = new \ilPCInteractiveImageGUI($pg, $iim, "", $pc_id);
+        $iim_gui->setPageConfig($pg->getPageConfig());
+        return $iim_gui;
+    }
+
+    protected function savePopup(string $pc_id, array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        $form_adapter = $this->getPCInteractiveImageGUI($pc_id)
+                             ->getPopupFormAdapter();
+        $pc = $this->getPCInteractiveImage($pc_id);
+        if ($form_adapter->isValid()) {
+            $title = $form_adapter->getData("title");
+            if ($body['nr'] == "") {
+                $pc->addContentPopup($title);
+            } else {
+                $pc->saveContentPopupTitle($body['nr'], $title);
+            }
+        }
+        $updated = $page->update();
+
+        return $this->getStandardResponse($updated, $pc);
+    }
+
+    protected function deletePopup(string $pc_id, array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        $pc = $this->getPCInteractiveImage($pc_id);
+        $pc->deletePopupByNr($body["data"]["nr"]);
         $updated = $page->update();
 
         return $this->getStandardResponse($updated, $pc);

@@ -64,4 +64,21 @@ export default class IIMCommandActionFactory {
     });
   }
 
+  /**
+   * @param {formData} data
+   * @return {CommandAction}
+   */
+  savePopup(data) {
+    console.log("---");
+    console.log(data);
+
+    return this.clientActionFactory.formCommand(this.COMPONENT, ACTIONS.C_SAVE_POPUP, data);
+  }
+
+  deletePopup(nr) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.C_DELETE_POPUP, {
+      nr: nr
+    });
+  }
+
 }

@@ -166,4 +166,19 @@ export default class Model {
   getOverlays() {
     return this.model.iim.overlays;
   }
+
+  getPopups() {
+    return this.model.iim.popups;
+  }
+
+  getPopupTitle(nr) {
+    let title = '';
+    this.model.iim.popups.forEach((p) => {
+      if (p.nr === nr) {
+        title = p.title;
+      }
+    });
+    return title;
+  }
+
 }

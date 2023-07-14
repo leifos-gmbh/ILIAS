@@ -86,6 +86,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $o->uiModel->popupOverview = $this->getPopupOverview();
         $o->uiModel->overlayOverview = $this->getOverlayOverview();
         $o->uiModel->overlayUpload = $this->getOverlayUpload();
+        $o->uiModel->popupForm = $this->getPopupForm();
         $o->uiModel->backgroundProperties = $this->getBackgroundProperties();
         $o->uiModel->modal = $this->getModalTemplate();
 
@@ -449,13 +450,18 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         return $modalt;
     }
 
-    protected function getOverlayUploadFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI {
-
+    protected function getPCInteractiveImageGUI(): \ilPCInteractiveImageGUI
+    {
         $pg = $this->page_gui->getPageObject();
-        $iim = new \ilPCInteractiveImage($pg);
+        $iim = $this->page_gui->getPageObject()->getContentObjectForPcId($this->pc_id);
         $iim_gui = new \ilPCInteractiveImageGUI($pg, $iim, "", $this->pc_id);
         $iim_gui->setPageConfig($pg->getPageConfig());
-        return $iim_gui->getOverlayUploadFormAdapter([get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class]);
+        return $iim_gui;
+    }
+
+    protected function getOverlayUploadFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI {
+        return $this->getPCInteractiveImageGUI()
+                    ->getOverlayUploadFormAdapter([get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class]);
     }
 
     protected function getOverlayUpload(): string
@@ -473,6 +479,16 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
             \ilPCInteractiveImageGUI::class,
             "mode",
             null
+        );
+        return $content;
+    }
+
+    protected function getPopupForm(): string
+    {
+        $iim_gui = $this->getPCInteractiveImageGUI();
+        $content = $this->ui_wrapper->getRenderedAdapterForm(
+            $iim_gui->getPopupFormAdapter(),
+            [["InteractiveImage", "popup.save", $this->lng->txt("save")]]
         );
         return $content;
     }

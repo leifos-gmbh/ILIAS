@@ -5595,8 +5595,10 @@ common#:#soap_user_administration_desc#:#Clique no canto superior esquerdo da á
 common#:#soap_wsdl_path#:#Caminho WSDL
 common#:#soap_wsdl_path_info#:#Insira o caminho para o ficheiro wsdl de ilias que deve ser usado para o webservice. Se deixar este campo vazio, será usado o seguinte caminho por defeito:%s
 common#:#sort_ascending#:#Sort Ascending###30 04 2021 new variable
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Note que as mesmas formatações não são suportadas em módulos de conteúdo.
 common#:#sort_descending#:#Sort Descending###30 04 2021 new variable
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Predefinição
 common#:#sorting_asc#:#Ascendente
 common#:#sorting_creation_header#:#Por data de criação
@@ -8218,6 +8220,7 @@ dateplaner#:#cal_on_the#:#A.
 dateplaner#:#cal_open_calendar#:#Abrir calendário
 dateplaner#:#cal_origin#:#Origem
 dateplaner#:#cal_owner#:#Proprietário
+dateplaner#:#cal_period#:#Period###21 06 2023 new variable
 dateplaner#:#cal_rec_err_limit#:#Insira um valor válido de marcações.
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.###28 05 2021 new variable
 dateplaner#:#cal_recurrences#:#Recorrências
@@ -13198,8 +13201,6 @@ rbac#:#iass_read_learning_progress#:#Ativar dados expandidos
 rbac#:#iass_visible#:#A avaliação individual adicionada
 rbac#:#iass_write#:#Itens que determinam o progresso de aprendizagem
 rbac#:#il_lti_global_role#:#LTI User###24 09 2021 new variable
-rbac#:#il_orgu_employee#:#Funcionário unidade organizacional
-rbac#:#il_orgu_superior#:#Superior hierárquico unidade organizacional
 rbac#:#il_sess_participant#:#Sessão participante
 rbac#:#il_sess_status_closed#:#Sessão fechada não participante
 rbac#:#ilias_id#:#ID ILIAS
@@ -13330,8 +13331,10 @@ rbac#:#orgu_cat_administrate_users#:#O utilizador pode criar e administrar conta
 rbac#:#orgu_copy#:#Copiar unidade organizacional
 rbac#:#orgu_delete#:#O utilizador pode mover ou apagar unidade organizacional
 rbac#:#orgu_edit_permission#:#O utilizador pode mudar as definições de permissões
+rbac#:#orgu_employee#:#Funcionário unidade organizacional
 rbac#:#orgu_read#:#O utilizador tem acesso de leitura à unidade organizacional
 rbac#:#orgu_read_users#:#O utilizador pode ler contas de utilizador locais criadas nesta unidade organizacional
+rbac#:#orgu_superior#:#Superior hierárquico unidade organizacional
 rbac#:#orgu_view_learning_progress#:#Ver progresso de aprendizagem
 rbac#:#orgu_view_learning_progress_rec#:#Ver progresso de aprendizagem da unidade incl. subunidades
 rbac#:#orgu_visible#:#A unidade organizacional está visível

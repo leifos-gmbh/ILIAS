@@ -4897,7 +4897,8 @@ CREATE TABLE `event_appointment` (
   `starting_time` int(11) NOT NULL DEFAULT 0,
   `ending_time` int(11) NOT NULL DEFAULT 0,
   `fulltime` tinyint(4) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`appointment_id`)
+  PRIMARY KEY (`appointment_id`),
+  KEY `i1_idx` (`event_id`)
 ) ;
 
 --
@@ -15527,7 +15528,9 @@ CREATE TABLE `rbac_fa` (
   `protected` char(1) DEFAULT 'n',
   `blocked` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`rol_id`,`parent`),
-  KEY `i1_idx` (`parent`)
+  KEY `i1_idx` (`parent`),
+  KEY `i2_idx` (`assign`,`rol_id`),
+  KEY `i3_idx` (`assign`,`parent`)
 ) ;
 
 --
@@ -19935,7 +19938,7 @@ INSERT INTO `settings` VALUES ('common','dbupwarn_tos_migr_54x','1');
 INSERT INTO `settings` VALUES ('common','dbupwarn_tstfixqstseq','1');
 INSERT INTO `settings` VALUES ('common','dbup_tst_skl_thres_mig_done','1');
 INSERT INTO `settings` VALUES ('common','db_hotfixes_5_3','18');
-INSERT INTO `settings` VALUES ('common','db_hotfixes_7','99');
+INSERT INTO `settings` VALUES ('common','db_hotfixes_7','103');
 INSERT INTO `settings` VALUES ('common','db_update_running','0');
 INSERT INTO `settings` VALUES ('common','db_version','5751');
 INSERT INTO `settings` VALUES ('common','default_repository_view','flat');
@@ -22672,7 +22675,6 @@ CREATE TABLE `tree` (
   `depth` smallint(6) NOT NULL DEFAULT 0,
   `path` varchar(4000) DEFAULT NULL,
   PRIMARY KEY (`child`),
-  KEY `i1_idx` (`child`),
   KEY `i2_idx` (`parent`),
   KEY `i3_idx` (`tree`),
   KEY `i4_idx` (`path`(255))
@@ -24116,7 +24118,7 @@ CREATE TABLE `usr_search` (
 --
 
 CREATE TABLE `usr_sess_istorage` (
-  `session_id` varchar(80) NOT NULL DEFAULT '',
+  `session_id` varchar(256) NOT NULL DEFAULT '',
   `component_id` varchar(30) NOT NULL DEFAULT '',
   `vkey` varchar(50) NOT NULL DEFAULT '',
   `value` varchar(1000) DEFAULT NULL,
@@ -24133,7 +24135,7 @@ CREATE TABLE `usr_sess_istorage` (
 --
 
 CREATE TABLE `usr_session` (
-  `session_id` varchar(250) NOT NULL DEFAULT ' ',
+  `session_id` varchar(256) NOT NULL DEFAULT ' ',
   `expires` int(11) NOT NULL DEFAULT 0,
   `data` longtext DEFAULT NULL,
   `ctime` int(11) NOT NULL DEFAULT 0,
@@ -24203,7 +24205,7 @@ CREATE TABLE `usr_session_stats` (
 --
 
 CREATE TABLE `usr_session_stats_raw` (
-  `session_id` varchar(80) NOT NULL DEFAULT '',
+  `session_id` varchar(256) NOT NULL DEFAULT '',
   `type` smallint(6) NOT NULL DEFAULT 0,
   `start_time` int(11) NOT NULL DEFAULT 0,
   `end_time` int(11) DEFAULT NULL,
@@ -25030,4 +25032,4 @@ CREATE TABLE `xmlvalue_seq` (
 
 
 
--- Dump completed on 2023-05-05 15:41:13
+-- Dump completed on 2023-06-21 13:36:05

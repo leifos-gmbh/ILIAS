@@ -5595,8 +5595,10 @@ common#:#soap_user_administration_desc#:#Jeśli wybrane, to wszystkie konta mog�
 common#:#soap_wsdl_path#:#Ścieżka WSDL
 common#:#soap_wsdl_path_info#:#Tutaj możesz podać ścieżkę do pliku WSDL, którą ILIAS ma użyć dla usług sieciowych. Jeśli to pole pozostanie puste, jako domyślna zostanie wykorzystana poniższa ścieżka:%s
 common#:#sort_ascending#:#Sort Ascending###30 04 2021 new variable
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Sortuj wg tej kolumny
 common#:#sort_descending#:#Sort Descending###30 04 2021 new variable
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Domyślnie
 common#:#sorting_asc#:#Rosnąco
 common#:#sorting_creation_header#:#Wg daty utworzenia
@@ -8218,6 +8220,7 @@ dateplaner#:#cal_on_the#:#W każdy:
 dateplaner#:#cal_open_calendar#:#Otwórz kalendarz
 dateplaner#:#cal_origin#:#Pochodzenie
 dateplaner#:#cal_owner#:#Właściciel
+dateplaner#:#cal_period#:#Period###21 06 2023 new variable
 dateplaner#:#cal_rec_err_limit#:#Podaj liczbę terminów.
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.###28 05 2021 new variable
 dateplaner#:#cal_recurrences#:#Powtarzalność
@@ -13198,8 +13201,6 @@ rbac#:#iass_read_learning_progress#:#Obejrzyj postęp w nauce dla indywidualnych
 rbac#:#iass_visible#:#Indywidualna ocena jest widoczna
 rbac#:#iass_write#:#Edytuj ustawienia dotyczące indywidualnych ocen
 rbac#:#il_lti_global_role#:#LTI User###24 09 2021 new variable
-rbac#:#il_orgu_employee#:#Jednostka organizacyjna Pracownik
-rbac#:#il_orgu_superior#:#Jednostka organizacyjna Przełożony
 rbac#:#il_sess_participant#:#Uczestnicy sesji
 rbac#:#il_sess_status_closed#:#Sesja dostępna tylko dla członków
 rbac#:#ilias_id#:#ILIAS-ID
@@ -13330,8 +13331,10 @@ rbac#:#orgu_cat_administrate_users#:#Administracja kontami lokalnych użytkownik
 rbac#:#orgu_copy#:#Skopiuj jednostkę organizacyjną
 rbac#:#orgu_delete#:#Usuń lub przesuń jednostkę organizacyjną
 rbac#:#orgu_edit_permission#:#Zmień ustawienia uprawnień
+rbac#:#orgu_employee#:#Jednostka organizacyjna Pracownik
 rbac#:#orgu_read#:#Prawo czytania dotyczące jednostki organizacyjnej
 rbac#:#orgu_read_users#:#Istnieje możliwość obejrzenia lokalnych użytkowników tej jednostki organizacyjnej
+rbac#:#orgu_superior#:#Jednostka organizacyjna Przełożony
 rbac#:#orgu_view_learning_progress#:#Obejrzyj postęp w nauce
 rbac#:#orgu_view_learning_progress_rec#:#Wgląd w postęp w nauce w trybie powtarzającym się
 rbac#:#orgu_visible#:#Jednostka organizacyjna jest widoczna.

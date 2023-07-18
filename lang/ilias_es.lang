@@ -5597,8 +5597,10 @@ common#:#soap_user_administration_desc#:#Si está habilitado, todas las cuentas 
 common#:#soap_wsdl_path#:#Ruta WSDL
 common#:#soap_wsdl_path_info#:#Por favor, escriba la ruta al archivo ilias WSDL que debe utilizarse para el WebService. Si deja este campo en blanco, la siguiente ruta de acceso se utilizará por defecto: %s
 common#:#sort_ascending#:#Sort Ascending###30 04 2021 new variable
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Ordenar por esta columna
 common#:#sort_descending#:#Sort Descending###30 04 2021 new variable
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Por defecto
 common#:#sorting_asc#:#Ascendente
 common#:#sorting_creation_header#:#Por fecha de creación
@@ -8220,6 +8222,7 @@ dateplaner#:#cal_on_the#:#En el:
 dateplaner#:#cal_open_calendar#:#Abrir calendario
 dateplaner#:#cal_origin#:#Origen
 dateplaner#:#cal_owner#:#Propietario
+dateplaner#:#cal_period#:#Period###21 06 2023 new variable
 dateplaner#:#cal_rec_err_limit#:#Por favor, introduzca un numero valido de responsables.
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.###28 05 2021 new variable
 dateplaner#:#cal_recurrences#:#Frecuencia
@@ -13200,8 +13203,6 @@ rbac#:#iass_read_learning_progress#:#Ver información sobre el progreso de apren
 rbac#:#iass_visible#:#La valoración individual es visible
 rbac#:#iass_write#:#Editar una valoración individual
 rbac#:#il_lti_global_role#:#LTI User###24 09 2021 new variable
-rbac#:#il_orgu_employee#:#Empleado de la Unidad Organizativa
-rbac#:#il_orgu_superior#:#Superior de la Unidad Organizativa
 rbac#:#il_sess_participant#:#Participante en la sesión
 rbac#:#il_sess_status_closed#:#Sesión cerrada de no participante
 rbac#:#ilias_id#:#ID de ILIAS
@@ -13332,8 +13333,10 @@ rbac#:#orgu_cat_administrate_users#:#El usuario puede crear y administrar cuenta
 rbac#:#orgu_copy#:#Copiar unidad organizativa
 rbac#:#orgu_delete#:#El usuario puede mover o borrar esta unidad organizativa
 rbac#:#orgu_edit_permission#:#El usuario puede cambiar la configuración de permisos
+rbac#:#orgu_employee#:#Empleado de la Unidad Organizativa
 rbac#:#orgu_read#:#El usuario tiene acceso de lectura a la unidad organizativa
 rbac#:#orgu_read_users#:#El usuario puede consultar cuentas de usuarios locales creadas en esta unidad organizativa
+rbac#:#orgu_superior#:#Superior de la Unidad Organizativa
 rbac#:#orgu_view_learning_progress#:#Ver progreso de aprendizaje
 rbac#:#orgu_view_learning_progress_rec#:#Ver progreso de aprendizaje de unidad que incluye subunidades
 rbac#:#orgu_visible#:#La unidad organizativa está visible

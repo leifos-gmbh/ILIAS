@@ -5609,8 +5609,10 @@ common#:#soap_user_administration_desc#:#Ha be van kapcsolva, az ILIAS kezelhet�
 common#:#soap_wsdl_path#:#WSDL útvonal
 common#:#soap_wsdl_path_info#:#Adja meg a webszolgáltatásokhoz használandó ILIAS WSDL fájl útját. Ha üresen hagyja ezt a mezőt, az alábbi útvonal lesz alapértelmezett: %s
 common#:#sort_ascending#:#Rendezés növekvő sorrendben
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Rendezés erre az oszlopra
 common#:#sort_descending#:#Rendezés csökkenő sorrendben
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Alapértelmezett
 common#:#sorting_asc#:#Növekvő
 common#:#sorting_creation_header#:#Létrehozás ideje szerinti
@@ -8232,6 +8234,7 @@ dateplaner#:#cal_on_the#:#Ekkor:
 dateplaner#:#cal_open_calendar#:#Naptár megnyitása
 dateplaner#:#cal_origin#:#Származás
 dateplaner#:#cal_owner#:#Tulajdonos
+dateplaner#:#cal_period#:#Period###21 06 2023 new variable
 dateplaner#:#cal_rec_err_limit#:#Érvényes esemény számot adjon meg!
 dateplaner#:#cal_recurrence_confirm_deletion#:#Kérem válasszon, hogy egy foglaltságot vagy egy teljes foglaltságsorozatot.
 dateplaner#:#cal_recurrences#:#Ismétlődés
@@ -13212,8 +13215,6 @@ rbac#:#iass_read_learning_progress#:#Személyes értékelés tanulási haladási
 rbac#:#iass_visible#:#Személyes értékelés látható
 rbac#:#iass_write#:#Személyes értékelés módosítása
 rbac#:#il_lti_global_role#:#LTI-Felhasználó
-rbac#:#il_orgu_employee#:#Szervezeti egység beosztottja
-rbac#:#il_orgu_superior#:#Szervezeti egység felettese
 rbac#:#il_sess_participant#:#Munkamenet résztvevők
 rbac#:#il_sess_status_closed#:#Résztvevő nélküli zárt esemény
 rbac#:#ilias_id#:#ILIAS-ID
@@ -13344,8 +13345,10 @@ rbac#:#orgu_cat_administrate_users#:#A felhasználó létrehozhat és helyi ILIA
 rbac#:#orgu_copy#:#Szervezeti egység másolása
 rbac#:#orgu_delete#:#A felhasználó mozgathatja és törölheti a Szervezeti egységet
 rbac#:#orgu_edit_permission#:#A felhasználó módosíthatja a jogosultsági beállításokat
+rbac#:#orgu_employee#:#Szervezeti egység beosztottja
 rbac#:#orgu_read#:#A felhasználónak olvasási hozzáférése van a Szervezeti egységhez
 rbac#:#orgu_read_users#:#A felhasználó láthatja a helyi ILIAS-fiókokat ebben a Szervezeti egységben
+rbac#:#orgu_superior#:#Szervezeti egység felettese
 rbac#:#orgu_view_learning_progress#:#Tanulási haladás megjelenítése
 rbac#:#orgu_view_learning_progress_rec#:#Egység és alegységei Tanulási haladásának megjelenítése
 rbac#:#orgu_visible#:#Szervezeti egység látható

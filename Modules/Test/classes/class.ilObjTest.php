@@ -6752,14 +6752,22 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     * export files of file itmes
     *
     */
-    public function exportFileItems($a_target_dir, &$expLog)
+    public function exportFileItems($target_dir, &$expLog)
     {
         include_once "./Modules/File/classes/class.ilObjFile.php";
 
         foreach ($this->file_ids as $file_id) {
             $expLog->write(date("[y-m-d H:i:s] ") . "File Item " . $file_id);
+            $file_dir = $target_dir . '/objects/il_' . IL_INST_ID . '_file_' . $file_id;
+            ilUtil::makeDir($file_dir);
             $file_obj = new ilObjFile($file_id, false);
-            $file_obj->export($a_target_dir);
+            $source_file = $file_obj->getFile($file_obj->getVersion());
+            if (!is_file($source_file)) {
+                $source_file = $file_obj->getFile();
+            }
+            if (is_file($source_file)) {
+                copy($source_file, $file_dir . '/' . $file_obj->getFileName());
+            }
             unset($file_obj);
         }
     }
@@ -8128,17 +8136,14 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             $bestrow = null;
             $bestfactor = 0;
             while ($row = $ilDB->fetchAssoc($result)) {
-                if ($bestrow === null) {
-                    $bestrow = $row;
-                    continue;
-                }
                 if ($row["maxpoints"] > 0) {
                     $factor = $row["points"] / $row["maxpoints"];
                 } else {
                     $factor = 0;
                 }
 
-                if ($factor > $bestfactor) {
+                if ($factor === 0 && $bestfactor === 0
+                    || $factor > $bestfactor) {
                     $bestrow = $row;
                     $bestfactor = $factor;
                 }
@@ -12293,7 +12298,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 
     /**
      * This is originally a fix for https://mantis.ilias.de/view.php?id=35707;
-     * in general, the handling of those pathes shold be improved or better, 
+     * in general, the handling of those pathes shold be improved or better,
      * avoided entirely (e.g. with the IRSS).
      */
     public static function getDataWebPath(string $relative_path = '') : string
@@ -12304,7 +12309,9 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             CLIENT_ID,
             $relative_path
         ]);
-        $parts = array_filter(explode('/', $webdir), function($p) {return trim($p) != '' && trim($p) != '.';});
+        $parts = array_filter(explode('/', $webdir), function ($p) {
+            return trim($p) != '' && trim($p) != '.';
+        });
         return array_shift($parts) . '//' . implode('/', $parts) . '/';
     }
 }

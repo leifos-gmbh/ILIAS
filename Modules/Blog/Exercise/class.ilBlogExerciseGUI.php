@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -188,7 +190,7 @@ class ilBlogExerciseGUI
 
         if ($tooltip) {
             $modal = $ui->factory()->modal()->roundtrip($lng->txt("exc_instruction"), $ui->factory()->legacy($tooltip))
-                ->withCancelButtonLabel("close");
+                ->withCancelButtonLabel($lng->txt("close"));
             $elements[] = $modal;
             $buttons[] = $ui->factory()->button()->standard($lng->txt("exc_instruction"), '#')
                 ->withOnClick($modal->getShowSignal());

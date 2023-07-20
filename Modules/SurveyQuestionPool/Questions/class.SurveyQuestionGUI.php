@@ -27,6 +27,7 @@ use ILIAS\SurveyQuestionPool\Editing\EditManager;
  */
 abstract class SurveyQuestionGUI
 {
+    protected \ILIAS\Survey\InternalGUIService $gui;
     protected EditingGUIRequest $request;
     protected EditManager $edit_manager;
     protected ilRbacSystem $rbacsystem;
@@ -86,6 +87,7 @@ abstract class SurveyQuestionGUI
             ->internal()
             ->domain()
             ->editing();
+        $this->gui = $DIC->survey()->internal()->gui();
     }
 
     abstract protected function initObject(): void;
@@ -259,12 +261,14 @@ abstract class SurveyQuestionGUI
         $question->setRequired(true);
         $question->setRows(10);
         $question->setCols(80);
-        $question->setUseRte(true);
-        $question->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("survey"));
-        $question->addPlugin("latex");
-        $question->addButton("latex");
-        $question->addButton("pastelatex");
-        $question->setRTESupport($this->object->getId(), "spl", "survey");
+        if (ilObjAdvancedEditing::_getRichTextEditor() === "tinymce") {
+            $question->setUseRte(true);
+            $question->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("survey"));
+            $question->addPlugin("latex");
+            $question->addButton("latex");
+            $question->addButton("pastelatex");
+            $question->setRTESupport($this->object->getId(), "spl", "survey");
+        }
         $form->addItem($question);
 
         // obligatory
@@ -569,6 +573,27 @@ abstract class SurveyQuestionGUI
         return $title;
     }
 
+    protected function getQuestionTitle(
+        int $question_title_mode = 1
+    ): string {
+        $title = "";
+        switch ($question_title_mode) {
+            case ilObjSurvey::PRINT_HIDE_LABELS:
+                $title = $this->object->getTitle();
+                break;
+
+            case ilObjSurvey::PRINT_SHOW_LABELS:
+                $title = $this->object->getTitle();
+                if (trim($this->object->getLabel())) {
+                    $title .= ' <span class="questionLabel">(' .
+                            $this->object->getLabel()
+                         . ')</span>';
+                }
+                break;
+        }
+        return $title;
+    }
+
     public function preview(): void
     {
         $ilTabs = $this->tabs;
@@ -585,10 +610,14 @@ abstract class SurveyQuestionGUI
 
         $tpl->setVariable("QUESTION_OUTPUT", $this->getWorkingForm());
 
-        $panel = ilPanelGUI::getInstance();
-        $panel->setBody($tpl->get());
+        $f = $this->gui->ui()->factory();
+        $r = $this->gui->ui()->renderer();
+        $p = $f->panel()->standard(
+            "",
+            $f->legacy($tpl->get())
+        );
 
-        $this->tpl->setContent($panel->getHTML());
+        $this->tpl->setContent($r->render($p));
     }
 
 
@@ -766,11 +795,14 @@ abstract class SurveyQuestionGUI
             );
             $exp->setPathOpen($this->request->getRefId());
             if (!$exp->handleCommand()) {
-                $panel = ilPanelGUI::getInstance();
-                $panel->setHeading($this->lng->txt("select_object_to_link"));
-                $panel->setBody($exp->getHTML());
+                $f = $this->gui->ui()->factory();
+                $r = $this->gui->ui()->renderer();
+                $p = $f->panel()->standard(
+                    $this->lng->txt("select_object_to_link"),
+                    $f->legacy($exp->getHTML())
+                );
 
-                $this->tpl->setContent($panel->getHTML());
+                $this->tpl->setContent($r->render($p));
             }
         }
     }

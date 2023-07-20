@@ -16,9 +16,6 @@
  *
  *********************************************************************/
 
-
-include_once("./Services/Table/classes/class.ilTable2GUI.php");
-
 /**
 * TableGUI class for evaluation of all users
 *
@@ -116,7 +113,7 @@ class ilEvaluationAllTableGUI extends ilTable2GUI
         }
         $this->addColumn($lng->txt("tst_answered_questions"), "answered", "");
         $this->addColumn($lng->txt("working_time"), "working_time", "");
-        $this->addColumn($lng->txt("detailed_evaluation"), "details", "");
+        $this->addColumn($lng->txt("detailed_evaluation"), "", "");
 
         $this->setFormAction($this->ctrl->getFormAction($a_parent_obj, $a_parent_cmd));
         $this->setRowTemplate("tpl.table_evaluation_all.html", "Modules/Test");
@@ -236,8 +233,6 @@ class ilEvaluationAllTableGUI extends ilTable2GUI
         $rbacreview = $DIC['rbacreview'];
         $ilUser = $DIC['ilUser'];
 
-        // name
-        include_once("./Services/Form/classes/class.ilTextInputGUI.php");
         $ti = new ilTextInputGUI($lng->txt("name"), "name");
         $ti->setMaxLength(64);
         $ti->setValidationRegexp('/^[^%]*$/is');
@@ -261,8 +256,6 @@ class ilEvaluationAllTableGUI extends ilTable2GUI
         $this->addFilterItem($ti);
         $ti->readFromSession();
 
-        // passed tests
-        include_once("./Services/Form/classes/class.ilCheckboxInputGUI.php");
         $si = new ilCheckboxInputGUI($this->lng->txt("passed_only"), "passed_only");
         //		$si->setOptionTitle();
         $this->addFilterItem($si);

@@ -448,7 +448,7 @@ class ilUserProfile
         foreach ($this->getStandardFields() as $field => $info) {
             if ($ilSetting->get('usr_settings_visib_lua_' . $field, '1')) {
                 $fields[$field] = $info;
-            } elseif ($info['visib_lua_fix_value']) {
+            } elseif ($info['visib_lua_fix_value'] ?? false) {
                 $fields[$field] = $info;
             }
         }
@@ -592,7 +592,7 @@ class ilUserProfile
                     if (self::userSettingVisible($f)) {
                         $bi = new ilBirthdayInputGUI($lng->txt($lv), "usr_" . $f);
                         $date = null;
-                        if ($a_user && strlen($a_user->$m())) {
+                        if ($a_user && $a_user->$m() && strlen($a_user->$m())) {
                             $date = new ilDateTime($a_user->$m(), IL_CAL_DATE);
                             $bi->setDate($date);
                         }
@@ -887,7 +887,7 @@ class ilUserProfile
                     continue;
                 }
 
-                if (!$user_defined_data["f_" . $field]) {
+                if (!($user_defined_data["f_" . $field] ?? false)) {
                     ilLoggerFactory::getLogger('user')->info('Profile is incomplete due to missing required udf.');
                     return true;
                 }

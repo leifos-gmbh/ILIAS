@@ -1,37 +1,30 @@
 <?php
 
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 declare(strict_types=1);
-/*
-    +-----------------------------------------------------------------------------+
-    | ILIAS open source                                                           |
-    +-----------------------------------------------------------------------------+
-    | Copyright (c) 1998-2006 ILIAS open source, University of Cologne            |
-    |                                                                             |
-    | This program is free software; you can redistribute it and/or               |
-    | modify it under the terms of the GNU General Public License                 |
-    | as published by the Free Software Foundation; either version 2              |
-    | of the License, or (at your option) any later version.                      |
-    |                                                                             |
-    | This program is distributed in the hope that it will be useful,             |
-    | but WITHOUT ANY WARRANTY; without even the implied warranty of              |
-    | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
-    | GNU General Public License for more details.                                |
-    |                                                                             |
-    | You should have received a copy of the GNU General Public License           |
-    | along with this program; if not, write to the Free Software                 |
-    | Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
-    +-----------------------------------------------------------------------------+
-*/
+
 
 /**
-* Search result implementing iterator interface.
-*
-*
-* @author Stefan Meyer <meyer@leifos.com>
-*
-*
-* @ingroup
-*/
+ * Search result implementing iterator interface.
+ *
+ * @author Stefan Meyer <meyer@leifos.com>
+ * @ingroup
+ */
 class ilLuceneSearchResult implements Iterator
 {
     /**
@@ -42,7 +35,7 @@ class ilLuceneSearchResult implements Iterator
 
     private int $limit = 0;
     private int $total_hits = 0;
-    private int $max_score = 0;
+    private float $max_score = 0;
 
     private array $objects = [];
     private array $relevance = [];
@@ -61,7 +54,7 @@ class ilLuceneSearchResult implements Iterator
     /**
      * Iterator rewind
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -71,7 +64,7 @@ class ilLuceneSearchResult implements Iterator
      * @param
      * @return
      */
-    public function valid()
+    public function valid(): bool
     {
         if ($this->position < count($this->objects)) {
             return true;
@@ -93,7 +86,7 @@ class ilLuceneSearchResult implements Iterator
      * Iterator key
      * @return
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
@@ -102,7 +95,7 @@ class ilLuceneSearchResult implements Iterator
      * Iterator current
      * @return
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->objects[$this->position];
     }
@@ -110,7 +103,7 @@ class ilLuceneSearchResult implements Iterator
     /**
      * Iterator next
      */
-    public function next()
+    public function next(): void
     {
         $this->position++;
     }
@@ -148,12 +141,12 @@ class ilLuceneSearchResult implements Iterator
     }
 
 
-    public function setMaxScore(int $a_score): void
+    public function setMaxScore(float $a_score): void
     {
         $this->max_score = $a_score;
     }
 
-    public function getMaxScore(): int
+    public function getMaxScore(): float
     {
         return $this->max_score;
     }

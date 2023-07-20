@@ -22,6 +22,9 @@
  */
 class ilBookingReservationsGUI
 {
+    protected ilToolbarGUI $toolbar;
+    protected \ILIAS\DI\UIServices $ui;
+    protected \ILIAS\BookingManager\InternalService $service;
     protected array $raw_post_data;
     protected \ILIAS\BookingManager\StandardGUIRequest $book_request;
     protected ilBookingHelpAdapter $help;
@@ -59,6 +62,9 @@ class ilBookingReservationsGUI
                                   ->internal()
                                   ->gui()
                                   ->standardRequest();
+        $this->service = $DIC->bookingManager()->internal();
+        $this->ui = $DIC->ui();
+        $this->toolbar = $DIC->toolbar();
 
         $this->book_obj_id = $this->book_request->getObjectId();
 
@@ -106,7 +112,7 @@ class ilBookingReservationsGUI
         switch ($next_class) {
             default:
                 if (in_array($cmd, array("log", "logDetails", "changeStatusObject", "rsvConfirmCancelUser", "rsvCancelUser",
-                    "applyLogFilter", "resetLogFilter", "rsvConfirmCancel", "rsvCancel", "back", "rsvConfirmDelete", "rsvDelete"))) {
+                    "applyLogFilter", "resetLogFilter", "rsvConfirmCancel", "rsvCancel", "back", "rsvConfirmDelete", "rsvDelete", "confirmResetRun", "resetRun"))) {
                     $this->$cmd();
                 }
         }
@@ -123,6 +129,7 @@ class ilBookingReservationsGUI
     public function log(): void
     {
         $tpl = $this->tpl;
+        $this->showRerunPreferenceAssignment();
         $table = $this->getReservationsTable();
         $tpl->setContent($table->getHTML());
     }
@@ -151,9 +158,8 @@ class ilBookingReservationsGUI
             $this,
             'log',
             $this->ref_id,
-            $this->pool->getId(),
+            $this->pool,
             $show_all,
-            ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE),
             $filter,
             $reservation_id,
             $context_filter
@@ -548,6 +554,11 @@ class ilBookingReservationsGUI
             $this->ctrl->redirect($this, 'log');
         }
 
+        $ids = $this->getLogReservationIds();
+        if (count($ids) === 0) {
+            $this->back();
+        }
+
         $this->tabs_gui->clearTargets();
         $this->tabs_gui->setBackTarget(
             $this->lng->txt("back"),
@@ -561,51 +572,120 @@ class ilBookingReservationsGUI
         $conf->setCancel($this->lng->txt('cancel'), 'log');
 
         if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE) {
-            [$obj_id, $user_id, $from, $to] = explode("_", $DIC->http()->request()->getQueryParams()['reservation_id']);
-            $ids = ilBookingReservation::getCancelDetails($obj_id, $user_id, $from, $to);
-            $rsv_id = $ids[0];
+            foreach ($ids as $idx => $id) {
+                [$obj_id, $user_id, $from, $to] = explode("_", $id);
+                $rsv_ids = ilBookingReservation::getCancelDetails($obj_id, $user_id, $from, $to);
+                $rsv_id = $rsv_ids[0];
+
+                $rsv = new ilBookingReservation($rsv_id);
+                $obj = new ilBookingObject($rsv->getObjectId());
+
+                $details = sprintf($this->lng->txt('X_reservations_of'), count($rsv_ids)) . ' ' . $obj->getTitle();
+                $details .= ", " . ilDatePresentation::formatPeriod(
+                    new ilDateTime($rsv->getFrom(), IL_CAL_UNIX),
+                    new ilDateTime($rsv->getTo() + 1, IL_CAL_UNIX)
+                );
+                $conf->addItem('mrsv[]', $id, $details);
+            }
         } else {
-            $rsv_id = $DIC->http()->request()->getQueryParams()['reservation_id'];
-            $ids = [$rsv_id];
+            foreach ($ids as $idx => $rsv_id) {
+                $rsv = new ilBookingReservation($rsv_id);
+                $obj = new ilBookingObject($rsv->getObjectId());
+                $details = sprintf($this->lng->txt('X_reservations_of'), 1) . ' ' . $obj->getTitle();
+                $conf->addItem('mrsv[]', $rsv_id, $details);
+            }
         }
-        $rsv = new ilBookingReservation($rsv_id);
-        $obj = new ilBookingObject($rsv->getObjectId());
-
-        $details = sprintf($this->lng->txt('X_reservations_of'), count($ids)) . ' ' . $obj->getTitle();
-        if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE) {
-            $details .= ", " . ilDatePresentation::formatPeriod(
-                new ilDateTime($rsv->getFrom(), IL_CAL_UNIX),
-                new ilDateTime($rsv->getTo() + 1, IL_CAL_UNIX)
-            );
-        }
-
-        $conf->addItem('rsv_ids', implode(',', $ids), $details);
         $this->tpl->setContent($conf->getHTML());
     }
 
     public function rsvDelete(): void
     {
         global $DIC;
-        $get = $DIC->http()->request()->getParsedBody()['rsv_ids'];
+        $get = $DIC->http()->request()->getParsedBody()['mrsv'];
         if ($get) {
-            foreach (explode(',', $get) as $id) {
-                $res = new ilBookingReservation($id);
-                $obj = new ilBookingObject($res->getObjectId());
-                if (!$this->checkPermissionBool("write") || $obj->getPoolId() !== $this->pool->getId()) {
-                    $this->tpl->setOnScreenMessage('failure', $this->lng->txt('permission_denied'), true);
-                    $this->ctrl->redirect($this, 'log');
+            foreach ($get as $id) {
+                if ($this->pool->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE) {
+                    list($obj_id, $user_id, $from, $to) = explode("_", $id);
+                    $rsv_ids = ilBookingReservation::getCancelDetails($obj_id, $user_id, $from, $to);
+                } else {
+                    $rsv_ids = [$id];
                 }
-                if ($this->pool->getScheduleType() !== ilObjBookingPool::TYPE_NO_SCHEDULE) {
-                    $cal_entry_id = $res->getCalendarEntry();
-                    if ($cal_entry_id) {
-                        $entry = new ilCalendarEntry($cal_entry_id);
-                        $entry->delete();
+
+                foreach ($rsv_ids as $rsv_id) {
+                    $res = new ilBookingReservation($rsv_id);
+                    $obj = new ilBookingObject($res->getObjectId());
+                    if (!$this->checkPermissionBool("write") || $obj->getPoolId() !== $this->pool->getId()) {
+                        $this->tpl->setOnScreenMessage('failure', $this->lng->txt('permission_denied'), true);
+                        $this->ctrl->redirect($this, 'log');
                     }
+                    if ($this->pool->getScheduleType() !== ilObjBookingPool::TYPE_NO_SCHEDULE) {
+                        $cal_entry_id = $res->getCalendarEntry();
+                        if ($cal_entry_id) {
+                            $entry = new ilCalendarEntry($cal_entry_id);
+                            $entry->delete();
+                        }
+                    }
+                    $res->delete();
                 }
-                $res->delete();
             }
         }
         $this->tpl->setOnScreenMessage('success', $this->lng->txt('reservation_deleted'), true);
         $this->ctrl->redirect($this, 'log');
+    }
+
+    protected function showRerunPreferenceAssignment(): void
+    {
+        if (!$this->checkPermissionBool('write')) {
+            return;
+        }
+        if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES) {
+            $pref_manager = $this->service->domain()->preferences($this->pool);
+            if ($pref_manager->hasRun()) {
+                $this->toolbar->addComponent($this->ui->factory()->button()->standard(
+                    $this->lng->txt("book_rerun_assignments"),
+                    $this->ctrl->getLinkTarget($this, "confirmResetRun")
+                ));
+            }
+        }
+    }
+
+    protected function confirmResetRun()
+    {
+        if (!$this->checkPermissionBool('write')) {
+            return;
+        }
+        $this->tabs_gui->activateTab("log");
+        $mess = $this->ui->factory()->messageBox()->confirmation($this->lng->txt("book_rerun_confirmation"))->withButtons(
+            [
+                $this->ui->factory()->button()->standard(
+                    $this->lng->txt("book_rerun_assignments"),
+                    $this->ctrl->getLinkTarget($this, "resetRun")
+                ),
+                $this->ui->factory()->button()->standard(
+                    $this->lng->txt("cancel"),
+                    $this->ctrl->getLinkTarget($this, "log")
+                )
+            ]
+        );
+        $this->tpl->setContent(
+            $this->ui->renderer()->render($mess)
+        );
+    }
+
+    protected function resetRun()
+    {
+        if (!$this->checkPermissionBool('write')) {
+            return;
+        }
+        if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES
+            && $this->access->checkAccess("write", "", $this->pool->getRefId())) {
+            $pref_manager = $this->service->domain()->preferences($this->pool);
+            $repo = $this->service->repo()->preferences();
+            $pref_manager->resetRun();
+            $pref_manager->storeBookings(
+                $repo->getPreferences($this->pool->getId())
+            );
+        }
+        $this->ctrl->redirect($this, "log");
     }
 }

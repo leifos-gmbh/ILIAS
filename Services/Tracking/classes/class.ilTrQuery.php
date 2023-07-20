@@ -250,19 +250,16 @@ class ilTrQuery
                 continue;
             }
 
-            if (in_array($a_user_id, $status_info["completed"][$item_id])) {
+            if (in_array($a_user_id, ($status_info["completed"][$item_id] ?? []))) {
                 $status = ilLPStatus::LP_STATUS_COMPLETED;
-            } elseif (in_array(
-                $a_user_id,
-                $status_info["in_progress"][$item_id]
-            )) {
+            } elseif (in_array($a_user_id, ($status_info["in_progress"][$item_id] ?? []))) {
                 $status = ilLPStatus::LP_STATUS_IN_PROGRESS;
             } else {
                 $status = ilLPStatus::LP_STATUS_NOT_ATTEMPTED;
             }
 
             $items[$item_id] = array(
-                "title" => $item_data[$item_id]["title"],
+                "title" => ($item_data[$item_id]["title"] ?? ''),
                 "status" => (int) $status,
                 "type" => self::getSubItemType($a_parent_obj_id)
             );
@@ -338,7 +335,6 @@ class ilTrQuery
             $udf_order = $a_order_field;
             $a_order_field = null;
         }
-
         $result = self::executeQueries(
             $queries,
             $a_order_field,
@@ -560,6 +556,19 @@ class ilTrQuery
                 }
 
                 $result["set"][$idx]["ref_id"] = $objects["ref_ids"][(int) $item["obj_id"]];
+
+                // BT 35475: set titles of referenced objects correctly
+                if (
+                    $item['title'] == '' &&
+                    ($item['type'] == 'catr' ||
+                    $item['type'] == 'crsr' ||
+                    $item['type'] == 'grpr')
+                ) {
+                    $result['set'][$idx]['title'] =
+                        ilContainerReference::_lookupTargetTitle(
+                            (int) $item["obj_id"]
+                        );
+                }
             }
 
             // scos data (:TODO: will not be part of offset/limit)
@@ -1000,6 +1009,9 @@ class ilTrQuery
 
         // begin-patch ouf
         if ($members_read) {
+            // BT 35452: failsafe against invalid users without an entry in usr_data
+            $members = self::filterOutUsersWithoutData($members);
+
             return $GLOBALS['DIC']->access(
             )->filterUserIdsByRbacOrPositionOfCurrentUser(
                 'read_learning_progress',
@@ -1065,6 +1077,9 @@ class ilTrQuery
             return $a_users;
         }
 
+        // BT 35452: failsafe against invalid users without an entry in usr_data
+        $a_users = self::filterOutUsersWithoutData($a_users);
+
         // begin-patch ouf
         return $GLOBALS['DIC']->access(
         )->filterUserIdsByRbacOrPositionOfCurrentUser(
@@ -1073,6 +1088,31 @@ class ilTrQuery
             $a_ref_id,
             $a_users
         );
+    }
+
+    /**
+     * @param int[] $user_ids
+     * @return int[]
+     */
+    protected static function filterOutUsersWithoutData(array $user_ids): array
+    {
+        if (ilObjUser::userExists($user_ids)) {
+            return $user_ids;
+        }
+
+        $res = [];
+        foreach ($user_ids as $user_id) {
+            if (ilObjUser::userExists([$user_id])) {
+                $res[] = $user_id;
+                continue;
+            }
+            global $DIC;
+            $DIC->logger()->trac()->info(
+                'Excluded user with id ' . $user_id .
+                ' from participants, because they do not have an entry in usr_data.'
+            );
+        }
+        return $res;
     }
 
     protected static function buildFilters(
@@ -1249,7 +1289,7 @@ class ilTrQuery
 
                     case "read_count":
                         if (!$a_aggregate) {
-                            if (isset($value["from"])) {
+                            if (isset($value["from"]) && $value["from"] > 0) {
                                 $where[] = "(read_event." . $id . "+read_event.childs_" . $id . ") >= " . $ilDB->quote(
                                     $value["from"],
                                     "integer"
@@ -1263,14 +1303,14 @@ class ilTrQuery
                                     " OR (read_event." . $id . "+read_event.childs_" . $id . ") IS NULL)";
                             }
                         } else {
-                            if (isset($value["from"])) {
-                                $having[] = "SUM(read_event." . $id . "+read_event.childs_" . $id . ") >= " . $ilDB->quote(
+                            if (isset($value["from"]) && $value["from"] > 0) {
+                                $having[] = "IFNULL(SUM(read_event." . $id . "+read_event.childs_" . $id . "),0) >= " . $ilDB->quote(
                                     $value["from"],
                                     "integer"
                                 );
                             }
                             if (isset($value["to"])) {
-                                $having[] = "SUM(read_event." . $id . "+read_event.childs_" . $id . ") <= " . $ilDB->quote(
+                                $having[] = "IFNULL(SUM(read_event." . $id . "+read_event.childs_" . $id . "),0) <= " . $ilDB->quote(
                                     $value["to"],
                                     "integer"
                                 );
@@ -1280,13 +1320,13 @@ class ilTrQuery
 
                     case "spent_seconds":
                         if (!$a_aggregate) {
-                            if (isset($value["from"])) {
+                            if (isset($value["from"]) && $value["from"] > 0) {
                                 $where[] = "(read_event." . $id . "+read_event.childs_" . $id . ") >= " . $ilDB->quote(
                                     $value["from"],
                                     "integer"
                                 );
                             }
-                            if (isset($value["to"])) {
+                            if (isset($value["to"]) && $value["to"] > 0) {
                                 $where[] = "((read_event." . $id . "+read_event.childs_" . $id . ") <= " . $ilDB->quote(
                                     $value["to"],
                                     "integer"
@@ -1294,13 +1334,13 @@ class ilTrQuery
                                     " OR (read_event." . $id . "+read_event.childs_" . $id . ") IS NULL)";
                             }
                         } else {
-                            if (isset($value["from"])) {
+                            if (isset($value["from"]) && $value["from"] > 0) {
                                 $having[] = "ROUND(AVG(read_event." . $id . "+read_event.childs_" . $id . ")) >= " . $ilDB->quote(
                                     $value["from"],
                                     "integer"
                                 );
                             }
-                            if (isset($value["to"])) {
+                            if (isset($value["to"]) && $value["to"] > 0) {
                                 $having[] = "ROUND(AVG(read_event." . $id . "+read_event.childs_" . $id . ")) <= " . $ilDB->quote(
                                     $value["to"],
                                     "integer"
@@ -1322,7 +1362,7 @@ class ilTrQuery
         }
         if (sizeof($having)) {
             // ugly "having" hack because of summary view
-            $sql .= " [[--HAVING " . implode(" AND ", $having) . "HAVING--]]";
+            $sql .= " [[--HAVING " . implode(" AND ", $having) . " HAVING--]]";
         }
 
         return $sql;
@@ -1563,7 +1603,6 @@ class ilTrQuery
         global $DIC;
 
         $ilDB = $DIC->database();
-
         $cnt = 0;
         $subqueries = array();
         foreach ($queries as $item) {
@@ -1614,7 +1653,6 @@ class ilTrQuery
             $offset = $a_offset;
             $limit = $a_limit;
             $ilDB->setLimit($limit, $offset);
-
             $set = $ilDB->query($query);
             while ($rec = $ilDB->fetchAssoc($set)) {
                 $result[] = $rec;
@@ -1643,7 +1681,6 @@ class ilTrQuery
         ?int $a_check_agreement = null
     ): array {
         global $DIC;
-
         $ilDB = $DIC->database();
 
         $result = array("cnt" => 0, "set" => null);
@@ -1874,6 +1911,9 @@ class ilTrQuery
         $sql .= " GROUP BY obj_id," . $column;
         $set = $ilDB->query($sql);
         while ($row = $ilDB->fetchAssoc($set)) {
+            if (!isset($res[(int) $row["obj_id"]][$row[$column]]["users"])) {
+                $res[(int) $row["obj_id"]][$row[$column]]["users"] = 0;
+            }
             $res[(int) $row["obj_id"]][$row[$column]]["users"] += (int) $row["counter"];
         }
 
@@ -1912,16 +1952,18 @@ class ilTrQuery
         $set = $ilDB->query($sql);
         $res = array();
         while ($row = $ilDB->fetchAssoc($set)) {
-            $res[$row["type"]]["type"] = $row["type"];
+            $res[$row["type"]]["type"] = (string) $row["type"];
             $res[$row["type"]]["references"] = ($res[$row["type"]]["references"] ?? 0) + 1;
             $res[$row["type"]]["objects"][] = (int) $row["obj_id"];
             if ($row[$tree->getTreePk()] < 0) {
                 $res[$row["type"]]["deleted"] = ($res[$row["type"]]["deleted"] ?? 0) + 1;
+            } else {
+                $res[$row['type']]['deleted'] = 0;
             }
         }
 
         foreach ($res as $type => $values) {
-            $res[$type]["objects"] = sizeof(array_unique($values["objects"]));
+            $res[$type]["objects"] = count((array_unique($values["objects"] ?? [])));
         }
 
         // portfolios (not part of repository)
@@ -1936,7 +1978,6 @@ class ilTrQuery
             $res["blog"]["references"] = ($res["blog"]["references"] ?? 0) + 1;
             $res["blog"]["objects"] = ($res["blog"]["objects"] ?? 0) + 1;
         }
-
         return $res;
     }
 

@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTextSubsetCorrectionsInputGUI
@@ -48,7 +62,6 @@ class ilAssAnswerCorrectionsInputGUI extends ilAnswerWizardInputGUI
     {
         global $DIC;
         $lng = $DIC['lng'];
-        $this->sanitizeSuperGlobalSubmitValue();
         $foundvalues = $_POST[$this->getPostVar()];
 
         if ($this->isHidePointsEnabled()) {
@@ -60,6 +73,7 @@ class ilAssAnswerCorrectionsInputGUI extends ilAnswerWizardInputGUI
             $max = 0;
             if (is_array($foundvalues['points'])) {
                 foreach ($foundvalues['points'] as $points) {
+                    $points = str_replace(',', '.', $points);
                     if ($points > $max) {
                         $max = $points;
                     }

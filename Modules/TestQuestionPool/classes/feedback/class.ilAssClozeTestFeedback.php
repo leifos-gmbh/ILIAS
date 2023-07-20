@@ -1,10 +1,22 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 use ILIAS\Refinery\Random\Group as RandomGroup;
-
-require_once 'Modules/TestQuestionPool/classes/feedback/class.ilAssMultiOptionQuestionFeedback.php';
 
 /**
  * feedback class for assClozeTest questions
@@ -719,7 +731,6 @@ class ilAssClozeTestFeedback extends ilAssMultiOptionQuestionFeedback
      */
     protected function fetchFeedbackIdsForGapQuestionMode(): array
     {
-        require_once 'Modules/TestQuestionPool/classes/feedback/class.ilAssSpecificFeedbackIdentifierList.php';
         $feedbackIdentifiers = new ilAssSpecificFeedbackIdentifierList();
         $feedbackIdentifiers->load($this->questionOBJ->getId());
 
@@ -741,7 +752,6 @@ class ilAssClozeTestFeedback extends ilAssMultiOptionQuestionFeedback
      */
     protected function fetchFeedbackIdsForGapAnswersMode(): array
     {
-        require_once 'Modules/TestQuestionPool/classes/feedback/class.ilAssSpecificFeedbackIdentifierList.php';
         $feedbackIdentifiers = new ilAssSpecificFeedbackIdentifierList();
         $feedbackIdentifiers->load($this->questionOBJ->getId());
 
@@ -786,7 +796,7 @@ class ilAssClozeTestFeedback extends ilAssMultiOptionQuestionFeedback
         return $this->getSpecificAnswerFeedbackTestPresentation($this->questionOBJ->getId(), $gapIndex, $answerIndex);
     }
 
-    public function determineAnswerIndexForAnswerValue(assClozeGap $gap, int $answerValue): int
+    public function determineAnswerIndexForAnswerValue(assClozeGap $gap, string $answerValue): int
     {
         switch ($gap->getType()) {
             case CLOZE_TEXT:
@@ -830,7 +840,6 @@ class ilAssClozeTestFeedback extends ilAssMultiOptionQuestionFeedback
                     return self::FB_NUMERIC_GAP_VALUE_HIT_INDEX;
                 }
 
-                require_once 'Services/Math/classes/class.EvalMath.php';
                 $math = new EvalMath();
 
                 $item = $gap->getItem(0);

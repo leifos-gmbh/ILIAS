@@ -139,27 +139,32 @@ class ilLMMenuRendererGUI
                 );
             }
         }
-
         if (!$this->offline &&
             $ilAccess->checkAccess("read", "", $this->requested_ref_id) && // #14075
             ilLearningProgressAccess::checkAccess($this->requested_ref_id)) {
             $olp = ilObjectLP::getInstance($this->lm->getId());
-
-            if ($olp->getCurrentMode() == ilLPObjSettings::LP_MODE_COLLECTION_MANUAL) {
+            if ($olp->getCurrentMode() !== ilLPObjSettings::LP_MODE_COLLECTION_MANUAL) {
+                $this->toolbar->addComponent(
+                    $this->ui_factory->button()->standard(
+                        $this->lng->txt("learning_progress"),
+                        $this->ctrl->getLinkTargetByClass(array("illmpresentationgui", "illearningprogressgui"), "")
+                    )
+                );
+            } else {
                 $this->toolbar->addComponent(
                     $this->ui_factory->button()->standard(
                         $this->lng->txt("learning_progress"),
                         $this->ctrl->getLinkTargetByClass(array("illmpresentationgui", "illearningprogressgui"), "editManual")
                     )
                 );
-            } elseif ($olp->getCurrentMode() == ilLPObjSettings::LP_MODE_COLLECTION_TLT) {
+            } /* elseif ($olp->getCurrentMode() == ilLPObjSettings::LP_MODE_COLLECTION_TLT) {
                 $this->toolbar->addComponent(
                     $this->ui_factory->button()->standard(
                         $this->lng->txt("learning_progress"),
                         $this->ctrl->getLinkTargetByClass(array("illmpresentationgui", "illearningprogressgui"), "showtlt")
                     )
                 );
-            }
+            }*/
         }
 
         // default entries (appearing in lsq and native mode)

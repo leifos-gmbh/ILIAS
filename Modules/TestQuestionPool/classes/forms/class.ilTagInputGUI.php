@@ -3,15 +3,18 @@
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
+ *
  * ILIAS is licensed with the GPL-3.0,
  * see https://www.gnu.org/licenses/gpl-3.0.en.html
  * You should have received a copy of said license along with the
  * source code, too.
+ *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
 /**
 * This class represents a tag list property in a property form.
@@ -20,10 +23,7 @@
 */
 class ilTagInputGUI extends ilSubEnabledFormPropertyGUI
 {
-    /**
-     * @var ilTemplate
-     */
-    protected $tpl;
+    protected ilGlobalTemplateInterface $tpl;
 
     protected $options = array();
     protected $max_tags = 0;
@@ -31,7 +31,6 @@ class ilTagInputGUI extends ilSubEnabledFormPropertyGUI
     protected $allow_duplicates = false;
     protected $js_self_init = true;
 
-    protected $type_ahead = false;
     protected $type_ahead_ignore_case = true;
     protected $type_ahead_list = array();
     protected $type_ahead_min_length = 2;
@@ -68,14 +67,6 @@ class ilTagInputGUI extends ilSubEnabledFormPropertyGUI
     public function setJsSelfInit($js_self_init): void
     {
         $this->js_self_init = $js_self_init;
-    }
-
-    /**
-     * @param boolean $type_ahead
-     */
-    public function setTypeAhead($type_ahead): void
-    {
-        $this->type_ahead = $type_ahead;
     }
 
     /**
@@ -147,15 +138,13 @@ class ilTagInputGUI extends ilSubEnabledFormPropertyGUI
     public function __construct($a_title = "", $a_postvar = "")
     {
         global $DIC;
-
         $this->tpl = $DIC["tpl"];
         $this->lng = $DIC->language();
         parent::__construct($a_title, $a_postvar);
         $this->setType("tag_input");
-        $tpl = $DIC["tpl"];
-        $tpl->addJavaScript('./Services/Form/js/bootstrap-tagsinput_2015_25_03.js');
-        $tpl->addJavaScript('./Services/Form/js/typeahead_0.11.1.js');
-        $tpl->addCss('./Services/Form/css/bootstrap-tagsinput_2015_25_03.css');
+        $this->tpl->addJavaScript('./Modules/TestQuestionPool/templates/default/bootstrap-tagsinput_2015_25_03.js');
+        $this->tpl->addJavaScript('./Modules/TestQuestionPool/templates/default/typeahead_0.11.1.js');
+        $this->tpl->addCss('./Modules/TestQuestionPool/templates/default/bootstrap-tagsinput_2015_25_03.css');
     }
 
     /**
@@ -203,26 +192,28 @@ class ilTagInputGUI extends ilSubEnabledFormPropertyGUI
      * @param string    $a_mode
      * @return string
      */
-    public function render($a_mode = ""): string
+    public function render(): string
     {
-        if ($this->type_ahead) {
-            $tpl = new ilTemplate("tpl.prop_tag_typeahead.html", true, true, "Services/Form");
-            $tpl->setVariable("MIN_LENGTH", $this->type_ahead_min_length);
-            $tpl->setVariable("LIMIT", $this->type_ahead_limit);
-            $tpl->setVariable("HIGHLIGHT", $this->type_ahead_highlight);
-            if ($this->type_ahead_ignore_case) {
-                $tpl->setVariable("CASE", 'i');
-            }
-            $tpl->setVariable("TERMS", json_encode($this->type_ahead_list));
-        } else {
-            $tpl = new ilTemplate("tpl.prop_tag.html", true, true, "Services/Form");
+        $this->tpl->addJavaScript('Modules/TestQuestionPool/templates/default/tagInput.js');
+        $config = [
+            'min_length' => $this->type_ahead_min_length,
+            'limit' => $this->type_ahead_limit,
+            'highlight' => $this->type_ahead_highlight,
+            'case' => '',
+            'maxtags' => $this->max_tags,
+            'maxchars' => $this->max_chars,
+            'allow_duplicates' => $this->allow_duplicates
+        ];
+        if ($this->type_ahead_ignore_case) {
+            $config['case'] = 'i';
         }
 
-        $tpl->setVariable("MAXTAGS", $this->max_tags);
-        $tpl->setVariable("MAXCHARS", $this->max_chars);
-        $tpl->setVariable("ALLOW_DUPLICATES", $this->allow_duplicates);
+        $this->tpl->addOnLoadCode(
+            'ilBootstrapTaggingOnLoad.initConfig(' . json_encode($config) . ');'
+        );
 
-        foreach ($this->getOptions() as $option_value => $option_text) {
+        $tpl = new ilTemplate("tpl.prop_tag_typeahead.html", true, true, "Modules/TestQuestionPool");
+        foreach ($this->getOptions() as $option_text) {
             $tpl->setCurrentBlock("prop_select_option");
             $tpl->setVariable("VAL_SELECT_OPTION", ilLegacyFormElementsUtil::prepareFormOutput($option_text));
             $tpl->setVariable("TXT_SELECT_OPTION", $option_text);
@@ -234,10 +225,13 @@ class ilTagInputGUI extends ilSubEnabledFormPropertyGUI
         $tpl->setVariable("POST_VAR", $this->getPostVar() . "[]");
 
         if ($this->js_self_init) {
-            $tpl->setCurrentBlock("initialize_on_page_load");
-            $tpl->parseCurrentBlock();
+            $id = preg_replace('/[^\d]+/', '', $this->getFieldId());
+            $this->tpl->addOnLoadCode(
+                "ilBootstrapTaggingOnLoad.appendId('#" . $this->getFieldId() . "');\n"
+                . "ilBootstrapTaggingOnLoad.appendTerms(" . $id . ", " . json_encode($this->type_ahead_list) . ");\n"
+                . "ilBootstrapTaggingOnLoad.Init();"
+            );
         }
-        $tpl->setVariable("ID", $this->getFieldId());
         return $tpl->get();
     }
 

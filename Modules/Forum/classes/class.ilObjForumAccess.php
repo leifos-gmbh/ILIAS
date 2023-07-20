@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class ilObjForumAccess
@@ -104,7 +104,7 @@ class ilObjForumAccess extends ilObjectAccess
     }
 
     /**
-     * @return array{num_posts: int, num_unread_posts: int, num_new_posts: int}
+     * @return array{num_posts: int, num_unread_posts: int}
      */
     public static function getStatisticsByRefId(int $ref_id): array
     {

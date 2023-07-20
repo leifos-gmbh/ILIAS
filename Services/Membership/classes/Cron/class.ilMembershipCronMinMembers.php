@@ -20,6 +20,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+use ILIAS\Cron\Schedule\CronJobScheduleType;
+
 /**
  * Cron for course/group minimum members
  * @author  Jörg Lützenkirchen <luetzenkirchen@leifos.com>
@@ -51,9 +53,9 @@ class ilMembershipCronMinMembers extends ilCronJob
         return $this->lng->txt("mem_cron_min_members_info");
     }
 
-    public function getDefaultScheduleType(): int
+    public function getDefaultScheduleType(): CronJobScheduleType
     {
-        return self::SCHEDULE_TYPE_DAILY;
+        return CronJobScheduleType::SCHEDULE_TYPE_DAILY;
     }
 
     public function getDefaultScheduleValue(): ?int
@@ -74,7 +76,7 @@ class ilMembershipCronMinMembers extends ilCronJob
     public function run(): ilCronJobResult
     {
         $status = ilCronJobResult::STATUS_NO_ACTION;
-        $message = null;
+        $message = '';
 
         $recipients_map = array();
 
@@ -85,7 +87,6 @@ class ilMembershipCronMinMembers extends ilCronJob
             foreach ($recipients_map as $reci_id => $items) {
                 $this->sendMessage($reci_id, $items);
             }
-
             $status = ilCronJobResult::STATUS_OK;
             $message = count($recipients_map) . " notifications sent";
         }
@@ -142,7 +143,8 @@ class ilMembershipCronMinMembers extends ilCronJob
         foreach ($a_items as $item) {
             $obj_type = (string) $item[0];
             $obj_id = (int) $item[1];
-            $ref_id = array_pop($ref_id);
+            $ref_ids = ilObject::_getAllReferences($obj_id);
+            $ref_id = array_pop($ref_ids);
             $title = ilObject::_lookupTitle($obj_id);
             $url = ilLink::_getLink($ref_id, $obj_type);
 

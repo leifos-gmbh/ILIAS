@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class ilSendMailActivity
@@ -65,13 +65,13 @@ class ilSendMailActivity implements ilActivity, ilWorkflowEngineElement
         $subject = '';
         foreach ($this->parameters as $parameter) {
             foreach ($definitions as $definition) {
-                if ($definition['id'] = $parameter) {
-                    switch (strtolower($definition['role'])) {
+                if ($definition['id'] == $parameter) {
+                    switch (strtolower((string) ($definition['role'] ?? ''))) {
                         case 'emailaddress':
-                            $recipient = $definition['value'];
+                            $recipient = (string) ($definition['value'] ?? '');
                             break;
                         case 'subject':
-                            $subject = $definition['value'];
+                            $subject = (string) ($definition['value'] ?? '');
                             break;
                     }
                 }
@@ -82,11 +82,12 @@ class ilSendMailActivity implements ilActivity, ilWorkflowEngineElement
         $mail_text = $this->decodeMessageText($mail_data['content']);
         $mail_text = $this->processPlaceholders($mail_text);
 
-        $mail = new ilWorkflowEngineMailNotification();
-        $mail->setSubjectText($subject);
-        $mail->setBodyText($mail_text);
-
-        $mail->send($recipient);
+        if ($recipient !== '') {
+            $mail = new ilWorkflowEngineMailNotification();
+            $mail->setSubjectText($subject);
+            $mail->setBodyText($mail_text);
+            $mail->send($recipient);
+        }
     }
 
     /**
@@ -175,7 +176,7 @@ class ilSendMailActivity implements ilActivity, ilWorkflowEngineElement
                 $content = $this->context->getContext()->getInstanceVarById($placeholder);
             }
 
-            if ($content !== '') {
+            if (is_string($content) && $content !== '') {
                 $message_text = str_replace($match, $content, $message_text);
             }
         }
@@ -193,7 +194,7 @@ class ilSendMailActivity implements ilActivity, ilWorkflowEngineElement
         preg_match_all('/\{{(.*?)\}}/', $params, $matches, PREG_PATTERN_ORDER);
         foreach ($matches[1] as $match) {
             if ($match === 'THIS:WFID') {
-                $params = str_replace('{{' . $match . '}}', $this->getContext()->getContext()->getDbId(), $params);
+                $params = str_replace('{{' . $match . '}}', (string) $this->getContext()->getContext()->getDbId(), $params);
             }
         }
         $pieces = explode(':', $params);

@@ -18,7 +18,7 @@
 use ILIAS\Refinery\Transformation;
 use ILIAS\Refinery\Random\Transformation\ShuffleTransformation;
 
-include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
+require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
 /**
  * Class for cloze question gaps
@@ -68,7 +68,7 @@ class assClozeGap
     public function __construct($a_type)
     {
         $this->type = (int) $a_type;
-        $this->items = array();
+        $this->items = [];
         $this->shuffle = true;
     }
 
@@ -113,13 +113,22 @@ class assClozeGap
      * @param Transformation $shuffler
      * @return assAnswerCloze[] The list of items
      */
-    public function getItems(Transformation $shuffler): array
+    public function getItems(Transformation $shuffler, ?int $gap_index = null): array
     {
-        if ($this->getShuffle()) {
+        if (!$this->getShuffle()) {
+            return $this->items;
+        }
+
+        if ($gap_index === null) {
             return $shuffler->transform($this->items);
         }
 
-        return $this->items;
+        $items = $this->items;
+        for ($i = -2; $i < $gap_index; $i++) {
+            $items = $shuffler->transform($items);
+        }
+
+        return $items;
     }
 
     /**
@@ -163,7 +172,7 @@ class assClozeGap
     {
         $order = $a_item->getOrder();
         if (array_key_exists($order, $this->items)) {
-            $newitems = array();
+            $newitems = [];
             for ($i = 0; $i < $order; $i++) {
                 array_push($newitems, $this->items[$i]);
             }
@@ -289,7 +298,7 @@ class assClozeGap
     */
     public function clearItems(): void
     {
-        $this->items = array();
+        $this->items = [];
     }
 
     /**
@@ -349,7 +358,7 @@ class assClozeGap
                 $maxpoints = $item->getPoints();
             }
         }
-        $keys = array();
+        $keys = [];
         foreach ($this->items as $key => $item) {
             if ($item->getPoints() == $maxpoints) {
                 array_push($keys, $key);
@@ -370,16 +379,16 @@ class assClozeGap
         switch ($this->getType()) {
             case CLOZE_TEXT:
             case CLOZE_SELECT:
-                $best_solutions = array();
+                $best_solutions = [];
                 if ($combinations !== null && $combinations['best_solution'] == 1) {
-                    $best_solutions[$combinations['points']] = array();
+                    $best_solutions[$combinations['points']] = [];
                     array_push($best_solutions[$combinations['points']], $combinations['answer']);
                 } else {
                     foreach ($this->getItems($shuffler) as $answer) {
                         if (isset($best_solutions[$answer->getPoints()]) && is_array($best_solutions[$answer->getPoints()])) {
                             array_push($best_solutions[$answer->getPoints()], $answer->getAnswertext());
                         } else {
-                            $best_solutions[$answer->getPoints()] = array();
+                            $best_solutions[$answer->getPoints()] = [];
                             array_push($best_solutions[$answer->getPoints()], $answer->getAnswertext());
                         }
                     }
@@ -425,7 +434,6 @@ class assClozeGap
             return false;
         }
 
-        require_once 'Services/Math/classes/class.EvalMath.php';
         $math = new EvalMath();
 
         $item = $this->getItem(0);
@@ -438,19 +446,5 @@ class assClozeGap
         }
 
         return false;
-    }
-
-    public function setShuffler()
-    {
-        global $DIC;
-        $this->shuffler = $DIC->refinery()->random()->shuffleArray(new ILIAS\Refinery\Random\Seed\RandomSeed());
-    }
-
-    public function getShuffler(): Transformation
-    {
-        if ($this->shuffler == null) {
-            $this->setShuffler();
-        }
-        return $this->shuffler;
     }
 }

@@ -280,12 +280,12 @@ class ilObjMediaCast extends ilObject
         $set = $ilDB->query($query);
         $rec = $ilDB->fetchAssoc($set);
 
-        $this->setOnline($rec["is_online"]);
-        $this->setPublicFiles($rec["public_files"]);
-        $this->setDownloadable($rec["downloadable"]);
-        $this->setDefaultAccess($rec["def_access"]);
+        $this->setOnline((bool) $rec["is_online"]);
+        $this->setPublicFiles((bool) $rec["public_files"]);
+        $this->setDownloadable((bool) $rec["downloadable"]);
+        $this->setDefaultAccess((int) $rec["def_access"]);
         $this->setOrder((int) $rec["sortmode"]);
-        $this->setViewMode($rec["viewmode"]);
+        $this->setViewMode((string) $rec["viewmode"]);
         $this->setAutoplayMode((int) $rec["autoplaymode"]);
         $this->setNumberInitialVideos((int) $rec["nr_initial_videos"]);
         $this->setNewItemsInLearningProgress((bool) $rec["new_items_in_lp"]);
@@ -419,8 +419,8 @@ class ilObjMediaCast extends ilObject
 
         $pf = ilBlockSetting::_lookup("news", "public_feed", 0, $this->getId());
         $keeprss = (int) ilBlockSetting::_lookup("news", "keep_rss_min", 0, $this->getId());
-        ilBlockSetting::_write("news", "public_feed", $pf, 0, $new_obj->getId());
-        ilBlockSetting::_write("news", "keep_rss_min", $keeprss, 0, $new_obj->getId());
+        ilBlockSetting::_write("news", "public_feed", (string) $pf, 0, $new_obj->getId());
+        ilBlockSetting::_write("news", "keep_rss_min", (string) $keeprss, 0, $new_obj->getId());
 
         // copy items
         $mapping = $this->copyItems($new_obj);
@@ -489,9 +489,16 @@ class ilObjMediaCast extends ilObject
     public function addMobToCast(
         int $mob_id,
         int $user_id,
-        string $long_desc = ""
+        string $long_desc = "",
+        bool $extract = false
     ): int {
         $mob = new ilObjMediaObject($mob_id);
+        if ($extract) {
+            try {
+                $mob->getExternalMetadata();
+            } catch (Exception $e) {
+            }
+        }
         $news_set = new ilSetting("news");
         $enable_internal_rss = $news_set->get("enable_rss_for_internal");
 
@@ -517,7 +524,11 @@ class ilObjMediaCast extends ilObject
 
         // see ilLPListOfSettingsGUI assign
         $collection = $lp->getCollectionInstance();
-        if ($collection && $collection->hasSelectableItems()) {
+        if (
+            $collection &&
+            $collection->hasSelectableItems() &&
+            $this->getNewItemsInLearningProgress()
+        ) {
             $collection->activateEntries([$mob_id]);
             $lp->resetCaches();
             ilLPStatusWrapper::_refreshStatus($this->getId());

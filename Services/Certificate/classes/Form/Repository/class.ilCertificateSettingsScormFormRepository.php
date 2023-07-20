@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 use ILIAS\Filesystem\Exception\FileNotFoundException;
 use ILIAS\Filesystem\Exception\FileAlreadyExistsException;
 use ILIAS\Filesystem\Exception\IOException;
@@ -27,40 +27,34 @@ use ILIAS\Filesystem\Exception\IOException;
  */
 class ilCertificateSettingsScormFormRepository implements ilCertificateFormRepository
 {
-    private ilCertificateSettingsFormRepository $settingsFormFactory;
-    private ilSetting $setting;
+    private readonly ilCertificateSettingsFormRepository $settingsFormFactory;
 
     public function __construct(
-        private ilObject $object,
+        private readonly ilObject $object,
         string $certificatePath,
         bool $hasAdditionalElements,
-        private ilLanguage $language,
+        private readonly ilLanguage $language,
         ilCtrlInterface $ctrl,
         ilAccess $access,
         ilToolbarGUI $toolbar,
         ilCertificatePlaceholderDescription $placeholderDescriptionObject,
         ?ilCertificateSettingsFormRepository $settingsFormRepository = null,
-        ?ilSetting $setting = null
+        private readonly ilSetting $setting = new ilSetting('scorm')
     ) {
-        if (null === $settingsFormRepository) {
-            $settingsFormRepository = new ilCertificateSettingsFormRepository(
-                $object->getId(),
-                $certificatePath,
-                $hasAdditionalElements,
-                $language,
-                $ctrl,
-                $access,
-                $toolbar,
-                $placeholderDescriptionObject
-            );
-        }
+        global $DIC;
 
-        $this->settingsFormFactory = $settingsFormRepository;
-
-        if (null === $setting) {
-            $setting = new ilSetting('scorm');
-        }
-        $this->setting = $setting;
+        $this->settingsFormFactory = $settingsFormRepository ?? new ilCertificateSettingsFormRepository(
+            $object->getId(),
+            $certificatePath,
+            $hasAdditionalElements,
+            $language,
+            $ctrl,
+            $access,
+            $toolbar,
+            $placeholderDescriptionObject,
+            $DIC->ui()->factory(),
+            $DIC->ui()->renderer()
+        );
     }
 
     /**
@@ -80,8 +74,21 @@ class ilCertificateSettingsScormFormRepository implements ilCertificateFormRepos
         $short_name->setValue(ilStr::subStr($this->object->getTitle(), 0, 30));
         $short_name->setSize(30);
 
+        $short_name_value = $this->setting->get(
+            'certificate_short_name_' . $this->object->getId(),
+            ''
+        );
+
         $infoText = $this->language->txt('certificate_short_name_description');
-        $short_name->setInfo($infoText);
+        if ($short_name_value !== '') {
+            $short_name->setInfo(str_replace(
+                '[SHORT_TITLE]',
+                $short_name_value,
+                $infoText
+            ));
+        } else {
+            $short_name->setInfo($infoText);
+        }
 
         $form->addItem($short_name);
 
@@ -90,8 +97,8 @@ class ilCertificateSettingsScormFormRepository implements ilCertificateFormRepos
 
     public function save(array $formFields): void
     {
-        $this->setting->set('certificate_' . $this->object->getId(), (string) $formFields['certificate_enabled_scorm']);
-        $this->setting->set('certificate_short_name_' . $this->object->getId(), (string) $formFields['short_name']);
+        $this->setting->set('certificate_' . $this->object->getId(), (string) ($formFields['certificate_enabled_scorm'] ?? '0'));
+        $this->setting->set('certificate_short_name_' . $this->object->getId(), (string) ($formFields['short_name'] ?? ''));
     }
 
     public function fetchFormFieldData(string $content): array
@@ -99,11 +106,11 @@ class ilCertificateSettingsScormFormRepository implements ilCertificateFormRepos
         $formFields = $this->settingsFormFactory->fetchFormFieldData($content);
         $formFields['certificate_enabled_scorm'] = $this->setting->get(
             'certificate_' . $this->object->getId(),
-            (string) $formFields['certificate_enabled_scorm']
+            (string) ($formFields['certificate_enabled_scorm'] ?? '0')
         );
         $formFields['short_name'] = $this->setting->get(
             'certificate_short_name_' . $this->object->getId(),
-            (string) $formFields['short_name']
+            (string) ($formFields['short_name'] ?? '')
         );
 
         return $formFields;

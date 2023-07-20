@@ -390,6 +390,7 @@ abstract class ilObjPortfolioBase extends ilObject2
 
         $lng = $DIC->language();
         $ilUser = $DIC->user();
+        $skill_personal_service = $DIC->skills()->personal();
 
         $source_id = $a_source->getId();
         $target_id = $a_target->getId();
@@ -410,6 +411,13 @@ abstract class ilObjPortfolioBase extends ilObject2
         $copy_id = ilCopyWizardOptions::_allocateCopyId();
         ilAdvancedMDValues::_cloneValues($copy_id, $a_source->getId(), $a_target->getId());
 
+        // copy selection of global optional sets
+        ilAdvancedMDRecord::saveObjRecSelection(
+            $a_target->getId(),
+            'pfpg',
+            ilAdvancedMDRecord::getObjRecSelection($a_source->getId(), 'pfpg')
+        );
+
         // fix metadata record type assignment
         // e.g. if portfolio is created from template
         // we need to change this from prtt to prtf
@@ -419,18 +427,31 @@ abstract class ilObjPortfolioBase extends ilObject2
             "pfpg",
             false
         ) as $rec) {
-            $rec->setAssignedObjectTypes(
-                [[
-                    "obj_type" => ilObject::_lookupType($a_target->getId()),
-                    "sub_type" => "pfpg",
-                    "optional" => 0
-                ]]
-            );
+            /*
+             * BT 35494: reset assignement of the newly cloned local records,
+             * and only append what's needed to global ones
+             */
+            $target_type = ilObject::_lookupType($a_target->getId());
+            if ($rec->getParentObject() == $a_target->getId()) {
+                $rec->setAssignedObjectTypes(
+                    [[
+                         "obj_type" => $target_type,
+                         "sub_type" => "pfpg",
+                         "optional" => 0
+                     ]
+                    ]
+                );
+            } elseif (!$rec->isAssignedObjectType($target_type, 'pfpg')) {
+                $rec->appendAssignedObjectType(
+                    $target_type,
+                    "pfpg"
+                );
+            }
             $rec->update();
         }
 
         // personal skills
-        $pskills = array_keys(ilPersonalSkill::getSelectedUserSkills($ilUser->getId()));
+        $pskills = array_keys($skill_personal_service->getSelectedUserSkills($ilUser->getId()));
 
         // copy pages
         $blog_count = 0;
@@ -511,10 +532,7 @@ abstract class ilObjPortfolioBase extends ilObject2
                     // parse content / blocks
 
                     if ($direction === "t2p") {
-                        $dom = $target_page->getDom();
-                        if ($dom instanceof php4DOMDocument) {
-                            $dom = $dom->myDOMDocument;
-                        }
+                        $dom = $target_page->getDomDoc();
 
                         // update profile/consultation hours user id
                         self::updateDomNodes($dom, "//PageContent/Profile", "User", $ilUser->getId());
@@ -533,7 +551,7 @@ abstract class ilObjPortfolioBase extends ilObject2
                             }
                             // new skill
                             elseif ($copy_all || in_array($skill_id, $a_recipe["skills"])) {
-                                ilPersonalSkill::addPersonalSkill($ilUser->getId(), $skill_id);
+                                $skill_personal_service->addPersonalSkill($ilUser->getId(), $skill_id);
 
                                 $node->setAttribute("User", $ilUser->getId());
                             }

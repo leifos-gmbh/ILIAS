@@ -22,7 +22,7 @@
  * @author Alexander Killing <killing@leifos.de>
  * @author Stefan Wanzenried <sw@studer-raimann.ch>
  *
- * @deprecated 11
+ * @deprecated 10
  */
 class ilToolbarGUI
 {
@@ -288,12 +288,15 @@ class ilToolbarGUI
         if (count($this->items) || count($this->sticky_items)) {
             $tpl = new ilTemplate("tpl.toolbar.html", true, true, "Services/UIComponent/Toolbar");
             $tpl->setVariable('TOOLBAR_ID', $this->getId());
+            $tpl->setVariable('MORE_LABEL', $this->lng->txt('toolbar_more_actions'));
+
             if (count($this->sticky_items)) {
                 $tpl_sticky = new ilTemplate("tpl.toolbar_sticky_items.html", true, true, "Services/UIComponent/Toolbar");
                 /** @var ilToolbarItem $sticky_item */
                 foreach ($this->sticky_items as $sticky_item) {
                     if ($sticky_item['label']) {
                         $tpl_sticky->setCurrentBlock('input_label');
+                        $tpl_sticky->setVariable('INPUT_ID', $sticky_item['item']->getFieldId());
                         $tpl_sticky->setVariable('TXT_INPUT', $sticky_item['item']->getTitle());
                         $tpl_sticky->parseCurrentBlock();
                     }
@@ -373,6 +376,7 @@ class ilToolbarGUI
                             if ($item["label"]) {
                                 $tpl_items->setCurrentBlock("input_label");
                                 $tpl_items->setVariable("TXT_INPUT", $item["input"]->getTitle());
+                                $tpl_items->setVariable("INPUT_ID", $item["input"]->getFieldId());
                                 $tpl_items->parseCurrentBlock();
                             }
                             $tpl_items->setCurrentBlock("input");

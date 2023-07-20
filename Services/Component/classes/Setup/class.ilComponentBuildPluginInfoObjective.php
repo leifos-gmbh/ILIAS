@@ -1,4 +1,20 @@
 <?php
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ ********************************************************************
+ */
 
 use ILIAS\Setup;
 
@@ -20,10 +36,16 @@ class ilComponentBuildPluginInfoObjective extends Setup\Artifact\BuildArtifactOb
         foreach (["Modules", "Services"] as $type) {
             $components = $this->scanDir(static::BASE_PATH . $type);
             foreach ($components as $component) {
+                if ($this->isDotFile($component)
+                    || ! $this->isDir(static::BASE_PATH . "$type/$component")) continue;
                 $slots = $this->scanDir(static::BASE_PATH . "$type/$component");
                 foreach ($slots as $slot) {
+                    if ($this->isDotFile($slot)
+                        || ! $this->isDir(static::BASE_PATH . "$type/$component/$slot")) continue;
                     $plugins = $this->scanDir(static::BASE_PATH . "$type/$component/$slot");
                     foreach ($plugins as $plugin) {
+                        if ($this->isDotFile($plugin)
+                            || ! $this->isDir(static::BASE_PATH . "$type/$component/$slot/$plugin")) continue;
                         $this->addPlugin($data, $type, $component, $slot, $plugin);
                     }
                 }
@@ -34,22 +56,22 @@ class ilComponentBuildPluginInfoObjective extends Setup\Artifact\BuildArtifactOb
 
     protected function addPlugin(array &$data, string $type, string $component, string $slot, string $plugin): void
     {
-        $path = static::BASE_PATH . "$type/$component/$slot/$plugin/" . static::PLUGIN_PHP;
-        $plugin_php = $this->readFile($path);
-        if (is_null($plugin_php)) {
+        $plugin_path = $this->buildPluginPath($type, $component, $slot, $plugin);
+        $plugin_php = $plugin_path . static::PLUGIN_PHP;
+        if (!$this->fileExists($plugin_php)) {
             throw new \RuntimeException(
-                "Cannot read plugin.php of $type/$component/$slot/$plugin at $path."
+                "Cannot read $plugin_php."
             );
         }
 
-        $path = static::BASE_PATH . "$type/$component/$slot/$plugin/" . sprintf(static::PLUGIN_CLASS_FILE, $plugin);
-        if (is_null($this->readFile($path))) {
+        $plugin_class = $plugin_path . sprintf(static::PLUGIN_CLASS_FILE, $plugin);
+        if (!$this->fileExists($plugin_class)) {
             throw new \RuntimeException(
-                "Cannot read plugin class file of $type/$component/$slot/$plugin at $path."
+                "Cannot read $plugin_class."
             );
         }
 
-        eval("?>" . $plugin_php);
+        require_once($plugin_php);
         if (!isset($id)) {
             throw new \InvalidArgumentException("$path does not define \$id");
         }
@@ -97,11 +119,23 @@ class ilComponentBuildPluginInfoObjective extends Setup\Artifact\BuildArtifactOb
         return array_values(array_diff($result, [".", ".."]));
     }
 
-    protected function readFile(string $path): ?string
+    protected function fileExists(string $path): bool
     {
-        if (!file_exists($path) || !is_file($path)) {
-            return null;
-        }
-        return file_get_contents($path);
+        return file_exists($path) && is_file($path);
+    }
+
+    protected function isDir(string $dir): bool
+    {
+        return file_exists($dir) && is_dir($dir);
+    }
+
+    protected function isDotFile(string $file): bool
+    {
+        return ( substr($file, 0, 1) === '.' );
+    }
+
+    protected function buildPluginPath(string $type, string $component, string $slot, string $plugin): string
+    {
+        return static::BASE_PATH . "$type/$component/$slot/$plugin/";
     }
 }

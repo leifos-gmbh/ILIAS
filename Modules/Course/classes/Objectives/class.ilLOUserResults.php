@@ -154,6 +154,10 @@ class ilLOUserResults
             " WHERE course_id = " . $ilDB->quote($a_course_id, "integer") .
             " AND " . $ilDB->in("user_id", $a_user_ids, false, "integer");
 
+        if ($a_objective_ids !== []) {
+            $base_sql .= ' AND ' . $ilDB->in('objective_id', $a_objective_ids, false, "integer");
+        }
+
         $sql = '';
         if ($a_remove_initial) {
             $sql = $base_sql .
@@ -167,12 +171,9 @@ class ilLOUserResults
             $ilDB->manipulate($sql);
         }
 
-        if (is_array($a_objective_ids)) {
-            $sql = $base_sql .
-                " AND " . $ilDB->in("objective_id", $a_objective_ids, false, "integer");
-            $ilDB->manipulate($sql);
+        if ($a_objective_ids === []) {
+            $ilDB->manipulate($base_sql);
         }
-
         $ilDB->manipulate($sql);
         return true;
     }
@@ -415,7 +416,7 @@ class ilLOUserResults
             // initial tests only count if no qualified test
             if (
                 $row["type"] == self::TYPE_INITIAL &&
-                in_array($row['user_id'], (array) $has_final_result[(int) $row['objective_id']])
+                in_array($row['user_id'], (array) ($has_final_result[(int) $row['objective_id']] ?? []))
             ) {
                 continue;
             }
@@ -425,7 +426,7 @@ class ilLOUserResults
 
             switch ($status) {
                 case self::STATUS_COMPLETED:
-                    $tmp_completed[$user_id]++;
+                    $tmp_completed[$user_id] = ($tmp_completed[$user_id] ?? 0) + 1;
                     break;
 
                 case self::STATUS_FAILED:

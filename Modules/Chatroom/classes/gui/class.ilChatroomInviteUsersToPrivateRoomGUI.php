@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class ilChatroomInviteUsersToPrivateRoomGUI
@@ -45,24 +45,20 @@ class ilChatroomInviteUsersToPrivateRoomGUI extends ilChatroomGUIHandler
         $this->exitIfNoRoomExists($room);
 
         $chat_user = new ilChatroomUser($this->ilUser, $room);
-        $subRoomId = $this->getRequestValue('sub', $this->refinery->kindlyTo()->int());
-        $this->exitIfNoRoomModeratePermission($room, $subRoomId, $chat_user);
-
-        if (!$this->isMainRoom($subRoomId)) {
-            $room->inviteUserToPrivateRoom($invited_id, $subRoomId);
-        }
 
         $connector = $this->gui->getConnector();
         $response = $connector->sendInviteToPrivateRoom(
             $room->getRoomId(),
-            $subRoomId,
             $chat_user->getUserId(),
             $invited_id
         );
 
-        $room->sendInvitationNotification($this->gui, $chat_user, $invited_id, $subRoomId);
+        $room->sendInvitationNotification($this->gui, $chat_user, $invited_id);
 
-        $this->sendResponse($response);
+        if ('asynch' === $this->getRequestValue('cmdMode', $this->refinery->kindlyTo()->string())) {
+            $this->sendResponse($response);
+        }
+        $this->ilCtrl->redirect($this->gui, 'view');
     }
 
     public function byId(): void

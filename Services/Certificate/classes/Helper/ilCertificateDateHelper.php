@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 /**
  * @author  Niels Theen <ntheen@databay.de>
  */
@@ -29,6 +29,7 @@ class ilCertificateDateHelper
     public function formatDate($date, ?int $dateFormat = null): string
     {
         if (null === $dateFormat) {
+            require_once 'Services/Calendar/classes/class.ilDateTime.php'; // Required because of global contant IL_CAL_DATE
             $dateFormat = IL_CAL_DATETIME;
         }
 
@@ -49,6 +50,7 @@ class ilCertificateDateHelper
     public function formatDateTime($dateTime, ?int $dateFormat = null): string
     {
         if (null === $dateFormat) {
+            require_once 'Services/Calendar/classes/class.ilDateTime.php'; // Required because of global contant IL_CAL_DATE
             $dateFormat = IL_CAL_DATETIME;
         }
 

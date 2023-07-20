@@ -47,18 +47,19 @@ class ilLink
             }
         }
 
-        // workaround for administration links
-        if ($objDefinition->isAdministrationObject($a_type)) {
-            return ILIAS_HTTP_PATH . '/ilias.php?baseClass=ilAdministrationGUI&cmd=jump&ref_id=' . $a_ref_id;
+        // workaround for administration links: https://mantis.ilias.de/view.php?id=33088
+        if (
+            $objDefinition->isAdministrationObject($a_type) &&
+            $param_string === '' &&
+            $append === ''
+        ) {
+            $determined_object_type = $ilObjDataCache->lookupType($ilObjDataCache->lookupObjId($a_ref_id));
+            // https://mantis.ilias.de/view.php?id=34853
+            if ($determined_object_type === $a_type) {
+                return ILIAS_HTTP_PATH . '/ilias.php?baseClass=ilAdministrationGUI&cmd=jump&ref_id=' . $a_ref_id;
+            }
         }
-        switch ($a_type) {
-            case 'git':
-                //case 'pg':
-                return ILIAS_HTTP_PATH . '/' . self::LINK_SCRIPT . '?client_id=' . CLIENT_ID . $param_string . $append;
-
-            default:
-                return ILIAS_HTTP_PATH . '/' . self::LINK_SCRIPT . '?target=' . $a_type . '_' . $a_ref_id . $append . '&client_id=' . CLIENT_ID . $param_string;
-        }
+        return ILIAS_HTTP_PATH . '/' . self::LINK_SCRIPT . '?target=' . $a_type . '_' . $a_ref_id . $append . '&client_id=' . CLIENT_ID . $param_string;
     }
 
     /**

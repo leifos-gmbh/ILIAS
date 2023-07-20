@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 class ilForumDatabaseUpdateSteps implements ilDatabaseUpdateSteps
 {
@@ -46,5 +46,55 @@ class ilForumDatabaseUpdateSteps implements ilDatabaseUpdateSteps
     public function step_2(): void
     {
         $this->db->manipulateF("UPDATE object_data SET offline = %s WHERE type = %s", ['integer', 'text'], [0, 'frm']);
+    }
+
+    public function step_3(): void
+    {
+        if (!$this->db->tableColumnExists('frm_posts', 'rcid')) {
+            $this->db->addTableColumn(
+                'frm_posts',
+                'rcid',
+                [
+                    'type' => 'text',
+                    'notnull' => false,
+                    'length' => 64,
+                    'default' => ''
+                ]
+            );
+        }
+    }
+
+    public function step_4(): void
+    {
+        if ($this->db->tableExists('frm_thread_access')) {
+            $this->db->dropTable('frm_thread_access');
+        }
+    }
+
+    public function step_5(): void
+    {
+        if ($this->db->tableExists('settings')) {
+            $this->db->manipulateF(
+                "DELETE FROM settings WHERE keyword = %s",
+                ['text'],
+                ['frm_new_deadline']
+            );
+        }
+    }
+
+    public function step_6(): void
+    {
+        if (!$this->db->tableColumnExists('frm_posts_drafts', 'rcid')) {
+            $this->db->addTableColumn(
+                'frm_posts_drafts',
+                'rcid',
+                [
+                    'type' => 'text',
+                    'notnull' => false,
+                    'length' => 64,
+                    'default' => ''
+                ]
+            );
+        }
     }
 }

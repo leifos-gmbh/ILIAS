@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -33,6 +35,7 @@ class ilSkillLevelTableGUI extends ilTable2GUI
     protected bool $manage_perm = false;
     protected \ILIAS\UI\Factory $ui_fac;
     protected \ILIAS\UI\Renderer $ui_ren;
+    protected \ILIAS\Skill\Resource\SkillResourcesManager $resource_manager;
 
     public function __construct(
         int $a_skill_id,
@@ -51,6 +54,7 @@ class ilSkillLevelTableGUI extends ilTable2GUI
         $lng = $DIC->language();
         $this->ui_fac = $DIC->ui()->factory();
         $this->ui_ren = $DIC->ui()->renderer();
+        $this->resource_manager = $DIC->skills()->internal()->manager()->getResourceManager();
 
         $this->skill_id = $a_skill_id;
         $this->skill = new ilBasicSkill($a_skill_id);
@@ -74,8 +78,8 @@ class ilSkillLevelTableGUI extends ilTable2GUI
         }
         $this->addColumn($this->lng->txt("title"));
         $this->addColumn($this->lng->txt("description"));
-        $this->addColumn($this->lng->txt("skmg_suggested_resources"));
-        $this->addColumn($this->lng->txt("skmg_lp_triggers_level_resources"));
+        $this->addColumn($this->lng->txt("skmg_suggested"));
+        $this->addColumn($this->lng->txt("skmg_lp_triggers_level"));
         if ($this->manage_perm) {
             $this->addColumn($this->lng->txt("actions"));
         }
@@ -112,8 +116,7 @@ class ilSkillLevelTableGUI extends ilTable2GUI
 
         // add ressource data
         $res = [];
-        $resources = new ilSkillResources($this->skill_id, $this->tref_id);
-        foreach ($resources->getResources() as $level_id => $item) {
+        foreach ($this->resource_manager->getResources($this->skill_id, $this->tref_id) as $level_id => $item) {
             $res[$level_id] = $item;
         }
 
@@ -168,8 +171,8 @@ class ilSkillLevelTableGUI extends ilTable2GUI
         $this->tpl->setVariable("TXT_TITLE", $a_set["title"]);
         $this->tpl->setVariable("TXT_DESCRIPTION", $a_set["description"]);
         if (isset($a_set["ressources"]) && is_array($a_set["ressources"])) {
-            foreach ($a_set["ressources"] as $rref_id => $ressource) {
-                $robj_id = ilObject::_lookupObjId($rref_id);
+            foreach ($a_set["ressources"] as $ressource) {
+                $robj_id = ilObject::_lookupObjId($ressource->getRepoRefId());
                 $robj_type = ilObject::_lookupType($robj_id);
                 $robj_icon = $this->ui_fac->symbol()->icon()->standard(
                     $robj_type,
@@ -177,9 +180,9 @@ class ilSkillLevelTableGUI extends ilTable2GUI
                     "medium"
                 );
                 $robj_title = ilObject::_lookupTitle($robj_id);
-                $robj_link = ilLink::_getStaticLink($rref_id);
+                $robj_link = ilLink::_getStaticLink($ressource->getRepoRefId());
 
-                if ($ressource["imparting"]) {
+                if ($ressource->getImparting()) {
                     $this->tpl->setCurrentBlock("ressource_sugg");
                     $this->tpl->setVariable("RSRC_IMG", $this->ui_ren->render($robj_icon));
                     $this->tpl->setVariable("RSRC_TITLE", $robj_title);
@@ -187,7 +190,7 @@ class ilSkillLevelTableGUI extends ilTable2GUI
                     $this->tpl->parseCurrentBlock();
                 }
 
-                if ($ressource["trigger"]) {
+                if ($ressource->getTrigger()) {
                     $this->tpl->setCurrentBlock("ressource_trigg");
                     $this->tpl->setVariable("RSRC_IMG", $this->ui_ren->render($robj_icon));
                     $this->tpl->setVariable("RSRC_TITLE", $robj_title);

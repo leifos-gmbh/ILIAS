@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -15,7 +14,10 @@ declare(strict_types=1);
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\HTTP\Services as HTTPServices;
 use ILIAS\DI\UIServices;
@@ -51,6 +53,10 @@ class ilGlobalPageTemplate implements ilGlobalTemplateInterface
         "",
     ];
 
+
+    /**
+     * @inheritDoc
+     */
     public function __construct(Services $gs, UIServices $ui, HTTPServices $http)
     {
         global $DIC;
@@ -125,6 +131,8 @@ class ilGlobalPageTemplate implements ilGlobalTemplateInterface
         $this->prepareBasicCSS();
 
         PageContentProvider::setContent($this->legacy_content_template->renderPage(self::DEFAULT_BLOCK, true));
+        $this->http->sendResponse();
+
         print $this->ui->renderer()->render($this->gs->collector()->layout()->getFinalPage());
 
         // save language usages as late as possible
@@ -235,7 +243,7 @@ class ilGlobalPageTemplate implements ilGlobalTemplateInterface
 
     public function setHeaderPageTitle(string $a_title): void
     {
-        $this->legacy_content_template->setHeaderPageTitle($a_title);
+        PageContentProvider::setViewTitle($a_title);
     }
 
     public function addLightbox(string $a_html, string $a_id): void

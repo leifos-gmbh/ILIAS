@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 /**
  * Base class for course/group mail notifications
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
@@ -25,7 +25,8 @@ declare(strict_types=1);
  */
 abstract class ilMailNotification
 {
-    public const SUBJECT_TITLE_LENGTH = 60;
+    final public const SUBJECT_TITLE_LENGTH = 60;
+
     protected int $type;
     protected int $sender;
     protected ?ilMail $mail = null;
@@ -36,8 +37,8 @@ abstract class ilMailNotification
     protected array $lang_modules = [];
     protected array $recipients = [];
     protected int $ref_id;
-    protected int $obj_id;
-    protected string $obj_type;
+    protected int $obj_id = 0;
+    protected string $obj_type = '';
     protected array $additional_info = [];
     protected ilWorkspaceTree $wsp_tree;
     protected ilWorkspaceAccessHandler $wsp_access_handler;

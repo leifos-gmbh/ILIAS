@@ -1,7 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -143,10 +156,7 @@ class ilTestSkillLevelThreshold
         $this->testId = $testId;
     }
 
-    /**
-     * @return int
-     */
-    public function getTestId(): int
+    public function getTestId(): ?int
     {
         return $this->testId;
     }
@@ -159,10 +169,7 @@ class ilTestSkillLevelThreshold
         $this->skillBaseId = $skillBaseId;
     }
 
-    /**
-     * @return int
-     */
-    public function getSkillBaseId(): int
+    public function getSkillBaseId(): ?int
     {
         return $this->skillBaseId;
     }
@@ -175,10 +182,7 @@ class ilTestSkillLevelThreshold
         $this->skillTrefId = $skillTrefId;
     }
 
-    /**
-     * @return int
-     */
-    public function getSkillTrefId(): int
+    public function getSkillTrefId(): ?int
     {
         return $this->skillTrefId;
     }
@@ -191,10 +195,7 @@ class ilTestSkillLevelThreshold
         $this->skillLevelId = $skillLevelId;
     }
 
-    /**
-     * @return int
-     */
-    public function getSkillLevelId(): int
+    public function getSkillLevelId(): ?int
     {
         return $this->skillLevelId;
     }
@@ -207,10 +208,7 @@ class ilTestSkillLevelThreshold
         $this->threshold = $threshold;
     }
 
-    /**
-     * @return int
-     */
-    public function getThreshold(): int
+    public function getThreshold(): ?int
     {
         return $this->threshold;
     }

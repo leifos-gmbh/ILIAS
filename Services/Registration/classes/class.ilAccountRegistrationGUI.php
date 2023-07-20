@@ -92,7 +92,7 @@ class ilAccountRegistrationGUI
                 $tpl = $this->displayForm();
         }
 
-        $this->tpl->setPermanentLink('usr', 0, 'registration');
+        $this->tpl->setPermanentLink('usr', null, 'registration');
         ilStartUpGUI::printToGlobalTemplate($tpl);
     }
 
@@ -145,7 +145,7 @@ class ilAccountRegistrationGUI
             $fprop = ilCustomUserFieldsHelper::getInstance()->getFormPropertyForDefinition(
                 $definition,
                 true,
-                $user_defined_data['f_' . $field_id] ?? null
+                $user_defined_data['f_' . $field_id] ?? ''
             );
             if ($fprop instanceof ilFormPropertyGUI) {
                 $custom_fields['udf_' . $definition['field_id']] = $fprop;
@@ -345,14 +345,18 @@ class ilAccountRegistrationGUI
         if (!ilUtil::isLogin($login)) {
             $login_obj->setAlert($this->lng->txt("login_invalid"));
             $form_valid = false;
-        } elseif (ilObjUser::_loginExists($login)) {
-            $login_obj->setAlert($this->lng->txt("login_exists"));
-            $form_valid = false;
-        } elseif ((int) $this->settings->get('allow_change_loginname') &&
-            (int) $this->settings->get('reuse_of_loginnames') === 0 &&
-            ilObjUser::_doesLoginnameExistInHistory($login)) {
-            $login_obj->setAlert($this->lng->txt('login_exists'));
-            $form_valid = false;
+        }
+
+        if ($form_valid) {
+            if (ilObjUser::_loginExists($login)) {
+                $login_obj->setAlert($this->lng->txt("login_exists"));
+                $form_valid = false;
+            } elseif ((int) $this->settings->get('allow_change_loginname') &&
+                (int) $this->settings->get('reuse_of_loginnames') === 0 &&
+                ilObjUser::_doesLoginnameExistInHistory($login)) {
+                $login_obj->setAlert($this->lng->txt('login_exists'));
+                $form_valid = false;
+            }
         }
 
         if (!$form_valid) {
@@ -432,10 +436,11 @@ class ilAccountRegistrationGUI
         $user_defined_fields = ilUserDefinedFields::_getInstance();
         $defs = $user_defined_fields->getRegistrationDefinitions();
         $udf = [];
-        foreach ($_POST as $k => $v) {
-            if (strpos($k, "udf_") === 0) {
-                $f = substr($k, 4);
-                $udf[$f] = $v;
+        foreach ($defs as $definition) {
+            $f = "udf_" . $definition['field_id'];
+            $item = $this->form->getItemByPostVar($f);
+            if ($item && !$item->getDisabled()) {
+                $udf[$definition['field_id']] = $this->form->getInput($f);
             }
         }
         $this->userObj->setUserDefinedData($udf);
@@ -475,7 +480,7 @@ class ilAccountRegistrationGUI
 
                         case "relative":
                             $rel = unserialize($code_data["alimitdt"], ['allowed_classes' => false]);
-                            $access_limit = $rel["d"] * 86400 + $rel["m"] * 2592000 + time();
+                            $access_limit = $rel["d"] * 86400 + $rel["m"] * 2592000 + $rel["y"] * 31536000 + time();
                             break;
                     }
                 }

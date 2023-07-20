@@ -31,12 +31,12 @@ use ILIAS\Export\PrintProcessGUI;
 class GUIService
 {
     protected InternalGUIService $ui_service;
-    protected \ilObjectServiceInterface $object_service;
+    protected \ilObjectService $object_service;
     protected InternalDomainService $domain_service;
 
     public function __construct(
         InternalGUIService $ui_service,
-        \ilObjectServiceInterface $object_service,
+        \ilObjectService $object_service,
         InternalDomainService $domain_service
     ) {
         $this->ui_service = $ui_service;
@@ -47,6 +47,16 @@ class GUIService
     public function page(int $ref_id): PrintProcessGUI
     {
         $provider = new PagePrintViewProviderGUI(
+            $this->domain_service->lng(),
+            $this->ui_service->ctrl(),
+            $ref_id
+        );
+        return $this->getPrintProcessGUI($provider);
+    }
+
+    public function list(int $ref_id): PrintProcessGUI
+    {
+        $provider = new ListPrintViewProviderGUI(
             $this->domain_service->lng(),
             $this->ui_service->ctrl(),
             $ref_id

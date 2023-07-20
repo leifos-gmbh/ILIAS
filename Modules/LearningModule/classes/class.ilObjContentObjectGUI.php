@@ -31,6 +31,7 @@ use ILIAS\LearningModule\Editing\EditingGUIRequest;
  */
 class ilObjContentObjectGUI extends ilObjectGUI
 {
+    protected ilRbacSystem $rbacsystem;
     protected \ILIAS\LearningModule\ReadingTime\SettingsGUI $reading_time_gui;
     protected ilLMMenuEditor $lmme_obj;
     protected ilObjLearningModule $lm_obj;
@@ -66,6 +67,8 @@ class ilObjContentObjectGUI extends ilObjectGUI
     protected ilObjLearningModule $lm;
     protected EditingGUIRequest $edit_request;
     protected \ILIAS\Style\Content\Service $content_style_service;
+
+    protected ilLMTree $lm_tree;
 
     /**
      * @param mixed $a_data
@@ -333,6 +336,10 @@ class ilObjContentObjectGUI extends ilObjectGUI
                 break;
 
             case "ilexportgui":
+                // it is important to reset the "transl" parameter here
+                // otherwise it will effect the HTML export and overwrite the selected language
+                $this->ctrl->setParameterByClass(ilObjLearningModuleGUI::class, "transl", "");
+                $this->ctrl->setParameterByClass(ilLMEditorGUI::class, "transl", "");
                 $exp_gui = new ilExportGUI($this);
                 $exp_gui->addFormat("xml");
                 $ot = ilObjectTranslation::getInstance($this->lm->getId());
@@ -380,6 +387,7 @@ class ilObjContentObjectGUI extends ilObjectGUI
 
             case "ilcommonactiondispatchergui":
                 $gui = ilCommonActionDispatcherGUI::getInstanceFromAjaxCall();
+                $this->prepareOutput();
                 $this->ctrl->forwardCommand($gui);
                 break;
 
@@ -553,10 +561,10 @@ class ilObjContentObjectGUI extends ilObjectGUI
 
         // tries
         $radg = new ilRadioGroupInputGUI($lng->txt("cont_tries"), "store_tries");
-        $radg->setValue(0);
-        $op1 = new ilRadioOption($lng->txt("cont_tries_reset_on_visit"), 0, $lng->txt("cont_tries_reset_on_visit_info"));
+        $radg->setValue("0");
+        $op1 = new ilRadioOption($lng->txt("cont_tries_reset_on_visit"), "0", $lng->txt("cont_tries_reset_on_visit_info"));
         $radg->addOption($op1);
-        $op2 = new ilRadioOption($lng->txt("cont_tries_store"), 1, $lng->txt("cont_tries_store_info"));
+        $op2 = new ilRadioOption($lng->txt("cont_tries_store"), "1", $lng->txt("cont_tries_store_info"));
         $radg->addOption($op2);
         $this->form->addItem($radg);
 
@@ -656,7 +664,7 @@ class ilObjContentObjectGUI extends ilObjectGUI
         $values["rating_pages"] = $this->lm->hasRatingPages();
         $values["disable_def_feedback"] = $this->lm->getDisableDefaultFeedback();
         $values["progr_icons"] = $this->lm->getProgressIcons();
-        $values["store_tries"] = $this->lm->getStoreTries();
+        $values["store_tries"] = (string) (int) $this->lm->getStoreTries();
         $values["restrict_forw_nav"] = $this->lm->getRestrictForwardNavigation();
 
         $values["notification_blocked_users"] = ilNotification::hasNotification(
@@ -666,7 +674,6 @@ class ilObjContentObjectGUI extends ilObjectGUI
         );
 
         $values["cont_show_info_tab"] = $this->object->isInfoEnabled();
-
         $this->form->setValuesByArray($values, true);
     }
 
@@ -1006,6 +1013,9 @@ class ilObjContentObjectGUI extends ilObjectGUI
             ->editing()
             ->request();
 
+        $ui_renderer = $DIC->ui()->renderer();
+        $ui_factory = $DIC->ui()->factory();
+
         $requested_transl = $edit_request->getTranslation();
         $requested_totransl = $edit_request->getToTranslation();
 
@@ -1021,17 +1031,15 @@ class ilObjContentObjectGUI extends ilObjectGUI
             $ml_gui = new ilPageMultiLangGUI("lm", $a_lm_id);
             $ml_head = $ml_gui->getMultiLangInfo($requested_transl);
 
+            $actions = [];
+
             // language switch
-            $list = new ilAdvancedSelectionListGUI();
-            $list->setListTitle($lng->txt("actions"));
-            $list->setId("copage_act");
             $entries = false;
             if (!in_array($requested_transl, array("", "-"))) {
                 $l = $ot->getMasterLanguage();
-                $list->addItem(
+                $actions[] = $ui_factory->link()->standard(
                     $lng->txt("cont_edit_language_version") . ": " .
                     $lng->txt("meta_l_" . $l),
-                    "",
                     $ilCtrl->getLinkTarget($a_gui_class, "editMasterLanguage")
                 );
                 $entries = true;
@@ -1041,10 +1049,9 @@ class ilObjContentObjectGUI extends ilObjectGUI
                 if ($requested_transl != $al &&
                     $al != $ot->getMasterLanguage()) {
                     $ilCtrl->setParameter($a_gui_class, "totransl", $al);
-                    $list->addItem(
+                    $actions[] = $ui_factory->link()->standard(
                         $lng->txt("cont_edit_language_version") . ": " .
                         $lng->txt("meta_l_" . $al),
-                        "",
                         $ilCtrl->getLinkTarget($a_gui_class, "switchToLanguage")
                     );
                     $ilCtrl->setParameter($a_gui_class, "totransl", $requested_totransl);
@@ -1053,7 +1060,9 @@ class ilObjContentObjectGUI extends ilObjectGUI
             }
 
             if ($entries) {
-                $ml_head = '<div class="ilFloatLeft">' . $ml_head . '</div><div style="margin: 5px 0;" class="small ilRight">' . $list->getHTML() . "</div>";
+                $dd = $ui_factory->dropdown()->standard($actions)->withLabel($lng->txt("actions"));
+
+                $ml_head = '<div class="ilFloatLeft">' . $ml_head . '</div><div style="margin: 5px 0;" class="small ilRight">' . $ui_renderer->render($dd) . "</div>";
             }
             $ilCtrl->setParameter($a_gui_class, "lang_switch_mode", "");
         }
@@ -1227,7 +1236,7 @@ class ilObjContentObjectGUI extends ilObjectGUI
         }
 
         if ($a_parent_subobj_id == 0) {
-            $this->setTabs();
+            $this->setTabs("content");
         }
 
         if ($a_parent_subobj_id != 0) {
@@ -2981,7 +2990,7 @@ class ilObjContentObjectGUI extends ilObjectGUI
     {
         $ilCtrl = $this->ctrl;
 
-        $ilCtrl->setParameter($this, "transl", "");
+        $ilCtrl->setParameter($this, "transl", "-");
         if ($this->lang_switch_mode == "short_titles") {
             $ilCtrl->redirectByClass("illmeditshorttitlesgui", "");
         }

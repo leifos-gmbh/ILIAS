@@ -1,9 +1,19 @@
 <?php
-
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once './Services/PDFGeneration/classes/factory/class.ilHtmlToPdfTransformerFactory.php';
-require_once './Services/PDFGeneration/classes/class.ilPDFGeneratorUtils.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTestPDFGenerator
@@ -104,7 +114,17 @@ class ilTestPDFGenerator
             $filename .= '.pdf';
         }
         $pdf_factory = new ilHtmlToPdfTransformerFactory();
-        return $pdf_factory->deliverPDFFromHTMLString($pdf_output, $filename, $output_mode, self::service, $purpose);
+
+        if (!$pdf_factory->deliverPDFFromHTMLString(
+            $pdf_output,
+            $filename,
+            $output_mode,
+            self::service,
+            $purpose
+        )) {
+            throw new \Exception('could not write PDF');
+        }
+        return true;
     }
 
     public static function preprocessHTML($html): string
@@ -116,8 +136,6 @@ class ilTestPDFGenerator
 
     protected static function getTemplatePath($a_filename, $module_path = 'Modules/Test/'): string
     {
-        // use ilStyleDefinition instead of account to get the current skin
-        include_once "Services/Style/System/classes/class.ilStyleDefinition.php";
         $fname = '';
         if (ilStyleDefinition::getCurrentSkin() != "default") {
             $fname = "./Customizing/global/skin/" .

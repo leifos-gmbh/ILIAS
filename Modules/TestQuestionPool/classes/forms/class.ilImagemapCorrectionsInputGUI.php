@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilImagemapCorrectionsInputGUI
@@ -75,7 +89,6 @@ class ilImagemapCorrectionsInputGUI extends ilImagemapFileInputGUI
         if ($this->getImage() != "") {
             $template->setCurrentBlock("image");
             if (count($this->getAreas())) {
-                include_once "./Modules/TestQuestionPool/classes/class.ilImagemapPreview.php";
                 $preview = new ilImagemapPreview($this->getImagePath() . $this->getValue());
                 foreach ($this->getAreas() as $index => $area) {
                     $preview->addArea($index, $area->getArea(), $area->getCoords(), $area->getAnswertext(), "", "", true, $this->getLineColor());

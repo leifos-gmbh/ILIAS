@@ -1166,9 +1166,9 @@ class ilTree
                 $row = $this->db->fetchObject($res);
 
                 if ($row) {
-                    $data["title"] = $row->title;
+                    $data["title"] = (string) $row->title;
                     $data["description"] = ilStr::shortenTextExtended((string) $row->description, ilObject::DESC_LENGTH, true);
-                    $data["desc"] = $row->description;
+                    $data["desc"] = (string) $row->description;
                 }
 
                 // Store up to 1000 object translations in cache
@@ -1617,8 +1617,10 @@ class ilTree
             0,
             $this->tree_id
         ));
-        $row = $this->db->fetchObject($res);
-        $this->root_id = (int) $row->child;
+        $this->root_id = 0;
+        if ($row = $this->db->fetchObject($res)) {
+            $this->root_id = (int) $row->child;
+        }
         return $this->root_id;
     }
 

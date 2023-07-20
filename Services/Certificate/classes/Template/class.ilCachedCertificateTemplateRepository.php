@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 /**
  * A certicate template repository which caches results of query commands
  * List of cached results (other queries are not cached yet):
@@ -25,10 +25,10 @@ declare(strict_types=1);
  */
 class ilCachedCertificateTemplateRepository implements ilCertificateTemplateRepository
 {
-    /** @var array<int, ilCertificateTemplate[]> */
+    /** @var array<string, ilCertificateTemplate[]> */
     protected static array $crs_certificates_without_lp = [];
 
-    public function __construct(private ilCertificateTemplateRepository $wrapped)
+    public function __construct(private readonly ilCertificateTemplateRepository $wrapped)
     {
     }
 
@@ -78,16 +78,19 @@ class ilCachedCertificateTemplateRepository implements ilCertificateTemplateRepo
     }
 
     public function fetchActiveCertificateTemplatesForCoursesWithDisabledLearningProgress(
-        bool $isGlobalLpEnabled
+        bool $isGlobalLpEnabled,
+        ?int $forRefId = null
     ): array {
-        $cache_key = (int) $isGlobalLpEnabled;
+        $cache_key = (int) $isGlobalLpEnabled . '_' . (int) $forRefId;
 
         if (!array_key_exists($cache_key, self::$crs_certificates_without_lp)) {
             self::$crs_certificates_without_lp[$cache_key] =
                 $this->wrapped->fetchActiveCertificateTemplatesForCoursesWithDisabledLearningProgress(
-                    $isGlobalLpEnabled
+                    $isGlobalLpEnabled,
+                    $forRefId
                 );
         }
+
         return self::$crs_certificates_without_lp[$cache_key];
     }
 

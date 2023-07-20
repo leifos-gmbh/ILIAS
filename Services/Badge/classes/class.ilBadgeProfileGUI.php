@@ -25,7 +25,7 @@ use ILIAS\Badge\Notification\BadgeNotificationPrefRepository;
  */
 class ilBadgeProfileGUI
 {
-    public const BACKPACK_EMAIL = "badge_mozilla_bp";
+    final public const BACKPACK_EMAIL = "badge_mozilla_bp";
     protected ilBadgeGUIRequest $request;
 
     protected ilCtrl $ctrl;
@@ -141,8 +141,8 @@ class ilBadgeProfileGUI
             $modal = $this->factory->modal()->roundtrip(
                 $badge["title"],
                 $this->factory->legacy($badge["renderer"]->renderModalContent())
-            )->withCancelButtonLabel("ok");
-            $image = $this->factory->image()->responsive($badge["image"], $badge["name"])
+            )->withCancelButtonLabel($this->lng->txt("ok"));
+            $image = $this->factory->image()->responsive(ilWACSignedPath::signFile($badge["image"]), $badge["name"])
                 ->withAction($modal->getShowSignal());
 
             $this->ctrl->setParameter($this, "badge_id", $badge["id"]);
@@ -164,7 +164,7 @@ class ilBadgeProfileGUI
 
                 $ref_ids = ilObject::_getAllReferences($badge["object"]["id"]);
                 $parent_ref_id = array_shift($ref_ids);
-                if ($this->access->checkAccess("read", "", $parent_ref_id)) {
+                if ($parent_ref_id && $this->access->checkAccess("read", "", $parent_ref_id)) {
                     $parent_link = $this->factory->link()->standard($badge["object"]["title"], ilLink::_getLink($parent_ref_id));
                 } else {
                     $parent_link = $this->factory->legacy($badge["object"]["title"]);

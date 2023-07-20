@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -134,7 +136,7 @@ class ilSkillCatTableGUI extends ilTable2GUI
 
                 // skill template reference
             case "sktr":
-                $tid = ilSkillTemplateReference::_lookupTemplateId($a_set["child"]);
+                $tid = ilSkillTemplateReference::_lookupTemplateId((int) $a_set["child"]);
                 $ilCtrl->setParameterByClass("ilskilltemplatereferencegui", "tref_id", $a_set["child"]);
                 $ilCtrl->setParameterByClass("ilskilltemplatereferencegui", "node_id", $tid);
                 $ret = $ilCtrl->getLinkTargetByClass("ilskilltemplatereferencegui", "listItems");
@@ -194,8 +196,7 @@ class ilSkillCatTableGUI extends ilTable2GUI
         $icon = $this->ui_fac->symbol()->icon()->custom(
             $icon_path,
             "",
-            "medium",
-            (ilSkillTreeNode::_lookupStatus((int) $a_set["child"]) === ilSkillTreeNode::STATUS_DRAFT)
+            "medium"
         );
         $this->tpl->setVariable("ICON", $this->ui_ren->render($icon));
     }

@@ -14,7 +14,7 @@
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
  *
- * ******************************************************************* */
+ *********************************************************************/
 
 /**
  *
@@ -23,7 +23,6 @@
  *
  * @ingroup ModulesTest
  */
-
 class ilTestExportTableGUI extends ilExportTableGUI
 {
     public function __construct($a_parent_obj, $a_parent_cmd, $a_exp_obj)
@@ -85,5 +84,15 @@ class ilTestExportTableGUI extends ilExportTableGUI
     protected function getRowId(array $row): string
     {
         return $row['file'];
+    }
+
+    public function resetFormats(): void
+    {
+        $this->formats = [];
+    }
+
+    public function addFormat(string $format)
+    {
+        $this->formats[$format] = $format;
     }
 }

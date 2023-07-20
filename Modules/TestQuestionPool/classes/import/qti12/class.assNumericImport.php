@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -14,8 +15,6 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
-
-include_once "./Modules/TestQuestionPool/classes/import/qti12/class.assQuestionImport.php";
 
 /**
 * Class for numeric question imports
@@ -41,7 +40,7 @@ class assNumericImport extends assQuestionImport
     * @param array $import_mapping An array containing references to included ILIAS objects
     * @access public
     */
-    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping): void
+    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, $import_mapping): array
     {
         global $DIC;
         $ilUser = $DIC['ilUser'];
@@ -50,7 +49,6 @@ class assNumericImport extends assQuestionImport
         ilSession::clear('import_mob_xhtml');
 
         $presentation = $item->getPresentation();
-        $duration = $item->getDuration();
         $now = getdate();
         $maxchars = 0;
         $points = 0;
@@ -140,7 +138,6 @@ class assNumericImport extends assQuestionImport
         $this->object->setOwner($ilUser->getId());
         $this->object->setQuestion($this->object->QTIMaterialToString($item->getQuestiontext()));
         $this->object->setObjId($questionpool_id);
-        $this->object->setEstimatedWorkingTime($duration["h"] ?? 0, $duration["m"] ?? 0, $duration["s"] ?? 0);
         $this->object->setMaxChars($maxchars);
         $this->object->setPoints($points);
         $this->object->setLowerLimit($lowerlimit);
@@ -166,8 +163,6 @@ class assNumericImport extends assQuestionImport
         // handle the import of media objects in XHTML code
         $questiontext = $this->object->getQuestion();
         if (is_array(ilSession::get("import_mob_xhtml"))) {
-            include_once "./Services/MediaObjects/classes/class.ilObjMediaObject.php";
-            include_once "./Services/RTE/classes/class.ilRTE.php";
             foreach (ilSession::get("import_mob_xhtml") as $mob) {
                 if ($tst_id > 0) {
                     $importfile = $this->getTstImportArchivDirectory() . '/' . $mob["uri"];
@@ -197,11 +192,12 @@ class assNumericImport extends assQuestionImport
         $this->object->saveToDb();
         if ($tst_id > 0) {
             $q_1_id = $this->object->getId();
-            $question_id = $this->object->duplicate(true, null, null, null, $tst_id);
+            $question_id = $this->object->duplicate(true, "", "", "", $tst_id);
             $tst_object->questions[$question_counter++] = $question_id;
             $import_mapping[$item->getIdent()] = array("pool" => $q_1_id, "test" => $question_id);
         } else {
             $import_mapping[$item->getIdent()] = array("pool" => $this->object->getId(), "test" => 0);
         }
+        return $import_mapping;
     }
 }

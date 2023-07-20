@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory as Refinery;
@@ -242,7 +242,7 @@ class ilForumExportGUI
                 $tpl->setVariable('POST', ilRTE::_replaceMediaObjectImageSrc($post->getMessage(), 1));
             }
         } else {
-            $tpl->setVariable('POST', "<span class=\"moderator\">" . nl2br($post->getCensorshipComment()) . "</span>");
+            $tpl->setVariable('POST', "<span class=\"moderator\">" . nl2br((string) $post->getCensorshipComment()) . "</span>");
         }
 
         $tpl->parseCurrentBlock('posts_row');

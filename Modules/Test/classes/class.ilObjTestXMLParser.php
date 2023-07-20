@@ -28,6 +28,8 @@ class ilObjTestXMLParser extends ilSaxParser
 
     protected ?ilImportMapping $importMapping = null;
 
+    protected String $cdata = '';
+
     public function getTestOBJ(): ?\ilObjTest
     {
         return $this->testOBJ;
@@ -273,6 +275,10 @@ class ilObjTestXMLParser extends ilSaxParser
         $sourcePoolDefinition->setPoolQuestionCount((int) $attr['poolQuestCount']);
         $sourcePoolDefinition->setQuestionAmount((int) $attr['questAmount']);
         $sourcePoolDefinition->setSequencePosition((int) $attr['position']);
+
+        if (isset($attr['typeFilter']) && strlen($attr['typeFilter']) > 0) {
+            $sourcePoolDefinition->setTypeFilterFromTypeTags(explode(',', $attr['typeFilter']));
+        }
 
         // #21330
         if (isset($attr['tax']) && isset($attr['taxNode'])) {

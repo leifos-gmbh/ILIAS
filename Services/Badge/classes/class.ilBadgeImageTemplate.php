@@ -71,7 +71,6 @@ class ilBadgeImageTemplate
     }
 
     /**
-     * @param string $a_type_unique_id
      * @return self[]
      */
     public static function getInstancesByType(string $a_type_unique_id): array
@@ -120,7 +119,7 @@ class ilBadgeImageTemplate
     /**
      * @return string[]
      */
-    public function getTypes(): array
+    public function getTypes(): ?array
     {
         return $this->types;
     }

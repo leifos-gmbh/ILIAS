@@ -81,7 +81,7 @@ class ilMDGeneral extends ilMDBase
      */
     public function getLanguageIds(): array
     {
-        return ilMDLanguage::_getIds($this->getRBACId(), $this->getObjId(), $this->getMetaId(), 'meta_general');
+        return ilMDLanguage::_getIds($this->getRBACId(), $this->getObjId(), (int) $this->getMetaId(), 'meta_general');
     }
 
     public function getLanguage(int $a_language_id): ?ilMDLanguage
@@ -109,7 +109,7 @@ class ilMDGeneral extends ilMDBase
      */
     public function getDescriptionIds(): array
     {
-        return ilMDDescription::_getIds($this->getRBACId(), $this->getObjId(), $this->getMetaId(), 'meta_general');
+        return ilMDDescription::_getIds($this->getRBACId(), $this->getObjId(), (int) $this->getMetaId(), 'meta_general');
     }
 
     public function getDescription(int $a_description_id): ?ilMDDescription
@@ -137,7 +137,7 @@ class ilMDGeneral extends ilMDBase
      */
     public function getKeywordIds(): array
     {
-        return ilMDKeyword::_getIds($this->getRBACId(), $this->getObjId(), $this->getMetaId(), 'meta_general');
+        return ilMDKeyword::_getIds($this->getRBACId(), $this->getObjId(), (int) $this->getMetaId(), 'meta_general');
     }
 
     public function getKeyword(int $a_keyword_id): ?ilMDKeyword
@@ -326,9 +326,9 @@ class ilMDGeneral extends ilMDBase
                 $this->setObjType((string) $row->obj_type);
                 $this->setStructure((string) $row->general_structure);
                 $this->setTitle((string) $row->title);
-                $this->setTitleLanguage(new ilMDLanguageItem($row->title_language));
+                $this->setTitleLanguage(new ilMDLanguageItem($row->title_language ?? ''));
                 $this->setCoverage((string) $row->coverage);
-                $this->setCoverageLanguage(new ilMDLanguageItem($row->coverage_language));
+                $this->setCoverageLanguage(new ilMDLanguageItem($row->coverage_language ?? ''));
             }
         }
         return true;

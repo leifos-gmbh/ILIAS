@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class ilForumSaveAsyncDraftAction
@@ -87,7 +87,7 @@ class ilForumAutoSaveAsyncDraftAction
                 $draftObj->setPostSubject($subjectFormatterCallback($inputValues['subject']));
                 $draftObj->setPostMessage(ilRTE::_replaceMediaObjectImageSrc($inputValues['message'], 0));
                 $draftObj->setPostUserAlias($inputValues['alias']);
-                $draftObj->setNotificationStatus($inputValues['notify']);
+                $draftObj->setNotificationStatus((bool) $inputValues['notify']);
                 $draftObj->setUpdateUserId($this->actor->getId());
                 $draftObj->setPostAuthorId($this->actor->getId());
                 $draftObj->setPostDisplayUserId(($this->forumProperties->isAnonymized() ? 0 : $this->actor->getId()));
@@ -131,7 +131,7 @@ class ilForumAutoSaveAsyncDraftAction
             $draftObj->setPostSubject($subjectFormatterCallback($inputValues['subject']));
             $draftObj->setPostMessage(ilRTE::_replaceMediaObjectImageSrc($inputValues['message'], 0));
             $draftObj->setPostUserAlias($inputValues['alias']);
-            $draftObj->setNotificationStatus($inputValues['notify']);
+            $draftObj->setNotificationStatus((bool) $inputValues['notify']);
             $draftObj->setPostAuthorId($this->actor->getId());
             $draftObj->setPostDisplayUserId(($this->forumProperties->isAnonymized() ? 0 : $this->actor->getId()));
             $draftObj->saveDraft();

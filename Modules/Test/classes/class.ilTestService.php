@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\Test\TestManScoringDoneHelper;
+
 /**
  * Service class for tests.
  *
@@ -133,7 +135,6 @@ class ilTestService
      */
     public function getManScoringQuestionGuiList($activeId, $pass): array
     {
-        include_once "./Modules/Test/classes/class.ilObjAssessmentFolder.php";
         $manScoringQuestionTypes = ilObjAssessmentFolder::_getManualScoring();
 
         $testResultData = $this->object->getTestResult($activeId, $pass);
@@ -163,32 +164,25 @@ class ilTestService
 
     /**
      * reads the flag wether manscoring is done for the given test active or not
-     * from the global settings (scope: assessment / key: manscoring_done_<activeId>)
      *
      * @access public
      * @static
-     * @param integer $activeId
-     * @return boolean $manScoringDone
+     * @param int $activeId
+     * @return bool
      */
-    public static function isManScoringDone($activeId): bool
+    public static function isManScoringDone(int $activeId): bool
     {
-        $assessmentSetting = new ilSetting("assessment");
-        return $assessmentSetting->get("manscoring_done_" . $activeId, false);
+        return (new TestManScoringDoneHelper())->isDone($activeId);
     }
 
     /**
      * stores the flag wether manscoring is done for the given test active or not
-     * within the global settings (scope: assessment / key: manscoring_done_<activeId>)
-     *
-     * @access public
-     * @static
-     * @param integer $activeId
-     * @param boolean $manScoringDone
+     * @param int  $activeId
+     * @param bool $manScoringDone
      */
-    public static function setManScoringDone($activeId, $manScoringDone)
+    public static function setManScoringDone(int $activeId, bool $manScoringDone): void
     {
-        $assessmentSetting = new ilSetting("assessment");
-        $assessmentSetting->set("manscoring_done_" . $activeId, (bool) $manScoringDone);
+        (new TestManScoringDoneHelper())->setDone($activeId, $manScoringDone);
     }
 
     public function buildVirtualSequence(ilTestSession $testSession)
@@ -196,7 +190,7 @@ class ilTestService
         global $DIC;
         $ilDB = $DIC['ilDB'];
         $lng = $DIC['lng'];
-        $component_repository = $DIC['component_repository'];
+        $component_repository = $DIC['component.repository'];
 
         $testSequenceFactory = new ilTestSequenceFactory($ilDB, $lng, $component_repository, $this->object);
 
@@ -260,7 +254,6 @@ class ilTestService
         $marked_questions = array();
 
         if ($this->object->getShowMarker()) {
-            include_once "./Modules/Test/classes/class.ilObjTest.php";
             $marked_questions = ilObjTest::_getSolvedQuestions($testSequence->getActiveId());
         }
 

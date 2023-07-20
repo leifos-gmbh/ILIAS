@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTestScoring
@@ -80,7 +94,6 @@ class ilTestScoring
     {
         $participants = $this->test->getCompleteEvaluationData(false)->getParticipants();
         if (is_array($participants)) {
-            require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
             foreach ($participants as $active_id => $userdata) {
                 if (is_object($userdata) && is_array($userdata->getPasses())) {
                     $this->recalculatePasses($userdata, $active_id);
@@ -203,7 +216,9 @@ class ilTestScoring
 
     public function addRecalculatedPassByActive($activeId, $pass)
     {
-        if (!is_array($this->recalculatedPasses[$activeId])) {
+        if (! array_key_exists($activeId, $this->recalculatedPasses)
+            || !is_array($this->recalculatedPasses[$activeId])
+        ) {
             $this->recalculatedPasses[$activeId] = array();
         }
 
@@ -244,11 +259,11 @@ class ilTestScoring
         $query = "
 			SELECT COUNT(*) num_manual_scorings
 			FROM tst_test_result tres
-			
+
 			INNER JOIN tst_active tact
 			ON tact.active_id = tres.active_fi
 			AND tact.test_fi = %s
-			
+
 			WHERE tres.manual = 1
 		";
 

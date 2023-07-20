@@ -24,6 +24,7 @@ require_once(__DIR__ . "/../../Base.php");
 use ILIAS\UI\Component\Link as C;
 use ILIAS\UI\Implementation\Component as I;
 use ILIAS\Data;
+use ILIAS\Data\LanguageTag;
 
 /**
  * Testing behavior of the Bulky Link.
@@ -203,5 +204,49 @@ class BulkyLinkTest extends ILIAS_UI_TestBase
             $expected,
             $r->render($b)
         );
+    }
+
+    public function testRenderWithLanguage(): void
+    {
+        $language = $this->getMockBuilder(LanguageTag::class)->getMock();
+        $language->method('__toString')->willReturn('en');
+        $reference = $this->getMockBuilder(LanguageTag::class)->getMock();
+        $reference->method('__toString')->willReturn('fr');
+
+        $r = $this->getDefaultRenderer();
+        $b = $this->factory->bulky($this->icon, "label", $this->target)
+            ->withContentLanguage($language)
+            ->withLanguageOfReferencedContent($reference);
+
+        $expected = ''
+            . '<a lang="en" hreflang="fr" class="il-link link-bulky" href="http://www.ilias.de">'
+            . '<img class="icon someExample small" src="./templates/default/images/icon_default.svg" alt=""/>'
+            . ' <span class="bulky-label">label</span>'
+            . '</a>';
+
+        $this->assertHTMLEquals(
+            $expected,
+            $r->render($b)
+        );
+    }
+
+    public function testRenderWithHelpTopic(): void
+    {
+        $r = $this->getDefaultRenderer();
+        $b = $this->factory->bulky($this->icon, "label", $this->target)
+            ->withHelpTopics(new \ILIAS\UI\Help\Topic("a"));
+
+        $html = $r->render($b);
+        $expected_html = <<<EXP
+            <div class="c-tooltip__container">
+                <a class="il-link link-bulky" aria-describedby="id_1" href="http://www.ilias.de" id="id_2">
+                    <img class="icon someExample small" src="./templates/default/images/icon_default.svg" alt="" />
+                    <span class="bulky-label">label</span>
+                </a>
+                <div id="id_1" role="tooltip" class="c-tooltip c-tooltip--hidden"><p>tooltip: a</p></div>
+             </div>
+EXP;
+
+        $this->assertHTMLEquals($expected_html, $html);
     }
 }

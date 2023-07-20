@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class ilChatroomFormFactory
@@ -44,8 +44,6 @@ class ilChatroomFormFactory
 
     /**
      * Applies given values to field in given form.
-     * @param ilPropertyFormGUI $form
-     * @param array $values
      */
     public static function applyValues(ilPropertyFormGUI $form, array $values): void
     {
@@ -58,7 +56,6 @@ class ilChatroomFormFactory
     /**
      * Instantiates and returns ilPropertyFormGUI containing ilTextInputGUI
      * and ilTextAreaInputGUI
-     * @return ilPropertyFormGUI
      * @deprecated replaced by default creation screens
      */
     public function getCreationForm(): ilPropertyFormGUI
@@ -76,8 +73,6 @@ class ilChatroomFormFactory
 
     /**
      * Adds 'create-save' and 'cancel' button to given $form and returns it.
-     * @param ilPropertyFormGUI $form
-     * @return ilPropertyFormGUI
      */
     private function addDefaultBehaviour(ilPropertyFormGUI $form): ilPropertyFormGUI
     {
@@ -153,16 +148,11 @@ class ilChatroomFormFactory
         $cb->addSubItem($txt);
         $form->addItem($cb);
 
-        $cb = new ilCheckboxInputGUI($this->lng->txt('private_rooms_enabled'), 'private_rooms_enabled');
-        $cb->setInfo($this->lng->txt('private_rooms_enabled_info'));
-        $form->addItem($cb);
-
         return $form;
     }
 
     /**
      * Prepares Fileupload form and returns it.
-     * @return ilPropertyFormGUI
      */
     public function getFileUploadForm(): ilPropertyFormGUI
     {
@@ -181,7 +171,6 @@ class ilChatroomFormFactory
 
     /**
      * Returns period form.
-     * @return ilPropertyFormGUI
      */
     public function getPeriodForm(): ilPropertyFormGUI
     {
@@ -202,7 +191,6 @@ class ilChatroomFormFactory
     /**
      * Returns chatname selection form.
      * @param array<string, string> $name_options
-     * @return ilPropertyFormGUI
      */
     public function getUserChatNameSelectionForm(array $name_options): ilPropertyFormGUI
     {
@@ -233,8 +221,6 @@ class ilChatroomFormFactory
 
     /**
      * Returns session form with period set by given $sessions.
-     * @param array $sessions
-     * @return ilPropertyFormGUI
      */
     public function getSessionForm(array $sessions): ilPropertyFormGUI
     {
@@ -289,10 +275,6 @@ class ilChatroomFormFactory
         $oscBrowserNotificationIdleTime->setSize(5);
         $oscBrowserNotificationIdleTime->setInfo($this->lng->txt('osc_adm_conv_idle_state_threshold_info'));
         $enable_osc->addSubItem($oscBrowserNotificationIdleTime);
-
-        $enable_smilies = new ilCheckboxInputGUI($this->lng->txt('enable_smilies'), 'enable_smilies');
-        $enable_smilies->setInfo($this->lng->txt('hint_enable_smilies'));
-        $enable_chat->addSubItem($enable_smilies);
 
         $name = new ilTextInputGUI($this->lng->txt('chatroom_client_name'), 'client_name');
         $name->setInfo($this->lng->txt('chatroom_client_name_info'));

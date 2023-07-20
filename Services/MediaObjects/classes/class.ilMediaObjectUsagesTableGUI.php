@@ -108,7 +108,6 @@ class ilMediaObjectUsagesTableGUI extends ilTable2GUI
         if ($clip_cnt > 0) {
             $agg_usages[] = array("type" => "clip", "cnt" => $clip_cnt);
         }
-
         $this->setData($agg_usages);
     }
 
@@ -142,7 +141,7 @@ class ilMediaObjectUsagesTableGUI extends ilTable2GUI
                             $item["sub_title"] = ilLMObject::_lookupTitle($page_obj->getId());
                             $ref_id = $this->getFirstWritableRefId($lm_obj->getId());
                             if ($ref_id > 0) {
-                                $item["obj_link"] = ilLink::_getStaticLink($page_obj->getId() . "_" . $ref_id, "pg");
+                                $item["obj_link"] = ilLink::_getStaticLink(null, "pg", "", $page_obj->getId() . "_" . $ref_id);
                             }
                         }
                         break;
@@ -158,8 +157,8 @@ class ilMediaObjectUsagesTableGUI extends ilTable2GUI
                         }
                         break;
 
-                    case "gdf":
-                        $term_id = ilGlossaryDefinition::_lookupTermId($page_obj->getId());
+                    case "term":
+                        $term_id = $page_obj->getId();
                         $glo_id = ilGlossaryTerm::_lookGlossaryID($term_id);
                         $item["obj_type_txt"] = $this->lng->txt("obj_glo");
                         $item["obj_title"] = ilObject::_lookupTitle($glo_id);
@@ -178,6 +177,23 @@ class ilMediaObjectUsagesTableGUI extends ilTable2GUI
                         $ref_id = $this->getFirstWritableRefId($page_obj->getId());
                         if ($ref_id > 0) {
                             $item["obj_link"] = ilLink::_getStaticLink($ref_id, $otype);
+                        }
+                        break;
+
+                    case "mep":
+                        $item["obj_type_txt"] = $this->lng->txt("mep_page_type_mep");
+                        $item["sub_txt"] = $this->lng->txt("mep_page_type_mep");
+                        $item["sub_title"] = ilMediaPoolItem::lookupTitle($usage["id"]);
+
+                        $mep_pools = ilMediaPoolItem::getPoolForItemId($usage["id"]);
+                        foreach ($mep_pools as $mep_id) {
+                            $ref_ids = ilObject::_getAllReferences($mep_id);
+                            $item["obj_title"] = ilObject::_lookupTitle($mep_id);
+                            foreach ($ref_ids as $rid) {
+                                $item["obj_link"] = ilLink::_getStaticLink($rid, "mep");
+                                break;
+                            }
+                            break;
                         }
                         break;
 
@@ -215,6 +231,18 @@ class ilMediaObjectUsagesTableGUI extends ilTable2GUI
                 $item["obj_title"] = ilObject::_lookupTitle($usage["id"]);
                 $item["sub_txt"] = $this->lng->txt("cont_link_area");
                 break;
+
+            case "news":
+                $obj_id = ilNewsItem::_lookupContextObjId($usage["id"]);
+                $obj_type = ilObject::_lookupType($obj_id);
+                $item["obj_type_txt"] = $this->lng->txt("obj_" . $obj_type);
+                $item["obj_title"] = ilObject::_lookupTitle($obj_id);
+                $item["sub_txt"] = $this->lng->txt("news");
+                $ref_id = $this->getFirstWritableRefId($obj_id);
+                if ($ref_id > 0) {
+                    $item["obj_link"] = ilLink::_getStaticLink($ref_id, $obj_type);
+                }
+                break;
         }
 
         // show versions
@@ -247,11 +275,11 @@ class ilMediaObjectUsagesTableGUI extends ilTable2GUI
         }
         $this->tpl->parseCurrentBlock();
 
-        if ($item["obj_type_txt"] != "") {
+        if (($item["obj_type_txt"] ?? "") != "") {
             $this->tpl->setVariable("VAL_TYPE", $item["obj_type_txt"]);
         }
 
-        if ($usage["type"] != "clip") {
+        if (($usage["type"] ?? "") != "clip") {
             if ($item["obj_link"]) {
                 $this->tpl->setCurrentBlock("linked_item");
                 $this->tpl->setVariable("TXT_OBJECT", $item["obj_title"]);

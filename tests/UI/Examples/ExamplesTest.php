@@ -37,6 +37,9 @@ class ExamplesTest extends ILIAS_UI_TestBase
     public function setUp(): void
     {
         //This avoids various index not set warnings, which are only relevant in test context.
+        $_SERVER["REQUEST_SCHEME"] = "http";
+        $_SERVER["SERVER_NAME"] = "localhost";
+        $_SERVER["SERVER_PORT"] = "80";
         $_SERVER["REQUEST_URI"] = "";
         $_SERVER['SCRIPT_NAME'] = "";
         $_SERVER['QUERY_STRING'] = "param=1";
@@ -56,16 +59,20 @@ class ExamplesTest extends ILIAS_UI_TestBase
         $this->dic = new Container();
         $this->dic["tpl"] = $this->getTemplateFactory()->getTemplate("tpl.main.html", false, false);
         $this->dic["lng"] = $this->getLanguage();
-        $this->dic["refinery"] = $this->getRefinery();
+        $this->dic["refinery"] = new \ILIAS\Refinery\Factory(
+            new ILIAS\Data\Factory(),
+            $this->getLanguage()
+        );
         (new InitUIFramework())->init($this->dic);
 
         $this->dic["ui.template_factory"] = $this->getTemplateFactory();
 
         $this->dic["ilCtrl"] = $this->getMockBuilder(\ilCtrl::class)->disableOriginalConstructor()->onlyMethods([
-            "getFormActionByClass","setParameterByClass","saveParameterByClass","getLinkTargetByClass"
+            "getFormActionByClass","setParameterByClass","saveParameterByClass","getLinkTargetByClass", "isAsynch"
         ])->getMock();
         $this->dic["ilCtrl"]->method("getFormActionByClass")->willReturn("Testing");
         $this->dic["ilCtrl"]->method("getLinkTargetByClass")->willReturn("2");
+        $this->dic["ilCtrl"]->method("isAsynch")->willReturn(false);
 
         $this->dic["upload"] = $this->getMockBuilder(FileUpload::class)->getMock();
 
@@ -83,6 +90,8 @@ class ExamplesTest extends ILIAS_UI_TestBase
         $component_factory->method("getActivePluginsInSlot")->willReturn(new ArrayIterator());
         $this->dic["component.factory"] = $component_factory;
 
+        $this->dic["help.text_retriever"] = new ILIAS\UI\Help\TextRetriever\Echoing();
+
         (new InitHttpServices())->init($this->dic);
     }
 
@@ -95,6 +104,9 @@ class ExamplesTest extends ILIAS_UI_TestBase
         $DIC = $this->dic;
 
         foreach ($this->getEntriesFromCrawler() as $entry) {
+            if ($entry->getNamespace() === "\ILIAS\UI\Help\Topic[]") {
+                continue;
+            }
             if (!$entry->isAbstract()) {
                 $this->assertGreaterThan(
                     0,

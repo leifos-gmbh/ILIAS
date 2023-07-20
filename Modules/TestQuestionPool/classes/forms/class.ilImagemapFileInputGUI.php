@@ -16,6 +16,9 @@
  *
  *********************************************************************/
 
+use ILIAS\UI\Renderer;
+use ILIAS\UI\Component\Symbol\Glyph\Factory as GlyphFactory;
+
 /**
 * This class represents an image map file property in a property form.
 *
@@ -32,6 +35,9 @@ class ilImagemapFileInputGUI extends ilImageFileInputGUI
 
     protected $pointsUncheckedFieldEnabled = false;
 
+    protected GlyphFactory $glyph_factory;
+    protected Renderer $renderer;
+
     /**
     * Constructor
     *
@@ -40,10 +46,11 @@ class ilImagemapFileInputGUI extends ilImageFileInputGUI
     */
     public function __construct($a_title = "", $a_postvar = "")
     {
-        global $DIC;
-        $lng = $DIC['lng'];
-
         parent::__construct($a_title, $a_postvar);
+
+        global $DIC;
+        $this->glyph_factory = $DIC->ui()->factory()->symbol()->glyph();
+        $this->renderer = $DIC->ui()->renderer();
     }
 
     public function setPointsUncheckedFieldEnabled($pointsUncheckedFieldEnabled): void
@@ -164,8 +171,7 @@ class ilImagemapFileInputGUI extends ilImageFileInputGUI
     */
     public function checkInput(): bool
     {
-        global $DIC;
-        $lng = $DIC['lng'];
+        $lng = $this->lng;
 
         // remove trailing '/'
         $_FILES[$this->getPostVar()]["name"] = rtrim($_FILES[$this->getPostVar()]["name"], '/');
@@ -272,8 +278,7 @@ class ilImagemapFileInputGUI extends ilImageFileInputGUI
     */
     public function insert(ilTemplate $a_tpl): void
     {
-        global $DIC;
-        $lng = $DIC['lng'];
+        $lng = $this->lng;
 
         $template = new ilTemplate("tpl.prop_imagemap_file.html", true, true, "Modules/TestQuestionPool");
 
@@ -330,7 +335,7 @@ class ilImagemapFileInputGUI extends ilImageFileInputGUI
                 }
                 if (strlen($area->getAnswertext())) {
                     $template->setCurrentBlock('area_name_value');
-                    $template->setVariable('VALUE_NAME', $area->getAnswertext());
+                    $template->setVariable('VALUE_NAME', htmlspecialchars($area->getAnswertext()));
                     $template->parseCurrentBlock();
                 }
                 $template->setCurrentBlock('row');
@@ -340,8 +345,9 @@ class ilImagemapFileInputGUI extends ilImageFileInputGUI
                 $coords = preg_replace("/(\d+,\d+,)/", "\$1 ", $area->getCoords());
                 $template->setVariable('VALUE_COORDINATES', $area->getCoords());
                 $template->setVariable('TEXT_COORDINATES', $coords);
-                $template->setVariable('COUNTER', $counter);
-                $template->setVariable("REMOVE_BUTTON", ilGlyphGUI::get(ilGlyphGUI::REMOVE));
+                $template->setVariable("REMOVE_BUTTON", $this->renderer->render(
+                    $this->glyph_factory->remove()->withAction('#')
+                ));
                 $template->parseCurrentBlock();
                 $counter++;
             }
@@ -366,15 +372,13 @@ class ilImagemapFileInputGUI extends ilImageFileInputGUI
         $template->setVariable("ID", $this->getFieldId());
         $template->setVariable("TXT_BROWSE", $lng->txt("select_file"));
         $template->setVariable("TXT_MAX_SIZE", $lng->txt("file_notice") . " " .
-            $this->getMaxFileSizeString());
+        $this->getMaxFileSizeString());
 
         $a_tpl->setCurrentBlock("prop_generic");
         $a_tpl->setVariable("PROP_GENERIC", $template->get());
         $a_tpl->parseCurrentBlock();
 
-        global $DIC;
-        $tpl = $DIC['tpl'];
-        $tpl->addJavascript("./Services/Form/js/ServiceFormWizardInput.js");
-        $tpl->addJavascript("./Modules/TestQuestionPool/templates/default/imagemap.js");
+        $this->tpl->addJavascript("./Modules/TestQuestionPool/templates/default/answerwizardinput.js");
+        $this->tpl->addJavascript("./Modules/TestQuestionPool/templates/default/imagemap.js");
     }
 }

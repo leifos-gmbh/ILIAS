@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -43,10 +45,8 @@ class ilSkillAssignedObjectsTableGUI extends ilTable2GUI
         parent::__construct($a_parent_obj, $a_parent_cmd);
 
         $data = [];
-        foreach ($a_ass_objects as $obj) {
-            if (ilObject::_hasUntrashedReference($obj)) {
-                $data[] = array("obj_id" => $obj);
-            }
+        foreach ($a_ass_objects as $obj_id) {
+            $data[] = ["obj_id" => $obj_id];
         }
 
         $this->setData($data);

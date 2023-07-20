@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -16,8 +14,9 @@ declare(strict_types=1);
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
  *
- ********************************************************************
- */
+ *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * QTI Parser
@@ -48,7 +47,7 @@ class ilQTIParser extends ilSaxParser
     public ?ilQTIItem $item = null;
 
     /**
-     * @var SplObjectStorage<XmlParser|resource, int>
+     * @var SplObjectStorage<XMLParser, int>|array<resource, int>
      */
     public $depth;
 
@@ -195,8 +194,12 @@ class ilQTIParser extends ilSaxParser
         parent::__construct($a_xml_file);
 
         $this->qpl_id = $a_qpl_id;
-        $this->lng = &$lng;
-        $this->depth = new SplObjectStorage();
+        $this->lng = $lng;
+        if (is_array($a_import_idents)) {
+            $this->import_idents = &$a_import_idents;
+        }
+
+        $this->depth = $this->createParserStorage();
     }
 
     public function isIgnoreItemsEnabled(): bool
@@ -223,6 +226,11 @@ class ilQTIParser extends ilSaxParser
     {
         $this->tst_object = $a_tst_object;
         $this->tst_id = $this->tst_object->getId();
+    }
+
+    public function getTestObject(): ilObjTest
+    {
+        return $this->tst_object;
     }
 
     /**
@@ -752,7 +760,7 @@ class ilQTIParser extends ilSaxParser
                 if (!ilAssQuestionTypeList::isImportable($qt)) {
                     return;
                 }
-                assQuestion::_includeClass($qt);
+
                 $question = new $qt();
                 $fbt = str_replace('ass', 'ilAss', $qt) . 'Feedback';
                 $question->feedbackOBJ = new $fbt(
@@ -761,7 +769,7 @@ class ilQTIParser extends ilSaxParser
                     $GLOBALS['ilDB'],
                     $GLOBALS['lng']
                 );
-                $question->fromXML(
+                $this->import_mapping = $question->fromXML(
                     $this->item,
                     $this->qpl_id,
                     $this->tst_id,
@@ -779,7 +787,7 @@ class ilQTIParser extends ilSaxParser
             case "material":
                 if ($this->material) {
                     $mat = $this->material->getMaterial(0);
-                    if(!is_array($mat)) {
+                    if (!is_array($mat)) {
                         $this->material = null;
                         break;
                     }
@@ -1738,7 +1746,11 @@ class ilQTIParser extends ilSaxParser
             }
         }
         if (!$this->matimage->getEmbedded() && strlen($this->matimage->getUri())) {
-            $this->matimage->setContent(@file_get_contents(dirname($this->xml_file) . '/' . $this->matimage->getUri()));
+            $img_string = @file_get_contents(dirname($this->xml_file) . '/' . $this->matimage->getUri());
+
+            if (is_string($img_string)) {
+                $this->matimage->setContent($img_string);
+            }
         }
     }
 
@@ -1770,5 +1782,17 @@ class ilQTIParser extends ilSaxParser
                     break;
             }
         }
+    }
+
+    /**
+     * @return SplObjectStorage<XMLParser, int>|array<resource, int>
+     */
+    private function createParserStorage()
+    {
+        $parser = xml_parser_create();
+        $is_resource = is_resource($parser);
+        xml_parser_free($parser);
+
+        return $is_resource ? [] : new SplObjectStorage();
     }
 }

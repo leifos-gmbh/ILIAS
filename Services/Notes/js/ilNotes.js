@@ -1,5 +1,5 @@
 "use strict";
-/* global $, il, YAHOO */
+/* global il */
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -25,13 +25,12 @@ const ilNotes = {
   old: false,
 
   listNotes: function (e, hash, update_code) {
-    console.log("listNotes");
     // prevent the default action
     e.preventDefault();
     e.stopPropagation(); // #11546 - list properties not working
 
     // hide overlays
-    il.Overlay.hideAllOverlays(e, true);
+    //il.Overlay.hideAllOverlays(e, true);
 
     this.hash = hash;
     this.update_code = update_code;
@@ -41,7 +40,6 @@ const ilNotes = {
   },
 
   listComments: function (e, hash, update_code) {
-    console.log("listComments");
     // prevent the default action
     e.preventDefault();
     e.stopPropagation(); // #11546 - list properties not working
@@ -58,7 +56,6 @@ const ilNotes = {
 
   // init the notes editing panel
   initPanel: function (comments, e) {
-    console.log("initPanel");
     let head_str;
     const t = ilNotes;
 
@@ -74,9 +71,10 @@ const ilNotes = {
       header: head_str,
       buttons: {},
     });
-    $("#il_notes_modal .modal-body").html("");
-    $("#il_notes_modal").data("status", "loading");
-    console.log($("#il_notes_modal").data("status"));
+    const modalBody = document.querySelector("#il_notes_modal .modal-body");
+    const modal = document.getElementById("il_notes_modal");
+    modalBody.innerHTML = "";
+    modal.dataset.status = "loading";
 
     if (comments) {
       this.sendAjaxGetRequest({ cmd: "getCommentsHTML", cadh: this.hash },
@@ -88,117 +86,104 @@ const ilNotes = {
   },
 
   cmdAjaxLink: function (e, url) {
-    console.log("cmdAjaxLink");
-    console.log(url);
     e.preventDefault();
     this.sendAjaxGetRequestToUrl(url, {}, { mode: 'cmd' });
   },
 
   cmdAjaxForm: function (e, url) {
-    console.log("cmdAjaxForm");
     e.preventDefault();
 
     this.sendAjaxPostRequest(e.target, url, { mode: 'cmd' });
   },
 
   setAjaxUrl: function (url) {
-    console.log("setAjaxUrl");
     this.ajax_url = url;
   },
 
   getAjaxUrl: function () {
-    console.log("getAjaxUrl");
     return this.ajax_url;
   },
 
   sendAjaxGetRequest: function (par, args) {
-    console.log("sendAjaxGetRequest");
     var url = this.getAjaxUrl();
     this.sendAjaxGetRequestToUrl(url, par, args)
   },
 
   sendAjaxGetRequestToUrl: function (url, par, args) {
-    console.log("sendAjaxGetRequestToUrl");
-    var k;
+    let k;
     args.reg_type = "get";
     args.url = url;
-    var cb =
-      {
-        success: this.handleAjaxSuccess,
-        failure: this.handleAjaxFailure,
-        argument: args
-      };
     for (k in par) {
       url = url + "&" + k + "=" + par[k];
     }
-    var request = YAHOO.util.Connect.asyncRequest('GET', url, cb);
+    il.repository.core.fetchHtml(url).then((html) => {
+      this.handleAjaxSuccess({
+        argument: args,
+        responseText: html
+      });
+    });
   },
 
   // send request per ajax
   sendAjaxPostRequest: function (form, url, args) {
-    console.log("sendAjaxPostRequest");
-    console.log(form);
-    console.log(url);
     args.reg_type = "post";
-    var cb =
-      {
-        success: this.handleAjaxSuccess,
-        failure: this.handleAjaxFailure,
-        argument: args
-      };
-    var form_str = YAHOO.util.Connect.setForm(form);
-    var request = YAHOO.util.Connect.asyncRequest('POST', url, cb);
+    const formData = new FormData(form);
+    let data = {};
+    formData.forEach((value, key) => (data[key] = value));
+    il.repository.core.fetchHtml(url, data, true).then((html) => {
+      this.handleAjaxSuccess({
+        argument: args,
+        responseText: html
+      });
+    });
 
     return false;
   },
 
   inModal: function () {
-    console.log("inModal");
-    const status = $("#il_notes_modal").data("status");
-    const cs = $("#il_notes_modal").css("display");
-    console.log($("#il_notes_modal").length);
-    console.log($("#il_notes_modal").data("status"));
-    console.log(status);
-    return ($("#il_notes_modal").length && (status === "loading" || cs !== "none"));
+    const modal = document.getElementById("il_notes_modal");
+    if (!modal) {
+      return false;
+    }
+    const status = modal.dataset.status;
+    const cs = modal.style.display;
+    return (status === "loading" || cs !== "none");
   },
 
   handleAjaxSuccess: function (o) {
-    console.log("handleAjaxSuccess");
-    var t;
+    let t;
+    const modal = document.getElementById("il_notes_modal");
+
     // perform page modification
     if (o.responseText !== undefined) {
-      if (o.argument.mode == 'xxx') {
+      t = ilNotes;
+
+      // default action: replace html
+      if (t.inModal()) {
+        const modalBody = document.querySelector("#il_notes_modal .modal-body");
+        modal.dataset.status = "";
+        il.repository.core.setInnerHTML(modalBody, o.responseText)
+        ilNotes.init(document.getElementById("il_notes_modal"));
       } else {
-        t = ilNotes;
+        const embedOuter = document.getElementById("notes_embedded_outer");
+        il.repository.core.setInnerHTML(embedOuter, o.responseText)
+        ilNotes.init(document.getElementById("notes_embedded_outer"));
+      }
+      const headButton = document.querySelector("#il_notes_modal .modal-header button");
+      if (headButton) {
+        headButton.focus();
+      }
+    }
 
-        // default action: replace html
-        if (t.old) {
-          il.UICore.setRightPanelContent(o.responseText);
-        } else {
-          if (t.inModal()) {
-            console.log("setting " + "#il_notes_modal .modal-body");
-            $("#il_notes_modal").data("status", "");
-            $("#il_notes_modal .modal-body").html(o.responseText);
-            ilNotes.init(document.getElementById("il_notes_modal"));
-          } else {
-            console.log("setting " + "#notes_embedded_outer");
-            $("#notes_embedded_outer").html(o.responseText);
-            ilNotes.init(document.getElementById("notes_embedded_outer"));
-          }
-          $("#il_notes_modal .modal-header button").focus();
-        }
-
-        //				ilNotes.insertPanelHTML(o.responseText);
-        if (typeof ilNotes.update_code != "undefined" &&
-          ilNotes.update_code != null && ilNotes.update_code !== "") {
-          if (o.argument.reg_type === "post" ||
-            (typeof o.argument.url == "string" &&
-              (o.argument.url.indexOf("cmd=activateComments") !== -1 ||
-                o.argument.url.indexOf("cmd=deactivateComments") !== -1
-              ))) {
-            eval(ilNotes.update_code);
-          }
-        }
+    if (typeof ilNotes.update_code != "undefined" &&
+      ilNotes.update_code != null && ilNotes.update_code !== "") {
+      if (o.argument.reg_type === "post" ||
+        (typeof o.argument.url == "string" &&
+          (o.argument.url.indexOf("cmd=activateComments") !== -1 ||
+            o.argument.url.indexOf("cmd=deactivateComments") !== -1 ||
+            o.argument.url.indexOf("cmd=confirmDelete") !== -1
+          ))) {
+        eval(ilNotes.update_code);
       }
     }
   },
@@ -208,12 +193,8 @@ const ilNotes = {
     console.log("ilNotes.js: Ajax Failure.");
   },
 
-  // FailureHandler
   updateWidget: function (id, url) {
-    console.log("updateWidget");
-    console.log(id);
-    console.log(url);
-    il.Util.ajaxReplace(url, id);
+    il.repository.core.fetchReplace(id, url);
   },
 
   init: function (node) {
@@ -260,6 +241,9 @@ const ilNotes = {
         event.target.style.display = 'none';
       });
       f.addEventListener("submit", (event) => {
+        f.querySelectorAll("button").forEach((b) => {
+          b.disabled = true;
+        });
         event.preventDefault();
         ilNotes.cmdAjaxForm(event, fArea.dataset.noteFormAction);
       });
@@ -269,6 +253,6 @@ const ilNotes = {
   }
 }
 
-$(() => {
+il.Util.addOnLoad(() => {
   ilNotes.init(null);
 });

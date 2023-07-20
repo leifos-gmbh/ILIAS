@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 class assClozeGapCombination
 {
     public function loadFromDb($question_id): array
@@ -20,7 +36,7 @@ class assClozeGapCombination
 									INNER JOIN qpl_a_cloze AS cloze
 													WHERE combinations.question_fi = cloze.question_fi
 													AND combinations.gap_fi = cloze.gap_id
-													AND combinations.question_fi = %s 
+													AND combinations.question_fi = %s
 									ORDER BY combination_id, row_id, gap_fi ASC
 									',
             array('integer'),
@@ -100,7 +116,7 @@ class assClozeGapCombination
                             $gap_combinations['select'][$i][$k],
                             $j,
                             $gap_values[$i][$j][$k],
-                            $gap_combinations['points'][$i][$j],
+                            (float) str_replace(',', '.', $gap_combinations['points'][$i][$j]),
                             $best_solution
                         )
                     );

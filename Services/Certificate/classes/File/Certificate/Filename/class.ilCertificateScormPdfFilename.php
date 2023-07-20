@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,15 +16,17 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 /**
  * @author  Niels Theen <ntheen@databay.de>
  */
 class ilCertificateScormPdfFilename implements ilCertificateFilename
 {
     public function __construct(
-        private ilCertificateFilename $origin,
-        private ilLanguage $lng,
-        private ilSetting $scormSetting
+        private readonly ilCertificateFilename $origin,
+        private readonly ilLanguage $lng,
+        private readonly ilSetting $scormSetting
     ) {
     }
 
@@ -37,12 +37,13 @@ class ilCertificateScormPdfFilename implements ilCertificateFilename
         if (null === $presentation->getUserCertificate()) {
             $fileNameParts = implode('_', array_filter([
                 $this->lng->txt('certificate_var_user_lastname'),
-                $this->scormSetting->get('certificate_short_name_' . $presentation->getObjId()),
+                $this->scormSetting->get('certificate_short_name_' . $presentation->getObjId(), ''),
             ]));
         } else {
+            $short_name = $this->scormSetting->get('certificate_short_name_' . $presentation->getObjId(), '');
             $fileNameParts = implode('_', array_filter([
                 $presentation->getUserName(),
-                $presentation->getObjectTitle(),
+                $short_name ?: $presentation->getObjectTitle(),
             ]));
         }
 

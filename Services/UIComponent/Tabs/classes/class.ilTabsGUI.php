@@ -20,7 +20,7 @@
  * Tabs GUI
  * @author Alexander Killing <killing@leifos.de>
  *
- * @deprecated 11
+ * @deprecated 10
  */
 class ilTabsGUI
 {
@@ -64,6 +64,12 @@ class ilTabsGUI
         $this->back_target = "";
         $this->back_2_target = "";
         $this->back_2_title = "";
+    }
+
+    protected function symbol(): \ILIAS\Repository\Symbol\SymbolAdapterGUI
+    {
+        global $DIC;
+        return $DIC->repository()->internal()->gui()->symbol();
     }
 
     public function setSetupMode(bool $a_val): void
@@ -377,7 +383,7 @@ class ilTabsGUI
             // back 2 tab
             if ($this->back_2_title !== "") {
                 $tpl->setCurrentBlock("back_2_tab");
-                $tpl->setVariable("BACK_2_ICON", ilGlyphGUI::get(ilGlyphGUI::PREVIOUS, ilGlyphGUI::NO_TEXT));
+                $tpl->setVariable("BACK_2_ICON", $this->symbol()->glyph("back")->render());
                 $tpl->setVariable("BACK_2_TAB_LINK", $this->back_2_target);
                 $tpl->setVariable("BACK_2_TAB_TEXT", $this->back_2_title);
                 if ($this->back_2_frame !== "") {
@@ -390,7 +396,7 @@ class ilTabsGUI
             // back tab
             if ($this->back_title !== "") {
                 $tpl->setCurrentBlock("back_tab");
-                $tpl->setVariable("BACK_ICON", ilGlyphGUI::get(ilGlyphGUI::PREVIOUS, ilGlyphGUI::NO_TEXT));
+                $tpl->setVariable("BACK_ICON", $this->symbol()->glyph("back")->render());
                 $tpl->setVariable("BACK_TAB_LINK", $this->back_target);
                 $tpl->setVariable("BACK_TAB_TEXT", $this->back_title);
                 if ($this->back_frame !== "") {
@@ -482,15 +488,16 @@ class ilTabsGUI
             }
 
             if ($a_get_sub_tabs) {
-                $tpl->setVariable("TXT_SUBTABS", $lng->txt("subtabs"));
+                $tpl->setVariable("TXT_SUBTABS", $this->getTabTextOfId($this->getActiveTab()) . ": " . $lng->txt("subtabs"));
             } else {
                 $tpl->setVariable("TXT_TABS", $lng->txt("tabs"));
+                $tpl->setVariable("LAST_TAB_LABEL", $lng->txt("show_more"));
 
                 // non tabbed links
                 foreach ($this->non_tabbed_link as $link) {
                     $tpl->setCurrentBlock("tab");
                     $tpl->setVariable("TAB_TYPE", "nontabbed");
-                    $tpl->setVariable("TAB_ICON", " " . ilGlyphGUI::get(ilGlyphGUI::NEXT, ilGlyphGUI::NO_TEXT));
+                    $tpl->setVariable("TAB_ICON", " " . $this->symbol()->glyph("next")->render());
                     $tpl->setVariable("TAB_TEXT", $link["text"]);
                     $tpl->setVariable("TAB_LINK", $link["link"]);
                     $tpl->setVariable("TAB_TARGET", $link["frame"]);
@@ -520,10 +527,24 @@ class ilTabsGUI
         }
     }
 
+    protected function getTabTextOfId(string $id): string
+    {
+        foreach ($this->target as $i => $target) {
+            if ($this->target[$i]['id'] == $id) {
+                if ($target["dir_text"]) {
+                    return $target["text"];
+                } else {
+                    return $this->lng->txt($target["text"]);
+                }
+            }
+        }
+        return "";
+    }
+
     public function getActiveTab(): string
     {
         foreach ($this->target as $i => $target) {
-            if ($this->target[$i]['activate']) {
+            if ($this->target[$i]['activate'] ?? null) {
                 return $this->target[$i]['id'];
             }
         }

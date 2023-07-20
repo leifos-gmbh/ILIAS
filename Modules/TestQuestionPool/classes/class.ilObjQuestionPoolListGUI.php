@@ -1,6 +1,22 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
+require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
 /**
 * Class ilObjQuestionPoolListGUI
@@ -11,12 +27,7 @@
 *
 * @extends ilObjectListGUI
 * @ingroup ModulesTestQuestionPool
-*/
-
-
-include_once "Services/Object/classes/class.ilObjectListGUI.php";
-include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
-
+ */
 class ilObjQuestionPoolListGUI extends ilObjectListGUI
 {
     protected $command_link_params = array();
@@ -44,8 +55,6 @@ class ilObjQuestionPoolListGUI extends ilObjectListGUI
         $this->type = "qpl";
         $this->gui_class_name = "ilobjquestionpoolgui";
 
-        // general commands array
-        include_once "./Modules/TestQuestionPool/classes/class.ilObjQuestionPoolAccess.php";
         $this->commands = ilObjQuestionPoolAccess::_getCommands();
     }
 
@@ -60,7 +69,6 @@ class ilObjQuestionPoolListGUI extends ilObjectListGUI
         switch ($cmd) {
             case "":
             case "questions":
-                include_once "./Services/UICore/classes/class.ilFrameTargetInfo.php";
                 $frame = ilFrameTargetInfo::_getFrame("MainContent");
                 break;
 
@@ -88,7 +96,6 @@ class ilObjQuestionPoolListGUI extends ilObjectListGUI
 
         $props = array();
 
-        include_once "./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php";
         if (!ilObjQuestionPool::_lookupOnline($this->obj_id)) {
             $props[] = array("alert" => true, "property" => $lng->txt("status"),
                 "value" => $lng->txt("offline"));

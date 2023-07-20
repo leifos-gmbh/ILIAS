@@ -287,7 +287,7 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
         if (is_array($entered_value)) {
             foreach ($entered_value as $idx => $value) {
                 $data[] = array("value" => $value,
-                                "textanswer" => $post_data[$this->getId() . '_' . $value . '_other']
+                                "textanswer" => $post_data[$this->getId() . '_' . $value . '_other'] ?? ""
                 );
             }
         }
@@ -298,7 +298,7 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
                 if (!is_array($entered_value) || !in_array($i, $entered_value)) {
                     if (strlen($post_data[$this->getId() . "_" . $i . "_other"])) {
                         $data[] = array("value" => $i,
-                                        "textanswer" => $post_data[$this->getId() . '_' . $i . '_other'],
+                                        "textanswer" => $post_data[$this->getId() . '_' . $i . '_other'] ?? "",
                                         "uncheck" => true
                         );
                     }
@@ -357,7 +357,7 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
         if ($a_return) {
             $return_data = array();
         }
-        if (is_array($post_data[$this->getId() . "_value"])) {
+        if (is_array($post_data[$this->getId() . "_value"] ?? null)) {
             foreach ($post_data[$this->getId() . "_value"] as $entered_value) {
                 if (strlen($entered_value) > 0) {
                     if (!$a_return) {

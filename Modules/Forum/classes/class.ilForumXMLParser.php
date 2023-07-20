@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 class ilForumXMLParser extends ilSaxParser
 {
@@ -231,6 +231,10 @@ class ilForumXMLParser extends ilSaxParser
                 $propertyValue['NotificationType'] = $this->cdata;
                 break;
 
+            case 'NotificationEvents':
+                $propertyValue['NotificationEvents'] = $this->cdata;
+                break;
+
             case 'ForceNotification':
                 $propertyValue['ForceNotification'] = $this->cdata;
                 break;
@@ -295,7 +299,7 @@ class ilForumXMLParser extends ilSaxParser
                     $this->forum->setTitle(ilUtil::stripSlashes((string) ($this->forumArray["Title"] ?? '')));
                     $this->forum->setDescription(ilUtil::stripSlashes((string) ($this->forumArray["Description"] ?? '')));
                     $this->forum->update();
-                    $this->forum->updateMoficationUserId($update_forum_array['usr_id']);
+                    $this->forum->updateModificationUserId($update_forum_array['usr_id']);
 
                     $newObjProp = ilForumProperties::getInstance($this->forum->getId());
                     $newObjProp->setDefaultView((int) ($this->forumArray['DefaultView'] ?? ilForumProperties::VIEW_TREE));
@@ -306,10 +310,10 @@ class ilForumXMLParser extends ilSaxParser
                     $newObjProp->setPresetSubject((bool) ($this->forumArray['PresetSubject'] ?? false));
                     $newObjProp->setAddReSubject((bool) ($this->forumArray['PresetRe'] ?? false));
                     $newObjProp->setNotificationType((string) ($this->forumArray['NotificationType'] ?: 'all_users'));
+                    $newObjProp->setInterestedEvents((int) ($this->forumArray['NotificationEvents'] ?? 0));
                     $newObjProp->setAdminForceNoti((bool) ($this->forumArray['ForceNotification'] ?? false));
                     $newObjProp->setUserToggleNoti((bool) ($this->forumArray['ToggleNotification'] ?? false));
                     $newObjProp->setFileUploadAllowed((bool) ($this->forumArray['FileUpload'] ?? false));
-                    $newObjProp->setThreadSorting((int) ($this->forumArray['Sorting'] ?? ilForumProperties::THREAD_SORTING_DEFAULT));
                     $newObjProp->setMarkModeratorPosts((bool) ($this->forumArray['MarkModeratorPosts'] ?? false));
                     $newObjProp->update();
 
@@ -356,10 +360,6 @@ class ilForumXMLParser extends ilSaxParser
 
             case 'Sticky':
                 $propertyValue['Sticky'] = $this->cdata;
-                break;
-
-            case 'Sorting':
-                $propertyValue['Sorting'] = $this->cdata;
                 break;
 
             case 'MarkModeratorPosts':
@@ -469,7 +469,8 @@ class ilForumXMLParser extends ilSaxParser
                     );
                     $this->forumPost->setNotification((bool) ($this->postArray['Notification'] ?? false));
                     $this->forumPost->setStatus((bool) ($this->postArray['Status'] ?? false));
-                    $this->forumPost->setMessage(ilUtil::stripSlashes((string) ($this->postArray['Message'] ?? '')));
+                    $purifier = ilHtmlPurifierFactory::getInstanceByType('frm_post');
+                    $this->forumPost->setMessage($purifier->purify((string) ($this->postArray['Message'] ?? '')));
                     $this->forumPost->setSubject(ilUtil::stripSlashes((string) ($this->postArray['Subject'] ?? '')));
                     $this->forumPost->setLft((int) $this->postArray['Lft']);
                     $this->forumPost->setRgt((int) $this->postArray['Rgt']);
@@ -578,19 +579,10 @@ class ilForumXMLParser extends ilSaxParser
             case 'Attachment':
                 $filedata = new ilFileDataForum($this->forum->getId(), $this->lastHandledPostId);
 
-                $importPath = $this->contentArray['content'];
-
-                if ($importPath !== '') {
-                    $importPath = $this->getImportDirectory() . '/' . $importPath;
-
-                    $newFilename = preg_replace(
-                        "/^\d+_\d+(_.*)/ms",
-                        $this->forum->getId() . "_" . $this->lastHandledPostId . "$1",
-                        basename($importPath)
-                    );
-                    $path = $filedata->getForumPath();
-                    $newPath = $path . '/' . $newFilename;
-                    @copy($importPath, $newPath);
+                $import_path = $this->contentArray['content'];
+                if ($import_path !== '') {
+                    $import_path = $this->getImportDirectory() . '/' . $import_path;
+                    $filedata->importPath($import_path, (int)$this->lastHandledPostId);
                 }
                 break;
         }

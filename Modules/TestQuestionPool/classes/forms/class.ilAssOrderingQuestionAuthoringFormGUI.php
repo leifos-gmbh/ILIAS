@@ -1,8 +1,21 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
-require_once 'Modules/TestQuestionPool/classes/forms/class.ilAssQuestionAuthoringFormGUI.php';
 /**
  * @author        Björn Heyser <bheyser@databay.de>
  * @version        $Id$
@@ -17,6 +30,8 @@ class ilAssOrderingQuestionAuthoringFormGUI extends ilAssQuestionAuthoringFormGU
 
     public function __construct()
     {
+        global $DIC;
+        $tpl = $DIC->ui()->mainTemplate();
         $this->setAvailableCommandButtonIds(
             [
                 $this->buildCommandButtonId(assOrderingQuestionGUI::CMD_SWITCH_TO_TERMS),
@@ -24,6 +39,18 @@ class ilAssOrderingQuestionAuthoringFormGUI extends ilAssQuestionAuthoringFormGU
             ]
         );
         parent::__construct();
+        $tpl->addOnloadCode("
+            let form = document.getElementById('form_ordering');
+            let button = form.querySelector('input[name=\"cmd[save]\"]');
+            if (form && button) {
+                form.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' && e.target.type !== 'textarea') {
+                        e.preventDefault();
+                        form.requestSubmit(button);
+                    }
+                })
+            }
+        ");
     }
 
     protected function setAvailableCommandButtonIds($availableCommandButtonIds): void

@@ -1,8 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-include_once("./Services/Export/classes/class.ilXmlExporter.php");
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Used for container export with tests
@@ -46,11 +58,9 @@ class ilTestQuestionPoolExporter extends ilXmlExporter
      */
     public function getXmlRepresentation(string $a_entity, string $a_schema_version, string $a_id): string
     {
-        include_once './Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php';
         $qpl = new ilObjQuestionPool($a_id, false);
         $qpl->loadFromDb();
 
-        include_once("./Modules/TestQuestionPool/classes/class.ilQuestionpoolExport.php");
         $qpl_exp = new ilQuestionpoolExport($qpl, 'xml');
         $qpl_exp->buildExportFile();
 
@@ -93,8 +103,6 @@ class ilTestQuestionPoolExporter extends ilXmlExporter
      */
     private function getDependingTaxonomyIds($poolObjIds): array
     {
-        include_once 'Services/Taxonomy/classes/class.ilObjTaxonomy.php';
-
         $taxIds = array();
 
         foreach ($poolObjIds as $poolObjId) {

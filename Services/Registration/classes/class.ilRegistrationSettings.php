@@ -54,11 +54,15 @@ class ilRegistrationSettings
 
     protected ilSetting $settings;
 
-    public function __construct()
+    public function __construct(ilSetting $settings = null)
     {
         global $DIC;
 
-        $this->settings = $DIC->settings();
+        if (null == $settings) {
+            $settings = $DIC->settings();
+        }
+
+        $this->settings = $settings;
         $this->read();
     }
 
@@ -265,14 +269,14 @@ class ilRegistrationSettings
         $this->reg_allow_codes = (bool) $this->settings->get('reg_allow_codes');
 
         $this->approve_recipient_ids = unserialize(
-            stripslashes($this->settings->get('approve_recipient', "")),
+            stripslashes($this->settings->get('approve_recipient', serialize([]))),
             ['allowed_classes' => false]
         ) ?: [];
 
         // create login array
         $tmp_logins = [];
         foreach ($this->approve_recipient_ids as $id) {
-            if ($login = ilObjUser::_lookupLogin($id)) {
+            if ($login = ilObjUser::_lookupLogin((int) $id)) {
                 $tmp_logins[] = $login;
             }
         }

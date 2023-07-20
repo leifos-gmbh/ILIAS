@@ -214,6 +214,7 @@ export default class ParagraphUI {
     this.uiModel.config.text_formats.forEach(f =>
       wrapper.addTextFormat(f)
     );
+    wrapper.setTextBlockFormats(this.uiModel.config.text_block_formats);
 
     il.Util.addOnLoad(function () {
       $(window).resize(() => {
@@ -327,36 +328,37 @@ export default class ParagraphUI {
     if (!content) {
       content = "";
     }
+    let rng = ed.selection.getRng();
+    const startContainer = rng.startContainer;
+    const endContainer = rng.endContainer;
+    const startOffset = rng.startOffset;
+    const endOffset = rng.endOffset;
+
+    let mode = "";
+    if (startContainer.nodeName === "#text"
+      && startContainer.parentNode.nodeName === "P") {
+      mode = "text";
+    }
+
     if (ed.selection.getContent() === "")
     {
       stag = stag + content;
-      rcopy = ed.selection.getRng(true).cloneRange();
-      var nc = stag + ed.selection.getContent() + etag;
-      ed.selection.setContent(nc);
+      const nc = stag + ed.selection.getContent() + etag;
+
+      ed.selection.setContent(nc);    // note: this changes the start/end container
+
+      let rcopy = ed.selection.getRng().cloneRange();
+      let r =  ed.dom.createRng();
       ed.focus();
-      r =  ed.dom.createRng();
-      if (rcopy.endContainer.nextSibling) // usual text node
-      {
-        if (rcopy.endContainer.nextSibling.nodeName !== "P")
-        {
-          r.setEnd(rcopy.endContainer.nextSibling, stag.length);
-          r.setStart(rcopy.startContainer.nextSibling, stag.length);
-          ed.selection.setRng(r);
+      if (mode === "text") { // usual text node
+        let targetElement = rcopy.startContainer;
+        if (targetElement.nodeName === "P") {
+          targetElement = targetElement.firstChild;
         }
-        else
-        {
-          r.setStart(rcopy.endContainer.firstChild, stag.length);
-          r.setEnd(rcopy.endContainer.firstChild, stag.length);
-          ed.selection.setRng(r);
-        }
-      }
-      else if (rcopy.endContainer.firstChild) // e.g. when being in an empty list node
-      {
-        r.setEnd(rcopy.endContainer.firstChild, stag.length);
-        r.setStart(rcopy.startContainer.firstChild, stag.length);
+        r.setEnd(targetElement, stag.length + startOffset);
+        r.setStart(targetElement, stag.length + startOffset);
         ed.selection.setRng(r);
       }
-      ed.selection.setRng(r);
     }
     else
     {
@@ -431,10 +433,12 @@ export default class ParagraphUI {
     this.log("setParagraphClass");
     this.log(i);
     const fc = document.querySelector(".ilTinyParagraphClassSelector .dropdown button");
+    const ddbtn = document.querySelector(
+      ".ilTinyParagraphClassSelector button[data-copg-ed-par-class='" + i + "']");
     this.log(fc);
     if (fc) {
       this.log("SETTin DROP DOWN BUTTON: " + i)
-      fc.firstChild.textContent = i + " ";
+      fc.firstChild.textContent = ddbtn.textContent + " ";
     }
     this.tinyWrapper.setParagraphClass(i);
   }
@@ -556,53 +560,6 @@ export default class ParagraphUI {
       il.AdvancedSelectionList.init['char_style_selection']();
     }
     il.copg.editor.reInitUI();
-  }
-
-  // default callback for successfull ajax request, reloads page content
-  pageReloadAjaxSuccess(o)
-  {
-    if(o.responseText !== undefined)
-    {
-      let edit_div = document.getElementById('il_EditPage');
-
-      if (typeof il == 'undefined'){
-        il = o.argument.il;
-      }
-      removeToolbar();
-      $("#ilPageEditTopActionBar").css("visibility", "");
-      $('#il_EditPage').replaceWith(o.responseText);
-      this.reInitUI();
-      il.IntLink.refresh();
-      if (o.argument.osd_text && o.argument.osd_text != "") {
-        OSDNotifier = OSDNotifications({
-          initialNotifications: [{
-            notification_osd_id: 123,
-            valid_until: 0,
-            visible_for: 3,
-            data: {
-              title: "",
-              link: false,
-              iconPath: false,
-              shortDescription: o.argument.osd_text,
-              handlerParams: {
-                osd: {
-                  closable: false
-                }
-              }
-            }
-          }]
-        });
-      }
-    }
-  }
-
-  insertJSAtPlaceholder(cmd_id)
-  {
-    /*
-    clickcmdid = cmd_id;
-    let pl = document.getElementById('CONTENT' + cmd_id);
-    pl.style.display = 'none';
-    doActionForm('cmd[exec]', 'command', 'insert_par', '', 'PageContent', '');*/
   }
 
   ////
@@ -809,7 +766,7 @@ export default class ParagraphUI {
       ed.shortcuts.add('meta+b', '', function() {parUI.cmdSpan('Strong');});
       ed.shortcuts.add('meta+u', '', function() {parUI.cmdSpan('Important');});
       ed.shortcuts.add('meta+i', '', function() {parUI.cmdSpan('Emph');});
-
+      wrapper.checkSplitOnReturn();
     });
   }
 
@@ -1018,13 +975,13 @@ export default class ParagraphUI {
 
   autoSaveStarted() {
     document.querySelector("[data-copg-ed-action='save.return']").disabled = true;
-    document.querySelector("[data-copg-ed-action='component.cancel']").disabled = true;
+    //document.querySelector("[data-copg-ed-action='component.cancel']").disabled = true;
     this.autoSave.displayAutoSave(il.Language.txt("cont_saving"));
   }
 
   autoSaveEnded() {
     document.querySelector("[data-copg-ed-action='save.return']").disabled = false;
-    document.querySelector("[data-copg-ed-action='component.cancel']").disabled = false;
+    //document.querySelector("[data-copg-ed-action='component.cancel']").disabled = false;
     this.autoSave.displayAutoSave("&nbsp;");
   }
 
@@ -1098,7 +1055,12 @@ export default class ParagraphUI {
     if (i === "") {
       i = il.Language.txt("cont_no_block");
     } else {
-      i = document.querySelector("[data-copg-ed-par-class='" + i + "'] div.ilc_section_" + i).innerHTML;
+      const dropdownEl = document.querySelector("[data-copg-ed-par-class='" + i + "'] div.ilc_section_" + i);
+      if (dropdownEl) {
+        i = document.querySelector("[data-copg-ed-par-class='" + i + "'] div.ilc_section_" + i).innerHTML;
+      } else {
+        i = "";
+      }
     }
     const fc = document.querySelector(".ilSectionClassSelector .dropdown button");
     if (fc) {

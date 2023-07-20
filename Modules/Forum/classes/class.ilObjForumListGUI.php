@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class ilObjForumListGUI
@@ -81,12 +81,7 @@ class ilObjForumListGUI extends ilObjectListGUI
             $drafts_statistics = ilForumPostDraft::getDraftsStatisticsByRefId($this->ref_id);
             $num_drafts_total = $drafts_statistics['total'];
         }
-
-        $frm_overview_setting = (int) $this->settings->get('forum_overview');
         $num_new_total = 0;
-        if ($frm_overview_setting === ilForumProperties::FORUM_OVERVIEW_WITH_NEW_POSTS) {
-            $num_new_total = $properties['num_new_posts'];
-        }
 
         if (!$this->user->isAnonymous()) {
             if ($this->getDetailsLevel() === ilObjectListGUI::DETAILS_ALL) {
@@ -95,13 +90,6 @@ class ilObjForumListGUI extends ilObjectListGUI
                     'property' => $this->lng->txt('forums_articles') . ' (' . $this->lng->txt('unread') . ')',
                     'value' => $num_posts_total . ' (' . $num_unread_total . ')'
                 ];
-                if ($frm_overview_setting === ilForumProperties::FORUM_OVERVIEW_WITH_NEW_POSTS && $num_new_total > 0) {
-                    $props[] = [
-                        'alert' => false,
-                        'property' => $this->lng->txt('forums_new_articles'),
-                        'value' => $num_new_total
-                    ];
-                }
             }
 
             if ($num_drafts_total > 0 && ilForumPostDraft::isSavePostDraftAllowed()) {

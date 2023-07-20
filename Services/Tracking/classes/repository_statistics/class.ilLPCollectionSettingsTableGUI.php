@@ -128,18 +128,18 @@ class ilLPCollectionSettingsTableGUI extends ilTable2GUI
 
                 $mode_suffix = '';
                 if (
-                    $a_set['grouped'] ||
+                    ($a_set['grouped'] ?? false) ||
                     ($a_set['group_item'] ?? null)) {
                     // #14941
                     $mode_suffix = '_INLINE';
 
-                    if (!$a_set['group_item']) {
+                    if (!($a_set['group_item'] ?? false)) {
                         $this->tpl->setVariable("COLL_MODE", "");
                     }
                 }
                 if (ilLearningProgressAccess::checkPermission(
                     'edit_learning_progress',
-                    $a_set['ref_id']
+                    (int) $a_set['ref_id']
                 )) {
                     $gui_class = "ilObj" . $this->obj_definition->getClassName(
                         $a_set['type']
@@ -150,15 +150,17 @@ class ilLPCollectionSettingsTableGUI extends ilTable2GUI
                         $a_set['ref_id']
                     );
                     if ('sahs' === $a_set['type']) {
-                        $obj_id = ilObject::_lookupObjectId($a_set['ref_id']);
+                        $obj_id = ilObject::_lookupObjectId((int) $a_set['ref_id']);
                         switch (ilObjSAHSLearningModule::_lookupSubType(
                             $obj_id
                         )) {
                             case "scorm2004":
+                                $gui_class = ilSAHSEditGUI::class;
                                 $scorm_class = ilObjSCORM2004LearningModuleGUI::class;
                                 break;
 
                             case "scorm":
+                                $gui_class = ilSAHSEditGUI::class;
                                 $scorm_class = ilObjSCORMLearningModuleGUI::class;
                                 break;
 

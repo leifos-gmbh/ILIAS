@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * @author Stefan Meyer <meyer@leifos.com>
@@ -36,14 +36,14 @@ class ilFormatMail extends ilMail
 
         $currentUserLogin = $DIC->user()->getLogin();
 
-        foreach (explode(',', $this->mail_data['rcp_to']) as $to) {
+        foreach (explode(',', (string) $this->mail_data['rcp_to']) as $to) {
             $to = trim($to);
             if ($to !== '' && $currentUserLogin !== $to) {
                 $newCC[] = $to;
             }
         }
 
-        foreach (explode(',', $this->mail_data['rcp_cc']) as $cc) {
+        foreach (explode(',', (string) $this->mail_data['rcp_cc']) as $cc) {
             $cc = trim($cc);
             if ($cc !== '' && $currentUserLogin !== $cc) {
                 $newCC[] = $cc;
@@ -89,23 +89,6 @@ class ilFormatMail extends ilMail
         $this->mail_data[$key] .= $name_str;
 
         return $this->mail_data;
-    }
-
-    public function formatLinebreakMessage(string $message): string
-    {
-        $formatted = [];
-
-        $linebreak = $this->mail_options->getLinebreak();
-
-        $lines = explode(chr(10), $message);
-        foreach ($lines as $iValue) {
-            if (strpos($iValue, '>') !== 0) {
-                $formatted[] = wordwrap($iValue, $linebreak, chr(10));
-            } else {
-                $formatted[] = $iValue;
-            }
-        }
-        return implode(chr(10), $formatted);
     }
 
     public function appendSignature(string $message): string

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -70,7 +72,7 @@ class ilSkillLevelDBRepository implements ilSkillLevelRepository
             " skill_id = " . $ilDB->quote($skill_id, "integer")
         );
         $rec = $ilDB->fetchAssoc($set);
-        return (int) $rec["mnr"] ?? 0;
+        return (int) ($rec["mnr"] ?? 0);
     }
 
     /**
@@ -126,7 +128,12 @@ class ilSkillLevelDBRepository implements ilSkillLevelRepository
 
     public function lookupLevelSkillId(int $a_id): int
     {
-        return (int) $this->lookupLevelProperty($a_id, "skill_id") ?? 0;
+        return (int) ($this->lookupLevelProperty($a_id, "skill_id") ?? 0);
+    }
+
+    public function lookupLevelNumber(int $a_id): int
+    {
+        return (int) ($this->lookupLevelProperty($a_id, "nr") ?? 0);
     }
 
     protected function writeLevelProperty(int $a_id, string $a_prop, ?string $a_value, string $a_type): void

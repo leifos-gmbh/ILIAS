@@ -398,7 +398,6 @@ adve#:#adve_autosave#:#Automatic Saving Intervall
 adve#:#adve_autosave_info#:#Auto-save for text content. With shorter intervals, the server load increases and the performance of the system decreases.
 adve#:#adve_autosave_info_min_10#:#Please choose a value of minimal 10 seconds if you activated this feature.###29 07 2022 new variable
 adve#:#adve_blocking_mode#:#Szerkesztés zárolása
-adve#:#adve_char_selector_settings#:#Karakterválasztó
 adve#:#adve_excass_settings#:#Beadandó feladatok
 adve#:#adve_grp_copa#:#Tartalomlapok
 adve#:#adve_grp_frm#:#Forums###29 07 2022 new variable
@@ -417,45 +416,6 @@ adve#:#adve_text_content_features#:#Szövegtartalom menü
 adve#:#adve_use_physical#:#b/i/u használata str/emp/imp helyett
 adve#:#adve_use_physical_info#:#Ez a beállítás lecseréli a félkövér, dőlt, aláhúzott (strong, emphatic, important) szemantikus stílusosztályokhoz tartozó gombokat b (bold), i (italic), u (underline) fizikai attribútumok gombjaira. Ne feledje, hogy ez inkonzisztenciát okozhat, ha a stílusszerkesztőt használ és más fizikai attribútumokat rendelt a strong/emphatic/important stílusosztályokhoz.
 adve#:#adve_use_tiny_mce#:#TinyMCE engedélyezése WYSIWYG szerkesztéshez
-adve#:#char_selector_admin#:#Unicode karakterválasztó (Ω gomb) megjelenítése tesztekben és kérdésgyűjteményekben
-adve#:#char_selector_blocks#:#Elérhető Unicode karaktergyűjtemények
-adve#:#char_selector_blocks_info#:#A kiválasztott blokkok összes karaktere felsorolásra kerül, nem biztos, hogy jelen böngészőbetűk mindegyiket támogatják
-adve#:#char_selector_custom_items#:#Egyéni választó
-adve#:#char_selector_custom_items_info1#:#A kiválasztott blokkok előtt egyéni választó jelenik meg. Adja meg karaktereit a következő formában:
-adve#:#char_selector_custom_items_info2a#:#A B C
-adve#:#char_selector_custom_items_info2b#:#A karaktereket szóköz választja el, elválasztó gombokat különválasztva ezáltal.
-adve#:#char_selector_custom_items_info3a#:#A BC D
-adve#:#char_selector_custom_items_info3b#:#Egy gombon több karakter is lehetséges.
-adve#:#char_selector_custom_items_info4a#:#A-Z
-adve#:#char_selector_custom_items_info4b#:#Karakterek tartomány '-' kerül elválasztásra.
-adve#:#char_selector_custom_items_info5a#:#U+00C0
-adve#:#char_selector_custom_items_info5b#:#Karakter Unicode jelöléssel is megadható (kis- és nagybetű között nincs különbség)
-adve#:#char_selector_custom_items_info6a#:#U+00C0-U+00CF
-adve#:#char_selector_custom_items_info6b#:#Tartományok Unicode jelöléssel
-adve#:#char_selector_disabled_admin#:#Unicode karakterválasztó csak akkor jelenik meg, ha be van kapcsolva
-adve#:#char_selector_disabled_info_admin#:#Az Unicode karakterválasztó tesztekben és kérdésgyűjteményekben engedélyezve van, de a felhasználó beállítása alatt vagy az adott tesztben, illetve kérdésgyűjteményeben be kell kapcsolniuk a felhasználóknak. A tesztbeállítások felülírják a a felhasználó beállításait.
-adve#:#char_selector_disabled_info_test#:#Az Unicode karakterválasztó ebben a tesztben - a felhasználó egyéni beállításaitól függetlenül - ki van kapcsolva.
-adve#:#char_selector_disabled_info_user#:#Tesztekben az Unicode karakterválasztó nem jelenik meg. Azonban a tesztek egyéni beállításaiban ez mégis kikényszeríthető.
-adve#:#char_selector_disabled_test#:#Unicode karakterválasztó ki van kapcsolva
-adve#:#char_selector_disabled_user#:#Unicode karakterválasztó kikapcsolása
-adve#:#char_selector_enabled_admin#:#Unicode karakterválasztó alapértelmezetten be van kapcsolva
-adve#:#char_selector_enabled_info_admin#:#Az Unicode karakterválasztó a tesztekben és kérdésgyűjteményekben be van kapcsolva. Az alább összeválogatott Unicode karaktergyűjtemények jelennek meg. A felhasználók egyéni beállításokat hozhatnak létre a saját beállításában, és a tesztek, illetve a kérdésgyűjtemények beállításaiban bekapcsolhatják azt.
-adve#:#char_selector_enabled_info_test#:#A felhasználók egyéni beállítástól függően jelenik meg az Unicode karakterválasztó. Speciális karakterek így bevihetőek.
-adve#:#char_selector_enabled_info_user#:#Tesztekben az Unicode karakterválasztó megjelenik. Ennek ellenére egyéni tesztbeállítások meggátolhatják ennek érvényre jutását, és nem jelenik meg az Unicode karakterválasztó.
-adve#:#char_selector_enabled_test#:#Unicode karakterválasztó be van kapcsolva
-adve#:#char_selector_enabled_user#:#Unicode karakterválasztó bekapcsolása
-adve#:#char_selector_inactive_admin#:#Unicode karakterválasztó globális kikapcsolása
-adve#:#char_selector_inactive_info_admin#:#Unicode karakterválasztó globálisan, az egész rendszerre ki van kapcsolva. A felhasználók nem módosíthatják ezt a saját egyéni, a tesztek, illetve a kérdésgyűjtemények beállításaiban sem.
-adve#:#char_selector_inherit_info_test#:#A globális rendszer- és az egyéni felhasználói beállítástól függően jelenik meg vagy marad rejtve az Unicode karakterválasztó Ω gomb.
-adve#:#char_selector_inherit_info_user#:#A globális, egész rendszerre vonatkozó rendszerbeállítás legyen érvényben.
-adve#:#char_selector_inherit_test#:#A globális rendszer-, illetve az egyéni felhasználói beállítás együtt hatnak.
-adve#:#char_selector_inherit_user#:#Globális beállítások használata
-adve#:#char_selector_menu_close#:#Speciális karakterválasztó bezárása
-adve#:#char_selector_menu_open#:#Speciális karakterválasztó megnyitása
-adve#:#char_selector_msg_blocks_or_custom_needed#:#Amikor aktiválja a karakterválasztót, válasszon egy karakterblokkot vagy adjon meg egy kijelölést!
-adve#:#char_selector_test#:#Unicode karakterválasztó
-adve#:#char_selector_unicode_all#:#Összes Unicode karaktergyűjtemény
-adve#:#char_selector_user#:#Unicode karakterválasztó (Ω gomb) megjelenítése tesztekben
 assessment#:#action#:#Művelet
 assessment#:#addSuggestedSolution#:#Ismétlő összefoglaláshoz tartalom hozzáadása
 assessment#:#add_answers#:#Válasz hozzáadása
@@ -598,7 +558,6 @@ assessment#:#categories#:#Kategóriák
 assessment#:#category#:#Kategória
 assessment#:#changeSuggestedSolution#:#Ismétléshez tartalomtípus kiválasztása
 assessment#:#change_adm_categories_not_allowed#:#Nem rendelkezel semmilyen ezt a kategóriát érintő jogosultsággal.
-assessment#:#char_selector_btn_label#:#&nbsp;Ω&nbsp;
 assessment#:#checkbox_checked#:#Kiválasztott
 assessment#:#checkbox_unchecked#:#Nem kiválasztott
 assessment#:#circle#:#Kör
@@ -1202,7 +1161,6 @@ assessment#:#showSuggestedSolution#:#Típus
 assessment#:#show_answer_overview#:#Válaszok áttekintésének megjelenítése
 assessment#:#show_detailed_results#:#Figyelembe vett tesztkitöltés részletes áttekintése
 assessment#:#show_examview_html#:#Képernyőn
-assessment#:#show_examview_pdf#:#PDF letöltés
 assessment#:#show_pass_overview#:#Figyelembe vett tesztkitöltés áttekintése
 assessment#:#show_user_answers#:#Figyelembe vett tesztkitöltés válaszainak megjelenítése
 assessment#:#showinfo#:#Az összes teszttulajdonság megjelenítése
@@ -1257,10 +1215,8 @@ assessment#:#text_wrong#:#Hibás szöveg
 assessment#:#textsize#:#Szövegméret
 assessment#:#textsize_errortext_info#:#Adja meg a hibás szöveg méretét százalékban, ha 100%-tól eltérőt szeretne.
 assessment#:#textsize_info#:#Adja meg a sorrendbe rakó szöveg szövegméretét százalékban, ha 100%-tól eltérőt szeretne.
-assessment#:#thumb_geometry#:#Bélyegkép geometriája
-assessment#:#thumb_geometry_info#:#A bélyegkép adott magasság és szélesség maximális értékekkel jön létre, megtartva a kép méretarányát.
 assessment#:#thumb_size#:#Bélyegképméret
-assessment#:#thumb_size_info#:#Ha megad bélyegképméretet, a feltöltött képhez egy olyan méretű bélyegképet generálunk. Bélyegképméret nélkül a kép eredeti méretét használjuk.
+assessment#:#thumb_size_info#:#A bélyegkép adott magasság és szélesség maximális értékekkel jön létre, megtartva a kép méretarányát.
 assessment#:#thumb_size_unit_pixel#:#Pixel
 assessment#:#time_format#:#ÓÓ PP MM
 assessment#:#timing#:#Extra-idő
@@ -1283,10 +1239,10 @@ assessment#:#tst_activate_skill_service_desc#:#Kérdések kompetenciákhoz rende
 assessment#:#tst_activation_limited_visibility_info#:#Az adott időszakon kívül csak a teszt címe látható. Ilyenkor a résztvevők nem tudják kitölteni a tesztet.
 assessment#:#tst_activation_online_info#:#Ha online, a résztvevők kitölthetik a tesztet.
 assessment#:#tst_add_quest_cont_edit_mode#:#Visszajelzések és tippek szerkesztésének módja
+assessment#:#tst_add_quest_cont_edit_mode_IPE#:#ILIAS-lapszerkesztő használata
 assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#No formatting of text in question and answers. No use of LaTex either. But feedback and hints can be reused when question is embedded in ILIAS learning module.###29 07 2022 new variable
+assessment#:#tst_add_quest_cont_edit_mode_RTE#:#Rich Text szerkesztő használata
 assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Allows text formatting of questions, answers, feedbacks and hints. But feedback and hints cannot be reused when question is embedded in ILIAS learning module.###29 07 2022 new variable
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Rich Text szerkesztő használata
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#ILIAS-lapszerkesztő használata
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#A tesztet sikeresen kitöltötte, több kitöltést nem indíthat el.
 assessment#:#tst_all_test_competences#:#Összes tesztkompetencia
 assessment#:#tst_all_user_data_deleted#:#Ennek a tesztnek minden felhasználói adatát sikeresen eltávolította.
@@ -3302,7 +3258,6 @@ cntr#:#cntr_view_info_sessions#:#Először az eseményeket azok objektumaival, a
 cntr#:#cntr_view_info_simple#:#Az objektumokat nem csoportosítjuk, azokat egymás alatt jelenítjük meg.
 cntr#:#cntr_view_sessions#:#Események nézete
 cntr#:#cntr_view_simple#:#Egyszerű nézet
-cntr#:#cont_custom_icon#:#Egyéni ikon
 cntr#:#container_import_zip_file_invalid#:#A feltöltött fájl nem érvényes ILIAS-exportfájl. A mappaszerkezet feltöltéséhez használjon fájlobjektumot.
 cntr#:#edit_questions#:#Kérdések módosítása
 cntr#:#exc_next_deadline_single#:#Határidő
@@ -10866,12 +10821,13 @@ mathjax#:#mathjax_home_link#:# » MathJax
 mathjax#:#mathjax_limiter#:#Beágyazott határolójelek
 mathjax#:#mathjax_limiter_info#:#Válassza ki a beágyazott határolójeleket, ahogy azok az Ön MathJax installációjában konfiguráltak.
 mathjax#:#mathjax_mathjax#:#MathJax
-mathjax#:#mathjax_polyfill_url#:#Url of a Polyfill###29 07 2022 new variable
-mathjax#:#mathjax_polyfill_url_desc_line1#:#For MathJax 2 not needed###29 07 2022 new variable
-mathjax#:#mathjax_polyfill_url_desc_line2#:#For MathJax 3 e.g. https://polyfill.io/v3/polyfill.min.js?features=es6###29 07 2022 new variable
-mathjax#:#mathjax_script_url#:#URL of the MathJax Script###29 07 2022 new variable
-mathjax#:#mathjax_script_url_desc_line1#:#For MathJax 2 e.g. https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_CHTML###29 07 2022 new variable
-mathjax#:#mathjax_script_url_desc_line2#:#For MathJax 3 e.g. https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js###29 07 2022 new variable
+mathjax#:#mathjax_polyfill_url#:#Polyfill URJ-je
+mathjax#:#mathjax_polyfill_url_desc_line1#:#MathJax 2-höz nem szükséges
+mathjax#:#mathjax_polyfill_url_desc_line2#:#MathJax 3-hoz például https://polyfill.io/v3/polyfill.min.js?features=es6
+mathjax#:#mathjax_script_url#:#MathJax Script URL-je
+mathjax#:#mathjax_script_url_desc_line1#:#MathJax 2-höz például https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe
+mathjax#:#mathjax_script_url_desc_line2#:#MathJax 3-hoz például https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js
+mathjax#:#mathjax_script_url_desc_line3#:#Kérem, aktiválja a biztonságos módot, hogy elkerülje a MathJax kódon keresztüli javascript-alapú XSS-támadásokat. MathJax 2 alatt ezt a CDN url-hez a 'Safe' paraméter hozzádásával teheti meg. MathJax 3 alatt egy szkriptet kell beletennie, ami ezt beállítja, mielőtt a MathJax betöltődik. Például: https://domain/ilias/Services/MathJax/js/cdn-mathjax3-es5-tex-mml-chtml-safe.js
 mathjax#:#mathjax_server_address#:#Szerver címe
 mathjax#:#mathjax_server_address_info#:#Például http://localhost:8003
 mathjax#:#mathjax_server_cache_cleared#:#A MathJax gyorsítótárát sikeresen ürítette.
@@ -12003,6 +11959,7 @@ notification_adm#:#play_sound_desc#:#Play a sound when receiving a new notficiat
 obj#:#cont_filter_empty#:#Az objektumok megtekintéséhez használja a szűrőt.
 obj#:#cont_skll_published#:#Az összes hozzárendelést sikeresen közzétette.
 obj#:#cont_skll_published_some_not#:#Az összes megadott hozzárendelést sikeresen közzétette. Néhány felhasználóhoz nincs kompetencia rendelve, náluk nincs mit közzétenni.
+obj#:#custom_icon#:#Egyéni ikon
 obj#:#edit_questions#:#Kérdések módosítása
 obj#:#obj_activate_content_lang#:#Lapszerkesztés fordításának bekapcsolása
 obj#:#obj_activate_multilang#:#Többnyelvűség bekapcsolása

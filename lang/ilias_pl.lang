@@ -398,7 +398,6 @@ adve#:#adve_autosave#:#Automatic Saving Intervall###29 07 2022 new variable
 adve#:#adve_autosave_info#:#Auto-save for text content. With shorter intervals, the server load increases and the performance of the system decreases.###29 07 2022 new variable
 adve#:#adve_autosave_info_min_10#:#Please choose a value of minimal 10 seconds if you activated this feature.###29 07 2022 new variable
 adve#:#adve_blocking_mode#:#Blokada edycji
-adve#:#adve_char_selector_settings#:#Wybór znaków
 adve#:#adve_excass_settings#:#Zadania
 adve#:#adve_grp_copa#:#Content Pages
 adve#:#adve_grp_frm#:#Forums###29 07 2022 new variable
@@ -417,45 +416,6 @@ adve#:#adve_text_content_features#:#Tekst menu zawartości
 adve#:#adve_use_physical#:#W miejsce str|emp|imp wstaw pr<b>B</b>|<i>I</i>|<u>U</u>
 adve#:#adve_use_physical_info#:#To ustawienie zastępuje przyciski semantycznych klas stylów odnoszących się do opcji strong, emphatic oraz important  na stałe określonymi wartościami <b>B</b> (bold), <i>I</i> (italic) oraz <u>U</u> (underline). Uwaga: w takiej sytuacji może dojść do niespójności, jeśli poprzez edytorów stylów klasom strong, emphatic i important zostaną przyporządkowane inne wartości.
 adve#:#adve_use_tiny_mce#:#Aktywuj TinyMCE do edytowania WYSIWYG
-adve#:#char_selector_admin#:#Menu wyboru ze znaki specjalnymi (unicode) do testów i puli pytań
-adve#:#char_selector_blocks#:#Dostępne znaki specjalne (unicode)
-adve#:#char_selector_blocks_info#:#Wszystkie znaki wybranych sekcji umieszczone zostaną na liście, nawet wówczas, gdy nie ma ich w danej czcionce przeglądarki.
-adve#:#char_selector_custom_items#:#Wybór specjalny
-adve#:#char_selector_custom_items_info1#:#Wybór specjalny umieszczany jest na liście przed sekcjami unicode. Tutaj wpisz znaki w poniższym formacie:
-adve#:#char_selector_custom_items_info2a#:#A B C
-adve#:#char_selector_custom_items_info2b#:#Pojedyncze znaki można rozdzielić znakiem pustym, dzięki czemu otrzymają oddzielne przycisku wyboru.
-adve#:#char_selector_custom_items_info3a#:#A BC D
-adve#:#char_selector_custom_items_info3b#:#Znaki następujące kolejno po sobie zostaną przydzielone do jednego przycisku wyboru.
-adve#:#char_selector_custom_items_info4a#:#A-Z
-adve#:#char_selector_custom_items_info4b#:#Zakresy znaków można definiować za pomocą "-"
-adve#:#char_selector_custom_items_info5a#:#U+00C0
-adve#:#char_selector_custom_items_info5b#:#Znak można podać również w systemie unicode (dowolne małe i wielkie litery).
-adve#:#char_selector_custom_items_info6a#:#U+00C0-U+00CF
-adve#:#char_selector_custom_items_info6b#:#W systemie unicode można również wprowadzać zakresy znaków
-adve#:#char_selector_disabled_admin#:#Przycisk Ω do aktywacji menu wyboru ze znakami specjalnymi musi być dodatkowo włączony
-adve#:#char_selector_disabled_info_admin#:#Menu wyboru ze znakami specjalnymi (unicode) jest aktywne dla testów i puli pytań, jednak użytkownicy muszą aktywować w pulpicie osobistym odpowiednie ustawienia lub można skonfigurować test lub pulę pytań w zakładce 'Ustawienia' w taki sposób, aby menu wyboru było dostępne. Ustawienia dotyczące testu są nadrzędne wobec ustawień użytkownika.
-adve#:#char_selector_disabled_info_test#:#Niezależnie od ustawień użytkownika menu wyboru ze znakami specjalnymi (unicode) jest wyłączone podczas testu; znaki będzie można wprowadzać tylko za pomocą klawiatury.
-adve#:#char_selector_disabled_info_user#:#W testach zwykle menu wyboru ze znakami specjalnymi nie jest wyświetlane. Jednak w niektórych testach można wymusić wyświetlenie tego menu mimo ustawień.
-adve#:#char_selector_disabled_test#:#Nie pokazuj wyboru znaków specjalnych
-adve#:#char_selector_disabled_user#:#Nie pokazuj menu wyboru ze znakami specjalnymi w testach
-adve#:#char_selector_enabled_admin#:#Przycisk Ω do aktywacji menu wyboru ze znakami specjalnymi wyświetlany jest domyślnie
-adve#:#char_selector_enabled_info_admin#:#Menu wyboru ze znakami specjalnymi (unicode) jest aktywne. Zawiera sekcje unicode, które zostały wybrane w tym ustawieniu. Użytkownicy mogą jednak włączyć indywidualne ustawienia w pulpicie osobistym lub można skonfigurować testy w taki sposób, aby menu wyboru było dostępne.
-adve#:#char_selector_enabled_info_test#:#Niezależnie od ustawień użytkownika menu wyboru ze znakami specjalnymi (unicode) będzie wyświetlane podczas testu; znaki specjalne będzie można wprowadzać za pomocą menu.
-adve#:#char_selector_enabled_info_user#:#W testach wyświetlane jest menu wyboru ze znakami specjalnymi. Jednak w niektórych testach to menu będzie mimo ustawień ukryte.
-adve#:#char_selector_enabled_test#:#Pokaż wybór znaków specjalnych
-adve#:#char_selector_enabled_user#:#Aktywuj menu wyboru ze znakami specjalnymi
-adve#:#char_selector_inactive_admin#:#Wyłącz globalnie menu wyboru ze znakami specjalnymi
-adve#:#char_selector_inactive_info_admin#:#Menu wyboru ze znakami specjalnymi jest wyłączone dla całej platformy. Ukryta jest również możliwość dokonywania indywidualnych ustawień na pulpicie osobistym lub w zakładce 'Ustawienia' w testach.
-adve#:#char_selector_inherit_info_test#:#W zależności od ustawień systemowych oraz ustawień indywidualnych, które użytkownik włączyć w pulpicie osobistym, w przebiegu testu wyświetlane jest menu wyboru ze znakami specjalnymi (unicode) lub też nie.
-adve#:#char_selector_inherit_info_user#:#Przejmowane są te ustawienia, które administrator aktywował globalnie dla całej platformy.
-adve#:#char_selector_inherit_test#:#Przejmij platformę i indywidualne ustawienia użytkownika
-adve#:#char_selector_inherit_user#:#Przejmij ustawienia domyślne
-adve#:#char_selector_menu_close#:#Ukryj wybór znaków specjalnych
-adve#:#char_selector_menu_open#:#Pokaż wybór znaków specjalnych
-adve#:#char_selector_msg_blocks_or_custom_needed#:#Jeśli włączyć tę opcję, wybierz sekcję znaków lub wprowadź własny zbiór znaków.
-adve#:#char_selector_test#:#Menu wyboru ze znaki specjalnymi
-adve#:#char_selector_unicode_all#:#Wszystkie sekcje unicode
-adve#:#char_selector_user#:#Menu wyboru ze znaki specjalnymi (unicode) do testów
 assessment#:#action#:#Akcja
 assessment#:#addSuggestedSolution#:#Pokaż sugerowane rozwiązanie
 assessment#:#add_answers#:#Dodaj odpowiedzi
@@ -598,7 +558,6 @@ assessment#:#categories#:#Kategorie
 assessment#:#category#:#Kategoria
 assessment#:#changeSuggestedSolution#:#Wybierz sugerowane rozwiązanie
 assessment#:#change_adm_categories_not_allowed#:#Tutaj nie masz uprawnień do zapisywania kategorii.
-assessment#:#char_selector_btn_label#:#&nbsp;Ω&nbsp;
 assessment#:#checkbox_checked#:#Wybrany
 assessment#:#checkbox_unchecked#:#Niewybrany
 assessment#:#circle#:#Koło
@@ -1202,7 +1161,6 @@ assessment#:#showSuggestedSolution#:#Rodzaj
 assessment#:#show_answer_overview#:#Pokaż widok ogólny odpowiedzi
 assessment#:#show_detailed_results#:#Szczegółowe wyniki testu (oceniony przebieg testu)
 assessment#:#show_examview_html#:#Na ekranie
-assessment#:#show_examview_pdf#:#Pobieranie PDF
 assessment#:#show_pass_overview#:#Pokaż podgląd zaznaczonych wykonań
 assessment#:#show_user_answers#:#Pokaż zaznaczone przez użytkownika odpowiedzi
 assessment#:#showinfo#:#Pokaż pełną stronę informacyjną
@@ -1257,10 +1215,8 @@ assessment#:#text_wrong#:#Błędny tekst
 assessment#:#textsize#:#Rozmiar tekstu
 assessment#:#textsize_errortext_info#:#Podaj rozmiar tekstu w procentach odnoszących się do standardowego rozmiaru tekstu. Jeśli nie podasz żadnej wartości, użyty zostanie rozmiar standardowy (100%).
 assessment#:#textsize_info#:#Podaj rozmiar tekstu, który należy umieścić, w procentach odnoszących się do standardowego rozmiaru tekstu. Jeśli nie podasz żadnej wartości, użyty zostanie rozmiar standardowy (100%).
-assessment#:#thumb_geometry#:#Rozmiar miniaturki
-assessment#:#thumb_geometry_info#:#Podaj wartość w pikselach dla maksymalnego rozmiaru miniaturki grafik. W zależności od rastra obrazu podgląd zostanie pokazany z maksymalną wysokością lub szerokością rozmiaru miniaturki.
 assessment#:#thumb_size#:#Rozmiar miniaturki
-assessment#:#thumb_size_info#:#Jeśli podasz rozmiar miniaturki, ładowane obrazy będą automatycznie zmniejszanego do tej wielkości. Jeśli rozmiar miniaturki nie zostanie podany, obrazy będą używane w oryginalnym rozmiarze.
+assessment#:#thumb_size_info#:#Podaj wartość w pikselach dla maksymalnego rozmiaru miniaturki grafik. W zależności od rastra obrazu podgląd zostanie pokazany z maksymalną wysokością lub szerokością rozmiaru miniaturki.
 assessment#:#thumb_size_unit_pixel#:#Piksel
 assessment#:#time_format#:#HH MM SS
 assessment#:#timing#:#Przedłużenie czasu
@@ -1283,10 +1239,10 @@ assessment#:#tst_activate_skill_service_desc#:#Umożliwia przydzielanie pytań d
 assessment#:#tst_activation_limited_visibility_info#:#Jeśli wybrano, widoczny jest tylko tytuł testu pomimo ustawień o dostępności testu.
 assessment#:#tst_activation_online_info#:#Jeśli wybrano tryb offline, tylko administratorzy mogą wyświetlać i edytować test.
 assessment#:#tst_add_quest_cont_edit_mode#:#Edytor komunikatów zwrotnych i podpowiedzi
+assessment#:#tst_add_quest_cont_edit_mode_IPE#:#Użyj edytora stron ILIAS do edytowania komunikatów zwrotnych oraz podpowiedzi.
 assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#No formatting of text in question and answers. No use of LaTex either. But feedback and hints can be reused when question is embedded in ILIAS learning module.###29 07 2022 new variable
+assessment#:#tst_add_quest_cont_edit_mode_RTE#:#Użyj edytora sformatowanego tekstu do edytowania komunikatów zwrotnych oraz podpowiedzi.
 assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Allows text formatting of questions, answers, feedbacks and hints. But feedback and hints cannot be reused when question is embedded in ILIAS learning module.###29 07 2022 new variable
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Użyj edytora sformatowanego tekstu do edytowania komunikatów zwrotnych oraz podpowiedzi.
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Użyj edytora stron ILIAS do edytowania komunikatów zwrotnych oraz podpowiedzi.
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#You have passed the test. The test cannot be started again.###07 02 2020 new variable
 assessment#:#tst_all_test_competences#:#Wszystkie kompetencje testu
 assessment#:#tst_all_user_data_deleted#:#Wszystkie dane uczestnika testu zostały skasowane!
@@ -3302,7 +3258,6 @@ cntr#:#cntr_view_info_sessions#:#Sesje pokazywane są w jednej liście. Obiekty,
 cntr#:#cntr_view_info_simple#:#Wszystkie obiekty przedstawiane są tylko w jednej liście.
 cntr#:#cntr_view_sessions#:#Widok sesji
 cntr#:#cntr_view_simple#:#Prosta lista
-cntr#:#cont_custom_icon#:#Custom Icon
 cntr#:#container_import_zip_file_invalid#:#Załadowany plik nie jest ważnym plikiem eksportowym ILIAS. Aby załadować struktury indeksu, należy użyć obiektu pliku.
 cntr#:#edit_questions#:#Edytuj pytania
 cntr#:#exc_next_deadline_single#:#Termin oddania
@@ -10869,7 +10824,7 @@ mathjax#:#mathjax_polyfill_url#:#Url of a Polyfill###29 07 2022 new variable
 mathjax#:#mathjax_polyfill_url_desc_line1#:#For MathJax 2 not needed###29 07 2022 new variable
 mathjax#:#mathjax_polyfill_url_desc_line2#:#For MathJax 3 e.g. https://polyfill.io/v3/polyfill.min.js?features=es6###29 07 2022 new variable
 mathjax#:#mathjax_script_url#:#URL of the MathJax Script###29 07 2022 new variable
-mathjax#:#mathjax_script_url_desc_line1#:#For MathJax 2 e.g. https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_CHTML###29 07 2022 new variable
+mathjax#:#mathjax_script_url_desc_line1#:#For MathJax 2 e.g. https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe###29 07 2022 new variable
 mathjax#:#mathjax_script_url_desc_line2#:#For MathJax 3 e.g. https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js###29 07 2022 new variable
 mathjax#:#mathjax_server_address#:#Adres serwera
 mathjax#:#mathjax_server_address_info#:#np. http://localhost:8003
@@ -12002,6 +11957,7 @@ notification_adm#:#play_sound_desc#:#Play a sound when receiving a new notficiat
 obj#:#cont_filter_empty#:#Please use the filter to see any objects.###07 02 2020 new variable
 obj#:#cont_skll_published#:#Przydziały kompetencji zostały opublikowane.
 obj#:#cont_skll_published_some_not#:#Wszystkie przydzielone kompetencje zostały opublikowane. Dla niektórych użytkowników nie udało się opublikować kompetencji, ponieważ nie zostały przydzielone.
+obj#:#custom_icon#:#Custom Icon
 obj#:#edit_questions#:#Edytuj pytania
 obj#:#obj_activate_content_lang#:#Aktywuj opcję treści w wielu językach dla edytora stron
 obj#:#obj_activate_multilang#:#Aktywuj opcję treści w wielu językach

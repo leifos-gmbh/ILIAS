@@ -55,13 +55,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
     public $output_type;
 
     /**
-    * Thumbnail size
-    *
-    * @var integer
-    */
-    protected $thumb_size;
-
-    /**
      * 1 - Feedback is shown for all answer options.
      * 2 - Feedback is shown for all checked/selected options.
      * 3 - Feedback is shown for all correct options.
@@ -92,7 +85,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
         $output_type = OUTPUT_ORDER
     ) {
         parent::__construct($title, $comment, $author, $owner, $question);
-        $this->thumb_size = 150;
         $this->output_type = $output_type;
         $this->answers = array();
         $this->shuffle = 1;
@@ -196,7 +188,7 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
                     $ext = 'JPEG';
                     break;
             }
-            ilShellUtil::convertImage($filename, $thumbpath, $ext, $this->getThumbSize());
+            ilShellUtil::convertImage($filename, $thumbpath, $ext, (string)$this->getThumbSize());
         }
     }
 
@@ -211,8 +203,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
     {
         global $DIC;
         $ilDB = $DIC['ilDB'];
-
-        $hasimages = 0;
 
         $result = $ilDB->queryF(
             "SELECT qpl_questions.*, " . $this->getAdditionalTableName() . ".* FROM qpl_questions LEFT JOIN " . $this->getAdditionalTableName() . " ON " . $this->getAdditionalTableName() . ".question_fi = qpl_questions.question_id WHERE qpl_questions.question_id = %s",
@@ -230,12 +220,12 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
             $this->setAuthor($data["author"]);
             $this->setPoints($data["points"]);
             $this->setOwner($data["owner"]);
-            include_once("./Services/RTE/classes/class.ilRTE.php");
             $this->setQuestion(ilRTE::_replaceMediaObjectImageSrc((string) $data["question_text"], 1));
             $shuffle = (is_null($data['shuffle'])) ? true : $data['shuffle'];
             $this->setShuffle((bool) $shuffle);
-            $this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
-            $this->setThumbSize($data['thumb_size']);
+            if ($data['thumb_size'] !== null && $data['thumb_size'] >= self::MINIMUM_THUMB_SIZE) {
+                $this->setThumbSize($data['thumb_size']);
+            }
             $this->isSingleline = ($data['allow_images']) ? false : true;
             $this->lastChange = $data['tstamp'];
             $this->feedback_setting = $data['feedback_setting'];
@@ -257,17 +247,23 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
             array('integer'),
             array($question_id)
         );
-        include_once "./Modules/TestQuestionPool/classes/class.assAnswerBinaryStateImage.php";
+
         if ($result->numRows() > 0) {
             while ($data = $ilDB->fetchAssoc($result)) {
                 $imagefilename = $this->getImagePath() . $data["imagefile"];
                 if (!@file_exists($imagefilename)) {
                     $data["imagefile"] = "";
                 }
-                include_once("./Services/RTE/classes/class.ilRTE.php");
+
                 $data["answertext"] = ilRTE::_replaceMediaObjectImageSrc($data["answertext"], 1);
-                $image = new ASS_AnswerBinaryStateImage($data["answertext"], $data["points"], $data["aorder"], 1, -1);
-                $image->setImage($data["imagefile"]);
+                $image = new ASS_AnswerBinaryStateImage(
+                    $data["answertext"],
+                    $data["points"],
+                    $data["aorder"],
+                    1,
+                    $data["imagefile"],
+                    $data["answer_id"]
+                );
                 $this->answers[] = $image;
             }
         }
@@ -291,7 +287,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
         $thisObjId = $this->getObjId();
 
         $clone = $this;
-        include_once("./Modules/TestQuestionPool/classes/class.assQuestion.php");
         $original_id = assQuestion::_getOriginalId($this->id);
         $clone->id = -1;
 
@@ -340,7 +335,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
         }
         // duplicate the question in database
         $clone = $this;
-        include_once("./Modules/TestQuestionPool/classes/class.assQuestion.php");
         $original_id = assQuestion::_getOriginalId($this->id);
         $clone->id = -1;
         $source_questionpool_id = $this->getObjId();
@@ -366,8 +360,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
         if ($this->getId() <= 0) {
             throw new RuntimeException('The question has not been saved. It cannot be duplicated');
         }
-
-        include_once("./Modules/TestQuestionPool/classes/class.assQuestion.php");
 
         $sourceQuestionId = $this->id;
         $sourceParentId = $this->getObjId();
@@ -436,13 +428,13 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
         $answertext = "",
         $points = 0.0,
         $order = 0,
-        $answerimage = ""
+        $answerimage = "",
+        $answer_id = -1
     ): void {
-        include_once "./Modules/TestQuestionPool/classes/class.assAnswerBinaryStateImage.php";
+        $answertext = $this->getHtmlQuestionContentPurifier()->purify($answertext);
         if (array_key_exists($order, $this->answers)) {
             // insert answer
-            $answer = new ASS_AnswerBinaryStateImage($answertext, $points, $order, 1, -1);
-            $answer->setImage($answerimage);
+            $answer = new ASS_AnswerBinaryStateImage($answertext, $points, $order, 1, $answerimage, $answer_id);
             $newchoices = array();
             for ($i = 0; $i < $order; $i++) {
                 $newchoices[] = $this->answers[$i];
@@ -455,9 +447,14 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
             }
             $this->answers = $newchoices;
         } else {
-            // add answer
-            $answer = new ASS_AnswerBinaryStateImage($answertext, $points, count($this->answers), 1, -1);
-            $answer->setImage($answerimage);
+            $answer = new ASS_AnswerBinaryStateImage(
+                $answertext,
+                $points,
+                count($this->answers),
+                1,
+                $answerimage,
+                $answer_id
+            );
             $this->answers[] = $answer;
         }
     }
@@ -630,7 +627,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
         $ilUser = $DIC['ilUser'];
 
         if (is_null($pass)) {
-            include_once "./Modules/Test/classes/class.ilObjTest.php";
             $pass = ilObjTest::_getPass($active_id);
         }
 
@@ -638,31 +634,33 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
 
         $this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function () use (&$entered_values, $ilDB, $active_id, $pass, $authorized) {
             $result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorized);
-            $row = $ilDB->fetchAssoc($result);
 
             $update = -1;
-            if ($ilDB->numRows($result) != 0) {
+            if ($ilDB->numRows($result)) {
                 $row = $ilDB->fetchAssoc($result);
                 $update = $row["solution_id"];
             }
 
+            $multiple_choice_result = $this->http->wrapper()->post()->has('multiple_choice_result') ?
+                $this->http->wrapper()->post()->retrieve('multiple_choice_result', $this->refinery->kindlyTo()->string()) :
+                '';
+
             if ($update != -1) {
-                if (strlen($_POST["multiple_choice_result"])) {
-                    $this->updateCurrentSolution($update, $_POST["multiple_choice_result"], null, $authorized);
+                if ($multiple_choice_result !== '') {
+                    $this->updateCurrentSolution($update, $multiple_choice_result, null, $authorized);
                     $entered_values++;
                 } else {
                     $this->removeSolutionRecordById($update);
                 }
             } else {
-                if (strlen($_POST["multiple_choice_result"])) {
-                    $this->saveCurrentSolution($active_id, $pass, $_POST['multiple_choice_result'], null, $authorized);
+                if ($multiple_choice_result !== '') {
+                    $this->saveCurrentSolution($active_id, $pass, $multiple_choice_result, null, $authorized);
                     $entered_values++;
                 }
             }
         });
 
         if ($entered_values) {
-            include_once("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
             if (ilObjAssessmentFolder::_enabledAssessmentLogging()) {
                 assQuestion::logAction($this->lng->txtlng(
                     "assessment",
@@ -671,7 +669,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
                 ), $active_id, $this->getId());
             }
         } else {
-            include_once("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
             if (ilObjAssessmentFolder::_enabledAssessmentLogging()) {
                 assQuestion::logAction($this->lng->txtlng(
                     "assessment",
@@ -686,8 +683,12 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
 
     protected function savePreviewData(ilAssQuestionPreviewSession $previewSession): void
     {
-        if (strlen($_POST['multiple_choice_result' . $this->getId() . 'ID'])) {
-            $previewSession->setParticipantsSolution($_POST['multiple_choice_result' . $this->getId() . 'ID']);
+        $mc_result_key = 'multiple_choice_result' . $this->getId() . 'ID';
+        if (
+            $this->http->wrapper()->post()->has($mc_result_key) &&
+            ($mc_result = $this->http->wrapper()->post()->retrieve($mc_result_key, $this->refinery->kindlyTo()->string())) !== ''
+        ) {
+            $previewSession->setParticipantsSolution($mc_result);
         } else {
             $previewSession->setParticipantsSolution(null);
         }
@@ -714,25 +715,100 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
                                 $this->getId(),
                                 $this->getShuffle(),
                                 ($this->isSingleline) ? "0" : "1",
-                                (strlen($this->getThumbSize()) == 0) ? null : $this->getThumbSize()
+                                $this->getThumbSize()
                             )
         );
     }
 
+    /**
+     * Deletes all existing Answer data from a question and reintroduces old data and changes.
+     * Additionally, it updates the corresponding feedback.
+     * @return void
+     */
     public function saveAnswerSpecificDataToDb()
     {
-        /** @var ilDBInterface $ilDB */
+        /** @var $ilDB ilDBInterface */
         global $DIC;
         $ilDB = $DIC['ilDB'];
+
         if (!$this->isSingleline) {
             ilFileUtils::delDir($this->getImagePath());
         }
+        // Get all feedback entrys
+        $result = $ilDB->queryF(
+            "SELECT * FROM qpl_fb_specific WHERE question_fi = %s",
+            array( 'integer' ),
+            array( $this->getId() )
+        );
+        $feedback = $ilDB->fetchAll($result);
+
+        // Check if feedback exists
+        if (sizeof($feedback) >= 1 && $this->getAdditionalContentEditingMode() == 'default') {
+            // Get all existing answer data for question
+            $result = $ilDB->queryF(
+                "SELECT answer_id, aorder  FROM qpl_a_sc WHERE question_fi = %s",
+                array( 'integer' ),
+                array( $this->getId() )
+            );
+            $db_answers = $ilDB->fetchAll($result);
+
+            // Collect old and new order entries by ids and order to calculate a diff/intersection and remove/update feedback
+            $db_ids = [];
+            $post_ids = [];
+            $db_idsr = [];
+            foreach ($this->answers as $answer) {
+                // Only the first appearance of an id is used
+                if ($answer->getId() !== null && !in_array($answer->getId(), array_keys($post_ids))) {
+                    $post_ids[$answer->getId()] = $answer->getOrder();
+                }
+            }
+            foreach ($db_answers as $old_answer) {
+                $db_ids[$old_answer["answer_id"]] = intval($old_answer["aorder"]);
+                $db_idsr[intval($old_answer["aorder"])] = $old_answer["answer_id"];
+            }
+
+            // Handle feedback
+            $id_diff = array_diff(array_keys($db_ids), array_keys($post_ids)); // should be deleted
+            // delete corresponding feedback from array
+            foreach (array_keys($id_diff) as $key) {
+                unset($feedback[$key]);
+            }
+
+            // Reorder feedback in array
+            foreach ($feedback as $feedback_option) {
+                $feedback[array_search($feedback_option, $feedback)]["answer"] = $post_ids[$db_idsr[$feedback_option["answer"]]];
+            }
+
+            // Delete all feedback in database
+            $this->feedbackOBJ->deleteSpecificAnswerFeedbacks($this->getId(), false);
+            // Recreate remaining feedback in database
+            foreach ($feedback as $feedback_option) {
+                $next_id = $ilDB->nextId('qpl_fb_specific');
+                $ilDB->manipulateF(
+                    "INSERT INTO qpl_fb_specific (feedback_id, question_fi, answer, tstamp, feedback, question)
+                            VALUES (%s, %s, %s, %s, %s, %s)",
+                    [ 'integer', 'integer', 'integer', 'integer', 'text', 'integer'],
+                    [
+                                $next_id,
+                                $feedback_option["question_fi"],
+                                $feedback_option["answer"],
+                                time(),
+                                $feedback_option["feedback"],
+                                $feedback_option["question"]
+                            ]
+                );
+            }
+
+        }
+
+        // Delete all entries in qpl_a_sc for question
         $ilDB->manipulateF(
             "DELETE FROM qpl_a_sc WHERE question_fi = %s",
             array( 'integer' ),
             array( $this->getId() )
         );
 
+        // Recreate answers one by one
         foreach ($this->answers as $key => $value) {
             /** @var ASS_AnswerMultipleResponseImage $answer_obj */
             $answer_obj = $this->answers[$key];
@@ -741,14 +817,14 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
                 "INSERT INTO qpl_a_sc (answer_id, question_fi, answertext, points, aorder, imagefile, tstamp) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 array( 'integer', 'integer', 'text', 'float', 'integer', 'text', 'integer' ),
                 array(
-                                    $next_id,
-                                    $this->getId(),
-                                    ilRTE::_replaceMediaObjectImageSrc($answer_obj->getAnswertext(), 0),
-                                    $answer_obj->getPoints(),
-                                    $answer_obj->getOrder(),
-                                    $answer_obj->getImage(),
-                                    time()
-                                )
+                        $next_id,
+                        $this->getId(),
+                        ilRTE::_replaceMediaObjectImageSrc($answer_obj->getAnswertext(), 0),
+                        $answer_obj->getPoints(),
+                        $answer_obj->getOrder(),
+                        $answer_obj->getImage(),
+                        time()
+                )
             );
         }
         $this->rebuildThumbnails();
@@ -808,7 +884,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
             if (!ilFileUtils::moveUploadedFile($image_tempfilename, $image_filename, $imagepath . $image_filename)) {
                 $result = 2;
             } else {
-                include_once "./Services/MediaObjects/classes/class.ilObjMediaObject.php";
                 $mimetype = ilObjMediaObject::getMimeType($imagepath . $image_filename);
                 if (!preg_match("/^image/", $mimetype)) {
                     unlink($imagepath . $image_filename);
@@ -978,39 +1053,29 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
     /**
      * {@inheritdoc}
      */
-    public function setExportDetailsXLS(ilAssExcelFormatHelper $worksheet, int $startrow, int $active_id, int $pass): int
+    public function setExportDetailsXLS(ilAssExcelFormatHelper $worksheet, int $startrow, int $col, int $active_id, int $pass): int
     {
-        parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
+        parent::setExportDetailsXLS($worksheet, $startrow, $col, $active_id, $pass);
 
         $solution = $this->getSolutionValues($active_id, $pass);
         $i = 1;
         foreach ($this->getAnswers() as $id => $answer) {
-            $worksheet->setCell($startrow + $i, 0, $answer->getAnswertext());
-            $worksheet->setBold($worksheet->getColumnCoord(0) . ($startrow + $i));
+            $worksheet->setCell($startrow + $i, $col, $answer->getAnswertext());
+            $worksheet->setBold($worksheet->getColumnCoord($col) . ($startrow + $i));
             if (
                 count($solution) > 0 &&
                 isset($solution[0]) &&
                 is_array($solution[0]) &&
                 strlen($solution[0]['value1']) > 0 && $id == $solution[0]['value1']
             ) {
-                $worksheet->setCell($startrow + $i, 1, 1);
+                $worksheet->setCell($startrow + $i, $col + 2, 1);
             } else {
-                $worksheet->setCell($startrow + $i, 1, 0);
+                $worksheet->setCell($startrow + $i, $col + 2, 0);
             }
             $i++;
         }
 
         return $startrow + $i + 1;
-    }
-
-    public function getThumbSize()
-    {
-        return $this->thumb_size;
-    }
-
-    public function setThumbSize($a_size): void
-    {
-        $this->thumb_size = $a_size;
     }
 
     /**
@@ -1029,7 +1094,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
     */
     public function toJSON(): string
     {
-        include_once("./Services/RTE/classes/class.ilRTE.php");
         $result = array();
         $result['id'] = $this->getId();
         $result['type'] = (string) $this->getQuestionType();
@@ -1179,7 +1243,6 @@ class assSingleChoice extends assQuestion implements ilObjQuestionScoringAdjusta
      */
     public function getOperators($expression): array
     {
-        require_once "./Modules/TestQuestionPool/classes/class.ilOperatorsExpressionMapping.php";
         return ilOperatorsExpressionMapping::getOperatorsByExpression($expression);
     }
 

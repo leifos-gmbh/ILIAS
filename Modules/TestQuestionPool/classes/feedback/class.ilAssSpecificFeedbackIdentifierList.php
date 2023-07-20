@@ -1,8 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once 'Modules/TestQuestionPool/classes/feedback/class.ilAssSpecificFeedbackIdentifier.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilAssClozeTestFeedbackIdMap
@@ -48,20 +60,17 @@ class ilAssSpecificFeedbackIdentifierList implements Iterator
         }
     }
 
-    /** @return false|ilAssSpecificFeedbackIdentifier */
-    public function current()
+    public function current(): ?ilAssSpecificFeedbackIdentifier
     {
         return current($this->map);
     }
 
-    /** @return false|ilAssSpecificFeedbackIdentifier */
-    public function next()
+    public function next(): void
     {
-        return next($this->map);
+        next($this->map);
     }
 
-    /** @return int|null|string */
-    public function key()
+    public function key(): ?int
     {
         return key($this->map);
     }
@@ -71,15 +80,13 @@ class ilAssSpecificFeedbackIdentifierList implements Iterator
         return key($this->map) !== null;
     }
 
-    /** @return false|ilAssSpecificFeedbackIdentifier */
-    public function rewind()
+    public function rewind(): void
     {
-        return reset($this->map);
+        reset($this->map);
     }
 
     protected function getSpecificFeedbackTableName(): string
     {
-        require_once 'Modules/TestQuestionPool/classes/feedback/class.ilAssClozeTestFeedback.php';
         return ilAssClozeTestFeedback::TABLE_NAME_SPECIFIC_FEEDBACK;
     }
 }

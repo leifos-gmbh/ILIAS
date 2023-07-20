@@ -217,9 +217,17 @@ class GUIRequest
     }
 
     /**
-     * @return string[]
+     * @return array<int, list<string>>
      */
     public function getFiles(): array
+    {
+        return $this->arrayArray("file");
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getInstructionFilesToDelete(): array
     {
         return $this->strArray("file");
     }

@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -49,24 +63,24 @@ class ilTestRandomQuestionSetSourcePoolDefinition
     /**
      * @var array taxId => [nodeId, ...]
      */
-    private $originalTaxonomyFilter = array();
+    private $originalTaxonomyFilter = [];
 
     /**
      * @var array taxId => [nodeId, ...]
      */
-    private $mappedTaxonomyFilter = array();
+    private $mappedTaxonomyFilter = [];
 
     /**
      * @var array
      */
-    private $typeFilter = array();
+    private $typeFilter = [];
     // fau.
     // fau.
 
     /**
      * @var array
      */
-    private $lifecycleFilter = array();
+    private $lifecycleFilter = [];
 
     private $questionAmount = null;
 
@@ -78,12 +92,12 @@ class ilTestRandomQuestionSetSourcePoolDefinition
         $this->testOBJ = $testOBJ;
     }
 
-    public function setId($id)
+    public function setId(int $id)
     {
         $this->id = $id;
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -290,48 +304,45 @@ class ilTestRandomQuestionSetSourcePoolDefinition
         $this->lifecycleFilter = empty($dbValue) ? array() : unserialize($dbValue);
     }
 
-    /*
-    public function setOriginalFilterTaxId($originalFilterTaxId)
+    /**
+     * Get the type filter as a list of type tags
+     * @return string[]
+     */
+    public function getTypeFilterAsTypeTags(): array
     {
-        $this->originalFilterTaxId = $originalFilterTaxId;
+        $map = [];
+        foreach (ilObjQuestionPool::_getQuestionTypes(true) as $row) {
+            $map[$row['question_type_id']] = $row['type_tag'];
+        }
+
+        $tags = [];
+        foreach ($this->typeFilter as $type_id) {
+            if (isset($map[$type_id])) {
+                $tags[] = $map[$type_id];
+            }
+        }
+
+        return $tags;
     }
 
-    public function getOriginalFilterTaxId()
+    /**
+     * Set the type filter from a list of type tags
+     * @param string[] $tags
+     */
+    public function setTypeFilterFromTypeTags(array $tags)
     {
-        return $this->originalFilterTaxId;
-    }
+        $map = [];
+        foreach (ilObjQuestionPool::_getQuestionTypes(true) as $row) {
+            $map[$row['type_tag']] = $row['question_type_id'];
+        }
 
-    public function setOriginalFilterTaxNodeId($originalFilterNodeId)
-    {
-        $this->originalFilterTaxNodeId = $originalFilterNodeId;
+        $this->typeFilter = [];
+        foreach ($tags as $type_tag) {
+            if (isset($map[$type_tag])) {
+                $this->typeFilter[] = $map[$type_tag];
+            }
+        }
     }
-
-    public function getOriginalFilterTaxNodeId()
-    {
-        return $this->originalFilterTaxNodeId;
-    }
-
-    public function setMappedFilterTaxId($mappedFilterTaxId)
-    {
-        $this->mappedFilterTaxId = $mappedFilterTaxId;
-    }
-
-    public function getMappedFilterTaxId()
-    {
-        return $this->mappedFilterTaxId;
-    }
-
-    public function setMappedFilterTaxNodeId($mappedFilterTaxNodeId)
-    {
-        $this->mappedFilterTaxNodeId = $mappedFilterTaxNodeId;
-    }
-
-    public function getMappedFilterTaxNodeId()
-    {
-        return $this->mappedFilterTaxNodeId;
-    }
-    */
-    // fau.
 
     public function setQuestionAmount($questionAmount)
     {
@@ -362,35 +373,42 @@ class ilTestRandomQuestionSetSourcePoolDefinition
     {
         foreach ($dataArray as $field => $value) {
             switch ($field) {
-                case 'def_id':				$this->setId($value);
+                case 'def_id':
+                    $this->setId($value);
                     break;
-                case 'pool_fi':				$this->setPoolId($value);
+                case 'pool_fi':
+                    $this->setPoolId($value);
                     break;
-                case 'pool_ref_id':         $this->setPoolRefId($value ? (int) $value : null);
+                case 'pool_ref_id':
+                    $this->setPoolRefId($value ? (int) $value : null);
                     break;
-                case 'pool_title':			$this->setPoolTitle($value);
+                case 'pool_title':
+                    $this->setPoolTitle($value);
                     break;
-                case 'pool_path':			$this->setPoolPath($value);
+                case 'pool_path':
+                    $this->setPoolPath($value);
                     break;
-                case 'pool_quest_count':	$this->setPoolQuestionCount($value);
+                case 'pool_quest_count':
+                    $this->setPoolQuestionCount($value);
                     break;
-                    // fau: taxFilter - use new db fields
-                    #case 'origin_tax_fi':		$this->setOriginalFilterTaxId($value);		break;
-                    #case 'origin_node_fi':		$this->setOriginalFilterTaxNodeId($value);	break;
-                    #case 'mapped_tax_fi':		$this->setMappedFilterTaxId($value);		break;
-                    #case 'mapped_node_fi':		$this->setMappedFilterTaxNodeId($value);	break;
-                case 'origin_tax_filter':	$this->setOriginalTaxonomyFilterFromDbValue($value);
+                case 'origin_tax_filter':
+                    $this->setOriginalTaxonomyFilterFromDbValue($value);
                     break;
-                case 'mapped_tax_filter':	$this->setMappedTaxonomyFilterFromDbValue($value);
+                case 'mapped_tax_filter':
+                    $this->setMappedTaxonomyFilterFromDbValue($value);
                     break;
-                case 'type_filter':			$this->setTypeFilterFromDbValue($value);
+                case 'type_filter':
+                    $this->setTypeFilterFromDbValue($value);
                     break;
-                case 'lifecycle_filter':			$this->setLifecycleFilterFromDbValue($value);
+                case 'lifecycle_filter':
+                    $this->setLifecycleFilterFromDbValue($value);
                     break;
                     // fau.
-                case 'quest_amount':		$this->setQuestionAmount($value);
+                case 'quest_amount':
+                    $this->setQuestionAmount($value);
                     break;
-                case 'sequence_pos':		$this->setSequencePosition($value);
+                case 'sequence_pos':
+                    $this->setSequencePosition($value);
                     break;
             }
         }

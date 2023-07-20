@@ -185,7 +185,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                     if ($a_frame != "") {
                         $this->ctrl->setParameterByClass(self::TARGET_GUI, "frame", $a_frame);
                     }
-                    if ($a_obj_id != "") {
+                    if ($a_obj_id > 0) {
                         switch ($a_type) {
                             case "MediaObject":
                                 $this->ctrl->setParameterByClass(self::TARGET_GUI, "mob_id", $a_obj_id);
@@ -268,7 +268,6 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
             }
         }
         $this->ctrl->clearParametersByClass(self::TARGET_GUI);
-
         return $link;
     }
 
@@ -281,12 +280,14 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                 "OnClick" => ""],
             "FAQ" => [
                 "Type" => "FAQ",
+                "Frame" => "faq",
                 "OnClick" => "return il.LearningModule.showContentFrame(event, 'faq');"],
             "Glossary" => [
                 "Type" => "Glossary",
                 "OnClick" => "return il.LearningModule.showContentFrame(event, 'glossary');"],
             "Media" => [
                 "Type" => "Media",
+                "Frame" => "media",
                 "OnClick" => "return il.LearningModule.showContentFrame(event, 'media');"]
         ];
 
@@ -357,7 +358,8 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                                 $ltarget = "_parent";
                             }
                             $cmd = "layout";
-                            if ($nframe != "") {
+                            // page command is for displaying in the slate
+                            if ($nframe != "" && $nframe != "_blank") {
                                 $cmd = "page";
                             }
                             $href =
@@ -448,7 +450,11 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                         break;
 
                     case "WikiPage":
-                        $href = ilWikiPage::getGotoForWikiPageTarget($target_id);
+                        $wiki_anc = "";
+                        if ($int_link["Anchor"] != "") {
+                            $wiki_anc = "#" . rawurlencode($int_link["Anchor"]);
+                        }
+                        $href = ilWikiPage::getGotoForWikiPageTarget($target_id) . $wiki_anc;
                         if ($this->embed_mode) {
                             $ltarget = "_blank";
                         }

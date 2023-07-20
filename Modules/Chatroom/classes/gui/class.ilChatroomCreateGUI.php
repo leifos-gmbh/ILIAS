@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class ilChatroomCreateGUI
@@ -37,7 +37,7 @@ class ilChatroomCreateGUI extends ilChatroomGUIHandler
             $room = ilChatroom::byObjectId($roomObj->getId());
 
             $connector = $this->gui->getConnector();
-            $response = $connector->sendCreatePrivateRoom($room->getRoomId(), 0, $roomObj->getOwner(), $roomObj->getTitle());
+            $response = $connector->sendCreatePrivateRoom($room->getRoomId(), $roomObj->getOwner(), $roomObj->getTitle());
 
             $this->ilCtrl->setParameter($this->gui, 'ref_id', $this->gui->getRefId());
             $this->ilCtrl->redirect($this->gui, 'settings-general');

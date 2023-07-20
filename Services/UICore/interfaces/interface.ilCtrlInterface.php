@@ -1,12 +1,27 @@
 <?php
 
-/* Copyright (c) 2021 Thibeau Fuhrer <thf@studer-raimann.ch> Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilCtrl provides processing control methods. A global
  * instance is available through $DIC->ctrl() or $ilCtrl.
  *
  * @author Thibeau Fuhrer <thf@studer-raimann.ch>
+ * @noinspection AutoloadingIssuesInspection
  */
 interface ilCtrlInterface
 {
@@ -47,16 +62,18 @@ interface ilCtrlInterface
 
     /**
      * Calls the currently provided baseclass.
+     *
      * If no baseclass is provided as an argument, the current GET
-     * request MUST contain @param string|null $a_base_class
+     * request MUST contain ilCtrlInterface::PARAM_BASE_CLASS
+     *
+     * @param string|null $a_base_class
      * @throws ilCtrlException if no valid baseclass is provided.
-     * @see ilCtrlInterface::PARAM_BASE_CLASS.
      */
     public function callBaseClass(string $a_base_class = null): void;
 
     /**
      * Forwards the request by invoking executeCommand() on the
-     * given GUI object.
+     * given GUI object and fires an according ilCtrlEvent.
      *
      * If any output was generated in that method, it will be
      * returned by this method as well.
@@ -79,7 +96,8 @@ interface ilCtrlInterface
     public function getHTML(object $a_gui_object, array $a_parameters = null): string;
 
     /**
-     * Returns the command passed with the current POST or GET request.
+     * Returns the command passed with the current POST or GET request
+     * and fires an according ilCtrlEvent.
      *
      * @param string|null $fallback_command
      * @return string|null
@@ -89,8 +107,8 @@ interface ilCtrlInterface
     /**
      * Sets the current command.
      *
-     * @deprecated this method should not be used anymore, as all commands
-     *             should be passed as $_GET or $_POST parameters.
+     * @deprecated this method should not be used anymore and will be
+     *             removed with ILIAS 10.
      *
      * @param string|null $a_cmd
      */
@@ -106,8 +124,8 @@ interface ilCtrlInterface
     /**
      * Sets the command class that should be executed next.
      *
-     * @deprecated this method should not be used anymore, as all command
-     *             classes should be passed by $_GET or $_POST parameters.
+     * @deprecated this method should not be used anymore and will be
+     *             removed with ILIAS 10.
      *
      * @param object|string|null $a_cmd_class
      */
@@ -379,6 +397,14 @@ interface ilCtrlInterface
     public function lookupClassPath(string $a_class): string;
 
     /**
+     * This method was introduced due to composer being case-sensitive
+     * when autoloading classes. In some cases, the command class needs
+     * to be dynamically instantiated, for which one should use the
+     * name with proper capitalization.
+     */
+    public function lookupOriginalClassName(string $a_class): ?string;
+
+    /**
      * Returns the effective classname for a given path.
      *
      * @deprecated if you know the classpath you most likely called
@@ -494,4 +520,14 @@ interface ilCtrlInterface
      * @return array
      */
     public function getCurrentClassPath(): array;
+
+    /**
+     * Attaches an observer to ALL or a specific @see ilCtrlEvent
+     */
+    public function attachObserver(ilCtrlObserver $observer, ilCtrlEvent $event = ilCtrlEvent::ALL): void;
+
+    /**
+     * Detaches an observer from ALL or a specific @see ilCtrlEvent
+     */
+    public function detachObserver(ilCtrlObserver $observer, ilCtrlEvent $event = ilCtrlEvent::ALL): void;
 }

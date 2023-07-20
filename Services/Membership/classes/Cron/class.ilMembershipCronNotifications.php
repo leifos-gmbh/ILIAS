@@ -20,6 +20,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+use ILIAS\Cron\Schedule\CronJobScheduleType;
+
 /**
  * Course/group notifications
  * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
@@ -61,9 +63,9 @@ class ilMembershipCronNotifications extends ilCronJob
         return $this->lng->txt("enable_course_group_notifications_desc");
     }
 
-    public function getDefaultScheduleType(): int
+    public function getDefaultScheduleType(): CronJobScheduleType
     {
-        return self::SCHEDULE_TYPE_DAILY;
+        return CronJobScheduleType::SCHEDULE_TYPE_DAILY;
     }
 
     public function getDefaultScheduleValue(): ?int
@@ -104,6 +106,10 @@ class ilMembershipCronNotifications extends ilCronJob
 
             $status_details = "Switched from daily runs to open schedule.";
         }
+
+        // out-comment for debugging purposes
+        //$last_run = date("Y-m-d H:i:s", strtotime("yesterday"));
+
         $last_run_unix = strtotime($last_run);
 
         $this->logger->debug("Last run: " . $last_run);
@@ -171,12 +177,12 @@ class ilMembershipCronNotifications extends ilCronJob
             return '';
         }
 
-        $item_obj_title = trim(ilObject::_lookupTitle($a_item["context_obj_id"]));
+        $item_obj_title = trim(ilObject::_lookupTitle((int) $a_item["context_obj_id"]));
         $item_obj_type = $a_item["context_obj_type"];
 
         // sub-items
         $sub = null;
-        if ($a_item["aggregation"]) {
+        if ($a_item["aggregation"] ?? false) {
             $do_sub = true;
             if ($item_obj_type === "file" &&
                 count($a_item["aggregation"]) === 1) {
@@ -196,23 +202,23 @@ class ilMembershipCronNotifications extends ilCronJob
         if (!$a_is_sub) {
             $title = ilNewsItem::determineNewsTitle(
                 $a_item["context_obj_type"],
-                $a_item["title"],
-                $a_item["content_is_lang_var"],
-                $a_item["agg_ref_id"],
-                $a_item["aggregation"]
+                (string) $a_item["title"],
+                (bool) (int) $a_item["content_is_lang_var"],
+                (int) ($a_item["agg_ref_id"] ?? 0),
+                $a_item["aggregation"] ?? []
             );
         } else {
             $title = ilNewsItem::determineNewsTitle(
                 $a_item["context_obj_type"],
-                $a_item["title"],
-                $a_item["content_is_lang_var"]
+                (string) $a_item["title"],
+                (bool) (int) $a_item["content_is_lang_var"]
             );
         }
 
         $content = ilNewsItem::determineNewsContent(
             $a_item["context_obj_type"],
-            $a_item["content"],
-            $a_item["content_text_is_lang_var"]
+            (string) $a_item["content"],
+            (bool) (int) $a_item["content_text_is_lang_var"]
         );
 
         $title = trim($title);
@@ -232,7 +238,7 @@ class ilMembershipCronNotifications extends ilCronJob
                 break;
 
             case "file":
-                if (!is_array($a_item["aggregation"]) ||
+                if (!isset($a_item["aggregation"]) ||
                     count($a_item["aggregation"]) === 1) {
                     $res = $this->lng->txt("obj_" . $item_obj_type) .
                         ' "' . $item_obj_title . '" - ' . $title;
@@ -263,7 +269,7 @@ class ilMembershipCronNotifications extends ilCronJob
         }
 
         // comments
-        $comments = $this->data->getComments($a_item["id"], $a_user_id);
+        $comments = $this->data->getComments((int) $a_item["id"], $a_user_id);
         if (count($comments) > 0) {
             $res .= "\n" . $this->lng->txt("news_new_comments") . " (" . count($comments) . ")";
         }
@@ -277,7 +283,7 @@ class ilMembershipCronNotifications extends ilCronJob
         }
 
         // likes
-        $likes = $this->data->getLikes($a_item["id"], $a_user_id);
+        $likes = $this->data->getLikes((int) $a_item["id"], $a_user_id);
         if (count($likes) > 0) {
             $res .= "\n" . $this->lng->txt("news_new_reactions") . " (" . count($likes) . ")";
         }
@@ -313,12 +319,12 @@ class ilMembershipCronNotifications extends ilCronJob
         // gather news ref ids and news parent ref ids
         foreach ($a_objects as $parent_ref_id => $news) {
             foreach ($news as $item) {
-                $news_map[$item["id"]] = $item["ref_id"];
+                $news_map[$item["id"]] = (int) ($item["ref_id"] ?? 0);
                 $parent_map[$item["id"]][$parent_ref_id] = $parent_ref_id;
 
-                if ($item["aggregation"]) {
+                if ($item["aggregation"] ?? false) {
                     foreach ($item["aggregation"] as $subitem) {
-                        $news_map[$subitem["id"]] = $subitem["ref_id"];
+                        $news_map[$subitem["id"]] = (int) ($subitem["ref_id"] ?? 0);
                         $parent_map[$subitem["id"]][$parent_ref_id] = $parent_ref_id;
                     }
                 }
@@ -327,12 +333,12 @@ class ilMembershipCronNotifications extends ilCronJob
         // if news has multiple parents find "lowest" parent in path
         foreach ($parent_map as $news_id => $parents) {
             if (count($parents) > 1 && $news_map[$news_id] > 0) {
-                $path = $this->tree->getPathId($news_map[$news_id]);
+                $path = $this->tree->getPathId((int) $news_map[$news_id]);
                 $lookup = array_flip($path);
 
                 $level = 0;
                 foreach ($parents as $parent_ref_id) {
-                    $level = max($level, $lookup[$parent_ref_id]);
+                    $level = max($level, (int) ($lookup[$parent_ref_id] ?? 0));
                 }
 
                 $parsed_map[$news_id] = $path[$level];
@@ -375,7 +381,7 @@ class ilMembershipCronNotifications extends ilCronJob
             }
             $path = implode("-", $path);
 
-            $parent_obj_id = ilObject::_lookupObjId($parent_ref_id);
+            $parent_obj_id = ilObject::_lookupObjId((int) $parent_ref_id);
             $parent_type = ilObject::_lookupType($parent_obj_id);
 
             $parent["title"] = $lng->txt("obj_" . $parent_type) . ' "' . ilObject::_lookupTitle($parent_obj_id) . '"';
@@ -387,6 +393,10 @@ class ilMembershipCronNotifications extends ilCronJob
             $parsed = array();
             if (is_array($items)) {
                 foreach ($items as $news_item) {
+                    if ($news_item === null) {
+                        continue;
+                    }
+
                     // # Type "<Object Title>": "<News Title>" - News Text
                     $parsed_item = $this->parseNewsItem($parent_ref_id, $filter_map, $news_item, false, $a_user_id);
                     if ($parsed_item) {

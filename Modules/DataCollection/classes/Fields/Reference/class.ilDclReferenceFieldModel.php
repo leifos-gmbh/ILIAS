@@ -13,8 +13,7 @@
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
  *
- ********************************************************************
- */
+ *********************************************************************/
 
 /**
  * Class ilDclReferenceFieldModel
@@ -104,10 +103,10 @@ class ilDclReferenceFieldModel extends ilDclBaseFieldModel
 
     public function getValidFieldProperties(): array
     {
-        return array(ilDclBaseFieldModel::PROP_REFERENCE,
-                     ilDclBaseFieldModel::PROP_REFERENCE_LINK,
-                     ilDclBaseFieldModel::PROP_N_REFERENCE
-        );
+        return [ilDclBaseFieldModel::PROP_REFERENCE,
+                ilDclBaseFieldModel::PROP_REFERENCE_LINK,
+                ilDclBaseFieldModel::PROP_N_REFERENCE
+        ];
     }
 
     public function allowFilterInListView(): bool
@@ -116,7 +115,7 @@ class ilDclReferenceFieldModel extends ilDclBaseFieldModel
         $ref_field = $this->getFieldRef();
 
         return !($ref_field->getDatatypeId() == ilDclDatatype::INPUTFORMAT_MOB
-            || $ref_field->getDatatypeId() == ilDclDatatype::INPUTFORMAT_FILE);
+            || $ref_field->getDatatypeId() == ilDclDatatype::INPUTFORMAT_FILEUPLOAD);
     }
 
     public function getFieldRef(): ilDclBaseFieldModel

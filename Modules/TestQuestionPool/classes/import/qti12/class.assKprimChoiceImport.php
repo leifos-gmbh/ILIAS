@@ -15,9 +15,6 @@
  *
  *********************************************************************/
 
-require_once 'Modules/TestQuestionPool/classes/import/qti12/class.assQuestionImport.php';
-require_once 'Modules/TestQuestionPool/classes/class.ilAssKprimChoiceAnswer.php';
-
 /**
  * @author		Björn Heyser <bheyser@databay.de>
  * @version		$Id$
@@ -31,14 +28,13 @@ class assKprimChoiceImport extends assQuestionImport
      */
     public $object;
 
-    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping): void
+    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, $import_mapping): array
     {
         global $DIC;
         $ilUser = $DIC['ilUser'];
 
         ilSession::clear('import_mob_xhtml');
 
-        $duration = $item->getDuration();
         $shuffle = 0;
         $answers = array();
 
@@ -201,13 +197,12 @@ class assKprimChoiceImport extends assQuestionImport
         $this->object->setOwner($ilUser->getId());
         $this->object->setQuestion($this->object->QTIMaterialToString($item->getQuestiontext()));
         $this->object->setObjId($questionpool_id);
-        $this->object->setEstimatedWorkingTime($duration["h"] ?? 0, $duration["m"] ?? 0, $duration["s"] ?? 0);
         $this->object->setShuffleAnswersEnabled($shuffle);
         $this->object->setAnswerType($item->getMetadataEntry("answer_type"));
         $this->object->setOptionLabel($item->getMetadataEntry("option_label_setting"));
         $this->object->setCustomTrueOptionLabel($item->getMetadataEntry("custom_true_option_label"));
         $this->object->setCustomFalseOptionLabel($item->getMetadataEntry("custom_false_option_label"));
-        $this->object->setThumbSize($item->getMetadataEntry("thumb_size"));
+        $this->object->setThumbSize((int) $item->getMetadataEntry("thumb_size"));
 
         $this->object->saveToDb();
 
@@ -237,7 +232,6 @@ class assKprimChoiceImport extends assQuestionImport
             if (is_array($answer["imagefile"]) && (count($answer["imagefile"]) > 0)) {
                 $image = base64_decode($answer["imagefile"]["content"]);
                 $imagepath = $this->object->getImagePath();
-                include_once "./Services/Utilities/classes/class.ilUtil.php";
                 if (!file_exists($imagepath)) {
                     ilFileUtils::makeDirParents($imagepath);
                 }
@@ -266,8 +260,6 @@ class assKprimChoiceImport extends assQuestionImport
         $questiontext = $this->object->getQuestion();
         $answers = $this->object->getAnswers();
         if (is_array(ilSession::get("import_mob_xhtml"))) {
-            include_once "./Services/MediaObjects/classes/class.ilObjMediaObject.php";
-            include_once "./Services/RTE/classes/class.ilRTE.php";
             foreach (ilSession::get("import_mob_xhtml") as $mob) {
                 if ($tst_id > 0) {
                     $importfile = $this->getTstImportArchivDirectory() . '/' . $mob["uri"];
@@ -325,11 +317,12 @@ class assKprimChoiceImport extends assQuestionImport
         }
         if ($tst_id > 0) {
             $q_1_id = $this->object->getId();
-            $question_id = $this->object->duplicate(true, null, null, null, $tst_id);
+            $question_id = $this->object->duplicate(true, "", "", "", $tst_id);
             $tst_object->questions[$question_counter++] = $question_id;
             $import_mapping[$item->getIdent()] = array("pool" => $q_1_id, "test" => $question_id);
         } else {
             $import_mapping[$item->getIdent()] = array("pool" => $this->object->getId(), "test" => 0);
         }
+        return $import_mapping;
     }
 }

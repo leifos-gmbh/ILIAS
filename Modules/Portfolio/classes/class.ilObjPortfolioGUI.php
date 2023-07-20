@@ -22,7 +22,7 @@ use ILIAS\GlobalScreen\ScreenContext\ContextServices;
  * Portfolio view gui class
  * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
  * @ilCtrl_Calls ilObjPortfolioGUI: ilPortfolioPageGUI, ilPageObjectGUI
- * @ilCtrl_Calls ilObjPortfolioGUI: ilWorkspaceAccessGUI, ilNoteGUI
+ * @ilCtrl_Calls ilObjPortfolioGUI: ilWorkspaceAccessGUI, ilNoteGUI, ilCommonActionDispatcherGUI
  * @ilCtrl_Calls ilObjPortfolioGUI: ilObjectContentStyleSettingsGUI, ilPortfolioExerciseGUI
  */
 class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
@@ -31,6 +31,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
     protected ilWorkspaceAccessHandler $ws_access;
     protected ContextServices $tool_context;
     protected ilPortfolioDeclarationOfAuthorship $declaration_authorship;
+    protected \ILIAS\Skill\Service\SkillPersonalService $skill_personal_service;
 
     public function __construct(int $a_id = 0)
     {
@@ -51,6 +52,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 
         $this->ctrl->saveParameter($this, "exc_back_ref_id");
         $this->notes_gui = $DIC->notes()->gui();
+        $this->skill_personal_service = $DIC->skills()->personal();
     }
 
     public function getType(): string
@@ -123,8 +125,14 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
                 $this->preview();
                 break;
 
+            case "ilcommonactiondispatchergui":
+                //$this->prepareOutput();
+                $gui = ilCommonActionDispatcherGUI::getInstanceFromAjaxCall();
+                $this->ctrl->forwardCommand($gui);
+                break;
+
                 /*
-            case "ilobjstylesheetgui":
+        case "ilobjstylesheetgui":
                 $this->ctrl->setReturn($this, "editStyleProperties");
                 $style_gui = new ilObjStyleSheetGUI("", $this->object->getStyleSheetId(), false, false);
                 $style_gui->enableWrite(true);
@@ -818,7 +826,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 
         $has_form_content = false;
 
-        $pskills = array_keys(ilPersonalSkill::getSelectedUserSkills($ilUser->getId()));
+        $pskills = array_keys($this->skill_personal_service->getSelectedUserSkills($ilUser->getId()));
         $skill_ids = array();
 
         foreach (ilPortfolioTemplatePage::getAllPortfolioPages($a_prtt_id) as $page) {
@@ -1045,7 +1053,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
             }
 
             //skills manipulation
-            $pskills = array_keys(ilPersonalSkill::getSelectedUserSkills($ilUser->getId()));
+            $pskills = array_keys($this->skill_personal_service->getSelectedUserSkills($ilUser->getId()));
             $skill_ids = array();
 
             $recipe = array();
@@ -1120,10 +1128,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
         array $a_skill_ids,
         ilPortfolioTemplatePage $a_source_page
     ): array {
-        $dom = $a_source_page->getDom();
-        if ($dom instanceof php4DOMDocument) {
-            $dom = $dom->myDOMDocument;
-        }
+        $dom = $a_source_page->getDomDoc();
         $xpath = new DOMXPath($dom);
         $nodes = $xpath->query("//PageContent/Skills");
         foreach ($nodes as $node) {

@@ -160,7 +160,6 @@ class ilCalendarViewGUI
     public function getEvents(): array
     {
         $user = $this->user->getId();
-
         $schedule = null;
         switch ($this->presentation_type) {
             case self::CAL_PRESENTATION_AGENDA_LIST:
@@ -274,7 +273,7 @@ class ilCalendarViewGUI
                 $modal = $this->ui_factory->modal()->roundtrip(
                     $modal_title,
                     $this->ui_factory->legacy($content)
-                )->withCancelButtonLabel("close");
+                )->withCancelButtonLabel($this->lng->txt("close"));
                 echo $this->ui_renderer->renderAsync($modal);
             }
         }

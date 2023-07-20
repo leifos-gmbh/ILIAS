@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=0);
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -16,6 +15,8 @@ declare(strict_types=0);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=0);
 
 /**
  * class ilCourseObjectiveMaterials
@@ -242,8 +243,10 @@ class ilCourseObjectiveMaterials
         if (!$a_get_id) {
             return (bool) $res->numRows();
         } else {
-            $row = $this->db->fetchAssoc($res);
-            return (int) $row["lm_ass_id"];
+            while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+                return (int) $row->lm_ass_id;
+            }
+            return 0;
         }
     }
 
@@ -288,6 +291,26 @@ class ilCourseObjectiveMaterials
             ")";
         $res = $this->db->manipulate($query);
         return $next_id;
+    }
+
+    public function deleteMaterial(int $ref_id, int $obj_id): bool
+    {
+        $query = "DELETE FROM crs_objective_lm " .
+            "WHERE objective_id = " . $this->db->quote($this->getObjectiveId(), 'integer') . " " .
+            "AND ref_id = " . $this->db->quote($ref_id, 'integer') . " " .
+            "AND obj_id = " . $this->db->quote($obj_id, 'integer');
+        $this->db->manipulate($query);
+        return true;
+    }
+
+    public function isMaterialAssigned(int $ref_id, int $obj_id): bool
+    {
+        $query = "SELECT * FROM crs_objective_lm " .
+            "WHERE ref_id = " . $this->db->quote($ref_id, 'integer') . " " .
+            "AND obj_id = " . $this->db->quote($obj_id, 'integer') . " " .
+            "AND objective_id = " . $this->db->quote($this->getObjectiveId(), 'integer') . " ";
+        $res = $this->db->query($query);
+        return (bool) $res->numRows();
     }
 
     public function delete(int $lm_id): bool

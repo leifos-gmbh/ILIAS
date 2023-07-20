@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -16,8 +14,9 @@ declare(strict_types=1);
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
  *
- ********************************************************************
- */
+ *********************************************************************/
+
+declare(strict_types=1);
 
 require_once "./Services/Language/classes/class.ilObjLanguage.php";
 
@@ -429,6 +428,7 @@ class ilObjLanguageExt extends ilObjLanguage
                 $topic = $keys[1];
                 $save_array[$module][$topic] = $value;
 
+                if (!isset($global_values[$key])) continue;
                 $are_comments_set = isset($global_comments[$key]) && isset($a_remarks[$key]);
                 if ($global_values[$key] != $value || ($are_comments_set ? $global_comments[$key] != $a_remarks[$key] : $are_comments_set)) {
                     $local_change = $save_date;
@@ -442,7 +442,7 @@ class ilObjLanguageExt extends ilObjLanguage
                     $a_lang_key,
                     $value,
                     $local_change,
-                    $a_remarks[$key]
+                    $a_remarks[$key] ?? null
                 );
             }
         }

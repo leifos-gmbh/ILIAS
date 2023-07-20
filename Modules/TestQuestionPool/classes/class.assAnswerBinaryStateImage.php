@@ -15,8 +15,6 @@
  *
  *********************************************************************/
 
-require_once './Modules/TestQuestionPool/classes/class.assAnswerBinaryState.php';
-
 /**
  * Class for answers with a binary state indicator
  *
@@ -53,7 +51,7 @@ class ASS_AnswerBinaryStateImage extends ASS_AnswerBinaryState
      */
     public function __construct($answertext = "", $points = 0.0, $order = 0, $state = 0, $a_image = "", int $id = -1)
     {
-        parent::__construct($answertext, (float)$points, $order, $id);
+        parent::__construct($answertext, (float) $points, $order, $id);
         $this->image = $a_image;
     }
 
@@ -67,19 +65,17 @@ class ASS_AnswerBinaryStateImage extends ASS_AnswerBinaryState
      */
     public function getImage(): string
     {
-        return $this->image;
+        return $this->image ?? '';
     }
 
     /**
-     * Sets the image filename
-     *
      * Sets the image filename
      *
      * @param int|string $a_image The image filename
      *
      * @see $image
      */
-    public function setImage($a_image = 0): void
+    public function setImage($a_image = ''): void
     {
         $this->image = $a_image;
     }

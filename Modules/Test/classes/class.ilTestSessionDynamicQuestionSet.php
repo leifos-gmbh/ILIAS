@@ -1,11 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once 'Modules/Test/classes/class.ilTestSession.php';
-require_once 'Modules/Test/classes/class.ilTestDynamicQuestionSetFilterSelection.php';
-
-require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionList.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Test session handler for tests with mode dynamic question set
@@ -141,9 +150,6 @@ class ilTestSessionDynamicQuestionSet extends ilTestSession
                 )
             );
 
-            // update learning progress
-            include_once("./Modules/Test/classes/class.ilObjTestAccess.php");
-            include_once("./Services/Tracking/classes/class.ilLPStatusWrapper.php");
             ilLPStatusWrapper::_updateStatus(
                 ilObjTestAccess::_lookupObjIdForTestId($this->getTestId()),
                 ilObjTestAccess::_getParticipantId($this->getActiveId())
@@ -171,9 +177,6 @@ class ilTestSessionDynamicQuestionSet extends ilTestSession
                 );
                 $this->active_id = $next_id;
 
-                // update learning progress
-                include_once("./Modules/Test/classes/class.ilObjTestAccess.php");
-                include_once("./Services/Tracking/classes/class.ilLPStatusWrapper.php");
                 ilLPStatusWrapper::_updateStatus(
                     ilObjTestAccess::_lookupObjIdForTestId($this->getTestId()),
                     $this->getUserId()
@@ -181,7 +184,6 @@ class ilTestSessionDynamicQuestionSet extends ilTestSession
             }
         }
 
-        include_once("./Services/Tracking/classes/class.ilLearningProgress.php");
         ilLearningProgress::_tracProgress(
             $this->getUserId(),
             ilObjTestAccess::_lookupObjIdForTestId($this->getTestId()),

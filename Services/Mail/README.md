@@ -27,6 +27,10 @@ interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
   * [Context Registration](#context-registration)
   * [Context Usage Example](#context-usage-example)
 * [ilMassMailTaskProcessor](#ilmassmailtaskprocessor)
+* [AutoResponder](#autoresponder)
+* [Business Rules](#business-rules)
+  * [Permission Handling in Recipient Validation](#permission-handling-in-recipient-validation)
+  * [Account Status vs. Channel](#account-status-vs-channel)
 
 ## General
 
@@ -368,7 +372,7 @@ registration process.
 global $DIC;
 
 /** @var \ilMailMimeSenderFactory $senderFactory */
-$senderFactory = $DIC["mail.mime.sender.factory"];
+$senderFactory = $DIC->mail()->mime()->senderFactory();
 $sender        = $senderFactory->system();
 
 $mailer = new \ilMimeMail();
@@ -819,3 +823,36 @@ The amount of mails before the background task will be executed can be defined
 by passing a positive integer in the **fifth parameter**.
 Be aware that a high integer for mails per task can exhaust the mail API.
 We recommend to keep this value below 1000 mails per task to ensure that every mail can be sent.
+
+## AutoResponder
+
+`send_time` of `AutoReponder` entries will be saved in `UTC`
+
+## Business Rules
+
+### Permission Handling in Recipient Validation
+
+* The `smtp` permission is checked, if the sending account explicitly entered one or more external email addresses,
+which are **not** used as `login` for existing user accounts. If the access check evaluates to `false`, the recipients
+  are considered **invalid**.
+* The `mail_to_global_roles` permission is checked, if the sending account explicitly entered one or more role
+identifiers, which are resolved to global roles. If the access check evaluates to `false`, the recipients
+  are considered **invalid**.
+* The `internal_mail` permission is checked in the context of a receiving account, if the sending account excplicitly
+  entered one more usernames (might be also an email address) matching existing accounts. If the access check
+  evaluates to `false`, the recipients are considered **invalid**.
+
+No additional permission checks are implemented, for instance there is **no** check if a sending account is a course or
+group participant, if it explicitly enters a course or group role identifier as recipient.
+
+### Account Status vs. Channel
+
+An account is considered to be able to read internal messages, if the `TermsOfService` are accepted (if enabled) **and**
+the account is **not** expired (see: `usr_data.time_limit_unlimited`, `usr_data.time_limit_from`, `usr_data.time_limit_until`).
+
+* If a mail is sent as a `system` mail and an account can't read internal messages, it will be completely skipped
+  when processing recipients.
+* If a recipient account is **not** `active`, the mail will be only sent internally.
+* If a recipient account is `active`, and it can't read internal mails or it wants to receive emails externally,
+  the message will be sent as an external email. If an account is configured to receive external emails only, no internal
+  message will be sent.

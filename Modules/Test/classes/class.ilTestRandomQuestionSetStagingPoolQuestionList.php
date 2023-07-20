@@ -48,25 +48,25 @@ class ilTestRandomQuestionSetStagingPoolQuestionList implements Iterator
     /**
      * @var array
      */
-    private $taxFilters = array();
+    private $taxFilters = [];
 
     // fau: taxFilter/typeFilter - private variable
     // TODO-RND2017: rename to typesFilter (multiple types allowed)
     /**
      * @var array
      */
-    private $typeFilter = array();
+    private $typeFilter = [];
     // fau.
 
     /**
      * @var array
      */
-    private $lifecycleFilter = array();
+    private $lifecycleFilter = [];
 
     /**
      * @var array
      */
-    private $questions = array();
+    private $questions = [];
 
     public function __construct(ilDBInterface $db, ilComponentRepository $component_repository)
     {
@@ -179,7 +179,7 @@ class ilTestRandomQuestionSetStagingPoolQuestionList implements Iterator
                 continue;
             }
 
-            $this->questions[] = $row['question_id'];
+            $this->questions[] = (int) $row['question_id'];
         }
     }
 
@@ -201,9 +201,6 @@ class ilTestRandomQuestionSetStagingPoolQuestionList implements Iterator
     private function getTaxonomyFilterExpressions(): array
     {
         $expressions = array();
-
-        require_once 'Services/Taxonomy/classes/class.ilTaxonomyTree.php';
-        require_once 'Services/Taxonomy/classes/class.ilTaxNodeAssignment.php';
 
         foreach ($this->getTaxonomyFilters() as $taxId => $taxNodes) {
             $questionIds = array();
@@ -306,41 +303,27 @@ class ilTestRandomQuestionSetStagingPoolQuestionList implements Iterator
 
     // =================================================================================================================
 
-    /**
-     * @return ilTestRandomQuestionSetSourcePoolDefinition
-     */
-    public function rewind(): ilTestRandomQuestionSetSourcePoolDefinition
+    public function rewind(): void
     {
-        return reset($this->questions);
+        reset($this->questions);
     }
 
-    /**
-     * @return ilTestRandomQuestionSetSourcePoolDefinition
-     */
-    public function current(): ilTestRandomQuestionSetSourcePoolDefinition
+    public function current(): ?int
     {
-        return current($this->questions);
+        $current = current($this->questions);
+        return $current !== false ? $current : null;
     }
 
-    /**
-     * @return integer
-     */
-    public function key(): int
+    public function key(): ?int
     {
         return key($this->questions);
     }
 
-    /**
-     * @return ilTestRandomQuestionSetSourcePoolDefinition
-     */
-    public function next(): ilTestRandomQuestionSetSourcePoolDefinition
+    public function next(): void
     {
-        return next($this->questions);
+        next($this->questions);
     }
 
-    /**
-     * @return boolean
-     */
     public function valid(): bool
     {
         return key($this->questions) !== null;

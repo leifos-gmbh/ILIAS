@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class ilChatroomKickGUI
@@ -35,12 +35,11 @@ class ilChatroomClearGUI extends ilChatroomGUIHandler
         $this->exitIfNoRoomExists($room);
 
         $chat_user = new ilChatroomUser($this->ilUser, $room);
-        $subRoomId = $this->getRequestValue('sub', $this->refinery->kindlyTo()->int());
 
-        $room->clearMessages($subRoomId);
+        $room->clearMessages();
 
         $connector = $this->gui->getConnector();
-        $response = $connector->sendClearMessages($room->getRoomId(), $subRoomId, $chat_user->getUserId());
+        $response = $connector->sendClearMessages($room->getRoomId(), $chat_user->getUserId());
 
         $this->sendResponse($response);
     }

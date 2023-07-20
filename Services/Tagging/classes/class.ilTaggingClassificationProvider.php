@@ -143,6 +143,8 @@ class ilTaggingClassificationProvider extends ilClassificationProvider
                         }
 
                         $tpl->parseCurrentBlock();
+                        $ctrl->setParameter($a_parent_gui, "tag_type", "");
+                        $ctrl->setParameter($a_parent_gui, "tag", "");
                     }
 
                     $a_html[] = array(
@@ -222,7 +224,7 @@ class ilTaggingClassificationProvider extends ilClassificationProvider
                     : true;
 
                 foreach ($this->selection[$type] as $tag) {
-                    $found[$tag] = array_keys(ilTagging::_findObjectsByTag($tag, $ilUser->getId(), $invert));
+                    $found[$tag] = array_keys(ilTagging::_findObjectsByTag((string) $tag, $ilUser->getId(), $invert));
                 }
             }
         }

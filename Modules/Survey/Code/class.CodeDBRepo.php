@@ -326,8 +326,8 @@ class CodeDBRepo
             "user_key" => ["text", $user_key]
         ],
             [    // where
-                "survey_id" => ["integer", $survey_id],
-                "survey_key" => ["integer", $code]
+                "survey_fi" => ["integer", $survey_id],
+                "survey_key" => ["text", $code]
             ]
         );
     }
@@ -348,6 +348,22 @@ class CodeDBRepo
             " WHERE survey_fi = %s AND user_key = %s ",
             ["integer", "string"],
             [$survey_id, $user_key]
+        );
+        $rec = $db->fetchAssoc($set);
+        return $rec["survey_key"] ?? "";
+    }
+
+    public function getByCodeId(
+        int $survey_id,
+        int $code_id
+    ): string {
+        $db = $this->db;
+
+        $set = $db->queryF(
+            "SELECT survey_key FROM svy_anonymous " .
+            " WHERE survey_fi = %s AND anonymous_id = %s ",
+            ["integer", "integer"],
+            [$survey_id, $code_id]
         );
         $rec = $db->fetchAssoc($set);
         return $rec["survey_key"] ?? "";

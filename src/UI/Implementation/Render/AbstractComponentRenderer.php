@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,12 +16,17 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 namespace ILIAS\UI\Implementation\Render;
 
+use ILIAS\Data\Factory as DataFactory;
 use ILIAS\UI\Component\Component;
 use ILIAS\UI\Component\JavaScriptBindable;
 use ILIAS\UI\Component\Triggerer;
 use ILIAS\UI\Factory;
+use ILIAS\UI\HelpTextRetriever;
+use ILIAS\UI\Help;
 use ilLanguage;
 use InvalidArgumentException;
 use LogicException;
@@ -35,31 +38,20 @@ use LogicException;
  * ComponentRenderer::render. Assumes that there is no special resource the
  * component requires.
  */
-abstract class AbstractComponentRenderer implements ComponentRenderer
+abstract class AbstractComponentRenderer implements ComponentRenderer, HelpTextRetriever
 {
-    private Factory $ui_factory;
-    private TemplateFactory $tpl_factory;
-    private ilLanguage $lng;
-    private JavaScriptBinding $js_binding;
-    private static array $component_storage = [];
-    private \ILIAS\Refinery\Factory $refinery;
-    private ImagePathResolver $image_path_resolver;
-
+    private static array $component_storage;
 
     final public function __construct(
-        Factory $ui_factory,
-        TemplateFactory $tpl_factory,
-        ilLanguage $lng,
-        JavaScriptBinding $js_binding,
-        \ILIAS\Refinery\Factory $refinery,
-        ImagePathResolver $image_path_resolver
+        private Factory $ui_factory,
+        private TemplateFactory $tpl_factory,
+        private ilLanguage $lng,
+        private JavaScriptBinding $js_binding,
+        private \ILIAS\Refinery\Factory $refinery,
+        private ImagePathResolver $image_path_resolver,
+        private DataFactory $data_factory,
+        private HelpTextRetriever $help_text_retriever
     ) {
-        $this->ui_factory = $ui_factory;
-        $this->tpl_factory = $tpl_factory;
-        $this->lng = $lng;
-        $this->js_binding = $js_binding;
-        $this->refinery = $refinery;
-        $this->image_path_resolver = $image_path_resolver;
     }
 
     /**
@@ -67,7 +59,7 @@ abstract class AbstractComponentRenderer implements ComponentRenderer
      */
     public function registerResources(ResourceRegistry $registry): void
     {
-        $registry->register('./src/UI/templates/js/Core/ui.js');
+        $registry->register('./src/UI/templates/js/Core/dist/core.js');
     }
 
     /**
@@ -78,6 +70,11 @@ abstract class AbstractComponentRenderer implements ComponentRenderer
     final protected function getUIFactory(): Factory
     {
         return $this->ui_factory;
+    }
+
+    final protected function getDataFactory(): DataFactory
+    {
+        return $this->data_factory;
     }
 
     final protected function getRefinery(): \ILIAS\Refinery\Factory
@@ -126,7 +123,7 @@ abstract class AbstractComponentRenderer implements ComponentRenderer
     final protected function getTemplate(string $name, bool $purge_unfilled_vars, bool $purge_unused_blocks): Template
     {
         $path = $this->getTemplatePath($name);
-        return $this->tpl_factory->getTemplate($path, $purge_unfilled_vars, $purge_unused_blocks);
+        return $this->getTemplateRaw($path, $purge_unfilled_vars, $purge_unused_blocks);
     }
 
     /**
@@ -136,6 +133,14 @@ abstract class AbstractComponentRenderer implements ComponentRenderer
     {
         $component = $this->getMyComponent();
         return "src/UI/templates/default/$component/$name";
+    }
+
+    /**
+     * Get a template from any path.
+     */
+    private function getTemplateRaw(string $path, bool $purge_unfilled_vars, bool $purge_unused_blocks): Template
+    {
+        return $this->tpl_factory->getTemplate($path, $purge_unfilled_vars, $purge_unused_blocks);
     }
 
     /**
@@ -294,5 +299,26 @@ abstract class AbstractComponentRenderer implements ComponentRenderer
     public function getImagePathResolver(): ImagePathResolver
     {
         return $this->image_path_resolver;
+    }
+
+    public function getHelpText(Help\Purpose $purpose, Help\Topic ...$topics): array
+    {
+        return $this->help_text_retriever->getHelpText($purpose, ...$topics);
+    }
+
+    /*
+     * This is supposed to unify rendering of tooltips over all components.
+     */
+    protected ?TooltipRenderer $tooltip_renderer = null;
+
+    protected function getTooltipRenderer(): TooltipRenderer
+    {
+        if ($this->tooltip_renderer === null) {
+            $this->tooltip_renderer = new TooltipRenderer(
+                $this,
+                fn($path, $f1, $f2) => $this->getTemplateRaw($path, $f1, $f2)
+            );
+        }
+        return $this->tooltip_renderer;
     }
 }

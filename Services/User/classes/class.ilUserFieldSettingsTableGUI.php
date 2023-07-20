@@ -16,13 +16,17 @@
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
+use ILIAS\User\UserGUIRequest;
+
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
 class ilUserFieldSettingsTableGUI extends ilTable2GUI
 {
     private bool $confirm_change = false;
-    protected \ILIAS\User\StandardGUIRequest $user_request;
+    protected UserGUIRequest $user_request;
 
     protected ilUserSettingsConfig $user_settings_config;
 
@@ -64,7 +68,7 @@ class ilUserFieldSettingsTableGUI extends ilTable2GUI
         $this->setData($fds);
         $this->addCommandButton("saveGlobalUserSettings", $lng->txt("save"));
 
-        $this->user_request = new \ILIAS\User\StandardGUIRequest(
+        $this->user_request = new UserGUIRequest(
             $DIC->http(),
             $DIC->refinery()
         );
@@ -133,7 +137,7 @@ class ilUserFieldSettingsTableGUI extends ilTable2GUI
 
 
                 if ($this->confirm_change == 1) {	// confirm value
-                    $checked = $req_checked[$prop . "_" . $field];
+                    $checked = $req_checked[$prop . "_" . $field] ?? false;
                 }
                 if (isset($a_set[$prop . "_fix_value"])) {	// fix values overwrite everything
                     $checked = $a_set[$prop . "_fix_value"];

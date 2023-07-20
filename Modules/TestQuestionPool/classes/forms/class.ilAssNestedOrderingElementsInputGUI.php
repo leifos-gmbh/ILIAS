@@ -1,6 +1,22 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
+use ILIAS\DI\UIServices;
 
 /**
  * @author        Björn Heyser <bheyser@databay.de>
@@ -17,7 +33,6 @@ class ilAssNestedOrderingElementsInputGUI extends ilMultipleNestedOrderingElemen
 
     public const ILC_CSS_CLASS_LIST = 'ilc_qordul_OrderList';
     public const ILC_CSS_CLASS_ITEM = 'ilc_qordli_OrderListItem';
-    public const ILC_CSS_CLASS_HANDLE = 'ilc_qanswer_Answer';
 
     /**
      * @var string
@@ -46,26 +61,6 @@ class ilAssNestedOrderingElementsInputGUI extends ilMultipleNestedOrderingElemen
      */
     protected $elementImagePath = null;
 
-    public const CORRECTNESS_ICON_TRUE = 'icon_ok.svg';
-    public const CORRECTNESS_LNGVAR_TRUE = 'answer_is_right';
-
-    public const CORRECTNESS_ICON_FALSE = 'icon_not_ok.svg';
-    public const CORRECTNESS_LNGVAR_FALSE = 'answer_is_wrong';
-
-    /**
-     * @var array
-     */
-    protected $correctnessIcons = array(
-        true => self::CORRECTNESS_ICON_TRUE, false => self::CORRECTNESS_ICON_FALSE
-    );
-
-    /**
-     * @var array
-     */
-    protected $correctnessLngVars = array(
-        true => self::CORRECTNESS_LNGVAR_TRUE, false => self::CORRECTNESS_LNGVAR_FALSE
-    );
-
     /**
      * @var bool
      */
@@ -76,6 +71,8 @@ class ilAssNestedOrderingElementsInputGUI extends ilMultipleNestedOrderingElemen
      */
     protected $correctnessTrueElementList = null;
 
+    private UIServices $ui;
+
     /**
      * ilAssNestedOrderingElementsInputGUI constructor.
      *
@@ -84,7 +81,8 @@ class ilAssNestedOrderingElementsInputGUI extends ilMultipleNestedOrderingElemen
      */
     public function __construct(ilAssOrderingFormValuesObjectsConverter $converter, $postVar)
     {
-        require_once 'Modules/TestQuestionPool/classes/forms/class.ilAssOrderingDefaultElementFallback.php';
+        global $DIC;
+        $this->ui = $DIC->ui();
         $manipulator = new ilAssOrderingDefaultElementFallback();
         $this->addFormValuesManipulator($manipulator);
 
@@ -95,7 +93,7 @@ class ilAssNestedOrderingElementsInputGUI extends ilMultipleNestedOrderingElemen
         $this->setHtmlListTag(parent::HTML_LIST_TAG_UL);
         $this->setCssListClass($this->getCssListClass() . ' ' . self::ILC_CSS_CLASS_LIST);
         $this->setCssItemClass($this->getCssItemClass() . ' ' . self::ILC_CSS_CLASS_ITEM);
-        $this->setCssHandleClass($this->getCssHandleClass() . ' ' . self::ILC_CSS_CLASS_HANDLE);
+        $this->setCssHandleClass($this->getCssHandleClass());
     }
 
     /**
@@ -112,7 +110,6 @@ class ilAssNestedOrderingElementsInputGUI extends ilMultipleNestedOrderingElemen
      */
     public function getElementList($questionId): ilAssOrderingElementList
     {
-        require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssOrderingElementList.php';
         return ilAssOrderingElementList::buildInstance($questionId, $this->getIdentifiedMultiValues());
     }
 
@@ -236,53 +233,6 @@ class ilAssNestedOrderingElementsInputGUI extends ilMultipleNestedOrderingElemen
     }
 
     /**
-     * @param bool $correctness
-     * @return string
-     */
-    public function getCorrectnessIconFilename($correctness): string
-    {
-        return $this->correctnessIcons[(bool) $correctness];
-    }
-
-    /**
-     * @param bool $correctness
-     * @param string $iconFilename
-     */
-    public function setCorrectnessIconFilename($correctness, $iconFilename): void
-    {
-        $this->correctnessIcons[(bool) $correctness] = $iconFilename;
-    }
-
-    /**
-     * @param bool $correctness
-     * @return string
-     */
-    public function getCorrectnessLangVar($correctness): string
-    {
-        return $this->correctnessLngVars[(bool) $correctness];
-    }
-
-    /**
-     * @param bool $correctness
-     * @param string $langVar
-     */
-    public function setCorrectnessLangVar($correctness, $langVar): void
-    {
-        $this->correctnessLngVars[(bool) $correctness] = $langVar;
-    }
-
-    /**
-     * @param bool $correctness
-     * @return string
-     */
-    public function getCorrectnessText($correctness): string
-    {
-        global $DIC; /* @var ILIAS\DI\Container $DIC */
-        $lng = $DIC['lng'];
-        return $lng->txt($this->correctnessLngVars[(bool) $correctness]);
-    }
-
-    /**
      * @return ilAssOrderingElementList
      */
     public function getCorrectnessTrueElementList(): ?ilAssOrderingElementList
@@ -305,6 +255,22 @@ class ilAssNestedOrderingElementsInputGUI extends ilMultipleNestedOrderingElemen
     protected function getCorrectness($identifier): bool
     {
         return $this->getCorrectnessTrueElementList()->elementExistByRandomIdentifier($identifier);
+    }
+
+    private function getCorrectnessIcon($correctness): string
+    {
+        $icon_name = 'icon_not_ok.svg';
+        $label = $this->lng->txt("answer_is_wrong");
+        if ($correctness === 'correct') {
+            $icon_name = 'icon_ok.svg';
+            $label = $this->lng->txt("answer_is_right");
+        }
+        $path = ilUtil::getImagePath($icon_name);
+        $icon = $this->ui->factory()->symbol()->icon()->custom(
+            $path,
+            $label
+        );
+        return $this->ui->renderer()->render($icon);
     }
 
     /**
@@ -363,9 +329,12 @@ class ilAssNestedOrderingElementsInputGUI extends ilMultipleNestedOrderingElemen
         }
 
         if ($this->isShowCorrectnessIconsEnabled()) {
+            $correctness = 'not_correct';
+            if ($this->getCorrectness($identifier)) {
+                $correctness = 'correct';
+            }
             $tpl->setCurrentBlock('correctness_icon');
-            $tpl->setVariable("ICON_SRC", $this->getCorrectnessIconFilename($this->getCorrectness($identifier)));
-            $tpl->setVariable("ICON_TEXT", $this->getCorrectnessText($this->getCorrectness($identifier)));
+            $tpl->setVariable("ICON_OK", $this->getCorrectnessIcon($correctness));
             $tpl->parseCurrentBlock();
         }
 

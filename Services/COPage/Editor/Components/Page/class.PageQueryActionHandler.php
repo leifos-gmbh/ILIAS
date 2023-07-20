@@ -29,6 +29,8 @@ use ILIAS\COPage\Editor\Components\MediaObject\MediaObjectStyleSelector;
  */
 class PageQueryActionHandler implements Server\QueryActionHandler
 {
+    protected \ILIAS\COPage\InternalGUIService $gui;
+    protected \ILIAS\COPage\PC\PCDefinition $pc_definition;
     protected \ILIAS\DI\UIServices $ui;
     protected \ilLanguage $lng;
     protected \ilPageObjectGUI $page_gui;
@@ -47,8 +49,15 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $this->user = $DIC->user();
         $this->ctrl = $DIC->ctrl();
         $this->component_factory = $DIC["component.factory"];
+        $this->gui = $DIC->copage()->internal()->gui();
 
         $this->ui_wrapper = new Server\UIWrapper($this->ui, $this->lng);
+        $this->pc_definition = $DIC
+            ->copage()
+            ->internal()
+            ->domain()
+            ->pc()
+            ->definition();
     }
 
     /**
@@ -108,6 +117,15 @@ class PageQueryActionHandler implements Server\QueryActionHandler
             \ilUtil::getStyleSheetLocation() . ", " .
             "./Services/COPage/css/tiny_extra.css";
         $config->text_formats = \ilPCParagraphGUI::_getTextCharacteristics($this->page_gui->getStyleId());
+        $config->text_block_formats = [];
+        foreach (["text_block", "heading1", "heading2", "heading3"] as $type) {
+            $dummy_pc = new \ilPCParagraphGUI($this->page_gui->getPageObject(), null, "");
+            $dummy_pc->setStyleId($this->page_gui->getStyleId());
+            $dummy_pc->getCharacteristicsOfCurrentStyle([$type]);
+            foreach ($dummy_pc->getCharacteristics() as $char => $txt) {
+                $config->text_block_formats[$char] = $txt;
+            }
+        }
         $config->editPlaceholders = $this->page_gui->getPageConfig()->getEnablePCType("PlaceHolder");
         $config->activatedProtection =
             ($this->page_gui->getPageConfig()->getSectionProtection() == \ilPageConfig::SEC_PROTECT_PROTECTED);
@@ -150,8 +168,8 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $tpl = new \ilTemplate("tpl.page_edit_help.html", true, true, "Services/COPage/Editor");
         $tpl->setCurrentBlock("help");
         $tpl->setVariable("TXT_ADD_EL", $lng->txt("cont_add_elements"));
-        $tpl->setVariable("PLUS", \ilGlyphGUI::get(\ilGlyphGUI::ADD));
-        $tpl->setVariable("DRAG_ARROW", \ilGlyphGUI::get(\ilGlyphGUI::DRAG));
+        $tpl->setVariable("PLUS", $this->gui->symbol()->glyph("add")->render());
+        $tpl->setVariable("DRAG_ARROW", $this->gui->symbol()->glyph("next")->render());
         $tpl->setVariable("TXT_DRAG", $lng->txt("cont_drag_and_drop_elements"));
         $tpl->setVariable("TXT_EDIT", $lng->txt("cont_click_edit"));
         $tpl->setVariable("TXT_SEL", $lng->txt("cont_shift_click_to_select"));
@@ -502,7 +520,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
 
     protected function componentEditFormResponse(array $query): Server\Response
     {
-        $pc_edit = \ilCOPagePCDef::getPCEditorInstanceByName($query["cname"]);
+        $pc_edit = $this->pc_definition->getPCEditorInstanceByName($query["cname"]);
         $form = "";
         if (!is_null($pc_edit)) {
             $form = $pc_edit->getEditComponentForm(
@@ -524,8 +542,8 @@ class PageQueryActionHandler implements Server\QueryActionHandler
     protected function getComponentsEditorUI(): array
     {
         $ui = [];
-        foreach (\ilCOPagePCDef::getPCDefinitions() as $def) {
-            $pc_edit = \ilCOPagePCDef::getPCEditorInstanceByName($def["name"]);
+        foreach ($this->pc_definition->getPCDefinitions() as $def) {
+            $pc_edit = $this->pc_definition->getPCEditorInstanceByName($def["name"]);
             if (!is_null($pc_edit)) {
                 $ui[$def["name"]] = $pc_edit->getEditorElements(
                     $this->ui_wrapper,
@@ -541,7 +559,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
     protected function getComponentsDefinitions(): array
     {
         $pcdef = [];
-        foreach (\ilCOPagePCDef::getPCDefinitions() as $def) {
+        foreach ($this->pc_definition->getPCDefinitions() as $def) {
             $pcdef["types"][$def["name"]] = $def["pc_type"];
             $pcdef["names"][$def["pc_type"]] = $def["name"];
             $pcdef["txt"][$def["pc_type"]] = $this->lng->txt("cont_" . "pc_" . $def["pc_type"]);

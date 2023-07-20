@@ -1,10 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once 'Modules/TestQuestionPool/classes/class.ilAnswerWizardInputGUI.php';
-require_once 'Modules/TestQuestionPool/classes/class.assAnswerSimple.php';
-require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionSolutionComparisonExpression.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -76,12 +86,5 @@ class ilLogicalAnswerComparisonExpressionInputGUI extends ilAnswerWizardInputGUI
     protected function getTemplate(): string
     {
         return "tpl.prop_lac_expression_input.html";
-    }
-
-    protected function sanitizeSuperGlobalSubmitValue(): void
-    {
-        if (isset($_POST[$this->getPostVar()]) && is_array($_POST[$this->getPostVar()])) {
-            $_POST[$this->getPostVar()] = ilArrayUtil::stripSlashesRecursive($_POST[$this->getPostVar()], false);
-        }
     }
 }

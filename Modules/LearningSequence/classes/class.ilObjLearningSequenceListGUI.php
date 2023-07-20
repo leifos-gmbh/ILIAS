@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,7 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+declare(strict_types=1);
 
 class ilObjLearningSequenceListGUI extends ilObjectListGUI
 {
@@ -50,18 +49,11 @@ class ilObjLearningSequenceListGUI extends ilObjectListGUI
         $this->commands = ilObjLearningSequenceAccess::_getCommands();
     }
 
-    public function getProperties(): array
+    public function createDefaultCommand(array $command): array
     {
-        $props = parent::getProperties();
-
-        if (ilObjLearningSequenceAccess::isOffline($this->ref_id)) {
-            $props[] = [
-                "alert" => true,
-                "property" => $this->lng->txt("status"),
-                "value" => $this->lng->txt("offline")
-            ];
-        }
-
-        return $props;
+        return [
+            "link" => ilLink::_getStaticLink($this->ref_id, $this->type, true),
+            "frame" => "_top"
+        ];
     }
 }

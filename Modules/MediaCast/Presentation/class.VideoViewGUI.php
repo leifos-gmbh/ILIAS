@@ -155,7 +155,7 @@ class VideoViewGUI
             $has_items = true;
             $preview = new VideoPreviewGUI(
                 $video->getPreviewPic(),
-                "il.VideoPlaylist.loadItem('mcst_playlist', '" . $video->getId() . "', true);",
+                "il.VideoPlaylist.toggleItem('mcst_playlist', '" . $video->getId() . "');",
                 $video->getPlayingTime()
             );
             $completed = false;
@@ -169,7 +169,7 @@ class VideoViewGUI
 
             $b = $factory->button()->shy($video->getTitle(), "")->withOnLoadCode(function ($id) use ($video) {
                 return
-                    "$(\"#$id\").click(function() { il.VideoPlaylist.loadItem('mcst_playlist', '" . $video->getId() . "', true); return false;});";
+                    "$(\"#$id\").click(function() { il.VideoPlaylist.toggleItem('mcst_playlist', '" . $video->getId() . "'); return false;});";
             });
 
             $items[] = [
@@ -262,7 +262,7 @@ class VideoViewGUI
     {
         // this is current only to include the resize mechanism when
         // the main menu is changed, so that the player is resized, too
-        \ilMediaPlayerGUI::initJavascript();
+        //\ilMediaPlayerGUI::initJavascript();
         $tpl = new \ilTemplate("tpl.video_cast_layout.html", true, true, "Modules/MediaCast/Presentation");
         $side_column = $this->renderSideColumn();
 

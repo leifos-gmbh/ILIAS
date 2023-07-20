@@ -1,9 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once 'Services/UIComponent/Toolbar/classes/class.ilToolbarGUI.php';
-require_once 'Services/UIComponent/Button/classes/class.ilLinkButton.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author	Björn Heyser <bheyser@databay.de>
@@ -16,11 +27,10 @@ class ilTestResultsToolbarGUI extends ilToolbarGUI
     public ilCtrl $ctrl;
     public ilGlobalTemplateInterface $tpl;
 
-    private ?string $pdfExportLinkTarget = null;
     private ?string $certificateLinkTarget = null;
     private ?string $showBestSolutionsLinkTarget = null;
     private ?string $hideBestSolutionsLinkTarget = null;
-    private array $participantSelectorOptions = array();
+    private array $participantSelectorOptions = [];
 
     public function __construct(ilCtrl $ctrl, ilGlobalTemplateInterface $tpl, ilLanguage $lng)
     {
@@ -35,23 +45,17 @@ class ilTestResultsToolbarGUI extends ilToolbarGUI
 
         $this->addButton($this->lng->txt('print'), 'javascript:window.print();');
 
-        if (strlen($this->getPdfExportLinkTarget())) {
-            require_once 'Services/UIComponent/Button/classes/class.ilLinkButton.php';
-            $link = ilLinkButton::getInstance(); // always returns a new instance
-            $link->setUrl($this->getPdfExportLinkTarget());
-            $link->setCaption($this->getPdfExportLabel(), false);
-            $link->setOmitPreventDoubleSubmission(true);
-            $this->addButtonInstance($link);
-        }
-
-        if (strlen($this->getCertificateLinkTarget())) {
+        if ($this->getCertificateLinkTarget() !== null
+            && $this->getCertificateLinkTarget() !== '') {
             $this->addButton($this->lng->txt('certificate'), $this->getCertificateLinkTarget());
         }
 
-        if (strlen($this->getShowBestSolutionsLinkTarget())) {
+        if ($this->getShowBestSolutionsLinkTarget() !== null
+            && $this->getShowBestSolutionsLinkTarget() !== '') {
             $this->addSeparator();
             $this->addButton($this->lng->txt('tst_btn_show_best_solutions'), $this->getShowBestSolutionsLinkTarget());
-        } elseif (strlen($this->getHideBestSolutionsLinkTarget())) {
+        } elseif ($this->getHideBestSolutionsLinkTarget() !== null
+            && $this->getHideBestSolutionsLinkTarget() !== '') {
             $this->addSeparator();
             $this->addButton($this->lng->txt('tst_btn_hide_best_solutions'), $this->getHideBestSolutionsLinkTarget());
         }
@@ -59,7 +63,6 @@ class ilTestResultsToolbarGUI extends ilToolbarGUI
         if (count($this->getParticipantSelectorOptions())) {
             $this->addSeparator();
 
-            require_once 'Services/Form/classes/class.ilSelectInputGUI.php';
             $sel = new ilSelectInputGUI('', 'active_id');
             $sel->setOptions($this->getParticipantSelectorOptionsWithHintOption());
             $this->addInputItem($sel);
@@ -72,21 +75,6 @@ class ilTestResultsToolbarGUI extends ilToolbarGUI
 
             $this->tpl->addJavaScript('Modules/Test/js/ilTestResultParticipantSelector.js');
         }
-    }
-
-    private function getPdfExportLabel(): string
-    {
-        return $this->lng->txt('pdf_export');
-    }
-
-    public function setPdfExportLinkTarget(string $pdfExportLinkTarget): void
-    {
-        $this->pdfExportLinkTarget = $pdfExportLinkTarget;
-    }
-
-    public function getPdfExportLinkTarget(): ?string
-    {
-        return $this->pdfExportLinkTarget;
     }
 
     public function setCertificateLinkTarget(string $certificateLinkTarget): void

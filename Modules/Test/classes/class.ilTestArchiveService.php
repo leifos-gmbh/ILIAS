@@ -1,10 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once './Modules/Test/classes/class.ilTestServiceGUI.php';
-require_once './Modules/Test/classes/class.ilTestPDFGenerator.php';
-require_once './Modules/Test/classes/class.ilTestArchiver.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -59,13 +69,10 @@ class ilTestArchiveService
     {
         $content = $this->renderOverviewContent($activeId, $pass);
         $filename = $this->buildOverviewFilename($activeId, $pass);
-
         ilTestPDFGenerator::generatePDF($content, ilTestPDFGenerator::PDF_OUTPUT_FILE, $filename, PDF_USER_RESULT);
-
         $archiver = new ilTestArchiver($this->testOBJ->getId());
         $archiver->setParticipantData($this->getParticipantData());
         $archiver->handInTestResult($activeId, $pass, $filename);
-
         unlink($filename);
     }
 
@@ -83,8 +90,6 @@ class ilTestArchiveService
         );
 
         $gui = new ilTestServiceGUI($this->testOBJ);
-
-        require_once 'Modules/Test/classes/class.ilTestResultHeaderLabelBuilder.php';
         $testResultHeaderLabelBuilder = new ilTestResultHeaderLabelBuilder($GLOBALS['DIC']->language(), $GLOBALS['DIC']['ilObjDataCache']);
 
         return $gui->getPassListOfAnswers(

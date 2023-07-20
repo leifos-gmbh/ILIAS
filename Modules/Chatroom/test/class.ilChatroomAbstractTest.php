@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\DI\Container;
 use PHPUnit\Framework\TestCase;
@@ -57,18 +57,6 @@ abstract class ilChatroomAbstractTest extends TestCase
         $DIC = $this->dic;
 
         parent::tearDown();
-    }
-
-    /**
-     * @return ilChatroom&MockObject
-     */
-    protected function createIlChatroomMock(): ilChatroom
-    {
-        $this->ilChatroomMock = $this->getMockBuilder(ilChatroom::class)->disableOriginalConstructor()->onlyMethods(
-            ['isOwnerOfPrivateRoom', 'clearMessages']
-        )->getMock();
-
-        return $this->ilChatroomMock;
     }
 
     /**

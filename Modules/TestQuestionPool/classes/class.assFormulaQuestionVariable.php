@@ -2,14 +2,17 @@
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
+ *
  * ILIAS is licensed with the GPL-3.0,
  * see https://www.gnu.org/licenses/gpl-3.0.en.html
  * You should have received a copy of said license along with the
  * source code, too.
+ *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
+ *
  *********************************************************************/
 
 /**
@@ -71,7 +74,6 @@ class assFormulaQuestionVariable
             }
         }
 
-        include_once "./Services/Math/classes/class.ilMath.php";
         $mul = ilMath::_pow(10, $this->getPrecision());
         $r1 = round(ilMath::_mul($this->getRangeMin(), $mul));
         $r2 = round(ilMath::_mul($this->getRangeMax(), $mul));
@@ -135,7 +137,6 @@ class assFormulaQuestionVariable
         if (!is_object($this->getUnit())) {
             return $this->value;
         } else {
-            include_once "./Services/Math/classes/class.ilMath.php";
             return ilMath::_mul($this->value, $this->getUnit()->getFactor());
         }
     }
@@ -164,7 +165,6 @@ class assFormulaQuestionVariable
 
     public function setRangeMin($range_min): void
     {
-        include_once "./Services/Math/classes/class.EvalMath.php";
         $math = new EvalMath();
         $math->suppress_errors = true;
         $result = $math->evaluate($range_min);
@@ -179,7 +179,6 @@ class assFormulaQuestionVariable
 
     public function setRangeMax($range_max): void
     {
-        include_once "./Services/Math/classes/class.EvalMath.php";
         $math = new EvalMath();
         $math->suppress_errors = true;
         $result = $math->evaluate($range_max);

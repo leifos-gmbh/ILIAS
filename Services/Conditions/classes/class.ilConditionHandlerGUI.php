@@ -2,8 +2,7 @@
 
 declare(strict_types=1);
 
-/******************************************************************************
- *
+/**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
  *
@@ -14,10 +13,10 @@ declare(strict_types=1);
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *     https://www.ilias.de
- *     https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
 
 use ILIAS\Refinery\Factory;
 use ILIAS\HTTP\GlobalHttpState;
@@ -143,13 +142,13 @@ class ilConditionHandlerGUI
 
     protected function initListModeFromPost(): string
     {
-        if ($this->http->wrapper()->post()->has('list_mode')) {
-            return $this->http->wrapper()->post()->retrieve(
-                'list_mode',
-                $this->refinery->kindlyTo()->string()
-            );
-        }
-        return "";
+        return $this->http->wrapper()->post()->retrieve(
+            'list_mode',
+            $this->refinery->byTrying([
+                $this->refinery->kindlyTo()->string(),
+                $this->refinery->always(self::LIST_MODE_UNDEFINED)
+            ])
+        );
     }
 
     protected function initSourceIdFromQuery(): int
@@ -320,7 +319,7 @@ class ilConditionHandlerGUI
             }
         }
 
-        $table = new ilConditionHandlerTableGUI($this, 'listConditions', $list_mode === self::LIST_MODE_ALL);
+        $table = new ilConditionHandlerTableGUI($this, 'listConditions', $list_mode !== self::LIST_MODE_ALL);
         $table->setConditions(
             ilConditionHandler::_getPersistedConditionsOfTarget(
                 $this->getTargetRefId(),
@@ -368,7 +367,7 @@ class ilConditionHandlerGUI
                     ilConditionHandler::saveNumberOfRequiredTriggers(
                         $this->getTargetRefId(),
                         $this->getTargetId(),
-                        $num_req
+                        (int) $num_req
                     );
                     break;
             }
@@ -462,7 +461,7 @@ class ilConditionHandlerGUI
                 $this->getTargetRefId(),
                 $this->getTargetId()
             );
-            $obl->setValue($num_required > 0 ? $num_required : null);
+            $obl->setValue($num_required > 0 ? (string) $num_required : null);
             $obl->setRequired(true);
             $obl->setSize(1);
             $obl->setMinValue($min);
@@ -743,14 +742,14 @@ class ilConditionHandlerGUI
 
         $sel = new ilSelectInputGUI($this->lng->txt('condition'), 'operator');
         $ch_obj = new ilConditionHandler();
-        if ($a_mode === 'add') {
-            $operators[0] = $this->lng->txt('select_one');
-        }
         $operators = [];
+        if ($a_mode === 'add') {
+            $operators[''] = $this->lng->txt('select_one');
+        }
         foreach ($ch_obj->getOperatorsByTriggerType($trigger_type) as $operator) {
             $operators[$operator] = $this->lng->txt('condition_' . $operator);
         }
-        $sel->setValue($condition['operator'] ?? 0);
+        $sel->setValue($condition['operator'] ?? '');
         $sel->setOptions($operators);
         $sel->setRequired(true);
         $form->addItem($sel);
@@ -778,29 +777,23 @@ class ilConditionHandlerGUI
         if ($trigger_type === 'sahs') {
             $this->lng->loadLanguageModule('trac');
 
-            $cus = new ilCustomInputGUI($this->lng->txt('trac_sahs_relevant_items'), 'item_ids[]');
+            $cus = new ilCheckboxGroupInputGUI($this->lng->txt('trac_sahs_relevant_items'), 'item_ids');
+            $cus->setInfo($this->lng->txt('trac_lp_determination_info_sco'));
             $cus->setRequired(true);
-
-            $tpl = new ilTemplate(
-                'tpl.condition_handler_sco_row.html',
-                true,
-                true,
-                "Services/AccessControl"
-            );
 
             $olp = ilObjectLP::getInstance($trigger_obj_id);
             $collection = $olp->getCollectionInstance();
+            $checked = [];
             if ($collection) {
                 foreach ($collection->getPossibleItems() as $item_id => $sahs_item) {
-                    $tpl->setCurrentBlock("sco_row");
-                    $tpl->setVariable('SCO_ID', $item_id);
-                    $tpl->setVariable('SCO_TITLE', $sahs_item['title']);
-                    $tpl->setVariable('CHECKED', $collection->isAssignedEntry($item_id) ? 'checked="checked"' : '');
-                    $tpl->parseCurrentBlock();
+                    $sco = new ilCheckboxOption($sahs_item['title'], (string) $item_id);
+                    if ($collection->isAssignedEntry($item_id)) {
+                        $checked[] = $item_id;
+                    }
+                    $cus->addOption($sco);
                 }
             }
-            $tpl->setVariable('INFO_SEL', $this->lng->txt('trac_lp_determination_info_sco'));
-            $cus->setHtml($tpl->get());
+            $cus->setValue($checked);
             $form->addItem($cus);
         }
         switch ($a_mode) {

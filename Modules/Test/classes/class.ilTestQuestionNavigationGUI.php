@@ -1,7 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -93,11 +106,6 @@ class ilTestQuestionNavigationGUI
      * @var bool
      */
     private $questionMarked = false;
-
-    /**
-     * @var bool
-     */
-    private $charSelectorEnabled = false;
 
     /**
      * @var bool
@@ -356,22 +364,6 @@ class ilTestQuestionNavigationGUI
         $this->anythingRendered = true;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isCharSelectorEnabled(): bool
-    {
-        return $this->charSelectorEnabled;
-    }
-
-    /**
-     * @param boolean $charSelectorEnabled
-     */
-    public function setCharSelectorEnabled($charSelectorEnabled)
-    {
-        $this->charSelectorEnabled = $charSelectorEnabled;
-    }
-
     // fau: testNav - generate question actions menu
     /**
      * Get the HTML of an actions menu below the title
@@ -381,7 +373,6 @@ class ilTestQuestionNavigationGUI
     {
         $tpl = $this->getTemplate('actions');
 
-        include_once("Services/UIComponent/GroupedList/classes/class.ilGroupedListGUI.php");
         $actions = new ilGroupedListGUI();
         $actions->setAsDropDown(true, true);
 
@@ -457,19 +448,6 @@ class ilTestQuestionNavigationGUI
             );
         }
 
-        if ($this->isCharSelectorEnabled()) {
-            $actions->addSeparator();
-            $actions->addEntry(
-                $this->lng->txt('char_selector_btn_label'),
-                '#',
-                '',
-                '',
-                'ilTestQuestionAction ilCharSelectorMenuToggle',
-                'ilCharSelectorMenuToggleLink'
-            );
-        }
-
-        // render the mark icon
         if ($this->getQuestionMarkLinkTarget()) {
             $this->renderActionsIcon(
                 $tpl,
@@ -479,8 +457,6 @@ class ilTestQuestionNavigationGUI
             );
         }
 
-        // render the action menu
-        include_once './Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php';
         $list = new ilAdvancedSelectionListGUI();
         $list->setSelectionHeaderClass('btn-primary');
         $list->setId('QuestionActions');

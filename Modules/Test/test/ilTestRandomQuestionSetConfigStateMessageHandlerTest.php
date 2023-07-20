@@ -2,7 +2,21 @@
 
 declare(strict_types=1);
 
-/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTestRandomQuestionSetConfigStateMessageHandlerTest
@@ -15,9 +29,11 @@ class ilTestRandomQuestionSetConfigStateMessageHandlerTest extends ilTestBaseTes
     protected function setUp(): void
     {
         parent::setUp();
+        $this->addGlobal_ilUser();
 
         $this->testObj = new ilTestRandomQuestionSetConfigStateMessageHandler(
             $this->createMock(ilLanguage::class),
+            $this->createMock(ILIAS\DI\UIServices::class),
             $this->createMock(ilCtrl::class)
         );
     }
@@ -66,33 +82,5 @@ class ilTestRandomQuestionSetConfigStateMessageHandlerTest extends ilTestBaseTes
         $mock = $this->createMock(ilTestRandomQuestionSetConfig::class);
         $this->testObj->setQuestionSetConfig($mock);
         $this->assertEquals($mock, $this->testObj->getQuestionSetConfig());
-    }
-
-    public function testValidationFailed(): void
-    {
-        $this->testObj->setValidationFailed(false);
-        $this->assertFalse($this->testObj->isValidationFailed());
-
-        $this->testObj->setValidationFailed(true);
-        $this->assertTrue($this->testObj->isValidationFailed());
-    }
-
-    public function testHasValidationReport(): void
-    {
-        $expected = [
-            "test1",
-            "test2"
-        ];
-        $this->testObj->addValidationReport($expected[0]);
-        $this->testObj->addValidationReport($expected[1]);
-        $this->assertEquals(2, $this->testObj->hasValidationReports());
-    }
-
-    public function testGetValidationReportHtml(): void
-    {
-        $expected = "test1<br />test2";
-        $this->testObj->addValidationReport("test1");
-        $this->testObj->addValidationReport("test2");
-        $this->assertEquals($expected, $this->testObj->getValidationReportHtml());
     }
 }

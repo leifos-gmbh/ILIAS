@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\Filesystem\Util\Convert\ImageOutputOptions;
+use ILIAS\Filesystem\Util\Convert\LegacyImages;
 use ILIAS\FileUpload\MimeType;
 
 define("IL_MODE_ALIAS", 1);
@@ -27,11 +29,13 @@ define("IL_MODE_FULL", 3);
  */
 class ilObjMediaObject extends ilObject
 {
+    private const DEFAULT_PREVIEW_SIZE = 400;
     protected ilObjUser $user;
     public bool $is_alias;
     public string $origin_id;
     public array $media_items;
     public bool $contains_int_link;
+    private $image_converter;
 
     public function __construct(
         int $a_id = 0
@@ -46,6 +50,7 @@ class ilObjMediaObject extends ilObject
         $this->contains_int_link = false;
         $this->type = "mob";
         parent::__construct($a_id, false);
+        $this->image_converter = $DIC->fileConverters()->legacyImages();
     }
 
     public static function _exists(
@@ -1055,10 +1060,10 @@ class ilObjMediaObject extends ilObject
                     case "qpl":
                         // Question Pool *Question* Text (Test)
                         $qinfo = assQuestion::_getQuestionInfo($id);
-                        if ($qinfo["original_id"] > 0) {
+                        if (isset($qinfo["original_id"]) && $qinfo["original_id"] > 0) {
                             $obj_id = ilObjTest::_lookupTestObjIdForQuestionId($id);	// usage in test
                         } else {
-                            $obj_id = (int) $qinfo["obj_fi"];		// usage in pool
+                            $obj_id = (int) ($qinfo["obj_fi"] ?? 0);		// usage in pool
                         }
                         break;
 
@@ -1155,10 +1160,6 @@ class ilObjMediaObject extends ilObject
                             if ($pinfo && $pinfo["parent_type"] == "lm") {
                                 $obj_id = ilLMObject::_lookupContObjID($pinfo["page_id"]);
                             }
-                            $pinfo = ilPCQuestion::_getPageForQuestionId($id, "sahs");
-                            if ($pinfo && $pinfo["parent_type"] == "sahs") {
-                                $obj_id = (int) ilSCORM2004Node::_lookupSLMID($pinfo["page_id"]);
-                            }
                         }
                         break;
 
@@ -1167,10 +1168,9 @@ class ilObjMediaObject extends ilObject
                         $obj_id = ilLMObject::_lookupContObjID($id);
                         break;
 
-                    case "gdf":
-                        // glossary definition
-                        $term_id = ilGlossaryDefinition::_lookupTermId($id);
-                        $obj_id = (int) ilGlossaryTerm::_lookGlossaryID($term_id);
+                    case "term":
+                        $term_id = $id;
+                        $obj_id = ilGlossaryTerm::_lookGlossaryID($term_id);
                         break;
 
                     case "wpg":
@@ -1240,20 +1240,28 @@ class ilObjMediaObject extends ilObject
         int $a_height,
         bool $a_constrain_prop = false
     ): string {
+        global $DIC;
         $file_path = pathinfo($a_file);
         $location = substr($file_path["basename"], 0, strlen($file_path["basename"]) -
-            strlen($file_path["extension"]) - 1) . "_" .
+                strlen($file_path["extension"]) - 1) . "_" .
             $a_width . "_" .
             $a_height . "." . $file_path["extension"];
         $target_file = $file_path["dirname"] . "/" .
             $location;
-        ilShellUtil::resizeImage(
-            $a_file,
-            $target_file,
-            $a_width,
-            $a_height,
-            $a_constrain_prop
-        );
+
+        $returned_target_file = $DIC->fileConverters()
+            ->legacyImages()
+            ->resizeToFixedSize(
+                $a_file,
+                $target_file,
+                $a_width,
+                $a_height,
+                $a_constrain_prop
+            );
+
+        if ($returned_target_file !== $target_file) {
+            throw new RuntimeException('Could not resize image');
+        }
 
         return $location;
     }
@@ -1355,7 +1363,6 @@ class ilObjMediaObject extends ilObject
         if ($height == 0 && is_null($a_user_height)) {
             $height = "";
         }
-
         return array("width" => $width, "height" => $height, "info" => $info);
     }
 
@@ -1433,7 +1440,7 @@ class ilObjMediaObject extends ilObject
         }
         ilFileUtils::makeDirParents($dir);
         if ($a_mode == "rename") {
-            rename($tmp_name, $dir . "/" . $a_name);
+            ilFileUtils::rename($tmp_name, $dir . "/" . $a_name);
         } else {
             ilFileUtils::moveUploadedFile($tmp_name, $a_name, $dir . "/" . $a_name, true, $a_mode);
         }
@@ -1483,17 +1490,27 @@ class ilObjMediaObject extends ilObject
     public function makeThumbnail(
         string $a_file,
         string $a_thumbname,
-        string $a_format = "png",
-        int $a_size = 80
     ): void {
+        $size = self::DEFAULT_PREVIEW_SIZE;
+        $m_dir = ilObjMediaObject::_getDirectory($this->getId());
+        $t_dir = ilObjMediaObject::_getThumbnailDirectory($this->getId());
+        $file = $m_dir . "/" . $a_file;
+
+        $mime = ilObjMediaObject::getMimeType($file);
+        $wh = ilMediaImageUtil::getImageSize($file);
+
+        // see #8602
+        if ($size > (int) $wh[0] && $size > $wh[1]) {
+            $size = min($wh[0], $wh[1]);
+        }
+
         $m_dir = ilObjMediaObject::_getDirectory($this->getId());
         $t_dir = ilObjMediaObject::_getThumbnailDirectory($this->getId());
         self::_createThumbnailDirectory($this->getId());
-        ilShellUtil::convertImage(
+        $this->image_converter->croppedSquare(
             $m_dir . "/" . $a_file,
             $t_dir . "/" . $a_thumbname,
-            $a_format,
-            $a_size
+            $size
         );
     }
 
@@ -1662,25 +1679,26 @@ class ilObjMediaObject extends ilObject
         $logger = $GLOBALS['DIC']->logger()->mob();
 
         $item = $this->getMediaItem("Standard");
+        if ($item->getFormat() === "image/svg+xml") {
+            return;
+        }
 
         if ($item->getLocationType() == "LocalFile") {
             if (is_int(strpos($item->getFormat(), "image/"))) {
-                $a_width = $a_height = 400;
-
+                $a_width = $a_height = self::DEFAULT_PREVIEW_SIZE;
 
                 $dir = ilObjMediaObject::_getDirectory($this->getId());
                 $file = $dir . "/" .
                     $item->getLocation();
                 if (is_file($file)) {
-                    if (ilShellUtil::isConvertVersionAtLeast("6.3.8-3")) {
-                        ilShellUtil::execConvert(
-                            ilShellUtil::escapeShellArg(
-                                $file
-                            ) . "[0] -geometry " . $a_width . "x" . $a_height . "^ -gravity center -extent " . $a_width . "x" . $a_height . " PNG:" . $dir . "/mob_vpreview.png"
-                        );
-                    } else {
-                        ilShellUtil::convertImage($file, $dir . "/mob_vpreview.png", "PNG", $a_width . "x" . $a_height);
-                    }
+                    $this->image_converter->resizeToFixedSize(
+                        $file,
+                        $dir . "/mob_vpreview.png",
+                        $a_width,
+                        $a_height,
+                        true,
+                        ImageOutputOptions::FORMAT_PNG
+                    );
                 }
             }
         }

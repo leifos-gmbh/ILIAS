@@ -2,7 +2,21 @@
 
 declare(strict_types=1);
 
-/* Copyright (c) 2021 - Stefan Hecken <stefan.hecken@concepts-and-training.de> - Extended GPL, see LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Edit the record of a user, set LP.
@@ -15,7 +29,7 @@ class ilIndividualAssessmentMember
     protected int $notification_ts;
     protected ?int $examiner_id;
     protected ?int $changer_id;
-    protected ?DateTime $change_time;
+    protected ?DateTimeImmutable $change_time;
 
     public function __construct(
         ilObjIndividualAssessment $iass,
@@ -24,7 +38,7 @@ class ilIndividualAssessmentMember
         int $notification_ts,
         ?int $examiner_id = null,
         ?int $changer_id = null,
-        ?DateTime $change_time = null
+        ?DateTimeImmutable $change_time = null
     ) {
         $this->iass = $iass;
         $this->usr = $usr;
@@ -95,12 +109,12 @@ class ilIndividualAssessmentMember
         return $clone;
     }
 
-    public function changeTime(): ?DateTime
+    public function changeTime(): ?DateTimeImmutable
     {
         return $this->change_time;
     }
 
-    public function withChangeTime(DateTime $change_time = null): ilIndividualAssessmentMember
+    public function withChangeTime(DateTimeImmutable $change_time = null): ilIndividualAssessmentMember
     {
         $clone = clone $this;
         $clone->change_time = $change_time;

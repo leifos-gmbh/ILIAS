@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\ContentPage\PageMetrics\Command\StorePageMetricsCommand;
 use ILIAS\ContentPage\PageMetrics\PageMetricsRepositoryImp;
@@ -210,22 +210,11 @@ class ilObjContentPage extends ilObject2 implements ilContentPageObjectConstants
 
     public function trackProgress(int $usrId): void
     {
-        ilChangeEvent::_recordReadEvent(
-            $this->getType(),
-            $this->getRefId(),
+        ilLearningProgress::_tracProgress(
+            $usrId,
             $this->getId(),
-            $usrId
+            $this->getRefId(),
+            $this->getType()
         );
-
-        $lp = ilObjectLP::getInstance($this->getId());
-        if ($lp->isActive() && $lp->getCurrentMode() === ilLPObjSettings::LP_MODE_CONTENT_VISITED) {
-            $current_status = (int) ilLPStatus::_lookupStatus($this->getId(), $usrId, false);
-            if ($current_status !== ilLPStatus::LP_STATUS_COMPLETED_NUM) {
-                ilLPStatusWrapper::_updateStatus(
-                    $this->getId(),
-                    $usrId
-                );
-            }
-        }
     }
 }

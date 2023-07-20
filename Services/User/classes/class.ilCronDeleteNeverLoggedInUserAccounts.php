@@ -19,6 +19,7 @@ declare(strict_types=1);
  *********************************************************************/
 
 use ILIAS\Refinery\ConstraintViolationException;
+use ILIAS\Cron\Schedule\CronJobScheduleType;
 
 class ilCronDeleteNeverLoggedInUserAccounts extends \ilCronJob
 {
@@ -96,9 +97,9 @@ class ilCronDeleteNeverLoggedInUserAccounts extends \ilCronJob
         return $DIC->language()->txt('user_never_logged_in_info');
     }
 
-    public function getDefaultScheduleType(): int
+    public function getDefaultScheduleType(): CronJobScheduleType
     {
-        return self::SCHEDULE_TYPE_DAILY;
+        return CronJobScheduleType::SCHEDULE_TYPE_DAILY;
     }
 
     public function getDefaultScheduleValue(): int
@@ -221,7 +222,10 @@ class ilCronDeleteNeverLoggedInUserAccounts extends \ilCronJob
 
         $this->roleIdWhiteliste = implode(',', $this->http->wrapper()->post()->retrieve(
             'role_whitelist',
-            $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int())
+            $this->refinery->byTrying([
+                $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int()),
+                $this->refinery->always([])
+            ])
         ));
 
         try {

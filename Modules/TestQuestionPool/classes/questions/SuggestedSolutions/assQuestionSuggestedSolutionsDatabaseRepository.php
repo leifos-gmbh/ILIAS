@@ -66,7 +66,7 @@ class assQuestionSuggestedSolutionsDatabaseRepository
         $result = $this->db->query($query);
 
         while ($row = $this->db->fetchAssoc($result)) {
-            $last_update = \DateTimeImmutable::createFromFormat('U', $row['tstamp']);
+            $last_update = \DateTimeImmutable::createFromFormat('U', (string) $row['tstamp']);
 
             $ret[] = $this->buildSuggestedSolution(
                 (int) $row['suggested_solution_id'],
@@ -141,9 +141,11 @@ class assQuestionSuggestedSolutionsDatabaseRepository
             throw new \LogicException('do not sync with same question');
         }
         $this->deleteForQuestion($target_question_id);
+        $suggested_solutions = [];
         foreach ($this->selectFor($source_question_id) as $solution) {
-            $this->update($solution->withQuestionId($target_question_id));
+            $suggested_solutions[] = $solution->withQuestionId($target_question_id);
         }
+        $this->update($suggested_solutions);
     }
 
     protected function buildSuggestedSolution(

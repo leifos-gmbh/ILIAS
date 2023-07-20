@@ -18,7 +18,7 @@
 
 /**
  * Class ilResourceStorageDB80
- * @author Fabian Schmid <fs@studer-raimann.ch>
+ * @author Fabian Schmid <fabian@sr.solutions.ch>
  */
 class ilResourceStorageDB80 implements ilDatabaseUpdateSteps
 {
@@ -121,7 +121,7 @@ class ilResourceStorageDB80 implements ilDatabaseUpdateSteps
                 'rid',
                 $attributes
             );
-        } catch (Throwable $t) {
+        } catch (Throwable $exception) {
         }
     }
 
@@ -319,5 +319,29 @@ SET il_resource_info.version_number = il_resource_revision.version_number
                 ]
             );
         }
+    }
+
+    public function step_11(): void
+    {
+        $this->db->modifyTableColumn(
+            'il_resource_rc',
+            'owner',
+            ['length' => 4]
+        );
+
+        $this->db->modifyTableColumn(
+            'il_resource_revision',
+            'owner_id',
+            ['length' => 4]
+        );
+    }
+
+    public function step_12(): void
+    {
+        $this->db->renameTableColumn(
+            'il_resource_rc',
+            'owner',
+            'owner_id',
+        );
     }
 }

@@ -29,10 +29,12 @@ use ILIAS\Survey\InternalService;
  */
 abstract class AbstractUIModifier implements UIModifier
 {
+    protected InternalGUIService $gui;
     protected ?InternalService $service = null;
 
-    public function __construct()
+    public function __construct(InternalGUIService $gui)
     {
+        $this->gui = $gui;
     }
 
     public function setInternalService(InternalService $internal_service): void
@@ -76,11 +78,14 @@ abstract class AbstractUIModifier implements UIModifier
         \ilToolbarGUI $toolbar,
         int $user_id
     ): void {
-        $this->addApprSelectionToToolbar(
-            $survey,
-            $toolbar,
-            $user_id
-        );
+        $config = $this->getInternalService()->domain()->modeFeatureConfig($survey->getMode());
+        if ($config->usesAppraisees()) {
+            $this->addApprSelectionToToolbar(
+                $survey,
+                $toolbar,
+                $user_id
+            );
+        }
 
         $this->addExportAndPrintButton(
             $survey,
@@ -115,11 +120,14 @@ abstract class AbstractUIModifier implements UIModifier
         $gui = $this->service->gui();
         $lng = $gui->lng();
 
-        $this->addApprSelectionToToolbar(
-            $survey,
-            $toolbar,
-            $user_id
-        );
+        $config = $this->getInternalService()->domain()->modeFeatureConfig($survey->getMode());
+        if ($config->usesAppraisees()) {
+            $this->addApprSelectionToToolbar(
+                $survey,
+                $toolbar,
+                $user_id
+            );
+        }
 
         $captions = new \ilSelectInputGUI($lng->txt("svy_eval_captions"), "cp");
         $captions->setOptions(array(
@@ -139,11 +147,10 @@ abstract class AbstractUIModifier implements UIModifier
         $view->setValue($request->getVW());
         $toolbar->addInputItem($view, true);
 
-        $button = \ilSubmitButton::getInstance();
-        $button->setCaption("ok");
-        $button->setCommand("evaluationdetails");
-        $button->setOmitPreventDoubleSubmission(true);
-        $toolbar->addButtonInstance($button);
+        $this->gui->button(
+            $this->gui->lng()->txt("ok"),
+            "evaluationdetails"
+        )->submit()->toToolbar(false, $toolbar);
 
         $toolbar->addSeparator();
 
@@ -164,15 +171,25 @@ abstract class AbstractUIModifier implements UIModifier
             ? 'exportDetailData'
             : 'exportData');
 
-        $button = \ilLinkButton::getInstance();
-        $button->setCaption("export");
-        $button->setOnClick('$(\'#' . $modal_id . '\').modal(\'show\')');
-        $toolbar->addButtonInstance($button);
+        $this->gui->button(
+            $this->gui->lng()->txt("export"),
+            "#"
+        )->onClick('$(\'#' . $modal_id . '\').modal(\'show\')')->toToolbar(false, $toolbar);
 
         $toolbar->addSeparator();
 
         if ($details) {
             $pv = $this->service->gui()->print()->resultsDetails($survey->getRefId());
+            $this->service->gui()->ctrl()->setParameterByClass(
+                "ilSurveyEvaluationGUI",
+                "vw",
+                $this->service->gui()->evaluation($survey)->request()->getVW()
+            );
+            $this->service->gui()->ctrl()->setParameterByClass(
+                "ilSurveyEvaluationGUI",
+                "cp",
+                $this->service->gui()->evaluation($survey)->request()->getCP()
+            );
             $modal_elements = $pv->getModalElements(
                 $this->service->gui()->ctrl()->getLinkTargetByClass(
                     "ilSurveyEvaluationGUI",
@@ -284,10 +301,10 @@ abstract class AbstractUIModifier implements UIModifier
             $appr->setValue($appr_id);
             $toolbar->addInputItem($appr, true);
 
-            $button = \ilSubmitButton::getInstance();
-            $button->setCaption("survey_360_select_appraisee");
-            $button->setCommand($ctrl->getCmd());
-            $toolbar->addButtonInstance($button);
+            $this->gui->button(
+                $lng->txt("survey_360_select_appraisee"),
+                $ctrl->getCmd()
+            )->submit()->toToolbar(false, $toolbar);
 
             if ($appr_id) {
                 $toolbar->addSeparator();

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 require_once("libs/composer/vendor/autoload.php");
 require_once(__DIR__ . "/../../../Base.php");
@@ -47,6 +47,7 @@ class CombinedSlateTest extends ILIAS_UI_TestBase
     {
         $factory = new class () extends NoUIFactory {
             public I\SignalGenerator $sig_gen;
+            public I\Button\Factory $button_factory;
 
             public function button(): C\Button\Factory
             {
@@ -70,13 +71,6 @@ class CombinedSlateTest extends ILIAS_UI_TestBase
         $factory->button_factory = $this->button_factory;
         $factory->sig_gen = $this->sig_gen;
         return $factory;
-    }
-
-    public function brutallyTrimHTML(string $html): string
-    {
-        $html = str_replace(["\n", "\r", "\t"], "", $html);
-        $html = preg_replace('# {2,}#', " ", $html);
-        return trim($html);
     }
 
     public function testRendering(): void
@@ -128,11 +122,14 @@ class CombinedSlateTest extends ILIAS_UI_TestBase
         $html = $r->render($slate);
 
         $expected = <<<EOT
-		<div class="il-maincontrols-slate disengaged" id="id_1">
-		<div class="il-maincontrols-slate-content" data-replace-marker="content">
-		<hr class="il-divider-with-label" />
-		<h4 class="il-divider">Title</h4>
-		<hr /></div></div>
+        <div class="il-maincontrols-slate disengaged" id="id_1">
+            <div class="il-maincontrols-slate-content" data-replace-marker="content">
+                <ul>
+                    <li><hr class="il-divider-with-label" /><h4 class="il-divider">Title</h4></li>
+                    <li><hr /></li>
+                </ul>
+            </div>
+        </div>
 EOT;
         $this->assertEquals(
             $this->brutallyTrimHTML($expected),
@@ -142,11 +139,10 @@ EOT;
 
     public function testRenderingWithSubslateAndButton(): void
     {
-        $name = 'name';
         $icon = $this->icon_factory->custom('', '');
-        $subslate = new Combined($this->sig_gen, $name, $icon);
-        $subbutton = $this->button_factory->bulky($icon, '', '');
-        $slate = new Combined($this->sig_gen, $name, $icon);
+        $subslate = new Combined($this->sig_gen, 'subslate_name', $icon);
+        $subbutton = $this->button_factory->bulky($icon, 'button_name', '');
+        $slate = new Combined($this->sig_gen, 'slate_name', $icon);
         $slate = $slate
             ->withAdditionalEntry($subslate)
             ->withAdditionalEntry($subbutton);
@@ -155,25 +151,27 @@ EOT;
         $html = $r->render($slate);
 
         $expected = <<<EOT
-		<div class="il-maincontrols-slate disengaged" id="id_3">
-			<div class="il-maincontrols-slate-content" data-replace-marker="content">
-
-				<button class="btn btn-bulky" id="id_1" >
-					<img class="icon custom small" src="" alt=""/>
-					<span class="bulky-label">name</span>
-				</button>
-				<div class="il-maincontrols-slate disengaged" id="id_2">
-					<div class="il-maincontrols-slate-content" data-replace-marker="content">
-					</div>
-				</div>
-
-				<button class="btn btn-bulky" data-action="" >
-					<img class="icon custom small" src="" alt=""/>
-					<span class="bulky-label"></span>
-				</button>
-
-			</div>
-		</div>
+            <div class="il-maincontrols-slate disengaged" id="id_3">
+              <div class="il-maincontrols-slate-content" data-replace-marker="content">
+                <ul>
+                  <li>
+                    <button class="btn btn-bulky" id="id_1">
+                      <img class="icon custom small" src="" alt=""/>
+                      <span class="bulky-label">subslate_name</span>
+                    </button>
+                    <div class="il-maincontrols-slate disengaged" id="id_2">
+                      <div class="il-maincontrols-slate-content" data-replace-marker="content"></div>
+                    </div>
+                  </li>
+                  <li>
+                    <button class="btn btn-bulky" data-action="">
+                      <img class="icon custom small" src="" alt=""/>
+                      <span class="bulky-label">button_name</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
 EOT;
         $this->assertEquals(
             $this->brutallyTrimHTML($expected),

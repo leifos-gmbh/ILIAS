@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,11 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
+/**
+ * @deprecated
+ */
 class ilTCPDFRenderer implements ilRendererConfig, ilPDFRenderer
 {
     protected ilLanguage $lng;
@@ -101,7 +104,7 @@ class ilTCPDFRenderer implements ilRendererConfig, ilPDFRenderer
         $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
         $pdf->SetMargins($config['margin_left'], $config['margin_top'], $config['margin_right']);
-        $pdf->SetAutoPageBreak('auto', $config['margin_buttom']);
+        $pdf->SetAutoPageBreak('auto', $config['margin_bottom']);
         $pdf->setImageScale($config['image_scale']);
 
         $pdf->setHeaderFont([PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN]);
@@ -117,7 +120,7 @@ class ilTCPDFRenderer implements ilRendererConfig, ilPDFRenderer
             $pdf->AddPage();
             $pdf->writeHTML($page, true, false, true, false, '');
         }
-        $result = $pdf->Output(basename($job->getFilename()), $job->getOutputMode()); // (I - Inline, D - Download, F - File)
+        $result = $pdf->Output($job->getFilename(), $job->getOutputMode()); // (I - Inline, D - Download, F - File)
 
         if (in_array($job->getOutputMode(), ['I', 'D'])) {
             exit();

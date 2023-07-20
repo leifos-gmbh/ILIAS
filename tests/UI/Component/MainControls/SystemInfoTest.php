@@ -51,16 +51,16 @@ class SystemInfoTest extends ILIAS_UI_TestBase
 
         // Neutral
         $expected = <<<EOT
-<div id="id" class="container-fluid il-system-info il-system-info-neutral" data-close-uri="" aria-live="polite" aria-labelledby="il-system-info-headline" aria-describedby="il-system-info-headline">
+<div id="id" class="container-fluid il-system-info il-system-info-neutral" data-close-uri="" aria-live="polite" aria-labelledby="id_headline" aria-describedby="id_description">
     <div class="il-system-info-content-wrapper">
         <div class="il-system-info-content">
-            <span class="il-system-info-headline">$headline</span>
-            <span class="il-system-info-body">$information</span>
+            <span id="id_headline" class="il-system-info-headline">$headline</span>
+            <span id="id_description" class="il-system-info-body">$information</span>
         </div>
     </div>
     <div class="il-system-info-actions">
         <span class="il-system-info-more">
-            <a class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
+            <a tabindex="0" class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
         </span>
         <span class="il-system-info-close"></span>
     </div>
@@ -84,16 +84,16 @@ EOT;
 
         // Neutral
         $expected = <<<EOT
-<div id="id" class="container-fluid il-system-info il-system-info-neutral" data-close-uri="" aria-live="polite" aria-labelledby="il-system-info-headline" aria-describedby="il-system-info-headline">
+<div id="id" class="container-fluid il-system-info il-system-info-neutral" data-close-uri="" aria-live="polite" aria-labelledby="id_headline" aria-describedby="id_description">
     <div class="il-system-info-content-wrapper">
         <div class="il-system-info-content">
-            <span class="il-system-info-headline">$headline</span>
-            <span class="il-system-info-body">$information</span>
+            <span id="id_headline" class="il-system-info-headline">$headline</span>
+            <span id="id_description" class="il-system-info-body">$information</span>
         </div>
     </div>
     <div class="il-system-info-actions">
         <span class="il-system-info-more">
-            <a class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
+            <a tabindex="0" class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
         </span>
         <span class="il-system-info-close"></span>
     </div>
@@ -117,16 +117,16 @@ EOT;
 
         $actual = $r->render($system_info);
         $expected = <<<EOT
-<div id="id" class="container-fluid il-system-info il-system-info-important" data-close-uri="" aria-live="polite" aria-labelledby="il-system-info-headline" aria-describedby="il-system-info-headline">
+<div id="id" class="container-fluid il-system-info il-system-info-important" data-close-uri="" aria-live="polite" aria-labelledby="id_headline" aria-describedby="id_description">
     <div class="il-system-info-content-wrapper">
         <div class="il-system-info-content">
-            <span class="il-system-info-headline">$headline</span>
-            <span class="il-system-info-body">$information</span>
+            <span id="id_headline" class="il-system-info-headline">$headline</span>
+            <span id="id_description" class="il-system-info-body">$information</span>
         </div>
     </div>
     <div class="il-system-info-actions">
         <span class="il-system-info-more">
-            <a class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
+            <a tabindex="0" class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
         </span>
         <span class="il-system-info-close"></span>
     </div>
@@ -149,16 +149,16 @@ EOT;
 
         // Breaking
         $expected = <<<EOT
-<div id="id" class="container-fluid il-system-info il-system-info-breaking" data-close-uri="" role="alert" aria-labelledby="il-system-info-headline" aria-describedby="il-system-info-headline">
+<div id="id" class="container-fluid il-system-info il-system-info-breaking" data-close-uri="" role="alert" aria-labelledby="id_headline" aria-describedby="id_description">
     <div class="il-system-info-content-wrapper">
         <div class="il-system-info-content">
-            <span class="il-system-info-headline">$headline</span>
-            <span class="il-system-info-body">$information</span>
+            <span id="id_headline" class="il-system-info-headline">$headline</span>
+            <span id="id_description" class="il-system-info-body">$information</span>
         </div>
     </div>
     <div class="il-system-info-actions">
         <span class="il-system-info-more">
-            <a class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
+            <a tabindex="0" class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
         </span>
         <span class="il-system-info-close"></span>
     </div>
@@ -184,18 +184,18 @@ EOT;
             ->withDismissAction($action);
 
         $expected = <<<EOT
-<div id="id" class="container-fluid il-system-info il-system-info-neutral" data-close-uri="$uri_string" aria-live="polite" aria-labelledby="il-system-info-headline" aria-describedby="il-system-info-headline">
+<div id="id" class="container-fluid il-system-info il-system-info-neutral" data-close-uri="$uri_string" aria-live="polite" aria-labelledby="id_headline" aria-describedby="id_description">
     <div class="il-system-info-content-wrapper">
         <div class="il-system-info-content">
-            <span class="il-system-info-headline">$headline</span>
-            <span class="il-system-info-body">$information</span>
+            <span id="id_headline" class="il-system-info-headline">$headline</span>
+            <span id="id_description" class="il-system-info-body">$information</span>
         </div>
     </div>
     <div class="il-system-info-actions">
         <span class="il-system-info-more">
-            <a class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
+            <a tabindex="0" class="glyph" href="#" aria-label="show_more"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
         </span>
-        <span class="il-system-info-close"><a class="glyph" href="#" aria-label="close" id="id"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></span>
+        <span class="il-system-info-close"><a tabindex="0" class="glyph" href="#" aria-label="close" id="id"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></span>
     </div>
 </div>
 EOT;

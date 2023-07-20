@@ -32,7 +32,7 @@ class ilADTMultiEnumDBBridge extends ilADTDBBridge
     public function readRecord(array $a_row): void
     {
         if (isset($a_row[$this->getElementId()])) {
-            $this->getADT()->addSelection($a_row[$this->getElementId()]);
+            $this->getADT()->addSelection((int) $a_row[$this->getElementId()]);
         }
     }
 
@@ -62,7 +62,7 @@ class ilADTMultiEnumDBBridge extends ilADTDBBridge
 
     protected function insertIndices(): void
     {
-        foreach ($this->getADT()->getSelections() as $index) {
+        foreach ((array) $this->getADT()->getSelections() as $index) {
             $fields = $this->getPrimary();
             $fields['value_index'] = [ilDBConstants::T_INTEGER, $index];
             $num_row = $this->db->insert($this->getTable(), $fields);

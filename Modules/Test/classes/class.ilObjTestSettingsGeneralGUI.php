@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -106,6 +107,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         }
 
         $DIC->tabs()->activateTab(ilTestTabsManager::TAB_ID_SETTINGS);
+        $DIC->tabs()->activateSubTab(ilTestTabsManager::SUBTAB_ID_GENERAL_SETTINGS);
 
         // process command
 
@@ -137,7 +139,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 
     private function showConfirmation(ilPropertyFormGUI $form, $oldQuestionSetType, $newQuestionSetType, $hasQuestionsWithoutQuestionpool)
     {
-        require_once 'Modules/Test/classes/confirmations/class.ilTestSettingsChangeConfirmationGUI.php';
         $confirmation = new ilTestSettingsChangeConfirmationGUI($this->testOBJ);
 
         $confirmation->setFormAction($this->ctrl->getFormAction($this));
@@ -417,18 +418,8 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         return true;
     }
 
-    private function isCharSelectorPropertyRequired(): bool
-    {
-        global $DIC;
-        $ilSetting = $DIC['ilSetting'];
-
-        return $ilSetting->get('char_selector_availability') > 0;
-    }
-
-
     private function buildForm(): ilPropertyFormGUI
     {
-        require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this));
         $form->addCommandButton(self::CMD_SAVE_FORM, $this->lng->txt("save"));
@@ -445,8 +436,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $this->addTestSequenceProperties($form);
         $this->addTestFinishProperties($form);
 
-        // Edit ecs export settings
-        include_once 'Modules/Test/classes/class.ilECSTestSettings.php';
         $ecs = new ilECSTestSettings($this->testOBJ);
         $ecs->addSettingsToForm($form, 'tst');
 
@@ -465,7 +454,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             $form->addItem($otherHead);
         }
 
-        require_once 'Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
         ilObjectServiceSettingsGUI::initServiceSettingsForm($this->testOBJ->getId(), $form, array(
                 ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS
         ));
@@ -503,7 +491,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             }
         }
 
-        require_once 'Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
         ilObjectServiceSettingsGUI::updateServiceSettingsForm($this->testOBJ->getId(), $form, array(
             ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS
         ));
@@ -512,7 +499,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $this->testOBJ->saveToDb(true);
 
         // Update ecs export settings
-        include_once 'Modules/Test/classes/class.ilECSTestSettings.php';
         $ecs = new ilECSTestSettings($this->testOBJ);
         $ecs->handleSettingsUpdate();
     }
@@ -527,8 +513,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $form->addItem($header);
 
         // title & description (meta data)
-
-        include_once 'Services/MetaData/classes/class.ilMD.php';
         $md_obj = new ilMD($this->testOBJ->getId(), 0, "tst");
         $md_section = $md_obj->getGeneral();
 
@@ -567,6 +551,9 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $random = new ilRadioOption($this->lng->txt('test_question_set_type_random'), ilObjTest::QUESTION_SET_TYPE_RANDOM);
         $random->setInfo($this->lng->txt('test_question_set_type_random_info'));
         $question_set_type->addOption($random);
+        if ($this->testOBJ->participantDataExist()) {
+            $question_set_type->setDisabled(true);
+        }
 
         $question_set_type->setValue($this->testOBJ->getQuestionSetType());
         $form->addItem($question_set_type);
@@ -641,7 +628,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
      */
     private function addAvailabilityProperties(ilPropertyFormGUI $form)
     {
-        include_once "Services/Object/classes/class.ilObjectActivation.php";
         $this->lng->loadLanguageModule('rep');
 
         $section = new ilFormSectionHeaderGUI();
@@ -664,7 +650,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $act_type->setChecked($this->testOBJ->isActivationLimited());
         // $act_type->setInfo($this->lng->txt('tst_availability_until_info'));
 
-        include_once "Services/Form/classes/class.ilDateDurationInputGUI.php";
         $dur = new ilDateDurationInputGUI($this->lng->txt("rep_time_period"), "access_period");
         $dur->setRequired(true);
         $dur->setShowTime(true);
@@ -966,11 +951,15 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $duration->setShowHours(true);
         $duration->setShowMinutes(true);
 
-        $pw_time_array = explode(':', $this->testOBJ->getPassWaiting());
-        $duration->setMonths($pw_time_array[0]);
-        $duration->setDays($pw_time_array[1]);
-        $duration->setHours($pw_time_array[2]);
-        $duration->setMinutes($pw_time_array[3]);
+        $pw_time_array = ["00", "000", "00", "00", "00"];
+        if ($this->testOBJ->getPassWaiting() !== '') {
+            $pw_time_array = explode(':', $this->testOBJ->getPassWaiting());
+        }
+
+        $duration->setMonths((int) $pw_time_array[0]);
+        $duration->setDays((int) $pw_time_array[1]);
+        $duration->setHours((int) $pw_time_array[2]);
+        $duration->setMinutes((int) $pw_time_array[3]);
         $duration->setRequired(false);
         $pass_waiting_enabled->addSubItem($duration);
 
@@ -1117,13 +1106,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             'answer_fixation_handling', 'obligations_enabled'
         );
 
-        if ($this->isCharSelectorPropertyRequired()) {
-            // sequence properties
-            $seqheader = new ilFormSectionHeaderGUI();
-            $seqheader->setTitle($this->lng->txt("tst_presentation_properties"));
-            $form->addItem($seqheader);
-        }
-
         // question title output
         $title_output = new ilRadioGroupInputGUI($this->lng->txt("tst_title_output"), "title_output");
         $title_output->addOption(new ilRadioOption($this->lng->txt("tst_title_output_full"), 0, ''));
@@ -1202,7 +1184,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         );
         $ifbTriggerOpt->setInfo($this->lng->txt('tst_instant_feedback_trigger_forced_desc'));
         $instant_feedback_trigger->addOption($ifbTriggerOpt);
-        $instant_feedback_trigger->setValue((string) $this->testOBJ->isForceInstantFeedbackEnabled());
+        $instant_feedback_trigger->setValue($this->testOBJ->isForceInstantFeedbackEnabled() ? 1 : 0);
         $instant_feedback_enabled->addSubItem($instant_feedback_trigger);
 
         $answerFixation = new ilRadioGroupInputGUI(
@@ -1241,16 +1223,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $checkBoxEnableObligations->setChecked($this->testOBJ->areObligationsEnabled());
         $checkBoxEnableObligations->setInfo($this->lng->txt('tst_setting_enable_obligations_info'));
         $form->addItem($checkBoxEnableObligations);
-
-        // selector for unicode characters
-        if ($this->isCharSelectorPropertyRequired()) {
-            require_once 'Services/UIComponent/CharSelector/classes/class.ilCharSelectorGUI.php';
-            $char_selector = new ilCharSelectorGUI(ilCharSelectorConfig::CONTEXT_TEST);
-            $char_selector->getConfig()->setAvailability($this->testOBJ->getCharSelectorAvailability());
-            $char_selector->getConfig()->setDefinition($this->testOBJ->getCharSelectorDefinition());
-            $char_selector->addFormProperties($form);
-            $char_selector->setFormValues($form);
-        }
 
         if ($this->testOBJ->participantDataExist()) {
             $checkBoxOfferHints->setDisabled(true);
@@ -1308,15 +1280,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 
         if (!$this->testOBJ->participantDataExist() && $this->formPropertyExists($form, 'obligations_enabled')) {
             $this->testOBJ->setObligationsEnabled($form->getItemByPostVar('obligations_enabled')->getChecked());
-        }
-
-        if ($this->isCharSelectorPropertyRequired()) {
-            require_once 'Services/UIComponent/CharSelector/classes/class.ilCharSelectorGUI.php';
-            $char_selector = new ilCharSelectorGUI(ilCharSelectorConfig::CONTEXT_TEST);
-            $char_selector->addFormProperties($form);
-            $char_selector->getFormValues($form);
-            $this->testOBJ->setCharSelectorAvailability($char_selector->getConfig()->getAvailability());
-            $this->testOBJ->setCharSelectorDefinition($char_selector->getConfig()->getDefinition());
         }
     }
 
@@ -1441,11 +1404,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $enable_examview->setValue(1);
         $enable_examview->setChecked($this->testOBJ->getEnableExamview());
         $enable_examview->setInfo($this->lng->txt("enable_examview_desc"));
-        $show_examview_pdf = new ilCheckboxInputGUI('', 'show_examview_pdf');
-        $show_examview_pdf->setValue(1);
-        $show_examview_pdf->setChecked($this->testOBJ->getShowExamviewPdf());
-        $show_examview_pdf->setOptionTitle($this->lng->txt("show_examview_pdf"));
-        $enable_examview->addSubItem($show_examview_pdf);
         $form->addItem($enable_examview);
 
         // show final statement
@@ -1507,6 +1465,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $mailnottype = new ilCheckboxInputGUI('', "mailnottype");
         $mailnottype->setValue(1);
         $mailnottype->setOptionTitle($this->lng->txt("mailnottype"));
+        $mailnottype->setInfo($this->lng->txt("mailnottype_desc"));
         $mailnottype->setChecked($this->testOBJ->getMailNotificationType());
         $mailnotification->addSubItem($mailnottype);
     }
@@ -1518,7 +1477,6 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
     {
         if ($this->formPropertyExists($form, 'enable_examview')) {
             $this->testOBJ->setEnableExamview($form->getItemByPostVar('enable_examview')->getChecked());
-            $this->testOBJ->setShowExamviewPdf($form->getItemByPostVar('show_examview_pdf')->getChecked());
         }
 
         $this->testOBJ->setShowFinalStatement($form->getItemByPostVar('showfinalstatement')->getChecked());

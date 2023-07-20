@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -20,6 +22,8 @@
 namespace ILIAS\Skill\Service;
 
 use ILIAS\Skill\Profile;
+use ILIAS\Skill\Personal;
+use ILIAS\Skill\Resource;
 
 /**
  * Skill internal repo service
@@ -72,5 +76,20 @@ class SkillInternalRepoService
     public function getProfileCompletionRepo(): Profile\SkillProfileCompletionDBRepository
     {
         return new Profile\SkillProfileCompletionDBRepository();
+    }
+
+    public function getPersonalSkillRepo(): Personal\PersonalSkillDBRepository
+    {
+        return new Personal\PersonalSkillDBRepository($this->getTreeRepo());
+    }
+
+    public function getAssignedMaterialRepo(): Personal\AssignedMaterialDBRepository
+    {
+        return new Personal\AssignedMaterialDBRepository();
+    }
+
+    public function getResourceRepo(): Resource\SkillResourceDBRepository
+    {
+        return new Resource\SkillResourceDBRepository();
     }
 }

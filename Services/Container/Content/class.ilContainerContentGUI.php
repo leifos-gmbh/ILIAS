@@ -62,6 +62,8 @@ abstract class ilContainerContentGUI
     protected StandardGUIRequest $request;
     protected ItemManager $item_manager;
     protected BlockSessionRepository $block_repo;
+    protected int $block_limit = 0;
+    protected array $type_grps = [];
 
     public function __construct(ilContainerGUI $container_gui_obj)
     {
@@ -278,6 +280,13 @@ abstract class ilContainerContentGUI
             $this->container_gui,
             $this->getViewMode()
         );
+
+        // all event items are included per session rendering
+        // and should return true for hasItem
+        $event_items = ilEventItems::_getItemsOfContainer($this->container_obj->getRefId());
+        foreach ($event_items as $ev) {
+            $this->renderer->addItemId($ev);
+        }
     }
 
     /**
@@ -629,9 +638,9 @@ abstract class ilContainerContentGUI
         ilObjectActivation::addListGUIActivationProperty($item_list_gui, $a_item_data);
 
         $html = $item_list_gui->getListItemHTML(
-            $a_item_data['ref_id'],
-            $a_item_data['obj_id'],
-            $a_item_data['title'],
+            (int) $a_item_data['ref_id'],
+            (int) $a_item_data['obj_id'],
+            (string) $a_item_data['title'],
             (string) $a_item_data['description'],
             $asynch,
             false,

@@ -26,6 +26,8 @@
  */
 class ilObjBookingPoolGUI extends ilObjectGUI
 {
+    protected \ILIAS\BookingManager\InternalDomainService $domain;
+    protected ilCronManager $cron_manager;
     protected \ILIAS\BookingManager\StandardGUIRequest $book_request;
     protected \ILIAS\BookingManager\InternalService $service;
     protected ilTabsGUI $tabs;
@@ -58,6 +60,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                                   ->internal()
                                   ->gui()
                                   ->standardRequest();
+        $this->domain = $DIC->bookingManager()->internal()->domain();
 
         parent::__construct($a_data, $a_id, $a_call_by_reference, $a_prepare_output);
         $this->lng->loadLanguageModule("book");
@@ -89,6 +92,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             ilBookingObject::lookupPoolId($this->book_request->getObjectId()) !== $this->object->getId()) {
             throw new ilException("Booking Object ID does not match Booking Pool.");
         }
+        $this->cron_manager = $DIC->cron()->manager();
     }
 
     /**
@@ -280,14 +284,30 @@ class ilObjBookingPoolGUI extends ilObjectGUI
     public function editObject(): void
     {
         $this->showNoScheduleMessage();
-        parent::editObject();
+        if (!$this->checkPermissionBool("write")) {
+            $this->error->raiseError($this->lng->txt("msg_no_perm_write"), $this->error->MESSAGE);
+        }
+
+        $this->tabs_gui->activateTab("settings");
+
+        $form = $this->initEditForm();
+        $values = $this->getEditFormValues();
+        if ($values) {
+            $form->setValuesByArray($values, true);
+        }
+
+        $this->addExternalEditFormCustom($form);
+
+        $this->tpl->setContent($form->getHTML());
     }
 
     public function showNoScheduleMessage(): void
     {
+        $schedule_manager = $this->domain->schedules($this->object->getId());
+
         // if we have no schedules yet - show info
         if ($this->object->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE &&
-            !count(ilBookingSchedule::getList($this->object->getId()))) {
+            !$schedule_manager->hasSchedules()) {
             $this->tpl->setOnScreenMessage('info', $this->lng->txt("book_schedule_warning_edit"));
         }
     }
@@ -325,7 +345,11 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         // reminder
         $rmd = new ilCheckboxInputGUI($this->lng->txt("book_reminder_setting"), "rmd");
         $rmd->setChecked((bool) $this->object->getReminderStatus());
-        $rmd->setInfo($this->lng->txt("book_reminder_day_info"));
+        $info = $this->lng->txt("book_reminder_day_info");
+        if (!$this->cron_manager->isJobActive('book_notification')) {
+            $info .= " " . $this->lng->txt("book_notification_cron_not_active");
+        }
+        $rmd->setInfo($info);
         $fixed->addSubItem($rmd);
 
         $rmd_day = new ilNumberInputGUI($this->lng->txt("book_reminder_day"), "rmd_day");
@@ -368,9 +392,15 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $pref_deadline->setRequired(true);
         $pref->addSubItem($pref_deadline);
 
+
         $public = new ilCheckboxInputGUI($this->lng->txt("book_public_log"), "public");
         $public->setInfo($this->lng->txt("book_public_log_info"));
         $form->addItem($public);
+
+        // messages
+        $mess = new ilCheckboxInputGUI($this->lng->txt("book_messages"), "messages");
+        $mess->setInfo($this->lng->txt("book_messages_info"));
+        $form->addItem($mess);
 
         $this->lng->loadLanguageModule("rep");
         $section = new ilFormSectionHeaderGUI();
@@ -399,6 +429,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
     ): void {
         $a_values["online"] = !$this->object->isOffline();
         $a_values["public"] = $this->object->hasPublicLog();
+        $a_values["messages"] = $this->object->usesMessages();
         $a_values["stype"] = $this->object->getScheduleType();
         $a_values["limit"] = $this->object->getOverallLimit();
         $a_values["period"] = $this->object->getReservationFilterPeriod();
@@ -426,6 +457,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             $this->object->setReminderDay($form->getInput('rmd_day'));
             $this->object->setPublicLog($form->getInput('public'));
             $this->object->setScheduleType($form->getInput('stype'));
+            $this->object->setMessages((bool) (int) $form->getInput('messages'));
             $this->object->setOverallLimit($form->getInput('limit') ?: null);
             $this->object->setReservationFilterPeriod($form->getInput('period') != '' ? (int) $form->getInput('period') : null);
             $this->object->setPreferenceDeadline($pref_deadline);
@@ -650,33 +682,40 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $lg = parent::initHeaderAction($sub_type, $sub_id);
 
         if ($lg && $access->checkAccess("read", "", $this->ref_id)) {
-            // notification
-            if (!ilNotification::hasNotification(ilNotification::TYPE_BOOK, $user->getId(), $this->object->getId())) {
-                $lg->addHeaderIcon(
-                    "not_icon",
-                    ilUtil::getImagePath("notification_off.svg"),
-                    $lng->txt("noti_notification_deactivated")
+            if ($this->object->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE &&
+                $this->object->getReminderStatus()) {
+                // notification
+                if (!ilNotification::hasNotification(
+                    ilNotification::TYPE_BOOK,
+                    $user->getId(),
+                    $this->object->getId()
+                )) {
+                    $lg->addHeaderIcon(
+                        "not_icon",
+                        ilUtil::getImagePath("notification_off.svg"),
+                        $lng->txt("noti_notification_deactivated")
+                    );
+
+                    $ctrl->setParameter($this, "ntf", 1);
+                    $caption = "noti_activate_notification";
+                } else {
+                    $lg->addHeaderIcon(
+                        "not_icon",
+                        ilUtil::getImagePath("notification_on.svg"),
+                        $lng->txt("noti_notification_activated")
+                    );
+
+                    $ctrl->setParameter($this, "ntf", 0);
+                    $caption = "noti_deactivate_notification";
+                }
+
+                $lg->addCustomCommand(
+                    $ctrl->getLinkTarget($this, "saveNotification"),
+                    $caption
                 );
 
-                $ctrl->setParameter($this, "ntf", 1);
-                $caption = "noti_activate_notification";
-            } else {
-                $lg->addHeaderIcon(
-                    "not_icon",
-                    ilUtil::getImagePath("notification_on.svg"),
-                    $lng->txt("noti_notification_activated")
-                );
-
-                $ctrl->setParameter($this, "ntf", 0);
-                $caption = "noti_deactivate_notification";
+                $ctrl->setParameter($this, "ntf", "");
             }
-
-            $lg->addCustomCommand(
-                $ctrl->getLinkTarget($this, "saveNotification"),
-                $caption
-            );
-
-            $ctrl->setParameter($this, "ntf", "");
         }
 
         return $lg;

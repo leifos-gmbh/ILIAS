@@ -1,17 +1,20 @@
 <?php
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 class ilTestResultsImportParser extends ilSaxParser
 {
     private $tst_obj;
@@ -91,9 +94,6 @@ class ilTestResultsImportParser extends ilSaxParser
     {
         global $DIC;
         $ilDB = $DIC['ilDB'];
-
-        $this->depth[$a_xml_parser]++;
-        $this->path[$this->depth[$a_xml_parser]] = strtolower($a_name);
 
         switch (strtolower($a_name)) {
             case "results":
@@ -294,7 +294,7 @@ class ilTestResultsImportParser extends ilSaxParser
     private function fetchLastFinishedPass($attribs): ?int
     {
         if (isset($attribs['last_finished_pass'])) {
-            return $attribs['last_finished_pass'];
+            return (int) $attribs['last_finished_pass'];
         }
 
         if ($attribs['tries'] > 0) {

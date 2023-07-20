@@ -31,7 +31,7 @@ use ILIAS\Survey\InternalDomainService;
 class SettingsFormGUI
 {
     protected InternalGUIService $ui_service;
-    protected \ilObjectServiceInterface $object_service;
+    protected \ilObjectService $object_service;
     protected \ilObjSurvey $survey;
     protected UIModifier $modifier;
     protected InternalDomainService $domain_service;
@@ -42,7 +42,7 @@ class SettingsFormGUI
     public function __construct(
         InternalGUIService $ui_service,
         InternalDomainService $domain_service,
-        \ilObjectServiceInterface $object_service,
+        \ilObjectService $object_service,
         \ilObjSurvey $survey,
         UIModifier $modifier
     ) {
@@ -324,13 +324,15 @@ class SettingsFormGUI
         $intro->setValue($survey->prepareTextareaOutput($survey->getIntroduction()));
         $intro->setRows(10);
         $intro->setCols(80);
-        $intro->setUseRte(true);
         $intro->setInfo($lng->txt("survey_introduction_info"));
-        $intro->setRteTags(\ilObjAdvancedEditing::_getUsedHTMLTags("survey"));
-        $intro->addPlugin("latex");
-        $intro->addButton("latex");
-        $intro->addButton("pastelatex");
-        $intro->setRTESupport($survey->getId(), "svy", "survey", null);
+        if (\ilObjAdvancedEditing::_getRichTextEditor() === "tinymce") {
+            $intro->setUseRte(true);
+            $intro->setRteTags(\ilObjAdvancedEditing::_getUsedHTMLTags("survey"));
+            $intro->addPlugin("latex");
+            $intro->addButton("latex");
+            $intro->addButton("pastelatex");
+            $intro->setRTESupport($survey->getId(), "svy", "survey", null);
+        }
         $form->addItem($intro);
 
         return $form;
@@ -450,12 +452,14 @@ class SettingsFormGUI
         $finalstatement->setValue($survey->prepareTextareaOutput($survey->getOutro()));
         $finalstatement->setRows(10);
         $finalstatement->setCols(80);
-        $finalstatement->setUseRte(true);
-        $finalstatement->setRteTags(\ilObjAdvancedEditing::_getUsedHTMLTags("survey"));
-        $finalstatement->addPlugin("latex");
-        $finalstatement->addButton("latex");
-        $finalstatement->addButton("pastelatex");
-        $finalstatement->setRTESupport($survey->getId(), "svy", "survey", null);
+        if (\ilObjAdvancedEditing::_getRichTextEditor() === "tinymce") {
+            $finalstatement->setUseRte(true);
+            $finalstatement->setRteTags(\ilObjAdvancedEditing::_getUsedHTMLTags("survey"));
+            $finalstatement->addPlugin("latex");
+            $finalstatement->addButton("latex");
+            $finalstatement->addButton("pastelatex");
+            $finalstatement->setRTESupport($survey->getId(), "svy", "survey", null);
+        }
         $form->addItem($finalstatement);
 
         // mail notification
@@ -503,7 +507,7 @@ class SettingsFormGUI
         if ($feature_config->supportsTutorNotification()) {
             $num_inv = count($invitation_manager->getAllForSurvey($survey->getSurveyId()));
 
-            // notification
+            // notification, if "all participants" have finished the survey
             $tut = new \ilCheckboxInputGUI($lng->txt("survey_notification_tutor_setting"), "tut");
             $tut->setChecked($survey->getTutorNotificationStatus());
             $form->addItem($tut);
@@ -526,11 +530,13 @@ class SettingsFormGUI
             $tut_ids->setValue(array_shift($tut_logins));
             $tut->addSubItem($tut_ids);
 
+            // radio to define who are "all participants"
             $tut_grp = new \ilRadioGroupInputGUI($lng->txt("survey_notification_target_group"), "tut_grp");
             $tut_grp->setRequired(true);
             $tut_grp->setValue((string) $survey->getTutorNotificationTarget());
             $tut->addSubItem($tut_grp);
 
+            // (a) ... the member of the parent group or course
             $tut_grp_crs = new \ilRadioOption(
                 $lng->txt("survey_notification_target_group_parent_course"),
                 (string) \ilObjSurvey::NOTIFICATION_PARENT_COURSE
@@ -545,6 +551,7 @@ class SettingsFormGUI
             }
             $tut_grp->addOption($tut_grp_crs);
 
+            // (b) ... all invited users
             $tut_grp_inv = new \ilRadioOption(
                 $lng->txt("survey_notification_target_group_invited"),
                 (string) \ilObjSurvey::NOTIFICATION_INVITED_USERS
@@ -820,13 +827,13 @@ class SettingsFormGUI
             $survey->setReminderStatus(false);
         }
 
-        if (!$feature_config->supportsTutorNotification()) {
+        if ($feature_config->supportsTutorNotification()) {
             // "one mail after all participants finished"
             if ($form->getInput("tut")) {
                 $tut_ids = $this->getTutorIdsFromForm($form);
                 $survey->setTutorNotificationStatus(true);
                 $survey->setTutorNotificationRecipients($tut_ids); // see above
-                $survey->setTutorNotificationTarget($form->getInput("tut_grp"));
+                $survey->setTutorNotificationTarget((int) $form->getInput("tut_grp"));
             } else {
                 $survey->setTutorNotificationStatus(false);
             }

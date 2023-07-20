@@ -15,7 +15,6 @@
  *
  *********************************************************************/
 
-
 /**
 * Class ilTestEvaluationUserData
 *
@@ -26,9 +25,7 @@
 * @defgroup ModulesTest Modules/Test
 * @extends ilObject
 */
-
-include_once "./Services/Object/classes/class.ilObject.php";
-include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
+require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
 class ilTestEvaluationUserData
 {
@@ -213,7 +210,7 @@ class ilTestEvaluationUserData
 
     public function getLogin(): string
     {
-        return $this->login;
+        return $this->login ?? '';
     }
 
     public function setLogin($a_login): void
@@ -397,27 +394,28 @@ class ilTestEvaluationUserData
         }
     }
     /**
-         * todo: this is used in the export and the scored pass differs from the result cache if the best pass is scored
-         * here: the last one of equal passes wins. In tst_result_cache the first one of equal passes wins
-         * @see \DBUpdateTestResultCalculator::_getBestPass
-        */
-    public function getBestPass(): int
+     * This is used in the export of test results
+     * Aligned with ilObjTest::_getBestPass: from passes with equal points the first one wins
+    */
+    public function getBestPass()
     {
         $bestpoints = 0;
-        $bestpass = 0;
+        $bestpass = null;
 
         $obligationsAnsweredPassExists = $this->doesObligationsAnsweredPassExist();
 
         foreach ($this->passes as $pass) {
             $reached = $this->getReachedPointsInPercentForPass($pass->getPass());
-            // todo: use > instead of >=
-            if ($reached >= $bestpoints && ($pass->areObligationsAnswered() || !$obligationsAnsweredPassExists)) {
+
+            if (($reached > $bestpoints
+                && ($pass->areObligationsAnswered() || !$obligationsAnsweredPassExists))
+                || !isset($bestpass)) {
                 $bestpoints = $reached;
                 $bestpass = $pass->getPass();
             }
         }
 
-        return $bestpass;
+        return (int) $bestpass;
     }
 
     public function getLastPass()
@@ -542,7 +540,7 @@ class ilTestEvaluationUserData
         $this->user_id = $a_usr_id;
     }
 
-    public function getUserID(): int
+    public function getUserID(): ?int
     {
         return $this->user_id;
     }

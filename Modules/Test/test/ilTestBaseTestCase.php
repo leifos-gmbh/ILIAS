@@ -192,6 +192,11 @@ class ilTestBaseTestCase extends TestCase
         $this->setGlobalVariable("ilDB", $this->createMock(ilDBInterface::class));
     }
 
+    protected function addGlobal_ilBench(): void
+    {
+        $this->setGlobalVariable("ilBench", $this->createMock(ilBenchmark::class));
+    }
+
     protected function addGlobal_ilLog(): void
     {
         $this->setGlobalVariable("ilLog", $this->createMock(ilLogger::class));
@@ -207,6 +212,11 @@ class ilTestBaseTestCase extends TestCase
         $this->setGlobalVariable("ilErr", $this->createMock(ilErrorHandling::class));
     }
 
+    protected function addGlobal_GlobalScreenService(): void
+    {
+        $this->setGlobalVariable("global_screen", $this->createMock(ILIAS\GlobalScreen\Services::class));
+    }
+
     protected function addGlobal_ilAppEventHandler(): void
     {
         $this->setGlobalVariable("ilAppEventHandler", $this->createMock(ilAppEventHandler::class));
@@ -220,6 +230,11 @@ class ilTestBaseTestCase extends TestCase
     protected function addGlobal_ilComponentRepository(): void
     {
         $this->setGlobalVariable("component.repository", $this->createMock(ilComponentRepository::class));
+    }
+
+    protected function addGlobal_ilComponentFactory(): void
+    {
+        $this->setGlobalVariable("component.factory", $this->createMock(ilComponentFactory::class));
     }
 
     protected function addGlobal_ilTabs(): void
@@ -264,7 +279,12 @@ class ilTestBaseTestCase extends TestCase
 
     protected function addGlobal_ilHelp(): void
     {
-        $this->setGlobalVariable("ilHelp", $this->createMock(ilHelp::class));
+        $this->setGlobalVariable("ilHelp", $this->createMock(ilHelpGUI::class));
+    }
+
+    protected function addGlobal_ui(): void
+    {
+        $this->setGlobalVariable("ui", $this->createMock(ILIAS\DI\UIServices::class));
     }
 
     protected function addGlobal_uiFactory(): void

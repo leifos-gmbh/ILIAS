@@ -1,8 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-include_once('./Services/Table/classes/class.ilTable2GUI.php');
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
 *
@@ -30,6 +42,7 @@ class ilQuestionPoolPrintViewTableGUI extends ilTable2GUI
         $this->lng = $lng;
         $this->ctrl = $ilCtrl;
         $this->outputmode = $outputmode;
+        $this->ctrl->setParameterByClass('ilObjQuestionPoolGUI', 'output', $outputmode);
 
         $this->setFormName('printviewform');
         $this->setStyle('table', 'fullwidth');
@@ -41,11 +54,9 @@ class ilQuestionPoolPrintViewTableGUI extends ilTable2GUI
         $this->setFormAction($this->ctrl->getFormAction($a_parent_obj, $a_parent_cmd));
         $this->setDefaultOrderField("title");
         $this->setDefaultOrderDirection("asc");
-        $this->setLimit(999);
 
         $this->enable('sort');
         $this->enable('header');
-        //		$this->disable('numinfo');
         $this->disable('select_all');
     }
 
@@ -158,11 +169,10 @@ class ilQuestionPoolPrintViewTableGUI extends ilTable2GUI
         }
         if ((strcmp($this->outputmode, "detailed") == 0) || (strcmp($this->outputmode, "detailed_printview") == 0)) {
             $this->tpl->setCurrentBlock("overview_row_detail");
-            include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
             $question_gui = assQuestion::instantiateQuestionGUI($a_set["question_id"]);
             $question_gui->setRenderPurpose(assQuestionGUI::RENDER_PURPOSE_PREVIEW);
             if (strcmp($this->outputmode, "detailed") == 0) {
-                $solutionoutput = $question_gui->getSolutionOutput($active_id = "", $pass = null, $graphicalOutput = false, $result_output = false, $show_question_only = false, $show_feedback = false, $show_correct_solution = true, $show_manual_scoring = false);
+                $solutionoutput = $question_gui->getSolutionOutput("", null, false, false, false, false, true, false);
                 if (strlen($solutionoutput) == 0) {
                     $solutionoutput = $question_gui->getPreview();
                 }

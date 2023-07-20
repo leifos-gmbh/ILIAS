@@ -51,6 +51,7 @@ class ilObjLanguageDBAccess
         $lang_array["common"] = array();
 
         $double_checker = [];
+        $query_check = false;
         $query = "INSERT INTO lng_data (module,identifier,lang_key,value,local_change,remarks) VALUES ";
         foreach ($this->content as $val) {
             // split the line of the language file
@@ -68,14 +69,14 @@ class ilObjLanguageDBAccess
             // check if the value has a local change
             $local_value = $this->local_changes[$separated[0]][$separated[1]] ?? "";
 
-            if (empty($scope)) {
+            if (empty($this->scope)) {
                 // import of a global language file
                 if ($local_value !== "" && $local_value !== $separated[2]) {
                     // keep an existing and different local value
                     $lang_array[$separated[0]][$separated[1]] = $local_value;
                     continue;
                 }
-            } elseif ($scope === "local") {
+            } elseif ($this->scope === "local") {
                 // import of a local language file
                 if ($local_value !== "") {
                     // keep a locally changed value that is newer than the file
@@ -103,11 +104,13 @@ class ilObjLanguageDBAccess
                 $this->ilDB->quote($this->change_date, "timestamp"),
                 $this->ilDB->quote($separated[3] ?? null, "text")
             );
-
+            $query_check = true;
             $lang_array[$separated[0]][$separated[1]] = $separated[2];
         }
         $query = rtrim($query, ",") . " ON DUPLICATE KEY UPDATE value=VALUES(value),remarks=VALUES(remarks);";
-        $this->ilDB->manipulate($query);
+        if ($query_check) {
+            $this->ilDB->manipulate($query);
+        }
 
         return $lang_array;
     }
@@ -116,8 +119,9 @@ class ilObjLanguageDBAccess
     {
         // avoid flushing the whole cache (see mantis #28818)
         ilCachedLanguage::getInstance($this->key)->deleteInCache();
-
+    
         $query = "INSERT INTO lng_modules (module, lang_key, lang_array) VALUES ";
+        $modules_to_delete = [];
         foreach ($lang_array as $module => $lang_arr) {
             if ($this->scope === "local") {
                 $q = "SELECT * FROM lng_modules WHERE " .
@@ -136,10 +140,12 @@ class ilObjLanguageDBAccess
                 $this->ilDB->quote($this->key, "text"),
                 $this->ilDB->quote(serialize($lang_arr), "clob"),
             );
+            $modules_to_delete[] = $module;
         }
-        $this->ilDB->manipulate(sprintf(
-            "DELETE FROM lng_modules WHERE lang_key = %s",
-            $this->ilDB->quote($this->key, "text"),
+
+        $inModulesToDelete = $this->ilDB->in('module', $modules_to_delete, false, 'text');
+        $this->ilDB->manipulate(sprintf("DELETE FROM lng_modules WHERE lang_key = %s AND $inModulesToDelete",
+            $this->ilDB->quote($this->key, "text")
         ));
 
         $query = rtrim($query, ",") . ";";

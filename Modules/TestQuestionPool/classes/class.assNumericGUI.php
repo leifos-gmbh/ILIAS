@@ -12,7 +12,8 @@
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
@@ -44,7 +45,6 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
     public function __construct($id = -1)
     {
         parent::__construct();
-        require_once './Modules/TestQuestionPool/classes/class.assNumeric.php';
         $this->object = new assNumeric();
         if ($id >= 0) {
             $this->object->loadFromDb($id);
@@ -66,7 +66,6 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
     {
         $hasErrors = (!$always) ? $this->editQuestion(true) : false;
         if (!$hasErrors) {
-            require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
             $this->writeQuestionGenericPostData();
             $this->writeQuestionSpecificPostData(new ilPropertyFormGUI());
             $this->writeAnswerSpecificPostData(new ilPropertyFormGUI());
@@ -88,7 +87,6 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
         $save = $this->isSaveCommand();
         $this->getQuestionTemplate();
 
-        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new ilPropertyFormGUI();
         $this->editForm = $form;
 
@@ -142,7 +140,6 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
     */
     public function checkRange($lower, $upper): bool
     {
-        include_once "./Services/Math/classes/class.EvalMath.php";
         $eval = new EvalMath();
         $eval->suppress_errors = true;
         if (($eval->e($lower) !== false) and ($eval->e($upper) !== false)) {
@@ -188,7 +185,6 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
         }
 
         // generate the question output
-        require_once './Services/UICore/classes/class.ilTemplate.php';
         $template = new ilTemplate("tpl.il_as_qpl_numeric_output_solution.html", true, true, "Modules/TestQuestionPool");
         $solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", true, true, "Modules/TestQuestionPool");
         if (is_array($solutions)) {
@@ -199,18 +195,14 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
                     } else {
                         $reached_points = $this->object->calculateReachedPoints($active_id, $pass);
                     }
-                    // output of ok/not ok icons for user entered solutions
+
+                    $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_NOT_OK);
                     if ($reached_points == $this->object->getMaximumPoints()) {
-                        $template->setCurrentBlock("icon_ok");
-                        $template->setVariable("ICON_OK", ilUtil::getImagePath("icon_ok.svg"));
-                        $template->setVariable("TEXT_OK", $this->lng->txt("answer_is_right"));
-                        $template->parseCurrentBlock();
-                    } else {
-                        $template->setCurrentBlock("icon_ok");
-                        $template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_not_ok.svg"));
-                        $template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_wrong"));
-                        $template->parseCurrentBlock();
+                        $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_OK);
                     }
+                    $template->setCurrentBlock("icon_ok");
+                    $template->setVariable("ICON_OK", $correctness_icon);
+                    $template->parseCurrentBlock();
                 }
             }
             foreach ($solutions as $solution) {
@@ -256,7 +248,6 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
     public function getPreview($show_question_only = false, $showInlineFeedback = false): string
     {
         // generate the question output
-        require_once './Services/UICore/classes/class.ilTemplate.php';
         $template = new ilTemplate("tpl.il_as_qpl_numeric_output.html", true, true, "Modules/TestQuestionPool");
         if (is_object($this->getPreviewSession())) {
             $template->setVariable("NUMERIC_VALUE", " value=\"" . $this->getPreviewSession()->getParticipantsSolution() . "\"");
@@ -292,18 +283,10 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
                 array('value1' => $use_post_solutions['numeric_result'])
             );
         } elseif ($active_id) {
-            // hey: prevPassSolutions - obsolete due to central check
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
             $solutions = $this->object->getTestOutputSolutions($active_id, $pass);
-            // hey.
         }
 
         // generate the question output
-        require_once './Services/UICore/classes/class.ilTemplate.php';
         $template = new ilTemplate("tpl.il_as_qpl_numeric_output.html", true, true, "Modules/TestQuestionPool");
         if (is_array($solutions)) {
             foreach ($solutions as $solution) {
@@ -338,7 +321,7 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
     {
         $this->object->setLowerLimit($_POST['lowerlimit']);
         $this->object->setUpperLimit($_POST['upperlimit']);
-        $this->object->setPoints((float)$_POST['points']);
+        $this->object->setPoints((float) str_replace(',', '.', $_POST['points']));
     }
 
     public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form): ilPropertyFormGUI
@@ -543,8 +526,8 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
      */
     public function saveCorrectionsFormProperties(ilPropertyFormGUI $form): void
     {
-        $this->object->setPoints((float) $form->getInput('points'));
-        $this->object->setLowerLimit((float) $form->getInput('lowerlimit'));
-        $this->object->setUpperLimit((float) $form->getInput('upperlimit'));
+        $this->object->setPoints((float) str_replace(',', '.', $form->getInput('points')));
+        $this->object->setLowerLimit((float) str_replace(',', '.', $form->getInput('lowerlimit')));
+        $this->object->setUpperLimit((float) str_replace(',', '.', $form->getInput('upperlimit')));
     }
 }

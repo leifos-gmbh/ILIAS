@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 /**
  * Class ilAuthProviderSaml
  */
@@ -31,6 +31,7 @@ final class ilAuthProviderSaml extends ilAuthProvider implements ilAuthProviderA
     private const SESSION_TMP_RETURN_TO = 'tmp_return_to';
 
     private ilSamlIdp $idp;
+    private readonly ilLanguage $lng;
     /** @var array<string, mixed> */
     private array $attributes = [];
     private string $return_to = '';
@@ -40,7 +41,11 @@ final class ilAuthProviderSaml extends ilAuthProvider implements ilAuthProviderA
 
     public function __construct(ilAuthCredentials $credentials, ?int $a_idp_id = null)
     {
+        global $DIC;
+
         parent::__construct($credentials);
+
+        $this->lng = $DIC->language();
 
         if (null === $a_idp_id || 0 === $a_idp_id) {
             $this->idp = ilSamlIdp::getFirstActiveIdp();
@@ -309,7 +314,13 @@ final class ilAuthProviderSaml extends ilAuthProvider implements ilAuthProviderA
             $login = $a_user_data[$this->idp->getLoginClaim()][0];
             $login = ilAuthUtils::_generateLogin($login);
 
-            $xml_writer->xmlStartTag('User', ['Action' => 'Insert']);
+            $xml_writer->xmlStartTag(
+                'User',
+                [
+                    'Action' => 'Insert',
+                    'Language' => $this->lng->getDefaultLanguage()
+                ]
+            );
             $xml_writer->xmlElement('Login', [], $login);
 
             $xml_writer->xmlElement('Role', [
@@ -386,23 +397,12 @@ final class ilAuthProviderSaml extends ilAuthProvider implements ilAuthProviderA
         switch (strtolower($rule->getAttribute())) {
             case 'gender':
                 $gender_attr = 'Gender';
-                switch (strtolower($value)) {
-                    case 'n':
-                    case 'neutral':
-                        $xml_writer->xmlElement($gender_attr, [], 'n');
-                        break;
-
-                    case 'm':
-                    case 'male':
-                        $xml_writer->xmlElement($gender_attr, [], 'm');
-                        break;
-
-                    case 'f':
-                    case 'female':
-                    default:
-                        $xml_writer->xmlElement($gender_attr, [], 'f');
-                        break;
-                }
+                match (strtolower($value)) {
+                    'n', 'neutral' => $xml_writer->xmlElement($gender_attr, [], 'n'),
+                    'm', 'male' => $xml_writer->xmlElement($gender_attr, [], 'm'),
+                    // no break
+                    default => $xml_writer->xmlElement($gender_attr, [], 'f'),
+                };
                 break;
 
             case 'firstname':

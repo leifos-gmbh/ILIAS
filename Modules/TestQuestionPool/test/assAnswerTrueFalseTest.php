@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Unit tests
@@ -21,9 +35,6 @@ class assAnswerTrueFalseTest extends assBaseTestCase
 
     public function test_instantiateObject_shouldReturnInstance(): void
     {
-        // Arrange
-        require_once './Modules/TestQuestionPool/classes/class.assAnswerTrueFalse.php';
-
         // Act
         $instance = new ASS_AnswerTrueFalse();
 
@@ -32,8 +43,6 @@ class assAnswerTrueFalseTest extends assBaseTestCase
 
     public function test_setGetCorrectness_shouldReturnUnchangedState(): void
     {
-        // Arrange
-        require_once './Modules/TestQuestionPool/classes/class.assAnswerTrueFalse.php';
         $instance = new ASS_AnswerTrueFalse();
         $expected = true;
 
@@ -47,8 +56,6 @@ class assAnswerTrueFalseTest extends assBaseTestCase
 
     public function test_isTrue_shouldReturnTrue(): void
     {
-        // Arrange
-        require_once './Modules/TestQuestionPool/classes/class.assAnswerTrueFalse.php';
         $instance = new ASS_AnswerTrueFalse();
         $expected = true;
 
@@ -62,8 +69,6 @@ class assAnswerTrueFalseTest extends assBaseTestCase
 
     public function test_isFalse_shouldReturnFalseOnTrueState(): void
     {
-        // Arrange
-        require_once './Modules/TestQuestionPool/classes/class.assAnswerTrueFalse.php';
         $instance = new ASS_AnswerTrueFalse();
         $expected = false;
 
@@ -77,8 +82,6 @@ class assAnswerTrueFalseTest extends assBaseTestCase
 
     public function test_setFalseGetCorrectness_shouldReturnFalse(): void
     {
-        // Arrange
-        require_once './Modules/TestQuestionPool/classes/class.assAnswerTrueFalse.php';
         $instance = new ASS_AnswerTrueFalse();
         $expected = false;
 
@@ -92,8 +95,6 @@ class assAnswerTrueFalseTest extends assBaseTestCase
 
     public function test_setTrueIsTrue_shouldReturnUnchangedState(): void
     {
-        // Arrange
-        require_once './Modules/TestQuestionPool/classes/class.assAnswerTrueFalse.php';
         $instance = new ASS_AnswerTrueFalse();
         $expected = true;
 
@@ -107,8 +108,6 @@ class assAnswerTrueFalseTest extends assBaseTestCase
 
     public function test_setFalseIsFalse_shouldReturnUnchangedState(): void
     {
-        // Arrange
-        require_once './Modules/TestQuestionPool/classes/class.assAnswerTrueFalse.php';
         $instance = new ASS_AnswerTrueFalse();
         $expected = true;
 

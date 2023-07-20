@@ -2,7 +2,22 @@
 
 declare(strict_types=1);
 
-/* Copyright (c) 1998-2012 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 
 use ILIAS\Refinery\Factory as RefineryFactory;
 use ILIAS\HTTP\Services as HttpServices;
@@ -186,7 +201,6 @@ class ilCalendarSelectionBlockGUI extends ilBlockGUI
             $tmp_arr['title'] = (string) $category['title'];
             $tmp_arr['type'] = (string) $category['type'];
             $tmp_arr['source_ref_id'] = (int) ($category['source_ref_id'] ?? 0);
-
             $tmp_arr['default_selected'] = true;
             if ($this->category_id) {
                 if ($this->category_id == $category['cat_id']) {
@@ -266,6 +280,11 @@ class ilCalendarSelectionBlockGUI extends ilBlockGUI
      */
     protected function buildPath($a_ref_id): string
     {
+        $obj_type = ilObject::_lookupType($a_ref_id, true);
+        if (!$this->obj_def->isAllowedInRepository($obj_type)) {
+            return '';
+        }
+
         $path_arr = $this->tree->getPathFull($a_ref_id, ROOT_FOLDER_ID);
         $counter = 0;
         unset($path_arr[count($path_arr) - 1]);
@@ -325,10 +344,15 @@ class ilCalendarSelectionBlockGUI extends ilBlockGUI
         $a_tpl->setCurrentBlock("item");
 
         $a_tpl->setVariable('VAL_ID', $a_set['id']);
-        if ($this->obj_id == 0) {
+        if ($this->obj_id === 0 && $this->category_id === 0) {
             if (!$a_set['hidden'] && $a_set['default_selected']) {
                 $a_tpl->setVariable('VAL_CHECKED', 'checked="checked"');
             }
+        } elseif ($this->obj_id === 0 && $this->category_id > 0) {
+            if (!$a_set['hidden'] && $a_set['default_selected']) {
+                $a_tpl->setVariable('VAL_CHECKED', 'checked="checked"');
+            }
+            $a_tpl->setVariable('VAL_DISABLED', 'disabled');
         } elseif ($a_set["obj_id"] == $this->obj_id) {
             // if calendar is shown and repo object id (course group given)
             $a_tpl->setVariable('VAL_CHECKED', 'checked="checked"');
@@ -338,15 +362,16 @@ class ilCalendarSelectionBlockGUI extends ilBlockGUI
         }
         $a_tpl->setVariable('BGCOLOR', $a_set['color']);
 
+        $obj_type = ilObject::_lookupType($a_set['obj_id']);
         if (
             ($a_set['type'] == ilCalendarCategory::TYPE_OBJ) &&
-            $a_set['ref_id']
+            ($a_set['ref_id'] ?? false)
         ) {
             if (!$this->ref_id) {
                 $this->ctrl->setParameterByClass('ilcalendarpresentationgui', 'backpd', 1);
             }
             $this->ctrl->setParameterByClass('ilcalendarpresentationgui', 'ref_id', $a_set['ref_id']);
-            switch (ilObject::_lookupType($a_set['obj_id'])) {
+            switch ($obj_type) {
                 case 'crs':
                     $link = $this->ctrl->getLinkTargetByClass(
                         [
@@ -367,6 +392,12 @@ class ilCalendarSelectionBlockGUI extends ilBlockGUI
                         ],
                         ''
                     );
+                    break;
+
+                case 'tals':
+                    $this->ctrl->setParameterByClass("ilcalendarpresentationgui", 'category_id', $a_set['id']);
+                    $link = $this->ctrl->getLinkTargetByClass("ilcalendarpresentationgui", '');
+                    $this->ctrl->setParameterByClass("ilcalendarpresentationgui", 'category_id', $this->category_id);
                     break;
 
                 default:
@@ -400,15 +431,14 @@ class ilCalendarSelectionBlockGUI extends ilBlockGUI
                 break;
 
             case ilCalendarCategory::TYPE_OBJ:
-                $type = ilObject::_lookupType($a_set['obj_id']);
-                $a_tpl->setVariable('IMG_SRC', ilUtil::getImagePath('icon_' . $type . '.svg'));
-                $a_tpl->setVariable('IMG_ALT', $this->lng->txt('cal_type_' . $type));
+                $img_type = $obj_type === 'tals' ? 'etal' : $obj_type;
+                $a_tpl->setVariable('IMG_SRC', ilUtil::getImagePath('icon_' . $img_type . '.svg'));
+                $a_tpl->setVariable('IMG_ALT', $this->lng->txt('cal_type_' . $obj_type));
                 break;
 
             case ilCalendarCategory::TYPE_BOOK:
-                $type = ilObject::_lookupType($a_set['obj_id']);
                 $a_tpl->setVariable('IMG_SRC', ilUtil::getImagePath('icon_book.svg'));
-                $a_tpl->setVariable('IMG_ALT', $this->lng->txt('cal_type_' . $type));
+                $a_tpl->setVariable('IMG_ALT', $this->lng->txt('cal_type_' . $obj_type));
                 break;
 
             case ilCalendarCategory::TYPE_CH:

@@ -1,9 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-
-include_once('./Services/Table/classes/class.ilTable2GUI.php');
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
 *
@@ -15,7 +26,7 @@ include_once('./Services/Table/classes/class.ilTable2GUI.php');
 
 class ilTestInviteGroupsTableGUI extends ilTable2GUI
 {
-    public function __construct($a_parent_obj, $a_parent_cmd)
+    public function __construct(ilObjTestGUI $a_parent_obj, string $a_parent_cmd)
     {
         parent::__construct($a_parent_obj, $a_parent_cmd);
 
@@ -25,7 +36,6 @@ class ilTestInviteGroupsTableGUI extends ilTable2GUI
 
         $this->lng = $lng;
         $this->ctrl = $ilCtrl;
-        $this->counter = 1;
 
         $this->setFormName('invitegroups');
         $this->setStyle('table', 'fullwidth');
@@ -52,7 +62,7 @@ class ilTestInviteGroupsTableGUI extends ilTable2GUI
         $this->enable('select_all');
     }
 
-    public function fillRow(array $a_set): void
+    protected function fillRow(array $a_set): void
     {
         $this->tpl->setVariable("GROUP_ID", $a_set['ref_id']);
         $this->tpl->setVariable("TITLE", $a_set['title']);

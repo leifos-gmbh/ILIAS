@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -79,7 +81,8 @@ class ilBlogExporter extends ilXmlExporter
         $res[] = array(
             "component" => "Services/Object",
             "entity" => "common",
-            "ids" => $a_ids);
+            "ids" => $a_ids
+        );
 
         return $res;
     }
@@ -97,19 +100,27 @@ class ilBlogExporter extends ilXmlExporter
         string $a_entity
     ): array {
         return array(
-                "4.3.0" => array(
-                        "namespace" => "https://www.ilias.de/Modules/Blog/4_3",
-                        "xsd_file" => "ilias_blog_4_3.xsd",
-                        "uses_dataset" => true,
-                        "min" => "4.3.0",
-                        "max" => "4.9.9"),
-                "5.0.0" => array(
-                        "namespace" => "https://www.ilias.de/Modules/Blog/5_0",
-                        "xsd_file" => "ilias_blog_5_0.xsd",
-                        "uses_dataset" => true,
-                        "min" => "5.0.0",
-                        "max" => "")
-
+            "5.3.0" => array(
+                "namespace" => "https://www.ilias.de/Modules/Blog/5_0",
+                "xsd_file" => "ilias_blog_5_0.xsd",
+                "uses_dataset" => true,
+                "min" => "5.3.0",
+                "max" => ""
+            ),
+            "5.0.0" => array(
+                "namespace" => "https://www.ilias.de/Modules/Blog/5_0",
+                "xsd_file" => "ilias_blog_5_0.xsd",
+                "uses_dataset" => true,
+                "min" => "5.0.0",
+                "max" => "5.2.99"
+            ),
+            "4.3.0" => array(
+                "namespace" => "https://www.ilias.de/Modules/Blog/4_3",
+                "xsd_file" => "ilias_blog_4_3.xsd",
+                "uses_dataset" => true,
+                "min" => "4.3.0",
+                "max" => "4.9.9"
+            )
         );
     }
 }

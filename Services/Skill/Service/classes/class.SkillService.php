@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +20,8 @@
  */
 
 namespace ILIAS\Skill\Service;
+
+use ILIAS\Container\Skills\ContainerSkillInternalService;
 
 /**
  * Skill service
@@ -39,7 +43,7 @@ class SkillService implements SkillServiceInterface
 
         $this->repository_tree = $DIC->repositoryTree();
         $skmg_obj = current(\ilObject::_getObjectsByType("skmg"));
-        $this->skmg_ref_id = (int) current(\ilObject::_getAllReferences($skmg_obj["obj_id"]));
+        $this->skmg_ref_id = (int) current(\ilObject::_getAllReferences((int) $skmg_obj["obj_id"]));
         $this->rbac_system = $DIC->rbac()->system();
         $this->usr_id = $DIC->user()->getId();
     }
@@ -77,6 +81,14 @@ class SkillService implements SkillServiceInterface
     }
 
     /**
+     * External personal service facade
+     */
+    public function personal(): SkillPersonalService
+    {
+        return new SkillPersonalService($this->internal());
+    }
+
+    /**
      * @inheritDoc
      */
     public function internal(): SkillInternalService
@@ -87,5 +99,13 @@ class SkillService implements SkillServiceInterface
             $this->rbac_system,
             $this->usr_id
         );
+    }
+
+    /**
+     * Internal service for Skill classes in Container Service
+     */
+    public function internalContainer(): ContainerSkillInternalService
+    {
+        return new ContainerSkillInternalService();
     }
 }

@@ -1,12 +1,25 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once 'Modules/Test/classes/toolbars/class.ilTestSkillEvaluationToolbarGUI.php';
-require_once 'Modules/Test/classes/class.ilTestPersonalSkillsGUI.php';
-require_once 'Modules/Test/classes/class.ilObjAssessmentFolder.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
+ * User interface which displays the competences which a learner has shown in a
+ * test.
+ *
  * @author		Björn Heyser <bheyser@databay.de>
  * @version		$Id: class.ilTestSkillGUI.php 46688 2013-12-09 15:23:17Z bheyser $
  *
@@ -114,8 +127,6 @@ class ilTestSkillEvaluationGUI
     {
         $cmd = $this->ctrl->getCmd(self::CMD_SHOW) . 'Cmd';
 
-        $this->manageTabs($cmd);
-
         $this->$cmd();
     }
 
@@ -124,32 +135,13 @@ class ilTestSkillEvaluationGUI
         return false;
     }
 
-    private function manageTabs($cmd)
-    {
-        #$this->tabs->clearTargets();
-#
-        #		$this->tabs->setBackTarget(
-        #			$this->lng->txt('tst_results_back_introduction'),
-        #			$this->ctrl->getLinkTargetByClass('ilObjTestGUI', 'infoScreen')
-        #		);
-
-        #		if( $this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired() )
-        #		{
-        #			require_once 'Services/Link/classes/class.ilLink.php';
-        #			$courseLink = ilLink::_getLink($this->getObjectiveOrientedContainer()->getRefId());
-        #			$this->tabs->setBack2Target($this->lng->txt('back_to_objective_container'), $courseLink);
-        #		}
-    }
-
     protected function init($skillProfileEnabled)
     {
-        require_once 'Modules/Test/classes/class.ilTestPassesSelector.php';
         $this->testPassesSelector = new ilTestPassesSelector($this->db, $this->testOBJ);
         $this->testPassesSelector->setActiveId($this->testSession->getActiveId());
         $this->testPassesSelector->setLastFinishedPass($this->testSession->getLastFinishedPass());
 
         $assSettings = new ilSetting('assessment');
-        require_once 'Modules/Test/classes/class.ilTestSkillEvaluation.php';
         $skillEvaluation = new ilTestSkillEvaluation(
             $this->db,
             $this->testOBJ->getTestId(),

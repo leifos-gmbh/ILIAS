@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -14,8 +15,6 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
-
-include_once "./Modules/TestQuestionPool/classes/import/qti12/class.assQuestionImport.php";
 
 /**
 * Class for imagemap question imports
@@ -41,7 +40,7 @@ class assImagemapQuestionImport extends assQuestionImport
     * @param array $import_mapping An array containing references to included ILIAS objects
     * @access public
     */
-    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping): void
+    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, $import_mapping): array
     {
         global $DIC;
         $ilUser = $DIC['ilUser'];
@@ -50,7 +49,6 @@ class assImagemapQuestionImport extends assQuestionImport
         ilSession::clear('import_mob_xhtml');
 
         $presentation = $item->getPresentation();
-        $duration = $item->getDuration();
         $now = getdate();
         $questionimage = array();
         $created = sprintf("%04d%02d%02d%02d%02d%02d", $now['year'], $now['mon'], $now['mday'], $now['hours'], $now['minutes'], $now['seconds']);
@@ -199,7 +197,6 @@ class assImagemapQuestionImport extends assQuestionImport
         $this->object->setOwner($ilUser->getId());
         $this->object->setQuestion($this->object->QTIMaterialToString($item->getQuestiontext()));
         $this->object->setObjId($questionpool_id);
-        $this->object->setEstimatedWorkingTime($duration["h"] ?? 0, $duration["m"] ?? 0, $duration["s"] ?? 0);
         $this->object->setIsMultipleChoice($item->getMetadataEntry("IS_MULTIPLE_CHOICE"));
         $areas = array("2" => "rect", "1" => "circle", "3" => "poly");
         $this->object->setImageFilename($questionimage["label"]);
@@ -223,17 +220,11 @@ class assImagemapQuestionImport extends assQuestionImport
         $image = base64_decode($questionimage["content"]);
         $imagepath = $this->object->getImagePath();
         if (!file_exists($imagepath)) {
-            include_once "./Services/Utilities/classes/class.ilUtil.php";
             ilFileUtils::makeDirParents($imagepath);
         }
         $imagepath .= $questionimage["label"];
         $fh = fopen($imagepath, "wb");
-        if ($fh == false) {
-            //									global $DIC;
-            //									$ilErr = $DIC['ilErr'];
-            //									$ilErr->raiseError($this->object->lng->txt("error_save_image_file") . ": $php_errormsg", $ilErr->MESSAGE);
-            //									return;
-        } else {
+        if ($fh == true) {
             $imagefile = fwrite($fh, $image);
             fclose($fh);
         }
@@ -248,8 +239,6 @@ class assImagemapQuestionImport extends assQuestionImport
         }
         $questiontext = $this->object->getQuestion();
         if (is_array(ilSession::get("import_mob_xhtml"))) {
-            include_once "./Services/MediaObjects/classes/class.ilObjMediaObject.php";
-            include_once "./Services/RTE/classes/class.ilRTE.php";
             foreach (ilSession::get("import_mob_xhtml") as $mob) {
                 if ($tst_id > 0) {
                     $importfile = $this->getTstImportArchivDirectory() . '/' . $mob["uri"];
@@ -290,11 +279,12 @@ class assImagemapQuestionImport extends assQuestionImport
         $this->object->saveToDb();
         if ($tst_id > 0) {
             $q_1_id = $this->object->getId();
-            $question_id = $this->object->duplicate(true, null, null, null, $tst_id);
+            $question_id = $this->object->duplicate(true, "", "", "", $tst_id);
             $tst_object->questions[$question_counter++] = $question_id;
             $import_mapping[$item->getIdent()] = array("pool" => $q_1_id, "test" => $question_id);
         } else {
             $import_mapping[$item->getIdent()] = array("pool" => $this->object->getId(), "test" => 0);
         }
+        return $import_mapping;
     }
 }

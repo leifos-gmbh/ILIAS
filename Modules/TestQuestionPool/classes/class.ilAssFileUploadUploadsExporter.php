@@ -1,7 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -166,13 +179,13 @@ class ilAssFileUploadUploadsExporter
     private function getFileUploadSolutionData(): array
     {
         $query = "
-			SELECT tst_solutions.solution_id, tst_solutions.pass, tst_solutions.active_fi, tst_solutions.question_fi, 
-				tst_solutions.value1, tst_solutions.value2, tst_solutions.tstamp 
-			FROM tst_solutions, tst_active, qpl_questions 
-			WHERE tst_solutions.active_fi = tst_active.active_id 
-			AND tst_solutions.question_fi = qpl_questions.question_id 
-			AND tst_solutions.question_fi = %s 
-			AND tst_active.test_fi = %s 
+			SELECT tst_solutions.solution_id, tst_solutions.pass, tst_solutions.active_fi, tst_solutions.question_fi,
+				tst_solutions.value1, tst_solutions.value2, tst_solutions.tstamp
+			FROM tst_solutions, tst_active, qpl_questions
+			WHERE tst_solutions.active_fi = tst_active.active_id
+			AND tst_solutions.question_fi = qpl_questions.question_id
+			AND tst_solutions.question_fi = %s
+			AND tst_active.test_fi = %s
 			ORDER BY tst_solutions.active_fi, tst_solutions.tstamp
 		";
 
@@ -207,7 +220,6 @@ class ilAssFileUploadUploadsExporter
             $activeIds[] = $activeId;
         }
 
-        require_once 'Modules/Test/classes/class.ilTestParticipantData.php';
         $participantData = new ilTestParticipantData($this->db, $this->lng);
         $participantData->setActiveIdsFilter($activeIds);
         $participantData->setParticipantAccessFilter(

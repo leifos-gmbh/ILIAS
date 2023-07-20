@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use Psr\Http\Message\ServerRequestInterface;
 use ILIAS\HTTP\Wrapper\ArrayBasedRequestWrapper;
@@ -290,11 +290,6 @@ class ilObjectGUI
                 $class = strtolower("ilObj" . $class_name . "GUI");
                 $class_path = $this->ctrl->lookupClassPath($class);
                 $class_name = $this->ctrl->getClassForClasspath($class_path);
-
-//                $parent_gui_obj = new $class_name($this->requested_ref_id, true, false); // TODO: this fails in many cases since the parameters of the constructor are not known
-                // the next line prevents the header action menu being shown
-//                $parent_gui_obj->setCreationMode(true);
-//                $parent_gui_obj->setTitleAndDescription();
             }
         } else {
             $this->setTitleAndDescription();
@@ -569,7 +564,7 @@ class ilObjectGUI
         }
 
         $ru = new ilRepositoryTrashGUI($this);
-        $ru->deleteObjects($this->requested_ref_id, ilSession::get("saved_post"));
+        $ru->deleteObjects($this->requested_ref_id, ilSession::get("saved_post") ?? []);
         ilSession::clear("saved_post");
         $this->ctrl->returnToParent($this);
     }
@@ -630,8 +625,7 @@ class ilObjectGUI
     {
         $forms = [
             self::CFORM_NEW => $this->initCreateForm($new_type),
-            self::CFORM_IMPORT => $this->initImportForm($new_type),
-            self::CFORM_CLONE => $this->fillCloneTemplate(null, $new_type)
+            self::CFORM_IMPORT => $this->initImportForm($new_type)
         ];
 
         return $forms;
@@ -650,48 +644,33 @@ class ilObjectGUI
             }
         }
 
-        // no accordion if there is just one form
-        if (sizeof($forms) == 1) {
-            $form_type = key($forms);
-            $forms = array_shift($forms);
+        $acc = new ilAccordionGUI();
+        $acc->setBehaviour(ilAccordionGUI::FIRST_OPEN);
+        $cnt = 1;
+        foreach ($forms as $form_type => $cf) {
+            $htpl = new ilTemplate("tpl.creation_acc_head.html", true, true, "Services/Object");
 
-            // see bug #0016217
+            // using custom form titles (used for repository plugins)
+            $form_title = "";
             if (method_exists($this, "getCreationFormTitle")) {
                 $form_title = $this->getCreationFormTitle($form_type);
-                if ($form_title != "") {
-                    $forms->setTitle($form_title);
-                }
             }
-            return $forms->getHTML();
-        } else {
-            $acc = new ilAccordionGUI();
-            $acc->setBehaviour(ilAccordionGUI::FIRST_OPEN);
-            $cnt = 1;
-            foreach ($forms as $form_type => $cf) {
-                $htpl = new ilTemplate("tpl.creation_acc_head.html", true, true, "Services/Object");
-
-                // using custom form titles (used for repository plugins)
-                $form_title = "";
-                if (method_exists($this, "getCreationFormTitle")) {
-                    $form_title = $this->getCreationFormTitle($form_type);
-                }
-                if (!$form_title) {
-                    $form_title = $cf->getTitle();
-                }
-
-                // move title from form to accordion
-                $htpl->setVariable("TITLE", $this->lng->txt("option") . " " . $cnt . ": " . $form_title);
-                $cf->setTitle('');
-                $cf->setTitleIcon('');
-                $cf->setTableWidth("100%");
-
-                $acc->addItem($htpl->get(), $cf->getHTML());
-
-                $cnt++;
+            if (!$form_title) {
+                $form_title = $cf->getTitle();
             }
 
-            return "<div class='ilCreationFormSection'>" . $acc->getHTML() . "</div>";
+            // move title from form to accordion
+            $htpl->setVariable("TITLE", $this->lng->txt("option") . " " . $cnt . ": " . $form_title);
+            $cf->setTitle('');
+            $cf->setTitleIcon('');
+            $cf->setTableWidth("100%");
+
+            $acc->addItem($htpl->get(), $cf->getHTML());
+
+            $cnt++;
         }
+
+        return "<div class='ilCreationFormSection'>" . $acc->getHTML() . "</div>";
     }
 
     protected function initCreateForm(string $new_type): ilPropertyFormGUI
@@ -710,6 +689,7 @@ class ilObjectGUI
         $ta = new ilTextAreaInputGUI($this->lng->txt("description"), "desc");
         $ta->setCols(40);
         $ta->setRows(2);
+        $ta->setMaxNumOfChars(ilObject::LONG_DESC_LENGTH);
         $form->addItem($ta);
 
         $form = $this->initDidacticTemplate($form);
@@ -778,8 +758,7 @@ class ilObjectGUI
             $form->addItem($type);
 
             foreach ($options as $id => $data) {
-                $option = new ilRadioOption($data[0], $id, $data[1]);
-
+                $option = new ilRadioOption($data[0] ?? '', (string) $id, $data[1] ?? '');
                 if ($existing_exclusive && $id == 'dtpl_0') {
                     //set default disabled if an exclusive template exists
                     $option->setDisabled(true);
@@ -797,6 +776,19 @@ class ilObjectGUI
      */
     protected function addDidacticTemplateOptions(array &$a_options): void
     {
+    }
+
+    protected function addAdoptContentLinkToToolbar(): void
+    {
+        $this->toolbar->addComponent(
+            $this->ui->factory()->link()->standard(
+                $this->lng->txt('cntr_adopt_content'),
+                $this->ctrl->getLinkTargetByClass(
+                    'ilObjectCopyGUI',
+                    'adoptContent'
+                )
+            )
+        );
     }
 
     /**
@@ -826,6 +818,7 @@ class ilObjectGUI
             $newObj->setType($this->requested_new_type);
             $newObj->setTitle($form->getInput("title"));
             $newObj->setDescription($form->getInput("desc"));
+            $newObj->processAutoRating();
             $newObj->create();
 
             $this->putObjectInTree($newObj);
@@ -835,7 +828,6 @@ class ilObjectGUI
                 $newObj->applyDidacticTemplate($dtpl);
             }
 
-            $this->handleAutoRating($newObj);
             $this->afterSave($newObj);
         }
 
@@ -891,11 +883,19 @@ class ilObjectGUI
         ilRbacLog::add(ilRbacLog::CREATE_OBJECT, $this->ref_id, $rbac_log);
 
         // use forced callback after object creation
-        if ($this->requested_crtcb > 0) {
-            $callback_type = ilObject::_lookupType($this->requested_crtcb, true);
-            $class_name = "ilObj" . $this->obj_definition->getClassName($callback_type) . "GUI";
-            if (strtolower($class_name) == "ilobjitemgroupgui") {
-                $callback_obj = new $class_name($this->requested_crtcb);
+        $this->callCreationCallback($obj);
+    }
+
+    public function callCreationCallback(ilObject $obj): void
+    {
+        $objDefinition = $this->obj_definition;
+        // use forced callback after object creation
+        if ($this->requested_crtcb) {
+            $callback_type = ilObject::_lookupType((int) $this->requested_crtcb, true);
+            $class_name = "ilObj" . $objDefinition->getClassName($callback_type) . "GUI";
+            $location = $objDefinition->getLocation($callback_type);
+            if (in_array(strtolower($class_name), array("ilobjitemgroupgui"))) {
+                $callback_obj = new $class_name((int) $this->requested_crtcb);
             } else {
                 // #10368
                 $callback_obj = new $class_name(null, $this->requested_crtcb, true, false);
@@ -956,6 +956,7 @@ class ilObjectGUI
         $ta = new ilTextAreaInputGUI($this->lng->txt("description"), "desc");
         $ta->setCols(40);
         $ta->setRows(2);
+        $ta->setMaxNumOfChars(ilObject::LONG_DESC_LENGTH);
         $form->addItem($ta);
 
         $this->initEditCustomForm($form);
@@ -1145,6 +1146,9 @@ class ilObjectGUI
                     );
                 }
             } catch (ilException $e) {
+                if (DEVMODE) {
+                    throw $e;
+                }
                 $this->tmp_import_dir = $imp->getTemporaryImportDir();
                 if (!$catch_errors) {
                     throw $e;
@@ -1163,10 +1167,15 @@ class ilObjectGUI
                 $this->ctrl->setParameter($this, "new_type", "");
 
                 $newObj = ilObjectFactory::getInstanceByObjId($new_id);
-
                 // put new object id into tree - already done in import for containers
                 if (!$this->obj_definition->isContainer($new_type)) {
                     $this->putObjectInTree($newObj);
+                } else {
+                    $ref_ids = ilObject::_getAllReferences($newObj->getId());
+                    if (count($ref_ids) === 1) {
+                        $newObj->setRefId((int) current($ref_ids));
+                    }
+                    $this->callCreationCallback($newObj);   // see #24244
                 }
 
                 $this->afterImport($newObj);
@@ -1412,29 +1421,6 @@ class ilObjectGUI
     }
 
     /**
-     * Fill object clone template
-     * This method can be called from any object GUI class that wants to offer object cloning.
-     *
-     * @param ?string template variable name that will be filled
-     * @param string type of new object
-     * @return ?ilPropertyFormGUI
-     */
-    protected function fillCloneTemplate(?string $tpl_name, string $type): ?ilPropertyFormGUI
-    {
-        $cp = new ilObjectCopyGUI($this);
-        $cp->setType($type);
-        $target = $this->request_wrapper->has("ref_id")
-            ? $this->request_wrapper->retrieve("ref_id", $this->refinery->kindlyTo()->int())
-            : 0;
-        $cp->setTarget($target);
-        if ($tpl_name) {
-            $cp->showSourceSearch($tpl_name);
-        }
-
-        return $cp->showSourceSearch(null);
-    }
-
-    /**
     * Get center column
     */
     protected function getCenterColumnHTML(): string
@@ -1577,65 +1563,21 @@ class ilObjectGUI
         $ctrl->redirectByClass("ilRepositoryGUI", $cmd);
     }
 
+    public static function _gotoSharedWorkspaceNode(int $wsp_id): void
+    {
+        global $DIC;
+
+        $ctrl = $DIC->ctrl();
+        $ctrl->setParameterByClass(ilSharedResourceGUI::class, "wsp_id", $wsp_id);
+        $ctrl->redirectByClass(ilSharedResourceGUI::class, "");
+    }
+
     /**
      * Enables the file upload into this object by dropping files.
      */
     protected function enableDragDropFileUpload(): void
     {
         $this->tpl->setFileUploadRefId($this->ref_id);
-    }
-
-    /**
-     * Activate rating automatically if parent container setting
-     */
-    protected function handleAutoRating(ilObject $new_obj): void
-    {
-        if (
-            ilObject::hasAutoRating($new_obj->getType(), $new_obj->getRefId()) &&
-            method_exists($new_obj, "setRating")
-        ) {
-            $new_obj->setRating(true);
-            $new_obj->update();
-        }
-    }
-
-    /**
-     * show edit section of custom icons for container
-     */
-    protected function showCustomIconsEditing(
-        $input_colspan = 1,
-        ilPropertyFormGUI $form = null,
-        $as_section = true
-    ): void {
-        if ($this->settings->get("custom_icons")) {
-            if ($form) {
-                $customIcon = $this->custom_icon_factory->getByObjId($this->object->getId(), $this->object->getType());
-
-                if ($as_section) {
-                    $title = new ilFormSectionHeaderGUI();
-                    $title->setTitle($this->lng->txt("icon_settings"));
-                } else {
-                    $title = new ilCustomInputGUI($this->lng->txt("icon_settings"), "");
-                }
-                $form->addItem($title);
-
-                $caption = $this->lng->txt("cont_custom_icon");
-                $icon = new ilImageFileInputGUI($caption, "cont_icon");
-
-                $icon->setSuffixes($customIcon->getSupportedFileExtensions());
-                $icon->setUseCache(false);
-                if ($customIcon->exists()) {
-                    $icon->setImage($customIcon->getFullPath());
-                } else {
-                    $icon->setImage('');
-                }
-                if ($as_section) {
-                    $form->addItem($icon);
-                } else {
-                    $title->addSubItem($icon);
-                }
-            }
-        }
     }
 
     /**

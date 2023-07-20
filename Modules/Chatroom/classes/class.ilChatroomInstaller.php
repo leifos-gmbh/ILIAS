@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class ilChatroomInstaller
@@ -180,27 +180,6 @@ class ilChatroomInstaller
                     "notnull" => true
                 ]
             );
-        }
-
-        if (!$ilDB->tableExists('chatroom_smilies')) {
-            $fields = [
-                'smiley_id' => [
-                    'type' => 'integer',
-                    'length' => 4,
-                ],
-                'smiley_keywords' => [
-                    'type' => 'text',
-                    'length' => 100,
-                ],
-                'smiley_path' => [
-                    'type' => 'text',
-                    'length' => 200,
-                ]
-            ];
-
-            $ilDB->createTable('chatroom_smilies', $fields);
-            $ilDB->addPrimaryKey('chatroom_smilies', ['smiley_id']);
-            $ilDB->createSequence('chatroom_smilies');
         }
 
         self::registerObject();
@@ -505,9 +484,6 @@ class ilChatroomInstaller
         self::setChatroomSettings($roomsToFix);
     }
 
-    /**
-     * @param int $ref_id
-     */
     public static function ensureCorrectPublicChatroomTreeLocation(int $ref_id): void
     {
         global $DIC;

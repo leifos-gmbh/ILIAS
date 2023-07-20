@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTestDashboardGUI
@@ -149,7 +163,6 @@ class ilTestDashboardGUI
 
                 $this->getTestTabs()->activateSubTab(ilTestTabsManager::SUBTAB_ID_FIXED_PARTICIPANTS);
 
-                require_once 'Modules/Test/classes/class.ilTestParticipantsGUI.php';
                 $gui = new ilTestParticipantsGUI($this->getTestObj(), $this->getQuestionSetConfig());
                 $gui->setTestAccess($this->getTestAccess());
                 $gui->setObjectiveParent($this->getObjectiveParent());
@@ -160,7 +173,6 @@ class ilTestDashboardGUI
 
                 $this->getTestTabs()->activateSubTab(ilTestTabsManager::SUBTAB_ID_TIME_EXTENSION);
 
-                require_once 'Modules/Test/classes/class.ilTestParticipantsTimeExtensionGUI.php';
                 $gui = new ilTestParticipantsTimeExtensionGUI($this->getTestObj());
                 $DIC->ctrl()->forwardCommand($gui);
                 break;

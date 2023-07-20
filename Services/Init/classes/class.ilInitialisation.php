@@ -18,6 +18,7 @@
 
 // TODO:
 use ILIAS\BackgroundTasks\Dependencies\DependencyMap\BaseDependencyMap;
+use ILIAS\Cache\Config;
 use ILIAS\DI\Container;
 use ILIAS\Filesystem\Provider\FilesystemFactory;
 use ILIAS\Filesystem\Security\Sanitizing\FilenameSanitizerImpl;
@@ -27,19 +28,10 @@ use ILIAS\FileUpload\Processor\BlacklistExtensionPreProcessor;
 use ILIAS\FileUpload\Processor\FilenameSanitizerPreProcessor;
 use ILIAS\FileUpload\Processor\PreProcessorManagerImpl;
 use ILIAS\GlobalScreen\Services;
-use ILIAS\ResourceStorage\Lock\LockHandlerilDB;
 use ILIAS\HTTP\Wrapper\SuperGlobalDropInReplacement;
-use ILIAS\ResourceStorage\Policy\WhiteAndBlacklistedFileNamePolicy;
-use ILIAS\ResourceStorage\StorageHandler\StorageHandlerFactory;
-use ILIAS\ResourceStorage\StorageHandler\FileSystemBased\MaxNestingFileSystemStorageHandler;
-use ILIAS\ResourceStorage\StorageHandler\FileSystemBased\FileSystemStorageHandler;
-use ILIAS\ResourceStorage\Resource\Repository\ResourceDBRepository;
-use ILIAS\ResourceStorage\Revision\Repository\RevisionDBRepository;
-use ILIAS\ResourceStorage\Information\Repository\InformationDBRepository;
-use ILIAS\ResourceStorage\Stakeholder\Repository\StakeholderDBRepository;
-use ILIAS\ResourceStorage\Preloader\DBRepositoryPreloader;
 use ILIAS\Filesystem\Definitions\SuffixDefinitions;
-use ILIAS\ResourceStorage\Resource\Repository\CollectionDBRepository;
+use ILIAS\FileUpload\Processor\InsecureFilenameSanitizerPreProcessor;
+use ILIAS\FileUpload\Processor\SVGBlacklistPreProcessor;
 
 require_once("libs/composer/vendor/autoload.php");
 
@@ -54,24 +46,6 @@ if (null === $DIC) {
     $DIC = new Container();
 }
 
-/**
- * This file is part of ILIAS, a powerful learning management system
- * published by ILIAS open source e-Learning e.V.
- *
- * ILIAS is licensed with the GPL-3.0,
- * see https://www.gnu.org/licenses/gpl-3.0.en.html
- * You should have received a copy of said license along with the
- * source code, too.
- *
- * If this is not the case or you just want to try ILIAS, you'll find
- * us at:
- * https://www.ilias.de
- * https://github.com/ILIAS-eLearning
- *
- *********************************************************************/
-
-/** @defgroup ServicesInit Services/Init
- */
 /**
  * ILIAS Initialisation Utility Class
  * perform basic setup: init database handler, load configuration file,
@@ -156,8 +130,12 @@ class ilInitialisation
         self::initGlobal('ilIliasIniFile', $ilIliasIniFile);
 
         // initialize constants
-        define("ILIAS_DATA_DIR", $ilIliasIniFile->readVariable("clients", "datadir"));
-        define("ILIAS_WEB_DIR", $ilIliasIniFile->readVariable("clients", "path"));
+        if (!defined('ILIAS_DATA_DIR')) {
+            define("ILIAS_DATA_DIR", $ilIliasIniFile->readVariable("clients", "datadir"));
+        }
+        if (!defined('ILIAS_WEB_DIR')) {
+            define("ILIAS_WEB_DIR", $ilIliasIniFile->readVariable("clients", "path"));
+        }
         if (!defined("ILIAS_ABSOLUTE_PATH")) {
             define("ILIAS_ABSOLUTE_PATH", $ilIliasIniFile->readVariable('server', 'absolute_path'));
         }
@@ -217,11 +195,10 @@ class ilInitialisation
                 break;
             case "icap":
                 define("IL_VIRUS_SCANNER", "icap");
-                define("IL_ICAP_HOST", $ilIliasIniFile->readVariable("tools", "i_cap_host"));
-                define("IL_ICAP_PORT", $ilIliasIniFile->readVariable("tools", "i_cap_port"));
-                define("IL_ICAP_AV_COMMAND", $ilIliasIniFile->readVariable("tools", "i_cap_av_command"));
-                define("IL_ICAP_CLIENT", $ilIliasIniFile->readVariable("tools", "i_cap_client"));
-                define("IL_VIRUS_CLEAN_COMMAND", '');
+                define("IL_ICAP_HOST", $ilIliasIniFile->readVariable("tools", "icap_host"));
+                define("IL_ICAP_PORT", $ilIliasIniFile->readVariable("tools", "icap_port"));
+                define("IL_ICAP_AV_COMMAND", $ilIliasIniFile->readVariable("tools", "icap_service_name"));
+                define("IL_ICAP_CLIENT", $ilIliasIniFile->readVariable("tools", "icap_client_path"));
                 break;
 
             default:
@@ -237,34 +214,7 @@ class ilInitialisation
     protected static function initResourceStorage(): void
     {
         global $DIC;
-
-        $DIC['resource_storage'] = static function (Container $c): \ILIAS\ResourceStorage\Services {
-            $revision_repository = new RevisionDBRepository($c->database());
-            $resource_repository = new ResourceDBRepository($c->database());
-            $collection_repository = new CollectionDBRepository($c->database());
-            $information_repository = new InformationDBRepository($c->database());
-            $stakeholder_repository = new StakeholderDBRepository($c->database());
-            return new \ILIAS\ResourceStorage\Services(
-                new StorageHandlerFactory([
-                    new MaxNestingFileSystemStorageHandler($c['filesystem.storage'], Location::STORAGE),
-                    new FileSystemStorageHandler($c['filesystem.storage'], Location::STORAGE)
-                ]),
-                $revision_repository,
-                $resource_repository,
-                $collection_repository,
-                $information_repository,
-                $stakeholder_repository,
-                new LockHandlerilDB($c->database()),
-                new ilFileServicesPolicy($c->fileServiceSettings()),
-                new DBRepositoryPreloader(
-                    $c->database(),
-                    $resource_repository,
-                    $revision_repository,
-                    $information_repository,
-                    $stakeholder_repository
-                )
-            );
-        };
+        (new InitResourceStorage())->init($DIC);
     }
 
     /**
@@ -394,11 +344,12 @@ class ilInitialisation
             $fileUploadImpl->register(new FilenameSanitizerPreProcessor());
             $fileUploadImpl->register(
                 new ilFileServicesPreProcessor(
-                    $c->rbac()->system(),
                     $c->fileServiceSettings(),
                     $c->language()->txt("msg_info_blacklisted")
                 )
             );
+            $fileUploadImpl->register(new InsecureFilenameSanitizerPreProcessor());
+            $fileUploadImpl->register(new SVGBlacklistPreProcessor());
 
             return $fileUploadImpl;
         };
@@ -447,12 +398,17 @@ class ilInitialisation
             }
         }
 
-        $iliasHttpPath = ilContext::modifyHttpPath(implode('', [$protocol, $host, $uri]));
+        $ilias_http_path = ilContext::modifyHttpPath(implode('', [$protocol, $host, $uri]));
+
+        // remove everything after the first .php in the path
+        $ilias_http_path = preg_replace('/(http|https)(:\/\/)(.*?\/.*?\.php).*/', '$1$2$3', $ilias_http_path);
 
         $f = new \ILIAS\Data\Factory();
-        $uri = $f->uri(ilFileUtils::removeTrailingPathSeparators($iliasHttpPath));
+        $uri = $f->uri(ilFileUtils::removeTrailingPathSeparators($ilias_http_path));
 
-        return define('ILIAS_HTTP_PATH', $uri->getBaseURI());
+        $base_URI = $uri->getBaseURI();
+
+        return define('ILIAS_HTTP_PATH', $base_URI);
     }
 
     /**
@@ -461,6 +417,9 @@ class ilInitialisation
      */
     protected static function determineClient(): void
     {
+        if (defined('CLIENT_ID')) {
+            return;
+        }
         global $DIC;
         $df = new \ILIAS\Data\Factory();
 
@@ -484,6 +443,7 @@ class ilInitialisation
         }
         // we found a client_id in $GET
         if (isset($client_id_from_get) && strlen($client_id_from_get) > 0) {
+            // @todo refinery undefined
             $client_id_to_use = $_GET['client_id'] = $df->clientId($client_id_from_get)->toString();
             if ($can_set_cookie) {
                 ilUtil::setCookie('ilClientId', $client_id_to_use);
@@ -522,7 +482,12 @@ class ilInitialisation
             self::abortAndDie("Fatal Error: ilInitialisation::initClientIniFile called without CLIENT_ID.");
         }
 
-        $ini_file = "./" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/client.ini.php";
+        $ini_file = "/client.ini.php";
+        if (defined('CLIENT_WEB_DIR')) {
+            $ini_file = CLIENT_WEB_DIR . $ini_file;
+        } else {
+            $ini_file = "./" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/client.ini.php";
+        }
 
         // get settings from ini file
         $ilClientIniFile = new ilIniFile($ini_file);
@@ -530,7 +495,6 @@ class ilInitialisation
 
         // invalid client id / client ini
         if ($ilClientIniFile->ERROR != "") {
-            $c = $_COOKIE["ilClientId"];
             $default_client = $ilIliasIniFile->readVariable("clients", "default");
             ilUtil::setCookie("ilClientId", $default_client);
             if (CLIENT_ID != "" && CLIENT_ID != $default_client) {
@@ -582,10 +546,6 @@ class ilInitialisation
         } else {
             define("IL_DB_TYPE", $db_type);
         }
-
-        $ilGlobalCacheSettings = new ilGlobalCacheSettings();
-        $ilGlobalCacheSettings->readFromIniFile($ilClientIniFile);
-        ilGlobalCache::setup($ilGlobalCacheSettings);
     }
 
     /**
@@ -599,8 +559,8 @@ class ilInitialisation
             $mess = array(
                 "en" => "The server is not available due to maintenance." .
                     " We apologise for any inconvenience.",
-                "de" => "Der Server ist aufgrund von Wartungsarbeiten nicht verfügbar." .
-                    " Wir bitten um Verständnis."
+                "de" => "Der Server ist aufgrund von Wartungsarbeiten aktuell nicht verf&uuml;gbar." .
+                    " Wir bitten um Verst&auml;ndnis. Versuchen Sie es sp&auml;ter noch einmal."
             );
             $mess_id = "init_error_maintenance";
 
@@ -624,6 +584,18 @@ class ilInitialisation
         $ilDB->connect();
 
         self::initGlobal("ilDB", $ilDB);
+    }
+
+    protected static function initGlobalCache(): void
+    {
+        global $DIC;
+        $legacy_settings = new ilGlobalCacheSettingsAdapter(
+            $DIC->clientIni(),
+            $DIC->database(),
+        );
+        $DIC['global_cache'] = new \ILIAS\Cache\Services(
+            $legacy_settings->toConfig()
+        );
     }
 
     /**
@@ -688,7 +660,7 @@ class ilInitialisation
             // If this code is executed, we can assume that \ilHTTPS::enableSecureCookies was NOT called before
             // \ilHTTPS::enableSecureCookies already executes session_set_cookie_params()
 
-            $cookie_secure = !$ilSetting->get('https', 0) && $DIC['https']->isDetected();
+            $cookie_secure = !$ilSetting->get('https', '0') && $DIC['https']->isDetected();
             define('IL_COOKIE_SECURE', $cookie_secure); // Default Value
 
             session_set_cookie_params(
@@ -699,19 +671,6 @@ class ilInitialisation
                 IL_COOKIE_HTTPONLY
             );
         }
-    }
-
-    protected static function initMail(\ILIAS\DI\Container $c): void
-    {
-        $c["mail.mime.transport.factory"] = static function (\ILIAS\DI\Container $c) {
-            return new \ilMailMimeTransportFactory($c->settings(), $c->event());
-        };
-        $c["mail.mime.sender.factory"] = static function (\ILIAS\DI\Container $c) {
-            return new \ilMailMimeSenderFactory($c->settings());
-        };
-        $c["mail.texttemplates.service"] = static function (\ILIAS\DI\Container $c) {
-            return new \ilMailTemplateService(new \ilMailTemplateRepository($c->database()));
-        };
     }
 
     protected static function initCron(\ILIAS\DI\Container $c): void
@@ -916,7 +875,7 @@ class ilInitialisation
     {
         global $ilSetting;
 
-        if (trim($ilSetting->get("locale")) != "") {
+        if ($ilSetting->get("locale") &&  trim($ilSetting->get("locale")) !== "") {
             $larr = explode(",", trim($ilSetting->get("locale")));
             $ls = array();
             $first = $larr[0];
@@ -977,7 +936,7 @@ class ilInitialisation
                 return;
             }
             // goto will check if target is accessible or redirect to login
-            self::redirect("goto.php?target=" . $_GET["target"]);
+            self::redirect("goto.php?target=" . $target);
         }
 
         // we do not know if ref_id of request is accesible, so redirecting to root
@@ -1016,9 +975,13 @@ class ilInitialisation
             $target = "target=" . $target . "&";
         }
 
-        $client_id = $DIC->http()->wrapper()->cookie()->has('ilClientId')
-            ? $DIC->http()->wrapper()->cookie()->retrieve('ilClientId', $DIC->refinery()->kindlyTo()->string())
-            : '';
+        $client_id = $DIC->http()->wrapper()->cookie()->retrieve(
+            'ilClientId',
+            $DIC->refinery()->byTrying([
+                $DIC->refinery()->kindlyTo()->string(),
+                $DIC->refinery()->always('')
+            ])
+        );
 
         $script = "login.php?" . $target . "client_id=" . $client_id .
             "&auth_stat=" . $a_auth_stat;
@@ -1128,9 +1091,7 @@ class ilInitialisation
      */
     protected static function handleDevMode(): void
     {
-        if ((defined(SHOWNOTICES) && SHOWNOTICES) || version_compare(PHP_VERSION, '8.0', '>=')) {
-            error_reporting(-1);
-        }
+        error_reporting(-1);
     }
 
     protected static bool $already_initialized = false;
@@ -1214,7 +1175,7 @@ class ilInitialisation
     public static function handleErrorReporting(): void
     {
         // push the error level as high as possible / sane
-        error_reporting(E_ALL & ~E_NOTICE);
+        error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 
         // see handleDevMode() - error reporting might be overwritten again
         // but we need the client ini first
@@ -1288,6 +1249,8 @@ class ilInitialisation
 
         self::initDatabase();
 
+        self::initGlobalCache();
+
         self::initComponentService($DIC);
 
         // init dafault language
@@ -1317,7 +1280,6 @@ class ilInitialisation
         self::initGlobal("https", "ilHTTPS", "./Services/Http/classes/class.ilHTTPS.php");
         self::initSettings();
         self::setSessionHandler();
-        self::initMail($GLOBALS['DIC']);
         self::initCron($GLOBALS['DIC']);
         self::initAvatar($GLOBALS['DIC']);
         self::initCustomObjectIcons($GLOBALS['DIC']);
@@ -1371,7 +1333,7 @@ class ilInitialisation
         // $ilUser
         self::initGlobal(
             "ilUser",
-            "ilObjUser",
+            new ilObjUser(ANONYMOUS_USER_ID),
             "./Services/User/classes/class.ilObjUser.php"
         );
         $ilias->account = $ilUser;
@@ -1481,7 +1443,11 @@ class ilInitialisation
     private static function initGlobalScreen(\ILIAS\DI\Container $c): void
     {
         $c['global_screen'] = function () use ($c) {
-            return new Services(new ilGSProviderFactory($c), htmlentities(str_replace(" ", "_", ILIAS_VERSION)));
+            return new Services(
+                new ilGSProviderFactory($c),
+                $c->ui(),
+                htmlentities(str_replace([" ", ".", "-"], "_", ILIAS_VERSION_NUMERIC))
+            );
         };
         $c->globalScreen()->tool()->context()->stack()->clear();
         $c->globalScreen()->tool()->context()->claim()->main();
@@ -1589,6 +1555,12 @@ class ilInitialisation
             "Services/Help/classes/class.ilHelpGUI.php"
         );
 
+        if (DEVMODE) {
+            $DIC["help.text_retriever"] = new ILIAS\UI\Help\TextRetriever\Echoing();
+        } else {
+            $DIC["help.text_retriever"] = new ilHelpUITextRetriever();
+        }
+
         self::initGlobal(
             "ilToolbar",
             "ilToolbarGUI",
@@ -1609,6 +1581,7 @@ class ilInitialisation
 
         if (ilContext::hasUser()) {
             // set hits per page for all lists using table module
+            // @todo this is not fixable due to unknown sideeffects.
             $_GET['limit'] = (int) $ilUser->getPref('hits_per_page');
             ilSession::set('tbl_limit', $_GET['limit']);
 
@@ -1618,7 +1591,8 @@ class ilInitialisation
             // or not set at all (then we want the last offset, e.g. being used from a session var).
             // So I added the wrapping if statement. Seems to work (hopefully).
             // Alex April 14th 2006
-            if (isset($_GET['offset']) && $_GET['offset'] != "") {                            // added April 14th 2006
+            // @todo not replaced by refinery due to unknown sideeffects
+            if (isset($_GET['offset']) && $_GET['offset'] != "") {
                 $_GET['offset'] = (int) $_GET['offset'];        // old code
             }
 
@@ -1630,18 +1604,15 @@ class ilInitialisation
 
     /**
      * Extract current cmd from request
+     * @todo superglobal access <= refinery undefined
      */
     protected static function getCurrentCmd(): string
     {
-        if (!isset($_REQUEST["cmd"])) {
-            return '';
-        }
+        $cmd = $_POST['cmd'] ?? ($_GET['cmd'] ?? '');
 
-        $cmd = $_REQUEST["cmd"];
         if (is_array($cmd)) {
-            $keys = array_keys($cmd);
-
-            return array_shift($keys);
+            $cmd_keys = array_keys($cmd);
+            $cmd = array_shift($cmd_keys) ?? '';
         }
 
         return $cmd;
@@ -1690,9 +1661,10 @@ class ilInitialisation
             return true;
         }
 
-        $requestBaseClass = strtolower((string) ($_REQUEST['baseClass'] ?? ''));
+        // @todo refinery undefined
+        $requestBaseClass = strtolower((string) ($_GET['baseClass'] ?? ''));
         if ($requestBaseClass == strtolower(ilStartUpGUI::class)) {
-            $requestCmdClass = strtolower((string) ($_REQUEST['cmdClass'] ?? ''));
+            $requestCmdClass = strtolower((string) ($_GET['cmdClass'] ?? ''));
             if (
                 $requestCmdClass == strtolower(ilAccountRegistrationGUI::class) ||
                 $requestCmdClass == strtolower(ilPasswordAssistanceGUI::class)
@@ -1702,7 +1674,7 @@ class ilInitialisation
             }
             $cmd = self::getCurrentCmd();
             if (
-                $cmd == "showTermsOfService" || $cmd == "showClientList" ||
+                $cmd == "showTermsOfService" ||
                 $cmd == 'showAccountMigration' || $cmd == 'migrateAccount' ||
                 $cmd == 'processCode' || $cmd == 'showLoginPage' || $cmd == 'showLogout' ||
                 $cmd == 'doStandardAuthentication' || $cmd == 'doCasAuthentication'
@@ -1714,7 +1686,7 @@ class ilInitialisation
 
         $target = '';
         if ($DIC->http()->wrapper()->query()->has('target')) {
-            // @todo refinery undefind
+            // @todo refinery undefined
             $target = $_GET['target'];
         }
 
@@ -1723,7 +1695,8 @@ class ilInitialisation
             ($a_current_script == "goto.php" && $target == "impr_0") ||
             $requestBaseClass == strtolower(ilImprintGUI::class)
         ) {
-            ilLoggerFactory::getLogger('auth')->debug('Blocked authentication for baseClass: ' . $_GET['baseClass']);
+            // @todo refinery undefind
+            ilLoggerFactory::getLogger('auth')->debug('Blocked authentication for baseClass: ' . ($_GET['baseClass'] ?? ""));
             return true;
         }
 
@@ -1736,6 +1709,24 @@ class ilInitialisation
             ilLoggerFactory::getLogger('auth')->debug('Blocked authentication for goto target: ' . $target);
             return true;
         }
+
+
+        $current_ref_id = $DIC->http()->wrapper()->query()->has('ref_id')
+            ? $DIC->http()->wrapper()->query()->retrieve('ref_id', $DIC->refinery()->kindlyTo()->int())
+            : null;
+
+        if (null !== $current_ref_id
+            && $DIC->user()->getId() === 0
+            && $DIC->access()->checkAccessOfUser(
+                ANONYMOUS_USER_ID,
+                'visible',
+                '',
+                $current_ref_id
+            )) {
+            return true;
+        }
+
+
         ilLoggerFactory::getLogger('auth')->debug('Authentication required');
         return false;
     }
@@ -1755,7 +1746,7 @@ class ilInitialisation
             } elseif ($_REQUEST["lang"]) {
                 $lang = (string) $_REQUEST["lang"];
             } elseif ($ilSetting) {
-                $lang = $ilSetting->get("language");
+                $lang = $ilSetting->get("language", '');
             } elseif ($ilClientIniFile) {
                 $lang = $ilClientIniFile->readVariable("language", "default");
             }
@@ -1886,7 +1877,7 @@ class ilInitialisation
         };
 
         $c["bt.persistence"] = function ($c) {
-            return \ILIAS\BackgroundTasks\Implementation\Persistence\BasicPersistence::instance();
+            return \ILIAS\BackgroundTasks\Implementation\Persistence\BasicPersistence::instance($c->database());
         };
 
         $c["bt.injector"] = function ($c) {

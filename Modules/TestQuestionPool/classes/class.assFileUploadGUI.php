@@ -49,7 +49,7 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
     public function __construct($id = -1)
     {
         parent::__construct();
-        include_once "./Modules/TestQuestionPool/classes/class.assFileUpload.php";
+
         $this->object = new assFileUpload();
         $this->setErrorMessage($this->lng->txt("msg_form_save_error"));
         if ($id >= 0) {
@@ -64,7 +64,6 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
     {
         $hasErrors = (!$always) ? $this->editQuestion(true) : false;
         if (!$hasErrors) {
-            require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
             $this->writeQuestionGenericPostData();
             $this->writeQuestionSpecificPostData(new ilPropertyFormGUI());
             $this->saveTaxonomyAssignments();
@@ -75,10 +74,10 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
 
     public function writeQuestionSpecificPostData(ilPropertyFormGUI $form): void
     {
-        $this->object->setPoints((float)$_POST["points"]);
+        $this->object->setPoints((float) str_replace(',', '.', $_POST["points"]));
         $this->object->setMaxSize(($_POST['maxsize'] ?? null) ? (int) $_POST['maxsize'] : null);
         $this->object->setAllowedExtensions($_POST["allowedextensions"]);
-        $this->object->setCompletionBySubmission($_POST['completion_by_submission'] == 1 ? true : false);
+        $this->object->setCompletionBySubmission(isset($_POST['completion_by_submission']) && $_POST['completion_by_submission'] == 1);
     }
 
     /**
@@ -91,7 +90,6 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
         $save = $this->isSaveCommand();
         $this->getQuestionTemplate();
 
-        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new ilPropertyFormGUI();
         $this->editForm = $form;
 
@@ -235,17 +233,9 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
         $solutionvalue = "";
         if (($active_id > 0) && (!$show_correct_solution)) {
             $solutions = $this->object->getSolutionValues($active_id, $pass);
-            include_once "./Modules/Test/classes/class.ilObjTest.php";
-            if (!ilObjTest::_getUsePreviousAnswers($active_id, true)) {
-                if (is_null($pass)) {
-                    $pass = ilObjTest::_getPass($active_id);
-                }
-            }
-            $solutions = $this->object->getSolutionValues($active_id, $pass);
 
             $files = ($show_manual_scoring) ? $this->object->getUploadedFilesForWeb($active_id, $pass) : $this->object->getUploadedFiles($active_id, $pass);
-            include_once "./Modules/TestQuestionPool/classes/tables/class.assFileUploadFileTableGUI.php";
-            $table_gui = new assFileUploadFileTableGUI($this->getTargetGuiClass(), 'gotoquestion');
+            $table_gui = new assFileUploadFileTableGUI($this, 'gotoquestion');
             $table_gui->setTitle(
                 $this->lng->txt('already_delivered_files'),
                 'icon_file.svg',
@@ -282,23 +272,15 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
         if (($active_id > 0) && (!$show_correct_solution)) {
             $reached_points = $this->object->getReachedPoints($active_id, $pass);
             if ($graphicalOutput) {
-                // output of ok/not ok icons for user entered solutions
+                $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_NOT_OK);
                 if ($reached_points == $this->object->getMaximumPoints()) {
-                    $template->setCurrentBlock("icon_ok");
-                    $template->setVariable("ICON_OK", ilUtil::getImagePath("icon_ok.svg"));
-                    $template->setVariable("TEXT_OK", $this->lng->txt("answer_is_right"));
-                    $template->parseCurrentBlock();
-                } else {
-                    $template->setCurrentBlock("icon_ok");
-                    if ($reached_points > 0) {
-                        $template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_mostly_ok.svg"));
-                        $template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_not_correct_but_positive"));
-                    } else {
-                        $template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_not_ok.svg"));
-                        $template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_wrong"));
-                    }
-                    $template->parseCurrentBlock();
+                    $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_OK);
+                } elseif ($reached_points > 0) {
+                    $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_MOSTLY_OK);
                 }
+                $template->setCurrentBlock("icon_ok");
+                $template->setVariable("ICON_OK", $correctness_icon);
+                $template->parseCurrentBlock();
             }
         } else {
             $reached_points = $this->object->getPoints();
@@ -338,7 +320,6 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
 
         if (is_object($this->getPreviewSession())) {
             $files = $this->object->getPreviewFileUploads($this->getPreviewSession());
-            include_once "./Modules/TestQuestionPool/classes/tables/class.assFileUploadFileTableGUI.php";
             $table_gui = new assFileUploadFileTableGUI(null, $this->getQuestionActionCmd(), 'ilAssQuestionPreview');
             $table_gui->setTitle(
                 $this->lng->txt('already_delivered_files'),
@@ -384,16 +365,8 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
         $template = new ilTemplate("tpl.il_as_qpl_fileupload_output.html", true, true, "Modules/TestQuestionPool");
 
         if ($active_id) {
-            // hey: prevPassSolutions - obsolete due to central check
-            #$solutions = NULL;
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
             $files = $this->object->getTestOutputSolutions($active_id, $pass);
             // hey.
-            include_once "./Modules/TestQuestionPool/classes/tables/class.assFileUploadFileTableGUI.php";
             $table_gui = new assFileUploadFileTableGUI(null, $this->getQuestionActionCmd());
             $table_gui->setTitle(
                 $this->lng->txt('already_delivered_files'),
@@ -471,7 +444,6 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
      */
     protected function buildFileTableDeleteButtonInstance(): ilAssFileUploadFileTableDeleteButton
     {
-        require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssFileUploadFileTableDeleteButton.php';
         return ilAssFileUploadFileTableDeleteButton::getInstance();
     }
 
@@ -480,7 +452,6 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
      */
     protected function buildFileTableReuseButtonInstance(): ilAssFileUploadFileTableReuseButton
     {
-        require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssFileUploadFileTableReuseButton.php';
         return ilAssFileUploadFileTableReuseButton::getInstance();
     }
 
@@ -557,7 +528,7 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
      */
     public function saveCorrectionsFormProperties(ilPropertyFormGUI $form): void
     {
-        $this->object->setPoints((float) $form->getInput('points'));
+        $this->object->setPoints((float) str_replace(',', '.', $form->getInput('points')));
         $this->object->setCompletionBySubmission((bool) $form->getInput('completion_by_submission'));
     }
 }

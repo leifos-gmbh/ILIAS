@@ -33,7 +33,10 @@ class ilDclExportGUI extends ilExportGUI
      */
     public function createExportFile(): void
     {
-        $format = $this->http->wrapper()->post()->retrieve('format', $this->refinery->kindlyTo()->string());
+        $format = "";
+        if ($this->http->wrapper()->post()->has('format')) {
+            $format = $this->http->wrapper()->post()->retrieve('format', $this->refinery->kindlyTo()->string());
+        }
         if ($format === 'xlsx') {
             $this->checkForExportableFields();
         }
@@ -46,9 +49,6 @@ class ilDclExportGUI extends ilExportGUI
      */
     protected function checkForExportableFields(): bool
     {
-        global $DIC;
-        $ilCtrl = $DIC['ilCtrl'];
-        $lng = $DIC['lng'];
         foreach ($this->obj->getTables() as $tbl) {
             /** @var $tbl ilDclTable */
             foreach ($tbl->getFields() as $field) {
@@ -58,8 +58,8 @@ class ilDclExportGUI extends ilExportGUI
             }
         }
 
-        $this->tpl->setOnScreenMessage('failure', $lng->txt('dcl_no_export_data_available'), true);
-        $ilCtrl->redirect($this, "listExportFiles");
+        $this->tpl->setOnScreenMessage('failure', $this->lng->txt('dcl_no_export_data_available'), true);
+        $this->ctrl->redirect($this, "listExportFiles");
 
         return false;
     }

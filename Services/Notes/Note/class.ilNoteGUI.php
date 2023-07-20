@@ -272,6 +272,7 @@ class ilNoteGUI
 
     public function getCommentsHTML(): string
     {
+        $this->gui->initJavascript();
         $ilCtrl = $this->ctrl;
         $ilCtrl->setParameter($this, "notes_type", Note::PUBLIC);
         $this->requested_note_type = Note::PUBLIC;
@@ -553,7 +554,16 @@ class ilNoteGUI
         $item_groups[] = $f->item()->group($it_group_title, $items);
 
         if ($notes_given) {
-            $panel = $f->panel()->listing()->standard("", $item_groups);
+            if (!is_array($this->rep_obj_id)) {
+                $title = $item_groups[0]->getTitle();
+                $item_groups[0] = $f->item()->group("", $item_groups[0]->getItems());
+            } else {
+                $title = "";
+            }
+            $panel = $f->panel()->listing()->standard($title, $item_groups);
+            if (!is_array($this->rep_obj_id)) {
+                $panel = $panel->withActions($this->getSortationControl());
+            }
             $html = $this->renderComponents([$panel]);
             $html = str_replace($text_placeholders, $texts, $html);
             $tpl->setVariable("NOTES_LIST", $html);
@@ -635,6 +645,50 @@ class ilNoteGUI
         }
 
         return $tpl->get();
+    }
+
+    /**
+     * @throws ilCtrlException
+     */
+    //protected function getSortationControl() : \ILIAS\UI\Component\ViewControl\Sortation
+    protected function getSortationControl(): \ILIAS\UI\Component\Dropdown\Standard
+    {
+        /*
+        $c = $this->lng->txt("create_date") . ", ";
+        $options = [
+            'desc' => $c . $this->lng->txt("sorting_desc"),
+            'asc' => $c . $this->lng->txt("sorting_asc")
+        ];
+        $select_option = (true)
+            ? 'asc'
+            : 'desc';
+        $s = $this->ui->factory()->viewControl()->sortation($options)
+                      ->withTargetURL($this->ctrl->getLinkTarget($this, "setSortation"), 'sortation')
+                      ->withLabel($options[$select_option]);*/
+        $dd_buttons = [];
+        if ($this->manager->getSortAscending()) {
+            $dd_buttons[] = $this->getShyButton(
+                "sort",
+                $this->lng->txt("notes_sort_desc"),
+                "listSortDesc",
+                "",
+                0
+            );
+        } else {
+            $dd_buttons[] = $this->getShyButton(
+                "sort",
+                $this->lng->txt("notes_sort_asc"),
+                "listSortAsc",
+                "",
+                0
+            );
+        }
+
+        $s = $this->ui->factory()->dropdown()->standard(
+            $dd_buttons
+        );
+
+        return $s;
     }
 
     protected function getItemGroupTitle(int $obj_id = 0): string
@@ -1172,7 +1226,7 @@ class ilNoteGUI
             )->withOnLoadCode(function ($id) use ($ctrl, $a_cmd, $note_id) {
                 $ctrl->setParameterByClass("ilnotegui", "note_id", $note_id);
                 return
-                    "$('#$id').on('click', () => { ilNotes.cmdAjaxLink(event, '" .
+                    "document.querySelector('#$id').addEventListener('click', () => { ilNotes.cmdAjaxLink(event, '" .
                     $ctrl->getLinkTargetByClass("ilnotegui", $a_cmd, "", true) .
                     "');});";
             });
@@ -1203,7 +1257,7 @@ class ilNoteGUI
                 "#"
             )->withOnLoadCode(function ($id) use ($ctrl, $a_cmd) {
                 return
-                    "$('#$id').on('click', () => { ilNotes.cmdAjaxLink(event, '" .
+                    "document.querySelector('#$id').addEventListener('click', () => { ilNotes.cmdAjaxLink(event, '" .
                     $ctrl->getLinkTargetByClass("ilnotegui", $a_cmd, "", true) .
                     "');});";
             });
@@ -1282,7 +1336,7 @@ class ilNoteGUI
         if ($cnt > 0) {
             $c = $f->counter()->status((int) $cnt);
             $comps[] = $f->symbol()->glyph()->comment()->withCounter($c)->withAdditionalOnLoadCode(function ($id) use ($hash, $update_url, $widget_el_id) {
-                return "$(\"#$id\").click(function(event) { " . self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"" . $widget_el_id . "\",\"" . $update_url . "\");") . "});";
+                return "document.querySelector('#$id').addEventListener('click', function(event) { " . self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"" . $widget_el_id . "\",\"" . $update_url . "\");") . "});";
             });
             $comps[] = $f->divider()->vertical();
             $tpl->setVariable("GLYPH", $r->render($comps));
@@ -1290,7 +1344,7 @@ class ilNoteGUI
         }
 
         $b = $f->button()->shy($lng->txt("notes_add_edit_comment"), "#")->withAdditionalOnLoadCode(function ($id) use ($hash, $update_url, $widget_el_id) {
-            return "$(\"#$id\").click(function(event) { " . self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"" . $widget_el_id . "\",\"" . $update_url . "\");") . "});";
+            return "document.querySelector('#$id').addEventListener('click', function(event) { " . self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"" . $widget_el_id . "\",\"" . $update_url . "\");") . "});";
         });
         if ($ctrl->isAsynch()) {
             $tpl->setVariable("SHY_BUTTON", $r->renderAsync($b));

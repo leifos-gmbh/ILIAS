@@ -18,6 +18,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+use ILIAS\Cron\Schedule\CronJobScheduleType;
+
 /**
  * Inform a user, that her qualification is about to expire
  */
@@ -25,12 +27,10 @@ class ilPrgUserNotRestartedCronJob extends ilCronJob
 {
     private const ID = 'prg_user_not_restarted';
 
-    /**
-     * @var mixed
-     */
-    protected $log;
+    protected ilComponentLogger $log;
     protected ilLanguage $lng;
-    protected Pimple\Container $dic;
+    protected ilPRGAssignmentDBRepository $assignment_repo;
+    protected ilPrgCronJobAdapter $adapter;
 
     public function __construct()
     {
@@ -39,7 +39,9 @@ class ilPrgUserNotRestartedCronJob extends ilCronJob
         $this->lng = $DIC['lng'];
         $this->lng->loadLanguageModule('prg');
 
-        $this->dic = ilStudyProgrammeDIC::dic();
+        $dic = ilStudyProgrammeDIC::dic();
+        $this->assignment_repo = $dic['repo.assignment'];
+        $this->adapter = $dic['cron.notRestarted'];
     }
 
     public function getTitle(): string
@@ -61,14 +63,15 @@ class ilPrgUserNotRestartedCronJob extends ilCronJob
     {
         return true;
     }
+
     public function hasFlexibleSchedule(): bool
     {
         return true;
     }
 
-    public function getDefaultScheduleType(): int
+    public function getDefaultScheduleType(): CronJobScheduleType
     {
-        return self::SCHEDULE_TYPE_IN_DAYS;
+        return CronJobScheduleType::SCHEDULE_TYPE_IN_DAYS;
     }
 
     public function getDefaultScheduleValue(): ?int
@@ -81,10 +84,8 @@ class ilPrgUserNotRestartedCronJob extends ilCronJob
         $result = new ilCronJobResult();
         $result->setStatus(ilCronJobResult::STATUS_NO_ACTION);
 
-        $programmes_to_send = $this->getSettingsRepository()
-            ->getProgrammeIdsWithMailsForExpiringValidity();
-
-        if (count($programmes_to_send) === 0) {
+        $programmes_to_send = $this->adapter->getRelevantProgrammeIds();
+        if (count($programmes_to_send) == 0) {
             return $result;
         }
 
@@ -96,25 +97,23 @@ class ilPrgUserNotRestartedCronJob extends ilCronJob
             $programmes_and_due[$programme_obj_id] = $due;
         }
 
-        $progresses = $this->getProgressRepository()
-            ->getAboutToExpire($programmes_and_due);
+        $assignments = $this->assignment_repo->getAboutToExpire($programmes_and_due, true);
 
-        if (count($progresses) === 0) {
+        if (count($assignments) == 0) {
             return $result;
         }
-
-        $events = $this->getEvents();
-        foreach ($progresses as $progress) {
+        foreach ($assignments as $ass) {
+            $pgs = $ass->getProgressTree();
             $this->log(
                 sprintf(
-                    'PRG, UserNotRestarted: user %s\'s qualification is about to expire at progress %s (prg obj_id %s)',
-                    $progress->getUserId(),
-                    $progress->getId(),
-                    $progress->getNodeId()
+                    'PRG, UserNotRestarted: user %s\'s qualification is about to expire at assignment %s (prg obj_id %s)',
+                    $ass->getUserId(),
+                    $ass->getId(),
+                    $pgs->getNodeId()
                 )
             );
-
-            $events->informUserByMailToRestart($progress);
+            $this->adapter->actOnSingleAssignment($ass);
+            $this->assignment_repo->storeExpiryInfoSentFor($ass);
         }
         $result->setStatus(ilCronJobResult::STATUS_OK);
         return $result;
@@ -123,26 +122,6 @@ class ilPrgUserNotRestartedCronJob extends ilCronJob
     protected function getNow(): DateTimeImmutable
     {
         return new DateTimeImmutable();
-    }
-
-    protected function getSettingsRepository(): ilStudyProgrammeSettingsDBRepository
-    {
-        return $this->dic['model.Settings.ilStudyProgrammeSettingsRepository'];
-    }
-
-    protected function getProgressRepository(): ilStudyProgrammeProgressDBRepository
-    {
-        return $this->dic['ilStudyProgrammeUserProgressDB'];
-    }
-
-    protected function getAssignmentRepository(): ilStudyProgrammeAssignmentDBRepository
-    {
-        return $this->dic['ilStudyProgrammeUserAssignmentDB'];
-    }
-
-    protected function getEvents(): ilStudyProgrammeEvents
-    {
-        return $this->dic['ilStudyProgrammeEvents'];
     }
 
     protected function log(string $msg): void

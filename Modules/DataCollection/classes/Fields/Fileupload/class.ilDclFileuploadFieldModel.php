@@ -13,13 +13,10 @@
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
  *
- ********************************************************************
- */
+ *********************************************************************/
 
 /**
- * Class ilDclBooleanFieldModel
- * @author  Michael Herren <mh@studer-raimann.ch>
- * @version 1.0.0
+ * @deprecated use new type ilDCLFileFieldModel instead
  */
 class ilDclFileuploadFieldModel extends ilDclBaseFieldModel
 {
@@ -67,14 +64,10 @@ class ilDclFileuploadFieldModel extends ilDclBaseFieldModel
         return $sql_obj;
     }
 
-    /**
-     * Returns supported file-extensions
-     * @return array|string
-     */
-    public function getSupportedExtensions()
+    public function getSupportedExtensions(): array
     {
         if (!$this->hasProperty(ilDclBaseFieldModel::PROP_SUPPORTED_FILE_TYPES)) {
-            return "*";
+            return [];
         }
 
         $file_types = $this->getProperty(ilDclBaseFieldModel::PROP_SUPPORTED_FILE_TYPES);
@@ -119,7 +112,7 @@ class ilDclFileuploadFieldModel extends ilDclBaseFieldModel
 
     public function getValidFieldProperties(): array
     {
-        return array(ilDclBaseFieldModel::PROP_SUPPORTED_FILE_TYPES);
+        return [ilDclBaseFieldModel::PROP_SUPPORTED_FILE_TYPES];
     }
 
     public function allowFilterInListView(): bool

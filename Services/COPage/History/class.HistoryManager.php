@@ -29,6 +29,7 @@ use ILIAS\COPage\InternalDomainService;
  */
 class HistoryManager
 {
+    protected \ILIAS\COPage\PC\PCDefinition $pc_definition;
     protected HistoryDBRepository $history_repo;
 
     public function __construct(
@@ -37,6 +38,9 @@ class HistoryManager
         InternalDomainService $domain_service
     ) {
         $this->history_repo = $repo_service->history();
+        $this->pc_definition = $domain_service
+            ->pc()
+            ->definition();
     }
 
     /**
@@ -49,13 +53,13 @@ class HistoryManager
         $deleted = false;
 
         foreach ($this->history_repo->getMaxHistEntryPerPageOlderThanX($x_days) as $page) {
-            $max_deletable = $this->history_repo->getMaxDeletableNr($keep_entries, $page["parent_type"], $page["page_id"], $page["lang"]);
+            $max_deletable = $this->history_repo->getMaxDeletableNr($keep_entries, $page["parent_type"], (int) $page["page_id"], $page["lang"]);
             $delete_lower_than_nr = min($page["max_nr"], $max_deletable);
             if ($delete_lower_than_nr > 0) {
                 $this->deleteHistoryEntriesOlderEqualThanNr(
                     $delete_lower_than_nr,
                     $page["parent_type"],
-                    $page["page_id"],
+                    (int) $page["page_id"],
                     $page["lang"]
                 );
                 $deleted = true;
@@ -71,7 +75,7 @@ class HistoryManager
         int $page_id,
         string $lang
     ): void {
-        $defs = \ilCOPagePCDef::getPCDefinitions();
+        $defs = $this->pc_definition->getPCDefinitions();
         foreach ($defs as $def) {
             $cl = $def["pc_class"];
             $cl::deleteHistoryLowerEqualThan(

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 /**
  * Class ilForumTopicTableGUI
  * @author  Nadia Matuschek <nmatuschek@databay.de>
@@ -30,7 +30,6 @@ class ilForumTopicTableGUI extends ilTable2GUI
     private ilForum $mapper;
     private bool $is_moderator = false;
     private int $ref_id = 0;
-    private int $overview_setting = 0;
     private ForumDto $topicData;
     private ?ilForumTopic $merge_thread_obj = null;
     private int $position = 1;
@@ -44,8 +43,7 @@ class ilForumTopicTableGUI extends ilTable2GUI
         string $a_parent_cmd,
         int $ref_id,
         ForumDto $topicData,
-        bool $is_moderator = false,
-        int $overview_setting = 0
+        bool $is_moderator = false
     ) {
         global $DIC;
 
@@ -56,7 +54,6 @@ class ilForumTopicTableGUI extends ilTable2GUI
 
         $this->parent_cmd = $a_parent_cmd;
         $this->setIsModerator($is_moderator);
-        $this->setOverviewSetting($overview_setting);
         $this->setRefId($ref_id);
         $this->setTopicData($topicData);
 
@@ -108,27 +105,23 @@ class ilForumTopicTableGUI extends ilTable2GUI
         $this->setFormAction($this->ctrl->getFormAction($this->getParentObject(), 'showThreads'));
         $this->setRowTemplate('tpl.forums_threads_table.html', 'Modules/Forum');
 
-        if ($this->parent_cmd === 'sortThreads') {
-            $this->addCommandButton('saveThreadSorting', $this->lng->txt('save'));
-        } else {
-            $this->addMultiCommand('', $this->lng->txt('please_choose'));
-            if ($this->settings->get('forum_notification') > 0 && !$this->user->isAnonymous()) {
-                $this->addMultiCommand('enable_notifications', $this->lng->txt('forums_enable_notification'));
-                $this->addMultiCommand('disable_notifications', $this->lng->txt('forums_disable_notification'));
-            }
-            if ($this->getIsModerator()) {
-                $this->addMultiCommand('makesticky', $this->lng->txt('make_topics_sticky'));
-                $this->addMultiCommand('unmakesticky', $this->lng->txt('make_topics_non_sticky'));
-                $this->addMultiCommand('editThread', $this->lng->txt('frm_edit_title'));
-                $this->addMultiCommand('close', $this->lng->txt('close_topics'));
-                $this->addMultiCommand('reopen', $this->lng->txt('reopen_topics'));
-                $this->addMultiCommand('move', $this->lng->txt('move_thread_to_forum'));
-            }
-            $this->addMultiCommand('html', $this->lng->txt('export_html'));
-            if ($this->getIsModerator()) {
-                $this->addMultiCommand('confirmDeleteThreads', $this->lng->txt('delete'));
-                $this->addMultiCommand('mergeThreads', $this->lng->txt('merge_posts_into_thread'));
-            }
+        $this->addMultiCommand('', $this->lng->txt('please_choose'));
+        if ($this->settings->get('forum_notification') > 0 && !$this->user->isAnonymous()) {
+            $this->addMultiCommand('enable_notifications', $this->lng->txt('forums_enable_notification'));
+            $this->addMultiCommand('disable_notifications', $this->lng->txt('forums_disable_notification'));
+        }
+        if ($this->getIsModerator()) {
+            $this->addMultiCommand('makesticky', $this->lng->txt('make_topics_sticky'));
+            $this->addMultiCommand('unmakesticky', $this->lng->txt('make_topics_non_sticky'));
+            $this->addMultiCommand('editThread', $this->lng->txt('frm_edit_title'));
+            $this->addMultiCommand('close', $this->lng->txt('close_topics'));
+            $this->addMultiCommand('reopen', $this->lng->txt('reopen_topics'));
+            $this->addMultiCommand('move', $this->lng->txt('move_thread_to_forum'));
+        }
+        $this->addMultiCommand('html', $this->lng->txt('export_html'));
+        if ($this->getIsModerator()) {
+            $this->addMultiCommand('confirmDeleteThreads', $this->lng->txt('delete'));
+            $this->addMultiCommand('mergeThreads', $this->lng->txt('merge_posts_into_thread'));
         }
         $this->setShowRowsSelector(true);
         $this->setRowSelectorLabel($this->lng->txt('number_of_threads'));
@@ -185,7 +178,7 @@ class ilForumTopicTableGUI extends ilTable2GUI
                     (string) $thread->getId()
                 )
             );
-        } elseif ('showThreads' === $this->parent_cmd) {
+        } else {
             $this->tpl->setVariable(
                 'VAL_CHECK',
                 ilLegacyFormElementsUtil::formCheckbox(
@@ -206,17 +199,9 @@ class ilForumTopicTableGUI extends ilTable2GUI
                 $rating->setUserId($this->user->getId());
                 $this->tpl->setVariable('VAL_RATING', $rating->getHTML());
             }
-        } else {
-            if ($thread->isSticky()) {
-                $this->tpl->setVariable('VAL_SORTING_NAME', 'thread_sorting[' . $thread->getId() . ']');
-                $this->tpl->setVariable('VAL_SORTING', $this->position * 10);
-            } else {
-                $this->tpl->setVariable('VAL_CHECK', '');
-            }
-            $this->position++;
         }
-        $subject = '';
 
+        $subject = '';
         if ($thread->isSticky()) {
             $subject .= '<span class="light">[' . $this->lng->txt('sticky') . ']</span> ';
         }
@@ -233,7 +218,6 @@ class ilForumTopicTableGUI extends ilTable2GUI
 
         $num_posts = $thread->getNumPosts();
         $num_unread = $thread->getNumUnreadPosts();
-        $num_new = $thread->getNumNewPosts();
 
         $this->ctrl->setParameter($this->getParentObject(), 'page', 0);
         $subject = '<div><a href="' . $this->ctrl->getLinkTarget(
@@ -266,9 +250,6 @@ class ilForumTopicTableGUI extends ilTable2GUI
         if (!$this->user->isAnonymous()) {
             if ($num_unread > 0) {
                 $topicStats .= '<br /><span class="ilAlert ilWhiteSpaceNowrap">' . $this->lng->txt('unread') . ': ' . $num_unread . '</span>';
-            }
-            if ($num_new > 0 && $this->getOverviewSetting() === 0) {
-                $topicStats .= '<br /><span class="ilAlert ilWhiteSpaceNowrap">' . $this->lng->txt('new') . ': ' . $num_new . '</span>';
             }
         }
 
@@ -395,17 +376,6 @@ class ilForumTopicTableGUI extends ilTable2GUI
     public function getRefId(): int
     {
         return $this->ref_id;
-    }
-
-    public function setOverviewSetting(int $overview_setting): self
-    {
-        $this->overview_setting = $overview_setting;
-        return $this;
-    }
-
-    public function getOverviewSetting(): int
-    {
-        return $this->overview_setting;
     }
 
     public function setIsModerator(bool $is_moderator): self

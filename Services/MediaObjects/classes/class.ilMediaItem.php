@@ -27,6 +27,7 @@ class ilMediaItem
     protected string $text_representation = "";
     protected ilDBInterface $db;
     protected ilLanguage $lng;
+    protected \ILIAS\Filesystem\Util\Convert\LegacyImages $image_converter;
 
     public int $id = 0;
     public string $purpose = "";
@@ -58,6 +59,7 @@ class ilMediaItem
 
         $this->db = $DIC->database();
         $this->lng = $DIC->language();
+        $this->image_converter = $DIC->fileConverters()->legacyImages();
         $this->parameters = array();
         $this->mapareas = array();
         $this->map_cnt = 0;
@@ -811,15 +813,13 @@ class ilMediaItem
         if (is_file($jpeg_file)) {
             $format = "jpeg";
         }
-
         if (is_int(strpos($this->getFormat(), "image"))) {
             $thumb_file = $this->getThumbnailDirectory() . "/" .
                 $this->getPurpose() . "." . $format;
-
             $thumb_file_small = $this->getThumbnailDirectory() . "/" .
                 $this->getPurpose() . "_small." . $format;
             // generate thumbnail (if not tried before)
-            if ($this->getThumbTried() == "n" && $this->getLocationType() == "LocalFile") {
+            if ($this->getThumbTried() == "n" && $this->getLocationType() == "LocalFile" && $this->getFormat() !== "image/svg+xml") {
                 if (is_file($thumb_file)) {
                     unlink($thumb_file);
                 }
@@ -831,9 +831,13 @@ class ilMediaItem
                 $med_file = $this->getDirectory() . "/" . $this->getLocation();
 
                 if (is_file($med_file)) {
-                    ilShellUtil::convertImage($med_file, $thumb_file, $format, "80");
-                    ilShellUtil::convertImage($med_file, $thumb_file_small, $format, "40");
+                    $mob = new ilObjMediaObject($this->getMobId());
+                    $mob->makeThumbnail($this->getLocation(), $this->getPurpose() . "." . $format, $format, "80");
+                    $mob->makeThumbnail($this->getLocation(), $this->getPurpose() . "_small." . $format, $format, "40");
                 }
+            }
+            if ($this->getFormat() === "image/svg+xml") {
+                return ilObjMediaObject::_getURL($this->getMobId()) . "/" . $this->getLocation();
             }
             if ($a_size == "small") {
                 if (is_file($thumb_file_small)) {
@@ -863,16 +867,13 @@ class ilMediaItem
         $lng = $this->lng;
         $this->createWorkDirectory();
 
-        $geom = ($this->getWidth() != "" && $this->getHeight() != "")
-            ? $this->getWidth() . "x" . $this->getHeight()
-            : "";
-
         if ($this->getLocationType() !== "Reference") {
-            ilShellUtil::convertImage(
+            $this->image_converter->convertToFormat(
                 $this->getDirectory() . "/" . $this->getLocation(),
                 $this->getMapWorkCopyName(),
                 $this->getMapWorkCopyType(),
-                $geom
+                $this->getWidth() === '' ? null : $this->getWidth(),
+                $this->getHeight() === '' ? null : $this->getHeight()
             );
         } else {
             // first copy the external file, if necessary
@@ -890,11 +891,12 @@ class ilMediaItem
             }
 
             // now, create working copy
-            ilShellUtil::convertImage(
+            $this->image_converter->convertToFormat(
                 $this->getMapWorkCopyName(true),
                 $this->getMapWorkCopyName(),
                 $this->getMapWorkCopyType(),
-                $geom
+                $this->getWidth() === '' ? null : $this->getWidth(),
+                $this->getHeight() === '' ? null : $this->getHeight()
             );
         }
         if (!is_file($this->getMapWorkCopyName())) {

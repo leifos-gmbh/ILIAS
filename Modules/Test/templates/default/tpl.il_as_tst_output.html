@@ -16,7 +16,6 @@
 			</div>
 			<!-- END enableprocessingtime -->
 			<input type="hidden" name="formtimestamp" value="{FORM_TIMESTAMP}" />
-			<!-- BEGIN char_selector -->{CHAR_SELECTOR_TEMPLATE}<!-- END char_selector -->
 			<!-- BEGIN test_nav_toolbar -->{TEST_NAV_TOOLBAR}<!-- END test_nav_toolbar -->
 			<div class="ilTstNavigation">
 				<div class="ilTstNavigationBtn_Prev">
@@ -39,6 +38,9 @@
 					<!-- BEGIN instant_response_header -->
 					<div<!-- BEGIN inst_resp_id --> id="{INSTANT_RESPONSE_FOCUS_ID}"<!-- END inst_resp_id -->><h2 class="ilc_page_title_PageTitle">{INSTANT_RESPONSE_HEADER}</h2></div>
 					<!-- END instant_response_header -->
+					<!-- BEGIN instant_response_message -->
+					<p>{INSTANT_RESPONSE_MESSAGE}</p>
+					<!-- END instant_response_message -->
 					<!-- BEGIN received_points_information -->
 					<p>{RECEIVED_POINTS_INFORMATION}</p>
 					<!-- END received_points_information -->
@@ -92,45 +94,7 @@
 					jsswitch.style.display = "block";
 				}
 			</script>
-			<!-- END jsswitch -->
-			<script type="text/javascript" charset="utf-8">
-
-					// fau: testNav - moved saving on time reached to ilTestPlayerQuestionEditControl.js .
-
-					function saveTextarea(editor)
-					{
-						let form = document.forms['taForm'];
-						let input = document.createElement('input');
-						input.type = 'hidden';
-						input.name = 'cmd[submitSolution]';
-						input.value = 'save';
-
-						form.appendChild(input);
-						form.submit();
-					}
-
-					(function($){ $(document).ready( function()
-					{
-						//return;
-						$('#taForm').on('keyup keydown keypress', function(event) {
-							if( event.which == 13  && $(event.target).prop("tagName").toLowerCase() == "a" ) {
-								return;
-							}
-							if (event.which == 13) {
-								if ($(event.target).prop("tagName").toLowerCase() != "textarea" &&
-									(
-										$(event.target).prop("tagName").toLowerCase() != "input"
-											||
-											$(event.target).prop("type") != "submit"
-										)) {
-									event.preventDefault();
-								}
-							}
-						});
-					}
-					); })(jQuery);
-
-			</script>
+            <!-- END jsswitch -->
 		</form>
 	</div>
 </div>

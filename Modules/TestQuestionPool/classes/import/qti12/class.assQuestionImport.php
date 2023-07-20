@@ -15,7 +15,8 @@
  *
  *********************************************************************/
 
-use  ILIAS\TA\Questions\assQuestionSuggestedSolution;
+use ILIAS\TA\Questions\assQuestionSuggestedSolution;
+use ILIAS\TA\Questions\assQuestionSuggestedSolutionsDatabaseRepository;
 
 /**
 * Class for question imports
@@ -177,7 +178,7 @@ class assQuestionImport
     * @param array $import_mapping An array containing references to included ILIAS objects
     * @access public
     */
-    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping): void
+    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, $import_mapping): array
     {
     }
 
@@ -227,7 +228,6 @@ class assQuestionImport
      */
     protected function getQplImportArchivDirectory(): string
     {
-        include_once "./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php";
         return ilObjQuestionPool::_getImportDirectory() . '/' . ilSession::get("qpl_import_subdir");
     }
 
@@ -236,7 +236,6 @@ class assQuestionImport
      */
     protected function getTstImportArchivDirectory(): string
     {
-        include_once "./Modules/Test/classes/class.ilObjTest.php";
         return ilObjTest::_getImportDirectory() . '/' . ilSession::get("tst_import_subdir");
     }
 
@@ -264,13 +263,12 @@ class assQuestionImport
             ilSession::set('import_mob_xhtml', $mobs);
         }
 
-        include_once "./Services/RTE/classes/class.ilRTE.php";
         return ilRTE::_replaceMediaObjectImageSrc($text, 0, $sourceNic);
     }
 
     /**
      * fetches the "additional content editing mode" information from qti item
-     * and falls back to ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT when no or invalid information is given
+     * and falls back to ADDITIONAL_CONTENT_EDITING_MODE_RTE when no or invalid information is given
      *
      * @final
      * @access protected
@@ -281,7 +279,7 @@ class assQuestionImport
         $additionalContentEditingMode = $qtiItem->getMetadataEntry('additional_cont_edit_mode');
 
         if (!$this->object->isValidAdditionalContentEditingMode($additionalContentEditingMode ?? '')) {
-            $additionalContentEditingMode = assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT;
+            $additionalContentEditingMode = assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_RTE;
         }
 
         return $additionalContentEditingMode;
@@ -299,18 +297,18 @@ class assQuestionImport
 
         $repo = $this->getSuggestedSolutionsRepo();
 
-        $nu_value = $this->object->_resolveInternalLink($value);
+        $nu_value = $this->object->resolveInternalLink($value);
         $solution = $repo->create($question_id, $type)
             ->withInternalLink($nu_value)
             ->withImportId($value);
-        $repo->update($solution);
+        $repo->update([$solution]);
     }
 
-    protected function findSolutionTypeByValue(strgin $value): ?string
+    protected function findSolutionTypeByValue(string $value): ?string
     {
         foreach (array_keys(assQuestionSuggestedSolution::TYPES) as $type) {
             $search_type = '_' . $type . '_';
-            if (substr($value, $search_type)) {
+            if (strpos($value, $search_type) !== false) {
                 return $type;
             }
         }

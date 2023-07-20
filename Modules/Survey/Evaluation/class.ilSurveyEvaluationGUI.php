@@ -29,6 +29,7 @@ class ilSurveyEvaluationGUI
     public const TYPE_XLS = "excel";
     public const TYPE_SPSS = "csv";
     public const EXCEL_SUBTITLE = "DDDDDD";
+    protected \ILIAS\Survey\InternalGUIService $gui;
     protected \ILIAS\Survey\Access\AccessManager $access_manager;
     protected \ILIAS\Survey\PrintView\GUIService $print;
     /**
@@ -112,6 +113,7 @@ class ilSurveyEvaluationGUI
                 $DIC->user()->getId()
             );
         $this->skill_profile_service = $DIC->skills()->profile();
+        $this->gui = $DIC->survey()->internal()->gui();
     }
 
     public function executeCommand(): string
@@ -166,7 +168,7 @@ class ilSurveyEvaluationGUI
             array("evaluationdetails")
         );
 
-        if ($this->hasResultsAccess()) {
+        if ($this->hasResultsAccess() && $this->object->getMode() !== ilObjSurvey::MODE_IND_FEEDB) {
             $ilTabs->addSubTabTarget(
                 "svy_eval_user",
                 $this->ctrl->getLinkTarget($this, "evaluationuser"),
@@ -694,7 +696,11 @@ class ilSurveyEvaluationGUI
         if ($this->object->getSkillService() && $skmg_set->isActivated()) {
             $this->competenceEval();
         } else {
-            $this->evaluation();
+            if ($this->object->getMode() === ilObjSurvey::MODE_IND_FEEDB) {
+                $this->evaluationdetails();
+            } else {
+                $this->evaluation();
+            }
         }
     }
 
@@ -773,7 +779,7 @@ class ilSurveyEvaluationGUI
             $finished_ids = $this->evaluation_manager->getFilteredFinishedIds();
 
             // parse answer data in evaluation results
-            $list = new ilNestedList();
+            $listing = $this->gui->listing();
 
             $panels = [];
             foreach ($this->object->getSurveyQuestions() as $qdata) {
@@ -796,21 +802,29 @@ class ilSurveyEvaluationGUI
                         $qdata["questionblock_id"] != $this->last_questionblock_id) {
                         $qblock = ilObjSurvey::_getQuestionblock($qdata["questionblock_id"]);
                         if ($qblock["show_blocktitle"]) {
-                            $list->addListNode($qdata["questionblock_title"], "q" . $qdata["questionblock_id"]);
+                            $listing->node(
+                                $this->ui->factory()->legacy($qdata["questionblock_title"]),
+                                "q" . $qdata["questionblock_id"]
+                            );
                         } else {
-                            $list->addListNode("", "q" . $qdata["questionblock_id"]);
+                            $listing->node(
+                                $this->ui->factory()->legacy(""),
+                                "q" . $qdata["questionblock_id"]
+                            );
                         }
                         $this->last_questionblock_id = $qdata["questionblock_id"];
                     }
                     $anchor_id = "svyrdq" . $qdata["question_id"];
-                    $list->addListNode("<a href='#" . $anchor_id . "'>" . $qdata["title"] . "</a>", $qdata["question_id"], $qdata["questionblock_id"] ?
-                        "q" . $qdata["questionblock_id"] : 0);
+                    $listing->node(
+                        $this->ui->factory()->link()->standard($qdata["title"], "#" . $anchor_id),
+                        (string) $qdata["question_id"],
+                        $qdata["questionblock_id"] ? "q" . $qdata["questionblock_id"] : "0"
+                    );
                 }
             }
 
             if ($details) {
-                $list->setListClass("il_Explorer");
-                $toc_tpl->setVariable("LIST", $list->getHTML());
+                $toc_tpl->setVariable("LIST", $listing->render());
 
                 //TABLE OF CONTENTS
                 $panel_toc = $ui_factory->panel()->standard("", $ui_factory->legacy($toc_tpl->get()));
@@ -1082,10 +1096,10 @@ class ilSurveyEvaluationGUI
             $modal_id = "svy_ev_exp";
             $modal = $this->buildExportModal($modal_id, "exportevaluationuser");
 
-            $button = ilLinkButton::getInstance();
-            $button->setCaption("export");
-            $button->setOnClick('$(\'#' . $modal_id . '\').modal(\'show\')');
-            $ilToolbar->addButtonInstance($button);
+            $this->gui->button(
+                $this->lng->txt("export"),
+                "#"
+            )->onClick('$(\'#' . $modal_id . '\').modal(\'show\')')->toToolbar();
 
             $ilToolbar->addSeparator();
 
@@ -1152,15 +1166,14 @@ class ilSurveyEvaluationGUI
         // -> add gap analysis to profile
         $profiles = $this->skill_profile_service->getProfilesOfUser($appr_id);
         foreach ($profiles as $p) {
-            $prof = $this->skill_profile_service->getById($p["id"]);
-            $prof_levels = $prof->getSkillLevels();
+            $prof_levels = $this->skill_profile_service->getSkillLevels($p->getId());
             foreach ($prof_levels as $pl) {
-                if (isset($skills[$pl["base_skill_id"] . ":" . $pl["tref_id"]])) {
-                    $skills[$pl["base_skill_id"] . ":" . $pl["tref_id"]]["profiles"][] =
-                        $p["id"];
+                if (isset($skills[$pl->getBaseSkillId() . ":" . $pl->getTrefId()])) {
+                    $skills[$pl->getBaseSkillId() . ":" . $pl->getTrefId()]["profiles"][] =
+                        $p->getId();
 
-                    $eval_modes["gap_" . $p["id"]] =
-                        $lng->txt("svy_gap_analysis") . ": " . $prof->getTitle();
+                    $eval_modes["gap_" . $p->getId()] =
+                        $lng->txt("svy_gap_analysis") . ": " . $p->getTitle();
                 }
             }
         }
@@ -1224,7 +1237,7 @@ class ilSurveyEvaluationGUI
                 $sskill = new ilSurveySkill($survey);
                 $self_levels = array();
                 foreach ($sskill->determineSkillLevelsForAppraisee($appr_id, true) as $sl) {
-                    $self_levels[$sl["base_skill_id"]][$sl["tref_id"]] = $sl["new_level_id"];
+                    $self_levels[$sl["base_skill_id"]][$sl["tref_id"]] = $sl["new_level_id"] ?? 0;
                 }
                 $pskills_gui->setGapAnalysisSelfEvalLevels($self_levels);
             }
@@ -1269,11 +1282,10 @@ class ilSurveyEvaluationGUI
         $modal_id = "svy_ev_exp";
         $modal = $this->buildExportModal($modal_id, "exportevaluationuser");
 
-        $button = ilLinkButton::getInstance();
-        $button->setCaption("print");
-        $button->setOnClick("window.print(); return false;");
-        $button->setOmitPreventDoubleSubmission(true);
-        $ilToolbar->addButtonInstance($button);
+        $this->gui->button(
+            $this->lng->txt("print"),
+            "#"
+        )->onClick("window.print(); return false;")->toToolbar();
 
         $finished_ids = null;
 
@@ -1325,6 +1337,16 @@ class ilSurveyEvaluationGUI
      */
     public function printResultsDetailsSelection(): void
     {
+        $this->ctrl->setParameterByClass(
+            "ilSurveyEvaluationGUI",
+            "vw",
+            $this->request->getVW()
+        );
+        $this->ctrl->setParameterByClass(
+            "ilSurveyEvaluationGUI",
+            "cp",
+            $this->request->getCP()
+        );
         $view = $this->print->resultsDetails($this->object->getRefId());
         $view->sendForm();
     }

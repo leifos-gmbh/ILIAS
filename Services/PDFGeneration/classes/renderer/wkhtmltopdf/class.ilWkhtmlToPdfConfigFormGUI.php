@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,11 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
+/**
+ * @deprecated
+ */
 class ilWkhtmlToPdfConfigFormGUI
 {
     private ilLanguage $lng;
@@ -327,7 +330,13 @@ class ilWkhtmlToPdfConfigFormGUI
     {
         $everything_ok = true;
         $config = new ilWkhtmlToPdfConfig();
-        $config->setPath($this->request->securedString('path'));
+        $path = realpath(ilShellUtil::escapeShellCmd($this->request->securedString('path')));
+        if($path === false) {
+            $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt("file_not_found"), true);
+            $everything_ok = false;
+            $path = '';
+        }
+        $config->setPath($path);
         if (mb_stripos($config->getPath(), 'wkhtmlto') === false) {
             $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt("file_not_found"), true);
             $everything_ok = false;

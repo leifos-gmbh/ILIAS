@@ -114,6 +114,13 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
                     }
                 }
             }
+            #22328 render session block if previous or next session link is available
+            if (
+                !count($this->items['sess'] ?? []) &&
+                ($prefix !== '' || $postfix !== '')
+            ) {
+                $this->renderer->addItemToBlock('sess', '', 0, '&nbsp;');
+            }
         }
 
         $pos = $this->getItemGroupsHTML(1);
@@ -268,13 +275,13 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
 
 
         // do session limit
-        if ($request->getPreviousSession() > 0) {
+        if ($request->getPreviousSession() !== null) {
             $user->writePref(
                 'crs_sess_show_prev_' . $container->getId(),
                 (string) $request->getPreviousSession()
             );
         }
-        if ($request->getNextSession() > 0) {
+        if ($request->getNextSession() !== null) {
             $user->writePref(
                 'crs_sess_show_next_' . $container->getId(),
                 (string) $request->getNextSession()

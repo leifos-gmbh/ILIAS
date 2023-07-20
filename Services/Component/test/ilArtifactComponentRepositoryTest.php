@@ -1,6 +1,20 @@
 <?php
-
-/* Copyright (c) 2021 Richard Klees <richard.klees@concepts-and-training.de>, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ ********************************************************************
+ */
 
 use PHPUnit\Framework\TestCase;
 use ILIAS\Data;
@@ -52,6 +66,21 @@ class ilArtifactComponentRepositoryTest extends TestCase
             false
         ]
     ];
+
+    protected Data\Factory $data_factory;
+    protected Data\Version $ilias_version;
+    protected ilPluginStateDB $plugin_state_db;
+    protected ilArtifactComponentRepository $db;
+    protected ilComponentInfo $mod1;
+    protected ilPluginSlotInfo $slt1;
+    protected ilPluginInfo $plg1;
+    protected ilPluginSlotInfo $slt2;
+    protected ilComponentInfo $mod2;
+    protected ilComponentInfo $ser1;
+    protected ilPluginSlotInfo $slt3;
+    protected ilComponentInfo $ser2;
+    protected ilPluginSlotInfo $slt4;
+    protected ilPluginInfo $plg2;
 
     protected function setUp(): void
     {

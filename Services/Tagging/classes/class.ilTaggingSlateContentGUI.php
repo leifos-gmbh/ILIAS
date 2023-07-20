@@ -130,7 +130,7 @@ class ilTaggingSlateContentGUI implements ilCtrlBaseClassInterface
                 $list_cmd = $ilCtrl->getLinkTarget($this, "showResourcesForTag");
                 $tpl->setVariable(
                     "ON_CLICK",
-                    "il.Util.ajaxReplaceInner('$list_cmd', 'il-tag-slate-container'); return false;"
+                    "il.repository.core.fetchReplaceInner(document.getElementById('il-tag-slate-container'), '$list_cmd'); return false;"
                 );
                 $tpl->setVariable("TAG_TITLE", $tag["tag"]);
                 $tpl->setVariable("HREF_TAG", "#");
@@ -162,7 +162,11 @@ class ilTaggingSlateContentGUI implements ilCtrlBaseClassInterface
         $tag_cmd = $ctrl->getLinkTarget($this, "showTagCloud", "", true, false);
         $back_button = $ui->factory()->button()->bulky($ui->factory()->symbol()->glyph()->back(), $lng->txt("back"), "#")->withOnLoadCode(function ($id) use ($tag_cmd) {
             return
-                "$(\"#$id\").click(function() { il.Util.ajaxReplaceInner('$tag_cmd', 'il-tag-slate-container'); return false;});";
+                "document.getElementById('$id').addEventListener('click', function() {
+                const el = document.getElementById('il-tag-slate-container');
+                if (el) {
+                    il.repository.core.fetchReplaceInner(el, '$tag_cmd'); return false;});
+                }";
         });
 
         // resource list
@@ -198,6 +202,7 @@ class ilTaggingSlateContentGUI implements ilCtrlBaseClassInterface
             $mbox = $f->messageBox()->info(
                 sprintf($lng->txt("tagging_no_obj_for_tag"), ilUtil::secureString($tag))
             );
+            $this->removeTagsWithoutAccess();
             $components = [$back_button, $mbox];
         }
 
@@ -236,7 +241,7 @@ class ilTaggingSlateContentGUI implements ilCtrlBaseClassInterface
         $objs = ilTagging::getObjectsForTagAndUser($ilUser->getId(), $tag);
 
         foreach ($objs as $key => $obj) {
-            $ref_ids = ilObject::_getAllReferences($obj["obj_id"]);
+            $ref_ids = ilObject::_getAllReferences((int) $obj["obj_id"]);
             if (count($ref_ids) == 0) {
                 $inaccessible = true;
             } else {
@@ -255,14 +260,17 @@ class ilTaggingSlateContentGUI implements ilCtrlBaseClassInterface
                     $inaccessible = true;
                 }
                 if ($inaccessible) {
-                    ilTagging::deleteTagOfObjectForUser($ilUser->getId(), $obj["obj_id"], $obj["obj_type"], $obj["sub_obj_id"], $obj["sub_obj_type"], $tag);
+                    ilTagging::deleteTagOfObjectForUser(
+                        $ilUser->getId(),
+                        (int) $obj["obj_id"],
+                        (string) $obj["obj_type"],
+                        (int) $obj["sub_obj_id"],
+                        (string) $obj["sub_obj_type"],
+                        $tag
+                    );
                 }
             }
         }
-
-        $this->main_tpl->setOnScreenMessage('success', $lng->txt("tag_tags_deleted"), true);
-
-        $ilCtrl->returnToParent($this);
     }
 
     public function getNoTagsUsedMessage(): ILIAS\UI\Component\MessageBox\MessageBox

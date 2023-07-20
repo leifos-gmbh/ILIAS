@@ -247,15 +247,6 @@ class ilPCParagraphGUI extends ilPageContentGUI
     }
 
     /**
-     * Edit multiple paragraphs (Ajax mode, sends the content of the paragraphs)
-     */
-    public function editMultipleJS(): void
-    {
-        echo $this->content_obj->getParagraphSequenceContent($this->pg_obj);
-        exit;
-    }
-
-    /**
      * Prepare content for js output
      */
     public static function xml2outputJS(string $s_text): string
@@ -576,108 +567,15 @@ class ilPCParagraphGUI extends ilPageContentGUI
 
     private function setStyle(): void
     {
-        if ($this->pg_obj->getParentType() == "gdf" ||
+        if ($this->pg_obj->getParentType() == "term" ||
             $this->pg_obj->getParentType() == "lm") {
-            if ($this->pg_obj->getParentType() != "gdf") {
+            if ($this->pg_obj->getParentType() != "term") {
                 $this->tpl->addCss(ilObjStyleSheet::getContentStylePath(
                     ilObjContentObject::_lookupStyleSheetId($this->pg_obj->getParentId())
                 ));
             } else {
                 $this->tpl->addCss(ilObjStyleSheet::getContentStylePath(0));
             }
-        }
-    }
-
-    /**
-     * insert paragraph form
-     */
-    public function insert(): string
-    {
-        $this->log->debug("ilPCParagraphGUI, saveJS: got updated value " . $this->updated);
-        return $this->edit(true);
-    }
-
-    /**
-     * update paragraph in dom and update page in db
-     */
-    public function update(): void
-    {
-        $this->log->debug("ilPCParagraphGUI, update(): start");
-
-        // set language and characteristic
-        $this->content_obj->setLanguage(
-            $this->request->getString("par_language")
-        );
-        $this->content_obj->setCharacteristic(
-            $this->request->getString("par_characteristic")
-        );
-
-        $this->updated = $this->content_obj->setText(
-            $this->content_obj->input2xml(
-                $this->request->getRaw("par_content"),
-                $this->request->getString("usedwsiwygeditor")
-            ),
-            true
-        );
-        if ($this->updated !== true) {
-            $this->edit();
-            return;
-        }
-
-        $this->updated = $this->content_obj->updatePage($this->pg_obj);
-
-
-        if ($this->updated === true) {
-            $this->log->debug("ilPCParagraphGUI, update(): return to parent: jump" . $this->hier_id);
-            $this->ctrl->returnToParent($this, "jump" . $this->hier_id);
-        } else {
-            $this->log->debug("ilPCParagraphGUI, update(): call edit.");
-            $this->edit();
-        }
-    }
-
-    /**
-     * create new paragraph in dom and update page in db
-     */
-    public function create(): void
-    {
-        $this->log->debug("ilPCParagraphGUI, create(): start.");
-
-        if ($this->request->getString("ajaxform_hier_id") != "") {
-            $this->createJS();
-            return;
-        }
-
-        $this->content_obj = new ilPCParagraph($this->getPage());
-        //echo "+".$this->pc_id."+";
-        $this->content_obj->create($this->pg_obj, $this->hier_id, $this->pc_id);
-
-        $this->content_obj->setLanguage(
-            $this->request->getString("par_language")
-        );
-        $this->setCurrentTextLang($this->request->getString("par_language"));
-        $this->content_obj->setCharacteristic(
-            $this->request->getString("par_characteristic")
-        );
-
-        $this->updated = $this->content_obj->setText(
-            $this->content_obj->input2xml(
-                $this->request->getRaw("par_content"),
-                $this->request->getString("usedwsiwygeditor")
-            ),
-            true
-        );
-
-        if ($this->updated !== true) {
-            $this->insert();
-            return;
-        }
-        $this->updated = $this->content_obj->updatePage($this->pg_obj);
-
-        if ($this->updated === true) {
-            $this->ctrl->returnToParent($this, "jump" . $this->hier_id);
-        } else {
-            $this->insert();
         }
     }
 

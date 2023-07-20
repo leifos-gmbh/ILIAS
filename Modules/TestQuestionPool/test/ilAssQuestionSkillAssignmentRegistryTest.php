@@ -1,8 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssQuestionSkillAssignmentRegistry.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilAssQuestionSkillAssignmentRegistryTest
@@ -35,7 +47,6 @@ class ilAssQuestionSkillAssignmentRegistryTest extends assBaseTestCase
      */
     public function testSkillAssignmentsCanBetStoredAndFetchedBySerializationStrategy($value, $chunkSize, callable $preCallback, callable $postCallback): void
     {
-        require_once 'Services/Administration/classes/class.ilSetting.php';
         $settingsMock = $this->getMockBuilder('ilSetting')->disableOriginalConstructor()->onlyMethods(array('set', 'get', 'delete'))->getMock();
 
         $settingsMock->expects($this->any())->method('set')->will(
@@ -74,7 +85,6 @@ class ilAssQuestionSkillAssignmentRegistryTest extends assBaseTestCase
      */
     public function testInvalidChunkSizeWillRaiseException(): void
     {
-        require_once 'Services/Administration/classes/class.ilSetting.php';
         $settingsMock = $this->getMockBuilder('ilSetting')->disableOriginalConstructor()->onlyMethods(array('set', 'get', 'delete'))->getMock();
 
         try {
@@ -101,9 +111,6 @@ class ilAssQuestionSkillAssignmentRegistryTest extends assBaseTestCase
     {
         $data = [];
 
-        require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssQuestionSkillAssignmentImportList.php';
-        require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssQuestionSkillAssignmentImport.php';
-        require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionSkillAssignment.php';
         $assignmentList = new \ilAssQuestionSkillAssignmentImportList();
 
         for ($i = 0; $i < 5; $i++) {

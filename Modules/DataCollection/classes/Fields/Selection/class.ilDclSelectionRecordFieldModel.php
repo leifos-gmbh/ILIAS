@@ -32,7 +32,7 @@ abstract class ilDclSelectionRecordFieldModel extends ilDclBaseRecordFieldModel
     public function getValue()
     {
         if ($this->getField()->isMulti() && !is_array($this->value)) {
-            return array($this->value);
+            return [$this->value];
         }
         if (!$this->getField()->isMulti() && is_array($this->value)) {
             return (count($this->value) == 1) ? array_shift($this->value) : '';
@@ -48,16 +48,11 @@ abstract class ilDclSelectionRecordFieldModel extends ilDclBaseRecordFieldModel
     {
         $values = ilDclSelectionOption::getValues($this->getField()->getId(), $value);
 
-        return is_array($values) ? implode("; ", $values) : $values;
+        return implode("; ", $values);
     }
 
-    /**
-     * @return array|int|string
-     */
     public function getValueFromExcel(ilExcel $excel, int $row, int $col)
     {
-        global $DIC;
-        $lng = $DIC['lng'];
         $string = parent::getValueFromExcel($excel, $row, $col);
         $old = $string;
         if ($this->getField()->isMulti()) {
@@ -69,10 +64,10 @@ abstract class ilDclSelectionRecordFieldModel extends ilDclBaseRecordFieldModel
         }
 
         if (!$has_value && $old) {
-            $warning = "(" . $row . ", " . ilDataCollectionImporter::getExcelCharForInteger($col + 1) . ") " . $lng->txt("dcl_no_such_reference") . " "
+            $warning = "(" . $row . ", " . ilDataCollectionImporter::getExcelCharForInteger($col + 1) . ") " . $this->lng->txt("dcl_no_such_reference") . " "
                 . $old;
 
-            return array('warning' => $warning);
+            return ['warning' => $warning];
         }
 
         return $string;
@@ -90,7 +85,7 @@ abstract class ilDclSelectionRecordFieldModel extends ilDclBaseRecordFieldModel
     {
         $delimiter = strpos($stringValues, '; ') ? '; ' : ', ';
         $slicedStrings = explode($delimiter, $stringValues);
-        $slicedReferences = array();
+        $slicedReferences = [];
         $resolved = 0;
         for ($i = 0; $i < count($slicedStrings); $i++) {
             //try to find a reference since the last resolved value separated by a comma.

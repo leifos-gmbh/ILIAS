@@ -16,7 +16,6 @@
  *
  *********************************************************************/
 
-
 /**
  * class that manages/holds the data for a question set configuration for continues tests
  *
@@ -313,8 +312,6 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
             $sourcePoolDefinitionList->loadDefinitions();
 
             foreach ($sourcePoolDefinitionList as $definition) {
-                /** @var ilTestRandomQuestionSetSourcePoolDefinition $definition */
-
                 if ($definition->getQuestionAmount() < 1) {
                     return false;
                 }
@@ -371,7 +368,6 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
         $sourcePoolDefinitionList = $this->buildSourcePoolDefinitionList($this->testOBJ);
         $sourcePoolDefinitionList->deleteDefinitions();
 
-        require_once 'Modules/Test/classes/class.ilTestRandomQuestionSetStagingPoolBuilder.php';
         $stagingPool = new ilTestRandomQuestionSetStagingPoolBuilder(
             $this->db,
             $this->testOBJ
@@ -385,7 +381,11 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
 
     public function resetQuestionSetRelatedTestSettings()
     {
-        $this->testOBJ->setResultFilterTaxIds(array());
+        $this->testOBJ->getScoreSettingsRepository()->store(
+            $this->testOBJ->getScoreSettings()->withResultDetailsSettings(
+                $this->testOBJ->getScoreSettings()->getResultDetailsSettings()->withTaxonomyFilterIds(array())
+            )
+        );
         $this->testOBJ->saveToDb(true);
     }
 
@@ -425,7 +425,6 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
         global $DIC;
         $ilLog = $DIC['ilLog'];
 
-        require_once 'Services/CopyWizard/classes/class.ilCopyWizardOptions.php';
         $cwo = ilCopyWizardOptions::_getInstance($cloneTestOBJ->getTmpCopyWizardCopyId());
 
         foreach ($definitionIdMap as $originalDefinitionId => $cloneDefinitionId) {
@@ -438,13 +437,11 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
 
     private function buildSourcePoolDefinitionList(ilObjTest $testOBJ): ilTestRandomQuestionSetSourcePoolDefinitionList
     {
-        require_once 'Modules/Test/classes/class.ilTestRandomQuestionSetSourcePoolDefinitionFactory.php';
         $sourcePoolDefinitionFactory = new ilTestRandomQuestionSetSourcePoolDefinitionFactory(
             $this->db,
             $testOBJ
         );
 
-        require_once 'Modules/Test/classes/class.ilTestRandomQuestionSetSourcePoolDefinitionList.php';
         $sourcePoolDefinitionList = new ilTestRandomQuestionSetSourcePoolDefinitionList(
             $this->db,
             $testOBJ,
@@ -456,7 +453,6 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
 
     private function buildStagingPoolBuilder(ilObjTest $testOBJ): ilTestRandomQuestionSetStagingPoolBuilder
     {
-        require_once 'Modules/Test/classes/class.ilTestRandomQuestionSetStagingPoolBuilder.php';
         $stagingPool = new ilTestRandomQuestionSetStagingPoolBuilder($this->db, $testOBJ);
 
         return $stagingPool;

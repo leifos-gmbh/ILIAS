@@ -1,8 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once 'Modules/Test/classes/class.ilTestParticipantData.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTestAccess
@@ -119,7 +131,7 @@ class ilTestAccess
      */
     public function checkManageParticipantsAccess(): bool
     {
-        if ($this->getAccess()->checkAccess('tst_results', '', $this->getRefId())) {
+        if ($this->getAccess()->checkAccess('write', '', $this->getRefId())) {
             return true;
         }
 
@@ -135,7 +147,15 @@ class ilTestAccess
      */
     public function checkParticipantsResultsAccess(): bool
     {
+        if ($this->getAccess()->checkAccess('write', '', $this->getRefId())) {
+            return true;
+        }
+
         if ($this->getAccess()->checkAccess('tst_results', '', $this->getRefId())) {
+            return true;
+        }
+
+        if ($this->getAccess()->checkPositionAccess(ilOrgUnitOperation::OP_MANAGE_PARTICIPANTS, $this->getRefId())) {
             return true;
         }
 
@@ -154,6 +174,11 @@ class ilTestAccess
         if ($this->getAccess()->checkAccess('tst_statistics', '', $this->getRefId())) {
             return true;
         }
+
+        if ($this->getAccess()->checkPositionAccess(ilOrgUnitOperation::OP_ACCESS_RESULTS, $this->getRefId())) {
+            return true;
+        }
+
         return false;
     }
 

@@ -1,8 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once 'Modules/OrgUnit/classes/Positions/Operation/class.ilOrgUnitOperation.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTestParticipantAccessFilter
@@ -83,7 +95,6 @@ class ilTestParticipantAccessFilter
                 return $this->accessStatisticsUserFilter($userIds);
         }
 
-        require_once 'Modules/Test/exceptions/class.ilTestException.php';
         throw new ilTestException('invalid user access filter mode chosen: ' . $this->getFilter());
     }
 
@@ -129,12 +140,21 @@ class ilTestParticipantAccessFilter
      */
     public function accessResultsUserFilter($userIds): array
     {
-        global $DIC; /* @var ILIAS\DI\Container $DIC */
+        /** @var ILIAS\DI\Container $DIC **/
+        global $DIC;
+
+        $ref_id = $this->getRefId();
+
+        $perm = 'write';
+
+        if ($DIC->access()->checkAccess('tst_results', '', $ref_id, 'tst')) {
+            $perm = 'tst_results';
+        }
 
         $userIds = $DIC->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
-            'write',
+            $perm,
             ilOrgUnitOperation::OP_ACCESS_RESULTS,
-            $this->getRefId(),
+            $ref_id,
             $userIds
         );
 

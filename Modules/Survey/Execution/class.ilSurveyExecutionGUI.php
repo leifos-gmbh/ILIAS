@@ -29,6 +29,7 @@ use ILIAS\Survey\Mode;
  */
 class ilSurveyExecutionGUI
 {
+    protected \ILIAS\Survey\InternalGUIService $gui;
     /**
      * @var array|object|null
      */
@@ -76,6 +77,9 @@ class ilSurveyExecutionGUI
                              ->gui()
                              ->execution()
                              ->request();
+        $this->gui = $DIC->survey()
+            ->internal()
+            ->gui();
 
         // stay in preview mode
         $this->preview = (bool) $this->request->getPreview();
@@ -87,9 +91,13 @@ class ilSurveyExecutionGUI
         $this->log = ilLoggerFactory::getLogger("svy");
 
         $domain_service = $DIC->survey()->internal();
+        $appraisee_id = ($a_object->getMode() === ilObjSurvey::MODE_SELF_EVAL)
+            ? $this->user->getId()
+            : $this->requested_appr_id;
         $this->run_manager = $domain_service->domain()->execution()->run(
             $a_object,
-            $this->user->getId()
+            $this->user->getId(),
+            $appraisee_id
         );
         $this->participant_manager = $domain_service->domain()->participants()->status(
             $a_object,
@@ -205,12 +213,12 @@ class ilSurveyExecutionGUI
 
         if (!$a_ignore_status) {
             // completed
-            if ($this->run_manager->hasFinished($appr_id)) {
+            if ($this->run_manager->hasFinished()) {
                 $this->tpl->setOnScreenMessage('failure', $this->lng->txt("already_completed_survey"), true);
                 $this->ctrl->redirectByClass("ilobjsurveygui", "infoScreen");
             }
             // starting
-            elseif (!$this->run_manager->hasStarted($appr_id)) {
+            elseif (!$this->run_manager->hasStarted()) {
                 if ($a_may_start) {
                     //$_SESSION["finished_id"][$this->object->getId()] =
                     //    $this->object->startSurvey($user_id, $anonymous_code, $appr_id);
@@ -228,7 +236,7 @@ class ilSurveyExecutionGUI
 
         // validate finished id
         if ($this->object->getActiveID($user_id, $anonymous_code, $appr_id) !==
-            $this->run_manager->getCurrentRunId($appr_id)) {
+            $this->run_manager->getCurrentRunId()) {
             throw new ilSurveyException("Run ID mismatch");
         }
     }
@@ -498,7 +506,7 @@ class ilSurveyExecutionGUI
 
     protected function getCurrentRunId(): int
     {
-        return $this->run_manager->getCurrentRunId($this->requested_appr_id);
+        return $this->run_manager->getCurrentRunId();
     }
 
     /**
@@ -579,10 +587,10 @@ class ilSurveyExecutionGUI
 
         if (!$this->preview) {
             if ($this->object->hasViewOwnResults()) {
-                $button = ilLinkButton::getInstance();
-                $button->setCaption("svy_view_own_results");
-                $button->setUrl($this->ctrl->getLinkTarget($this, "viewUserResults"));
-                $ilToolbar->addButtonInstance($button);
+                $this->gui->link(
+                    $this->lng->txt("svy_view_own_results"),
+                    $this->ctrl->getLinkTarget($this, "viewUserResults")
+                )->toToolbar();
 
                 $has_button = true;
             }
@@ -601,20 +609,20 @@ class ilSurveyExecutionGUI
 
                 $ilToolbar->setFormAction($this->ctrl->getFormAction($this, "mailUserResults"));
 
-                $button = ilSubmitButton::getInstance();
-                $button->setCaption("svy_mail_send_confirmation");
-                $button->setCommand("mailUserResults");
-                $ilToolbar->addButtonInstance($button);
+                $this->gui->button(
+                    $this->lng->txt("svy_mail_send_confirmation"),
+                    $this->ctrl->getLinkTarget($this, "mailUserResults")
+                )->submit()->toToolbar();
 
                 $has_button = true;
             }
 
             // #6307
             if (ilObjSurveyAccess::_hasEvaluationAccess($this->object->getId(), $ilUser->getId())) {
-                $button = ilLinkButton::getInstance();
-                $button->setCaption("svy_results");
-                $button->setUrl($this->ctrl->getLinkTargetByClass("ilObjSurveyGUI", "evaluation"));
-                $ilToolbar->addButtonInstance($button);
+                $this->gui->link(
+                    $this->lng->txt("svy_results"),
+                    $this->ctrl->getLinkTargetByClass("ilObjSurveyGUI", "evaluation")
+                )->toToolbar();
 
                 $has_button = true;
             }
@@ -628,15 +636,25 @@ class ilSurveyExecutionGUI
                 $ilToolbar->addSeparator();
             }
 
-            $button = ilLinkButton::getInstance();
-            $button->setCaption("survey_execution_exit");
-            $button->setUrl($this->ctrl->getLinkTarget($this, "exitSurvey"));
-            $ilToolbar->addButtonInstance($button);
+            if ($this->object->getMode() === ilObjSurvey::MODE_360) {
+                $txt = $this->lng->txt("survey_execution_exit_360");
+            } else {
+                $txt = $this->lng->txt("survey_execution_exit");
+            }
+            $this->gui->button(
+                $txt,
+                $this->ctrl->getLinkTarget($this, "exitSurvey")
+            )->toToolbar();
 
             if ($this->object->getOutro() !== '') {
-                $panel = ilPanelGUI::getInstance();
-                $panel->setBody($this->object->prepareTextareaOutput($this->object->getOutro()));
-                $this->tpl->setContent($panel->getHTML());
+                $f = $this->gui->ui()->factory();
+                $r = $this->gui->ui()->renderer();
+                $p = $f->panel()->standard(
+                    "",
+                    $this->object->prepareTextareaOutput($this->object->getOutro())
+                );
+
+                $this->tpl->setContent($r->render($p));
             }
         }
     }
@@ -646,7 +664,7 @@ class ilSurveyExecutionGUI
         $tree = $this->tree;
 
         // #14971
-        if ($this->feature_config->usesAppraisees()) {
+        if ($this->object->getMode() === ilObjSurvey::MODE_360) {
             $target_ref_id = $this->object->getRefId();
         } else {
             // #11534
@@ -708,10 +726,10 @@ class ilSurveyExecutionGUI
 
         $this->checkAuth(false, true);
 
-        $button = ilLinkButton::getInstance();
-        $button->setCaption("btn_back");
-        $button->setUrl($this->ctrl->getLinkTarget($this, "runShowFinishedPage"));
-        $ilToolbar->addButtonInstance($button);
+        $this->gui->link(
+            $this->lng->txt("btn_back"),
+            $this->ctrl->getLinkTarget($this, "runShowFinishedPage")
+        )->toToolbar();
 
         $survey_gui = new ilObjSurveyGUI();
         $html = $survey_gui->getUserResultsTable($this->getCurrentRunId());

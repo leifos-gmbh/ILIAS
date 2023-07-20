@@ -18,6 +18,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+use ILIAS\Cron\Schedule\CronJobScheduleType;
+
 /**
  * This will set progresses to FAILED,
  * if they are past the deadline (and not successful, yet)
@@ -28,14 +30,20 @@ class ilPrgUpdateProgressCronJob extends ilCronJob
 
     protected Pimple\Container $dic;
     protected ilLanguage $lng;
+    protected ilStudyProgrammeSettingsDBRepository $settings_repo;
+    protected ilPRGAssignmentDBRepository $assignment_repo;
+    protected int $acting_user_id;
 
     public function __construct()
     {
         global $DIC;
-
         $this->lng = $DIC['lng'];
         $this->lng->loadLanguageModule('prg');
-        $this->dic = ilStudyProgrammeDIC::dic();
+
+        $dic = ilStudyProgrammeDIC::dic();
+        $this->settings_repo = $dic['model.Settings.ilStudyProgrammeSettingsRepository'];
+        $this->assignment_repo = $dic['repo.assignment'];
+        $this->acting_user_id = $dic['current_user']->getId();
     }
 
     public function getTitle(): string
@@ -63,9 +71,9 @@ class ilPrgUpdateProgressCronJob extends ilCronJob
         return true;
     }
 
-    public function getDefaultScheduleType(): int
+    public function getDefaultScheduleType(): CronJobScheduleType
     {
-        return self::SCHEDULE_TYPE_IN_DAYS;
+        return CronJobScheduleType::SCHEDULE_TYPE_IN_DAYS;
     }
 
     public function getDefaultScheduleValue(): ?int
@@ -77,24 +85,18 @@ class ilPrgUpdateProgressCronJob extends ilCronJob
     {
         $result = new ilCronJobResult();
         $result->setStatus(ilCronJobResult::STATUS_NO_ACTION);
-        $acting_user = $this->getActingUserId();
-        foreach ($this->getProgressRepository()->getPassedDeadline() as $progress) {
-            if ($progress->getStatus() === ilStudyProgrammeProgress::STATUS_IN_PROGRESS) {
-                $programme = ilObjStudyProgramme::getInstanceByObjId($progress->getNodeId());
-                $programme->markFailed($progress->getId(), $acting_user);
-                $result->setStatus(ilCronJobResult::STATUS_OK);
-            }
+
+        $now = new DateTimeImmutable();
+
+        foreach ($this->assignment_repo->getPassedDeadline($now) as $assignment) {
+            $assignment = $assignment->markProgressesFailedForExpiredDeadline(
+                $this->settings_repo,
+                $this->acting_user_id
+            );
+            $this->assignment_repo->store($assignment);
         }
+
+        $result->setStatus(ilCronJobResult::STATUS_OK);
         return $result;
-    }
-
-    protected function getProgressRepository(): ilStudyProgrammeProgressDBRepository
-    {
-        return $this->dic['ilStudyProgrammeUserProgressDB'];
-    }
-
-    protected function getActingUserId(): int
-    {
-        return $this->dic['current_user']->getId();
     }
 }

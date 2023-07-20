@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -15,7 +13,10 @@ declare(strict_types=1);
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
+ *
  *********************************************************************/
+
+declare(strict_types=1);
 
 namespace ILIAS\ResourceStorage\Stakeholder;
 
@@ -23,10 +24,17 @@ use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 
 /**
  * Interface ResourceStakeholder
- * @author Fabian Schmid <fs@studer-raimann.ch>
+ * @author Fabian Schmid <fabian@sr.solutions.ch>
  */
 interface ResourceStakeholder
 {
+    /**
+     * Constructor must not have any parameters. The Stakeholder must be able to be instantiated without any parameters.
+     * Additionally, Stakeholder may get instantiated without dependencies available. Therefore, the Stakeholder must
+     * must check for dependencies and implement fallbacks.
+     */
+    public function __construct();
+
     /**
      * @return string not longer than 64 characters
      */
@@ -39,6 +47,8 @@ interface ResourceStakeholder
      */
     public function getFullyQualifiedClassName(): string;
 
+    public function canBeAccessedByCurrentUser(ResourceIdentification $identification): bool;
+
     public function isResourceInUse(ResourceIdentification $identification): bool;
 
     /**
@@ -50,4 +60,6 @@ interface ResourceStakeholder
     public function getOwnerOfResource(ResourceIdentification $identification): int;
 
     public function getOwnerOfNewResources(): int;
+
+    public function getLocationURIForResourceUsage(ResourceIdentification $identification): ?string;
 }

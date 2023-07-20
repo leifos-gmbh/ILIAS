@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,10 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
+
+use ILIAS\Filesystem\Util;
 
 /**
  * This class represents a file wizard property in a property form.
@@ -79,7 +81,7 @@ class ilFileWizardInputGUI extends ilFileInputGUI
         // see ilFileInputGUI
         // if no information is received, something went wrong
         // this is e.g. the case, if the post_max_size has been exceeded
-        if (!is_array($_FILES[$this->getPostVar()])) {
+        if (!isset($_FILES[$this->getPostVar()]) || !is_array($_FILES[$this->getPostVar()])) {
             $this->setAlert($lng->txt("form_msg_file_size_exceeds"));
             return false;
         }
@@ -97,7 +99,7 @@ class ilFileWizardInputGUI extends ilFileInputGUI
                 $temp_name = $pictures["tmp_name"][$index];
                 $error = $pictures["error"][$index];
 
-                $_FILES[$this->getPostVar()]["name"][$index] = utf8_encode($_FILES[$this->getPostVar()]["name"][$index]);
+                $_FILES[$this->getPostVar()]["name"][$index] = Util::sanitizeFileName($_FILES[$this->getPostVar()]["name"][$index]);
 
 
                 // error handling

@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2015 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTestTopList
@@ -438,14 +452,13 @@ class ilTestTopList
      */
     private function formatTime(int $seconds): string
     {
-        $retval = '';
-        $hours = intval($seconds / 3600);
-        $retval .= str_pad($hours, 2, "0", STR_PAD_LEFT) . ":";
-        $minutes = ($seconds / 60) % 60;
-        $retval .= str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":";
-        $seconds = $seconds % 60;
-        $retval .= str_pad($seconds, 2, "0", STR_PAD_LEFT);
+        $hours = floor($seconds / 3600);
+        $seconds -= $hours * 3600;
+        $minutes = floor($seconds / 60);
+        $seconds -= $minutes * 60;
 
-        return $retval;
+        return str_pad($hours, 2, "0", STR_PAD_LEFT) . ":"
+            . str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":"
+            . str_pad($seconds, 2, "0", STR_PAD_LEFT);
     }
 }

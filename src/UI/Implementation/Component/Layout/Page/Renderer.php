@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 namespace ILIAS\UI\Implementation\Component\Layout\Page;
 
@@ -109,12 +109,9 @@ class Renderer extends AbstractComponentRenderer
             $tpl = $this->setHeaderVars($tpl, $component->getIsUIDemo());
         }
 
-        foreach ($component->getMetaData() as $meta_key => $meta_value) {
-            $tpl->setCurrentBlock('meta_datum');
-            $tpl->setVariable('META_KEY', $meta_key);
-            $tpl->setVariable('META_VALUE', $meta_value);
-            $tpl->parseCurrentBlock();
-        }
+        $tpl->setVariable('META_DATA', $this->getDataFactory()->htmlMetadata()->collection(
+            $component->getMetaData()
+        )->toHtml());
 
         return $tpl->get();
     }
@@ -175,8 +172,8 @@ class Renderer extends AbstractComponentRenderer
             $additional_js_files = [
                 iljQueryUtil::getLocaljQueryPath(),
                 './Services/JavaScript/js/Basic.js',
-                ilUIFramework::BOWER_BOOTSTRAP_JS,
-                './libs/bower/bower_components/jquery-migrate/jquery-migrate.min.js',
+                ilUIFramework::BOOTSTRAP_JS,
+                './node_modules/jquery-migrate/jquery-migrate.min.js',
             ];
 
             array_unshift($js_files, ...$additional_js_files);

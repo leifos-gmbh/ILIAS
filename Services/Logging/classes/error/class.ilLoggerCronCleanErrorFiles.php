@@ -2,6 +2,24 @@
 
 declare(strict_types=1);
 
+use ILIAS\Cron\Schedule\CronJobScheduleType;
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 class ilLoggerCronCleanErrorFiles extends ilCronJob
 {
     protected const DEFAULT_VALUE_OLDER_THAN = 31;
@@ -35,9 +53,9 @@ class ilLoggerCronCleanErrorFiles extends ilCronJob
         return $this->lng->txt("log_error_file_cleanup_info");
     }
 
-    public function getDefaultScheduleType(): int
+    public function getDefaultScheduleType(): CronJobScheduleType
     {
-        return self::SCHEDULE_TYPE_IN_DAYS;
+        return CronJobScheduleType::SCHEDULE_TYPE_IN_DAYS;
     }
 
     public function getDefaultScheduleValue(): int
@@ -70,8 +88,10 @@ class ilLoggerCronCleanErrorFiles extends ilCronJob
             return $result;
         }
 
-        $offset = $this->settings->get('clear_older_then');
-        if (!$offset) {
+        $offset = $this->settings->get('clear_older_then', '');
+        if ($offset) {
+            $offset = (int) $offset;
+        } else {
             $offset = self::DEFAULT_VALUE_OLDER_THAN;
         }
 
@@ -93,7 +113,7 @@ class ilLoggerCronCleanErrorFiles extends ilCronJob
 
     protected function readLogDir(string $path): array
     {
-        $ret = array();
+        $ret = [];
 
         $folder = dir($path);
         while ($file_name = $folder->read()) {
@@ -113,10 +133,11 @@ class ilLoggerCronCleanErrorFiles extends ilCronJob
 
     public function addCustomSettingsToForm(ilPropertyFormGUI $a_form): void
     {
-        $offset = $this->settings->get('clear_older_then');
+        $offset = $this->settings->get('clear_older_then', '');
         if (!$offset) {
-            $offset = self::DEFAULT_VALUE_OLDER_THAN;
+            $offset = (string) self::DEFAULT_VALUE_OLDER_THAN;
         }
+
         $clear_older_then = new ilNumberInputGUI($this->lng->txt('frm_clear_older_then'), 'clear_older_then');
         $clear_older_then->allowDecimals(false);
         $clear_older_then->setMinValue(1, true);
@@ -128,7 +149,13 @@ class ilLoggerCronCleanErrorFiles extends ilCronJob
 
     public function saveCustomSettings(ilPropertyFormGUI $a_form): bool
     {
-        $this->settings->set('clear_older_then', $a_form->getInput('clear_older_then'));
+        $threshold = $a_form->getInput('clear_older_then');
+        if ((string) $threshold === '') {
+            $this->settings->delete('clear_older_then');
+        } else {
+            $this->settings->set('clear_older_then', (string) ((int) $a_form->getInput('clear_older_then')));
+        }
+
         return true;
     }
 }

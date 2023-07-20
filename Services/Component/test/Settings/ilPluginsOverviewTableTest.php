@@ -1,8 +1,22 @@
 <?php
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ ********************************************************************
+ */
 
 declare(strict_types=1);
-
-/* Copyright (c) 2022 - Daniel Weise <daniel.weise@concepts-and-training.de> - Extended GPL, see LICENSE */
 
 use PHPUnit\Framework\TestCase;
 use ILIAS\UI\Factory;
@@ -14,6 +28,12 @@ use ILIAS\UI\Component\Button\Shy;
 
 class ilPluginsOverviewTableTest extends TestCase
 {
+    protected ilObjComponentSettingsGUI $parent_gui;
+    protected ilCtrl $ctrl;
+    protected Factory $ui;
+    protected Renderer $renderer;
+    protected ilLanguage $lng;
+
     protected function setUp(): void
     {
         $this->parent_gui = $this->createMock(ilObjComponentSettingsGUI::class);
@@ -22,7 +42,7 @@ class ilPluginsOverviewTableTest extends TestCase
         $this->renderer = $this->createMock(Renderer::class);
         $this->lng = $this->createMock(ilLanguage::class);
         $this->lng->method("txt")
-            ->willReturnCallback(fn ($id) => $id);
+            ->willReturnCallback(fn($id) => $id);
     }
 
     public function testCreateObject(): void

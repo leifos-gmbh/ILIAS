@@ -34,7 +34,6 @@ use ILIAS\UI\Renderer as RendererInterface;
 use ILIAS\Data\URI;
 use ILIAS\UI\Implementation\Render\ResourceRegistry;
 use LogicException;
-use Closure;
 
 class Renderer extends AbstractComponentRenderer
 {
@@ -222,7 +221,7 @@ class Renderer extends AbstractComponentRenderer
         }
 
         //disengage all, close slates
-        $btn_disengage = $f->button()->bulky($f->symbol()->glyph()->collapseHorizontal("#"), "close", "#")
+        $btn_disengage = $f->button()->bulky($f->symbol()->glyph()->collapseHorizontal("#"), $this->txt('close'), "#")
             ->withOnClick($component->getDisengageAllSignal());
         $tpl->setVariable("CLOSE_SLATES", $default_renderer->render($btn_disengage));
 
@@ -244,7 +243,7 @@ class Renderer extends AbstractComponentRenderer
         ];
         $entries = $component->getEntries();
 
-        $more_label = 'more';
+        $more_label = $this->txt('show_more');
         $more_symbol = $f->symbol()->glyph()->disclosure()
             ->withCounter($f->counter()->novelty(0))
             ->withCounter($f->counter()->status(0));
@@ -332,6 +331,8 @@ class Renderer extends AbstractComponentRenderer
 
         $id = $this->bindJavaScript($component);
         $tpl->setVariable('ID', $id);
+        $tpl->setVariable('ID_HEADLINE', $id . "_headline");
+        $tpl->setVariable('ID_DESCRIPTION', $id . "_description");
 
         return $tpl->get();
     }
@@ -438,11 +439,10 @@ class Renderer extends AbstractComponentRenderer
         $perm_url = $component->getPermanentURL();
         if ($perm_url instanceof URI) {
             $url = $perm_url->__toString();
-            $button = $this->getUIFactory()
-                           ->button()
-                           ->shy($this->txt('copy_perma_link'), $url)
-                           ->withAdditionalOnLoadCode($this->permanentJS($url));
-            $tpl->setVariable('PERMANENT', $default_renderer->render($button));
+            $link = $this->getUIFactory()
+                         ->link()
+                         ->standard($this->txt('perma_link'), $url);
+            $tpl->setVariable('PERMANENT', $default_renderer->render($link));
         }
         return $tpl->get();
     }
@@ -471,21 +471,5 @@ class Renderer extends AbstractComponentRenderer
             ModeInfo::class,
             Component\MainControls\SystemInfo::class
         );
-    }
-
-    private function permanentJS(string $url): Closure
-    {
-        $url = json_encode($url);
-        return static function (string $id) use ($url): string {
-            return "document.getElementById('$id').addEventListener('click', function(event){
-                    if (window.navigator.clipboard) {
-                        window.navigator.clipboard.writeText($url);
-                        event.stopImmediatePropagation();
-                        return false;
-                    } else {
-                        console.warn('Cannot copy link to clipboard. Please note that the clipboard is only available in secure contexts (HTTPS). See https://developer.mozilla.org/en-US/docs/Web/API/Clipboard for more information.');
-                    }
-                });";
-        };
     }
 }

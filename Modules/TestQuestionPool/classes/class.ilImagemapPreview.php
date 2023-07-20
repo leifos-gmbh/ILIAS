@@ -1,8 +1,22 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
-include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
+require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
 /**
 * Image map image preview creator
@@ -46,7 +60,6 @@ class ilImagemapPreview
             if (preg_match("/.*\.(png|jpg|gif|jpeg)$/", $this->imagemap_filename, $matches)) {
                 $extension = "." . $matches[1];
             }
-            include_once "./Services/Utilities/classes/class.ilUtil.php";
             $this->preview_filename = ilFileUtils::ilTempnam() . $extension;
         }
         $this->areas = array();
@@ -85,7 +98,7 @@ class ilImagemapPreview
         $this->areas[$index] = array(
             "shape" => "$shape",
             "coords" => "$coords",
-            "title" => "$title",
+            "title" => htmlspecialchars($title),
             "href" => "$href",
             "target" => "$target",
             "linecolor" => '"' . $linecolor . '"',
@@ -133,7 +146,6 @@ class ilImagemapPreview
         if (count($this->areas) + count($this->points) == 0) {
             return;
         }
-        include_once "./Services/Utilities/classes/class.ilUtil.php";
         $convert_cmd = "-quality 100 ";
         foreach ($this->points as $point) {
             if ($point["visible"]) {

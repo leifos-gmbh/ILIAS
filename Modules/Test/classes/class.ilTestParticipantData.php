@@ -1,7 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -232,7 +245,7 @@ class ilTestParticipantData
 
     public function getFormatedFullnameByActiveId($activeId): string
     {
-        return $this->buildFormatedFullname($this->byActiveId[$activeId]);
+        return ilObjTestAccess::_getParticipantData($activeId);
     }
 
     public function getFileSystemCompliantFullnameByActiveId($activeId): string
@@ -249,21 +262,12 @@ class ilTestParticipantData
         $options = array();
 
         foreach ($this->byActiveId as $activeId => $usrData) {
-            $options[$activeId] = $this->buildFormatedFullname($usrData);
+            $options[$activeId] = ilObjTestAccess::_getParticipantData($activeId);
         }
 
         asort($options);
 
         return $options;
-    }
-
-    private function buildFormatedFullname($usrData): string
-    {
-        return sprintf(
-            $this->lng->txt('tst_participant_fullname_pattern'),
-            $usrData['firstname'],
-            $usrData['lastname']
-        );
     }
 
     public function getAnonymousActiveIds(): array

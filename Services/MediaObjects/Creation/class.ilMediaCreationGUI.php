@@ -153,7 +153,7 @@ class ilMediaCreationGUI
             $suffixes = $this->getAllSuffixes();
         }
         if (in_array(self::TYPE_VIDEO, $this->accept_types, true)) {
-            $suffixes = array_merge($suffixes, $this->type_manager->getImageSuffixes());
+            $suffixes = array_merge($suffixes, $this->type_manager->getVideoSuffixes());
         }
         if (in_array(self::TYPE_AUDIO, $this->accept_types, true)) {
             $suffixes = array_merge($suffixes, $this->type_manager->getAudioMimeTypes());
@@ -167,16 +167,18 @@ class ilMediaCreationGUI
     /**
      * @return string[]
      */
-    protected function getMimeTypes(): array
+    protected function getMimeTypes($local_only = false): array
     {
         $mimes = [];
         if (in_array(self::TYPE_ALL, $this->accept_types)) {
             $mimes = $this->getAllMimeTypes();
         }
         if (in_array(self::TYPE_VIDEO, $this->accept_types)) {
-            $mimes[] = "video/vimeo";
-            $mimes[] = "video/youtube";
             $mimes[] = "video/mp4";
+            if (!$local_only) {
+                $mimes[] = "video/vimeo";
+                $mimes[] = "video/youtube";
+            }
         }
         if (in_array(self::TYPE_AUDIO, $this->accept_types)) {
             $mimes[] = "audio/mpeg";
@@ -209,7 +211,7 @@ class ilMediaCreationGUI
                 break;
 
             default:
-                if (in_array($cmd, ["creationSelection", "uploadFile", "saveUrl", "cancel", "listPoolItems",
+                if (in_array($cmd, ["creationSelection", "uploadFile", "saveUrl", "cancel", "cancelCreate", "listPoolItems",
                     "insertFromPool", "poolSelection", "selectPool", "applyFilter", "resetFilter", "performBulkUpload",
                     "editTitlesAndDescriptions", "saveTitlesAndDescriptions"])) {
                     $this->$cmd();
@@ -275,7 +277,7 @@ class ilMediaCreationGUI
                     "mep_id",
                     "",
                     20,
-                    $this->getMimeTypes()
+                    $this->getMimeTypes(true)
                 );
             // ->meta()->text()->meta()->textarea()
         }
@@ -561,6 +563,12 @@ class ilMediaCreationGUI
         $ctrl->returnToParent($this);
     }
 
+    protected function cancelCreate(): void
+    {
+        $ctrl = $this->ctrl;
+        $ctrl->returnToParent($this);
+    }
+
     protected function saveUrl(): void
     {
         $form = $this->initUrlForm();
@@ -642,6 +650,14 @@ class ilMediaCreationGUI
         $lng = $this->lng;
         $ui = $this->ui;
         $main_tpl = $this->main_tpl;
+
+        $form = $this->initPoolSelection();
+        if ($this->requested_mep === 0) {
+            $this->main_tpl->setOnScreenMessage("failure", $this->lng->txt("mob_please_select_pool"));
+            $form->setValuesByPost();
+            $this->main_tpl->setContent($form->getHTML());
+            return;
+        }
 
         if ($this->requested_mep > 0 &&
             $access->checkAccess("write", "", $this->requested_mep)

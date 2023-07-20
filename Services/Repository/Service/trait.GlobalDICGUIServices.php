@@ -25,6 +25,15 @@ use ILIAS\HTTP;
 use ILIAS\FileUpload\FileUpload;
 use ILIAS\GlobalScreen;
 use ILIAS\Repository\Form\FormAdapterGUI;
+use ILIAS\Repository\Modal\ModalAdapterGUI;
+use Slim\Http\Stream;
+use ILIAS\Filesystem\Stream\Streams;
+use ILIAS\Repository\Filter\FilterAdapterGUI;
+use ILIAS\Repository\Button\ButtonAdapterGUI;
+use ILIAS\Repository\Link\LinkAdapterGUI;
+use ILIAS\Repository\Symbol\SymbolAdapterGUI;
+use ILIAS\Repository\Listing\ListingAdapterGUI;
+use ILIAS\Repository\HTTP\HTTPUtil;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -36,6 +45,7 @@ trait GlobalDICGUIServices
     protected function initGUIServices(\ILIAS\DI\Container $DIC): void
     {
         $this->DIC = $DIC;
+        FormAdapterGUI::initJavascript();
     }
 
     public function ui(): UIServices
@@ -43,7 +53,7 @@ trait GlobalDICGUIServices
         return $this->DIC->ui();
     }
 
-    public function object(): \ilObjectServiceInterface
+    public function object(): \ilObjectService
     {
         return $this->DIC->object();
     }
@@ -56,6 +66,11 @@ trait GlobalDICGUIServices
     public function http(): HTTP\Services
     {
         return $this->DIC->http();
+    }
+
+    public function httpUtil(): HTTPUtil
+    {
+        return new HTTPUtil($this->DIC->http());
     }
 
     public function mainTemplate(): \ilGlobalTemplateInterface
@@ -98,11 +113,90 @@ trait GlobalDICGUIServices
      */
     public function form(
         $class_path,
-        string $cmd
+        string $cmd,
+        string $submit_caption = ""
     ): FormAdapterGUI {
         return new FormAdapterGUI(
             $class_path,
+            $cmd,
+            $submit_caption
+        );
+    }
+
+    public function modal(
+        string $title = "",
+        string $cancel_label = ""
+    ): ModalAdapterGUI {
+        return new ModalAdapterGUI(
+            $title,
+            $cancel_label,
+            $this->httpUtil()
+        );
+    }
+
+    /**
+     * @throws \ILIAS\HTTP\Response\Sender\ResponseSendingException
+     */
+    public function send(string $output): void
+    {
+        $http = $this->http();
+        $http->saveResponse($http->response()->withBody(
+            Streams::ofString($output)
+        ));
+        $http->sendResponse();
+        $http->close();
+    }
+
+    /**
+     * @param array|string $class_path
+     */
+    public function filter(
+        string $filter_id,
+        $class_path,
+        string $cmd,
+        bool $activated = true,
+        bool $expanded = true
+    ): FilterAdapterGUI {
+        return new FilterAdapterGUI(
+            $filter_id,
+            $class_path,
+            $cmd,
+            $activated,
+            $expanded
+        );
+    }
+
+    public function button(
+        string $caption,
+        string $cmd
+    ): ButtonAdapterGUI {
+        return new ButtonAdapterGUI(
+            $caption,
             $cmd
+        );
+    }
+
+    public function link(
+        string $caption,
+        string $href,
+        bool $new_viewport = false
+    ): LinkAdapterGUI {
+        return new LinkAdapterGUI(
+            $caption,
+            $href,
+            $new_viewport
+        );
+    }
+
+    public function symbol(
+    ): SymbolAdapterGUI {
+        return new SymbolAdapterGUI(
+        );
+    }
+
+    public function listing(
+    ): ListingAdapterGUI {
+        return new ListingAdapterGUI(
         );
     }
 }

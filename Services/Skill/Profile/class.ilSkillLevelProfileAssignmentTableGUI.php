@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -31,8 +33,9 @@ class ilSkillLevelProfileAssignmentTableGUI extends ilTable2GUI
     protected ilBasicSkill $skill;
     protected SkillAdminGUIRequest $admin_gui_request;
     protected int $requested_level_id = 0;
+    protected bool $update = false;
 
-    public function __construct($a_parent_obj, string $a_parent_cmd, string $a_cskill_id)
+    public function __construct($a_parent_obj, string $a_parent_cmd, string $a_cskill_id, bool $update = false)
     {
         global $DIC;
 
@@ -47,6 +50,7 @@ class ilSkillLevelProfileAssignmentTableGUI extends ilTable2GUI
         $this->tref_id = (int) $parts[1];
 
         $this->requested_level_id = $this->admin_gui_request->getLevelId();
+        $this->update = $update;
 
         $this->skill = new ilBasicSkill($this->skill_id);
         parent::__construct($a_parent_obj, $a_parent_cmd);
@@ -73,7 +77,7 @@ class ilSkillLevelProfileAssignmentTableGUI extends ilTable2GUI
         $ilCtrl->setParameter($this->parent_obj, "level_id", (int) $a_set["id"]);
         $this->tpl->setVariable("CMD_HREF", $ilCtrl->getLinkTarget(
             $this->parent_obj,
-            "assignLevelToProfile"
+            $this->update ? "updateLevelOfProfile" : "assignLevelToProfile"
         ));
         $ilCtrl->setParameter($this->parent_obj, "level_id", $this->requested_level_id);
         $this->tpl->parseCurrentBlock();

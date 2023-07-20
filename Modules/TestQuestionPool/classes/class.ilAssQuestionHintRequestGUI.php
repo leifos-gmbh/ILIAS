@@ -1,9 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionHintAbstractGUI.php';
-require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionHintTracking.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * GUI class for management/output of hint requests during test session
@@ -66,15 +77,12 @@ class ilAssQuestionHintRequestGUI extends ilAssQuestionHintAbstractGUI
 
         switch ($nextClass) {
             case 'ilasshintpagegui':
-
-                require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionHintPageObjectCommandForwarder.php';
                 $forwarder = new ilAssQuestionHintPageObjectCommandForwarder($this->questionOBJ, $ilCtrl, $ilTabs, $lng);
                 $forwarder->setPresentationMode(ilAssQuestionHintPageObjectCommandForwarder::PRESENTATION_MODE_REQUEST);
                 $forwarder->forward();
                 break;
 
             default:
-
                 $cmd .= 'Cmd';
                 return $this->$cmd();
                 break;
@@ -93,8 +101,6 @@ class ilAssQuestionHintRequestGUI extends ilAssQuestionHintAbstractGUI
         $ilCtrl = $DIC['ilCtrl'];
         $tpl = $DIC['tpl'];
 
-        require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionHintsTableGUI.php';
-
         $questionHintList = $this->questionHintTracking->getRequestedHintsList();
 
         $table = new ilAssQuestionHintsTableGUI(
@@ -104,7 +110,7 @@ class ilAssQuestionHintRequestGUI extends ilAssQuestionHintAbstractGUI
             self::CMD_SHOW_LIST
         );
 
-        $this->populateContent($ilCtrl->getHtml($table));
+        $this->populateContent($ilCtrl->getHtml($table), $tpl);
     }
 
     /**
@@ -134,24 +140,14 @@ class ilAssQuestionHintRequestGUI extends ilAssQuestionHintAbstractGUI
 
         $questionHint = ilAssQuestionHint::getInstanceById((int) $this->request->raw('hintId'));
 
-        require_once 'Services/Utilities/classes/class.ilUtil.php';
-        require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
-        require_once 'Services/Form/classes/class.ilNonEditableValueGUI.php';
-
-        // build form
-
         $form = new ilPropertyFormGUI();
-
         $form->setFormAction($ilCtrl->getFormAction($this));
-
         $form->setTableWidth('100%');
-
         $form->setTitle(sprintf(
             $lng->txt('tst_question_hints_form_header_edit'),
             $questionHint->getIndex(),
             $this->questionOBJ->getTitle()
         ));
-
         $form->addCommandButton(self::CMD_BACK_TO_QUESTION, $lng->txt('tst_question_hints_back_to_question'));
 
         $numExistingRequests = $this->questionHintTracking->getNumExistingRequests();
@@ -172,7 +168,7 @@ class ilAssQuestionHintRequestGUI extends ilAssQuestionHintAbstractGUI
         $nonEditableHintPoints->setValue($questionHint->getPoints());
         $form->addItem($nonEditableHintPoints);
 
-        $this->populateContent($ilCtrl->getHtml($form));
+        $this->populateContent($ilCtrl->getHtml($form), $tpl);
     }
 
     /**
@@ -209,13 +205,17 @@ class ilAssQuestionHintRequestGUI extends ilAssQuestionHintAbstractGUI
         $confirmation->setConfirm($lng->txt('tst_question_hints_confirm_request'), self::CMD_PERFORM_REQUEST);
         $confirmation->setCancel($lng->txt('tst_question_hints_cancel_request'), self::CMD_BACK_TO_QUESTION);
 
-        $confirmation->setHeaderText(sprintf(
-            $lng->txt('tst_question_hints_request_confirmation'),
-            $nextRequestableHint->getIndex(),
-            $nextRequestableHint->getPoints()
-        ));
+        if ($nextRequestableHint->getPoints() == 0.0) {
+            $confirmation->setHeaderText($lng->txt('tst_question_hints_request_confirmation_no_deduction'));
+        } else {
+            $confirmation->setHeaderText(sprintf(
+                $lng->txt('tst_question_hints_request_confirmation'),
+                $nextRequestableHint->getIndex(),
+                $nextRequestableHint->getPoints()
+            ));
+        }
 
-        $this->populateContent($ilCtrl->getHtml($confirmation));
+        $this->populateContent($ilCtrl->getHtml($confirmation), $tpl);
     }
 
     /**
@@ -272,18 +272,17 @@ class ilAssQuestionHintRequestGUI extends ilAssQuestionHintAbstractGUI
      * @global ilTemplate $tpl
      * @param string $content
      */
-    private function populateContent($content): void
+    private function populateContent($content, $tpl): void
     {
         global $DIC;
         $tpl = $DIC['tpl'];
 
         if (!$this->isQuestionPreview() && $this->parentGUI->object->getKioskMode()) {
-            $tpl->setBodyClass('kiosk');
             $tpl->hideFooter();
 
             $tpl->addBlockFile(
                 'CONTENT',
-                'content',
+                'kiosk_content',
                 'tpl.il_tst_question_hints_kiosk_page.html',
                 'Modules/TestQuestionPool'
             );

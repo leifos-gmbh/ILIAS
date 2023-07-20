@@ -1,8 +1,21 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
-require_once 'Modules/Test/classes/class.ilTestRandomQuestionSetNonAvailablePool.php';
 /**
  * @author		Björn Heyser <bheyser@databay.de>
  * @version		$Id$
@@ -13,10 +26,10 @@ class ilTestRandomQuestionSetSourcePoolDefinitionList implements Iterator
 {
     protected ilDBInterface $db;
     protected ilObjTest $testOBJ;
-    private array $sourcePoolDefinitions = array();
+    private array $sourcePoolDefinitions = [];
     private ilTestRandomQuestionSetSourcePoolDefinitionFactory $sourcePoolDefinitionFactory;
-    protected array $lostPools = array();
-    protected array $trashedPools = array();
+    protected array $lostPools = [];
+    protected array $trashedPools = [];
 
     public function __construct(ilDBInterface $db, ilObjTest $testOBJ, ilTestRandomQuestionSetSourcePoolDefinitionFactory $sourcePoolDefinitionFactory)
     {
@@ -324,36 +337,25 @@ class ilTestRandomQuestionSetSourcePoolDefinitionList implements Iterator
         return true;
     }
 
-    /**
-     * @return false|ilTestRandomQuestionSetSourcePoolDefinition
-     */
-    public function rewind()
+    public function rewind(): void
     {
-        return reset($this->sourcePoolDefinitions);
+        reset($this->sourcePoolDefinitions);
     }
 
-    /**
-     * @return false|ilTestRandomQuestionSetSourcePoolDefinition
-     */
-    public function current()
+    public function current(): ?ilTestRandomQuestionSetSourcePoolDefinition
     {
-        return current($this->sourcePoolDefinitions);
+        $current = current($this->sourcePoolDefinitions);
+        return $current !== false ? $current : null;
     }
 
-    /**
-     * @return int|null|string
-     */
-    public function key()
+    public function key(): ?int
     {
         return key($this->sourcePoolDefinitions);
     }
 
-    /**
-     * @return false|ilTestRandomQuestionSetSourcePoolDefinition
-     */
-    public function next()
+    public function next(): void
     {
-        return next($this->sourcePoolDefinitions);
+        next($this->sourcePoolDefinitions);
     }
 
     /**

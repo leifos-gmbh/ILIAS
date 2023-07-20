@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class Forum
@@ -195,7 +195,7 @@ class ilForum
         int $parent_pos,
         bool $notify,
         string $subject = '',
-        string $alias = '',
+        ?string $alias = null,
         string $date = '',
         bool $status = true,
         bool $send_activation_mail = false
@@ -529,6 +529,21 @@ class ilForum
 
         $post = new ilForumPost((int) $p_node['pos_pk']);
         if ($raiseEvents) {
+            $is_deleted_thread = ($post->getParentId() == 0) ? true : false;
+            $num_visible_active_posts = 0;
+            if ($is_deleted_thread) {
+                $query = '
+                    SELECT COUNT(*) AS cnt
+                    FROM frm_posts
+                    INNER JOIN frm_posts_tree ON pos_pk = pos_fk
+                    WHERE frm_posts_tree.parent_pos != 0
+                    AND pos_thr_fk = ' . $this->db->quote($post->getThreadId(), 'integer') . '
+                    AND pos_status = ' . $this->db->quote(1, 'integer');
+                $res = $this->db->query($query);
+                $row = $this->db->fetchAssoc($res);
+                $num_visible_active_posts = (int) ($row['cnt'] ?? 0);
+            }
+
             $this->event->raise(
                 'Modules/Forum',
                 'beforePostDeletion',
@@ -536,7 +551,8 @@ class ilForum
                     'obj_id' => $this->getForumId(),
                     'ref_id' => $this->getForumRefId(),
                     'post' => $post,
-                    'thread_deleted' => ((int) $p_node['parent']) === 0
+                    'thread_deleted' => $is_deleted_thread,
+                    'num_visible_active_posts' => $num_visible_active_posts
                 ]
             );
         }
@@ -558,10 +574,8 @@ class ilForum
         $dead_pos = count($deleted_post_ids);
         $dead_thr = 0;
 
-        if ((int) $p_node['parent'] === 0) {
-            ilObjForum::_deleteAccessEntries((int) $p_node['tree']);
-
-            $dead_thr = (int) $p_node['tree'];
+        if ((int) $post->getParentId() === 0) {
+            $dead_thr = $post->getThreadId();
 
             $this->db->manipulateF('DELETE FROM frm_threads WHERE thr_pk = %s', ['integer'], [$dead_thr]);
             $this->db->manipulateF(
@@ -596,7 +610,7 @@ class ilForum
                 }
             }
 
-            $this->db->manipulateF('DELETE FROM frm_posts WHERE pos_thr_fk = %s', ['integer'], [$p_node['tree']]);
+            $this->db->manipulateF('DELETE FROM frm_posts WHERE pos_thr_fk = %s', ['integer'], [$post->getTreeId()]);
         } else {
             for ($i = 0; $i < $dead_pos; $i++) {
                 $this->db->manipulateF('DELETE FROM frm_posts WHERE pos_pk = %s', ['integer'], [$deleted_post_ids[$i]]);
@@ -628,13 +642,13 @@ class ilForum
             $this->db->manipulateF(
                 'UPDATE frm_threads SET thr_num_posts = thr_num_posts - %s WHERE thr_pk = %s',
                 ['integer', 'integer'],
-                [$dead_pos, $p_node['tree']]
+                [$dead_pos, $post->getTreeId()]
             );
 
             $res1 = $this->db->queryF(
                 'SELECT * FROM frm_posts WHERE pos_thr_fk = %s ORDER BY pos_date DESC',
                 ['integer'],
-                [$p_node['tree']]
+                [$post->getTreeId()]
             );
 
             $lastPost_thr = '';
@@ -654,7 +668,7 @@ class ilForum
             $this->db->manipulateF(
                 'UPDATE frm_threads SET thr_last_post = %s WHERE thr_pk = %s',
                 ['text', 'integer'],
-                [$lastPost_thr, $p_node['tree']]
+                [$lastPost_thr, $post->getTreeId()]
             );
         }
 
@@ -710,7 +724,6 @@ class ilForum
      */
     public function getAllThreads(int $a_topic_id, array $params = [], int $limit = 0, int $offset = 0): array
     {
-        $frm_overview_setting = (int) $this->settings->get('forum_overview');
         $frm_props = ilForumProperties::getInstance($this->getForumId());
         $is_post_activation_enabled = $frm_props->isPostActivationEnabled();
 
@@ -721,13 +734,13 @@ class ilForum
             $excluded_ids_condition = ' AND ' . $this->db->in('thr_pk', $params['excluded_ids'], true, 'integer') . ' ';
         }
 
-        if (!in_array(
+        if (!isset($params['order_column']) || !in_array(
             strtolower($params['order_column']),
             ['lp_date', 'rating', 'thr_subject', 'num_posts', 'num_visit']
         )) {
             $params['order_column'] = 'post_date';
         }
-        if (!in_array(strtolower($params['order_direction']), ['asc', 'desc'])) {
+        if (!isset($params['order_direction']) || !in_array(strtolower($params['order_direction']), ['asc', 'desc'])) {
             $params['order_direction'] = 'desc';
         }
 
@@ -749,11 +762,9 @@ class ilForum
         $cnt = (int) $cntData['cnt'];
 
         $active_query = '';
-        $active_inner_query = '';
         $having = '';
         if ($is_post_activation_enabled && !$params['is_moderator']) {
             $active_query = ' AND (pos_status = %s OR pos_author_id = %s) ';
-            $active_inner_query = ' AND (ipos.pos_status = %s OR ipos.pos_author_id = %s) ';
             $having = ' HAVING num_posts > 0';
         }
 
@@ -763,16 +774,10 @@ class ilForum
 
         $optional_fields = '';
         if ($frm_props->isIsThreadRatingEnabled()) {
-            $optional_fields = ',avg_rating';
-        }
-        if ($frm_props->getThreadSorting() === 1) {
-            $optional_fields = ',thread_sorting';
+            $optional_fields = ', avg_rating';
         }
 
         $additional_sort = '';
-        if ($frm_props->getThreadSorting() !== 0) {
-            $additional_sort .= ' , thread_sorting ASC ';
-        }
 
         if ($params['order_column'] === 'thr_subject') {
             $dynamic_columns = [', thr_subject ' . $params['order_direction']];
@@ -792,13 +797,6 @@ class ilForum
         }
         $additional_sort .= implode(' ', $dynamic_columns);
 
-        $new_deadline_condition = $this->db->quote(date(
-            'Y-m-d H:i:s',
-            (int) $this->settings->get(
-                'frm_new_deadline',
-                (string) (time() - 60 * 60 * 24 * 7 * ilObjForum::NEWS_NEW_CONSIDERATION_WEEKS)
-            )
-        ), 'timestamp');
 
         if (!$this->user->isAnonymous()) {
             $query = "SELECT
@@ -806,27 +804,6 @@ class ilForum
 					  MAX(pos_date) post_date,
 					  SUM(tree1.parent_pos != 0) num_posts, 
 					  SUM(tree1.parent_pos != 0) - SUM(tree1.parent_pos != 0 AND postread.post_id IS NOT NULL) num_unread_posts, ";
-
-            // new posts query
-            if ($frm_overview_setting === ilForumProperties::FORUM_OVERVIEW_WITH_NEW_POSTS) {
-                $query .= "
-					  (SELECT COUNT(DISTINCT(ipos.pos_pk))
-						FROM frm_posts ipos
-						INNER JOIN frm_posts_tree treenew
-							ON treenew.pos_fk = ipos.pos_pk 
-						LEFT JOIN frm_user_read iread ON iread.post_id = ipos.pos_pk AND iread.usr_id = %s
-						LEFT JOIN frm_thread_access iacc ON (iacc.thread_id = ipos.pos_thr_fk AND iacc.usr_id = %s)
-						WHERE ipos.pos_thr_fk = thr_pk
-						AND treenew.parent_pos != 0
-						AND (ipos.pos_update > iacc.access_old_ts
-							OR
-							(iacc.access_old IS NULL AND (ipos.pos_update > " . $new_deadline_condition . "))
-							)
-						 
-						AND ipos.pos_author_id != %s
-						AND iread.usr_id IS NULL $active_inner_query
-					  ) num_new_posts, ";
-            }
 
             $query .= " thr_pk, thr_top_fk, thr_subject, thr_author_id, thr_display_user_id, thr_usr_alias, thr_num_posts, thr_last_post, thr_date, thr_update, visits, frm_threads.import_name, is_sticky, is_closed
 					  $optional_fields
@@ -851,16 +828,7 @@ class ilForum
 						$having
 						ORDER BY is_sticky DESC $additional_sort, thr_date DESC";
 
-            // data_types for new posts query and $active_inner_query
-            if ($frm_overview_setting === ilForumProperties::FORUM_OVERVIEW_WITH_NEW_POSTS) {
-                $data_types[] = 'integer';
-                $data_types[] = 'integer';
-                $data_types[] = 'integer';
-                if ($is_post_activation_enabled && !$params['is_moderator']) {
-                    $data_types[] = 'integer';
-                    $data_types[] = 'integer';
-                }
-            }
+
             $data_types[] = 'integer';
             if ($is_post_activation_enabled && !$params['is_moderator']) {
                 $data_types[] = 'integer';
@@ -869,16 +837,7 @@ class ilForum
             $data_types[] = 'integer';
             $data_types[] = 'integer';
 
-            // data_values for new posts query and $active_inner_query
-            if ($frm_overview_setting === ilForumProperties::FORUM_OVERVIEW_WITH_NEW_POSTS) {
-                $data[] = $user_id;
-                $data[] = $user_id;
-                $data[] = $user_id;
-                if ($is_post_activation_enabled && !$params['is_moderator']) {
-                    $data[] = 1;
-                    $data[] = $user_id;
-                }
-            }
+
             $data[] = $user_id;
             if ($is_post_activation_enabled && !$params['is_moderator']) {
                 $data[] = 1;
@@ -891,7 +850,6 @@ class ilForum
 					  MAX(pos_date) post_date,
 					  COUNT(DISTINCT(tree1.pos_fk)) num_posts,
 					  COUNT(DISTINCT(tree1.pos_fk)) num_unread_posts,
-					  COUNT(DISTINCT(tree1.pos_fk)) num_new_posts,
 					  thr_pk, thr_top_fk, thr_subject, thr_author_id, thr_display_user_id, thr_usr_alias, thr_num_posts, thr_last_post, thr_date, thr_update, visits, frm_threads.import_name, is_sticky, is_closed
 					  $optional_fields
 					  FROM frm_threads
@@ -1325,6 +1283,7 @@ class ilForum
         return [
             'type' => 'post',
             'pos_pk' => (int) $a_row->pos_pk,
+            'pos_thr_fk' => (int) $a_row->pos_thr_fk,
             'child' => (int) $a_row->pos_pk,
             'author' => (int) $a_row->pos_display_user_id,
             'alias' => (string) $a_row->pos_usr_alias,
@@ -1756,7 +1715,6 @@ class ilForum
         $ilAtomQuery->run();
 
         ilForumNotification::mergeThreadNotifications($sourceThreadForMerge->getId(), $targetThreadForMerge->getId());
-        ilObjForum::_deleteAccessEntries($sourceThreadForMerge->getId());
         ilObjForum::mergeForumUserRead($sourceThreadForMerge->getId(), $targetThreadForMerge->getId());
 
         $lastPostString = $targetThreadForMerge->getLastPostString();

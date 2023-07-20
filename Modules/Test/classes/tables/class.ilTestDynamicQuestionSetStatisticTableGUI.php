@@ -1,9 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-
-require_once 'Services/Table/classes/class.ilTable2GUI.php';
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  *
@@ -84,8 +95,6 @@ class ilTestDynamicQuestionSetStatisticTableGUI extends ilTable2GUI
     public function initFilter(): void
     {
         if ($this->isTaxonomyFilterEnabled()) {
-            require_once 'Services/Taxonomy/classes/class.ilTaxSelectInputGUI.php';
-
             foreach ($this->taxIds as $taxId) {
                 $postvar = "tax_$taxId";
 
@@ -102,9 +111,6 @@ class ilTestDynamicQuestionSetStatisticTableGUI extends ilTable2GUI
         }
 
         if ($this->isAnswerStatusFilterEnabled()) {
-            require_once 'Services/Form/classes/class.ilSelectInputGUI.php';
-            require_once 'Services/Form/classes/class.ilRadioOption.php';
-
             $inp = new ilSelectInputGUI($this->lng->txt('tst_question_answer_status'), 'question_answer_status');
             $inp->setOptions(array(
                 ilAssQuestionList::ANSWER_STATUS_FILTER_ALL_NON_CORRECT => $this->lng->txt('tst_question_answer_status_all_non_correct'),

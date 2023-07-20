@@ -1,10 +1,23 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
-
-include_once('./Services/Table/classes/class.ilTable2GUI.php');
-require_once 'Modules/Test/classes/class.ilTestPlayerCommands.php';
+use ILIAS\UI\Renderer;
+use ILIAS\UI\Factory;
 
 /**
 *
@@ -26,16 +39,18 @@ class ilListOfQuestionsTableGUI extends ilTable2GUI
 
     protected ?bool $finishTestButtonEnabled = false;
 
+    protected Renderer $renderer;
+    protected Factory $factory;
+
     public function __construct($a_parent_obj, $a_parent_cmd)
     {
         parent::__construct($a_parent_obj, $a_parent_cmd);
 
         global $DIC;
-        $lng = $DIC['lng'];
-        $ilCtrl = $DIC['ilCtrl'];
-
-        $this->lng = $lng;
-        $this->ctrl = $ilCtrl;
+        $this->lng = $DIC['lng'];
+        $this->ctrl = $DIC['ilCtrl'];
+        $this->renderer = $DIC->ui()->renderer();
+        $this->factory = $DIC->ui()->factory();
 
         $this->setFormName('listofquestions');
         $this->setStyle('table', 'fullwidth');
@@ -145,12 +160,16 @@ class ilListOfQuestionsTableGUI extends ilTable2GUI
 
             // obligatory icon
             if ($a_set["obligatory"]) {
-                require_once 'Services/UIComponent/Glyph/classes/class.ilGlyphGUI.php';
-                $OBLIGATORY = ilGlyphGUI::get(ilGlyphGUI::EXCLAMATION, $this->lng->txt('question_obligatory'));
+                $obligatory = $this->renderer->render(
+                    $this->factory->symbol()->icon()->custom(
+                        ilUtil::getImagePath('icon_alert.svg'),
+                        $this->lng->txt('question_obligatory')
+                    )
+                );
             } else {
-                $OBLIGATORY = '';
+                $obligatory = '';
             }
-            $this->tpl->setVariable("QUESTION_OBLIGATORY", $OBLIGATORY);
+            $this->tpl->setVariable("QUESTION_OBLIGATORY", $obligatory);
         }
 
         $postponed = (

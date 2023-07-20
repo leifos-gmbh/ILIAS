@@ -324,11 +324,13 @@ class ilObjBadgeAdministrationGUI extends ilObjectGUI
         if ($a_mode === "create") {
             $img->setRequired(true);
         }
+        $img->setUseCache(false);
         $img->setAllowDeletion(false);
         $form->addItem($img);
 
         $types_mode = new ilRadioGroupInputGUI($lng->txt("badge_template_types"), "tmode");
         $types_mode->setRequired(true);
+        $types_mode->setValue("all");
         $form->addItem($types_mode);
 
         $type_all = new ilRadioOption($lng->txt("badge_template_types_all"), "all");

@@ -25,6 +25,7 @@ class ilPCInteractiveImage extends ilPageContent
 {
     public const AREA = "Area";
     public const MARKER = "Marker";
+    protected \ILIAS\COPage\PC\InteractiveImage\IIMManager $manager;
     protected php4DOMElement $mal_node;
     protected php4DOMElement $med_alias_node;
 
@@ -33,15 +34,16 @@ class ilPCInteractiveImage extends ilPageContent
     protected ilLanguage $lng;
     public php4DOMElement $iim_node;
 
-    public function init(): void
+    public function init() : void
     {
         global $DIC;
 
         $this->lng = $DIC->language();
         $this->setType("iim");
+        $this->manager = $DIC->copage()->internal()->domain()->pc()->interactiveImage();
     }
 
-    public function readMediaObject(int $a_mob_id = 0): void
+    public function readMediaObject(int $a_mob_id = 0) : void
     {
         if ($a_mob_id > 0) {
             $mob = new ilObjMediaObject($a_mob_id);
@@ -49,9 +51,9 @@ class ilPCInteractiveImage extends ilPageContent
         }
     }
 
-    public function setNode(php4DOMElement $a_node): void
+    public function setNode(php4DOMElement $a_node) : void
     {
-        parent::setNode($a_node);		// this is the PageContent node
+        parent::setNode($a_node);        // this is the PageContent node
         $this->iim_node = $a_node->first_child();
         if (isset($this->iim_node->myDOMNode)) {
             $this->med_alias_node = $this->iim_node->first_child();
@@ -72,52 +74,51 @@ class ilPCInteractiveImage extends ilPageContent
         );
     }
 
-    public function setDom(php4DOMDocument $a_dom): void
+    public function setDom(php4DOMDocument $a_dom) : void
     {
         $this->dom = $a_dom;
     }
 
-    public function setMediaObject(ilObjMediaObject $a_mediaobject): void
+    public function setMediaObject(ilObjMediaObject $a_mediaobject) : void
     {
         $this->mediaobject = $a_mediaobject;
     }
 
-    public function getMediaObject(): ilObjMediaObject
+    public function getMediaObject() : ilObjMediaObject
     {
         return $this->mediaobject;
     }
 
-    public function createMediaObject(): void
+    public function createMediaObject() : void
     {
         $this->setMediaObject(new ilObjMediaObject());
     }
 
-    public function create(): void
+    public function create() : void
     {
         $this->node = $this->createPageContentNode();
     }
 
-    public function getStandardMediaItem(): ilMediaItem
+    public function getStandardMediaItem() : ilMediaItem
     {
         return $this->getMediaObject()->getMediaItem("Standard");
     }
 
-    public function getStandardAliasItem(): ilMediaAliasItem
+    public function getStandardAliasItem() : ilMediaAliasItem
     {
         return $this->std_alias_item;
     }
 
-    public function getBaseThumbnailTarget(): string
+    public function getBaseThumbnailTarget() : string
     {
         return $this->getMediaObject()->getMediaItem("Standard")->getThumbnailTarget();
     }
-
 
     public function createAlias(
         ilPageObject $a_pg_obj,
         string $a_hier_id,
         string $a_pc_id = ""
-    ): void {
+    ) : void {
         $this->node = $this->dom->create_element("PageContent");
         $a_pg_obj->insertContent($this, $a_hier_id, IL_INSERT_AFTER, $a_pc_id);
         $this->iim_node = $this->dom->create_element("InteractiveImage");
@@ -158,7 +159,7 @@ class ilPCInteractiveImage extends ilPageContent
         }
     }
 
-    public function dumpXML(): string
+    public function dumpXML() : string
     {
         $xml = $this->dom->dump_node($this->node);
         return $xml;
@@ -169,14 +170,16 @@ class ilPCInteractiveImage extends ilPageContent
     //// Content popups
     ////
 
-
     /**
      * Add a tab
      */
-    public function addContentPopup(): void
+    public function addContentPopup(?string $title = null) : void
     {
         $lng = $this->lng;
 
+        if ($title === null) {
+            $title = $lng->txt("cont_new_popup");
+        }
         $max = 0;
         $popups = $this->getPopups();
         foreach ($popups as $p) {
@@ -184,7 +187,7 @@ class ilPCInteractiveImage extends ilPageContent
         }
 
         $new_item = $this->dom->create_element("ContentPopup");
-        $new_item->set_attribute("Title", $lng->txt("cont_new_popup"));
+        $new_item->set_attribute("Title", $title);
         $new_item->set_attribute("Nr", $max + 1);
         $new_item = $this->iim_node->append_child($new_item);
     }
@@ -192,7 +195,7 @@ class ilPCInteractiveImage extends ilPageContent
     /**
      * Get popup captions
      */
-    public function getPopups(): array
+    public function getPopups() : array
     {
         $titles = array();
         $childs = $this->iim_node->child_nodes();
@@ -204,8 +207,11 @@ class ilPCInteractiveImage extends ilPageContent
                 $title = $childs[$i]->get_attribute("Title");
                 $nr = $childs[$i]->get_attribute("Nr");
 
-                $titles[] = array("title" => $title, "nr" => $nr,
-                    "pc_id" => $pc_id, "hier_id" => $hier_id);
+                $titles[] = array("title" => $title,
+                                  "nr" => $nr,
+                                  "pc_id" => $pc_id,
+                                  "hier_id" => $hier_id
+                );
                 $k++;
             }
         }
@@ -215,7 +221,7 @@ class ilPCInteractiveImage extends ilPageContent
     /**
      * Save popups
      */
-    public function savePopups(array $a_popups): void
+    public function savePopups(array $a_popups) : void
     {
         $childs = $this->iim_node->child_nodes();
         for ($i = 0; $i < count($childs); $i++) {
@@ -234,7 +240,7 @@ class ilPCInteractiveImage extends ilPageContent
     public function deletePopup(
         string $a_hier_id,
         string $a_pc_id
-    ): void {
+    ) : void {
         // File Item
         $childs = $this->iim_node->child_nodes();
         $nodes = array();
@@ -244,6 +250,40 @@ class ilPCInteractiveImage extends ilPageContent
                     $a_hier_id == $childs[$i]->get_attribute("HierId")) {
                     $childs[$i]->unlink($childs[$i]);
                 }
+            }
+        }
+    }
+
+    public function saveContentPopupTitle(string $nr, string $title) : void
+    {
+        $childs = $this->iim_node->child_nodes();
+        $nodes = array();
+        for ($i = 0; $i < count($childs); $i++) {
+            if ($childs[$i]->node_name() == "ContentPopup") {
+                if ($nr == $childs[$i]->get_attribute("Nr")) {
+                    $childs[$i]->set_attribute("Title", $title);
+                }
+            }
+        }
+    }
+
+    public function deletePopupByNr(
+        string $nr
+    ) : void {
+        $childs = $this->iim_node->child_nodes();
+        $nodes = array();
+        for ($i = 0; $i < count($childs); $i++) {
+            if ($childs[$i]->node_name() == "ContentPopup") {
+                if ($nr == $childs[$i]->get_attribute("Nr")) {
+                    $childs[$i]->unlink($childs[$i]);
+                }
+            }
+        }
+        $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
+        for ($i = 0; $i < count($tr_nodes); $i++) {
+            $tr_node = $tr_nodes[$i];
+            if ($tr_node->get_attribute("PopupNr") === $nr) {
+                $tr_node->remove_attribute("PopupNr");
             }
         }
     }
@@ -260,7 +300,7 @@ class ilPCInteractiveImage extends ilPageContent
         string $a_shape_type,
         string $a_coords,
         string $a_title
-    ): void {
+    ) : void {
         $max = 0;
         $triggers = $this->getTriggers();
         foreach ($triggers as $t) {
@@ -269,7 +309,8 @@ class ilPCInteractiveImage extends ilPageContent
 
         $link = array(
             "LinkType" => IL_EXT_LINK,
-            "Href" => ilUtil::stripSlashes("#"));
+            "Href" => ilUtil::stripSlashes("#")
+        );
 
         $a_alias_item->addMapArea(
             $a_shape_type,
@@ -280,10 +321,17 @@ class ilPCInteractiveImage extends ilPageContent
         );
 
         $attributes = array("Type" => self::AREA,
-            "Title" => ilUtil::stripSlashes($a_title),
-            "Nr" => $max + 1,
-            "OverlayX" => "0", "OverlayY" => "0", "Overlay" => "", "PopupNr" => "",
-            "PopupX" => "0", "PopupY" => "0", "PopupWidth" => "150", "PopupHeight" => "200");
+                            "Title" => ilUtil::stripSlashes($a_title),
+                            "Nr" => $max + 1,
+                            "OverlayX" => "0",
+                            "OverlayY" => "0",
+                            "Overlay" => "",
+                            "PopupNr" => "",
+                            "PopupX" => "0",
+                            "PopupY" => "0",
+                            "PopupWidth" => "150",
+                            "PopupHeight" => "200"
+        );
         $ma_node = ilDOMUtil::addElementToList(
             $this->dom,
             $this->iim_node,
@@ -297,7 +345,7 @@ class ilPCInteractiveImage extends ilPageContent
     /**
      * Add a new trigger marker
      */
-    public function addTriggerMarker(): void
+    public function addTriggerMarker() : void
     {
         $lng = $this->lng;
 
@@ -308,10 +356,18 @@ class ilPCInteractiveImage extends ilPageContent
         }
 
         $attributes = array("Type" => self::MARKER,
-            "Title" => $lng->txt("cont_new_marker"),
-            "Nr" => $max + 1, "OverlayX" => "0", "OverlayY" => "0",
-            "MarkerX" => "0", "MarkerY" => "0", "PopupNr" => "",
-            "PopupX" => "0", "PopupY" => "0", "PopupWidth" => "150", "PopupHeight" => "200");
+                            "Title" => $lng->txt("cont_new_marker"),
+                            "Nr" => $max + 1,
+                            "OverlayX" => "0",
+                            "OverlayY" => "0",
+                            "MarkerX" => "0",
+                            "MarkerY" => "0",
+                            "PopupNr" => "",
+                            "PopupX" => "0",
+                            "PopupY" => "0",
+                            "PopupWidth" => "150",
+                            "PopupHeight" => "200"
+        );
         $ma_node = ilDOMUtil::addElementToList(
             $this->dom,
             $this->iim_node,
@@ -325,7 +381,7 @@ class ilPCInteractiveImage extends ilPageContent
     public function getTriggerNodes(
         string $a_hier_id,
         string $a_pc_id = ""
-    ): array {
+    ) : array {
         $xpc = xpath_new_context($this->dom);
         if ($a_pc_id != "") {
             $path = "//PageContent[@PCID = '" . $a_pc_id . "']/InteractiveImage/Trigger";
@@ -344,7 +400,7 @@ class ilPCInteractiveImage extends ilPageContent
         return [];
     }
 
-    public function getTriggers(): array
+    public function getTriggers() : array
     {
         $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
         $trigger_arr = array();
@@ -365,7 +421,7 @@ class ilPCInteractiveImage extends ilPageContent
                 "PopupY" => $tr_node->get_attribute("PopupY"),
                 "PopupWidth" => $tr_node->get_attribute("PopupWidth"),
                 "PopupHeight" => $tr_node->get_attribute("PopupHeight")
-                );
+            );
         }
 
         return $trigger_arr;
@@ -377,7 +433,7 @@ class ilPCInteractiveImage extends ilPageContent
     public function deleteTrigger(
         ilMediaAliasItem $a_alias_item,
         int $a_nr
-    ): void {
+    ) : void {
         // File Item
         $childs = $this->iim_node->child_nodes();
         $nodes = array();
@@ -391,14 +447,13 @@ class ilPCInteractiveImage extends ilPageContent
         $a_alias_item->deleteMapAreaById($a_nr);
     }
 
-
     /**
      * Set trigger overlays
      * @param array $a_ovs array of strings (representing the overlays for the trigger)
      */
     public function setTriggerOverlays(
         array $a_ovs
-    ): void {
+    ) : void {
         $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
         for ($i = 0; $i < count($tr_nodes); $i++) {
             $tr_node = $tr_nodes[$i];
@@ -411,13 +466,27 @@ class ilPCInteractiveImage extends ilPageContent
         }
     }
 
+    public function deleteOverlay(string $file) : void
+    {
+        $file = str_replace("..", "", ilUtil::stripSlashes($file));
+        $this->getMediaObject()
+             ->removeAdditionalFile("overlays/" . $file);
+        $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
+        for ($i = 0; $i < count($tr_nodes); $i++) {
+            $tr_node = $tr_nodes[$i];
+            if ($tr_node->get_attribute("Overlay") === $file) {
+                $tr_node->remove_attribute("Overlay");
+            }
+        }
+    }
+
     /**
      * Set trigger overlay position
      * @param array $a_pos array of strings (representing the overlays for the trigger)
      */
     public function setTriggerOverlayPositions(
         array $a_pos
-    ): void {
+    ) : void {
         $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
         for ($i = 0; $i < count($tr_nodes); $i++) {
             $tr_node = $tr_nodes[$i];
@@ -435,7 +504,7 @@ class ilPCInteractiveImage extends ilPageContent
      */
     public function setTriggerMarkerPositions(
         array $a_pos
-    ): void {
+    ) : void {
         $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
         for ($i = 0; $i < count($tr_nodes); $i++) {
             $tr_node = $tr_nodes[$i];
@@ -455,7 +524,7 @@ class ilPCInteractiveImage extends ilPageContent
      */
     public function setTriggerPopupPositions(
         array $a_pos
-    ): void {
+    ) : void {
         $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
         for ($i = 0; $i < count($tr_nodes); $i++) {
             $tr_node = $tr_nodes[$i];
@@ -473,7 +542,7 @@ class ilPCInteractiveImage extends ilPageContent
      */
     public function setTriggerPopupSize(
         array $a_size
-    ): void {
+    ) : void {
         $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
         for ($i = 0; $i < count($tr_nodes); $i++) {
             $tr_node = $tr_nodes[$i];
@@ -491,7 +560,7 @@ class ilPCInteractiveImage extends ilPageContent
      */
     public function setTriggerPopups(
         array $a_pops
-    ): void {
+    ) : void {
         $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
         for ($i = 0; $i < count($tr_nodes); $i++) {
             $tr_node = $tr_nodes[$i];
@@ -508,7 +577,7 @@ class ilPCInteractiveImage extends ilPageContent
      */
     public function setTriggerTitles(
         array $a_titles
-    ): void {
+    ) : void {
         $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
         for ($i = 0; $i < count($tr_nodes); $i++) {
             $tr_node = $tr_nodes[$i];
@@ -528,7 +597,7 @@ class ilPCInteractiveImage extends ilPageContent
     public function setExtLinkTitle(
         int $a_nr,
         string $a_title
-    ): void {
+    ) : void {
         if ($this->getPCId() != "") {
             $xpc = xpath_new_context($this->dom);
             $path = "//PageContent[@PCID = '" . $this->getPCId() . "']/InteractiveImage/MediaAliasItem/MapArea[@Id='" . $a_nr . "']/ExtLink";
@@ -544,6 +613,68 @@ class ilPCInteractiveImage extends ilPageContent
         $res = xpath_eval($xpc, $path);
         if (count($res->nodeset) > 0) {
             $res->nodeset[0]->set_content($a_title);
+        }
+    }
+
+    public function createFromMobId(
+        \ilPageObject $page,
+        int $mob_id,
+        string $hier_id,
+        string $pc_id
+    ) : void {
+        $this->setMediaObject(new ilObjMediaObject($mob_id));
+        $this->createAlias($page, $hier_id, $pc_id);
+    }
+
+    public function getIIMModel(): ?stdClass
+    {
+        $alias_item = $this->getStandardAliasItem();
+        $model = new \stdClass();
+        $model->triggers = $this->getTriggers();
+        $model->popups = $this->getPopups();
+        $model->media_item = $alias_item->getModel();
+        $model->overlays = $this->manager->getOverlays($this->getMediaObject());
+        return $model;
+    }
+
+    protected function getTriggerNode(string $nr)
+    {
+        $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
+        for ($i = 0; $i < count($tr_nodes); $i++) {
+            $tr_node = $tr_nodes[$i];
+            if ($tr_node->get_attribute("Nr") == $nr) {
+                return $tr_node;
+            }
+        }
+        return null;
+    }
+
+    public function setTriggerProperties(string $nr, string $title, string $shape_type, string $coords) : void
+    {
+        $tr_node = $this->getTriggerNode($nr);
+        if ($tr_node) {
+            $tr_node->set_attribute(
+                "Title",
+                $title
+            );
+            $this->setExtLinkTitle(
+                $nr,
+                $title
+            );
+            $xpc = xpath_new_context($this->dom);
+            $path = "//PageContent[@HierId = '" . $this->hier_id . "']/InteractiveImage/MediaAliasItem/MapArea[@Id='" . $nr . "']";
+            $res = xpath_eval($xpc, $path);
+            if (count($res->nodeset) > 0) {
+                $res->nodeset[0]->set_attribute("Shape", $shape_type);
+                $res->nodeset[0]->set_attribute("Coords", $coords);
+            }
+        } else {
+            $this->addTriggerArea(
+                $this->getStandardAliasItem(),
+                $shape_type,
+                $coords,
+                $title
+            );
         }
     }
 }

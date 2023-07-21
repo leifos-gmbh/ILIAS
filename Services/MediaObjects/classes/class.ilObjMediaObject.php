@@ -17,6 +17,9 @@
  *********************************************************************/
 
 use ILIAS\FileUpload\MimeType;
+use ILIAS\FileUpload\FileUpload;
+use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\FileUpload\Location;
 
 define("IL_MODE_ALIAS", 1);
 define("IL_MODE_OUTPUT", 2);
@@ -1438,6 +1441,22 @@ class ilObjMediaObject extends ilObject
         }
         self::renameExecutables($mob_dir);
         ilMediaSvgSanitizer::sanitizeDir($mob_dir);	// see #20339
+    }
+
+    public function addAdditionalFileFromUpload(
+        FileUpload $upload,
+        UploadResult $result,
+        string $subdir
+    ): void {
+        $mob_dir = self::_getRelativeDirectory($this->getId());
+        $mob_dir .= "/" . $subdir;
+        $upload->moveOneFileTo(
+            $result,
+            $mob_dir,
+            Location::WEB,
+            $result->getName(),
+            true
+        );
     }
 
     public function uploadSrtFile(

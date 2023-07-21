@@ -594,6 +594,11 @@ a.nostyle:hover {
 	}
 }
 
+#copg-editor-slate-content #ilPageEditLegend > p {
+	padding: @il-padding-base-vertical @il-padding-xlarge-horizontal;
+}
+
+
 .ilPageEditLegendElement {
 	width: 40px;
 	border: 1px solid #d0d0d0;
@@ -685,7 +690,10 @@ div.ilCOPGMediaPrint {
 	right: auto;
 }
 
-#il_prop_cont_characteristic ul.dropdown-menu {
+#il_prop_cont_characteristic ul.dropdown-menu,
+#il_prop_cont_import_characteristic ul.dropdown-menu,
+#il_prop_cont_style ul.dropdown-menu
+{
 	right: auto;
 }
 
@@ -825,8 +833,10 @@ p#copg-auto-save {
 
 	background-color: @il-main-bg;
 
-	th {
+	th.il-copg-edit-table {
 		background-color: @il-main-dark-bg;
+		text-align: center;
+		min-width: 40px;
 		.dropdown button {
 			background-color: @il-main-dark-bg;
 			text-align: center;
@@ -836,11 +846,11 @@ p#copg-auto-save {
 		}
 	}
 
-	th, td {
+	th.il-copg-edit-table, td.il-copg-edit-table {
 		border: 1px solid #CCCCCC;
 	}
 
-	th {
+	th.il-copg-edit-table {
 		vertical-align: middle;
 	}
 }
@@ -892,4 +902,30 @@ p#copg-auto-save {
 	button {
 		.il-focus();
 	}
+}
+
+.il-copg-cell-selected {
+	outline: @il-warning-color 2px solid;
+}
+
+#copg-table-top-actions, .copg-slate-section {
+	padding: 0 @il-padding-xlarge-horizontal;
+}
+
+.copg-slate-section {
+	padding: @il-padding-base-vertical @il-padding-xlarge-horizontal;
+}
+
+.copg-iim-area-shape-sel {
+	stroke: @il-warning-color;
+	stroke-width: 1;
+	/*fill-opacity: 50%;*/
+	fill: transparent;
+}
+
+.copg-iim-area-shape-sel:hover {
+	stroke: @il-focus-color;
+	stroke-width: 2;
+	fill-opacity: 40%;
+	fill: white;
 }

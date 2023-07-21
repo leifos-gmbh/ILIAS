@@ -15,6 +15,7 @@
  *********************************************************************/
 
 import ACTIONS from "../actions/page-action-types.js";
+import Util from "../../../ui/util.js";
 
 /**
  * page ui
@@ -108,6 +109,7 @@ export default class PageUI {
     this.model = model;
     this.toolSlate = toolSlate;
     this.pageModifier = pageModifier;
+    this.util = new Util();
   }
 
   //
@@ -1000,7 +1002,8 @@ export default class PageUI {
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
 
-    this.pageModifier.showModal(
+    this.util.showModal(
+      this.uiModel.modal,
       il.Language.txt("cont_delete_content"),
       content,
       il.Language.txt("delete"),
@@ -1011,7 +1014,7 @@ export default class PageUI {
   }
 
   hideDeleteConfirmation() {
-    this.pageModifier.hideCurrentModal();
+    this.util.hideCurrentModal();
   }
 
   //
@@ -1035,76 +1038,14 @@ export default class PageUI {
       content,
       this.model.getCurrentPCName()
     );
+    console.log("AAAA");
     this.toolSlate.setContentFromComponent(this.model.getCurrentPCName(), "creation_form");
+    console.log("BBBB");
     this.initFormButtonsAndSettingsLink();
   }
 
   initFormButtonsAndSettingsLink() {
-    const model = this.model;
-
-    document.querySelectorAll("#copg-editor-slate-content [data-copg-ed-type='form-button']").forEach(form_button => {
-      const dispatch = this.dispatcher;
-      const action = this.actionFactory;
-      const act = form_button.dataset.copgEdAction;
-      const cname = form_button.dataset.copgEdComponent;
-      if (cname === "Page") {
-        form_button.addEventListener("click", (event) => {
-          event.preventDefault();
-          switch (act) {
-            case "component.cancel":
-              dispatch.dispatch(action.page().editor().componentCancel());
-              break;
-
-            case "component.save":
-              const form = form_button.closest("form");
-              const form_data = new FormData(form);
-              //after_pcid, pcid, component, data
-              dispatch.dispatch(action.page().editor().componentSave(
-                model.getCurrentInsertPCId(),
-                model.getCurrentPCId(),
-                model.getCurrentPCName(),
-                form_data
-              ));
-              break;
-
-            case "component.update":
-              const uform = form_button.closest("form");
-              const uform_data = new FormData(uform);
-
-              //after_pcid, pcid, component, data
-              dispatch.dispatch(action.page().editor().componentUpdate(
-                model.getCurrentPCId(),
-                model.getCurrentPCName(),
-                uform_data
-              ));
-              break;
-          }
-        });
-      }
-    });
-
-    document.querySelectorAll("#copg-editor-slate-content [data-copg-ed-type='link']").forEach(link => {
-      const dispatch = this.dispatcher;
-      const action = this.actionFactory;
-      const act = link.dataset.copgEdAction;
-      const cname = link.dataset.copgEdComponent;
-      if (cname === "Page") {
-        link.addEventListener("click", (event) => {
-          event.preventDefault();
-          switch (act) {
-            case "component.settings":
-              //after_pcid, pcid, component, data
-              dispatch.dispatch(action.page().editor().componentSettings(
-                model.getCurrentPCName(),
-                model.getCurrentPCId(),
-                model.getCurrenntHierId()
-              ));
-              break;
-
-          }
-        });
-      }
-    });
+    this.pageModifier.initFormButtonsAndSettingsLink(this.model);
   }
 
   removeInsertedComponent(pcid) {
@@ -1116,12 +1057,15 @@ export default class PageUI {
   ////
 
   loadGenericEditingForm(cname, pcid, hierid) {
+    const dispatcher = this.dispatcher;
+    const actionFactory = this.actionFactory;
+
     const loadEditingFormAction = this.actionFactory.page().query().loadEditingForm(cname, pcid, hierid);
     this.client.sendQuery(loadEditingFormAction).then(result => {
       const p = result.getPayload();
-
       this.toolSlate.setContent(p.editForm);
       this.initFormButtonsAndSettingsLink();
+      dispatcher.dispatch(actionFactory.page().editor().componentFormLoaded(cname));
     });
   }
 

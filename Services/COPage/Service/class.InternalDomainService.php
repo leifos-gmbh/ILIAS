@@ -51,4 +51,22 @@ class InternalDomainService
             $this
         );
     }
+
+    public function xsl(): Xsl\XslManager
+    {
+        return new Xsl\XslManager();
+    }
+
+    public function domUtil(): Dom\DomUtil
+    {
+        return new Dom\DomUtil();
+    }
+
+    public function pc(): PC\DomainService
+    {
+        return new PC\DomainService(
+            $this
+        );
+    }
+
 }

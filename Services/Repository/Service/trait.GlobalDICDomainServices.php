@@ -97,4 +97,9 @@ trait GlobalDICDomainServices
     {
         return $this->DIC["objDefinition"];
     }
+
+    public function objectDataCache() : \ilObjectDataCache
+    {
+        return $this->DIC["ilObjDataCache"];
+    }
 }

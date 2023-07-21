@@ -24,6 +24,7 @@
  */
 abstract class ilPageContent
 {
+    protected \ILIAS\COPage\InternalDomainService $domain;
     protected string $pcid;
     protected string $type = "";
     protected ilPageObject $pg_obj;
@@ -42,9 +43,12 @@ abstract class ilPageContent
 
     final public function __construct(ilPageObject $a_pg_obj)
     {
+        global $DIC;
+
         $this->log = ilLoggerFactory::getLogger('copg');
         $this->setPage($a_pg_obj);
         $this->dom = $a_pg_obj->getDom();
+        $this->domain = $DIC->copage()->internal()->domain();
         $this->init();
         if ($this->getType() == "") {
             die("Error: ilPageContent::init() did not set type");
@@ -155,12 +159,12 @@ abstract class ilPageContent
         return $this->file_download_link;
     }
 
-    public function setProfileBackUrl(string $url) : void
+    public function setProfileBackUrl(string $url): void
     {
         $this->profile_back_url = $url;
     }
 
-    public function getProfileBackUrl() : string
+    public function getProfileBackUrl(): string
     {
         return $this->profile_back_url;
     }

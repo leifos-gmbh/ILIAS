@@ -28,7 +28,6 @@ class ilPCTableGUI extends ilPageContentGUI
     protected ilPropertyFormGUI $form;
     protected ilTabsGUI $tabs;
     protected ilObjUser $user;
-    protected \ILIAS\GlobalScreen\ScreenContext\ContextServices $tool_context;
 
     public function __construct(
         ilPageObject $a_pg_obj,
@@ -45,7 +44,6 @@ class ilPCTableGUI extends ilPageContentGUI
         $this->user = $DIC->user();
         parent::__construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
         $this->setCharacteristics(array("StandardTable" => $this->lng->txt("cont_StandardTable")));
-        $this->tool_context = $DIC->globalScreen()->tool()->context();
     }
 
     public function setBasicTableCellStyles(): void
@@ -81,6 +79,13 @@ class ilPCTableGUI extends ilPageContentGUI
         $ilTabs = $this->tabs;
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
+
+        $ilTabs->setBackTarget(
+            "",
+            ""
+        );
+
+        return;
 
         $ilTabs->setBackTarget(
             $lng->txt("pg"),
@@ -216,6 +221,7 @@ class ilPCTableGUI extends ilPageContentGUI
         $width->setMaxLength(6);
         $this->form->addItem($width);
 
+        /*
         // border
         $border = new ilTextInputGUI($this->lng->txt("cont_table_border"), "border");
         $border->setInfo($this->lng->txt("cont_table_border_info"));
@@ -235,7 +241,7 @@ class ilPCTableGUI extends ilPageContentGUI
         // spacing (deprecated, only hidden)
         $spacing = new ilHiddenInputGUI("spacing");
         $spacing->setValue("0px");
-        $this->form->addItem($spacing);
+        $this->form->addItem($spacing);*/
 
         // table templates and table classes
         $char_prop = new ilAdvSelectInputGUI(
@@ -375,6 +381,7 @@ class ilPCTableGUI extends ilPageContentGUI
             $this->form->addCommandButton("cancelCreate", $lng->txt("cancel"));
         } else {
             $this->form->addCommandButton("saveProperties", $lng->txt("save"));
+            $this->form->addCommandButton("editData", $lng->txt("cancel"));
         }
     }
 
@@ -382,9 +389,9 @@ class ilPCTableGUI extends ilPageContentGUI
     {
         $values = array();
         $values["width"] = $this->content_obj->getWidth();
-        $values["border"] = $this->content_obj->getBorder();
-        $values["padding"] = $this->content_obj->getCellPadding();
-        $values["spacing"] = $this->content_obj->getCellSpacing();
+        //$values["border"] = $this->content_obj->getBorder();
+        //$values["padding"] = $this->content_obj->getCellPadding();
+        //$values["spacing"] = $this->content_obj->getCellSpacing();
         $values["row_header"] = $this->content_obj->getHeaderRows();
         $values["row_footer"] = $this->content_obj->getFooterRows();
         $values["col_header"] = $this->content_obj->getHeaderCols();
@@ -804,9 +811,9 @@ class ilPCTableGUI extends ilPageContentGUI
 
         $this->content_obj->setLanguage($this->form->getInput("language"));
         $this->content_obj->setWidth($this->form->getInput("width"));
-        $this->content_obj->setBorder($this->form->getInput("border"));
-        $this->content_obj->setCellSpacing($this->form->getInput("spacing"));
-        $this->content_obj->setCellPadding($this->form->getInput("padding"));
+        //$this->content_obj->setBorder($this->form->getInput("border"));
+        //$this->content_obj->setCellSpacing($this->form->getInput("spacing"));
+        //$this->content_obj->setCellPadding($this->form->getInput("padding"));
         $this->content_obj->setHorizontalAlign($this->form->getInput("align"));
         $this->content_obj->setHeaderRows($this->form->getInput("row_header"));
         $this->content_obj->setHeaderCols($this->form->getInput("col_header"));
@@ -834,7 +841,7 @@ class ilPCTableGUI extends ilPageContentGUI
         $this->setProperties();
         $this->updated = $this->pg_obj->update();
         if ($this->updated === true) {
-            $this->ctrl->redirect($this, "editProperties");
+            $this->ctrl->redirect($this, "editData");
         //$this->ctrl->returnToParent($this, "jump".$this->hier_id);
         } else {
             $this->pg_obj->addHierIDs();
@@ -1019,33 +1026,18 @@ class ilPCTableGUI extends ilPageContentGUI
         $this->ctrl->redirect($this, "editCellAlignment");
     }
 
-    /**
-     * Set editor tool context
-     */
-    protected function setEditorToolContext(): void
-    {
-        $collection = $this->tool_context->current()->getAdditionalData();
-        if ($collection->exists(ilCOPageEditGSToolProvider::SHOW_EDITOR)) {
-            $collection->replace(ilCOPageEditGSToolProvider::SHOW_EDITOR, true);
-        } else {
-            $collection->add(ilCOPageEditGSToolProvider::SHOW_EDITOR, true);
-        }
-    }
 
     /**
      * Edit data of table
      */
     public function editData(): void
     {
-        $this->setEditorToolContext();
-
         $this->setTabs();
 
         $this->displayValidationError();
 
-        $editor_init = new \ILIAS\COPage\Editor\UI\Init();
-        $editor_init->initUI($this->tpl);
-
+        $this->initEditor();
+        $this->tpl->addJavaScript("./Services/UIComponent/AdvancedSelectionList/js/AdvancedSelectionList.js");
         $this->tpl->setContent($this->getEditDataTable(true));
     }
 
@@ -1053,10 +1045,27 @@ class ilPCTableGUI extends ilPageContentGUI
     {
         $ilCtrl = $this->ctrl;
 
+        /** @var ilPCTable $pc_tab */
+        $pc_tab = $this->content_obj;
+
         $dtpl = new ilTemplate("tpl.tabledata2.html", true, true, "Services/COPage");
         $dtpl->setVariable("FORMACTION", $this->ctrl->getFormAction($this, "tableAction"));
         $dtpl->setVariable("HIERID", $this->hier_id);
         $dtpl->setVariable("PCID", $this->pc_id);
+        $class = $pc_tab->getClass();
+        if ($class === "") {
+            $class = "StandardTable";
+        }
+        $template_classes = [];
+        if ($this->getStyleId() > 0 && $pc_tab->getTemplate() != "") {
+            $id = ilObjStyleSheet::_lookupTemplateIdByName($this->getStyleId(), $pc_tab->getTemplate());
+            $style = new ilObjStyleSheet($this->getStyleId());
+            $template_classes = $style->getTemplateClasses($id);
+            if ($template_classes["table"] !== "") {
+                $class = $template_classes["table"];
+            }
+        }
+        $dtpl->setVariable("TABLE_CLASS", "ilc_table" . $class);
 
         $dtpl->setVariable(
             "WYSIWYG_ACTION",
@@ -1068,7 +1077,7 @@ class ilPCTableGUI extends ilPageContentGUI
         $path = "//PageContent[@HierId='" . $this->getHierId() . "']" .
             "/Table/TableRow";
         $res = xpath_eval($xpc, $path);
-
+        $total_rows = count($res->nodeset);
         for ($i = 0; $i < count($res->nodeset); $i++) {
             $xpc2 = xpath_new_context($this->dom);
             $path2 = "//PageContent[@HierId='" . $this->getHierId() . "']" .
@@ -1077,6 +1086,7 @@ class ilPCTableGUI extends ilPageContentGUI
 
             // if this is the first row -> col icons
             if ($i == 0) {
+                $total_cols = count($res2->nodeset);
                 for ($j = 0; $j < count($res2->nodeset); $j++) {
                     if ($j == 0) {
                         $dtpl->touchBlock("empty_td");
@@ -1142,22 +1152,45 @@ class ilPCTableGUI extends ilPageContentGUI
                     $dtpl->setVariable("PAR_ROW", (string) $i);
                     $dtpl->setVariable("PAR_COLUMN", (string) $j);
 
+                    // which tag to use?
+                    $tag = "td";
+                    // only from template
+                    if (false) {
+                        $tag = "th";
+                    }
+                    $dtpl->setVariable("CELL_TAG", "td");
+
+                    // which class to use?
+                    $node_class = $res2->nodeset[$j]->get_attribute("Class");
+                    $class = $this->getCellClass($i, $j, $node_class, $template_classes,
+                        $total_rows, $total_cols);
+                    if ($class !== "") {
+                        $dtpl->setVariable("CELL_CLASS", "ilc_table_cell_" . $class);
+                    }
+
                     $dtpl->setVariable(
                         "PAR_TA_CONTENT",
                         $this->getCellContent($i, $j)
                     );
 
+
+                    $width = $res2->nodeset[$j]->get_attribute("Width");
+                    $dtpl->setVariable("WIDTH", $width);
+
+                    $al = $res2->nodeset[$j]->get_attribute("HorizontalAlign");
+                    $dtpl->setVariable("ALIGN", strtolower($al));
+
                     $cs = $res2->nodeset[$j]->get_attribute("ColSpan");
                     $rs = $res2->nodeset[$j]->get_attribute("RowSpan");
-                    $dtpl->setVariable("WIDTH", "140");
-                    $dtpl->setVariable("HEIGHT", "80");
+
+                    //$dtpl->setVariable("HEIGHT", "80");
                     if ($cs > 1) {
                         $dtpl->setVariable("COLSPAN", 'colspan="' . $cs . '"');
-                        $dtpl->setVariable("WIDTH", (140 + ($cs - 1) * 146));
+                        //$dtpl->setVariable("WIDTH", (140 + ($cs - 1) * 146));
                     }
                     if ($rs > 1) {
                         $dtpl->setVariable("ROWSPAN", 'rowspan="' . $rs . '"');
-                        $dtpl->setVariable("HEIGHT", (80 + ($rs - 1) * 86));
+                        //$dtpl->setVariable("HEIGHT", (80 + ($rs - 1) * 86));
                     }
                     $dtpl->parseCurrentBlock();
                 }
@@ -1184,11 +1217,91 @@ class ilPCTableGUI extends ilPageContentGUI
         );
         $dtpl->parseCurrentBlock();
 
+        $html = $dtpl->get();
         if ($initial) {
-            $dtpl->touchBlock("script");
+            $html.= $this->getEditorScriptTag();
         }
 
-        return $dtpl->get();
+        return $html;
+    }
+
+    protected function getCellClass(
+        int $i,
+        int $j,
+        string $node_class,
+        array $template_classes,
+        int $total_rows,
+        int $total_cols)
+    {
+        $class = "";
+        /** @var ilPCTable $pc_tab */
+        $pc_tab = $this->content_obj;
+
+        // ["col_foot"] ["row_foot"]
+
+        if (($template_classes["even_row"] ?? "") !== "") {
+            if ($i % 2 == 1) {
+                $class = $template_classes["even_row"];
+            }
+        }
+
+        if (($template_classes["odd_row"] ?? "") !== "") {
+            if ($i % 2 == 0) {
+                $class = $template_classes["odd_row"];
+            }
+        }
+
+        if (($template_classes["even_col"] ?? "") !== "") {
+            if ($j % 2 == 1) {
+                $class = $template_classes["even_col"];
+            }
+        }
+
+        if (($template_classes["odd_col"] ?? "") !== "") {
+            if ($j % 2 == 0) {
+                $class = $template_classes["odd_col"];
+            }
+        }
+
+        if (($template_classes["row_foot"] ?? "") !== "") {
+            if ($i + $pc_tab->getFooterRows() >= $total_rows) {
+                $class = $template_classes["row_foot"];
+            }
+        }
+
+        if (($template_classes["col_foot"] ?? "") !== "") {
+            if ($j + $pc_tab->getFooterCols() >= $total_cols) {
+                $class = $template_classes["col_foot"];
+            }
+        }
+
+        if (($template_classes["row_head"] ?? "") !== "") {
+            if ($i < $pc_tab->getHeaderRows()) {
+                $class = $template_classes["row_head"];
+            }
+        }
+
+        if (($template_classes["col_head"] ?? "") !== "") {
+            if ($j < $pc_tab->getHeaderCols()) {
+                $class = $template_classes["col_head"];
+            }
+        }
+
+        if ($class === "") {
+            if ($i < $pc_tab->getHeaderRows()) {
+                $class = "StandardHeader";
+            }
+        }
+
+        if ($class === "") {
+            $class = "StandardCell1";
+        }
+
+
+        if ($node_class !== "") {
+            $class = $node_class;
+        }
+        return $class;
     }
 
     protected function getColumnCaption(int $nr): string

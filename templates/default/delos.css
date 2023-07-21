@@ -11212,7 +11212,7 @@ footer {
   grid-template-areas: "icon title close" "none description description" "none actions actions";
   grid-template-columns: 20px 1fr 20px;
   grid-gap: 9px;
-  box-shadow: 3px 9px 9px 0 rgb(0 0 0);
+  box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
   transform: translateX(150%);
   transition: all 0.25s ease-in-out;
 }
@@ -14421,6 +14421,9 @@ a.nostyle:hover {
   width: 22px;
   height: 22px;
 }
+#copg-editor-slate-content #ilPageEditLegend > p {
+  padding: 3px 15px;
+}
 .ilPageEditLegendElement {
   width: 40px;
   border: 1px solid #d0d0d0;
@@ -14497,7 +14500,9 @@ div.ilCOPGMediaPrint {
 .ilSectionClassSelector ul.dropdown-menu {
   right: auto;
 }
-#il_prop_cont_characteristic ul.dropdown-menu {
+#il_prop_cont_characteristic ul.dropdown-menu,
+#il_prop_cont_import_characteristic ul.dropdown-menu,
+#il_prop_cont_style ul.dropdown-menu {
   right: auto;
 }
 #iltinymenu .dropdown-menu li {
@@ -14618,21 +14623,23 @@ p#copg-auto-save {
 #ed_datatable {
   background-color: white;
 }
-#ed_datatable th {
+#ed_datatable th.il-copg-edit-table {
   background-color: #f9f9f9;
+  text-align: center;
+  min-width: 40px;
 }
-#ed_datatable th .dropdown button {
+#ed_datatable th.il-copg-edit-table .dropdown button {
   background-color: #f9f9f9;
   text-align: center;
   color: #161616;
   width: 100%;
   border: 0;
 }
-#ed_datatable th,
-#ed_datatable td {
+#ed_datatable th.il-copg-edit-table,
+#ed_datatable td.il-copg-edit-table {
   border: 1px solid #CCCCCC;
 }
-#ed_datatable th {
+#ed_datatable th.il-copg-edit-table {
   vertical-align: middle;
 }
 .copg-new-content-placeholder,
@@ -14691,6 +14698,28 @@ p#copg-auto-save {
 .ilPageVideo button.engaged,
 .ilPageAudio button.engaged {
   outline: none;
+}
+.il-copg-cell-selected {
+  outline: #B54F00 2px solid;
+}
+#copg-table-top-actions,
+.copg-slate-section {
+  padding: 0 15px;
+}
+.copg-slate-section {
+  padding: 3px 15px;
+}
+.copg-iim-area-shape-sel {
+  stroke: #B54F00;
+  stroke-width: 1;
+  /*fill-opacity: 50%;*/
+  fill: transparent;
+}
+.copg-iim-area-shape-sel:hover {
+  stroke: #0078D7;
+  stroke-width: 2;
+  fill-opacity: 40%;
+  fill: white;
 }
 /* Services/Calendar */
 td.even {
@@ -20012,4 +20041,3 @@ table.mceToolbar td {
     width: auto !important;
   }
 }
-/*# sourceMappingURL=delos.css.map */

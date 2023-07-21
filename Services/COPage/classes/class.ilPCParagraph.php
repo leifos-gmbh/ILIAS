@@ -306,9 +306,6 @@ class ilPCParagraph extends ilPageContent
             DOMXML_LOAD_PARSING,
             $error
         );
-        //} catch (Exception $e) {
-
-        //}
         if (is_string($error) && $error != "") {
             $error = [$error];
         }

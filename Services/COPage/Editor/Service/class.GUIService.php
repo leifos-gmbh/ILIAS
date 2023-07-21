@@ -18,38 +18,30 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-namespace ILIAS\Container\Content;
+namespace ILIAS\COPage\Editor;
+
+use ILIAS\COPage\InternalGUIService;
+use ILIAS\COPage\InternalDomainService;
+use ILIAS\COPage\Editor\UI\Init;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
-class ViewManager
+class GUIService
 {
-    protected ViewSessionRepository $view_repo;
+    protected InternalGUIService $gui_service;
+    protected InternalDomainService $domain_service;
 
     public function __construct(
-        ViewSessionRepository $view_repo
+        InternalDomainService $domain_service,
+        InternalGUIService $gui_service
     ) {
-        $this->view_repo = $view_repo;
+        $this->gui_service = $gui_service;
+        $this->domain_service = $domain_service;
     }
 
-    public function setAdminView(): void
+    public function init(): Init
     {
-        $this->view_repo->setAdminView();
-    }
-
-    public function setContentView(): void
-    {
-        $this->view_repo->setContentView();
-    }
-
-    public function isAdminView(): bool
-    {
-        return $this->view_repo->isAdminView();
-    }
-
-    public function isContentView(): bool
-    {
-        return $this->view_repo->isContentView();
+        return new Init();
     }
 }

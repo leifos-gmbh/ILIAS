@@ -1585,14 +1585,22 @@
 		<!-- odd col -->
 		<xsl:when test="../../@Template and //StyleTemplates/StyleTemplate[@Name=$ttemp]/StyleClass[@Type='odd_col']/@Value and position() mod 2 = 1">
 			<xsl:attribute name = "class">ilc_table_cell_<xsl:value-of select = "//StyleTemplates/StyleTemplate[@Name=$ttemp]/StyleClass[@Type='odd_col']/@Value"/></xsl:attribute>
-		</xsl:when>						
+		</xsl:when>
+		<xsl:when test="number($headerrows) >= number($rowpos)">
+			<xsl:attribute name = "class">ilc_table_cell_StandardHeader</xsl:attribute>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:attribute name = "class">ilc_table_cell_StandardCell1</xsl:attribute>
+		</xsl:otherwise>
 	</xsl:choose>
 	<xsl:attribute name = "width"><xsl:value-of select = "@Width"/></xsl:attribute>
-	
+
+	<!--
 	<xsl:attribute name = "style">
 		<xsl:if test="../../@CellPadding">padding: <xsl:value-of select="../../@CellPadding"/>;</xsl:if>
 		<xsl:if test="../../@Border">border: solid <xsl:value-of select="../../@Border"/>;</xsl:if>
 	</xsl:attribute>
+	-->
 	
 	<!-- insert commands -->
 	<!-- <xsl:value-of select="@HierId"/> -->
@@ -3536,7 +3544,7 @@
 		<div>
 		<xsl:choose>
 		<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
-			<xsl:attribute name="class">ilEditVAccordCntr</xsl:attribute>
+			<xsl:attribute name="class">ilc_va_cntr_VAccordCntr</xsl:attribute>
 		</xsl:when>
 		<xsl:when test="@Type = 'VerticalAccordion'">
 			<xsl:attribute name="class">ilc_va_cntr_VAccordCntr</xsl:attribute>
@@ -3689,7 +3697,7 @@
 	<div>
 	<xsl:choose>
 	<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
-		<xsl:attribute name="class">ilEditVAccordICntr</xsl:attribute>
+		<xsl:attribute name="class">ilc_va_icntr_VAccordICntr</xsl:attribute>
 	</xsl:when>
 	<xsl:when test="../@Type = 'VerticalAccordion'">
 		<xsl:attribute name="class">ilc_va_icntr_VAccordICntr</xsl:attribute>
@@ -3726,7 +3734,7 @@
 		<div tabindex="0" role="button" aria-expanded="false">
 		<xsl:choose>
 		<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
-			<xsl:attribute name="class">ilEditVAccordIHead</xsl:attribute>
+			<xsl:attribute name="class">ilc_va_ihead_VAccordIHead ilc_va_iheada_VAccordIHeadActive</xsl:attribute>
 		</xsl:when>
 		<xsl:when test="../@Type = 'VerticalAccordion'">
 			<xsl:attribute name="class">ilc_va_ihead_VAccordIHead</xsl:attribute>
@@ -3751,7 +3759,7 @@
 		<div>
 			<xsl:choose>
 			<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
-				<xsl:attribute name="class">ilEditVAccordIHeadCap</xsl:attribute>
+				<xsl:attribute name="class">ilc_va_ihcap_VAccordIHeadCap</xsl:attribute>
 			</xsl:when>
 			<xsl:when test="../@Type = 'VerticalAccordion'">
 				<xsl:attribute name="class">ilc_va_ihcap_VAccordIHeadCap</xsl:attribute>

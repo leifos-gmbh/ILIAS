@@ -25,6 +25,7 @@ use ILIAS\HTTP;
 use ILIAS\FileUpload\FileUpload;
 use ILIAS\GlobalScreen;
 use ILIAS\Repository\Form\FormAdapterGUI;
+use ILIAS\Repository\Modal\ModalAdapterGUI;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -98,11 +99,24 @@ trait GlobalDICGUIServices
      */
     public function form(
         $class_path,
-        string $cmd
+        string $cmd,
+        string $submit_caption = ""
     ): FormAdapterGUI {
         return new FormAdapterGUI(
             $class_path,
-            $cmd
+            $cmd,
+            $submit_caption
         );
     }
+
+    public function modal(
+        string $title = "",
+        string $cancel_label = ""
+    ): ModalAdapterGUI {
+        return new ModalAdapterGUI(
+            $title,
+            $cancel_label
+        );
+    }
+
 }

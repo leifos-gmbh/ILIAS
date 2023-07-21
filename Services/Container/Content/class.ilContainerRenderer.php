@@ -1020,7 +1020,7 @@ class ilContainerRenderer
                 "&cont_block_id=itgr_" . $item_data['ref_id']
         ];
         if (ilObjItemGroup::lookupHideTitle($item_data["obj_id"]) &&
-            !$this->getContainerGUI()->isActiveAdministrationPanel()) {
+            !$this->container_gui->isActiveAdministrationPanel()) {
             $this->addCustomBlock($block_id, "", $commands_html, $data);
         } else {
             $this->addCustomBlock($block_id, $item_data["title"], $commands_html, $data);

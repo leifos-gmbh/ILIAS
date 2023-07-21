@@ -280,6 +280,7 @@ export default class UI {
         ));
       });
     });
+    this.showCurrentShape(true);
   }
 
   getInputValueByName(name) {
@@ -299,11 +300,37 @@ export default class UI {
     }
   }
 
+  setSelectOptions(sel, name, options, selected = null) {
+    let op;
+    const path = sel + " select[name='" + name + "']";
+    const el = document.querySelector(path);
+    if (el) {
+      el.innerHTML = null;
+      for (const [key, value] of Object.entries(options)) {
+        op = document.createElement("option");
+        op.value = key;
+        op.innerHTML = value;
+        el.appendChild(op);
+      }
+    }
+    if (selected) {
+      el.value = selected;
+    }
+  }
+
   showTriggerOverlay() {
     this.toolSlate.setContent(this.uiModel.triggerOverlay);
     this.initTriggerViewControl();
     this.initBackButton();
     this.initTriggerOverlay();
+    this.showCurrentShape();
+  }
+
+  showCurrentShape(edit = false) {
+    const trigger = this.iimModel.getCurrentTrigger();
+    this.shapeEditor.removeAllShapes();
+    this.shapeEditor.addShape(trigger.getShape(), edit);
+    this.shapeEditor.repaint();
   }
 
   initTriggerOverlay() {
@@ -319,12 +346,20 @@ export default class UI {
         }
       });
     });
+    let options = {};
+    options[''] = ' - ';
+    this.iimModel.getOverlays().forEach((ov) => {
+      console.log(ov);
+      options[ov.name] = ov.name;
+    });
+    this.setSelectOptions("#copg-editor-slate-content", "form_input_1", options);
   }
 
   showTriggerPopup() {
     this.toolSlate.setContent(this.uiModel.triggerPopup);
     this.initTriggerViewControl();
     this.initBackButton();
+    this.showCurrentShape();
   }
 
   initBackButton() {

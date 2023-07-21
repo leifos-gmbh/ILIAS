@@ -85,11 +85,14 @@ class TabsCommandActionHandler implements Server\CommandActionHandler
                 //$tabs->setHorizontalAlign($body["valign"]);
                 break;
             case \ilPCTabs::CAROUSEL:
+                $autotime = ($body["auto_time"] != "")
+                    ? (int) $body["auto_time"]
+                    : null;
                 $t = explode(":", $body["carousel_templ"]);
                 $tabs->setTemplate($t[2] ?? "");
                 //$tabs->setHorizontalAlign($body["calign"]);
-                $tabs->setAutoTime($body["auto_time"]);
-                $tabs->setRandomStart($body["rand_start"]);
+                $tabs->setAutoTime($autotime);
+                $tabs->setRandomStart((bool) ($body["rand_start"] ?? false));
                 break;
         }
 
@@ -119,10 +122,13 @@ class TabsCommandActionHandler implements Server\CommandActionHandler
                 //$tabs->setHorizontalAlign($body["valign"]);
                 break;
             case \ilPCTabs::CAROUSEL:
+                $autotime = ($body["auto_time"] != "")
+                    ? (int) $body["auto_time"]
+                    : null;
                 $t = explode(":", $body["carousel_templ"]);
                 $tabs->setTemplate($t[2] ?? "");
                 //$tabs->setHorizontalAlign($body["calign"]);
-                $tabs->setAutoTime($body["auto_time"]);
+                $tabs->setAutoTime($autotime);
                 $tabs->setRandomStart((bool) ($body["rand_start"] ?? false));
                 break;
         }

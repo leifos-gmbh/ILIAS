@@ -16,28 +16,26 @@
  *
  *********************************************************************/
 
+namespace ILIAS\BookingManager\Reservations;
+
 /**
  * Repo class for reservations
  * Acts on tables booking_reservation (rw), booking_reservation_group (rw) and booking_object (r)
  * @author Alexander Killing <killing@leifos.de>
  */
-class ilBookingReservationDBRepository
+class ReservationDBRepository
 {
-    protected ilDBInterface $db;
+    protected \ilDBInterface $db;
     protected ?array $preloaded_by_context_list = null;
 
-    /**
-     * Do not call this constructor directly,
-     * use ilBookingReservationDBRepositoryFactory instead
-     */
     public function __construct(
-        ilDBInterface $db,
+        \ilDBInterface $db,
         ?array $preload_context_obj_ids = null
     ) {
+        $this->db = $db;
         if (is_array($preload_context_obj_ids)) {
             $this->preloadByContextIds($preload_context_obj_ids);
         }
-        $this->db = $db;
     }
 
     /**
@@ -64,13 +62,14 @@ class ilBookingReservationDBRepository
         int $from,
         int $to,
         int $status,
-        int $group_id
+        int $group_id,
+        string $message = ""
     ): int {
         $ilDB = $this->db;
 
         $id = $ilDB->nextId('booking_reservation');
         $ilDB->manipulate('INSERT INTO booking_reservation' .
-            ' (booking_reservation_id,user_id,assigner_id,object_id,context_obj_id,date_from,date_to,status,group_id)' .
+            ' (booking_reservation_id,user_id,assigner_id,object_id,context_obj_id,date_from,date_to,status,group_id,message)' .
             ' VALUES (' . $ilDB->quote($id, 'integer') .
             ',' . $ilDB->quote($user_id, 'integer') .
             ',' . $ilDB->quote($assigner_id, 'integer') .
@@ -79,7 +78,8 @@ class ilBookingReservationDBRepository
             ',' . $ilDB->quote($from, 'integer') .
             ',' . $ilDB->quote($to, 'integer') .
             ',' . $ilDB->quote($status, 'integer') .
-            ',' . $ilDB->quote($group_id, 'integer') . ')');
+            ',' . $ilDB->quote($group_id, 'integer') .
+            ',' . $ilDB->quote($message, 'text') . ')');
         return $id;
     }
 
@@ -95,7 +95,8 @@ class ilBookingReservationDBRepository
         int $from,
         int $to,
         int $status,
-        int $group_id
+        int $group_id,
+        string $message = ""
     ): int {
         $ilDB = $this->db;
         return $ilDB->manipulate('UPDATE booking_reservation' .
@@ -107,6 +108,7 @@ class ilBookingReservationDBRepository
             ', status = ' . $ilDB->quote($status, 'integer') .
             ', group_id = ' . $ilDB->quote($group_id, 'integer') .
             ', context_obj_id = ' . $ilDB->quote($context_obj_id, 'integer') .
+            ', message = ' . $ilDB->quote($message, 'text') .
             ' WHERE booking_reservation_id = ' . $ilDB->quote($id, 'integer'));
     }
 
@@ -152,7 +154,7 @@ class ilBookingReservationDBRepository
             ' FROM booking_reservation' .
             ' WHERE ' . $ilDB->in('object_id', $ids, '', 'integer') . $date .
             ' AND (status IS NULL OR status <> ' . $ilDB->quote(
-                ilBookingReservation::STATUS_CANCELLED,
+                \ilBookingReservation::STATUS_CANCELLED,
                 'integer'
             ) . ')' .
             ' AND date_from <= ' . $to . ' AND date_to >= ' . $from .
@@ -252,7 +254,7 @@ class ilBookingReservationDBRepository
             }
 
             if (!isset($res[$idx])) {
-                $uname = ilObjUser::_lookupName($user_id);
+                $uname = \ilObjUser::_lookupName($user_id);
 
                 $res[$idx] = array(
                     "object_id" => $obj_id
@@ -260,6 +262,7 @@ class ilBookingReservationDBRepository
                 ,"pool_id" => $row["pool_id"]
                 ,"context_obj_id" => (int) $row["context_obj_id"]
                 ,"user_id" => $user_id
+                ,"message" => (string) $row["message"]
                 ,"counter" => 1
                 ,"user_name" => $uname["lastname"] . ", " . $uname["firstname"] // #17862
                 ,"login" => $uname["login"]
@@ -272,7 +275,7 @@ class ilBookingReservationDBRepository
                         date("H:i", $row["date_to"] + 1);
                     $res[$idx]["week"] = date("W", $row["date_from"]);
                     $res[$idx]["weekday"] = date("w", $row["date_from"]);
-                    $res[$idx]["can_be_cancelled"] = ($row["status"] != ilBookingReservation::STATUS_CANCELLED &&
+                    $res[$idx]["can_be_cancelled"] = ($row["status"] != \ilBookingReservation::STATUS_CANCELLED &&
                         $row["date_from"] > time());
                     $res[$idx]["_sortdate"] = $row["date_from"];
 
@@ -281,7 +284,7 @@ class ilBookingReservationDBRepository
                 } else {
                     $res[$idx]["booking_reservation_id"] = $row["booking_reservation_id"];
                     $res[$idx]["status"] = $row["status"];
-                    $res[$idx]["can_be_cancelled"] = ($row["status"] != ilBookingReservation::STATUS_CANCELLED);
+                    $res[$idx]["can_be_cancelled"] = ($row["status"] != \ilBookingReservation::STATUS_CANCELLED);
                 }
             } else {
                 $res[$idx]["counter"]++;
@@ -304,25 +307,23 @@ class ilBookingReservationDBRepository
     ): void {
         $filter = ["context_obj_ids" => ($context_obj_ids)];
         $filter['past'] = true;
-        $filter['status'] = -ilBookingReservation::STATUS_CANCELLED;
-        $f = new ilBookingReservationDBRepositoryFactory();
-        $repo = $f->getRepo();
-        $list = $repo->getListByDate(true, null, $filter);
-        $list = ilArrayUtil::sortArray($list, "slot", "asc", true);
-        $list = ilArrayUtil::stableSortArray($list, "date", "asc", true);
-        $list = ilArrayUtil::stableSortArray($list, "object_id", "asc", true);
-        $this->preloaded_by_context_list = ilArrayUtil::stableSortArray($list, "pool_id", "asc", true);
+        $filter['status'] = -\ilBookingReservation::STATUS_CANCELLED;
+        $list = $this->getListByDate(true, null, $filter);
+        $list = \ilArrayUtil::sortArray($list, "slot", "asc", true);
+        $list = \ilArrayUtil::stableSortArray($list, "date", "asc", true);
+        $list = \ilArrayUtil::stableSortArray($list, "object_id", "asc", true);
+        $this->preloaded_by_context_list = \ilArrayUtil::stableSortArray($list, "pool_id", "asc", true);
     }
 
     /**
      * Get context object properties info
-     * @throws ilBookingReservationException
+     * @throws \ilBookingReservationException
      */
     public function getCachedContextObjBookingInfo(
         int $context_obj_id
     ): array {
         if (!is_array($this->preloaded_by_context_list)) {
-            throw new ilBookingReservationException("Repo not initilialized.");
+            throw new \ilBookingReservationException("Repo not initilialized.");
         }
         return array_filter($this->preloaded_by_context_list, static function ($row) use ($context_obj_id) {
             return ($row["context_obj_id"] == $context_obj_id);

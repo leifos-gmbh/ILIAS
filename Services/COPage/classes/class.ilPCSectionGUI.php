@@ -75,6 +75,11 @@ class ilPCSectionGUI extends ilPageContentGUI
                 $onload_code = array_merge($onload_code, $rep_sel->getOnloadCode());
             }
 
+            if (($params["validation"] ?? false) === true) {
+                $form->checkInput();
+                $form->setValuesByPost();
+            }
+
             $html = $params["ui_wrapper"]->getRenderedForm(
                 $form,
                 $params["buttons"]

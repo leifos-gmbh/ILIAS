@@ -86,17 +86,16 @@ class SectionCommandActionHandler implements Server\CommandActionHandler
             $sec_gui->setValuesFromForm($form);
             $updated = $page->update();
         } else {
-            /*
             $rendered_form = $this->ctrl->getHTML(
                 $sec_gui,
                 [
                     "form" => true,
+                    "validation" => true,
                     "ui_wrapper" => $this->ui_wrapper,
                     "buttons" => [["Page", "component.save", $this->lng->txt("insert")],
                                   ["Page", "component.cancel", $this->lng->txt("cancel")]]
                 ]
-            );*/
-            $rendered_form = $form->getHTML();
+            );
             return $this->ui_wrapper->sendFormError($rendered_form);
         }
 
@@ -119,6 +118,18 @@ class SectionCommandActionHandler implements Server\CommandActionHandler
         if ($form->checkInput()) {
             $sec_gui->setValuesFromForm($form);
             $updated = $page->update();
+        } else {
+            $rendered_form = $this->ctrl->getHTML(
+                $sec_gui,
+                [
+                    "form" => true,
+                    "validation" => true,
+                    "ui_wrapper" => $this->ui_wrapper,
+                    "buttons" => [["Page", "component.update", $this->lng->txt("save")],
+                                  ["Page", "component.cancel", $this->lng->txt("cancel")]]
+                ]
+            );
+            return $this->ui_wrapper->sendFormError($rendered_form);
         }
 
         return $this->ui_wrapper->sendPage($this->page_gui, $updated);

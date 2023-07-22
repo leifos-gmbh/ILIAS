@@ -460,8 +460,13 @@ export default class PageUIActionHandler {
     );
 
     this.client.sendCommand(update_action).then(result => {
-      this.ui.handlePageReloadResponse(result);
-      dispatch.dispatch(af.page().editor().enablePageEditing());
+      const p = result.payload;
+      if (p.formError) {
+        this.ui.showFormAfterError(p.form);
+      } else {
+        this.ui.handlePageReloadResponse(result);
+        dispatch.dispatch(af.page().editor().enablePageEditing());
+      }
     });
   }
 

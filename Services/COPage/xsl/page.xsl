@@ -104,8 +104,8 @@
 		<xsl:value-of select="$pg_title"/>
 		</h1>
 	</xsl:if>
-	<xsl:if test="$page_toc = 'y' and $mode != 'edit'">{{{{{PageTOC}}}}}</xsl:if>
 	<xsl:comment>COPage-PageTop</xsl:comment>
+	<xsl:if test="$page_toc = 'y' and $mode != 'edit'">{{{{{PageTOC}}}}}</xsl:if>
 	<xsl:if test="$mode = 'edit'">
 		<xsl:if test="$javascript = 'enable'">
 			<div data-copg-ed-type="add-area">
@@ -1892,7 +1892,9 @@
 		<xsl:if test="$mode != 'print'">
 			<xsl:if test="$mode != 'offline'">
 				<a class="ilc_flist_a_FileListItemLink" target="_blank">
-					<xsl:attribute name="href"><xsl:value-of select="$file_download_link"/>&amp;file_id=<xsl:value-of select="./Identifier/@Entry"/></xsl:attribute>
+					<xsl:if test="$enable_href">
+						<xsl:attribute name="href"><xsl:value-of select="$file_download_link"/>&amp;file_id=<xsl:value-of select="./Identifier/@Entry"/></xsl:attribute>
+					</xsl:if>
 					<xsl:call-template name="FileItemText"/>
 				</a>
 			</xsl:if>
@@ -2108,7 +2110,8 @@
 			position: relative;
 			<xsl:choose>
 				<!-- all images use table as container since they expand the table even without width/height -->
-				<xsl:when test="substring($type, 1, 5) = 'image' and not(substring($type, 1, 9) = 'image/svg')">display:table;</xsl:when>
+				<!-- do same for svg, see 34557 -->
+				<xsl:when test="substring($type, 1, 5) = 'image' and not(substring($type, 1, 9) = 'image/xxxsvg')">display:table;</xsl:when>
 				<!-- if we have width/height, we also use table as container, since we will expand it -->
 				<xsl:when test="$width != '' and $height != ''">display:table;</xsl:when>
 				<xsl:otherwise>
@@ -2153,7 +2156,7 @@
 			</xsl:if>
 
 			<!-- build object tag -->
-			<div class="ilc_Mob">
+			<div class="ilc_Mob" style="height:100%">
 
 				<!-- set width of td, see bug #10911 and #19464 -->
 				<xsl:if test="$width != ''">
@@ -2437,7 +2440,22 @@
 		<!-- text/html -->
 		<xsl:when test="$type = 'text/html'">
 			<xsl:if test = "$enable_html_mob = 'y'">
+				<xsl:variable name="style_val" >
+					<xsl:if test="$width != ''">
+						width:<xsl:value-of select="$width"/>px;
+					</xsl:if>
+					<xsl:if test="$width = ''">
+						width:100%;
+					</xsl:if>
+					<xsl:if test="$height != ''">
+						height:<xsl:value-of select="$height"/>px;
+					</xsl:if>
+					<xsl:if test="$height = ''">
+						height:100%;
+					</xsl:if>
+				</xsl:variable>
 				<iframe frameborder="0">
+					<xsl:attribute name="style"><xsl:value-of select="$style_val"/></xsl:attribute>
 					<xsl:attribute name="src"><xsl:value-of select="$data"/></xsl:attribute>
 					<xsl:if test="$width != ''">
 						<xsl:attribute name="width"><xsl:value-of select="$width"/></xsl:attribute>
@@ -2461,8 +2479,14 @@
 				<xsl:if test="$width != ''">
 					width:<xsl:value-of select="$width"/>px;
 				</xsl:if>
+				<xsl:if test="$width = ''">
+					width:100%;
+				</xsl:if>
 				<xsl:if test="$height != ''">
 					height:<xsl:value-of select="$height"/>px;
+				</xsl:if>
+				<xsl:if test="$height = ''">
+					height:100%;
 				</xsl:if>
 			</xsl:variable>
 			<iframe frameborder="0">
@@ -2861,7 +2885,7 @@
 
 		<!-- svg -->
 		<xsl:when test="substring($type, 1, 9) = 'image/svg'">
-			<embed>
+			<embed style="width:100%">
 				<xsl:attribute name="src"><xsl:value-of select="$data"/></xsl:attribute>
 				<xsl:attribute name="type"><xsl:value-of select="$type"/></xsl:attribute>
 				<xsl:if test="$width != ''">

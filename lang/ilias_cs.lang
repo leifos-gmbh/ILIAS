@@ -890,6 +890,7 @@ assessment#:#log_user_not_entered_values#:#Uživatel nevložil hodnoty
 assessment#:#log_user_solution_willingly_deleted#:#Uživatel smazal odpověď.
 assessment#:#log_wrong_test_password_entered#:#Účastník zadal nesprávné heslo k testu.
 assessment#:#longmenu#:#Dlouhé menu
+assessment#:#longmenu_answeroptions_differ#:#This question does not work correctly, as there are not the same amount of gaps in the text as in the correction options.###20 07 2023 new variable
 assessment#:#longmenu_text#:#Text dlouhého menu
 assessment#:#mailnottype#:#Zaslat oznámení vždy, když uživatel ukončil průchod testem
 assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
@@ -2552,6 +2553,8 @@ book#:#book_reminder_day#:#Před rezervací
 book#:#book_reminder_day_info#:#Pošlete uživatelům seznam vlastních objednávek a správcům úplný seznam objednávek.
 book#:#book_reminder_days#:#Den (dny)
 book#:#book_reminder_setting#:#Připomenutí
+book#:#book_rerun_assignments#:#Run Assignment Process###05 05 2023 new variable
+book#:#book_rerun_confirmation#:#Attention. The assignments via preference process has already run. You may restart the process, if any errors have occured, e.g. no assignments have been saved. To prevent multiple assignments delete all reservations before restarting the process.###05 05 2023 new variable
 book#:#book_reservation_available#:#%s k dispozici
 book#:#book_reservation_confirmed#:#Vaše objednávka byla potvrzena.
 book#:#book_reservation_failed#:#Vaše objednávka byla neúspěšná.
@@ -5569,6 +5572,7 @@ common#:#short_inst_name#:#Zkrácený název
 common#:#short_inst_name_info#:#Tento název bude zobrazen v horní liště vyhledávače. Pokud nebude vložena žádná hodnota, bude použito 'ILIAS'.
 common#:#show#:#Zobrazit
 common#:#show_all_details#:#Zobrazit všechny detaily
+common#:#show_content#:#Show Content###05 05 2023 new variable
 common#:#show_details#:#Zobrazit podrobnosti
 common#:#show_filter#:#Zobrazit filtr
 common#:#show_hidden_sections#:#Show More Information &raquo;
@@ -5592,8 +5596,10 @@ common#:#soap_user_administration_desc#:#Je-li zapnuto, všechny účty uživate
 common#:#soap_wsdl_path#:#Cesta WSDL
 common#:#soap_wsdl_path_info#:#Vložte prosím cestu k ilias WSDL souboru, který by měl být použit pro webové služby. Pokud toto pole necháte prázdné, pak bude použita výchozí cesta: %s
 common#:#sort_ascending#:#Sort Ascending###30 04 2021 new variable
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Setřídit podle tohoto sloupce
 common#:#sort_descending#:#Sort Descending###30 04 2021 new variable
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Výchozí
 common#:#sorting_asc#:#Vzestupně
 common#:#sorting_creation_header#:#Podle data vytvoření
@@ -6463,6 +6469,8 @@ content#:#cont_grid_width_s#:#Malý
 content#:#cont_grid_width_s_info#:#Např. smartphone
 content#:#cont_grid_width_xl#:#Extra velký
 content#:#cont_grid_width_xl_info#:#Např. široká obrazovka
+content#:#cont_hacc_needs_height#:#Please set a content height for horizontal accordions.###05 05 2023 new variable
+content#:#cont_hacc_needs_width#:#Please set a content width for horizontal accordions.###05 05 2023 new variable
 content#:#cont_header#:#Záhlaví
 content#:#cont_height#:#Výška
 content#:#cont_help_no_valid_tooltip_id#:#ID nápovědné bubliny, které jste zadali, nebylo platné.
@@ -7545,6 +7553,8 @@ crs#:#crs_members_groups#:#Členství ve skupině
 crs#:#crs_members_map#:#Mapa členů kurzu
 crs#:#crs_members_print_title#:#Členové kurzu
 crs#:#crs_min_one_admin#:#K tomuto kurzu musí být přiřazen alespoň jeden správce.
+crs#:#crs_my_courses_groups_enabled#:#My Courses and Groups###20 07 2023 new variable
+crs#:#crs_my_courses_groups_enabled_info#:#If activated, the section 'My Courses and Groups' is visible.###20 07 2023 new variable
 crs#:#crs_new_status#:#Váš nový status je:
 crs#:#crs_new_subscription#:#Uživatel zařazen do kurzu "%s"
 crs#:#crs_new_subscription_body#:#%s byl registrován do kurzu "%s".
@@ -7943,6 +7953,8 @@ dash#:#dash_studyprogramme#:#My Study Programmes###07 02 2020 new variable
 dash#:#dash_tile#:#Tile###07 02 2020 new variable
 dash#:#dash_view_courses_groups#:#Section ‘My Courses and Groups’###07 02 2020 new variable
 dash#:#dash_view_favourites#:#Section ‘Favourites’###07 02 2020 new variable
+dash#:#favourites_disabled_info#:#Add to favorites is deactivated. You may change this inside the repository settings.###20 07 2023 new variable
+dash#:#memberships_disabled_info#:#Subscriptions are deactivated. You may change this inside the course settings.###20 07 2023 new variable
 dateplaner#:#Fr_long#:#Pátek
 dateplaner#:#Fr_short#:#Pá
 dateplaner#:#Mo_long#:#Pondělí
@@ -8213,6 +8225,7 @@ dateplaner#:#cal_on_the#:#Na:
 dateplaner#:#cal_open_calendar#:#Otevřít kalendář
 dateplaner#:#cal_origin#:#Původ
 dateplaner#:#cal_owner#:#Vlastník
+dateplaner#:#cal_period#:#Period###21 06 2023 new variable
 dateplaner#:#cal_rec_err_limit#:#Vložte prosím platný počet schůzek.
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.###28 05 2021 new variable
 dateplaner#:#cal_recurrences#:#Opakování
@@ -10537,6 +10550,7 @@ lti#:#lti_object_consumer#:#Spotřebitelé LTI
 lti#:#lti_object_release_settings_form#:#Upravit sílené části LTI
 lti#:#lti_provider#:#Sdílené položky LTI
 lti#:#lti_provider_not_avail_msg#:#LTI Provider is set to 'Not Available'###07 02 2020 new variable
+lti#:#lti_provider_not_set_msg#:#LTI Provider is configured incompletely.###05 05 2023 new variable
 lti#:#lti_providing_tab#:#ILIAS as LTI Provider###07 02 2020 new variable
 lti#:#lti_released_objects#:#Objekt-sdílené položky
 lti#:#lti_select_provider#:#Select Provider###07 02 2020 new variable
@@ -13032,7 +13046,9 @@ rbac#:#crs_visible#:#Kurz je viditelný
 rbac#:#crs_write#:#Upravit kurz
 rbac#:#crsr_copy#:#Kopírovat odkaz kurzu
 rbac#:#crsr_delete#:#Smazat odkaz kurzu
+rbac#:#crsr_edit_learning_progress#:#User can edit learning progress settings###20 07 2023 new variable
 rbac#:#crsr_edit_permission#:#Změnit nastavení oprávnění
+rbac#:#crsr_read_learning_progress#:#User can view learning progress of other users###20 07 2023 new variable
 rbac#:#crsr_visible#:#Odkaz kurzu je viditelný
 rbac#:#crsr_write#:#Upravit odkaz kurzu
 rbac#:#crss_edit_permission#:#Uživatel může měnit nastavení oprávnění ve správě kurzu
@@ -13192,8 +13208,6 @@ rbac#:#iass_read_learning_progress#:#Zobrazit informace o postupu výuky individ
 rbac#:#iass_visible#:#Individuální hodnocení je viditelné
 rbac#:#iass_write#:#Upravit individuální hodnocení
 rbac#:#il_lti_global_role#:#LTI User###24 09 2021 new variable
-rbac#:#il_orgu_employee#:#Zaměstnanec organizační jednotky
-rbac#:#il_orgu_superior#:#Nadřízený organizační jednotky
 rbac#:#il_sess_participant#:#Účastník relace
 rbac#:#il_sess_status_closed#:#Relace uzavřena pro ty, kteří nejsou účastníky
 rbac#:#ilias_id#:#ILIAS-ID
@@ -13324,8 +13338,10 @@ rbac#:#orgu_cat_administrate_users#:#Uživatel může v této organizační jedn
 rbac#:#orgu_copy#:#Kopírovat organizační jednotku
 rbac#:#orgu_delete#:#Uživatel může přesunout nebo odstranit organizační jednotku
 rbac#:#orgu_edit_permission#:#Uživatel může změnit nastavení oprávnění
+rbac#:#orgu_employee#:#Zaměstnanec organizační jednotky
 rbac#:#orgu_read#:#Uživatel má přístup k organizační jednotce jen pro čtení
 rbac#:#orgu_read_users#:#Uživatel může číst lokální uživatelské účty vytvořené v této organizační jednotce
+rbac#:#orgu_superior#:#Nadřízený organizační jednotky
 rbac#:#orgu_view_learning_progress#:#Zobrazit potup výuky
 rbac#:#orgu_view_learning_progress_rec#:#Zobrazit postup výuky jednotky vč. podjednotek
 rbac#:#orgu_visible#:#Organizační jednotka je viditelná
@@ -16283,6 +16299,7 @@ user#:#interests_general#:#Obecné zájmy
 user#:#interests_help_looking#:#Vyhledání nápovědy
 user#:#interests_help_offered#:#Nabídka pomoci
 user#:#msg_spoint_not_modified#:#Výchozí bod nebyl změněn
+user#:#no_deactivate_yourself#:#You cannot deactivate your own user account.###20 07 2023 new variable
 user#:#obj_ref_id_not_exist#:#Zadané ID odkazu neexistuje
 user#:#restrict_user_access#:#Omezený přístup k uživatelským účtům
 user#:#restrict_user_access_info#:#Je-li zapnuto, přístup k uživatelským účtům je omezen. Přísup závisí na oprávnění "Přístup číst na lokální uživatelské účty" v "Uživatelských účtech" a "Kategoriích".

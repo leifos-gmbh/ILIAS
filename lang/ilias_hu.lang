@@ -904,6 +904,7 @@ assessment#:#log_user_not_entered_values#:#A felhasználó nem írt be értékek
 assessment#:#log_user_solution_willingly_deleted#:#A felhasználó törölte a választ.
 assessment#:#log_wrong_test_password_entered#:#A résztvevő rossz jelszót adott meg.
 assessment#:#longmenu#:#Étlap
+assessment#:#longmenu_answeroptions_differ#:#This question does not work correctly, as there are not the same amount of gaps in the text as in the correction options.###20 07 2023 new variable
 assessment#:#longmenu_text#:#'Étlap'-szöveg
 assessment#:#mailnottype#:#Akkor is küldjön értesítést, amikor egy felhasználó a teszt egy lépését fejezi be.
 assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
@@ -2566,6 +2567,8 @@ book#:#book_reminder_day#:#A foglalás előtt
 book#:#book_reminder_day_info#:#A felhasználóknak saját foglalásuk, a vezetőknek az összes foglalás megküldése.
 book#:#book_reminder_days#:#nappal
 book#:#book_reminder_setting#:#Emlékeztető
+book#:#book_rerun_assignments#:#Run Assignment Process###05 05 2023 new variable
+book#:#book_rerun_confirmation#:#Attention. The assignments via preference process has already run. You may restart the process, if any errors have occured, e.g. no assignments have been saved. To prevent multiple assignments delete all reservations before restarting the process.###05 05 2023 new variable
 book#:#book_reservation_available#:#%s elérhető
 book#:#book_reservation_confirmed#:#Foglalását megerősítette.
 book#:#book_reservation_failed#:#Foglalása sikertelen.
@@ -5583,6 +5586,7 @@ common#:#short_inst_name#:#Rövid cím
 common#:#short_inst_name_info#:#Ez a cím fog megjelenni a böngésző fejléccím csíkjában. Ha nincs megadott érték, az 'ILIAS' kerül felhasználásra.
 common#:#show#:#Megjelenítés
 common#:#show_all_details#:#Összes részlet megjelenítése
+common#:#show_content#:#Show Content###05 05 2023 new variable
 common#:#show_details#:#Részletek megjelenítése
 common#:#show_filter#:#Szűrő megjelenítése
 common#:#show_hidden_sections#:#További információk megjelenítése &raquo;
@@ -5606,8 +5610,10 @@ common#:#soap_user_administration_desc#:#Ha be van kapcsolva, az ILIAS kezelhet�
 common#:#soap_wsdl_path#:#WSDL útvonal
 common#:#soap_wsdl_path_info#:#Adja meg a webszolgáltatásokhoz használandó ILIAS WSDL fájl útját. Ha üresen hagyja ezt a mezőt, az alábbi útvonal lesz alapértelmezett: %s
 common#:#sort_ascending#:#Rendezés növekvő sorrendben
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Rendezés erre az oszlopra
 common#:#sort_descending#:#Rendezés csökkenő sorrendben
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Alapértelmezett
 common#:#sorting_asc#:#Növekvő
 common#:#sorting_creation_header#:#Létrehozás ideje szerinti
@@ -6477,6 +6483,8 @@ content#:#cont_grid_width_s#:#Kicsi
 content#:#cont_grid_width_s_info#:#Például mobil
 content#:#cont_grid_width_xl#:#Extra nagy
 content#:#cont_grid_width_xl_info#:#Például széles asztali monitor
+content#:#cont_hacc_needs_height#:#Please set a content height for horizontal accordions.###05 05 2023 new variable
+content#:#cont_hacc_needs_width#:#Please set a content width for horizontal accordions.###05 05 2023 new variable
 content#:#cont_header#:#Fejléc
 content#:#cont_height#:#Magasság pixelben
 content#:#cont_help_no_valid_tooltip_id#:#A megadott tooltip_id nem érvényes.
@@ -7559,6 +7567,8 @@ crs#:#crs_members_groups#:#Csoporttagságok
 crs#:#crs_members_map#:#Kurzustagok térképe
 crs#:#crs_members_print_title#:#Kurzustagok
 crs#:#crs_min_one_admin#:#Legalább egy vezetőt hozzá kell rendelni ehhez a kurzushoz.
+crs#:#crs_my_courses_groups_enabled#:#My Courses and Groups###20 07 2023 new variable
+crs#:#crs_my_courses_groups_enabled_info#:#If activated, the section 'My Courses and Groups' is visible.###20 07 2023 new variable
 crs#:#crs_new_status#:#Az Ön új állapota:
 crs#:#crs_new_subscription#:#'%s' kurzusba felhasználó regisztrált
 crs#:#crs_new_subscription_body#:#ezúton értesítjük, hogy %s regisztrált a(z) '%s' kurzusba.
@@ -7957,6 +7967,8 @@ dash#:#dash_studyprogramme#:#Képzési programjaim
 dash#:#dash_tile#:#Csempe
 dash#:#dash_view_courses_groups#:#'Kurzusaim és csoportjaim' rész
 dash#:#dash_view_favourites#:#'Kedvenceim' rész
+dash#:#favourites_disabled_info#:#Add to favorites is deactivated. You may change this inside the repository settings.###20 07 2023 new variable
+dash#:#memberships_disabled_info#:#Subscriptions are deactivated. You may change this inside the course settings.###20 07 2023 new variable
 dateplaner#:#Fr_long#:#Péntek
 dateplaner#:#Fr_short#:#P
 dateplaner#:#Mo_long#:#Hétfő
@@ -8227,6 +8239,7 @@ dateplaner#:#cal_on_the#:#Ekkor:
 dateplaner#:#cal_open_calendar#:#Naptár megnyitása
 dateplaner#:#cal_origin#:#Származás
 dateplaner#:#cal_owner#:#Tulajdonos
+dateplaner#:#cal_period#:#Period###21 06 2023 new variable
 dateplaner#:#cal_rec_err_limit#:#Érvényes esemény számot adjon meg!
 dateplaner#:#cal_recurrence_confirm_deletion#:#Kérem válasszon, hogy egy foglaltságot vagy egy teljes foglaltságsorozatot.
 dateplaner#:#cal_recurrences#:#Ismétlődés
@@ -10551,6 +10564,7 @@ lti#:#lti_object_consumer#:#LTI-fogyasztók
 lti#:#lti_object_release_settings_form#:#LTI-megosztások módosítása
 lti#:#lti_provider#:#LTI-megosztások
 lti#:#lti_provider_not_avail_msg#:#Az LTI-kiszolgáló értéke 'Nem érhető el'
+lti#:#lti_provider_not_set_msg#:#LTI Provider is configured incompletely.###05 05 2023 new variable
 lti#:#lti_providing_tab#:#Az ILIAS, mint LTI-Kiszolgáló
 lti#:#lti_released_objects#:#Megosztott objektumok
 lti#:#lti_select_provider#:#Válasszon Kiszolgálót
@@ -13046,7 +13060,9 @@ rbac#:#crs_visible#:#A kurzus látható
 rbac#:#crs_write#:#A felhasználó módosíthatja a kurzus beállításait és kezelheti a tartalmát
 rbac#:#crsr_copy#:#A felhasználó másolhat kurzuslinket
 rbac#:#crsr_delete#:#A felhasználó áthelyezhet vagy törölhet kurzuslinket
+rbac#:#crsr_edit_learning_progress#:#User can edit learning progress settings###20 07 2023 new variable
 rbac#:#crsr_edit_permission#:#A felhasználó módosíthatja a jogosultsági beállításokat
+rbac#:#crsr_read_learning_progress#:#User can view learning progress of other users###20 07 2023 new variable
 rbac#:#crsr_visible#:#A kurzuslink látható
 rbac#:#crsr_write#:#A felhasználó szerkesztheti kurzuslinket
 rbac#:#crss_edit_permission#:#A felhasználó módosíthatja a Rendszerbeállítások » Kurzus jogosultsági beállításait
@@ -13206,8 +13222,6 @@ rbac#:#iass_read_learning_progress#:#Személyes értékelés tanulási haladási
 rbac#:#iass_visible#:#Személyes értékelés látható
 rbac#:#iass_write#:#Személyes értékelés módosítása
 rbac#:#il_lti_global_role#:#LTI-Felhasználó
-rbac#:#il_orgu_employee#:#Szervezeti egység beosztottja
-rbac#:#il_orgu_superior#:#Szervezeti egység felettese
 rbac#:#il_sess_participant#:#Munkamenet résztvevők
 rbac#:#il_sess_status_closed#:#Résztvevő nélküli zárt esemény
 rbac#:#ilias_id#:#ILIAS-ID
@@ -13338,8 +13352,10 @@ rbac#:#orgu_cat_administrate_users#:#A felhasználó létrehozhat és helyi ILIA
 rbac#:#orgu_copy#:#Szervezeti egység másolása
 rbac#:#orgu_delete#:#A felhasználó mozgathatja és törölheti a Szervezeti egységet
 rbac#:#orgu_edit_permission#:#A felhasználó módosíthatja a jogosultsági beállításokat
+rbac#:#orgu_employee#:#Szervezeti egység beosztottja
 rbac#:#orgu_read#:#A felhasználónak olvasási hozzáférése van a Szervezeti egységhez
 rbac#:#orgu_read_users#:#A felhasználó láthatja a helyi ILIAS-fiókokat ebben a Szervezeti egységben
+rbac#:#orgu_superior#:#Szervezeti egység felettese
 rbac#:#orgu_view_learning_progress#:#Tanulási haladás megjelenítése
 rbac#:#orgu_view_learning_progress_rec#:#Egység és alegységei Tanulási haladásának megjelenítése
 rbac#:#orgu_visible#:#Szervezeti egység látható
@@ -16297,6 +16313,7 @@ user#:#interests_general#:#Általános érdeklődési kör
 user#:#interests_help_looking#:#Segítséget várok ezekben
 user#:#interests_help_offered#:#Segíteni tudok ezekben
 user#:#msg_spoint_not_modified#:#A kiindulási pont nem változott
+user#:#no_deactivate_yourself#:#You cannot deactivate your own user account.###20 07 2023 new variable
 user#:#obj_ref_id_not_exist#:#A megadott ref_id nem létezik
 user#:#restrict_user_access#:#Korlátozott hozzáférés az ILIAS-fiókokhoz
 user#:#restrict_user_access_info#:#Csak akkor engedélyezze, ha korlátozni szeretné a hozzáférést az ILIAS-fiókokhoz. 'Olvasási elérés a helyi ILIAS-fiókhoz' jogosultság szükséges a helyi és a globális ILIAS-fiókok hozzáféréséhez.

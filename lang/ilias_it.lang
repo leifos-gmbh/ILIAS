@@ -904,6 +904,7 @@ assessment#:#log_user_not_entered_values#:#L'utente non ha inserito un valore
 assessment#:#log_user_solution_willingly_deleted#:#L’utente ha eliminato la risposta.
 assessment#:#log_wrong_test_password_entered#:#Il partecipante ha inserito una password sbagliata del test.
 assessment#:#longmenu#:#Menù esteso
+assessment#:#longmenu_answeroptions_differ#:#This question does not work correctly, as there are not the same amount of gaps in the text as in the correction options.###20 07 2023 new variable
 assessment#:#longmenu_text#:#Testo menu esteso
 assessment#:#mailnottype#:#Inviare la notifica anche quando un utente termina un passaggio di prova
 assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
@@ -2566,6 +2567,8 @@ book#:#book_reminder_day#:#Prima della prenotazione
 book#:#book_reminder_day_info#:#Invia l'elenco delle proprie prenotazioni agli utenti e l'elenco completo delle prenotazioni agli amministratori.
 book#:#book_reminder_days#:#Giorno(i)
 book#:#book_reminder_setting#:#Promemoria
+book#:#book_rerun_assignments#:#Run Assignment Process###05 05 2023 new variable
+book#:#book_rerun_confirmation#:#Attention. The assignments via preference process has already run. You may restart the process, if any errors have occured, e.g. no assignments have been saved. To prevent multiple assignments delete all reservations before restarting the process.###05 05 2023 new variable
 book#:#book_reservation_available#:#%s disponibile
 book#:#book_reservation_confirmed#:#La tua prenotazione è stata confermata.
 book#:#book_reservation_failed#:#La tua prenotazione è fallita.
@@ -5583,6 +5586,7 @@ common#:#short_inst_name#:#Titolo breve
 common#:#short_inst_name_info#:#Questo titolo verrà visualizzato nella barra del titolo dell'intestazione del browser. Se non viene inserito alcun valore, viene utilizzato "ILIAS".
 common#:#show#:#Mostra
 common#:#show_all_details#:#Mostra tutti i dettagli
+common#:#show_content#:#Show Content###05 05 2023 new variable
 common#:#show_details#:#Mostra dettagli
 common#:#show_filter#:#Mostra filtro
 common#:#show_hidden_sections#:#Mostra maggiori informazioni &raquo;
@@ -5606,8 +5610,10 @@ common#:#soap_user_administration_desc#:#Se selezionato, tutti gli utenti potran
 common#:#soap_wsdl_path#:#Percorso WSDL
 common#:#soap_wsdl_path_info#:#Si prega di inserire il percorso del file ilias wsdl che deve essere utilizzato per il servizio Web. Se si lascia vuoto questo campo, verrà utilizzato il seguente percorso per impostazione predefinita:%s
 common#:#sort_ascending#:#Ordinare in ordine crescente
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Ordina secondo questa colonna
 common#:#sort_descending#:#Ordinare in ordine decrescente
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Impostazione predefinita
 common#:#sorting_asc#:#Ascendente
 common#:#sorting_creation_header#:#Da data di creazione
@@ -6477,6 +6483,8 @@ content#:#cont_grid_width_s#:#Piccolo
 content#:#cont_grid_width_s_info#:#p.es. smartphone
 content#:#cont_grid_width_xl#:#Molto grande (Extra Large)
 content#:#cont_grid_width_xl_info#:#p.es. desktop ampio
+content#:#cont_hacc_needs_height#:#Please set a content height for horizontal accordions.###05 05 2023 new variable
+content#:#cont_hacc_needs_width#:#Please set a content width for horizontal accordions.###05 05 2023 new variable
 content#:#cont_header#:#Intestazione
 content#:#cont_height#:#Altezza
 content#:#cont_help_no_valid_tooltip_id#:#L’ID descrizione comando immesso non è valido.
@@ -7559,6 +7567,8 @@ crs#:#crs_members_groups#:#Gruppi dei membri del corso
 crs#:#crs_members_map#:#Mappa dei membri del corso
 crs#:#crs_members_print_title#:#Iscritti al corso
 crs#:#crs_min_one_admin#:#Deve essere assegnato almeno un amministratore a questo corso.
+crs#:#crs_my_courses_groups_enabled#:#My Courses and Groups###20 07 2023 new variable
+crs#:#crs_my_courses_groups_enabled_info#:#If activated, the section 'My Courses and Groups' is visible.###20 07 2023 new variable
 crs#:#crs_new_status#:#Il tuo nuovo status e':
 crs#:#crs_new_subscription#:#Nuova iscrizione al corso "%s"
 crs#:#crs_new_subscription_body#:#%s è registrato per il corso "%s".
@@ -7957,6 +7967,8 @@ dash#:#dash_studyprogramme#:#I miei programmi di studio
 dash#:#dash_tile#:#Piastrelle
 dash#:#dash_view_courses_groups#:#Blocco ‘I miei corsi e gruppi'
 dash#:#dash_view_favourites#:#Blocco 'Preferiti'
+dash#:#favourites_disabled_info#:#Add to favorites is deactivated. You may change this inside the repository settings.###20 07 2023 new variable
+dash#:#memberships_disabled_info#:#Subscriptions are deactivated. You may change this inside the course settings.###20 07 2023 new variable
 dateplaner#:#Fr_long#:#Venerdì
 dateplaner#:#Fr_short#:#Ve
 dateplaner#:#Mo_long#:#Lunedì
@@ -8227,6 +8239,7 @@ dateplaner#:#cal_on_the#:#Al:
 dateplaner#:#cal_open_calendar#:#Apri calendario
 dateplaner#:#cal_origin#:#Origine
 dateplaner#:#cal_owner#:#Proprietario
+dateplaner#:#cal_period#:#Period###21 06 2023 new variable
 dateplaner#:#cal_rec_err_limit#:#Per favore inserisci un numero valido di appuntamenti.
 dateplaner#:#cal_recurrence_confirm_deletion#:#Selezionare se si desidera eliminare singoli appuntamenti o l'intera serie di appuntamenti.
 dateplaner#:#cal_recurrences#:#Ripetizioni
@@ -10551,6 +10564,7 @@ lti#:#lti_object_consumer#:#Consumatori LTI
 lti#:#lti_object_release_settings_form#:#Modifica versioni LTI
 lti#:#lti_provider#:#Versioni LTI
 lti#:#lti_provider_not_avail_msg#:#Il fornitore è impostato come 'Non disponibile'
+lti#:#lti_provider_not_set_msg#:#LTI Provider is configured incompletely.###05 05 2023 new variable
 lti#:#lti_providing_tab#:#ILIAS come fornitore LTI
 lti#:#lti_released_objects#:#Versioni degli Oggetti
 lti#:#lti_select_provider#:#Seleziona un fornitore
@@ -13046,7 +13060,9 @@ rbac#:#crs_visible#:#Vedere un corso
 rbac#:#crs_write#:#Modificare un corso
 rbac#:#crsr_copy#:#Copia il Riferimento del Corso
 rbac#:#crsr_delete#:#Cancella il Riferimento del Corso
+rbac#:#crsr_edit_learning_progress#:#User can edit learning progress settings###20 07 2023 new variable
 rbac#:#crsr_edit_permission#:#Cambia le impostazioni dei permessi
+rbac#:#crsr_read_learning_progress#:#User can view learning progress of other users###20 07 2023 new variable
 rbac#:#crsr_visible#:#Il riferimento del Corso è visibile
 rbac#:#crsr_write#:#Edita i Riferimenti del Corso
 rbac#:#crss_edit_permission#:#L’utente può modificare le impostazioni di autorizzazione nell’amministrazione del corso
@@ -13206,8 +13222,6 @@ rbac#:#iass_read_learning_progress#:#Visualizza le informazioni sul progresso de
 rbac#:#iass_visible#:#L’assegnazione individuale è visibile
 rbac#:#iass_write#:#Modifica una valutazione individuale
 rbac#:#il_lti_global_role#:#LTI User###09 03 2022 new variable
-rbac#:#il_orgu_employee#:#Dipendente unità organizzativa
-rbac#:#il_orgu_superior#:#Superiore unità organizzativa
 rbac#:#il_sess_participant#:#Partecipante alla sessione
 rbac#:#il_sess_status_closed#:#Sessione chiusa non partecipante
 rbac#:#ilias_id#:#ILIAS-ID
@@ -13338,8 +13352,10 @@ rbac#:#orgu_cat_administrate_users#:#L’utente può creare e amministrare gli a
 rbac#:#orgu_copy#:#Copia unità organizzativa
 rbac#:#orgu_delete#:#L’utente può spostare o eliminare l’unità organizzativa
 rbac#:#orgu_edit_permission#:#L’utente può modificare le impostazioni di autorizzazione
+rbac#:#orgu_employee#:#Dipendente unità organizzativa
 rbac#:#orgu_read#:#L’utente ha l’accesso di lettura all’unità organizzativa
 rbac#:#orgu_read_users#:#L’utente può leggere gli account degli utenti locali in questa unità organizzativa
+rbac#:#orgu_superior#:#Superiore unità organizzativa
 rbac#:#orgu_view_learning_progress#:#Visualizza il progresso dell'apprendimento
 rbac#:#orgu_view_learning_progress_rec#:#Visualizza il progresso dell'apprendimento delle unità incluse le sottounità
 rbac#:#orgu_visible#:#L’unità organizzativa è visibile
@@ -16297,6 +16313,7 @@ user#:#interests_general#:#Interessi generali
 user#:#interests_help_looking#:#Cercare aiuto
 user#:#interests_help_offered#:#Offrire aiuto
 user#:#msg_spoint_not_modified#:#Punto di partenza non modificato
+user#:#no_deactivate_yourself#:#You cannot deactivate your own user account.###20 07 2023 new variable
 user#:#obj_ref_id_not_exist#:#L'ID di riferimento inserito non esiste
 user#:#restrict_user_access#:#Accesso Ristretto agli Account Utenti
 user#:#restrict_user_access_info#:#Se abilitato, l'accesso agli utenti è ristretto. L'accesso dipende dal "Permesso di Lettura agli utenti locali" in "Account Utente" e "Categorie".

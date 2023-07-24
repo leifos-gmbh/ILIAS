@@ -8718,6 +8718,12 @@ fieldset[disabled] .il-table-presentation-viewcontrols .btn-default.engaged.focu
 .il-table-presentation-row .il-table-presentation-actions {
   margin: 5px 0;
 }
+.il-table-presentation-row .il-table-presentation-actions:not(:empty) + .il-table-presentation-row-header {
+  max-width: calc(100% - 11rem);
+}
+.il-table-presentation-row .il-table-presentation-row-header {
+  min-height: 34px;
+}
 .il-table-presentation-row .il-table-presentation-row-header h4 {
   font-size: 17px;
   font-weight: normal;
@@ -8797,6 +8803,9 @@ fieldset[disabled] .il-table-presentation-viewcontrols .btn-default.engaged.focu
 }
 .il-table-data .header.cell {
   font-weight: bold;
+}
+.il-workflow {
+  word-break: break-word;
 }
 .il-workflow-header .il-workflow-title {
   background-color: #f0f0f0;
@@ -10336,9 +10345,6 @@ footer {
 }
 .il-maincontrols-footer .il-footer-permanent-url {
   margin-right: 5px;
-}
-.il-maincontrols-footer .il-footer-permanent-url > a {
-  color: white;
 }
 .il-maincontrols-footer .il-footer-text {
   margin-right: 5px;
@@ -13029,6 +13035,7 @@ div.ilSideBarContent {
   background-color: white;
   border: 1px solid #dddddd;
   font-size: 90%;
+  z-index: 5;
   -webkit-box-shadow: 2px 2px 4px #c0c0c0;
   box-shadow: 2px 2px 4px #c0c0c0;
 }
@@ -14290,7 +14297,6 @@ html.ilc_Fullscreen td > div,
 body.ilc_Fullscreen td > div,
 html.ilc_Fullscreen td > div > figure > div > iframe,
 body.ilc_Fullscreen td > div > figure > div > iframe {
-  height: 100%;
   width: 100%;
 }
 div.ilLMMenu {
@@ -19466,6 +19472,11 @@ div.ilc_Question {
   border: 1px solid #C0C0C0;
   padding: 0.25em;
   margin-top: 1em;
+  padding: 15px;
+}
+.questionPrintview .row.ilc_qanswer_Answer {
+  padding-left: 15px;
+  padding-right: 15px;
 }
 .solutionbox {
   color: black;
@@ -19917,7 +19928,8 @@ div.ilc_Page.readonly textarea[disabled] {
   font-size: 14px;
 }
 li.dd-item.ilc_qordli_OrderListItem > ul li.dd-item.ilc_qordli_OrderListItem {
-  border: 2px white solid;
+  border: 1px #4c6586 solid;
+  border-left: 9px #4c6586 solid;
 }
 .noMargin {
   margin: 0;

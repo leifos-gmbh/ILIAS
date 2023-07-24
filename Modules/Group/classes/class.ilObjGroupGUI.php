@@ -30,6 +30,11 @@ include_once('./Modules/Group/classes/class.ilObjGroup.php');
 class ilObjGroupGUI extends ilContainerGUI
 {
     /**
+     * @var ilNewsService
+     */
+    protected $news;
+
+    /**
     * Constructor
     * @access	public
     */
@@ -46,6 +51,7 @@ class ilObjGroupGUI extends ilContainerGUI
         $this->lng->loadLanguageModule('obj');
 
         $this->setting = $ilSetting;
+        $this->news = $DIC->news();
     }
 
     public function executeCommand()
@@ -672,44 +678,12 @@ class ilObjGroupGUI extends ilContainerGUI
             // update object settings
             $this->object->update();
 
-            // begin-patch skydoc
-            global $DIC;
-            $system = $DIC->rbac()->system();
-            if($system->checkAccess('read', \ilObjFileAccessSettings::lookupFileSettingsRefId())) {
-                ilObjectServiceSettingsGUI::updateServiceSettingsForm(
-                    $this->object->getId(),
-                    $form,
-                    array(
-                        ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
-                        ilObjectServiceSettingsGUI::USE_NEWS,
-                        ilObjectServiceSettingsGUI::CUSTOM_METADATA,
-                        ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
-                        ilObjectServiceSettingsGUI::TAG_CLOUD,
-                        ilObjectServiceSettingsGUI::BADGES,
-                        ilObjectServiceSettingsGUI::SKILLS,
-                        ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
-                        ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX,
-                        ilObjectServiceSettingsGUI::PL_SKYDOC
-                    )
-                );
-            } else {
-                ilObjectServiceSettingsGUI::updateServiceSettingsForm(
-                    $this->object->getId(),
-                    $form,
-                    array(
-                        ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
-                        ilObjectServiceSettingsGUI::USE_NEWS,
-                        ilObjectServiceSettingsGUI::CUSTOM_METADATA,
-                        ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
-                        ilObjectServiceSettingsGUI::TAG_CLOUD,
-                        ilObjectServiceSettingsGUI::BADGES,
-                        ilObjectServiceSettingsGUI::SKILLS,
-                        ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
-                        ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
-                    )
-                );
+            ilObjectServiceSettingsGUI::updateServiceSettingsForm(
+                $this->object->getId(),
+                $form,
+                $this->getSubServices()
+            );
 
-            }
             // Save sorting
             $this->saveSortingSettings($form);
             // if autofill has been activated trigger process
@@ -773,6 +747,41 @@ class ilObjGroupGUI extends ilContainerGUI
             $this->ctrl->redirect($this, 'edit');
             return true;
         }
+    }
+
+    protected function getSubServices() : array
+    {
+        // begin-patch skydoc
+        global $DIC;
+        $system = $DIC->rbac()->system();
+        if($system->checkAccess('read', \ilObjFileAccessSettings::lookupFileSettingsRefId())) {
+            $subs = array(
+                    ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
+                    ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+                    ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
+                    ilObjectServiceSettingsGUI::TAG_CLOUD,
+                    ilObjectServiceSettingsGUI::BADGES,
+                    ilObjectServiceSettingsGUI::SKILLS,
+                    ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
+                    ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX,
+                    ilObjectServiceSettingsGUI::PL_SKYDOC
+            );
+        } else {
+            $subs = array(
+                ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
+                ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+                ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
+                ilObjectServiceSettingsGUI::TAG_CLOUD,
+                ilObjectServiceSettingsGUI::BADGES,
+                ilObjectServiceSettingsGUI::SKILLS,
+                ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
+                ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
+            );
+        }
+        if ($this->news->isGloballyActivated()) {
+            $subs[] = ilObjectServiceSettingsGUI::USE_NEWS;
+        }
+        return $subs;
     }
 
     /**
@@ -1821,44 +1830,11 @@ class ilObjGroupGUI extends ilContainerGUI
             $feat->setTitle($this->lng->txt('obj_features'));
             $form->addItem($feat);
 
-            // begin-patch skydoc
-            global $DIC;
-            $system = $DIC->rbac()->system();
-            if($system->checkAccess('read', \ilObjFileAccessSettings::lookupFileSettingsRefId())) {
-                ilObjectServiceSettingsGUI::initServiceSettingsForm(
-                    $this->object->getId(),
-                    $form,
-                    array(
-                        ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
-                        ilObjectServiceSettingsGUI::USE_NEWS,
-                        ilObjectServiceSettingsGUI::CUSTOM_METADATA,
-                        ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
-                        ilObjectServiceSettingsGUI::TAG_CLOUD,
-                        ilObjectServiceSettingsGUI::BADGES,
-                        ilObjectServiceSettingsGUI::SKILLS,
-                        ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
-                        ilObjectServiceSettingsGUI::PL_SKYDOC
-                    )
-                );
-            }
-            else {
             ilObjectServiceSettingsGUI::initServiceSettingsForm(
                 $this->object->getId(),
                 $form,
-                array(
-                    ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
-                        ilObjectServiceSettingsGUI::USE_NEWS,
-                        ilObjectServiceSettingsGUI::CUSTOM_METADATA,
-                        ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
-                        ilObjectServiceSettingsGUI::TAG_CLOUD,
-                        ilObjectServiceSettingsGUI::BADGES,
-                        ilObjectServiceSettingsGUI::SKILLS,
-                        ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
-                        ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
-                    )
+                $this->getSubServices()
                 );
-            }
-
 
             $mem = new ilCheckboxInputGUI($this->lng->txt('grp_show_members'), 'show_members');
             $mem->setChecked($this->object->getShowMembers());

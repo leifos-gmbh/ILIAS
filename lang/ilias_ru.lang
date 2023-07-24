@@ -890,6 +890,7 @@ assessment#:#log_user_not_entered_values#:#Пользователь не вве�
 assessment#:#log_user_solution_willingly_deleted#:#User deleted the answer.###10 11 2018 new variable
 assessment#:#log_wrong_test_password_entered#:#Participant entered wrong test password.###23 12 2015 new variable
 assessment#:#longmenu#:#Longmenu###10 11 2018 new variable
+assessment#:#longmenu_answeroptions_differ#:#This question does not work correctly, as there are not the same amount of gaps in the text as in the correction options.###20 07 2023 new variable
 assessment#:#longmenu_text#:#Long Menu Text###30 08 2015 new variable
 assessment#:#mailnottype#:#Send notification even if a user finishes a test pass
 assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
@@ -2552,6 +2553,8 @@ book#:#book_reminder_day#:#Before Reservation###10 11 2018 new variable
 book#:#book_reminder_day_info#:#Send list of own reservations to users and full list of reservations to admins.###10 11 2018 new variable
 book#:#book_reminder_days#:#Day(s)###10 11 2018 new variable
 book#:#book_reminder_setting#:#Reminder###10 11 2018 new variable
+book#:#book_rerun_assignments#:#Run Assignment Process###05 05 2023 new variable
+book#:#book_rerun_confirmation#:#Attention. The assignments via preference process has already run. You may restart the process, if any errors have occured, e.g. no assignments have been saved. To prevent multiple assignments delete all reservations before restarting the process.###05 05 2023 new variable
 book#:#book_reservation_available#:#%s available
 book#:#book_reservation_confirmed#:#Your booking has been confirmed.
 book#:#book_reservation_failed#:#Your booking has failed.
@@ -5569,6 +5572,7 @@ common#:#short_inst_name#:#Заголовок окна
 common#:#short_inst_name_info#:#Этот текст появляется в заголовке окна/вкладки браузера. Если ничего не введено, выводится 'ILIAS'.
 common#:#show#:#Показать
 common#:#show_all_details#:#Show all details
+common#:#show_content#:#Show Content###05 05 2023 new variable
 common#:#show_details#:#Показать Детали
 common#:#show_filter#:#Показать фильтр
 common#:#show_hidden_sections#:#Show More Information &raquo;###26 09 2014 new variable
@@ -5592,8 +5596,10 @@ common#:#soap_user_administration_desc#:#Если включено, все уч�
 common#:#soap_wsdl_path#:#Путь к WSDL
 common#:#soap_wsdl_path_info#:#Пожалуйста, введите путь к файлу wsdl, который используется Веб-сервисом. Если оставить это поле пустым, то по умолчанию будет использован следующий путь :%s
 common#:#sort_ascending#:#Sort Ascending###30 04 2021 new variable
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Сортировать по этому столбцу
 common#:#sort_descending#:#Sort Descending###30 04 2021 new variable
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Default
 common#:#sorting_asc#:#Ascending###26 09 2014 new variable
 common#:#sorting_creation_header#:#By Creation Date###26 09 2014 new variable
@@ -6463,6 +6469,8 @@ content#:#cont_grid_width_s#:#Small###31 08 2017 new variable
 content#:#cont_grid_width_s_info#:#E.g. smartphone###31 08 2017 new variable
 content#:#cont_grid_width_xl#:#Extra Large###31 08 2017 new variable
 content#:#cont_grid_width_xl_info#:#E.g. wide desktop###31 08 2017 new variable
+content#:#cont_hacc_needs_height#:#Please set a content height for horizontal accordions.###05 05 2023 new variable
+content#:#cont_hacc_needs_width#:#Please set a content width for horizontal accordions.###05 05 2023 new variable
 content#:#cont_header#:#Header
 content#:#cont_height#:#Высота
 content#:#cont_help_no_valid_tooltip_id#:#The tooltip ID you have entered was not valid.###26 09 2014 new variable
@@ -7545,6 +7553,8 @@ crs#:#crs_members_groups#:#Группы подписчиков курса
 crs#:#crs_members_map#:#Course Members Map
 crs#:#crs_members_print_title#:#Подписчики курса
 crs#:#crs_min_one_admin#:#There has to be at least one administrator assigned to this course.
+crs#:#crs_my_courses_groups_enabled#:#My Courses and Groups###20 07 2023 new variable
+crs#:#crs_my_courses_groups_enabled_info#:#If activated, the section 'My Courses and Groups' is visible.###20 07 2023 new variable
 crs#:#crs_new_status#:#Your new status is:
 crs#:#crs_new_subscription#:#Новая подписка курса
 crs#:#crs_new_subscription_body#:#Новый пользователь был подписан
@@ -7943,6 +7953,8 @@ dash#:#dash_studyprogramme#:#My Study Programmes###07 02 2020 new variable
 dash#:#dash_tile#:#Tile###07 02 2020 new variable
 dash#:#dash_view_courses_groups#:#Section ‘My Courses and Groups’###07 02 2020 new variable
 dash#:#dash_view_favourites#:#Section ‘Favourites’###07 02 2020 new variable
+dash#:#favourites_disabled_info#:#Add to favorites is deactivated. You may change this inside the repository settings.###20 07 2023 new variable
+dash#:#memberships_disabled_info#:#Subscriptions are deactivated. You may change this inside the course settings.###20 07 2023 new variable
 dateplaner#:#Fr_long#:#Пятница
 dateplaner#:#Fr_short#:#Пт
 dateplaner#:#Mo_long#:#Понедельник
@@ -8213,6 +8225,7 @@ dateplaner#:#cal_on_the#:#On the:
 dateplaner#:#cal_open_calendar#:#Open Calendar###31 08 2017 new variable
 dateplaner#:#cal_origin#:#Origin###31 08 2017 new variable
 dateplaner#:#cal_owner#:#Owner###31 08 2017 new variable
+dateplaner#:#cal_period#:#Period###21 06 2023 new variable
 dateplaner#:#cal_rec_err_limit#:#Please enter a valid number of appointments.
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.###28 05 2021 new variable
 dateplaner#:#cal_recurrences#:#Recurrences
@@ -10537,6 +10550,7 @@ lti#:#lti_object_consumer#:#LTI Consumers###31 08 2017 new variable
 lti#:#lti_object_release_settings_form#:#LTI Freigaben bearbeiten###31 08 2017 new variable
 lti#:#lti_provider#:#LTI-Freigaben###31 08 2017 new variable
 lti#:#lti_provider_not_avail_msg#:#LTI Provider is set to 'Not Available'###07 02 2020 new variable
+lti#:#lti_provider_not_set_msg#:#LTI Provider is configured incompletely.###05 05 2023 new variable
 lti#:#lti_providing_tab#:#ILIAS as LTI Provider###07 02 2020 new variable
 lti#:#lti_released_objects#:#Objekt-Freigaben###31 08 2017 new variable
 lti#:#lti_select_provider#:#Select Provider###07 02 2020 new variable
@@ -13032,7 +13046,9 @@ rbac#:#crs_visible#:#Курс виден
 rbac#:#crs_write#:#Редактировать курс
 rbac#:#crsr_copy#:#Copy Course Reference
 rbac#:#crsr_delete#:#Delete Course Reference
+rbac#:#crsr_edit_learning_progress#:#User can edit learning progress settings###20 07 2023 new variable
 rbac#:#crsr_edit_permission#:#Change Permission Settings
+rbac#:#crsr_read_learning_progress#:#User can view learning progress of other users###20 07 2023 new variable
 rbac#:#crsr_visible#:#Course Reference is visible
 rbac#:#crsr_write#:#Edit Course Reference
 rbac#:#crss_edit_permission#:#User can change permission settings in Course administration
@@ -13192,8 +13208,6 @@ rbac#:#iass_read_learning_progress#:#View learning progress information of a Ind
 rbac#:#iass_visible#:#Individual Assessment is visible###25 10 2016 new variable
 rbac#:#iass_write#:#Edit a Individual Assessment###25 10 2016 new variable
 rbac#:#il_lti_global_role#:#LTI User###24 09 2021 new variable
-rbac#:#il_orgu_employee#:#Organisational Unit Employee
-rbac#:#il_orgu_superior#:#Organisational Unit Superior
 rbac#:#il_sess_participant#:#Session Participant###31 08 2017 new variable
 rbac#:#il_sess_status_closed#:#Non-Participant Closed Session###31 08 2017 new variable
 rbac#:#ilias_id#:#ILIAS-ID###27 01 2015 new variable
@@ -13324,8 +13338,10 @@ rbac#:#orgu_cat_administrate_users#:#User can create and administrate local user
 rbac#:#orgu_copy#:#Copy Organisational Unit###27 01 2015 new variable
 rbac#:#orgu_delete#:#User can move or delete Organisational Unit
 rbac#:#orgu_edit_permission#:#User can change permission settings
+rbac#:#orgu_employee#:#Organisational Unit Employee
 rbac#:#orgu_read#:#User has read access to Organisational Unit
 rbac#:#orgu_read_users#:#User can read local user accounts created in this Organisational Unit
+rbac#:#orgu_superior#:#Organisational Unit Superior
 rbac#:#orgu_view_learning_progress#:#View Learning Progress
 rbac#:#orgu_view_learning_progress_rec#:#View Learning Progress of Unit incl. Subunits###27 01 2015 new variable
 rbac#:#orgu_visible#:#Organisational Unit is visible
@@ -16283,6 +16299,7 @@ user#:#interests_general#:#General Interests###26 09 2014 new variable
 user#:#interests_help_looking#:#Looking For Help###26 09 2014 new variable
 user#:#interests_help_offered#:#Offering Help###26 09 2014 new variable
 user#:#msg_spoint_not_modified#:#Starting point not modified###07 02 2020 new variable
+user#:#no_deactivate_yourself#:#You cannot deactivate your own user account.###20 07 2023 new variable
 user#:#obj_ref_id_not_exist#:#The entered Reference-Id does not exist###07 02 2020 new variable
 user#:#restrict_user_access#:#Ограниченный доступ к учетным записям
 user#:#restrict_user_access_info#:#Активируйте данную опцию только если хотите ограничить доступ к информации об учетных записях пользователей. Если включено, то доступ к локальным и глобальным учетным записям будет лишь при наличии права "Чтение локальной учетной записи".

@@ -3594,7 +3594,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     {
         global $DIC;
         $ilDB = $DIC['ilDB'];
-        #var_dump($question_id);
         if ($linkOnly) {
             $duplicate_id = $question_id;
         } else {
@@ -4041,7 +4040,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 
         $results = $this->getResultsForActiveId($active_id);
 
-        if (is_null($pass)) {
+        if ($pass === null) {
             $pass = $results['pass'];
         }
 
@@ -4076,7 +4075,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             }
         }
 
-        $arrResults = array();
+        $arrResults = [];
 
         $query = "
 			SELECT		tst_test_result.question_fi,
@@ -4128,7 +4127,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 
         $result = $ilDB->query($query);
 
-        $unordered = array();
+        $unordered = [];
 
         $key = 1;
 
@@ -4176,7 +4175,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $pass_hint_points = 0;
         $key = 1;
 
-        $found = array();
+        $found = [];
 
         foreach ($sequence as $qid) {
             // building pass point sums based on prepared data
@@ -5416,9 +5415,8 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     */
     public function getImagePathWeb()
     {
-        include_once "./Services/Utilities/classes/class.ilUtil.php";
-        $webdir = ilUtil::removeTrailingPathSeparators(CLIENT_WEB_DIR) . "/assessment/" . $this->getId() . "/images/";
-        return str_replace(ilUtil::removeTrailingPathSeparators(ILIAS_ABSOLUTE_PATH), ilUtil::removeTrailingPathSeparators(ILIAS_HTTP_PATH), $webdir);
+        $relative_path = "/assessment/" . $this->getId() . "/images/";
+        return self::getDataWebPath($relative_path);
     }
 
     /**
@@ -6754,14 +6752,22 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     * export files of file itmes
     *
     */
-    public function exportFileItems($a_target_dir, &$expLog)
+    public function exportFileItems($target_dir, &$expLog)
     {
         include_once "./Modules/File/classes/class.ilObjFile.php";
 
         foreach ($this->file_ids as $file_id) {
             $expLog->write(date("[y-m-d H:i:s] ") . "File Item " . $file_id);
+            $file_dir = $target_dir . '/objects/il_' . IL_INST_ID . '_file_' . $file_id;
+            ilUtil::makeDir($file_dir);
             $file_obj = new ilObjFile($file_id, false);
-            $file_obj->export($a_target_dir);
+            $source_file = $file_obj->getFile($file_obj->getVersion());
+            if (!is_file($source_file)) {
+                $source_file = $file_obj->getFile();
+            }
+            if (is_file($source_file)) {
+                copy($source_file, $file_dir . '/' . $file_obj->getFileName());
+            }
             unset($file_obj);
         }
     }
@@ -8136,7 +8142,8 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                     $factor = 0;
                 }
 
-                if ($factor > $bestfactor) {
+                if ($factor === 0 && $bestfactor === 0
+                    || $factor > $bestfactor) {
                     $bestrow = $row;
                     $bestfactor = $factor;
                 }
@@ -8144,10 +8151,10 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             if (is_array($bestrow)) {
                 return $bestrow["pass"];
             } else {
-                return 0;
+                return null;
             }
         } else {
-            return 0;
+            return null;
         }
     }
 
@@ -9261,19 +9268,22 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     * @return string QTI material tag
     * @access public
     */
-    public function addQTIMaterial(&$a_xml_writer, $a_material)
+    public function addQTIMaterial(&$a_xml_writer, $a_material = '')
     {
         include_once "./Services/RTE/classes/class.ilRTE.php";
         include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");
 
         $a_xml_writer->xmlStartTag("material");
+        $txt = $a_material;
         $attrs = array(
             "texttype" => "text/plain"
         );
         if ($this->isHTML($a_material)) {
             $attrs["texttype"] = "text/xhtml";
+            $txt = ilRTE::_replaceMediaObjectImageSrc($a_material, 0);
         }
-        $a_xml_writer->xmlElement("mattext", $attrs, ilRTE::_replaceMediaObjectImageSrc($a_material, 0));
+
+        $a_xml_writer->xmlElement("mattext", $attrs, $txt);
 
         $mobs = ilObjMediaObject::_getMobsOfObject("tst:html", $this->getId());
         foreach ($mobs as $mob) {
@@ -10186,7 +10196,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             $update_default['finalized_by_usr_id'] = ['integer', $user];
             $update_default['finalized_tstamp'] = ['integer', $finalized_time];
         }
-        
+
         $ilDB->insert('tst_manual_fb', $update_default);
     }
 
@@ -12284,5 +12294,24 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     protected function getHtmlQuestionContentPurifier() : ilAssHtmlUserSolutionPurifier
     {
         return ilHtmlPurifierFactory::_getInstanceByType('qpl_usersolution');
+    }
+
+    /**
+     * This is originally a fix for https://mantis.ilias.de/view.php?id=35707;
+     * in general, the handling of those pathes shold be improved or better,
+     * avoided entirely (e.g. with the IRSS).
+     */
+    public static function getDataWebPath(string $relative_path = '') : string
+    {
+        $webdir = implode('/', [
+            ILIAS_HTTP_PATH,
+            ILIAS_WEB_DIR,
+            CLIENT_ID,
+            $relative_path
+        ]);
+        $parts = array_filter(explode('/', $webdir), function ($p) {
+            return trim($p) != '' && trim($p) != '.';
+        });
+        return array_shift($parts) . '//' . implode('/', $parts) . '/';
     }
 }

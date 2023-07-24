@@ -889,6 +889,7 @@ assessment#:#log_user_not_entered_values#:#User did not enter values用户没有
 assessment#:#log_user_solution_willingly_deleted#:#User deleted the answer.###10 11 2018 new variable
 assessment#:#log_wrong_test_password_entered#:#Participant entered wrong test password.###23 12 2015 new variable
 assessment#:#longmenu#:#Longmenu###10 11 2018 new variable
+assessment#:#longmenu_answeroptions_differ#:#This question does not work correctly, as there are not the same amount of gaps in the text as in the correction options.###20 07 2023 new variable
 assessment#:#longmenu_text#:#Long Menu Text###30 08 2015 new variable
 assessment#:#mailnottype#:#甚至当用户完成一个测试时也发送通知
 assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
@@ -2551,6 +2552,8 @@ book#:#book_reminder_day#:#Before Reservation###10 11 2018 new variable
 book#:#book_reminder_day_info#:#Send list of own reservations to users and full list of reservations to admins.###10 11 2018 new variable
 book#:#book_reminder_days#:#Day(s)###10 11 2018 new variable
 book#:#book_reminder_setting#:#Reminder###10 11 2018 new variable
+book#:#book_rerun_assignments#:#Run Assignment Process###05 05 2023 new variable
+book#:#book_rerun_confirmation#:#Attention. The assignments via preference process has already run. You may restart the process, if any errors have occured, e.g. no assignments have been saved. To prevent multiple assignments delete all reservations before restarting the process.###05 05 2023 new variable
 book#:#book_reservation_available#:#%s available###24 10 2013 new variable
 book#:#book_reservation_confirmed#:#您的预订已经被确认
 book#:#book_reservation_failed#:#您的预订已经失败
@@ -5568,6 +5571,7 @@ common#:#short_inst_name#:#短标题
 common#:#short_inst_name_info#:#这个标题将显示在浏览器的标题栏的前头。如果没有输入任何值，将使用“ILIAS”。
 common#:#show#:#显示
 common#:#show_all_details#:#Show all details###24 10 2013 new variable
+common#:#show_content#:#Show Content###05 05 2023 new variable
 common#:#show_details#:#显示详细情况
 common#:#show_filter#:#显示过滤器
 common#:#show_hidden_sections#:#Show More Information &raquo;###26 09 2014 new variable
@@ -5591,8 +5595,10 @@ common#:#soap_user_administration_desc#:#如果启用，所有用户账号都能
 common#:#soap_wsdl_path#:#WSDL路径
 common#:#soap_wsdl_path_info#:#请输入ilias的wsdl文件路径，它将使用在webservice中。如果您将这个字段留空，将使用以下路径做为默认值：%s
 common#:#sort_ascending#:#Sort Ascending###30 04 2021 new variable
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#根据此列分类
 common#:#sort_descending#:#Sort Descending###30 04 2021 new variable
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#默认
 common#:#sorting_asc#:#Ascending###26 09 2014 new variable
 common#:#sorting_creation_header#:#By Creation Date###26 09 2014 new variable
@@ -6462,6 +6468,8 @@ content#:#cont_grid_width_s#:#Small###31 08 2017 new variable
 content#:#cont_grid_width_s_info#:#E.g. smartphone###31 08 2017 new variable
 content#:#cont_grid_width_xl#:#Extra Large###31 08 2017 new variable
 content#:#cont_grid_width_xl_info#:#E.g. wide desktop###31 08 2017 new variable
+content#:#cont_hacc_needs_height#:#Please set a content height for horizontal accordions.###05 05 2023 new variable
+content#:#cont_hacc_needs_width#:#Please set a content width for horizontal accordions.###05 05 2023 new variable
 content#:#cont_header#:#Header
 content#:#cont_height#:#高
 content#:#cont_help_no_valid_tooltip_id#:#The tooltip ID you have entered was not valid.###26 09 2014 new variable
@@ -7544,6 +7552,8 @@ crs#:#crs_members_groups#:#课程成员组
 crs#:#crs_members_map#:#课程成员地图
 crs#:#crs_members_print_title#:#课程成员
 crs#:#crs_min_one_admin#:#必须至少有一个管理员分配给本课程
+crs#:#crs_my_courses_groups_enabled#:#My Courses and Groups###20 07 2023 new variable
+crs#:#crs_my_courses_groups_enabled_info#:#If activated, the section 'My Courses and Groups' is visible.###20 07 2023 new variable
 crs#:#crs_new_status#:#您的新状态
 crs#:#crs_new_subscription#:#新课程订阅
 crs#:#crs_new_subscription_body#:#一个新用户已经订阅
@@ -7942,6 +7952,8 @@ dash#:#dash_studyprogramme#:#My Study Programmes###07 02 2020 new variable
 dash#:#dash_tile#:#Tile###07 02 2020 new variable
 dash#:#dash_view_courses_groups#:#Section ‘My Courses and Groups’###07 02 2020 new variable
 dash#:#dash_view_favourites#:#Section ‘Favourites’###07 02 2020 new variable
+dash#:#favourites_disabled_info#:#Add to favorites is deactivated. You may change this inside the repository settings.###20 07 2023 new variable
+dash#:#memberships_disabled_info#:#Subscriptions are deactivated. You may change this inside the course settings.###20 07 2023 new variable
 dateplaner#:#Fr_long#:#星期五
 dateplaner#:#Fr_short#:#周五
 dateplaner#:#Mo_long#:#星期一
@@ -8212,6 +8224,7 @@ dateplaner#:#cal_on_the#:#On the:
 dateplaner#:#cal_open_calendar#:#Open Calendar###31 08 2017 new variable
 dateplaner#:#cal_origin#:#Origin###31 08 2017 new variable
 dateplaner#:#cal_owner#:#Owner###31 08 2017 new variable
+dateplaner#:#cal_period#:#Period###21 06 2023 new variable
 dateplaner#:#cal_rec_err_limit#:#请输入一个有效的预约数。
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.###28 05 2021 new variable
 dateplaner#:#cal_recurrences#:#Recurrences
@@ -10536,6 +10549,7 @@ lti#:#lti_object_consumer#:#LTI Consumers###31 08 2017 new variable
 lti#:#lti_object_release_settings_form#:#LTI Freigaben bearbeiten###31 08 2017 new variable
 lti#:#lti_provider#:#LTI-Freigaben###31 08 2017 new variable
 lti#:#lti_provider_not_avail_msg#:#LTI Provider is set to 'Not Available'###07 02 2020 new variable
+lti#:#lti_provider_not_set_msg#:#LTI Provider is configured incompletely.###05 05 2023 new variable
 lti#:#lti_providing_tab#:#ILIAS as LTI Provider###07 02 2020 new variable
 lti#:#lti_released_objects#:#Objekt-Freigaben###31 08 2017 new variable
 lti#:#lti_select_provider#:#Select Provider###07 02 2020 new variable
@@ -13031,7 +13045,9 @@ rbac#:#crs_visible#:#课程可视
 rbac#:#crs_write#:#用户能编辑课程设置和管理内容
 rbac#:#crsr_copy#:#复制课程参考
 rbac#:#crsr_delete#:#删除课程参考
+rbac#:#crsr_edit_learning_progress#:#User can edit learning progress settings###20 07 2023 new variable
 rbac#:#crsr_edit_permission#:#更改权限设置
+rbac#:#crsr_read_learning_progress#:#User can view learning progress of other users###20 07 2023 new variable
 rbac#:#crsr_visible#:#课程参考可见权限
 rbac#:#crsr_write#:#课程参考编辑权限
 rbac#:#crss_edit_permission#:#User can change permission settings in Course administration###30 12 2013 new variable
@@ -13191,8 +13207,6 @@ rbac#:#iass_read_learning_progress#:#View learning progress information of a Ind
 rbac#:#iass_visible#:#Individual Assessment is visible###25 10 2016 new variable
 rbac#:#iass_write#:#Edit a Individual Assessment###25 10 2016 new variable
 rbac#:#il_lti_global_role#:#LTI User###24 09 2021 new variable
-rbac#:#il_orgu_employee#:#Organisational Unit Employee###30 12 2013 new variable
-rbac#:#il_orgu_superior#:#Organisational Unit Superior###30 12 2013 new variable
 rbac#:#il_sess_participant#:#Session Participant###31 08 2017 new variable
 rbac#:#il_sess_status_closed#:#Non-Participant Closed Session###31 08 2017 new variable
 rbac#:#ilias_id#:#ILIAS-ID###27 01 2015 new variable
@@ -13323,8 +13337,10 @@ rbac#:#orgu_cat_administrate_users#:#User can create and administrate local user
 rbac#:#orgu_copy#:#Copy Organisational Unit###27 01 2015 new variable
 rbac#:#orgu_delete#:#User can move or delete Organisational Unit###11 03 2014 new variable
 rbac#:#orgu_edit_permission#:#User can change permission settings###11 03 2014 new variable
+rbac#:#orgu_employee#:#Organisational Unit Employee###30 12 2013 new variable
 rbac#:#orgu_read#:#User has read access to Organisational Unit###11 03 2014 new variable
 rbac#:#orgu_read_users#:#User can read local user accounts created in this Organisational Unit###11 03 2014 new variable
+rbac#:#orgu_superior#:#Organisational Unit Superior###30 12 2013 new variable
 rbac#:#orgu_view_learning_progress#:#View Learning Progress###11 03 2014 new variable
 rbac#:#orgu_view_learning_progress_rec#:#View Learning Progress of Unit incl. Subunits###27 01 2015 new variable
 rbac#:#orgu_visible#:#Organisational Unit is visible###11 03 2014 new variable
@@ -16282,6 +16298,7 @@ user#:#interests_general#:#General Interests###26 09 2014 new variable
 user#:#interests_help_looking#:#Looking For Help###26 09 2014 new variable
 user#:#interests_help_offered#:#Offering Help###26 09 2014 new variable
 user#:#msg_spoint_not_modified#:#Starting point not modified###07 02 2020 new variable
+user#:#no_deactivate_yourself#:#You cannot deactivate your own user account.###20 07 2023 new variable
 user#:#obj_ref_id_not_exist#:#The entered Reference-Id does not exist###07 02 2020 new variable
 user#:#restrict_user_access#:#受限访问用户账号
 user#:#restrict_user_access_info#:#如果启用，访问用户账号将受限。访问取决于“用户账号”和“类目”中的权限“本地用户账号读访问权限”。

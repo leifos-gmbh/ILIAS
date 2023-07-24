@@ -15,6 +15,7 @@
  *
  *********************************************************************/
 
+import Overlay from "../overlay/overlay.js";
 
 /**
  * Shape
@@ -28,7 +29,7 @@ export default class Trigger {
       area = null,
       markerX = "",
       markerY= "",
-      overlay= "",
+      overlay= null,
       popupNr= "",
       popupAlign= "",
       title= "",
@@ -37,8 +38,6 @@ export default class Trigger {
         this.markerX = markerX;
         this.markerY = markerY;
         this.overlay = overlay;
-        this.overlayX = '';
-        this.overlayY = '';
         this.popupNr = popupNr;
         this.popupAlign = popupAlign;
         this.title = title;
@@ -54,9 +53,9 @@ export default class Trigger {
             MarkerX: this.markerX,
             MarkerY: this.markerY,
             Nr: this.nr,
-            Overlay: this.overlay,
-            OverlayX: this.overlayX,
-            OverlayY: this.overlayY,
+            Overlay: this.overlay.getSrc(),
+            OverlayX: this.overlay.getX(),
+            OverlayY: this.overlay.getY(),
             PopupHeight: '',
             PopupNr: this.popupNr,
             PopupWidth: '',
@@ -76,5 +75,9 @@ export default class Trigger {
         if (this.area){
             return this.area.getShape(this.nr);
         }
+    }
+
+    getOverlay() {
+        return this.overlay;
     }
 }

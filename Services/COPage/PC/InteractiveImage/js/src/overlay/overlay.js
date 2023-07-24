@@ -53,6 +53,10 @@ export default class Overlay {
         return this.src;
     }
 
+    getCoordsString() {
+        return this.x + "," + this.y;
+    }
+
     addOverlayToMobElement(mobEl, drag = false) {
         const overlay = document.createElement("img");
         overlay.style.position = "absolute";

@@ -296,6 +296,9 @@ export default class UI {
     const path = sel + " input[name='" + name + "'],select[name='" + name + "']";
     const el = document.querySelector(path);
     if (el) {
+      console.log(":::");
+      console.log(el);
+      console.log(value);
       el.value = value;
     }
   }
@@ -320,6 +323,15 @@ export default class UI {
 
   showTriggerOverlay() {
     this.toolSlate.setContent(this.uiModel.triggerOverlay);
+    const tr = this.iimModel.getCurrentTrigger();
+    const overlay = tr.getOverlay();
+    console.log("***");
+    if (overlay) {
+      console.log("1");
+      console.log(overlay);
+      console.log(overlay.getSrc());
+      this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_1', overlay.getSrc());
+    }
     this.initTriggerViewControl();
     this.initBackButton();
     this.initTriggerOverlay();
@@ -342,6 +354,21 @@ export default class UI {
         switch (act) {
           case ACTIONS.E_TRIGGER_OVERLAY_ADD:
             dispatch.dispatch(action.interactiveImage().editor().addTriggerOverlay());
+            break;
+        }
+      });
+    });
+    document.querySelectorAll("form [data-copg-ed-type='form-button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_TRIGGER_OVERLAY_SAVE:
+            event.preventDefault();
+            dispatch.dispatch(action.interactiveImage().editor().saveTriggerOverlay(
+              model.getCurrentTrigger().nr,
+              this.getInputValueByName('form_input_1'),
+              model.getCurrentTrigger().getOverlay().getCoordsString()
+            ));
             break;
         }
       });

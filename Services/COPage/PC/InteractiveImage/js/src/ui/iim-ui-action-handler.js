@@ -132,6 +132,13 @@ export default class IIMUIActionHandler {
                     this.ui.showOverlayModal();
                     break;
 
+                case ACTIONS.E_TRIGGER_OVERLAY_SAVE:
+                    this.sendSaveTriggerOverlayCommand(
+                      params,
+                      model
+                    );
+                    break;
+
                 case ACTIONS.E_TRIGGER_POPUP_ADD:
                     this.ui.showPopupModal();
                     break;

@@ -17,6 +17,7 @@
 
 import Trigger from "./trigger.js";
 import AreaFactory from "../area/area-factory.js"
+import OverlayFactory from "../overlay/overlay-factory.js"
 
 /**
  * Shape
@@ -25,6 +26,7 @@ export default class TriggerFactory {
 
   constructor() {
     this.areaFactory = new AreaFactory();
+    this.overlayFactory = new OverlayFactory();
   }
 
   trigger(
@@ -53,13 +55,13 @@ export default class TriggerFactory {
 
   /**
    */
-  fromPropertiesObject(o, area = null) {
+  fromPropertiesObject(o, area = null, overlay = null) {
     return new Trigger(
       o.Nr,
       area,
       o.MarkerX,
       o.MarkerY,
-      o.Overlay,
+      overlay,
       o.PopupNr,
       o.PopupAlign,
       o.Title
@@ -71,7 +73,8 @@ export default class TriggerFactory {
     model.triggers.forEach((tr) => {
       if (tr.Nr == nr) {
         const area = this.areaFactory.fromModelForId(tr.Nr, model);
-        trigger = this.fromPropertiesObject(tr, area);
+        const overlay = this.overlayFactory.fromModelForNr(tr.Nr, model);
+        trigger = this.fromPropertiesObject(tr, area, overlay);
       }
     });
     return trigger;

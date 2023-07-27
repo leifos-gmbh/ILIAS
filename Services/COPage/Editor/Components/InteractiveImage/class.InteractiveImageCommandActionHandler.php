@@ -55,6 +55,12 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
             case "save.trigger.properties":
                 return $this->saveTriggerProperties($query['pc_id'], $body);
 
+            case "save.trigger.overlay":
+                return $this->saveTriggerOverlay($query['pc_id'], $body);
+
+            case "save.trigger.popup":
+                return $this->saveTriggerPopup($query['pc_id'], $body);
+
             case "upload.overlay":
                 return $this->uploadOverlay($query['pc_id'], $body);
 
@@ -111,6 +117,28 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
         /** @var \ilPCInteractiveImage $pc */
         $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
         $pc->setTriggerProperties((string) $body["data"]["trigger_nr"], $body["data"]["title"], $body["data"]["shape_type"], $body["data"]["coords"]);
+        $updated = $page->update();
+
+        return $this->getStandardResponse($updated, $pc);
+    }
+
+    protected function saveTriggerOverlay(string $pc_id, array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        /** @var \ilPCInteractiveImage $pc */
+        $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
+        $pc->setTriggerOverlay((string) $body["data"]["trigger_nr"], (string) $body["data"]["overlay"], (string) $body["data"]["coords"]);
+        $updated = $page->update();
+
+        return $this->getStandardResponse($updated, $pc);
+    }
+
+    protected function saveTriggerPopup(string $pc_id, array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        /** @var \ilPCInteractiveImage $pc */
+        $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
+        $pc->setTriggerPopup((string) $body["data"]["trigger_nr"], (string) $body["data"]["popup"], (string) $body["data"]["position"]);
         $updated = $page->update();
 
         return $this->getStandardResponse($updated, $pc);

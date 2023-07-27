@@ -51,6 +51,34 @@ export default class IIMCommandActionFactory {
   }
 
   /**
+   * @param pcid
+   * @param content
+   * @param redirect
+   * @return {CommandAction}
+   */
+  saveTriggerOverlay(triggerNr, overlay, coords) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.C_SAVE_TRIGGER_OVERLAY, {
+      trigger_nr: triggerNr,
+      overlay: overlay,
+      coords: coords
+    });
+  }
+
+  /**
+   * @param pcid
+   * @param content
+   * @param redirect
+   * @return {CommandAction}
+   */
+  saveTriggerPopup(triggerNr, popup, position) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.C_SAVE_TRIGGER_POPUP, {
+      trigger_nr: triggerNr,
+      popup: popup,
+      position: position
+    });
+  }
+
+  /**
    * @param {formData} data
    * @return {CommandAction}
    */

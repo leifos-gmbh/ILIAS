@@ -143,6 +143,13 @@ export default class IIMUIActionHandler {
                     this.ui.showPopupModal();
                     break;
 
+                case ACTIONS.E_TRIGGER_POPUP_SAVE:
+                    this.sendSaveTriggerPopupCommand(
+                      params,
+                      model
+                    );
+                    break;
+
                 case ACTIONS.E_POPUP_SAVE:
                     this.sendPopupSave(params, model);
                     break;
@@ -177,6 +184,40 @@ export default class IIMUIActionHandler {
           params.title,
           params.shapeType,
           params.coords
+        );
+
+        this.client.sendCommand(update_action).then(result => {
+            this.handleStandardResponse(result, model);
+            //dispatch.dispatch(af.page().editor().enablePageEditing());
+        });
+    }
+
+    sendSaveTriggerOverlayCommand(params, model) {
+        let update_action;
+        const af = this.actionFactory;
+        const dispatch = this.dispatcher;
+
+        update_action = af.interactiveImage().command().saveTriggerOverlay(
+          params.nr,
+          params.overlay,
+          params.coords
+        );
+
+        this.client.sendCommand(update_action).then(result => {
+            this.handleStandardResponse(result, model);
+            //dispatch.dispatch(af.page().editor().enablePageEditing());
+        });
+    }
+
+    sendSaveTriggerPopupCommand(params, model) {
+        let update_action;
+        const af = this.actionFactory;
+        const dispatch = this.dispatcher;
+
+        update_action = af.interactiveImage().command().saveTriggerPopup(
+          params.nr,
+          params.popup,
+          params.position
         );
 
         this.client.sendCommand(update_action).then(result => {

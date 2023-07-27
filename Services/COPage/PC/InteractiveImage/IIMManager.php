@@ -111,7 +111,11 @@ class IIMManager
         );
     }
 
-    public function getOverlayThumbnailPath($mob, string $file) : string {
+    public function getOverlayWebPath(\ilObjMediaObject $mob, string $file) : string {
+        return \ilObjMediaObject::_getURL($mob->getId()) . "/overlays/" . $file;
+    }
+
+    public function getOverlayThumbnailPath(\ilObjMediaObject $mob, string $file) : string {
         return \ilObjMediaObject::getThumbnailPath(
             $mob->getId(),
             $this->getOverlayThumbnailName($file)
@@ -127,7 +131,8 @@ class IIMManager
         return array_map(function($file) use ($mob){
             return [
                 "name" => $file,
-                "webpath" => $this->getOverlayThumbnailPath($mob, $file)
+                "thumbpath" => $this->getOverlayThumbnailPath($mob, $file),
+                "webpath" => $this->getOverlayWebPath($mob, $file)
             ];
         },
         $mob->getFilesOfDirectory("overlays"));

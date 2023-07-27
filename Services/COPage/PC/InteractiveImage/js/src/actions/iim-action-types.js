@@ -22,6 +22,7 @@ const ACTIONS = {
   // command actions (being sent to the server to "change things")
   C_SAVE_TRIGGER_PROPERTIES: "save.trigger.properties",
   C_SAVE_TRIGGER_OVERLAY: "save.trigger.overlay",
+  C_SAVE_TRIGGER_POPUP: "save.trigger.popup",
   C_UPLOAD_OVERLAY: "upload.overlay",
   C_DELETE_OVERLAY: "delete.overlay",
   C_SAVE_POPUP: "save.popup",
@@ -37,6 +38,7 @@ const ACTIONS = {
   E_TRIGGER_OVERLAY_ADD: "trigger.add.overlay",
   E_TRIGGER_OVERLAY_SAVE: "trigger.overlay.save",
   E_TRIGGER_POPUP_ADD: "trigger.add.popup",
+  E_TRIGGER_POPUP_SAVE: "trigger.save.popup",
   E_OVERLAY_UPLOAD: "overlay.upload",
   E_OVERLAY_DELETE: "overlay.delete",
   E_POPUP_DELETE: "popup.delete",

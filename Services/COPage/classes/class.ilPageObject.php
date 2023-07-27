@@ -68,7 +68,7 @@ abstract class ilPageObject
     public string $xml = "";
     public string $encoding = "";
     public php4DOMElement $node;
-    public string $cur_dtd = "ilias_pg_8.dtd";
+    public string $cur_dtd = "ilias_pg_9.dtd";
     public bool $contains_int_link = false;
     public bool $needs_parsing = false;
     public string $parent_type = "";

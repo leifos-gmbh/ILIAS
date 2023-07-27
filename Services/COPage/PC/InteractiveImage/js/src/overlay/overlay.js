@@ -25,10 +25,11 @@ export default class Overlay {
      * @param int x
      * @param int y
      */
-    constructor(x, y, src) {
+    constructor(x, y, src, imgPath) {
         this.x = x;
         this.y = y;
         this.src = src;
+        this.imgPath = imgPath;
         this.onDrag = null;
     }
 
@@ -53,6 +54,13 @@ export default class Overlay {
         return this.src;
     }
 
+    /**
+     * @return string
+     */
+    getImgPath() {
+        return this.imgPath;
+    }
+
     getCoordsString() {
         return this.x + "," + this.y;
     }
@@ -63,6 +71,7 @@ export default class Overlay {
         overlay.style.display = "block";
         overlay.style.left = this.getX() + "px";
         overlay.style.top = this.getY() + "px";
+        overlay.src = this.getImgPath();
         if (drag) {
             this.draggable(overlay);
         }
@@ -100,8 +109,8 @@ export default class Overlay {
             // set the element's new position:
             elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
             elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-            t.x = (elmnt.offsetLeft - pos1) + 3;
-            t.y = (elmnt.offsetTop - pos2) + 3;
+            t.x = (elmnt.offsetLeft - pos1);
+            t.y = (elmnt.offsetTop - pos2);
             if (t.onDrag) {
                 const f = t.onDrag;
                 console.log("call on drag");

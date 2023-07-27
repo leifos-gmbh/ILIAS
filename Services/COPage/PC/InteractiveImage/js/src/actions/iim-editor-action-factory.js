@@ -135,6 +135,36 @@ export default class IIMEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  saveTriggerOverlay(
+    nr,
+    overlay,
+    coords
+  ) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_OVERLAY_SAVE, {
+      nr: nr,
+      overlay: overlay,
+      coords: coords
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  saveTriggerPopup(
+    nr,
+    popup,
+    position
+  ) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_POPUP_SAVE, {
+      nr: nr,
+      popup: popup,
+      position: position
+    });
+  }
+
   uploadOverlay(data) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_OVERLAY_UPLOAD, {
       data: data

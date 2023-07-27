@@ -296,9 +296,6 @@ export default class UI {
     const path = sel + " input[name='" + name + "'],select[name='" + name + "']";
     const el = document.querySelector(path);
     if (el) {
-      console.log(":::");
-      console.log(el);
-      console.log(value);
       el.value = value;
     }
   }
@@ -309,12 +306,12 @@ export default class UI {
     const el = document.querySelector(path);
     if (el) {
       el.innerHTML = null;
-      for (const [key, value] of Object.entries(options)) {
+      options.forEach((value, key) => {
         op = document.createElement("option");
         op.value = key;
         op.innerHTML = value;
         el.appendChild(op);
-      }
+      });
     }
     if (selected) {
       el.value = selected;
@@ -325,16 +322,13 @@ export default class UI {
     this.toolSlate.setContent(this.uiModel.triggerOverlay);
     const tr = this.iimModel.getCurrentTrigger();
     const overlay = tr.getOverlay();
-    console.log("***");
-    if (overlay) {
-      console.log("1");
-      console.log(overlay);
-      console.log(overlay.getSrc());
-      this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_1', overlay.getSrc());
-    }
     this.initTriggerViewControl();
     this.initBackButton();
     this.initTriggerOverlay();
+    if (overlay) {
+      this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_1', overlay.getSrc());
+      this.shapeEditor.addOverlay(overlay, true);
+    }
     this.showCurrentShape();
   }
 
@@ -373,11 +367,10 @@ export default class UI {
         }
       });
     });
-    let options = {};
-    options[''] = ' - ';
+    let options = new Map();
+    options.set('', ' - ');
     this.iimModel.getOverlays().forEach((ov) => {
-      console.log(ov);
-      options[ov.name] = ov.name;
+      options.set(ov.name, ov.name);
     });
     this.setSelectOptions("#copg-editor-slate-content", "form_input_1", options);
   }
@@ -386,7 +379,49 @@ export default class UI {
     this.toolSlate.setContent(this.uiModel.triggerPopup);
     this.initTriggerViewControl();
     this.initBackButton();
+    this.initTriggerPopup();
+    const tr = this.iimModel.getCurrentTrigger();
+    if (tr.getPopupNr() !== "") {
+      this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_1', tr.getPopupNr());
+      this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_2', tr.getPopupPosition());
+    }
     this.showCurrentShape();
+  }
+
+  initTriggerPopup() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+    document.querySelectorAll("[data-copg-ed-type='button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_TRIGGER_POPUP_ADD:
+            dispatch.dispatch(action.interactiveImage().editor().addTriggerPopup());
+            break;
+        }
+      });
+    });
+    document.querySelectorAll("form [data-copg-ed-type='form-button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_TRIGGER_POPUP_SAVE:
+            event.preventDefault();
+            dispatch.dispatch(action.interactiveImage().editor().saveTriggerPopup(
+              model.getCurrentTrigger().nr,
+              this.getInputValueByName('form_input_1'),
+              this.getInputValueByName('form_input_2')
+            ));
+            break;
+        }
+      });
+    });
+    let options = new Map();
+    options.set('', ' - ');
+    this.iimModel.getPopups().forEach((pop) => {
+      options.set('' + pop.nr, pop.title);
+    });
+    this.setSelectOptions("#copg-editor-slate-content", "form_input_1", options);
   }
 
   initBackButton() {
@@ -470,7 +505,7 @@ export default class UI {
         placeholders: {
           'item-title': ov.name,
           'img-alt': ov.name,
-          'img-src': ov.webpath
+          'img-src': ov.thumbpath
         },
         actions: [
           {

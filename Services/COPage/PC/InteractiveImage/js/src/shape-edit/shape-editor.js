@@ -31,6 +31,8 @@ export default class ShapeEditor {
         this.mobElement = mobElement;
         this.shapes = [];
         this.currentShape = null;
+        this.overlays = [];
+        this.currentOverlay = null;
         this.factory = new ShapeFactory();
         this.initEvents();
         this.allowAdd = false
@@ -77,6 +79,13 @@ export default class ShapeEditor {
         this.shapes.push(shape);
         if (asCurrent) {
             this.currentShape = this.shapes.length - 1;
+        }
+    }
+
+    addOverlay(overlay, asCurrent = false) {
+        this.overlays.push(overlay);
+        if (asCurrent) {
+            this.currentOverlay = this.overlays.length - 1;
         }
     }
 
@@ -136,10 +145,14 @@ export default class ShapeEditor {
         this.removeAllChildsOfName(this.mobElement, "a");
     }
 
+    removeAllOverlays() {
+        //this.removeAllChildsOfName(this.mobElement, "img");
+    }
+
     repaint() {
         this.repaintSvg();
-        console.log("Repaint");
         this.removeAllHandles();
+        this.removeAllOverlays();
         if (this.currentShape !== null) {
             const cs = this.shapes[this.currentShape];
             cs.getHandles().forEach((h) => {
@@ -148,6 +161,10 @@ export default class ShapeEditor {
                     this.repaintSvg();
                 });
             });
+        }
+        if (this.currentOverlay !== null) {
+            const ov = this.overlays[this.currentOverlay];
+            ov.addOverlayToMobElement(this.mobElement, true);
         }
     }
 

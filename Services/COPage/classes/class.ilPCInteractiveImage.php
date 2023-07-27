@@ -420,7 +420,8 @@ class ilPCInteractiveImage extends ilPageContent
                 "PopupX" => $tr_node->get_attribute("PopupX"),
                 "PopupY" => $tr_node->get_attribute("PopupY"),
                 "PopupWidth" => $tr_node->get_attribute("PopupWidth"),
-                "PopupHeight" => $tr_node->get_attribute("PopupHeight")
+                "PopupHeight" => $tr_node->get_attribute("PopupHeight"),
+                "PopupPosition" => $tr_node->get_attribute("PopupPosition")
             );
         }
 
@@ -677,4 +678,27 @@ class ilPCInteractiveImage extends ilPageContent
             );
         }
     }
+
+    public function setTriggerOverlay(string $nr, string $overlay, string $coords) : void
+    {
+        $tr_node = $this->getTriggerNode($nr);
+        if ($tr_node) {
+            $c = explode(",", $coords);
+            $x = (int) ($c[0] ?? 0);
+            $y = (int) ($c[1] ?? 0);
+            $tr_node->set_attribute("Overlay", $overlay);
+            $tr_node->set_attribute("OverlayX", $x);
+            $tr_node->set_attribute("OverlayY", $y);
+        }
+    }
+
+    public function setTriggerPopup(string $nr, string $popup, string $position) : void
+    {
+        $tr_node = $this->getTriggerNode($nr);
+        if ($tr_node) {
+            $tr_node->set_attribute("PopupNr", $popup);
+            $tr_node->set_attribute("PopupPosition", $position);
+        }
+    }
+
 }

@@ -360,7 +360,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         ));
         $content.= $this->ui_wrapper->getRenderedAdapterForm(
             $this->getTriggerPopupFormAdapter(),
-            [["InteractiveImage", "trigger.popup.save", $this->lng->txt("save")]],
+            [["InteractiveImage", "trigger.save.popup", $this->lng->txt("save")]],
             "copg-iim-trigger-popup-form"
         );
         return $content;

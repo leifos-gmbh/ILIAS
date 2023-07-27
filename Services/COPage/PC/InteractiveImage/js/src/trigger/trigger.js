@@ -31,7 +31,7 @@ export default class Trigger {
       markerY= "",
       overlay= null,
       popupNr= "",
-      popupAlign= "",
+      popupPosition= "",
       title= "",
     ) {
         this.nr = nr;
@@ -39,7 +39,7 @@ export default class Trigger {
         this.markerY = markerY;
         this.overlay = overlay;
         this.popupNr = popupNr;
-        this.popupAlign = popupAlign;
+        this.popupPosition = popupPosition;
         this.title = title;
         this.area = area;
     }
@@ -61,7 +61,7 @@ export default class Trigger {
             PopupWidth: '',
             PopupX: '',
             PopupY: '',
-            PopupAlign: this.popupAlign,
+            PopupPosition: this.popupPosition,
             Title: this.title,
             Type: type
         };
@@ -80,4 +80,13 @@ export default class Trigger {
     getOverlay() {
         return this.overlay;
     }
+
+    getPopupNr() {
+        return this.popupNr;
+    }
+
+    getPopupPosition() {
+        return this.popupPosition;
+    }
+
 }

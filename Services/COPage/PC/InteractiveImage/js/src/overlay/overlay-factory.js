@@ -29,27 +29,40 @@ export default class OverlayFactory {
     x,
     y,
     src,
+    imgPath
   ) {
     return new Overlay(
       x,
       y,
-      src
+      src,
+      imgPath
     );
   }
 
-  fromPropertiesObject(t) {
+  fromPropertiesObject(t, model) {
     return this.overlay(
       t.OverlayX,
       t.OverlayY,
-      t.Overlay
+      t.Overlay,
+      this.getImgPathForOverlay(t.Overlay, model)
     );
+  }
+
+  getImgPathForOverlay(src, model) {
+    let p = '';
+    model.overlays.forEach((ov) => {
+      if (ov.name === src) {
+        p = ov.webpath;
+      }
+    });
+    return p;
   }
 
   fromModelForNr(nr, model) {
     let overlay = null;
     model.triggers.forEach((t) => {
       if (t.Nr == nr) {
-        overlay = this.fromPropertiesObject(t);
+        overlay = this.fromPropertiesObject(t, model);
       }
     });
     return overlay;

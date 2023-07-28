@@ -62,6 +62,11 @@ class InternalDomainService
         return new Dom\DomUtil();
     }
 
+    public function htmlTransformUtil(): Html\TransformUtil
+    {
+        return new Html\TransformUtil();
+    }
+
     public function pc(): PC\DomainService
     {
         return new PC\DomainService(

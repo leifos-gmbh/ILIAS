@@ -40,6 +40,9 @@ class ilServicesCOPageSuite extends TestSuite
         require_once("./Services/COPage/test/PCParagraphTest.php");
         $suite->addTestSuite("PCParagraphTest");
 
+        require_once("./Services/COPage/test/Html/TransformUtilTest.php");
+        $suite->addTestSuite(\ILIAS\COPage\Test\Html\TransformUtilTest::class);
+
         return $suite;
     }
 }

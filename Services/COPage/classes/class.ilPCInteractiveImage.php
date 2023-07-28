@@ -25,6 +25,8 @@ class ilPCInteractiveImage extends ilPageContent
 {
     public const AREA = "Area";
     public const MARKER = "Marker";
+    protected \ILIAS\DI\UIServices $ui;
+    protected \ILIAS\COPage\Html\TransformUtil $htmlTransform;
     protected \ILIAS\COPage\PC\InteractiveImage\IIMManager $manager;
     protected php4DOMElement $mal_node;
     protected php4DOMElement $med_alias_node;
@@ -41,6 +43,8 @@ class ilPCInteractiveImage extends ilPageContent
         $this->lng = $DIC->language();
         $this->setType("iim");
         $this->manager = $DIC->copage()->internal()->domain()->pc()->interactiveImage();
+        $this->htmlTransform = $DIC->copage()->internal()->domain()->htmlTransformUtil();
+        $this->ui = $DIC->copage()->internal()->gui()->ui();
     }
 
     public function readMediaObject(int $a_mob_id = 0) : void
@@ -701,4 +705,48 @@ class ilPCInteractiveImage extends ilPageContent
         }
     }
 
+    public function modifyPageContentPostXsl(
+        string $a_output,
+        string $a_mode,
+        bool $a_abstract_only = false
+    ): string
+    {
+        if (!in_array($a_mode, [ilPageObjectGUI::PRESENTATION, ilPageObjectGUI::PREVIEW], true)) {
+            return $a_output;
+        }
+        $trans = $this->htmlTransform;
+        while (!is_null($params = $trans->getPlaceholderParams($a_output, "InteractiveImage;PopupStart"))) {
+            $params = $trans->getPlaceholderParams($a_output, "InteractiveImage;PopupStart");
+            $par_page = $params[2] ?? 0;
+            $par_pop_nr = $params[4] ?? 0;
+            $inner = $trans->getInnerContentOfPlaceholders(
+                $a_output,
+                "InteractiveImage;PopupStart",
+                "InteractiveImage;PopupEnd"
+            );
+            $pop = $this->ui->factory()->popover()->standard(
+                $this->ui->factory()->legacy("#####popovercontent#####")
+            );
+            $signal_id = $pop->getShowSignal()->getId();
+            //$new_inner = $this->ui->renderer()->render($pop);
+            $new_inner = "#####popovercontent#####";
+            $new_inner = str_replace(
+                "#####popovercontent#####",
+                "<div style='display:none; position:relative;' data-copg-cont-type='iim-popup' data-signal-id='$signal_id' data-copg-page='$par_page' data-copg-popup-nr='$par_pop_nr' data-copg-cont-type='iim-popup'>" . $inner ."</div>",
+                $new_inner
+            );
+            $html = $trans->replaceInnerContentAndPlaceholders(
+                $a_output,
+                "InteractiveImage;PopupStart",
+                "InteractiveImage;PopupEnd",
+                $new_inner
+            );
+            if (is_null($html)) {
+                break;
+            } else {
+                $a_output = $html;
+            }
+        }
+        return $a_output.'<script src="https://unpkg.com/@popperjs/core@2"></script>';
+    }
 }

@@ -2375,7 +2375,6 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</img>
-
 </xsl:template>
 
 <!-- MOBTag: display media object tag -->
@@ -3107,10 +3106,10 @@
 <!-- ContentPopup -->
 <xsl:template match="ContentPopup">
 	<!-- TabContainer -->
+	{{{{{InteractiveImage;PopupStart;<xsl:value-of select = "$pg_id"/>;<xsl:number count="InteractiveImage" level="any" />;<xsl:value-of select = "@Nr"/>}}}}}
 	<div class="ilc_iim_ContentPopup">
 	<xsl:attribute name="id">iim_popup_<xsl:value-of select = "$pg_id"/>_<xsl:number count="InteractiveImage" level="any" />_<xsl:value-of select = "@Nr"/></xsl:attribute>
 	<xsl:if test="$mode != 'edit'">
-		<xsl:attribute name="style">display: none;</xsl:attribute>
 		<xsl:attribute name="data-copg-iim-data-type">popup</xsl:attribute>
 		<xsl:attribute name="data-copg-iim-id"><xsl:value-of select = "$pg_id"/>_<xsl:number count="InteractiveImage" level="any" /></xsl:attribute>
 		<xsl:attribute name="data-copg-iim-pop-id"><xsl:value-of select = "$pg_id"/>_<xsl:number count="ContentPopup" level="any" /></xsl:attribute>
@@ -3146,6 +3145,7 @@
 	</div>
 	<div style="clear:both;"><xsl:comment>Break</xsl:comment></div>
 	</div>
+	{{{{{InteractiveImage;PopupEnd;<xsl:value-of select = "$pg_id"/>;<xsl:number count="InteractiveImage" level="any" />;<xsl:value-of select = "@Nr"/>}}}}}
 </xsl:template>
 
 <!-- Trigger -->

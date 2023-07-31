@@ -71,6 +71,10 @@ export default class Trigger {
         this.area = area;
     }
 
+    setOverlay(overlay) {
+        this.overlay = overlay;
+    }
+
     getShape() {
         if (this.area){
             return this.area.getShape(this.nr);

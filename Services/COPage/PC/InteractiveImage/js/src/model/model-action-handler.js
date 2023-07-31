@@ -63,6 +63,10 @@ export default class ModelActionHandler {
         this.model.setActionState(this.model.ACTION_STATE_ADD);
         break;
 
+      case ACTIONS.E_TRIGGER_OVERLAY_CHANGE:
+        this.model.changeTriggerOverlay(params.overlay);
+        break;
+
       case ACTIONS.E_EDIT_TRIGGER:
         this.model.setTriggerByNr(params.triggerNr);
         this.model.setState(this.model.STATE_TRIGGER_PROPERTIES);

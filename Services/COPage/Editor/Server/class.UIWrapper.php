@@ -81,6 +81,14 @@ class UIWrapper
         return $ui->renderer()->renderAsync($m);
     }
 
+    public function getRenderedSuccessBox(string $text): string
+    {
+        $ui = $this->ui;
+        $f = $ui->factory();
+        $m = $f->messageBox()->success($text);
+        return $ui->renderer()->renderAsync($m);
+    }
+
     public function getRenderedFailureBox(): string
     {
         $ui = $this->ui;

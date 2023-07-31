@@ -67,6 +67,7 @@ export default class Overlay {
 
     addOverlayToMobElement(mobEl, drag = false) {
         const overlay = document.createElement("img");
+        overlay.setAttribute('data-copg-iim-type', 'overlay');
         overlay.style.position = "absolute";
         overlay.style.display = "block";
         overlay.style.left = this.getX() + "px";

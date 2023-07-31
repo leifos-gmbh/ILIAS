@@ -288,6 +288,7 @@ export default class UI {
       });
     });
     this.showCurrentShape(true);
+    this.setMessage('triggerPropertiesMesssage');
   }
 
   getInputValueByName(name) {
@@ -326,21 +327,31 @@ export default class UI {
   }
 
   showTriggerOverlay() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
     this.toolSlate.setContent(this.uiModel.triggerOverlay);
     const tr = this.iimModel.getCurrentTrigger();
-    const overlay = tr.getOverlay();
     this.initTriggerViewControl();
     this.initBackButton();
     this.initTriggerOverlay();
-    if (overlay) {
+    this.showCurrentShape(false, true);
+    document.querySelectorAll("form [name='form_input_1']").forEach(select => {
+      select.addEventListener("change", (event) => {
+        dispatch.dispatch(action.interactiveImage().editor().changeTriggerOverlay(
+          this.getInputValueByName('form_input_1')
+        ));
+      });
+    });
+  }
+
+  showCurrentShape(edit = false, showOverlay = false) {
+    const trigger = this.iimModel.getCurrentTrigger();
+    const overlay = trigger.getOverlay();
+    this.shapeEditor.removeAllOverlays();
+    if (showOverlay && overlay) {
       this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_1', overlay.getSrc());
       this.shapeEditor.addOverlay(overlay, true);
     }
-    this.showCurrentShape();
-  }
-
-  showCurrentShape(edit = false) {
-    const trigger = this.iimModel.getCurrentTrigger();
     this.shapeEditor.removeAllShapes();
     this.shapeEditor.addShape(trigger.getShape(), edit);
     this.shapeEditor.repaint();
@@ -467,6 +478,22 @@ export default class UI {
       });
     });
     this.refreshTriggerViewControl();
+  }
+
+  setMessage(mess) {
+    const messArea = document.getElementById('cont_iim_message');
+    if (messArea) {
+      if (this.uiModel[mess]) {
+        messArea.innerHTML = this.uiModel[mess];
+      }
+    }
+  }
+
+  setLoader() {
+    const messArea = document.getElementById('cont_iim_message');
+    if (messArea) {
+      messArea.innerHTML = this.uiModel.loader;
+    }
   }
 
   refreshTriggerViewControl() {
@@ -645,6 +672,20 @@ export default class UI {
     if (params) {
       this.setInputValueByName('.modal-content', 'form_input_1', model.getPopupTitle(params.nr));
     }
+  }
+
+  deactivateSlateButtons() {
+    const model = this.iimModel;
+    const prop = document.querySelectorAll("#copg-editor-slate-content button").forEach((b) => {
+      b.disabled = true;
+    });
+  }
+
+  activateSlateButtons() {
+    const model = this.iimModel;
+    const prop = document.querySelectorAll("#copg-editor-slate-content button").forEach((b) => {
+      b.disabled = false;
+    });
   }
 
 }

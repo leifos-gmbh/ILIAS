@@ -39,6 +39,15 @@ export default class OverlayFactory {
     );
   }
 
+  forSelection(selection, x, y, model) {
+    return this.overlay(
+      x,
+      y,
+      selection,
+      this.getImgPathForOverlay(selection, model)
+    );
+  }
+
   fromPropertiesObject(t, model) {
     return this.overlay(
       t.OverlayX,

@@ -34,6 +34,7 @@ const ACTIONS = {
   E_TRIGGER_PROPERTIES: "trigger.properties",
   E_TRIGGER_PROPERTIES_SAVE: "trigger.properties.save",
   E_TRIGGER_SHAPE_CHANGE: "trigger.shape.change",
+  E_TRIGGER_OVERLAY_CHANGE: "trigger.overlay.change",
   E_TRIGGER_OVERLAY: "trigger.overlay",
   E_TRIGGER_OVERLAY_ADD: "trigger.add.overlay",
   E_TRIGGER_OVERLAY_SAVE: "trigger.overlay.save",

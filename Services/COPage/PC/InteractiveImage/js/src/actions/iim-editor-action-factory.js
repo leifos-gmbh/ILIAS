@@ -165,6 +165,17 @@ export default class IIMEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  changeTriggerOverlay(
+    overlay
+  ) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_OVERLAY_CHANGE, {
+      overlay: overlay
+    });
+  }
+
   uploadOverlay(data) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_OVERLAY_UPLOAD, {
       data: data

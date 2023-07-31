@@ -82,6 +82,11 @@ export default class ShapeEditor {
         }
     }
 
+    removeAllOverlays() {
+        this.overlays = [];
+        this.currentOverlay = null;
+    }
+
     addOverlay(overlay, asCurrent = false) {
         this.overlays.push(overlay);
         if (asCurrent) {
@@ -97,6 +102,10 @@ export default class ShapeEditor {
 
     removeAllChildsOfName(node, name) {
         node.querySelectorAll(name).forEach(n => n.remove());
+    }
+
+    removeAllChildsBySelector(node, selector) {
+        node.querySelectorAll(selector).forEach(n => n.remove());
     }
 
     getSvg() {
@@ -145,14 +154,14 @@ export default class ShapeEditor {
         this.removeAllChildsOfName(this.mobElement, "a");
     }
 
-    removeAllOverlays() {
-        //this.removeAllChildsOfName(this.mobElement, "img");
+    removeAllOverlayImages() {
+        this.removeAllChildsBySelector(this.mobElement, "img[data-copg-iim-type='overlay']");
     }
 
     repaint() {
         this.repaintSvg();
         this.removeAllHandles();
-        this.removeAllOverlays();
+        this.removeAllOverlayImages();
         if (this.currentShape !== null) {
             const cs = this.shapes[this.currentShape];
             cs.getHandles().forEach((h) => {

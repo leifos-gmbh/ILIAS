@@ -81,6 +81,8 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $o->uiModel->mainHead = $this->getMainHead();
         $o->uiModel->addTriggerMessage = $this->getAddTriggerMessage();
         $o->uiModel->selectTriggerMessage = $this->getSelectTriggerMessage();
+        $o->uiModel->commonSuccessMessage = $this->getCommonSuccessMessage();
+        $o->uiModel->triggerPropertiesMesssage = $this->getTriggerPropertiesInfo();
         $o->uiModel->mainSlate = $this->getMainSlate();
         $o->uiModel->backgroundImage = $this->getBackgroundImage();
         $o->uiModel->triggerProperties = $this->getTriggerProperties();
@@ -92,6 +94,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $o->uiModel->popupForm = $this->getPopupForm();
         $o->uiModel->backgroundProperties = $this->getBackgroundProperties();
         $o->uiModel->modal = $this->getModalTemplate();
+        $o->uiModel->loader = $this->getLoader();
 
         $o->iimModel = $this->getIIMModel();
         /*
@@ -147,6 +150,20 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         return $this->section($this->ui_wrapper->getRenderedInfoBox(
                 $lng->txt("cont_iim_select_trigger")
         ));
+    }
+
+    protected function getCommonSuccessMessage() : string
+    {
+        $lng = $this->lng;
+        return $this->section($this->ui_wrapper->getRenderedSuccessBox(
+            $lng->txt("msg_obj_modified")
+        ));
+    }
+
+    protected function getLoader() : string
+    {
+        $lng = $this->lng;
+        return $this->section("<img src='" . \ilUtil::getImagePath("loader.svg") . "' />");
     }
 
     protected function getAddTriggerMessage() : string
@@ -304,12 +321,22 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
                           )->required();
     }
 
+    protected function getMessageArea() : string
+    {
+        return "<div id='cont_iim_message'></div>";
+    }
+
+    protected function getTriggerPropertiesInfo() : string
+    {
+        return $this->section($this->ui_wrapper->getRenderedInfoBox($this->lng->txt("cont_iim_tr_properties_info")));
+    }
+
     protected function getTriggerProperties() : string
     {
         $content = $this->getTriggerBackButton().
             $this->getTriggerHeader().
             $this->getTriggerViewControls();
-        $content.= $this->section($this->ui_wrapper->getRenderedInfoBox($this->lng->txt("cont_iim_tr_properties_info")));
+        $content.= $this->getMessageArea();
         $content.= $this->ui_wrapper->getRenderedAdapterForm(
             $this->getTriggerPropertiesFormAdapter(),
             [["InteractiveImage", "trigger.properties.save", $this->lng->txt("save")]],
@@ -334,6 +361,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $content = $this->getTriggerBackButton().
             $this->getTriggerHeader().
             $this->getTriggerViewControls();
+        $content.= $this->getMessageArea();
         $content.= $this->section($this->ui_wrapper->getRenderedButton(
             $this->lng->txt("cont_iim_add_overlay"),
             "button",
@@ -372,6 +400,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $content = $this->getTriggerBackButton().
             $this->getTriggerHeader().
             $this->getTriggerViewControls();
+        $content.= $this->getMessageArea();
         $content.= $this->section($this->ui_wrapper->getRenderedButton(
             $this->lng->txt("cont_iim_tr_add_popup"),
             "button",

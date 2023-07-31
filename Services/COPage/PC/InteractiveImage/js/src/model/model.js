@@ -16,6 +16,8 @@
 
 import AreaFactory from "../area/area-factory.js";
 import TriggerFactory from "../trigger/trigger-factory.js";
+import OverlayFactory from '../overlay/overlay-factory.js';
+
 
 /**
  * Interactive Image Model
@@ -56,6 +58,7 @@ export default class Model {
     ];
     this.areaFactory = new AreaFactory();
     this.triggerFactory = new TriggerFactory();
+    this.overlayFactory = new OverlayFactory();
   }
 
   log(message) {
@@ -150,6 +153,23 @@ export default class Model {
         break;
     }
     this.model.currentTrigger.setArea(area);
+  }
+
+  changeTriggerOverlay(selection) {
+    const tr = this.model.currentTrigger;
+    const ov = tr.getOverlay();
+    let x = 0;
+    let y = 0;
+    if (ov) {
+      x = ov.getX();
+      y = ov.getY();
+    }
+
+    if (selection && selection != '') {
+      tr.setOverlay(this.overlayFactory.forSelection(selection, x, y, this.model.iim));
+    } else {
+      tr.setOverlay(null);
+    }
   }
 
   setTriggerByNr(triggerNr) {

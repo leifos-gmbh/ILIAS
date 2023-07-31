@@ -101,6 +101,10 @@ export default class IIMUIActionHandler {
                     this.ui.showTriggerOverlay();
                     break;
 
+                case ACTIONS.E_TRIGGER_OVERLAY_CHANGE:
+                    this.ui.showTriggerOverlay();
+                    break;
+
                 case ACTIONS.E_TRIGGER_POPUP:
                     this.ui.showTriggerPopup();
                     break;
@@ -179,6 +183,9 @@ export default class IIMUIActionHandler {
         const af = this.actionFactory;
         const dispatch = this.dispatcher;
 
+        this.ui.deactivateSlateButtons();
+        this.ui.setLoader();
+
         update_action = af.interactiveImage().command().saveTriggerProperties(
           params.nr,
           params.title,
@@ -187,8 +194,11 @@ export default class IIMUIActionHandler {
         );
 
         this.client.sendCommand(update_action).then(result => {
-            this.handleStandardResponse(result, model);
-            //dispatch.dispatch(af.page().editor().enablePageEditing());
+            if (this.handleStandardResponse(result, model)) {
+                this.ui.activateSlateButtons();
+                this.ui.refreshTriggerViewControl();
+                this.ui.setMessage('commonSuccessMessage');
+            }
         });
     }
 
@@ -197,6 +207,9 @@ export default class IIMUIActionHandler {
         const af = this.actionFactory;
         const dispatch = this.dispatcher;
 
+        this.ui.deactivateSlateButtons();
+        this.ui.setLoader();
+
         update_action = af.interactiveImage().command().saveTriggerOverlay(
           params.nr,
           params.overlay,
@@ -204,8 +217,11 @@ export default class IIMUIActionHandler {
         );
 
         this.client.sendCommand(update_action).then(result => {
-            this.handleStandardResponse(result, model);
-            //dispatch.dispatch(af.page().editor().enablePageEditing());
+            if (this.handleStandardResponse(result, model)) {
+                this.ui.activateSlateButtons();
+                this.ui.refreshTriggerViewControl();
+                this.ui.setMessage('commonSuccessMessage');
+            }
         });
     }
 
@@ -214,6 +230,9 @@ export default class IIMUIActionHandler {
         const af = this.actionFactory;
         const dispatch = this.dispatcher;
 
+        this.ui.deactivateSlateButtons();
+        this.ui.setLoader();
+
         update_action = af.interactiveImage().command().saveTriggerPopup(
           params.nr,
           params.popup,
@@ -221,8 +240,11 @@ export default class IIMUIActionHandler {
         );
 
         this.client.sendCommand(update_action).then(result => {
-            this.handleStandardResponse(result, model);
-            //dispatch.dispatch(af.page().editor().enablePageEditing());
+            if (this.handleStandardResponse(result, model)) {
+                this.ui.activateSlateButtons();
+                this.ui.refreshTriggerViewControl();
+                this.ui.setMessage('commonSuccessMessage');
+            }
         });
     }
 
@@ -233,7 +255,9 @@ export default class IIMUIActionHandler {
         if(pl.error === false)
         {
             model.initModel(pl.model);
+            return true;
         }
+        return false;
     }
 
     sendUploadOverlay(params, model) {
@@ -242,17 +266,33 @@ export default class IIMUIActionHandler {
         const dispatch = this.dispatcher;
         const util = this.util;
 
+        const old_overlays = [];
+        model.getOverlays().forEach((ov) => {
+            old_overlays.push(ov.name)
+        });
+
         this.util.sendFiles(params.data.form).then(() => {
             const data = new FormData(params.data.form);
             upload_action = af.interactiveImage().command().uploadOverlay(
               data
             );
-
+            util.hideCurrentModal();
+            this.ui.deactivateSlateButtons();
+            this.ui.setLoader();
             this.client.sendCommand(upload_action).then(result => {
-                util.hideCurrentModal();
-                this.handleStandardResponse(result, model);
-                //after_pcid, pcid, component, data
-                dispatch.dispatch(af.interactiveImage().editor().triggerOverlay());
+                if (this.handleStandardResponse(result, model)) {
+                    this.ui.activateSlateButtons();
+                    this.ui.refreshTriggerViewControl();
+                    this.ui.showTriggerOverlay();
+                    this.ui.setMessage('commonSuccessMessage');
+                    model.getOverlays().forEach((ov) => {
+                        if (!old_overlays.includes(ov.name)) {
+                            dispatch.dispatch(af.interactiveImage().editor().changeTriggerOverlay(
+                              ov.name
+                            ));
+                        }
+                    });
+                }
             });
         });
     }

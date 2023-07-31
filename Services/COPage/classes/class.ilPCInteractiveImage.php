@@ -711,8 +711,9 @@ class ilPCInteractiveImage extends ilPageContent
         bool $a_abstract_only = false
     ): string
     {
-        if (!in_array($a_mode, [ilPageObjectGUI::PRESENTATION, ilPageObjectGUI::PREVIEW], true)) {
-            return $a_output;
+        $keep_original = false;
+        if (in_array($a_mode, [ilPageObjectGUI::EDIT], true)) {
+            $keep_original = true;
         }
         $trans = $this->htmlTransform;
         while (!is_null($params = $trans->getPlaceholderParams($a_output, "InteractiveImage;PopupStart"))) {
@@ -724,17 +725,21 @@ class ilPCInteractiveImage extends ilPageContent
                 "InteractiveImage;PopupStart",
                 "InteractiveImage;PopupEnd"
             );
-            $pop = $this->ui->factory()->popover()->standard(
-                $this->ui->factory()->legacy("#####popovercontent#####")
-            );
-            $signal_id = $pop->getShowSignal()->getId();
-            //$new_inner = $this->ui->renderer()->render($pop);
-            $new_inner = "#####popovercontent#####";
-            $new_inner = str_replace(
-                "#####popovercontent#####",
-                "<div style='display:none; position:relative;' data-copg-cont-type='iim-popup' data-signal-id='$signal_id' data-copg-page='$par_page' data-copg-popup-nr='$par_pop_nr' data-copg-cont-type='iim-popup'>" . $inner ."</div>",
-                $new_inner
-            );
+            if ($keep_original) {
+                $new_inner = $inner;
+            } else {
+                $pop = $this->ui->factory()->popover()->standard(
+                    $this->ui->factory()->legacy("#####popovercontent#####")
+                );
+                $signal_id = $pop->getShowSignal()->getId();
+                //$new_inner = $this->ui->renderer()->render($pop);
+                $new_inner = "#####popovercontent#####";
+                $new_inner = str_replace(
+                    "#####popovercontent#####",
+                    "<div style='display:none; position:relative;' data-copg-cont-type='iim-popup' data-signal-id='$signal_id' data-copg-page='$par_page' data-copg-popup-nr='$par_pop_nr' data-copg-cont-type='iim-popup'>" . $inner . "</div>",
+                    $new_inner
+                );
+            }
             $html = $trans->replaceInnerContentAndPlaceholders(
                 $a_output,
                 "InteractiveImage;PopupStart",

@@ -78,6 +78,9 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $ctrl = $this->ctrl;
         $o = new \stdClass();
         $o->uiModel = new \stdClass();
+        $o->uiModel->mainHead = $this->getMainHead();
+        $o->uiModel->addTriggerMessage = $this->getAddTriggerMessage();
+        $o->uiModel->selectTriggerMessage = $this->getSelectTriggerMessage();
         $o->uiModel->mainSlate = $this->getMainSlate();
         $o->uiModel->backgroundImage = $this->getBackgroundImage();
         $o->uiModel->triggerProperties = $this->getTriggerProperties();
@@ -118,17 +121,12 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         return null;
     }
 
-
-    public function getMainSlate(): string
+    public function getMainHead(): string
     {
         $lng = $this->lng;
-
-        $tpl = new \ilTemplate("tpl.main_slate.html", true, true, "Services/COPage/PC/InteractiveImage");
+        $tpl = new \ilTemplate("tpl.main_head.html", true, true, "Services/COPage/PC/InteractiveImage");
         $tpl->setVariable("TITLE", $lng->txt("cont_iim_edit"));
         $tpl->setVariable("HEAD_TRIGGER", $lng->txt("cont_iim_trigger"));
-        $tpl->setVariable("HEAD_SETTINGS", $lng->txt("settings"));
-        $tpl->setVariable("HEAD_OVERVIEW", $lng->txt("cont_iim_overview"));
-
         $tpl->setVariable(
             "CLOSE_BUTTON",
             $this->section($this->ui_wrapper->getRenderedButton(
@@ -140,18 +138,41 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
                 true
             ))
         );
+        return $tpl->get();
+    }
 
-        $b = $this->ui_wrapper->getButton(
-            $lng->txt("cont_iim_add_trigger"),
-            "button",
-            "add.trigger"
-        );
+    protected function getSelectTriggerMessage() : string
+    {
+        $lng = $this->lng;
+        return $this->section($this->ui_wrapper->getRenderedInfoBox(
+                $lng->txt("cont_iim_select_trigger")
+        ));
+    }
+
+    protected function getAddTriggerMessage() : string
+    {
+        $lng = $this->lng;
+        return $this->section($this->ui_wrapper->getRenderedInfoBox(
+            $lng->txt("cont_iim_add_trigger_text")
+        ));
+    }
+
+    public function getMainSlate(): string
+    {
+        $lng = $this->lng;
+
+        $tpl = new \ilTemplate("tpl.main_slate.html", true, true, "Services/COPage/PC/InteractiveImage");
+        $tpl->setVariable("HEAD_SETTINGS", $lng->txt("settings"));
+        $tpl->setVariable("HEAD_OVERVIEW", $lng->txt("cont_iim_overview"));
 
         $tpl->setVariable(
-            "MSBOX_TRIGGER",
-            $this->section($this->ui_wrapper->getRenderedInfoBox(
-                $lng->txt("cont_iim_add_trigger_text"),
-                [$b]
+            "ADD_BUTTON",
+            $this->section($this->ui_wrapper->getRenderedButton(
+                $this->lng->txt("cont_iim_add_trigger"),
+                "button",
+                "add.trigger",
+                null,
+                "InteractiveImage"
             ))
         );
 

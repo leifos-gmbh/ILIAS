@@ -124,7 +124,14 @@ export default class UI {
   }
 
   showMainScreen() {
-    this.toolSlate.setContent(this.uiModel.mainSlate);
+    let content = this.uiModel.mainHead;
+    if (this.iimModel.model.iim.triggers.length > 0) {
+      content += this.uiModel.selectTriggerMessage;
+    } else {
+      content += this.uiModel.addTriggerMessage;
+    }
+    content += this.uiModel.mainSlate;
+    this.toolSlate.setContent(content);
     this.initMainScreenActions();
     this.setMainContent(this.uiModel.backgroundImage);
     this.initShapeEditor();

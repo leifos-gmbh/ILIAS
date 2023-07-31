@@ -17119,6 +17119,7 @@ content#:#cont_iim_edit#:#Edit Interactive Image
 content#:#cont_iim_finish_editing#:#Finish Editing Interactive Image
 content#:#cont_iim_trigger#:#Trigger
 content#:#cont_iim_add_trigger_text#:#Please add a trigger. Afterwards edit size and position on the right screen.
+content#:#cont_iim_select_trigger#:#To edit an existing trigger, click it on the right screen.
 content#:#cont_iim_add_trigger#:#Add Trigger
 content#:#cont_iim_overview#:#Overview
 content#:#cont_iim_background_image_and_caption#:#Background Image and Caption

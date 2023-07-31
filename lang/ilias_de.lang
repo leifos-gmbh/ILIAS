@@ -17120,6 +17120,7 @@ content#:#cont_iim_edit#:#Interaktives Bild bearbeiten
 content#:#cont_iim_finish_editing#:#Bearbeitung des interaktiven Bildes beenden
 content#:#cont_iim_trigger#:#Auslöser
 content#:#cont_iim_add_trigger_text#:#Bitte fügen Sie einen Auslöser hinzu. Passen Sie anschließen im rechten Bereich Größe und Position an.
+content#:#cont_iim_select_trigger#:#Klicken Sie auf einen Auslöser im rechten Bereich um diesen zu bearbeiten.
 content#:#cont_iim_add_trigger#:#Auslöser hinzufügen
 content#:#cont_iim_overview#:#Übersicht
 content#:#cont_iim_background_image_and_caption#:#Hintergrundbild und Bildunterschrift

@@ -296,6 +296,28 @@ class ilPCInteractiveImage extends ilPageContent
     //// Trigger
     ////
 
+    protected function setMapAreaProperties(
+        ilMediaAliasItem $a_alias_item,
+        string $a_shape_type,
+        string $a_coords,
+        string $a_title,
+        string $a_id)
+    {
+        $link = array(
+            "LinkType" => IL_EXT_LINK,
+            "Href" => ilUtil::stripSlashes("#")
+        );
+
+        $a_alias_item->deleteMapAreaById($a_id);
+        $a_alias_item->addMapArea(
+            $a_shape_type,
+            $a_coords,
+            ilUtil::stripSlashes($a_title),
+            $link,
+            $a_id
+        );
+    }
+
     /**
      * Add a new trigger
      */
@@ -311,17 +333,12 @@ class ilPCInteractiveImage extends ilPageContent
             $max = max($max, (int) $t["Nr"]);
         }
 
-        $link = array(
-            "LinkType" => IL_EXT_LINK,
-            "Href" => ilUtil::stripSlashes("#")
-        );
-
-        $a_alias_item->addMapArea(
+        $this->setMapAreaProperties(
+            $a_alias_item,
             $a_shape_type,
             $a_coords,
             ilUtil::stripSlashes($a_title),
-            $link,
-            $max + 1
+            (string) ($max + 1)
         );
 
         $attributes = array("Type" => self::AREA,
@@ -657,22 +674,42 @@ class ilPCInteractiveImage extends ilPageContent
     public function setTriggerProperties(string $nr, string $title, string $shape_type, string $coords) : void
     {
         $tr_node = $this->getTriggerNode($nr);
-        if ($tr_node) {
+
+        if ($shape_type === "Marker") {
+
+            // set marker properties
+            $tr_node->set_attribute("Type", "Marker");
             $tr_node->set_attribute(
                 "Title",
                 $title
             );
-            $this->setExtLinkTitle(
-                $nr,
-                $title
-            );
+            $coord_parts = explode(",", $coords);
+            $tr_node->set_attribute("MarkerX", ($coord_parts[0] ?? "0"));
+            $tr_node->set_attribute("MarkerY", ($coord_parts[1] ?? "0"));
+
+            // remove area
             $xpc = xpath_new_context($this->dom);
             $path = "//PageContent[@HierId = '" . $this->hier_id . "']/InteractiveImage/MediaAliasItem/MapArea[@Id='" . $nr . "']";
             $res = xpath_eval($xpc, $path);
             if (count($res->nodeset) > 0) {
-                $res->nodeset[0]->set_attribute("Shape", $shape_type);
-                $res->nodeset[0]->set_attribute("Coords", $coords);
+                $child = $res->nodeset[0];
+                $child->unlink($child);
             }
+            return;
+        }
+
+        if ($tr_node) {
+            $tr_node->set_attribute("Type", "Area");
+            $tr_node->remove_attribute("MarkerX");
+            $tr_node->remove_attribute("MarkerY");
+
+            $this->setMapAreaProperties(
+                $this->getStandardAliasItem(),
+                $shape_type,
+                $coords,
+                ilUtil::stripSlashes($title),
+                $nr
+            );
         } else {
             $this->addTriggerArea(
                 $this->getStandardAliasItem(),

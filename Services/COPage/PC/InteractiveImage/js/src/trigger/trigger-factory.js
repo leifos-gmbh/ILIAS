@@ -18,6 +18,7 @@
 import Trigger from "./trigger.js";
 import AreaFactory from "../area/area-factory.js"
 import OverlayFactory from "../overlay/overlay-factory.js"
+import MarkerFactory from "../marker/marker-factory.js"
 
 /**
  * Shape
@@ -27,12 +28,12 @@ export default class TriggerFactory {
   constructor() {
     this.areaFactory = new AreaFactory();
     this.overlayFactory = new OverlayFactory();
+    this.markerFactory = new MarkerFactory();
   }
 
   trigger(
     nr,
-    markerX,
-    markerY,
+    marker,
     overlay,
     popupNr,
     popupPosition,
@@ -42,8 +43,7 @@ export default class TriggerFactory {
     return new Trigger(
       nr,
       area,
-      markerX,
-      markerY,
+      marker,
       overlay,
       popupNr,
       popupPosition,
@@ -53,12 +53,11 @@ export default class TriggerFactory {
 
   /**
    */
-  fromPropertiesObject(o, area = null, overlay = null) {
+  fromPropertiesObject(o, area = null, overlay = null, marker = null) {
     return new Trigger(
       o.Nr,
       area,
-      o.MarkerX,
-      o.MarkerY,
+      marker,
       overlay,
       o.PopupNr,
       o.PopupPosition,
@@ -69,10 +68,14 @@ export default class TriggerFactory {
   fullTriggerFromModel(nr, model) {
     let trigger = null;
     model.triggers.forEach((tr) => {
+      let marker = null;
       if (tr.Nr == nr) {
         const area = this.areaFactory.fromModelForId(tr.Nr, model);
         const overlay = this.overlayFactory.fromModelForNr(tr.Nr, model);
-        trigger = this.fromPropertiesObject(tr, area, overlay);
+        if (area === null) {
+          marker = this.markerFactory.marker(parseInt(tr.MarkerX), parseInt(tr.MarkerY), tr.Nr);
+        }
+        trigger = this.fromPropertiesObject(tr, area, overlay, marker);
       }
     });
     return trigger;

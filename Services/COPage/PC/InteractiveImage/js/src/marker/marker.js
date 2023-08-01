@@ -17,50 +17,52 @@
 
 
 /**
- * Handle
+ * Marker
  */
-export default class Handle {
+export default class Marker {
 
     /**
-     * @param int x
-     * @param int y
      */
-    constructor(x, y) {
+    constructor(
+      x,
+      y,
+      triggerNr
+    ) {
         this.x = x;
         this.y = y;
-        this.onDrag = null;
+        this.triggerNr = triggerNr;
     }
 
-    /**
-     * @return int
-     */
     getX() {
         return this.x;
     }
 
-    /**
-     * @return int
-     */
     getY() {
         return this.y;
     }
 
-    addHandleToMobElement(mobEl, drag = true) {
-        const handleEl = document.createElement("a");
-        handleEl.setAttribute('data-copg-iim-type', 'handle');
-        handleEl.style.position = "absolute";
-        handleEl.style.display = "block";
-        handleEl.style.left = (this.getX() - 3) + "px";
-        handleEl.style.top = (this.getY() - 3) + "px";
-        handleEl.style.background = "white";
-        handleEl.style.width = "5px";
-        handleEl.style.height = "5px";
-        handleEl.style.width = "5px";
-        handleEl.style.border = "black solid 2px";
+    getTriggerNr() {
+        return this.triggerNr;
+    }
+
+    getCoordsString() {
+        return this.getX() + "," +
+          this.getY();
+    }
+
+    addMarkerToMobElement(mobEl, drag = false) {
+        const marker = document.createElement("a");
+        marker.setAttribute('data-copg-iim-type', 'marker');
+        marker.style.position = "absolute";
+        marker.style.display = "block";
+        marker.classList.add("ilc_marker_Marker");
+        marker.style.left = this.getX() + "px";
+        marker.style.top = this.getY() + "px";
+        marker.setAttribute("data-trigger-nr", this.getTriggerNr());
         if (drag) {
-            this.draggable(handleEl);
+            this.draggable(marker);
         }
-        mobEl.appendChild(handleEl);
+        mobEl.appendChild(marker);
     }
 
     setOnDrag(f) {
@@ -94,8 +96,8 @@ export default class Handle {
             // set the element's new position:
             elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
             elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-            t.x = (elmnt.offsetLeft - pos1) + 3;
-            t.y = (elmnt.offsetTop - pos2) + 3;
+            t.x = (elmnt.offsetLeft - pos1);
+            t.y = (elmnt.offsetTop - pos2);
             if (t.onDrag) {
                 const f = t.onDrag;
                 console.log("call on drag");

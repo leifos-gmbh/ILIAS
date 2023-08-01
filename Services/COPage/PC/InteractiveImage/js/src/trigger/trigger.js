@@ -27,16 +27,14 @@ export default class Trigger {
     constructor(
       nr,
       area = null,
-      markerX = "",
-      markerY= "",
+      marker = null,
       overlay= null,
       popupNr= "",
       popupPosition= "",
       title= "",
     ) {
         this.nr = nr;
-        this.markerX = markerX;
-        this.markerY = markerY;
+        this.marker = marker;
         this.overlay = overlay;
         this.popupNr = popupNr;
         this.popupPosition = popupPosition;
@@ -46,12 +44,18 @@ export default class Trigger {
 
 
     toPropertiesObject() {
+        let markerX = "";
+        let markerY = "";
         const type = (this.area === null)
             ? 'Marker'
             : 'Area';
+        if (this.area === null && this.marker !== null) {
+            markerX = this.marker.getX();
+            markerY = this.marker.getY();
+        }
         return {
-            MarkerX: this.markerX,
-            MarkerY: this.markerY,
+            MarkerX: markerX,
+            MarkerY: markerY,
             Nr: this.nr,
             Overlay: this.overlay.getSrc(),
             OverlayX: this.overlay.getX(),
@@ -69,10 +73,16 @@ export default class Trigger {
 
     setArea(area) {
         this.area = area;
+        this.marker = null;
     }
 
     setOverlay(overlay) {
         this.overlay = overlay;
+    }
+
+    setMarker(marker) {
+        this.area = null;
+        this.marker = marker;
     }
 
     getShape() {
@@ -83,6 +93,14 @@ export default class Trigger {
 
     getOverlay() {
         return this.overlay;
+    }
+
+    getNr() {
+        return this.nr;
+    }
+
+    getMarker() {
+        return this.marker;
     }
 
     getPopupNr() {

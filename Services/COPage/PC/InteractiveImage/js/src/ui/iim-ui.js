@@ -195,9 +195,11 @@ export default class UI {
     m.triggers.forEach((tr) => {
       const trigger = this.triggerFactory.fullTriggerFromModel(tr.Nr, m);
       if (trigger) {
-        console.log("ADDING SHAPE");
-        console.log(trigger.getShape());
-        this.shapeEditor.addShape(trigger.getShape());
+        if (trigger.getShape()) {
+          this.shapeEditor.addShape(trigger.getShape());
+        } else if (trigger.getMarker()) {
+          this.shapeEditor.addMarker(trigger.getMarker());
+        }
       }
     });
     this.shapeEditor.repaint();
@@ -211,6 +213,13 @@ export default class UI {
       shape.addEventListener("click", (event) => {
           dispatch.dispatch(action.interactiveImage().editor().editTrigger(
             shape.dataset.triggerNr
+          ));
+      });
+    });
+    document.querySelectorAll("[data-copg-iim-type='marker']").forEach(marker => {
+      marker.addEventListener("click", (event) => {
+          dispatch.dispatch(action.interactiveImage().editor().editTrigger(
+            marker.dataset.triggerNr
           ));
       });
     });
@@ -247,11 +256,13 @@ export default class UI {
   }
 
   repaintTrigger() {
-    const trigger = this.iimModel.getCurrentTrigger();
+    //const trigger = this.iimModel.getCurrentTrigger();
     this.setEditorAddMode();
+    this.showCurrentShape(true);
+    /*
     this.shapeEditor.removeAllShapes();
     this.shapeEditor.addShape(trigger.getShape(), true);
-    this.shapeEditor.repaint();
+    this.shapeEditor.repaint();*/
   }
 
   showTriggerProperties() {
@@ -260,21 +271,31 @@ export default class UI {
     const tr = this.iimModel.getCurrentTrigger();
     this.toolSlate.setContent(this.uiModel.triggerProperties);
     this.setInputValueByName('#copg-iim-trigger-prop-form', 'form_input_1', tr.title);
-    this.setInputValueByName('#copg-iim-trigger-prop-form', 'form_input_2', tr.area.shapeType);
+    if (tr.getShape()) {
+      this.setInputValueByName('#copg-iim-trigger-prop-form', 'form_input_2', tr.area.shapeType);
+    } else {
+      this.setInputValueByName('#copg-iim-trigger-prop-form', 'form_input_2', "Marker");
+    }
     this.initTriggerViewControl();
     this.initBackButton();
     model = this.iimModel;
     document.querySelectorAll("form [data-copg-ed-type='form-button']").forEach(button => {
       const act = button.dataset.copgEdAction;
       button.addEventListener("click", (event) => {
+        let coords;
         switch (act) {
           case ACTIONS.E_TRIGGER_PROPERTIES_SAVE:
             event.preventDefault();
+            if (model.getCurrentTrigger().getShape()) {
+              coords = model.getCurrentTrigger().getShape().getAreaCoordsString();
+            } else {
+              coords = model.getCurrentTrigger().getMarker().getCoordsString();
+            }
             dispatch.dispatch(action.interactiveImage().editor().saveTriggerProperties(
               model.getCurrentTrigger().nr,
               this.getInputValueByName('form_input_1'),
               this.getInputValueByName('form_input_2'),
-              model.getCurrentTrigger().getShape().getAreaCoordsString()
+              coords
             ));
             break;
         }
@@ -348,12 +369,20 @@ export default class UI {
     const trigger = this.iimModel.getCurrentTrigger();
     const overlay = trigger.getOverlay();
     this.shapeEditor.removeAllOverlays();
+    this.shapeEditor.removeAllMarkers();
     if (showOverlay && overlay) {
       this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_1', overlay.getSrc());
       this.shapeEditor.addOverlay(overlay, true);
     }
     this.shapeEditor.removeAllShapes();
-    this.shapeEditor.addShape(trigger.getShape(), edit);
+    if (trigger.getShape()) {
+      this.shapeEditor.addShape(trigger.getShape(), edit);
+    }
+    console.log("A");
+    if (trigger.getMarker()) {
+      console.log("B");
+      this.shapeEditor.addMarker(trigger.getMarker(), edit);
+    }
     this.shapeEditor.repaint();
   }
 

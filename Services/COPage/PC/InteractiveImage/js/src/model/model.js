@@ -17,6 +17,7 @@
 import AreaFactory from "../area/area-factory.js";
 import TriggerFactory from "../trigger/trigger-factory.js";
 import OverlayFactory from '../overlay/overlay-factory.js';
+import MarkerFactory from '../marker/marker-factory.js';
 
 
 /**
@@ -59,6 +60,7 @@ export default class Model {
     this.areaFactory = new AreaFactory();
     this.triggerFactory = new TriggerFactory();
     this.overlayFactory = new OverlayFactory();
+    this.markerFactory = new MarkerFactory();
   }
 
   log(message) {
@@ -119,9 +121,8 @@ export default class Model {
     );
     this.model.currentTrigger = this.triggerFactory.trigger(
       this.getNextTriggerNr(),
-      "",
-      "",
-      "",
+      null,
+      null,
       "",
       "",
       "",
@@ -132,27 +133,36 @@ export default class Model {
 
   changeTriggerShape(shape) {
     let area;
+    let marker;
+    console.log("MODEL: CHANGE SHAPE");
+    console.log(shape);
     switch (shape) {
       case "Rect":
         area = this.areaFactory.area(
           "Rect",
           "10,10,50,50"
         );
+        this.model.currentTrigger.setArea(area);
         break;
       case "Circle":
         area = this.areaFactory.area(
           "Circle",
           "100,100,50"
         );
+        this.model.currentTrigger.setArea(area);
         break;
       case "Poly":
         area = this.areaFactory.area(
           "Poly",
           ""
         );
+        this.model.currentTrigger.setArea(area);
+        break;
+      case "Marker":
+        marker = this.markerFactory.marker(0, 0, this.model.currentTrigger.getNr());
+        this.model.currentTrigger.setMarker(marker);
         break;
     }
-    this.model.currentTrigger.setArea(area);
   }
 
   changeTriggerOverlay(selection) {

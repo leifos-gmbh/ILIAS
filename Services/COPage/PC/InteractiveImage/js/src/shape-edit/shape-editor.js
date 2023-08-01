@@ -33,6 +33,8 @@ export default class ShapeEditor {
         this.currentShape = null;
         this.overlays = [];
         this.currentOverlay = null;
+        this.markers = [];
+        this.currentMarker = null;
         this.factory = new ShapeFactory();
         this.initEvents();
         this.allowAdd = false
@@ -80,6 +82,21 @@ export default class ShapeEditor {
         if (asCurrent) {
             this.currentShape = this.shapes.length - 1;
         }
+    }
+
+    addMarker(marker, asCurrent = false) {
+        if (!marker) {
+            return;
+        }
+        this.markers.push(marker);
+        if (asCurrent) {
+            this.currentMarker = this.markers.length - 1;
+        }
+    }
+
+    removeAllMarkers() {
+        this.markers = [];
+        this.currentMarker = null;
     }
 
     removeAllOverlays() {
@@ -151,18 +168,25 @@ export default class ShapeEditor {
     }
 
     removeAllHandles() {
-        this.removeAllChildsOfName(this.mobElement, "a");
+        this.removeAllChildsOfName(this.mobElement, "a[data-copg-iim-type='handle']");
     }
 
     removeAllOverlayImages() {
         this.removeAllChildsBySelector(this.mobElement, "img[data-copg-iim-type='overlay']");
     }
 
+    removeAllMarkerLinks() {
+        this.removeAllChildsBySelector(this.mobElement, "a[data-copg-iim-type='marker']");
+    }
+
     repaint() {
+        console.log("REPAINT");
         this.repaintSvg();
         this.removeAllHandles();
         this.removeAllOverlayImages();
+        this.removeAllMarkerLinks();
         if (this.currentShape !== null) {
+            console.log("1");
             const cs = this.shapes[this.currentShape];
             cs.getHandles().forEach((h) => {
                 h.addHandleToMobElement(this.mobElement, !this.allowAdd);
@@ -170,6 +194,18 @@ export default class ShapeEditor {
                     this.repaintSvg();
                 });
             });
+        } else {
+            console.log("2");
+            if (this.currentMarker !== null) {
+                console.log("3");
+                console.log("ADDING MARKER");
+                const m = this.markers[this.currentMarker];
+                m.addMarkerToMobElement(this.mobElement, true);
+            } else {
+                this.markers.forEach((m) => {
+                    m.addMarkerToMobElement(this.mobElement, false);
+                });
+            }
         }
         if (this.currentOverlay !== null) {
             const ov = this.overlays[this.currentOverlay];

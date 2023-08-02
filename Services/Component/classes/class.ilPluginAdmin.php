@@ -49,8 +49,11 @@ class ilPluginAdmin
     public function __construct()
     {
         global $DIC;
-        $this->lng = $DIC->language();
-        $this->lng->loadLanguageModule("cmps");
+        // cdpatch: added if (to get update 5.4->7 running)
+        if (isset($DIC["lng"])) {
+            $this->lng = $DIC->language();
+            $this->lng->loadLanguageModule("cmps");
+        }
     }
 
 

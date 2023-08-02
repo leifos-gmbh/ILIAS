@@ -85,6 +85,10 @@ class ilPersonalSettingsGUI
     // init sub tabs
     public function __initSubTabs($a_cmd)
     {
+        // cdpatch start
+        //return;
+        // cdpatch end
+
         /**
          * @var $rbacsystem ilRbacSystem
          * @var $ilTabs ilTabsGUI
@@ -176,6 +180,8 @@ class ilPersonalSettingsGUI
         $ilUser = $DIC['ilUser'];
         
         $this->__initSubTabs("showPersonalData");
+
+        // cdpatch: out-commented next line
         $ilTabs->activateTab("password");
 
         $this->setHeader();
@@ -416,6 +422,8 @@ class ilPersonalSettingsGUI
         $ilTabs = $DIC['ilTabs'];
 
         $this->__initSubTabs("showPersonalData");
+
+        // cdpatch: out-commented next line
         $ilTabs->activateTab("general_settings");
 
         $this->setHeader();

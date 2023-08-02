@@ -96,6 +96,17 @@ class ilObjUserGUI extends ilObjectGUI
                               'm' => "salutation_m",
                               'f' => "salutation_f",
                               );
+
+        // cdpatch start
+        global $ilPluginAdmin;
+        $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+        $plugin_html = false;
+        foreach ($pl_names as $pl) {
+            if ($pl == "CD") {
+                $this->cd_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+            }
+        }
+        // cdpatch end
     }
 
     public function executeCommand()
@@ -429,6 +440,27 @@ class ilObjUserGUI extends ilObjectGUI
             $userObj->setTitle($userObj->getFullname());
             $userObj->setDescription($userObj->getEmail());
 
+            // cdpatch start
+            $userObj->setCenterId(0);
+            $userObj->setCompanyId(0);
+            switch ($_POST["user_type"]) {
+                case "employee":
+                    $userObj->setCenterId((int) $_POST["center_id"]);
+                    break;
+
+                case "customer":
+                    $userObj->setCompanyId((int) $_POST["company_id"]);
+                    break;
+
+                case "std_user":
+                    break;
+            }
+            $userObj->setBranch(ilUtil::stripSlashes($_POST["branch"]));
+            $userObj->setFieldOfResponsibility(ilUtil::stripSlashes($_POST["field_of_responsibility"]));
+            $userObj->setProfession(ilUtil::stripSlashes($_POST["profession"]));
+            // cdpatch end
+
+
             $udf = array();
             foreach ($_POST as $k => $v) {
                 if (substr($k, 0, 4) == "udf_") {
@@ -508,6 +540,17 @@ class ilObjUserGUI extends ilObjectGUI
                     $this->object->update();
                 }
             }
+
+            // cdpatch start
+            if ($_POST["user_type"] == "customer") {
+                include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
+                ilCDPermWrapper::initCompanyUserRoles($userObj->getId(), $_POST["company_id"]);
+            }
+            if ($_POST["user_type"] == "employee") {
+                include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
+                ilCDPermWrapper::initEmployeeUserRoles($userObj->getId(), $_POST["center_id"]);
+            }
+            // cdpatch end
 
             // send new account mail
             if ($_POST['send_mail'] == 'y') {
@@ -828,6 +871,39 @@ class ilObjUserGUI extends ilObjectGUI
             #$this->object->assignData($_POST);
             $this->loadValuesFromForm('update');
 
+            // cdpatch start
+            $old_company_id = $this->object->getCompanyId();
+            $old_center_id = $this->object->getCenterId();
+            switch ($_POST["user_type"]) {
+                case "employee":
+                    if ((int) $_POST["center_id"] != $old_center_id) {
+                        include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
+                        ilCDPermWrapper::initCenterUserRoles($this->object->getId(), (int) $_POST["center_id"]);
+                    }
+                    $this->object->setCenterId((int) $_POST["center_id"]);
+                    $this->object->setCompanyId(0);
+                    break;
+
+                case "customer":
+                    if ((int) $_POST["company_id"] != $old_company_id) {
+                        include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
+                        ilCDPermWrapper::initCompanyUserRoles($this->object->getId(), (int) $_POST["company_id"]);
+                    }
+                    $this->object->setCompanyId((int) $_POST["company_id"]);
+                    $this->object->setCenterId(0);
+                    break;
+
+                case "std_user":
+                    $this->object->setCenterId(0);
+                    $this->object->setCompanyId(0);
+                    break;
+            }
+            $this->object->setBranch(ilUtil::stripSlashes($_POST["branch"]));
+            $this->object->setFieldOfResponsibility(ilUtil::stripSlashes($_POST["field_of_responsibility"]));
+            $this->object->setProfession(ilUtil::stripSlashes($_POST["profession"]));
+            // cdpatch end
+
+
             $udf = array();
             foreach ($_POST as $k => $v) {
                 if (substr($k, 0, 4) == "udf_") {
@@ -1006,6 +1082,25 @@ class ilObjUserGUI extends ilObjectGUI
         // other data
         $data["matriculation"] = $this->object->getMatriculation();
         $data["client_ip"] = $this->object->getClientIP();
+
+        // cdpatch start
+        $data["branch"] = $this->object->getBranch();
+        $data["profession"] = $this->object->getProfession();
+        $data["field_of_responsibility"] = $this->object->getFieldOfResponsibility();
+
+        if ($this->object->getCenterId() > 0) {
+            $data["user_type"] = "employee";
+            $data["center_id"] = $this->object->getCenterId();
+        } else {
+            if ($this->object->getCompanyId() > 0) {
+                $data["user_type"] = "customer";
+                $data["company_id"] = $this->object->getCompanyId();
+            } else {
+                $data["user_type"] = "std_user";
+            }
+        }
+        // cdpatch end
+
 
         // user defined fields
         include_once './Services/User/classes/class.ilUserDefinedFields.php';
@@ -1188,6 +1283,44 @@ class ilObjUserGUI extends ilObjectGUI
         //		$this->form_gui->addItem($ac);
         $this->form_gui->addItem($radg);
 
+        // cdpatch start
+        // user type
+        $pl = $this->cd_plugin;
+        $radg = new ilRadioGroupInputGUI($pl->txt("user_type"), "user_type");
+        $op1 = new ilRadioOption($pl->txt("employee"), "employee");
+        $radg->addOption($op1);
+
+        // center
+        $pl->includeClass("class.cdCenter.php");
+        $centers = cdCenter::getAllCenters();
+        $options = array();
+        foreach ($centers as $c) {
+            $options[$c["id"]] = $c["title"];
+        }
+        $si = new ilSelectInputGUI($pl->txt("center"), "center_id");
+        $si->setOptions($options);
+        $op1->addSubItem($si);
+
+        $op2 = new ilRadioOption($pl->txt("customer"), "customer");
+        $radg->addOption($op2);
+
+        // company
+        $pl = $this->cd_plugin;
+        $pl->includeClass("class.cdCompany.php");
+        $cs = cdCompany::getAllCompanies();
+        $options = array();
+        foreach ($cs as $c) {
+            $options[$c["id"]] = $c["title"] . " (" . cdCenter::lookupTitle($c["center_id"]) . ")";
+        }
+        $si = new ilSelectInputGUI($pl->txt("company"), "company_id");
+        $si->setOptions($options);
+        $op2->addSubItem($si);
+
+        $op3 = new ilRadioOption($pl->txt("standard_user"), "std_user");
+        $radg->addOption($op3);
+        $this->form_gui->addItem($radg);
+        // cdpatch end
+
         // personal data
         if (
             $this->isSettingChangeable('gender') or
@@ -1233,6 +1366,8 @@ class ilObjUserGUI extends ilObjectGUI
         }
 
         // personal image
+        // cdpatch start
+        /*
         if ($this->isSettingChangeable('upload')) {
             $pi = new ilImageFileInputGUI($lng->txt("personal_picture"), "userfile");
             if ($a_mode == "edit" || $a_mode == "upload") {
@@ -1245,6 +1380,8 @@ class ilObjUserGUI extends ilObjectGUI
             }
             $this->form_gui->addItem($pi);
         }
+        */
+        // cdpatch end
 
         if ($this->isSettingChangeable('birthday')) {
             $birthday = new ilBirthdayInputGUI($lng->txt('birthday'), 'birthday');
@@ -1267,6 +1404,23 @@ class ilObjUserGUI extends ilObjectGUI
             array("phone_home", 30, 30),
             array("phone_mobile", 30, 30),
             array("fax", 30, 30));
+
+        // cdpatch start (please note: phone mobile, sel_country needed by trainers)
+        $fields = array(
+            array("department", 40, 80),
+            array("branch", 40, 80),
+            array("profession", 40, 80),
+            array("field_of_responsibility", 40, 80),
+            array("street", 40, 40),
+            array("city", 40, 40),
+            array("zipcode", 10, 10),
+            array("country", 40, 40),
+            array("sel_country"),
+            array("phone_office", 30, 30),
+            array("phone_mobile", 30, 30),
+            array("fax", 30, 30)
+        );
+        // cdpatch end
 
         $counter = 0;
         foreach ($fields as $field) {
@@ -1294,7 +1448,11 @@ class ilObjUserGUI extends ilObjectGUI
                 } else {
                     // country selection
                     include_once("./Services/Form/classes/class.ilCountrySelectInputGUI.php");
-                    $cs = new ilCountrySelectInputGUI($lng->txt($field[0]), $field[0]);
+                    // cdpatch start
+                    //$cs = new ilCountrySelectInputGUI($lng->txt($field[0]), $field[0]);
+                    $lng->loadLanguageModule("cd");
+                    $cs = new ilCountrySelectInputGUI($lng->txt("cd_sel_country"), $field[0]);
+                    // cdpatch end
                     $cs->setRequired(isset($settings["require_" . $field[0]]) &&
                         $settings["require_" . $field[0]]);
                     $this->form_gui->addItem($cs);
@@ -1317,6 +1475,8 @@ class ilObjUserGUI extends ilObjectGUI
             $this->form_gui->addItem($em);
         }
 
+        // cdpatch start
+        /*
         // interests/hobbies
         if ($this->isSettingChangeable('hobby')) {
             $hob = new ilTextAreaInputGUI($lng->txt("hobby"), "hobby");
@@ -1383,6 +1543,8 @@ class ilObjUserGUI extends ilObjectGUI
         $ip->setInfo($this->lng->txt("current_ip") . " " . $_SERVER["REMOTE_ADDR"] . " <br />" .
             '<span class="warning">' . $this->lng->txt("current_ip_alert") . "</span>");
         $this->form_gui->addItem($ip);
+        */
+        // cdpatch end
 
         // additional user defined fields
         include_once './Services/User/classes/class.ilUserDefinedFields.php';
@@ -1642,9 +1804,13 @@ class ilObjUserGUI extends ilObjectGUI
         $userfile_input = $this->form_gui->getItemByPostVar("userfile");
 
         if ($_FILES["userfile"]["tmp_name"] == "") {
-            if ($userfile_input->getDeletionFlag()) {
+			// cdpatch start
+			/*
+			if ($userfile_input->getDeletionFlag()) {
                 $this->object->removeUserPicture();
             }
+			*/
+			// cdpatch end
             return;
         }
         if ($_FILES["userfile"]["size"] == 0) {

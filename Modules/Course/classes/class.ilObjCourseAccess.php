@@ -205,7 +205,8 @@ class ilObjCourseAccess extends ilObjectAccess implements ilConditionHandling
         $commands[] = array('permission' => "join", "cmd" => "leave", "lang_var" => "leave_waiting_list");
         
         // regualar users
-        $commands[] = array('permission' => "leave", "cmd" => "leave", "lang_var" => "crs_unsubscribe");
+        // cdpatch: outcommented
+        //$commands[] = array('permission' => "leave", "cmd" => "leave", "lang_var" => "crs_unsubscribe");
 
         include_once('Services/WebDAV/classes/class.ilDAVActivationChecker.php');
         if (ilDAVActivationChecker::_isActive()) {
@@ -540,4 +541,26 @@ class ilObjCourseAccess extends ilObjectAccess implements ilConditionHandling
             ];
         }
     }
+
+    // cdpatch start
+
+    /**
+     * Get cd properties
+     * @param
+     * @return
+     */
+    static function _getCDProperties($a_obj_id)
+    {
+        global $ilDB;
+
+        $set = $ilDB->query("SELECT course_type, course_level, course_nr FROM crs_settings " .
+            " WHERE obj_id = " . $ilDB->quote($a_obj_id, "integer")
+        );
+        $rec = $ilDB->fetchAssoc($set);
+
+        return $rec;
+    }
+
+    // cdpatch end
+
 }

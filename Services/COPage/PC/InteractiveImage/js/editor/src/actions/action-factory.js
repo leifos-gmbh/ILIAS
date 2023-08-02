@@ -15,8 +15,8 @@
  *********************************************************************/
 
 import InteractiveImageFactory from './iim-action-factory.js';
-import ClientActionFactory from '../../../../../Editor/js/src/client/actions/client-action-factory.js';
-import EditorActionFactory from '../../../../../Editor/js/src/actions/editor-action-factory.js';
+import ClientActionFactory from '../../../../../../Editor/js/src/client/actions/client-action-factory.js';
+import EditorActionFactory from '../../../../../../Editor/js/src/actions/editor-action-factory.js';
 
 /**
  * action factory for calling the server

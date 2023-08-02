@@ -70,11 +70,12 @@ export default class IIMCommandActionFactory {
    * @param redirect
    * @return {CommandAction}
    */
-  saveTriggerPopup(triggerNr, popup, position) {
+  saveTriggerPopup(triggerNr, popup, position, size) {
     return this.clientActionFactory.command(this.COMPONENT, ACTIONS.C_SAVE_TRIGGER_POPUP, {
       trigger_nr: triggerNr,
       popup: popup,
-      position: position
+      position: position,
+      size: size
     });
   }
 

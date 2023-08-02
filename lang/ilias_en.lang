@@ -17132,3 +17132,7 @@ content#:#cont_iim_tr_add_popup#:#Add Content-Popup
 content#:#cont_iim_vertical#:#Vertical
 content#:#cont_iim_horizontal#:#Horizontal
 content#:#cont_iim_background_image#:#Background Image
+content#:#cont_iim_size#:#Size
+content#:#cont_iim_sm#:#Small
+content#:#cont_iim_md#:#Medium
+content#:#cont_iim_lg#:#Large

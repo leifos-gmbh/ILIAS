@@ -37,6 +37,7 @@ export default class TriggerFactory {
     overlay,
     popupNr,
     popupPosition,
+    popupSize,
     title,
     area
   ) {
@@ -47,6 +48,7 @@ export default class TriggerFactory {
       overlay,
       popupNr,
       popupPosition,
+      popupSize,
       title
     );
   }
@@ -61,6 +63,7 @@ export default class TriggerFactory {
       overlay,
       o.PopupNr,
       o.PopupPosition,
+      o.PopupSize,
       o.Title
     );
   }

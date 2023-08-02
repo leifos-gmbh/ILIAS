@@ -14721,6 +14721,71 @@ p#copg-auto-save {
   fill-opacity: 40%;
   fill: white;
 }
+.copg-iim-popup {
+  position: absolute;
+  width: auto;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+@media (min-width: 480px) {
+  .copg-iim-popup-sm {
+    max-width: 50%;
+  }
+}
+@media (min-width: 768px) {
+  .copg-iim-popup-sm {
+    max-width: 35%;
+  }
+}
+@media (min-width: 992px) {
+  .copg-iim-popup-sm {
+    max-width: 30%;
+  }
+}
+@media (min-width: 1200px) {
+  .copg-iim-popup-sm {
+    max-width: 300px;
+  }
+}
+@media (min-width: 480px) {
+  .copg-iim-popup-md {
+    max-width: 100%;
+  }
+}
+@media (min-width: 768px) {
+  .copg-iim-popup-md {
+    max-width: 70%;
+  }
+}
+@media (min-width: 992px) {
+  .copg-iim-popup-md {
+    max-width: 45%;
+  }
+}
+@media (min-width: 1200px) {
+  .copg-iim-popup-md {
+    max-width: 600px;
+  }
+}
+@media (min-width: 480px) {
+  .copg-iim-popup-lg {
+    max-width: 100%;
+  }
+}
+@media (min-width: 768px) {
+  .copg-iim-popup-lg {
+    max-width: 100%;
+  }
+}
+@media (min-width: 992px) {
+  .copg-iim-popup-lg {
+    max-width: 100%;
+  }
+}
+@media (min-width: 1200px) {
+  .copg-iim-popup-lg {
+    max-width: 100%;
+  }
+}
 /* Services/Calendar */
 td.even {
   color: #161616;

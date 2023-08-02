@@ -138,7 +138,7 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
         $page = $this->page_gui->getPageObject();
         /** @var \ilPCInteractiveImage $pc */
         $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
-        $pc->setTriggerPopup((string) $body["data"]["trigger_nr"], (string) $body["data"]["popup"], (string) $body["data"]["position"]);
+        $pc->setTriggerPopup((string) $body["data"]["trigger_nr"], (string) $body["data"]["popup"], (string) $body["data"]["position"], (string) $body["data"]["size"]);
         $updated = $page->update();
 
         return $this->getStandardResponse($updated, $pc);

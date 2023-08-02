@@ -17,7 +17,7 @@
 import ACTIONS from "../actions/iim-action-types.js";
 import ActionFactory from "../actions/iim-action-factory.js"
 import UI from "./iim-ui.js";
-import Util from "../../../../../Editor/js/src/ui/util.js";
+import Util from "../../../../../../Editor/js/src/ui/util.js";
 
 /**
  * Interactive image UI action handler
@@ -236,7 +236,8 @@ export default class IIMUIActionHandler {
         update_action = af.interactiveImage().command().saveTriggerPopup(
           params.nr,
           params.popup,
-          params.position
+          params.position,
+          params.size
         );
 
         this.client.sendCommand(update_action).then(result => {

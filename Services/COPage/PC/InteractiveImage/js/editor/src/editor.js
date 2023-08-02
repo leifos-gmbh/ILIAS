@@ -15,21 +15,21 @@
  *********************************************************************/
 
 import UI from "./ui/ui.js";
-import Controller from "../../../../Editor/js/src/controller.js";
-import Client from "../../../../Editor/js/src/client/client.js";
+import Controller from "../../../../../Editor/js/src/controller.js";
+import Client from "../../../../../Editor/js/src/client/client.js";
 import ActionFactory from "./actions/action-factory.js";
-import ResponseFactory from "../../../../Editor/js/src/client/response/response-factory.js";
+import ResponseFactory from "../../../../../Editor/js/src/client/response/response-factory.js";
 import Model from "./model/model.js";
-import Dispatcher from "../../../../Editor/js/src/dispatcher.js";
+import Dispatcher from "../../../../../Editor/js/src/dispatcher.js";
 import ModelActionHandler from "./model/model-action-handler.js";
 import UIActionHandler from "./ui/ui-action-handler.js";
-import ToolSlate from "../../../../Editor/js/src/ui/tool-slate.js";
+import ToolSlate from "../../../../../Editor/js/src/ui/tool-slate.js";
 import IIMUIModifier from "./ui/iim-ui-modifier.js";
 
 /**
  * Editor (mainly sets up dependency tree)
  */
-const editor = (function ($, il) {
+const editor = (function () {
 
   /**
    * @type {Controller}
@@ -116,7 +116,7 @@ const editor = (function ($, il) {
     reInitUI
   };
 
-})($, il);
+})();
 window.addEventListener('load', function () {
   editor.init();
 }, false);

@@ -156,12 +156,14 @@ export default class IIMEditorActionFactory {
   saveTriggerPopup(
     nr,
     popup,
-    position
+    position,
+    size
   ) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_POPUP_SAVE, {
       nr: nr,
       popup: popup,
-      position: position
+      position: position,
+      size: size
     });
   }
 

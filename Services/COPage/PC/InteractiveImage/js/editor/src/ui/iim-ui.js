@@ -15,7 +15,7 @@
  *********************************************************************/
 
 import ACTIONS from "../actions/iim-action-types.js";
-import Util from "../../../../../Editor/js/src/ui/util.js";
+import Util from "../../../../../../Editor/js/src/ui/util.js";
 import ShapeEditor from "../shape-edit/shape-editor.js";
 import ActionFactory from "../actions/iim-editor-action-factory.js";
 import TriggerFactory from "../trigger/trigger-factory.js";
@@ -428,11 +428,41 @@ export default class UI {
     this.initBackButton();
     this.initTriggerPopup();
     const tr = this.iimModel.getCurrentTrigger();
+    let size;
     if (tr.getPopupNr() !== "") {
+      size = tr.getPopupSize();
+      if (size == '') {
+        size = 'md';
+      }
       this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_1', tr.getPopupNr());
-      this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_2', tr.getPopupPosition());
+      this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_2', size);
     }
     this.showCurrentShape();
+    if (tr.getPopupNr() !== "") {
+      this.showPopupDummy(size);
+    }
+  }
+
+  removeDummyPopup() {
+    document.querySelectorAll("[data-copg-iim-type='dummmy-popup']").forEach((d) => {
+      d.unlink();
+    });
+  }
+  showPopupDummy(size) {
+    const mainEl = document.getElementById('il-copg-iim-main');
+    const dummy = document.createElement('div');
+    this.removeDummyPopup();
+    dummy.setAttribute('data-copg-iim-type', 'dummmy-popup');
+    let ln = 160;
+    switch(size) {
+      case 'sm': ln = 40; break;
+      case 'lg': ln = 360; break;
+    }
+    dummy.innerHTML = this.uiModel.popupDummy.replace("###content###", this.uiModel.lore.substr(0, ln) + "...");
+    mainEl.appendChild(dummy);
+    const popEl = mainEl.querySelector("[data-copg-cont-type='iim-popup']");
+    popEl.classList.remove('copg-iim-popup-md');
+    popEl.classList.add('copg-iim-popup-' + size);
   }
 
   initTriggerPopup() {
@@ -457,6 +487,7 @@ export default class UI {
             dispatch.dispatch(action.interactiveImage().editor().saveTriggerPopup(
               model.getCurrentTrigger().nr,
               this.getInputValueByName('form_input_1'),
+              'Horizontal',
               this.getInputValueByName('form_input_2')
             ));
             break;

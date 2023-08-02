@@ -116,6 +116,7 @@
 	PopupWidth CDATA #IMPLIED
 	PopupHeight CDATA #IMPLIED
 	PopupPosition (Vertical | Horizontal) #IMPLIED
+	PopupSize (sm | md | lg) #IMPLIED
 >
 <!ELEMENT ContentPopup (PageContent*)>
 <!ATTLIST ContentPopup

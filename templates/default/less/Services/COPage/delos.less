@@ -929,3 +929,54 @@ p#copg-auto-save {
 	fill-opacity: 40%;
 	fill: white;
 }
+
+.copg-iim-popup {
+	position:absolute;
+	width: auto;
+	box-shadow: 2px 2px 4px @il-standard-page-shadow-color;
+}
+
+.copg-iim-popup-sm {
+	@media (min-width: @screen-xs-min) {
+		max-width: 50%;
+	}
+	@media (min-width: @screen-sm-min) {
+		max-width: 35%;
+	}
+	@media (min-width: @screen-md-min) {
+		max-width: 30%;
+	}
+	@media (min-width: @screen-lg-min) {
+		max-width: 300px;
+	}
+}
+
+.copg-iim-popup-md {
+	@media (min-width: @screen-xs-min) {
+		max-width: 100%;
+	}
+	@media (min-width: @screen-sm-min) {
+		max-width: 70%;
+	}
+	@media (min-width: @screen-md-min) {
+		max-width: 45%;
+	}
+	@media (min-width: @screen-lg-min) {
+		max-width: 600px;
+	}
+}
+
+.copg-iim-popup-lg {
+	@media (min-width: @screen-xs-min) {
+		max-width: 100%;
+	}
+	@media (min-width: @screen-sm-min) {
+		max-width: 100%;
+	}
+	@media (min-width: @screen-md-min) {
+		max-width: 100%;
+	}
+	@media (min-width: @screen-lg-min) {
+		max-width: 100%;
+	}
+}

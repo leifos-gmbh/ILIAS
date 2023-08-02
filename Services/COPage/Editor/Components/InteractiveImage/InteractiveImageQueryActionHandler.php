@@ -95,6 +95,8 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $o->uiModel->backgroundProperties = $this->getBackgroundProperties();
         $o->uiModel->modal = $this->getModalTemplate();
         $o->uiModel->loader = $this->getLoader();
+        $o->uiModel->popupDummy = $this->getPopupDummy();
+        $o->uiModel->lore = $this->getLore();
 
         $o->iimModel = $this->getIIMModel();
         /*
@@ -122,6 +124,20 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
             return $pc->getIIMModel();
         }
         return null;
+    }
+
+    protected function getPopupDummy(): string
+    {
+        if ($this->pc_id !== "") {
+            $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($this->pc_id);
+            return $pc->getPopupDummy();
+        }
+        return "";
+    }
+
+    protected function getLore(): string
+    {
+        return "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
     }
 
     public function getMainHead(): string
@@ -386,12 +402,13 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
                              [
                              ]
                          )->select(
-                "position",
-                    $this->lng->txt("cont_position"),
+                "size",
+                    $this->lng->txt("cont_iim_size"),
                     [
-                        "Vertical" => $this->lng->txt("cont_iim_vertical"),
-                        "Horizontal" => $this->lng->txt("cont_iim_horizontal")
-                    ], "", "Vertical"
+                        "sm" => $this->lng->txt("cont_iim_sm"),
+                        "md" => $this->lng->txt("cont_iim_md"),
+                        "lg" => $this->lng->txt("cont_iim_lg")
+                    ], "", "md"
                 )->required();
     }
 

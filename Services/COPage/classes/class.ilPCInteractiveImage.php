@@ -442,7 +442,8 @@ class ilPCInteractiveImage extends ilPageContent
                 "PopupY" => $tr_node->get_attribute("PopupY"),
                 "PopupWidth" => $tr_node->get_attribute("PopupWidth"),
                 "PopupHeight" => $tr_node->get_attribute("PopupHeight"),
-                "PopupPosition" => $tr_node->get_attribute("PopupPosition")
+                "PopupPosition" => $tr_node->get_attribute("PopupPosition"),
+                "PopupSize" => $tr_node->get_attribute("PopupSize")
             );
         }
 
@@ -733,12 +734,13 @@ class ilPCInteractiveImage extends ilPageContent
         }
     }
 
-    public function setTriggerPopup(string $nr, string $popup, string $position) : void
+    public function setTriggerPopup(string $nr, string $popup, string $position, string $size) : void
     {
         $tr_node = $this->getTriggerNode($nr);
         if ($tr_node) {
             $tr_node->set_attribute("PopupNr", $popup);
             $tr_node->set_attribute("PopupPosition", $position);
+            $tr_node->set_attribute("PopupSize", $size);
         }
     }
 
@@ -771,9 +773,10 @@ class ilPCInteractiveImage extends ilPageContent
                 $signal_id = $pop->getShowSignal()->getId();
                 //$new_inner = $this->ui->renderer()->render($pop);
                 $new_inner = "#####popovercontent#####";
+                // we need a position relative around the absolute inner div, to make 100% the current available space
                 $new_inner = str_replace(
                     "#####popovercontent#####",
-                    "<div style='display:none; position:relative;' data-copg-cont-type='iim-popup' data-signal-id='$signal_id' data-copg-page='$par_page' data-copg-popup-nr='$par_pop_nr' data-copg-cont-type='iim-popup'>" . $inner . "</div>",
+                    "<div style='position:relative'><div class='copg-iim-popup copg-iim-popup-md' style='display:none;' data-copg-cont-type='iim-popup' data-signal-id='$signal_id' data-copg-page='$par_page' data-copg-popup-nr='$par_pop_nr'>" . $inner . "</div></div>",
                     $new_inner
                 );
             }
@@ -791,4 +794,17 @@ class ilPCInteractiveImage extends ilPageContent
         }
         return $a_output.'<script src="https://unpkg.com/@popperjs/core@2"></script>';
     }
+
+    public function getPopupDummy() : string
+    {
+        $content = <<<EOT
+<div style='position:relative'><div class='copg-iim-popup copg-iim-popup-md' data-copg-cont-type='iim-popup'>
+<div class="ilc_iim_ContentPopup" data-copg-iim-data-type="popup"><div class="ilc_Paragraph ilc_text_block_Standard">
+###content###
+</div></div></div></div>
+
+EOT;
+        return $content;
+    }
+
 }

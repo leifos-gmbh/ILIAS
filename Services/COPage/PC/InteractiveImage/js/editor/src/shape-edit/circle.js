@@ -50,7 +50,7 @@ export default class Circle extends Shape {
           ((this.getCenter().getY() - this.getPoint().getY()) ** 2)
         );
     }
-    addToSvg(nr, svg) {
+    addToSvg(svg) {
         let c = this.createSvgElement("circle");
         const cx = this.getCenter().getX();
         const cy = this.getCenter().getY();
@@ -59,9 +59,10 @@ export default class Circle extends Shape {
         c.setAttribute("cx", cx);
         c.setAttribute("cy", cy);
         c.setAttribute("r", r);
-        c.id = this.getElementId(nr);
+        //c.id = this.getElementId(nr);
         this.addDataAttributes(c);
         this.setStyle(c);
+        return c;
     }
 
     getAreaCoordsString() {

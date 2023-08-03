@@ -44,7 +44,7 @@ export default class Rect extends Shape {
         return this.handles[1];
     }
 
-    addToSvg(nr, svg) {
+    addToSvg(svg) {
         let r = this.createSvgElement("rect");
         const x = Math.min(this.getTopLeft().getX(), this.getBottomRight().getX());
         const y = Math.min(this.getTopLeft().getY(), this.getBottomRight().getY());
@@ -56,8 +56,9 @@ export default class Rect extends Shape {
         r.setAttribute("width", w);
         r.setAttribute("height", h);
         this.addDataAttributes(r);
-        r.id = this.getElementId(nr);
+        //r.id = this.getElementId(nr);
         this.setStyle(r);
+        return r;
     }
 
     getAreaCoordsString() {

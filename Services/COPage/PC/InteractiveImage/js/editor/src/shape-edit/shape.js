@@ -50,14 +50,14 @@ export default class Shape {
         return document.createElementNS("http://www.w3.org/2000/svg", name);
     }
 
-    getElementId (nr) {
+    /*getElementId (nr) {
         return "il-copg-iim-shape-" + nr;
-    }
+    }*/
 
     /**
      * @param int nr
      */
-    addToSvg(nr, svg) {
+    addToSvg(svg) {
     }
 
     addDataAttributes(el) {

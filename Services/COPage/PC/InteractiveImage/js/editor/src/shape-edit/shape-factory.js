@@ -48,6 +48,10 @@ export default class ShapeFactory {
     return new Rect(this.handle(x1, y1), this.handle(x2, y2), data);
   }
 
+  rectFromCoordString(coordStr, data = {}) {
+    return new Rect(this.handle(x1, y1), this.handle(x2, y2), data);
+  }
+
   /**
    * @param int x1
    * @param int y1

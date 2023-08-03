@@ -33,7 +33,7 @@ export default class Poly extends Shape {
         return this.handles.push(h);
     }
 
-    addToSvg(nr, svg) {
+    addToSvg(svg) {
         let p = this.createSvgElement("polygon");
         let points = "";
         this.handles.forEach((h) => {
@@ -41,9 +41,10 @@ export default class Poly extends Shape {
         });
         p = svg.appendChild(p);
         p.setAttribute("points", points);
-        p.id = this.getElementId(nr);
+        //p.id = this.getElementId(nr);
         this.addDataAttributes(p);
         this.setStyle(p);
+        return p;
     }
 
     getAreaCoordsString() {

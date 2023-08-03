@@ -792,7 +792,8 @@ class ilPCInteractiveImage extends ilPageContent
                 $a_output = $html;
             }
         }
-        return $a_output.'<script src="https://unpkg.com/@popperjs/core@2"></script>';
+        return $a_output.
+'<script type="module" src="./Services/COPage/PC/InteractiveImage/js/presentation/src/presentation.js"></script>';
     }
 
     public function getPopupDummy() : string

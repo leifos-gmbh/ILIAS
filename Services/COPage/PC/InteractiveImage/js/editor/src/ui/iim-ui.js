@@ -21,6 +21,7 @@ import ActionFactory from "../actions/iim-editor-action-factory.js";
 import TriggerFactory from "../trigger/trigger-factory.js";
 import Poly from "../shape-edit/poly.js";
 import IIMUIModifier from "./iim-ui-modifier.js";
+import IimCommonUtil from "../../../common/src/util.js";
 
 /**
  * interactive image ui
@@ -91,6 +92,7 @@ export default class UI {
     this.shapeEditor = null;
     this.triggerFactory = new TriggerFactory();
     this.uiModifier = uiModifier;
+    this.iimCommonUtil = new IimCommonUtil();
   }
 
   //
@@ -439,7 +441,7 @@ export default class UI {
     }
     this.showCurrentShape();
     if (tr.getPopupNr() !== "") {
-      this.showPopupDummy(size);
+      this.showPopupDummy(size, tr.getNr());
     }
   }
 
@@ -448,7 +450,7 @@ export default class UI {
       d.unlink();
     });
   }
-  showPopupDummy(size) {
+  showPopupDummy(size, triggerNr) {
     const mainEl = document.getElementById('il-copg-iim-main');
     const dummy = document.createElement('div');
     this.removeDummyPopup();
@@ -463,6 +465,7 @@ export default class UI {
     const popEl = mainEl.querySelector("[data-copg-cont-type='iim-popup']");
     popEl.classList.remove('copg-iim-popup-md');
     popEl.classList.add('copg-iim-popup-' + size);
+    this.iimCommonUtil.attachPopupToTrigger(mainEl, mainEl, popEl, triggerNr);
   }
 
   initTriggerPopup() {

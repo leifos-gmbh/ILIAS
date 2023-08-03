@@ -17,6 +17,7 @@
 
 import ShapeFactory from "./shape-factory.js";
 import Poly from "./poly.js";
+import IimCommonUtil from "../../../common/src/util.js";
 
 /**
  * Circle
@@ -38,6 +39,7 @@ export default class ShapeEditor {
         this.factory = new ShapeFactory();
         this.initEvents();
         this.allowAdd = false
+        this.iimCommonUtil = new IimCommonUtil();
     }
 
     setAllowAdd(allow) {
@@ -126,18 +128,7 @@ export default class ShapeEditor {
     }
 
     getSvg() {
-        let svg = document.getElementById("il-copg-iim-svg");
-        if (!svg) {
-            svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            svg.id = "il-copg-iim-svg";
-            svg.style.position = "absolute";
-            svg.style.left = "0px";
-            svg.style.top = "0px";
-            svg.style.width = "100%";
-            svg.style.height = "100%";
-            this.mobElement.appendChild(svg);
-        };
-        return svg;
+        return this.iimCommonUtil.getOverlaySvg(this.mobElement);
     }
 
     addClickLayer() {
@@ -218,7 +209,7 @@ export default class ShapeEditor {
         this.removeAllChilds(svg);
         let cnt = 0;
         this.shapes.forEach((shape) => {
-            shape.addToSvg(cnt++, svg);
+            shape.addToSvg(svg);
         });
     }
 

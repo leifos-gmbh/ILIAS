@@ -94,7 +94,6 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
         $iim->create();
         $iim_gui = new \ilPCInteractiveImageGUI($page, $iim, "", "");
         $iim_gui->setPageConfig($page->getPageConfig());
-
         $form = $iim_gui->getImportFormAdapter();
         if ($form->isValid()) {
             $iim->createFromMobId(

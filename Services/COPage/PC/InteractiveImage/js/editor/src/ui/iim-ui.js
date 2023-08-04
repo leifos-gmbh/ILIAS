@@ -367,11 +367,29 @@ export default class UI {
     });
   }
 
+  updateOverlayPresentationAfterSaving() {
+    this.showCurrentShape(false, true);
+  }
+
+  updatePopupPresentationAfterSaving() {
+    this.showCurrentShape(false, false);
+    const tr = this.iimModel.getCurrentTrigger();
+    let size;
+    if (tr.getPopupNr() !== "") {
+      size = tr.getPopupSize();
+      if (size == '') {
+        size = 'md';
+      }
+      this.showPopupDummy(size, tr.getNr());
+    }
+  }
+
   showCurrentShape(edit = false, showOverlay = false) {
     const trigger = this.iimModel.getCurrentTrigger();
     const overlay = trigger.getOverlay();
     this.shapeEditor.removeAllOverlays();
     this.shapeEditor.removeAllMarkers();
+    this.removeDummyPopup();
     if (showOverlay && overlay) {
       this.setInputValueByName('#copg-iim-trigger-overlay-form', 'form_input_1', overlay.getSrc());
       this.shapeEditor.addOverlay(overlay, true);
@@ -447,9 +465,10 @@ export default class UI {
 
   removeDummyPopup() {
     document.querySelectorAll("[data-copg-iim-type='dummmy-popup']").forEach((d) => {
-      d.unlink();
+      d.remove();
     });
   }
+
   showPopupDummy(size, triggerNr) {
     const mainEl = document.getElementById('il-copg-iim-main');
     const dummy = document.createElement('div');

@@ -64,7 +64,7 @@ export default class ModelActionHandler {
         break;
 
       case ACTIONS.E_TRIGGER_OVERLAY_CHANGE:
-        this.model.changeTriggerOverlay(params.overlay);
+        //this.model.changeTriggerOverlay(params.overlay);
         break;
 
       case ACTIONS.E_EDIT_TRIGGER:

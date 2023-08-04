@@ -712,7 +712,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
 
     public function getImportFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI
     {
-        //$this->ctrl->setParameter($this, "cname", "SourceCode");
+        $this->ctrl->setParameter($this, "cname", "InteractiveImage");
         $form = $this->gui->form([self::class], "#")
                           ->async()
             ->section("f", $this->lng->txt("cont_ed_insert_iim"))

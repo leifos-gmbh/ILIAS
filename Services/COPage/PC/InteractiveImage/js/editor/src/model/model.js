@@ -190,6 +190,12 @@ export default class Model {
     );
   }
 
+  updateCurrentTriggerFromModel() {
+    if (this.getCurrentTrigger()) {
+      this.setTriggerByNr(this.getCurrentTrigger().getNr());
+    }
+  }
+
   getCurrentTrigger() {
     return this.model.currentTrigger;
   }

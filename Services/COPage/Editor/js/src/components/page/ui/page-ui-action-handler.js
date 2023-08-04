@@ -416,6 +416,14 @@ export default class PageUIActionHandler {
 
     this.util.sendFiles(params.data.form).then(() => {
       const data = new FormData(params.data.form);
+
+      // debug after sending files
+      /*
+      for (const pair of data.entries()) {
+        console.log(`${pair[0]}, ${pair[1]}`);
+        return;
+      }*/
+
       insert_action = af.page().command().insert(
         params.afterPcid,
         params.pcid,

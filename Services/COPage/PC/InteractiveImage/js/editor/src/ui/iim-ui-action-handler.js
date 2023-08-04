@@ -102,7 +102,7 @@ export default class IIMUIActionHandler {
                     break;
 
                 case ACTIONS.E_TRIGGER_OVERLAY_CHANGE:
-                    this.ui.showTriggerOverlay();
+                    //this.ui.showTriggerOverlay();
                     break;
 
                 case ACTIONS.E_TRIGGER_POPUP:
@@ -221,6 +221,7 @@ export default class IIMUIActionHandler {
                 this.ui.activateSlateButtons();
                 this.ui.refreshTriggerViewControl();
                 this.ui.setMessage('commonSuccessMessage');
+                this.ui.updateOverlayPresentationAfterSaving();
             }
         });
     }
@@ -245,6 +246,7 @@ export default class IIMUIActionHandler {
                 this.ui.activateSlateButtons();
                 this.ui.refreshTriggerViewControl();
                 this.ui.setMessage('commonSuccessMessage');
+                this.ui.updatePopupPresentationAfterSaving();
             }
         });
     }
@@ -256,6 +258,7 @@ export default class IIMUIActionHandler {
         if(pl.error === false)
         {
             model.initModel(pl.model);
+            model.updateCurrentTriggerFromModel();
             return true;
         }
         return false;

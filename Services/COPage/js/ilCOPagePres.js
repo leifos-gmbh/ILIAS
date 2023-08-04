@@ -94,15 +94,16 @@ il.COPagePres =
 	 * Init interactive images
 	 */
 	initInteractiveImages: function () {
+
 		// preload overlay images (necessary?)
 		// add onmouseover event to all map areas
-		$("map.iim > area").mouseover(this.overBaseArea);
-		$("map.iim > area").mouseout(this.outBaseArea);
-		$("map.iim > area").click(this.clickBaseArea);
-		
-		$("a.ilc_marker_Marker").mouseover(this.overMarker);
-		$("a.ilc_marker_Marker").mouseout(this.outMarker);
-		$("a.ilc_marker_Marker").click(this.clickMarker);
+		//$("map.iim > area").mouseover(this.overBaseArea);
+		//$("map.iim > area").mouseout(this.outBaseArea);
+		//$("map.iim > area").click(this.clickBaseArea);
+
+		//$("a.ilc_marker_Marker").mouseover(this.overMarker);
+		//$("a.ilc_marker_Marker").mouseout(this.outMarker);
+		//$("a.ilc_marker_Marker").click(this.clickMarker);
 
 		// add areas
 		document.querySelectorAll("[data-copg-iim-data-type='area']").forEach(el => {

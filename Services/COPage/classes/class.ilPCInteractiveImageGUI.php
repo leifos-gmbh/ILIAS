@@ -114,6 +114,11 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
                 $gui = $form->getRepoStandardUploadHandlerGUI("overlay_file");
                 break;
 
+            case "backgroundUpdate":
+                $form = $this->getBackgroundPropertiesFormAdapter();
+                $gui = $form->getRepoStandardUploadHandlerGUI("input_file");
+                break;
+
             default:
                 $form = $this->getImportFormAdapter();
                 $gui = $form->getRepoStandardUploadHandlerGUI("input_file");
@@ -803,7 +808,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
                        ->file(
                            "input_file",
                            $this->lng->txt("file"),
-                           \Closure::fromCallable([$this, 'handlBackgroundUpload']),
+                           \Closure::fromCallable([$this, 'handleBackgroundUpload']),
                            "mob_id",
                            "",
                            1,
@@ -818,13 +823,13 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
     }
 
 
-    public function handlBackgroundUpload(
+    public function handleBackgroundUpload(
         FileUpload $upload,
         UploadResult $result
     ): BasicHandlerResult {
-        $this->log(">>>");
-        $this->log("Start upload");
-        $this->log($this->content_obj->getMediaObject()->getId());
+        $this->log->debug(">>>");
+        $this->log->debug("Start upload");
+        $this->log->debug($this->content_obj->getMediaObject()->getId());
         return $this->iim_manager->handleUploadResult(
             $upload,
             $result,

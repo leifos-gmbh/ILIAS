@@ -135,9 +135,7 @@ export default class UI {
     content += this.uiModel.mainSlate;
     this.toolSlate.setContent(content);
     this.initMainScreenActions();
-    this.setMainContent(this.uiModel.backgroundImage);
-    this.initShapeEditor();
-    this.showAllShapes();
+    this.refreshMainScreen();
   }
 
   initMainScreenActions() {
@@ -796,4 +794,12 @@ export default class UI {
     });
   }
 
+  refreshMainScreen() {
+    this.setMainContent(this.uiModel.backgroundImage);
+    this.initShapeEditor();
+    this.showAllShapes();
+    // ensure img is not scaled
+    const img = document.querySelector("#il-copg-iim-main .ilc_Mob img");
+    img.style.width = 'auto';
+  }
 }

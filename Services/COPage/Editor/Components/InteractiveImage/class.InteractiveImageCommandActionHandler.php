@@ -162,6 +162,7 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
         $data = new \stdClass();
         $data->error = $error;
         $data->model = $pc->getIIMModel();
+        $data->backgroundImage = $pc->getBackgroundImage();
         return new Server\Response($data);
     }
 

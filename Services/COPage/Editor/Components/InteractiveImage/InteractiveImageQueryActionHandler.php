@@ -255,36 +255,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
             return "";
         }
 
-        $mob = $pc->getMediaObject();
-
-        //$ilCtrl = $this->ctrl;
-
-        $st_item = $mob->getMediaItem("Standard");
-
-        // output image map
-        $xml = "<dummy>";
-        $xml .= $mob->getXML(IL_MODE_ALIAS);
-        $xml .= $mob->getXML(IL_MODE_OUTPUT);
-        $xml .= "</dummy>";
-        $xsl = file_get_contents("./Services/COPage/xsl/page.xsl");
-        //echo htmlentities($xml); exit;
-        $args = array( '/_xml' => $xml, '/_xsl' => $xsl );
-        $xh = xslt_create();
-        $wb_path = \ilFileUtils::getWebspaceDir("output") . "/";
-        $mode = "media";
-        //echo htmlentities($ilCtrl->getLinkTarget($this, "showImageMap"));
-
-        $random = new \ilRandom();
-        $params = array(
-                        'media_mode' => 'enable',
-                        'pg_frame' => "",
-                        'enlarge_path' => \ilUtil::getImagePath("enlarge.svg"),
-                        'webspace_path' => $wb_path);
-        $output = xslt_process($xh, "arg:/_xml", "arg:/_xsl", null, $args, $params);
-        xslt_error($xh);
-        xslt_free($xh);
-
-        return $output;
+        return $pc->getBackgroundImage();
     }
 
     protected function section(string $content) : string
@@ -467,6 +438,12 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
 
     protected function getBackgroundProperties(): string
     {
+        $this->ctrl->setParameterByClass(
+            \ilPCInteractiveImageGUI::class,
+            "mode",
+            "backgroundUpdate"
+        );
+
         $content = $this->getTriggerBackButton();
         $content.= "<h3>".$this->lng->txt("cont_iim_background_image")."</h3>";
         $content.= $this->getMessageArea();

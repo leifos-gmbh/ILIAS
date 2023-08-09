@@ -263,6 +263,7 @@ export default class IIMUIActionHandler {
         {
             model.initModel(pl.model);
             model.updateCurrentTriggerFromModel();
+            this.ui.uiModel.backgroundImage = pl.backgroundImage;
             return true;
         }
         return false;
@@ -361,7 +362,9 @@ export default class IIMUIActionHandler {
             this.client.sendCommand(save_action).then(result => {
                 if (this.handleStandardResponse(result, model)) {
                     this.ui.activateSlateButtons();
+                    this.ui.showSettings();
                     this.ui.setMessage('commonSuccessMessage');
+                    this.ui.refreshMainScreen();
                 }
             });
         });

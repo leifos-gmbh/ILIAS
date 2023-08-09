@@ -110,4 +110,12 @@ export default class IIMCommandActionFactory {
     });
   }
 
+  /**
+   * @param {formData} data
+   * @return {CommandAction}
+   */
+  saveSettings(data) {
+    return this.clientActionFactory.formCommand(this.COMPONENT, ACTIONS.C_SAVE_SETTINGS, data);
+  }
+
 }

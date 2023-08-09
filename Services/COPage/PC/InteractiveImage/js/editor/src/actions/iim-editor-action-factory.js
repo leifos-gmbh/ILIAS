@@ -218,4 +218,10 @@ export default class IIMEditorActionFactory {
     });
   }
 
+  saveSettings(form) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_SAVE_SETTINGS, {
+      form: form
+    });
+  }
+
 }

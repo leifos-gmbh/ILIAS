@@ -27,6 +27,7 @@ const ACTIONS = {
   C_DELETE_OVERLAY: "delete.overlay",
   C_SAVE_POPUP: "save.popup",
   C_DELETE_POPUP: "delete.popup",
+  C_SAVE_SETTINGS: "save.settings",
 
   // editor actions (things happening in the editor client side)
   E_ADD_TRIGGER: "add.trigger",
@@ -49,6 +50,7 @@ const ACTIONS = {
   E_TRIGGER_BACK: "trigger.back",
   E_SWITCH_SETTINGS: "switch.settings",
   E_SWITCH_OVERLAYS: "switch.overlays",
-  E_SWITCH_POPUPS: "switch.popups"
+  E_SWITCH_POPUPS: "switch.popups",
+  E_SAVE_SETTINGS: "component.save"
 };
 export default ACTIONS;

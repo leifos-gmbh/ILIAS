@@ -31,6 +31,7 @@ use ILIAS\FileUpload\Handler\HandlerResult;
  */
 class IIMManager
 {
+    protected \ilLogger $log;
     protected InternalDomainService $domain;
 
     public function __construct(
@@ -38,30 +39,40 @@ class IIMManager
     )
     {
         $this->domain = $domain;
+        $this->log = $domain->log();
     }
 
     public function handleUploadResult(
         FileUpload $upload,
-        UploadResult $result
+        UploadResult $result,
+        \ilObjMediaObject $mob = null
     ): BasicHandlerResult
     {
-
+        $this->log->debug("Handle mob upload");
         $title = $result->getName();
+        $this->log->debug($title);
 
-        $mob = new \ilObjMediaObject();
-        $mob->setTitle($title);
-        $mob->setDescription("");
-        $mob->create();
+        if (is_null($mob)) {
+            $this->log->debug("New...");
+            $mob = new \ilObjMediaObject();
+            $mob->setTitle($title);
+            $mob->setDescription("");
+            $mob->create();
 
-        $mob->createDirectory();
-        $media_item = new \ilMediaItem();
-        $mob->addMediaItem($media_item);
-        $media_item->setPurpose("Standard");
+            $mob->createDirectory();
+            $media_item = new \ilMediaItem();
+            $mob->addMediaItem($media_item);
+            $media_item->setPurpose("Standard");
+        } else {
+            $this->log->debug("Update...");
+            $media_item = $mob->getMediaItem("Standard");
+        }
 
         $mob_dir = \ilObjMediaObject::_getRelativeDirectory($mob->getId());
         $file_name = \ilObjMediaObject::fixFilename($title);
         $file = $mob_dir . "/" . $file_name;
 
+        $this->log->debug("Move file to: " . $mob_dir . ", " . $file_name);
         $upload->moveOneFileTo(
             $result,
             $mob_dir,

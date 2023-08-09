@@ -30,6 +30,7 @@ class InternalDomainService
 {
     use GlobalDICDomainServices;
 
+    protected ?\ilLogger $copg_log = null;
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
 
@@ -72,6 +73,14 @@ class InternalDomainService
         return new PC\DomainService(
             $this
         );
+    }
+
+    public function log(): \ilLogger
+    {
+        if (is_null($this->copg_log)) {
+            $this->copg_log = $this->logger()->copg();
+        }
+        return $this->copg_log;
     }
 
 }

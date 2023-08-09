@@ -73,6 +73,9 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
             case "delete.popup":
                 return $this->deletePopup($query['pc_id'], $body);
 
+            case "save.settings":
+                return $this->saveSettings($query['pc_id'], $body);
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
         }
@@ -226,5 +229,25 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
 
         return $this->getStandardResponse($updated, $pc);
     }
+
+    protected function saveSettings(string $pc_id, array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        /** @var \ilPCInteractiveImage $pc */
+        $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
+        $form_adapter = $this->getPCInteractiveImageGUI($pc_id)
+                             ->getBackgroundPropertiesFormAdapter();
+
+        if ($form_adapter->isValid()) {
+            $caption = $form_adapter->getData("caption");
+            $std_alias_item = $pc->getStandardAliasItem();
+            $std_alias_item->setCaption($caption);
+        }
+
+        $updated = $page->update();
+
+        return $this->getStandardResponse($updated, $pc);
+    }
+
 
 }

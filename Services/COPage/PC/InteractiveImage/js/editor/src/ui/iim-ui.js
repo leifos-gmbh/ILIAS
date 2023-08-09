@@ -604,7 +604,33 @@ export default class UI {
   showSettings() {
     this.toolSlate.setContent(this.uiModel.backgroundProperties);
     this.initBackButton();
+    this.initSettings();
   }
+
+  initSettings() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+    document.querySelectorAll("form [data-copg-ed-type='form-button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_SAVE_SETTINGS:
+            event.preventDefault();
+            const form = document.querySelector("#copg-editor-slate-content form");
+            dispatch.dispatch(action.interactiveImage().editor().saveSettings(
+              form
+            ));
+            break;
+        }
+      });
+    });
+    this.setInputValueByName(
+      '#copg-editor-slate-content',
+      'form_input_2',
+      this.iimModel.getCaption()
+    );
+  }
+
 
   showOverlays() {
     this.toolSlate.setContent(this.uiModel.overlayOverview);

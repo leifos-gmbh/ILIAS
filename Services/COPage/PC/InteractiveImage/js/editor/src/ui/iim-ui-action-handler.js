@@ -174,6 +174,10 @@ export default class IIMUIActionHandler {
                     this.sendDeleteOverlay(params, model);
                     break;
 
+                case ACTIONS.E_SAVE_SETTINGS:
+                    this.sendSaveSettings(params, model);
+                    break;
+
             }
         }
     }
@@ -338,6 +342,28 @@ export default class IIMUIActionHandler {
         this.client.sendCommand(delete_action).then(result => {
             this.handleStandardResponse(result, model);
             dispatch.dispatch(af.interactiveImage().editor().switchPopups());
+        });
+    }
+
+    sendSaveSettings(params, model) {
+        let save_action;
+        const af = this.actionFactory;
+        const dispatch = this.dispatcher;
+        const util = this.util;
+
+        this.util.sendFiles(params.form).then(() => {
+            const data = new FormData(params.form);
+            save_action = af.interactiveImage().command().saveSettings(
+              data
+            );
+            this.ui.deactivateSlateButtons();
+            this.ui.setLoader();
+            this.client.sendCommand(save_action).then(result => {
+                if (this.handleStandardResponse(result, model)) {
+                    this.ui.activateSlateButtons();
+                    this.ui.setMessage('commonSuccessMessage');
+                }
+            });
         });
     }
 

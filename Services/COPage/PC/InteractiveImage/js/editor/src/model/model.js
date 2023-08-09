@@ -114,6 +114,10 @@ export default class Model {
     return maxNr + 1;
   }
 
+  getCaption() {
+    return this.model.iim.media_item.caption;
+  }
+
   addStandardTrigger() {
     const area = this.areaFactory.area(
       "Rect",

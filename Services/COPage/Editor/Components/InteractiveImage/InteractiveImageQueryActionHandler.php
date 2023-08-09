@@ -464,40 +464,14 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         return $content;
     }
 
-    protected function getBackgroundPropertiesFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI {
-        //$pc = $this->page_gui->getPageObject()->getContentObjectForPcId($this->pc_id);
-        //$iim_gui = new \ilPCInteractiveImageGUI($this->page_gui->getPageObject(), $pc, $pc->getHierId());
-        return $this->gui->form([get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class], "#")
-                 ->async()
-                 ->file(
-                     "input_file",
-                     $this->lng->txt("file"),
-                     \Closure::fromCallable([$this, 'handleUploadResult']),
-                     "mob_id",
-                     "",
-                     1,
-                     [],
-                     [get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class],
-                     "copg"
-                 )->text(
-                "caption",
-                    $this->lng->txt("cont_caption")
-                );
-    }
-
-    public function handleUploadResult(
-        FileUpload $upload,
-        UploadResult $result
-    ): BasicHandlerResult {
-        return $this->iim_manager->handleUploadResult($upload, $result);
-    }
 
     protected function getBackgroundProperties(): string
     {
         $content = $this->getTriggerBackButton();
         $content.= "<h3>".$this->lng->txt("cont_iim_background_image")."</h3>";
+        $content.= $this->getMessageArea();
         $content.= $this->ui_wrapper->getRenderedAdapterForm(
-            $this->getBackgroundPropertiesFormAdapter(),
+            $this->getPCInteractiveImageGUI()->getBackgroundPropertiesFormAdapter([get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class]),
             [["InteractiveImage", "component.save", $this->lng->txt("save")]]
         );
 

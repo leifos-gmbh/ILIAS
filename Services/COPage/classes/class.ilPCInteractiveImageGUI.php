@@ -792,4 +792,44 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
                        );
         return $f;
     }
+
+    public function getBackgroundPropertiesFormAdapter(array $path = null): \ILIAS\Repository\Form\FormAdapterGUI {
+        if (is_null($path)) {
+            $path = [self::class];
+        }
+
+        $f = $this->gui->form($path, "#")
+                       ->async()
+                       ->file(
+                           "input_file",
+                           $this->lng->txt("file"),
+                           \Closure::fromCallable([$this, 'handlBackgroundUpload']),
+                           "mob_id",
+                           "",
+                           1,
+                           ["image/png", "image/jpeg", "image/gif"],
+                           $path,
+                           "copg"
+                       )->text(
+                "caption",
+                $this->lng->txt("cont_caption")
+            );
+        return $f;
+    }
+
+
+    public function handlBackgroundUpload(
+        FileUpload $upload,
+        UploadResult $result
+    ): BasicHandlerResult {
+        $this->log(">>>");
+        $this->log("Start upload");
+        $this->log($this->content_obj->getMediaObject()->getId());
+        return $this->iim_manager->handleUploadResult(
+            $upload,
+            $result,
+            $this->content_obj->getMediaObject()
+        );
+    }
+
 }

@@ -631,9 +631,21 @@ export default class UI {
 
 
   showOverlays() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
     this.toolSlate.setContent(this.uiModel.overlayOverview);
     this.initBackButton();
     this.initOverlayList();
+    document.querySelectorAll("[data-copg-ed-type='button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_TRIGGER_OVERLAY_ADD:
+            dispatch.dispatch(action.interactiveImage().editor().addTriggerOverlay());
+            break;
+        }
+      });
+    });
   }
 
   initOverlayList() {

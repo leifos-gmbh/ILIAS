@@ -291,16 +291,23 @@ export default class IIMUIActionHandler {
             this.client.sendCommand(upload_action).then(result => {
                 if (this.handleStandardResponse(result, model)) {
                     this.ui.activateSlateButtons();
-                    this.ui.refreshTriggerViewControl();
-                    this.ui.showTriggerOverlay();
-                    this.ui.setMessage('commonSuccessMessage');
-                    model.getOverlays().forEach((ov) => {
-                        if (!old_overlays.includes(ov.name)) {
-                            dispatch.dispatch(af.interactiveImage().editor().changeTriggerOverlay(
-                              ov.name
-                            ));
-                        }
-                    });
+                    if (model.getCurrentTrigger() == null) {
+                        this.ui.showOverlays();
+                        this.ui.setMessage('commonSuccessMessage');
+                    } else {
+                        this.ui.refreshTriggerViewControl();
+                        this.ui.showTriggerOverlay();
+                        this.ui.setMessage('commonSuccessMessage');
+                        model.getOverlays().forEach((ov) => {
+                            if (!old_overlays.includes(ov.name)) {
+                                dispatch.dispatch(af.interactiveImage()
+                                .editor()
+                                .changeTriggerOverlay(
+                                  ov.name
+                                ));
+                            }
+                        });
+                    }
                 }
             });
         });
@@ -330,7 +337,14 @@ export default class IIMUIActionHandler {
         this.client.sendCommand(save_action).then(result => {
             this.handleStandardResponse(result, model);
             util.hideCurrentModal();
-            dispatch.dispatch(af.interactiveImage().editor().switchPopups());
+            if (model.getCurrentTrigger() == null) {
+                this.ui.showPopups();
+                this.ui.setMessage('commonSuccessMessage');
+            } else {
+                this.ui.refreshTriggerViewControl();
+                this.ui.showTriggerPopup();
+                this.ui.setMessage('commonSuccessMessage');
+            }
         });
     }
 
@@ -342,7 +356,8 @@ export default class IIMUIActionHandler {
         );
         this.client.sendCommand(delete_action).then(result => {
             this.handleStandardResponse(result, model);
-            dispatch.dispatch(af.interactiveImage().editor().switchPopups());
+            this.ui.showPopups();
+            this.ui.setMessage('commonSuccessMessage');
         });
     }
 

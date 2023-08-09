@@ -87,6 +87,7 @@ export default class ModelActionHandler {
 
       case ACTIONS.E_TRIGGER_BACK:
         this.model.setState(this.model.STATE_OVERVIEW);
+        this.model.resetCurrentTrigger();
         break;
 
       case ACTIONS.E_SWITCH_SETTINGS:

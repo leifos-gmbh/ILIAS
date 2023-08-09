@@ -194,6 +194,10 @@ export default class Model {
     );
   }
 
+  resetCurrentTrigger() {
+    this.model.currentTrigger = null;
+  }
+
   updateCurrentTriggerFromModel() {
     if (this.getCurrentTrigger()) {
       this.setTriggerByNr(this.getCurrentTrigger().getNr());

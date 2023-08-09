@@ -408,6 +408,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
     {
         $content = $this->getTriggerBackButton();
         $content.= "<h3>".$this->lng->txt("cont_content_popups")."</h3>";
+        $content.= $this->getMessageArea();
         $content.= $this->section($this->ui_wrapper->getRenderedButton(
             $this->lng->txt("cont_iim_tr_add_popup"),
             "button",
@@ -423,6 +424,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
     {
         $content = $this->getTriggerBackButton();
         $content.= "<h3>".$this->lng->txt("cont_overlay_images")."</h3>";
+        $content.= $this->getMessageArea();
         $content.= $this->section($this->ui_wrapper->getRenderedButton(
             $this->lng->txt("cont_iim_add_overlay"),
             "button",

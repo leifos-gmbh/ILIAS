@@ -495,8 +495,8 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -1736,6 +1736,8 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ILIAS\\Notes\\Export\\UserImageExporter' => __DIR__ . '/../../../..' . '/Services/Notes/Export/class.UserImageExporter.php',
         'ILIAS\\Notes\\Provider\\NotesMainBarProvider' => __DIR__ . '/../../../..' . '/Services/Notes/GlobalScreen/classes/NotesMainBarProvider.php',
         'ILIAS\\Notifications\\Provider\\NotificationCenterProvider' => __DIR__ . '/../../../..' . '/Services/Notifications/classes/Provider/NotificationCenterProvider.php',
+        'ILIAS\\Object\\CreationCallbackTrait' => __DIR__ . '/../../../..' . '/Services/Object/traits/CreationCallbackTrait.php',
+        'ILIAS\\Object\\ImplementsCreationCallback' => __DIR__ . '/../../../..' . '/Services/Object/interfaces/ImplementsCreationCallback.php',
         'ILIAS\\OnScreenChat\\DTO\\ConversationDto' => __DIR__ . '/../../../..' . '/Services/OnScreenChat/classes/DTO/ConversationDto.php',
         'ILIAS\\OnScreenChat\\DTO\\MessageDto' => __DIR__ . '/../../../..' . '/Services/OnScreenChat/classes/DTO/MessageDto.php',
         'ILIAS\\OnScreenChat\\Provider\\OnScreenChatNotificationProvider' => __DIR__ . '/../../../..' . '/Services/OnScreenChat/classes/Provider/OnScreenChatNotificationProvider.php',

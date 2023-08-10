@@ -1111,6 +1111,8 @@ return array(
     'ILIAS\\Notes\\Export\\UserImageExporter' => $baseDir . '/Services/Notes/Export/class.UserImageExporter.php',
     'ILIAS\\Notes\\Provider\\NotesMainBarProvider' => $baseDir . '/Services/Notes/GlobalScreen/classes/NotesMainBarProvider.php',
     'ILIAS\\Notifications\\Provider\\NotificationCenterProvider' => $baseDir . '/Services/Notifications/classes/Provider/NotificationCenterProvider.php',
+    'ILIAS\\Object\\CreationCallbackTrait' => $baseDir . '/Services/Object/traits/CreationCallbackTrait.php',
+    'ILIAS\\Object\\ImplementsCreationCallback' => $baseDir . '/Services/Object/interfaces/ImplementsCreationCallback.php',
     'ILIAS\\OnScreenChat\\DTO\\ConversationDto' => $baseDir . '/Services/OnScreenChat/classes/DTO/ConversationDto.php',
     'ILIAS\\OnScreenChat\\DTO\\MessageDto' => $baseDir . '/Services/OnScreenChat/classes/DTO/MessageDto.php',
     'ILIAS\\OnScreenChat\\Provider\\OnScreenChatNotificationProvider' => $baseDir . '/Services/OnScreenChat/classes/Provider/OnScreenChatNotificationProvider.php',

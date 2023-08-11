@@ -41,6 +41,7 @@ class InternalDomainService
      * @var ScheduleManager[]
      */
     protected static array $schedule_manager = [];
+    protected ?\ilLogger $book_log = null;
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
 
@@ -64,6 +65,14 @@ class InternalDomainService
             $user_id
         );
     }*/
+
+    public function log(): \ilLogger
+    {
+        if (is_null($this->book_log)) {
+            $this->book_log = $this->logger()->book();
+        }
+        return $this->book_log;
+    }
 
     public function preferences(
         \ilObjBookingPool $pool

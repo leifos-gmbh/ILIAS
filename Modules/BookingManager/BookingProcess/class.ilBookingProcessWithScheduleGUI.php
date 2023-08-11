@@ -24,6 +24,7 @@ use \ILIAS\Filesystem\Stream\Streams;
  */
 class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingProcess\BookingProcessGUI
 {
+    protected ilLogger $log;
     protected \ILIAS\BookingManager\BookingProcess\ObjectSelectionManager $object_selection;
     protected \ILIAS\BookingManager\Objects\ObjectsManager $object_manager;
     protected \ILIAS\BookingManager\Reservations\ReservationManager $reservation;
@@ -64,8 +65,6 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         $this->access = $DIC->access();
         $this->tabs_gui = $DIC->tabs();
         $this->user = $DIC->user();
-        $this->help = $DIC->bookingManager()->internal()
-            ->gui()->bookingHelp($pool);
         $this->http = $DIC->http();
 
         $this->context_obj_id = $context_obj_id;
@@ -75,22 +74,17 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         $this->pool = $pool;
 
         $this->seed = $seed;
-        $this->book_request = $DIC->bookingManager()
-            ->internal()
-            ->gui()
-            ->standardRequest();
+        $internal_service = $DIC->bookingManager()->internal();
+        $this->gui = $internal_service->gui();
+        $domain = $internal_service->domain();
+        $this->book_request = $this->gui->standardRequest();
+        $this->help = $this->gui->bookingHelp($pool);
+        $this->log = $domain->log();
 
-        $this->gui = $DIC->bookingManager()
-            ->internal()
-            ->gui();
+        $this->repo = $internal_service->repo();
 
-        $this->repo = $DIC->bookingManager()
-                         ->internal()
-                         ->repo();
-        $this->object_manager = $DIC->bookingManager()->internal()
-            ->domain()->objects($pool->getId());
-        $this->object_selection = $DIC->bookingManager()->internal()
-            ->domain()->objectSelection($pool->getId());
+        $this->object_manager = $domain->objects($pool->getId());
+        $this->object_selection = $domain->objectSelection($pool->getId());
 
         $this->rsv_ids = $this->book_request->getReservationIdsFromString();
 
@@ -150,6 +144,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
     public function week() : void // ok
     {
         $tpl = $this->tpl;
+        $this->log->debug("Step 0, week");
 
         //$this->tabs_gui->clearTargets();
         //$this->tabs_gui->setBackTarget($this->lng->txt('book_back_to_list'), $this->ctrl->getLinkTarget($this, 'back'));
@@ -190,6 +185,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
 
     protected function selectObjects() : void
     {
+        $this->log->debug("selectObjects");
         $obj_ids = $this->book_request->getObjectIds();
         $this->object_selection->setSelectedObjects($obj_ids);
         $this->ctrl->redirect($this, "week");
@@ -208,6 +204,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
      */
     public function book() : void // ok
     {
+        $this->log->debug("Step 1, book");
         $tpl = $this->tpl;
 
         $this->tabs_gui->clearTargets();
@@ -246,6 +243,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
 
     public function showNumberForm() : void
     {
+        $this->log->debug("showNumberForm");
         $object_id = $this->book_obj_id;
         $from = $this->book_request->getSlotFrom();
         $to = $this->book_request->getSlotTo() - 1;
@@ -303,6 +301,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
 
     public function processNumberForm() : void
     {
+        $this->log->debug("processNumberForm");
         //get the user who will get the booking.
         if ($this->book_request->getBookedUser() > 0) {
             $this->user_id_to_book = $this->book_request->getBookedUser();
@@ -378,6 +377,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         string $message = ""
     ) : void
     {
+        $this->log->debug("checkAvailability");
         $obj_id = $this->book_request->getObjectId();
         $from = $this->book_request->getSlotFrom();
         $to = $this->book_request->getSlotTo();
@@ -462,6 +462,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
 
     protected function bookAvailableItems(?int $recurrence = null, ?ilDateTime $until = null) : void
     {
+        $this->log->debug("bookAvailableItems");
         $obj_id = $this->book_request->getObjectId();
         $from = $this->book_request->getSlotFrom();
         $to = $this->book_request->getSlotTo();

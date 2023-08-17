@@ -9248,6 +9248,7 @@ exc#:#exc_peer_review_show_missing#:#Sie können das erhaltene Feedback nicht ei
 exc#:#exc_peer_review_show_received_none#:#Sie haben kein Feedback erhalten.
 exc#:#exc_peer_review_simple_unlock#:#Anzeige der erhaltenen Bewertungen
 exc#:#exc_peer_review_simple_unlock_active#:#Nach Abgabe einer Bewertung
+exc#:#exc_peer_review_simple_unlock_immed#:#Erhaltene Feedbacks immer anzeigen
 exc#:#exc_peer_review_simple_unlock_inactive#:#Nach Abgabe aller Bewertungen
 exc#:#exc_peer_review_text#:#Texteingabe
 exc#:#exc_peer_review_updated#:#Ihr Feedback wurde gespeichert.

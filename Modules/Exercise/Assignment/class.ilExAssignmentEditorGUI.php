@@ -853,7 +853,7 @@ class ilExAssignmentEditorGUI
         // peer review default values (on separate form)
         if ($is_create) {
             $a_ass->setPeerReviewMin(2);
-            $a_ass->setPeerReviewSimpleUnlock(false);
+            $a_ass->setPeerReviewSimpleUnlock(0);
             $a_ass->setPeerReviewValid(ilExAssignment::PEER_REVIEW_VALID_NONE);
             $a_ass->setPeerReviewPersonalized(false);
             $a_ass->setPeerReviewFileUpload(false);
@@ -1326,6 +1326,7 @@ class ilExAssignmentEditorGUI
         $form->addItem($peer_min);
 
         $peer_unlock = new ilRadioGroupInputGUI($lng->txt("exc_peer_review_simple_unlock"), "peer_unlock");
+        $peer_unlock->addOption(new ilRadioOption($lng->txt("exc_peer_review_simple_unlock_immed"), 2));
         $peer_unlock->addOption(new ilRadioOption($lng->txt("exc_peer_review_simple_unlock_active"), 1));
         $peer_unlock->addOption(new ilRadioOption($lng->txt("exc_peer_review_simple_unlock_inactive"), 0));
         $peer_unlock->setRequired(true);
@@ -1489,7 +1490,7 @@ class ilExAssignmentEditorGUI
     {
         $a_form->getItemByPostVar("peer_min")->setValue($this->assignment->getPeerReviewMin());
         $a_form->getItemByPostVar("peer_prsl")->setChecked($this->assignment->hasPeerReviewPersonalized());
-        $a_form->getItemByPostVar("peer_unlock")->setValue((int) $this->assignment->getPeerReviewSimpleUnlock());
+        $a_form->getItemByPostVar("peer_unlock")->setValue($this->assignment->getPeerReviewSimpleUnlock());
 
         if ($this->enable_peer_review_completion) {
             $a_form->getItemByPostVar("peer_valid")->setValue($this->assignment->getPeerReviewValid());
@@ -1652,7 +1653,7 @@ class ilExAssignmentEditorGUI
     ): void {
         $a_ass->setPeerReviewMin((int) $a_input["peer_min"]);
         $a_ass->setPeerReviewDeadline((int) $a_input["peer_dl"]);
-        $a_ass->setPeerReviewSimpleUnlock((bool) $a_input["peer_unlock"]);
+        $a_ass->setPeerReviewSimpleUnlock((int) $a_input["peer_unlock"]);
         $a_ass->setPeerReviewPersonalized((bool) $a_input["peer_prsl"]);
 
         // #18964

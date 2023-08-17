@@ -72,7 +72,7 @@ class ilExAssignment
     protected int $order_nr = 0;
     protected bool $peer = false;       // peer review activated
     protected int $peer_min = 0;
-    protected bool $peer_unlock = false;
+    protected int $peer_unlock = 0;
     protected int $peer_dl = 0;
     protected int $peer_valid;  // passed after submission, one or all peer feedbacks
     protected bool $peer_file = false;
@@ -428,12 +428,12 @@ class ilExAssignment
         return $this->peer_min;
     }
 
-    public function setPeerReviewSimpleUnlock(bool $a_value)
+    public function setPeerReviewSimpleUnlock(int $a_value)
     {
         $this->peer_unlock = $a_value;
     }
 
-    public function getPeerReviewSimpleUnlock(): bool
+    public function getPeerReviewSimpleUnlock(): int
     {
         return $this->peer_unlock;
     }
@@ -676,7 +676,7 @@ class ilExAssignment
         $this->setType((int) $a_set["type"]);
         $this->setPeerReview((bool) $a_set["peer"]);
         $this->setPeerReviewMin((int) $a_set["peer_min"]);
-        $this->setPeerReviewSimpleUnlock((bool) $a_set["peer_unlock"]);
+        $this->setPeerReviewSimpleUnlock((int) $a_set["peer_unlock"]);
         $this->setPeerReviewDeadline((int) $a_set["peer_dl"]);
         $this->setPeerReviewValid((int) $a_set["peer_valid"]);
         $this->setPeerReviewFileUpload((bool) $a_set["peer_file"]);

@@ -9248,6 +9248,7 @@ exc#:#exc_peer_review_show_missing#:#You cannot view your received feedback as y
 exc#:#exc_peer_review_show_received_none#:#You received no feedback.
 exc#:#exc_peer_review_simple_unlock#:#Access to received feedback
 exc#:#exc_peer_review_simple_unlock_active#:#After giving at least 1 valid feedback
+exc#:#exc_peer_review_simple_unlock_immed#:#Always show received peer feedback
 exc#:#exc_peer_review_simple_unlock_inactive#:#After giving all required feedbacks
 exc#:#exc_peer_review_text#:#Text Input
 exc#:#exc_peer_review_updated#:#Your feedback has been saved.

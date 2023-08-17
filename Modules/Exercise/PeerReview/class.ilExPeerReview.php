@@ -440,7 +440,9 @@ class ilExPeerReview
         }
 
         // are all required or just 1?
-        if (!$this->assignment->getPeerReviewSimpleUnlock()) {
+        if ($this->assignment->getPeerReviewSimpleUnlock() == 2) {
+            $needed = 0;
+        } elseif ($this->assignment->getPeerReviewSimpleUnlock() == 0) {
             $needed = $this->assignment->getPeerReviewMin();
         } else {
             $needed = 1;

@@ -9088,6 +9088,7 @@ exc#:#exc_direct_submit#:#Submit
 exc#:#exc_direct_submit_blog#:#Would you like to submit the current version of the blog right now? You can do it anytime from the blog editor later on.
 exc#:#exc_direct_submit_portfolio#:#Would you like to submit the current version of the portfolio right now? You can do it anytime from the portfolio editor later on.
 exc#:#exc_down_files_started_bg#:#A ZIP archive with all download files is now created in the background. You can see the status of your background processes at the top right in the Notification Centre. You can also download the ZIP archive there.
+exc#:#exc_download_selected#:#Download Selected Submission
 exc#:#exc_download_zip_structure#:#Download ZIP Structure
 exc#:#exc_earliest_start_time#:#Earliest Start Time
 exc#:#exc_edit_assignment#:#Edit Assignment

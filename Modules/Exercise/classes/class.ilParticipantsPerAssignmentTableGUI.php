@@ -42,6 +42,8 @@ class ilParticipantsPerAssignmentTableGUI extends ilExerciseSubmissionTableGUI
         $this->ass_type = $this->ass_types->getById(ilExAssignment::lookupType($a_item_id));
 
         $this->setFormAction($ctrl->getFormAction($a_parent_obj, "saveStatusAll"));
+
+        $this->addMultiCommand("downloadSelected", $this->lng->txt("exc_download_selected"));
     }
 
     /**

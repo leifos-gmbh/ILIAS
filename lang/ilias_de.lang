@@ -9088,6 +9088,7 @@ exc#:#exc_direct_submit#:#Abgeben
 exc#:#exc_direct_submit_blog#:#Möchten Sie die aktuelle Version Ihres Blogs jetzt abgeben? Sie können dies auch jederzeit im Blog-Editor tun.
 exc#:#exc_direct_submit_portfolio#:#Möchten Sie die aktuelle Version Ihres Portfolios jetzt abgeben? Sie können dies auch jederzeit im Portfolio-Editor tun.
 exc#:#exc_down_files_started_bg#:#Ein ZIP-Archiv mit allen Download-Dateien wird jetzt im Hintergrund erstellt. Den Status Ihrer Hintergrundprozesse sehen Sie oben rechts in der Nachrichtenzentrale. Dort können Sie das ZIP-Archiv auch herunterladen.
+exc#:#exc_download_selected#:#Ausgewählte Abgaben herunterladen
 exc#:#exc_download_zip_structure#:#ZIP-Verzeichnisstruktur herunterladen
 exc#:#exc_earliest_start_time#:#Frühester Starttermin
 exc#:#exc_edit_assignment#:#Einstellungen der Übungseinheit

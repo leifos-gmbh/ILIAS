@@ -463,7 +463,15 @@ class ilExerciseManagementGUI
         $ilCtrl->setParameter($this, "ass_id", "");
     }
 
-    public function downloadSubmissionsObject(): void
+    public function downloadSelectedObject(): void
+    {
+        if (count($this->selected_participants) > 0) {
+            $this->downloadSubmissionsObject($this->selected_participants);
+        } else {
+            $this->backToCurrentOverview();
+        }
+    }
+    public function downloadSubmissionsObject(?array $selected_participants = null): void
     {
         $participant_id = $this->requested_part_id;
 
@@ -472,13 +480,19 @@ class ilExerciseManagementGUI
             $this->exercise->getRefId(),
             $this->exercise->getId(),
             $this->ass_id,
-            $participant_id
+            $participant_id,
+            $selected_participants
         );
 
         if ($download_task->run()) {
             $this->tpl->setOnScreenMessage('success', $this->lng->txt('exc_down_files_started_bg'), true);
         }
 
+        $this->backToCurrentOverview();
+    }
+
+    function backToCurrentOverview() : void
+    {
         if ($this->assignment !== null) {
             $this->ctrl->redirect($this, "members");
         } else {

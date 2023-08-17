@@ -4018,6 +4018,7 @@ common#:#exc_last_submission#:#Datum der letzten Abgabe
 common#:#exc_members_already_assigned#:#Die ausgewählten Benutzer sind bereits Mitglieder dieser Übungseinheit.
 common#:#exc_members_assigned#:#Die Benutzer wurden der Übung zugeordnet
 common#:#exc_members_comments_saved#:#Die Kommentare zu den Übungen der ausgewählten Benutzer wurden gespeichert.
+common#:#exc_member_of_crs_grp#:#Mitglied in Kurs/Gruppe
 common#:#exc_new#:#Neue Übung anlegen
 common#:#exc_next_deadline#:#Nächste Abgabefrist
 common#:#exc_obj#:#Übung
@@ -9358,6 +9359,8 @@ exc#:#exc_tbl_feedback_time#:#Rückmeldung am
 exc#:#exc_tbl_filter_has_no_submission#:#Hat noch nicht abgegeben
 exc#:#exc_tbl_filter_has_submission#:#Hat abgegeben
 exc#:#exc_tbl_filter_submission#:#Abgabe
+exc#:#exc_tbl_filter_submission_after#:#Abgabe nach
+exc#:#exc_tbl_filter_submission_before#:#Abgabe vor
 exc#:#exc_tbl_individual_deadline#:#Individueller Abgabetermin
 exc#:#exc_tbl_mark#:#Note
 exc#:#exc_tbl_notice#:#Notiz für Tutoren

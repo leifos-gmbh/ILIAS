@@ -21,6 +21,7 @@
  *
  * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
  * @author Alexander Killing <killing@leifos.de>
+ * @ilCtrl_Calls ilParticipantsPerAssignmentTableGUI: ilFormPropertyDispatchGUI
  */
 class ilParticipantsPerAssignmentTableGUI extends ilExerciseSubmissionTableGUI
 {
@@ -44,6 +45,11 @@ class ilParticipantsPerAssignmentTableGUI extends ilExerciseSubmissionTableGUI
         $this->setFormAction($ctrl->getFormAction($a_parent_obj, "saveStatusAll"));
 
         $this->addMultiCommand("downloadSelected", $this->lng->txt("exc_download_selected"));
+    }
+
+    protected function isForwardingToFormDispatcher(): bool
+    {
+        return true;
     }
 
     /**
@@ -155,10 +161,36 @@ class ilParticipantsPerAssignmentTableGUI extends ilExerciseSubmissionTableGUI
                     }
                 }
             }
+            if ($this->filter["subm_after"]) {
+                foreach ($tmp as $idx => $item) {
+                    $submission = $item["submission_obj"];
+                    if ($this->filter["subm_after"]) {
+                        if (is_null($submission->getLastSubmission())) {
+                            unset($tmp[$idx]);
+                        } else {
+                            if ($submission->getLastSubmission() <
+                                $this->filter["subm_after"]->get(IL_CAL_DATETIME)) {
+                                unset($tmp[$idx]);
+                            }
+                        }
+                    }
+                    if ($this->filter["subm_before"]) {
+                        if (is_null($submission->getLastSubmission())) {
+                            unset($tmp[$idx]);
+                        } else {
+                            if ($submission->getLastSubmission() >
+                                $this->filter["subm_before"]->get(IL_CAL_DATETIME)) {
+                                unset($tmp[$idx]);
+                            }
+                        }
+                    }
+                }
+            }
 
             $data = $tmp;
             unset($tmp);
         } else {
+            $member_of_members = null;
             foreach ($data as $idx => $item) {
                 // filter
                 if ($this->filter["status"] &&
@@ -186,6 +218,31 @@ class ilParticipantsPerAssignmentTableGUI extends ilExerciseSubmissionTableGUI
                         $submission->getLastSubmission()) {
                         unset($data[$idx]);
                         continue;
+                    }
+                }
+                if ($this->filter["subm_after"]) {
+                    if (is_null($data[$idx]["submission_obj"]->getLastSubmission())) {
+                        unset($data[$idx]);
+                    } else {
+                        if ($data[$idx]["submission_obj"]->getLastSubmission() <
+                            $this->filter["subm_after"]->get(IL_CAL_DATETIME)) {
+                            unset($data[$idx]);
+                        }
+                    }
+                }
+                if ($this->filter["subm_before"]) {
+                    if (is_null($data[$idx]["submission_obj"]->getLastSubmission())) {
+                        unset($data[$idx]);
+                    } else {
+                        if ($data[$idx]["submission_obj"]->getLastSubmission() >
+                            $this->filter["subm_before"]->get(IL_CAL_DATETIME)) {
+                            unset($data[$idx]);
+                        }
+                    }
+                }
+                if ($this->filter['member_of']) {
+                    if (!ilParticipants::_isParticipant($this->filter['member_of'], $item["usr_id"])) {
+                        unset($data[$idx]);
                     }
                 }
 

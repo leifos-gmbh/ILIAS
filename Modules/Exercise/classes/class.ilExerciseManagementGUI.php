@@ -32,6 +32,7 @@ use ILIAS\Exercise\GUIRequest;
  * @ilCtrl_Calls ilExerciseManagementGUI: ilFileSystemGUI, ilRepositorySearchGUI
  * @ilCtrl_Calls ilExerciseManagementGUI: ilExSubmissionTeamGUI, ilExSubmissionFileGUI
  * @ilCtrl_Calls ilExerciseManagementGUI: ilExSubmissionTextGUI, ilExPeerReviewGUI
+ * @ilCtrl_Calls ilExerciseManagementGUI: ilParticipantsPerAssignmentTableGUI
  */
 class ilExerciseManagementGUI
 {
@@ -244,6 +245,13 @@ class ilExerciseManagementGUI
             case "ilexpeerreviewgui":
                 $gui = new ilExPeerReviewGUI($this->assignment, $this->initSubmission());
                 $ilCtrl->forwardCommand($gui);
+                break;
+
+            case "ilparticipantsperassignmenttablegui":
+                $table = new ilParticipantsPerAssignmentTableGUI(
+                    $this, "members", $this->exercise, $this->assignment->getId()
+                );
+                $this->ctrl->forwardCommand($table);
                 break;
 
             default:

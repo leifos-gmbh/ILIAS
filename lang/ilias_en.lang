@@ -4018,6 +4018,7 @@ common#:#exc_last_submission#:#Last Submission
 common#:#exc_members_already_assigned#:#These users are already assigned to the assignment.
 common#:#exc_members_assigned#:#Members assigned
 common#:#exc_members_comments_saved#:#The exercise comments for the selected user have been saved
+common#:#exc_member_of_crs_grp#:#Member in Course/Group
 common#:#exc_new#:#New Exercise
 common#:#exc_next_deadline#:#Next Deadline
 common#:#exc_obj#:#Exercise
@@ -9358,6 +9359,8 @@ exc#:#exc_tbl_feedback_time#:#Evaluation on
 exc#:#exc_tbl_filter_has_no_submission#:#Has not submitted yet
 exc#:#exc_tbl_filter_has_submission#:#Has submitted
 exc#:#exc_tbl_filter_submission#:#Submission
+exc#:#exc_tbl_filter_submission_after#:#Submission After
+exc#:#exc_tbl_filter_submission_before#:#Submission Before
 exc#:#exc_tbl_individual_deadline#:#Individual Deadline
 exc#:#exc_tbl_mark#:#Mark
 exc#:#exc_tbl_notice#:#Note for Tutors

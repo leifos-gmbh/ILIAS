@@ -32,6 +32,7 @@ class ilWikiPageConfig extends ilPageConfig
         $this->setEnableAnchors(true);
         $this->setEnableWikiLinks(true);
         $this->setIntLinkFilterWhiteList(true);
+        $this->setMultiLangSupport(true);
         $this->addIntLinkFilter("RepositoryItem");
         $this->addIntLinkFilter("WikiPage");
         $this->addIntLinkFilter("User");

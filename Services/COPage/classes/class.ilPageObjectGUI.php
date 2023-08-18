@@ -3076,6 +3076,7 @@ class ilPageObjectGUI
             0,
             "-"
         );
+
         $p->copyPageToTranslation($l);
         $this->ctrl->setParameter($this, "transl", $l);
         $this->ctrl->redirect($this, "edit");

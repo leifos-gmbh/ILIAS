@@ -41,7 +41,7 @@ class ilWikiDataSet extends ilDataSet
 
     public function getSupportedVersions(): array
     {
-        return array("4.1.0", "4.3.0", "4.4.0", "5.1.0", "5.4.0");
+        return array("4.1.0", "4.3.0", "4.4.0", "5.1.0", "5.4.0", "8.0");
     }
 
     protected function getXmlNamespace(string $a_entity, string $a_schema_version): string
@@ -116,6 +116,7 @@ class ilWikiDataSet extends ilDataSet
                     );
 
                 case "5.4.0":
+                case "8.0":
                     return array(
                         "Id" => "integer",
                         "Title" => "text",
@@ -165,6 +166,18 @@ class ilWikiDataSet extends ilDataSet
                         "TemplateNewPages" => "integer",
                         "TemplateAddToPage" => "integer"
                     );
+
+                case "8.0":
+                    return array(
+                        "Id" => "integer",
+                        "Title" => "text",
+                        "WikiId" => "integer",
+                        "Blocked" => "integer",
+                        "Rating" => "integer",
+                        "TemplateNewPages" => "integer",
+                        "TemplateAddToPage" => "integer",
+                        "Lang" => "text"
+                    );
             }
         }
 
@@ -172,6 +185,7 @@ class ilWikiDataSet extends ilDataSet
             switch ($a_version) {
                 case "5.1.0":
                 case "5.4.0":
+                case "8.0":
                     return array(
                         "WikiId" => "integer",
                         "PageId" => "integer",
@@ -224,6 +238,7 @@ class ilWikiDataSet extends ilDataSet
                     break;
 
                 case "5.4.0":
+                case "8.0":
                     $this->getDirectDataFromQuery("SELECT id, title, description," .
                         " startpage start_page, short, rating, rating_overall, introduction," . // imp_pages,
                         " public_notes, page_toc, rating_side, rating_new, rating_ext, link_md_values, empty_page_templ" .
@@ -269,6 +284,26 @@ class ilWikiDataSet extends ilDataSet
                         }
                     }
                     break;
+
+                case "8.0":
+                    $this->getDirectDataFromQuery("SELECT id, title, wiki_id," .
+                        " blocked, rating, lang" .
+                        " FROM il_wiki_page" .
+                        " WHERE " . $ilDB->in("wiki_id", $a_ids, false, "integer"));
+                    foreach ($this->data as $k => $v) {
+                        $set = $ilDB->queryF(
+                            "SELECT * FROM wiki_page_template " .
+                            " WHERE wiki_id = %s " .
+                            " AND wpage_id = %s ",
+                            ["integer", "integer"],
+                            [$v["WikiId"], $v["Id"]]
+                        );
+                        if ($rec = $ilDB->fetchAssoc($set)) {
+                            $this->data[$k]["TemplateNewPages"] = $rec["new_pages"];
+                            $this->data[$k]["TemplateAddToPage"] = $rec["add_to_page"];
+                        }
+                    }
+                    break;
             }
         }
 
@@ -276,6 +311,7 @@ class ilWikiDataSet extends ilDataSet
             switch ($a_version) {
                 case "5.1.0":
                 case "5.4.0":
+                case "8.0":
                     $this->getDirectDataFromQuery("SELECT wiki_id, page_id, ord, indent " .
                         " FROM il_wiki_imp_pages " .
                         " WHERE " . $ilDB->in("wiki_id", $a_ids, false, "integer"));
@@ -348,7 +384,11 @@ class ilWikiDataSet extends ilDataSet
 
             case "wpg":
                 $wiki_id = $a_mapping->getMapping("Modules/Wiki", "wiki", $a_rec["WikiId"]);
+                $lang = ($a_rec["Title"] ?? "");
                 $wpage = new ilWikiPage();
+                if (!in_array($lang, ["", "-"])) {
+                    $wpage->setLanguage($lang);
+                }
                 $wpage->setWikiId($wiki_id);
                 $wpage->setTitle($a_rec["Title"]);
 

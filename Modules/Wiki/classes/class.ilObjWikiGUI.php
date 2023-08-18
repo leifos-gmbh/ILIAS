@@ -31,7 +31,7 @@ use ILIAS\Wiki\Editing\EditingGUIRequest;
  * @ilCtrl_Calls ilObjWikiGUI: ilObjectMetaDataGUI
  * @ilCtrl_Calls ilObjWikiGUI: ilSettingsPermissionGUI
  * @ilCtrl_Calls ilObjWikiGUI: ilRepositoryObjectSearchGUI, ilObjectCopyGUI, ilObjNotificationSettingsGUI
- * @ilCtrl_Calls ilObjWikiGUI: ilLTIProviderObjectSettingGUI
+ * @ilCtrl_Calls ilObjWikiGUI: ilLTIProviderObjectSettingGUI, ilObjectTranslationGUI
  */
 class ilObjWikiGUI extends ilObjectGUI
 {
@@ -141,6 +141,16 @@ class ilObjWikiGUI extends ilObjectGUI
                 $perm_gui->setRoleRequiredPermissions(array("edit_content"));
                 $perm_gui->setRoleProhibitedPermissions(array("write"));
                 $this->ctrl->forwardCommand($perm_gui);
+                break;
+
+            case 'ilobjecttranslationgui':
+                $this->checkPermission("read");
+                $this->addHeaderAction();
+                $ilTabs->activateTab("settings");
+                $this->setSettingsSubTabs("obj_multilinguality");
+                $transgui = new ilObjectTranslationGUI($this);
+                $transgui->setTitleDescrOnlyMode(false);
+                $this->ctrl->forwardCommand($transgui);
                 break;
 
             case 'ilwikipagegui':
@@ -547,7 +557,8 @@ class ilObjWikiGUI extends ilObjectGUI
         // wiki tabs
         if (in_array(strtolower($ilCtrl->getCmdClass()), array("", "ilobjectcontentstylesettingsgui", "ilobjwikigui",
             "ilinfoscreengui", "ilpermissiongui", "ilexportgui", "ilratingcategorygui", "ilobjnotificationsettingsgui", "iltaxmdgui",
-            "ilwikistatgui", "ilwikipagetemplategui", "iladvancedmdsettingsgui", "ilsettingspermissiongui", 'ilrepositoryobjectsearchgui'
+            "ilwikistatgui", "ilwikipagetemplategui", "iladvancedmdsettingsgui", "ilsettingspermissiongui", 'ilrepositoryobjectsearchgui',
+            'ilobjecttranslationgui'
             ), true) || $ilCtrl->getNextClass() === "ilpermissiongui") {
             if ($this->requested_page !== "") {
                 $this->tabs_gui->setBackTarget(
@@ -640,10 +651,9 @@ class ilObjWikiGUI extends ilObjectGUI
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
         $ilAccess = $this->access;
-
         if (in_array(
             $a_active,
-            array("general_settings", "style", "imp_pages", "rating_categories",
+            array("general_settings", "style", "imp_pages", "rating_categories", "obj_multilinguality",
             "page_templates", "advmd", "permission_settings", "notifications", "lti_provider")
         )) {
             if ($ilAccess->checkAccess("write", "", $this->object->getRefId())) {
@@ -700,6 +710,12 @@ class ilObjWikiGUI extends ilObjectGUI
                     'notifications',
                     $lng->txt("notifications"),
                     $ilCtrl->getLinkTargetByClass("ilobjnotificationsettingsgui", '')
+                );
+
+                $ilTabs->addSubTab(
+                    'obj_multilinguality',
+                    $lng->txt("obj_multilinguality"),
+                    $this->ctrl->getLinkTargetByClass("ilobjecttranslationgui", "")
                 );
             }
 

@@ -200,6 +200,7 @@ class ilPCAMDPageList extends ilPageContent
         if (is_array($found_ids) && count($found_ids) > 0) {
             $sql = "SELECT id,title FROM il_wiki_page" .
                 " WHERE " . $ilDB->in("id", $found_ids, "", "integer") .
+                " AND lang = " . $ilDB->quote($wpage->getLanguage(), "text") .
                 " ORDER BY title";
             $set = $ilDB->query($sql);
             while ($row = $ilDB->fetchAssoc($set)) {

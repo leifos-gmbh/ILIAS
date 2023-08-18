@@ -110,7 +110,8 @@ class ilWikiPage extends ilPageObject
         // see also bug #12224
         $set = $ilDB->query(
             "SELECT id FROM il_wiki_page " .
-            " WHERE id = " . $ilDB->quote($this->getId(), "integer")
+            " WHERE id = " . $ilDB->quote($this->getId(), "integer") .
+            " AND lang = " . $ilDB->quote($this->getLanguage(), "integer")
         );
         if ($rec = $ilDB->fetchAssoc($set)) {
             $this->read(true);
@@ -124,8 +125,12 @@ class ilWikiPage extends ilPageObject
     ): void {
         $ilDB = $this->db;
 
-        $id = $ilDB->nextId("il_wiki_page");
-        $this->setId($id);
+        // get new id, if not a translation page
+        if (in_array($this->getLanguage(), ["-", ""]) && $this->getId() == 0) {
+            $id = $ilDB->nextId("il_wiki_page");
+            $this->setId($id);
+        }
+
         $query = "INSERT INTO il_wiki_page (" .
             "id" .
             ", title" .
@@ -133,6 +138,7 @@ class ilWikiPage extends ilPageObject
             ", blocked" .
             ", rating" .
             ", hide_adv_md" .
+            ", lang" .
             " ) VALUES (" .
             $ilDB->quote($this->getId(), "integer")
             . "," . $ilDB->quote($this->getTitle(), "text")
@@ -140,6 +146,7 @@ class ilWikiPage extends ilPageObject
             . "," . $ilDB->quote((int) $this->getBlocked(), "integer")
             . "," . $ilDB->quote((int) $this->getRating(), "integer")
             . "," . $ilDB->quote((int) $this->isAdvancedMetadataHidden(), "integer")
+            . "," . $ilDB->quote($this->getLanguage(), "text")
             . ")";
         $ilDB->manipulate($query);
 
@@ -208,7 +215,8 @@ class ilWikiPage extends ilPageObject
             ",blocked = " . $ilDB->quote((int) $this->getBlocked(), "integer") .
             ",rating = " . $ilDB->quote((int) $this->getRating(), "integer") .
             ",hide_adv_md = " . $ilDB->quote((int) $this->isAdvancedMetadataHidden(), "integer") .
-            " WHERE id = " . $ilDB->quote($this->getId(), "integer");
+            " WHERE id = " . $ilDB->quote($this->getId(), "integer") .
+            " AND lang = " . $ilDB->quote($this->getLanguage(), "text");
         $ilDB->manipulate($query);
         $updated = parent::update($a_validate, $a_no_history);
 
@@ -231,7 +239,9 @@ class ilWikiPage extends ilPageObject
         $ilDB = $this->db;
 
         $query = "SELECT * FROM il_wiki_page WHERE id = " .
-            $ilDB->quote($this->getId(), "integer");
+            $ilDB->quote($this->getId(), "integer") .
+            " AND lang = " . $ilDB->quote($this->getLanguage(), "text");
+
         $set = $ilDB->query($query);
         $rec = $ilDB->fetchAssoc($set);
 
@@ -278,8 +288,12 @@ class ilWikiPage extends ilPageObject
         ilNotification::removeForObject(ilNotification::TYPE_WIKI_PAGE, $this->getId());
 
         // delete record of table il_wiki_data
+        $and = in_array($this->getLanguage(), ["", "-"])
+            ? ""
+            : " AND lang = " . $ilDB->quote($this->getLanguage(), "text");
         $query = "DELETE FROM il_wiki_page" .
-            " WHERE id = " . $ilDB->quote($this->getId(), "integer");
+            " WHERE id = " . $ilDB->quote($this->getId(), "integer") .
+            $and;
         $ilDB->manipulate($query);
 
         // delete co page
@@ -315,7 +329,7 @@ class ilWikiPage extends ilPageObject
         $set = $ilDB->query($query);
 
         while ($rec = $ilDB->fetchAssoc($set)) {
-            $wiki_page = new ilWikiPage($rec["id"]);
+            $wiki_page = new ilWikiPage($rec["id"], 0, $rec["lang"]);
             $wiki_page->delete();
         }
     }
@@ -325,7 +339,8 @@ class ilWikiPage extends ilPageObject
      */
     public static function exists(
         int $a_wiki_id,
-        string $a_title
+        string $a_title,
+        string $lang = "-"
     ): bool {
         global $DIC;
 
@@ -335,7 +350,8 @@ class ilWikiPage extends ilPageObject
 
         $query = "SELECT id FROM il_wiki_page" .
             " WHERE wiki_id = " . $ilDB->quote($a_wiki_id, "integer") .
-            " AND title = " . $ilDB->quote($a_title, "text");
+            " AND title = " . $ilDB->quote($a_title, "text") .
+            " AND lang = " . $ilDB->quote($lang, "text");
         $set = $ilDB->query($query);
         if ($rec = $ilDB->fetchAssoc($set)) {
             return true;
@@ -350,7 +366,8 @@ class ilWikiPage extends ilPageObject
      */
     public static function getPageIdForTitle(
         int $a_wiki_id,
-        string $a_title
+        string $a_title,
+        string $lang = "-"
     ): ?int {
         global $DIC;
 
@@ -360,7 +377,8 @@ class ilWikiPage extends ilPageObject
 
         $query = "SELECT * FROM il_wiki_page" .
             " WHERE wiki_id = " . $ilDB->quote($a_wiki_id, "integer") .
-            " AND title = " . $ilDB->quote($a_title, "text");
+            " AND title = " . $ilDB->quote($a_title, "text") .
+            " AND lang = " . $ilDB->quote($lang, "text");
         $set = $ilDB->query($query);
         if ($rec = $ilDB->fetchAssoc($set)) {
             return (int) $rec["id"];
@@ -369,14 +387,15 @@ class ilWikiPage extends ilPageObject
         return null;
     }
 
-    public static function lookupTitle(int $a_page_id): ?string
+    public static function lookupTitle(int $a_page_id, string $lang = "-"): ?string
     {
         global $DIC;
 
         $ilDB = $DIC->database();
 
         $query = "SELECT * FROM il_wiki_page" .
-            " WHERE id = " . $ilDB->quote($a_page_id, "integer");
+            " WHERE id = " . $ilDB->quote($a_page_id, "integer") .
+            " AND lang = " . $ilDB->quote($lang, "text");
         $set = $ilDB->query($query);
         if ($rec = $ilDB->fetchAssoc($set)) {
             return (string) $rec["title"];
@@ -402,7 +421,8 @@ class ilWikiPage extends ilPageObject
     }
 
     public static function getAllWikiPages(
-        int $a_wiki_id
+        int $a_wiki_id,
+        string $lang = "-"
     ): array {
         global $DIC;
 
@@ -412,6 +432,7 @@ class ilWikiPage extends ilPageObject
 
         $query = "SELECT * FROM il_wiki_page" .
             " WHERE wiki_id = " . $ilDB->quote($a_wiki_id, "integer") .
+            " AND lang = " . $ilDB->quote($lang, "text") .
             " ORDER BY title";
         $set = $ilDB->query($query);
 
@@ -470,6 +491,8 @@ class ilWikiPage extends ilPageObject
 
         $orphaned = array();
         foreach ($pages as $k => $page) {
+
+            // find wiki page sources that link to page
             $sources = ilInternalLink::_getSourcesOfTarget("wpg", $page["id"], 0);
             $ids = array();
             foreach ($sources as $source) {
@@ -477,12 +500,16 @@ class ilWikiPage extends ilPageObject
                     $ids[] = $source["id"];
                 }
             }
+
+            // cross check existence of sources in il_wiki_page
             $query = "SELECT count(*) cnt FROM il_wiki_page" .
                 " WHERE " . $ilDB->in("id", $ids, false, "integer") .
                 " AND wiki_id = " . $ilDB->quote($a_wiki_id, "integer") .
                 " GROUP BY wiki_id";
             $set = $ilDB->query($query);
             $rec = $ilDB->fetchAssoc($set);
+
+            // if no sources found (or sources are not wiki pages, page is orphaned
             if (count($ids) === 0 || ($rec && (int) $rec["cnt"] === 0)) {
                 if (ilObjWiki::_lookupStartPage($a_wiki_id) !== $page["title"]) {
                     $orphaned[] = $page;
@@ -495,7 +522,8 @@ class ilWikiPage extends ilPageObject
 
     public static function _wikiPageExists(
         int $a_wiki_id,
-        string $a_title
+        string $a_title,
+        string $lang = "-"
     ): bool {
         global $DIC;
 
@@ -505,7 +533,8 @@ class ilWikiPage extends ilPageObject
 
         $query = "SELECT id FROM il_wiki_page" .
             " WHERE wiki_id = " . $ilDB->quote($a_wiki_id, "integer") .
-            " AND title = " . $ilDB->quote($a_title, "text");
+            " AND title = " . $ilDB->quote($a_title, "text") .
+            " AND lang = " . $ilDB->quote($lang, "text");
         $set = $ilDB->query($query);
 
         if ($ilDB->fetchAssoc($set)) {
@@ -651,7 +680,8 @@ class ilWikiPage extends ilPageObject
 
         // delete record of table il_wiki_data
         $query = "SELECT count(*) as cnt FROM il_wiki_page" .
-            " WHERE wiki_id = " . $ilDB->quote($a_wiki_id, "integer");
+            " WHERE wiki_id = " . $ilDB->quote($a_wiki_id, "integer") .
+            " WHERE lang = " . $ilDB->quote("-", "text");
         $s = $ilDB->query($query);
         $r = $ilDB->fetchAssoc($s);
 
@@ -674,7 +704,6 @@ class ilWikiPage extends ilPageObject
         $random = new \ilRandom();
         $rand = $random->int(1, $cnt);
 
-        // delete record of table il_wiki_data
         $ilDB->setLimit(1, $rand);
         $query = "SELECT title FROM il_wiki_page" .
             " WHERE wiki_id = " . $ilDB->quote($a_wiki_id, "integer");

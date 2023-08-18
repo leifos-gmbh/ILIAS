@@ -19,15 +19,15 @@ declare(strict_types=1);
  ********************************************************************
  */
 
-namespace ILIAS\Container\Skills;
+namespace ILIAS\Survey\Skills;
 
 /**
  * @author Thomas Famula <famula@leifos.de>
  */
-class ContainerSkillInternalFactoryService
+class SkillInternalRepoService
 {
-    public function containerSkill(): ContainerSkillFactory
+    public function getSurveySkillRepo(): SurveySkillDBRepository
     {
-        return new ContainerSkillFactory();
+        return new SurveySkillDBRepository();
     }
 }

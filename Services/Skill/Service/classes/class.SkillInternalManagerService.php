@@ -127,4 +127,9 @@ class SkillInternalManagerService
     {
         return new Resource\SkillResourcesManager();
     }
+
+    public function getDeletionManager(): Node\SkillDeletionManager
+    {
+        return new Node\SkillDeletionManager();
+    }
 }

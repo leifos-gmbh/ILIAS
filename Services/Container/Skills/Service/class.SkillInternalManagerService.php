@@ -24,10 +24,15 @@ namespace ILIAS\Container\Skills;
 /**
  * @author Thomas Famula <famula@leifos.de>
  */
-class ContainerSkillInternalManagerService
+class SkillInternalManagerService
 {
     public function getSkillManager(int $cont_obj_id, int $cont_ref_id): ContainerSkillManager
     {
         return new ContainerSkillManager($cont_obj_id, $cont_ref_id);
+    }
+
+    public function getSkillDeletionManager(): ContainerSkillDeletionManager
+    {
+        return new ContainerSkillDeletionManager();
     }
 }

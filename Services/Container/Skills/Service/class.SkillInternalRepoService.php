@@ -24,7 +24,7 @@ namespace ILIAS\Container\Skills;
 /**
  * @author famula@leifos.de
  */
-class ContainerSkillInternalRepoService
+class SkillInternalRepoService
 {
     public function getContainerSkillRepo(): ContainerSkillDBRepository
     {

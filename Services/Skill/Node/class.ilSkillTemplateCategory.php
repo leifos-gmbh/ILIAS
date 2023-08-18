@@ -46,25 +46,12 @@ class ilSkillTemplateCategory extends ilSkillTreeNode
 
     public function delete(): void
     {
-        $sctp_id = $this->getId();
-        $skill_tree = $this->skill_service->internal()->repo()->getTreeRepo()->getTreeForNodeId($sctp_id);
-        $childs = $skill_tree->getChildsByTypeFilter(
-            $sctp_id,
-            ["sktp", "sctp"]
-        );
-        foreach ($childs as $node) {
-            switch ($node["type"]) {
-                case "sktp":
-                    $obj = new ilBasicSkillTemplate((int) $node["obj_id"]);
-                    $obj->delete();
-                    break;
+        $ilDB = $this->db;
 
-                case "sctp":
-                    $obj = new ilSkillTemplateCategory((int) $node["obj_id"]);
-                    $obj->delete();
-                    break;
-            }
-        }
+        $ilDB->manipulate(
+            "DELETE FROM skl_templ_ref WHERE "
+            . " templ_id = " . $ilDB->quote($this->getId(), "integer")
+        );
 
         parent::delete();
     }

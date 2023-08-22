@@ -52,14 +52,16 @@ class ilWikiUtil
     public static function replaceInternalLinks(
         string $s,
         int $a_wiki_id,
-        bool $a_offline = false
+        bool $a_offline = false,
+        string $lang = "-"
     ): string {
         return self::processInternalLinks(
             $s,
             $a_wiki_id,
             IL_WIKI_MODE_REPLACE,
             false,
-            $a_offline
+            $a_offline,
+            $lang
         );
     }
 
@@ -89,7 +91,8 @@ class ilWikiUtil
         int $a_wiki_id,
         string $a_mode = IL_WIKI_MODE_REPLACE,
         bool $a_collect_non_ex = false,
-        bool $a_offline = false
+        bool $a_offline = false,
+        string $lang = "-"
     ) {
         include_once("./Modules/Wiki/libs/Sanitizer.php");
         $collect = array();
@@ -243,7 +246,8 @@ class ilWikiUtil
                     '',
                     $trail,
                     $prefix,
-                    $a_offline
+                    $a_offline,
+                    $lang
                 );
             }
             if ($a_mode === IL_WIKI_MODE_EXT_COLLECT) {
@@ -299,10 +303,10 @@ class ilWikiUtil
         string $query = '',
         string $trail = '',
         string $prefix = '',
-        bool $a_offline = false
+        bool $a_offline = false,
+        string $lang = "-"
     ): string {
         global $DIC;
-
         $request = $DIC
             ->wiki()
             ->internal()
@@ -334,7 +338,7 @@ class ilWikiUtil
             $url_title = self::makeUrlTitle($nt->mTextform);
             $db_title = self::makeDbTitle($nt->mTextform);
             if ($db_title != "") {
-                $pg_exists = ilWikiPage::_wikiPageExists($a_wiki_id, $db_title);
+                $pg_exists = ilWikiPage::_wikiPageExists($a_wiki_id, $db_title, $lang);
             } else {
                 // links on same page (only anchor used)
                 $pg_exists = true;

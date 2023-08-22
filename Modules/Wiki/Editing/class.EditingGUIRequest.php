@@ -232,4 +232,10 @@ class EditingGUIRequest
     {
         return $this->int("scp");
     }
+
+    public function getTranslation(): string
+    {
+        return $this->str("transl");
+    }
+
 }

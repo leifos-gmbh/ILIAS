@@ -28,6 +28,8 @@
  */
 class ilWikiPageGUI extends ilPageObjectGUI
 {
+    protected ilObjectTranslation $ot;
+    protected \ILIAS\Wiki\InternalGUIService $gui;
     protected \ILIAS\Notes\Service $notes;
     protected \ILIAS\HTTP\Services $http;
     protected \ILIAS\Wiki\Editing\EditingGUIRequest $wiki_request;
@@ -62,6 +64,10 @@ class ilWikiPageGUI extends ilPageObjectGUI
             ->editing()
             ->request();
         $this->notes = $DIC->notes();
+        $this->gui = $DIC->wiki()->internal()->gui();
+        $this->ot = ilObjectTranslation::getInstance(
+            ilObject::_lookupObjId($this->wiki_request->getRefId())
+        );
     }
 
     public function setScreenIdComponent(): void
@@ -232,9 +238,10 @@ class ilWikiPageGUI extends ilPageObjectGUI
         int $a_wiki_id,
         string $a_title,
         int $a_old_nr = 0,
-        int $a_wiki_ref_id = 0
+        int $a_wiki_ref_id = 0,
+        string $translation = "-"
     ): ilWikiPageGUI {
-        $id = ilWikiPage::getPageIdForTitle($a_wiki_id, $a_title);
+        $id = ilWikiPage::getPageIdForTitle($a_wiki_id, $a_title, $translation);
         return new ilWikiPageGUI($id, $a_old_nr, $a_wiki_ref_id);
     }
 
@@ -468,6 +475,8 @@ class ilWikiPageGUI extends ilPageObjectGUI
     {
         $toolbar = $this->toolbar;
 
+        $this->addLanguageSelectionToToolbar();
+
         $print_view = $this->getPrintView();
         $modal_elements = $print_view->getModalElements($this->ctrl->getLinkTarget(
             $this,
@@ -475,6 +484,60 @@ class ilWikiPageGUI extends ilPageObjectGUI
         ));
         $toolbar->addComponent($modal_elements->button);
         $toolbar->addComponent($modal_elements->modal);
+    }
+
+    protected function getCurrentLanguage() : string
+    {
+        return $this->getPageObject()->getLanguage();
+    }
+
+    protected function addLanguageSelectionToToolbar() : void
+    {
+        $toolbar = $this->toolbar;
+        $f = $this->gui->ui()->factory();
+
+        if ($this->ot->getContentActivated()) {
+            $actions = [];
+            foreach ($this->ot->getLanguages() as $language) {
+                $lang_code = ($language->getLanguageCode() === $this->ot->getMasterLanguage())
+                    ? "-"
+                    : $language->getLanguageCode();
+                $exists = (ilPageObject::_exists("wpg", $this->getId(), $lang_code));
+                $this->ctrl->setParameterByClass(self::class, "transl", $lang_code);
+                $action = ($lang_code !== "-" && !$exists)
+                    ? "switchToLanguage"
+                    : "preview";
+                if ($action === "switchToLanguage") {
+                    $this->ctrl->setParameterByClass(self::class, "transl", null);
+                    $this->ctrl->setParameterByClass(self::class, "totransl", $lang_code);
+                }
+                $append = $exists
+                    ? ""
+                    : " (" . $this->lng->txt("wiki_not_existing") .")";
+                if ($lang_code === $this->getCurrentLanguage()) {
+                    continue;
+                }
+                $actions[] = $f->link()->standard(
+                    $this->getLanguageLabelForCode($language->getLanguageCode()) . $append,
+                    $this->ctrl->getLinkTargetByClass(self::class, $action)
+                );
+            }
+            $this->ctrl->setParameterByClass(self::class, "transl", $this->requested_transl);
+            $this->ctrl->setParameterByClass(self::class, "totransl", null);
+            if (count($actions) > 1) {
+                $dd = $f->dropdown()->standard($actions)
+                    ->withLabel($this->getLanguageLabelForCode($this->getCurrentLanguage()));
+                $toolbar->addComponent($dd);
+            }
+        }
+    }
+
+    protected function getLanguageLabelForCode(string $code) : string
+    {
+        if ($code === "-") {
+            $code = $this->ot->getMasterLanguage();
+        }
+        return $this->lng->txt("language") . ": " .$this->lng->txt("meta_l_" . $code);
     }
 
     protected function getPrintView(): \ILIAS\Export\PrintProcessGUI
@@ -524,7 +587,8 @@ class ilWikiPageGUI extends ilPageObjectGUI
             $output = ilWikiUtil::replaceInternalLinks(
                 $a_output,
                 $this->getWikiPage()->getWikiId(),
-                ($this->getOutputMode() === "offline")
+                ($this->getOutputMode() === "offline"),
+                $this->getCurrentLanguage()
             );
         } else {
             $output = $a_output;
@@ -1259,4 +1323,78 @@ class ilWikiPageGUI extends ilPageObjectGUI
             true
         );
     }
+
+    /**
+     * Confirm page translation creation
+     */
+    public function confirmPageTranslationCreation(): void
+    {
+        $this->tabs_gui->clearTargets();
+        $this->tabs_gui->setBackTarget(
+            $this->lng->txt("back"),
+            $this->ctrl->getLinkTarget($this, "edit")
+        );
+
+        $l = $this->request->getString("totransl");
+        $this->ctrl->setParameter($this, "totransl", $l);
+        $this->lng->loadLanguageModule("meta");
+
+        $r = $this->gui->ui()->renderer();
+        $box = $this->gui->ui()->factory()->messageBox()->confirmation(
+            $this->lng->txt("cont_page_translation_does_not_exist") . ": " .
+            $this->lng->txt("meta_l_" . $l)
+        );
+
+        $form = $this->getTranslatePageFormAdapter();
+
+        $content = $r->render($box) . $form->render();
+
+        /*
+        $cgui = new ilConfirmationGUI();
+        $cgui->setFormAction($this->ctrl->getFormAction($this));
+        $cgui->setHeaderText($this->lng->txt("cont_page_translation_does_not_exist") . ": " .
+            $this->lng->txt("meta_l_" . $l));
+        $cgui->setCancel($this->lng->txt("cancel"), "editMasterLanguage");
+        $cgui->setConfirm($this->lng->txt("confirm"), "createPageTranslation");*/
+        $this->tpl->setContent($content);
+    }
+
+    protected function getTranslatePageFormAdapter() : \ILIAS\Repository\Form\FormAdapterGUI
+    {
+        $f = $this->gui->form(self::class, "createPageTranslation")
+            ->text("title", $this->lng->txt("title"));
+            //->required();
+        return $f;
+    }
+
+    public function createPageTranslation(): void
+    {
+        $l = $this->request->getString("totransl");
+
+        $form = $this->getTranslatePageFormAdapter();
+        //if ($form->isValid()) {
+
+            $p = ilPageObjectFactory::getInstance(
+                $this->getPageObject()->getParentType(),
+                $this->getPageObject()->getId(),
+                0,
+                "-"
+            );
+
+            $p->copyPageToTranslation($l);
+
+            $p2 = ilPageObjectFactory::getInstance(
+                $this->getPageObject()->getParentType(),
+                $this->getPageObject()->getId(),
+                0,
+                $l
+            );
+            $p2->setTitle($form->getData("title"));
+            $p2->update();
+            $this->ctrl->setParameter($this, "transl", $l);
+        //}
+
+        $this->ctrl->redirect($this, "edit");
+    }
+
 }

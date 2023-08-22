@@ -87,7 +87,7 @@ class ilObjWikiGUI extends ilObjectGUI
         if ($this->requested_page !== "") {
             $ilCtrl->setParameter($this, "page", ilWikiUtil::makeUrlTitle($this->requested_page));
         }
-
+        $this->ctrl->saveParameterByClass(self::class, "transl");
         $this->req_with_comments = $this->edit_request->getWithComments();
         $cs = $DIC->contentStyle();
         $this->content_style_gui = $cs->gui();
@@ -155,11 +155,19 @@ class ilObjWikiGUI extends ilObjectGUI
 
             case 'ilwikipagegui':
                 $this->checkPermission("read");
+                $requested_page = $this->requested_page;
+                if ($this->edit_request->getWikiPageId() > 0) {
+                    $requested_page = ilWikiPage::lookupTitle(
+                        $this->edit_request->getWikiPageId(),
+                        $this->edit_request->getTranslation()
+                    );
+                }
                 $wpage_gui = ilWikiPageGUI::getGUIForTitle(
                     $this->object->getId(),
-                    ilWikiUtil::makeDbTitle($this->requested_page),
+                    ilWikiUtil::makeDbTitle($requested_page),
                     $this->edit_request->getOldNr(),
-                    $this->object->getRefId()
+                    $this->object->getRefId(),
+                    $this->edit_request->getTranslation()
                 );
                 $wpage_gui->setStyleId($this->content_style_domain->getEffectiveStyleId());
                 $this->setContentStyleSheet();
@@ -1063,6 +1071,9 @@ class ilObjWikiGUI extends ilObjectGUI
         $ilAccess = $DIC->access();
         $lng = $DIC->language();
         $ctrl = $DIC->ctrl();
+        $transl = $DIC->wiki()->internal()->gui()->editing()->request()->getTranslation();
+        $DIC->ctrl()->setParameterByClass(self::class, "transl", $transl);
+
 
         $i = strpos($a_target, "_");
         $a_page = "";
@@ -1126,15 +1137,18 @@ class ilObjWikiGUI extends ilObjectGUI
 
     public static function getGotoLink(
         int $a_ref_id,
-        string $a_page = ""
+        string $a_page = "",
+        string $lang = "-"
     ): string {
         if ($a_page === "") {
             $a_page = ilObjWiki::_lookupStartPage(ilObject::_lookupObjId($a_ref_id));
         }
 
+        $append = (!in_array($lang, ["", "-"]))
+            ? "&transl=" . $lang
+            : "";
         $goto = "goto.php?target=wiki_" . $a_ref_id . "_" .
-            ilWikiUtil::makeUrlTitle($a_page);
-
+            ilWikiUtil::makeUrlTitle($a_page) . $append;
         return $goto;
     }
 
@@ -1276,10 +1290,11 @@ class ilObjWikiGUI extends ilObjectGUI
 
         if (ilWikiPage::_wikiPageExists(
             $this->object->getId(),
-            ilWikiUtil::makeDbTitle($a_page)
+            ilWikiUtil::makeDbTitle($a_page),
+            $this->edit_request->getTranslation()
         )) {
             // to do: get rid of this redirect
-            ilUtil::redirect(self::getGotoLink($this->object->getRefId(), $a_page));
+            ilUtil::redirect(self::getGotoLink($this->object->getRefId(), $a_page, $this->edit_request->getTranslation()));
         } else {
             if (!$this->access->checkAccess("edit_content", "", $this->object->getRefId())) {
                 $this->tpl->setOnScreenMessage("failure", $this->lng->txt("no_permission"), true);

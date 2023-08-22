@@ -371,6 +371,10 @@ class ilWikiPage extends ilPageObject
     ): ?int {
         global $DIC;
 
+        if ($lang === "") {
+            $lang = "-";
+        }
+
         $ilDB = $DIC->database();
 
         $a_title = ilWikiUtil::makeDbTitle($a_title);

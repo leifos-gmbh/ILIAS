@@ -32,7 +32,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
     protected \ILIAS\Wiki\InternalGUIService $gui;
     protected \ILIAS\Notes\Service $notes;
     protected \ILIAS\HTTP\Services $http;
-    protected \ILIAS\Wiki\Editing\EditingGUIRequest $wiki_request;
+    protected \ILIAS\Wiki\WikiGUIRequest $wiki_request;
     protected ?ilAdvancedMDRecordGUI $record_gui = null;
     protected bool $fill_on_load_code = false;
     protected int $wiki_ref_id = 0;
@@ -42,7 +42,8 @@ class ilWikiPageGUI extends ilPageObjectGUI
     public function __construct(
         int $a_id = 0,
         int $a_old_nr = 0,
-        int $a_wiki_ref_id = 0
+        int $a_wiki_ref_id = 0,
+        string $lang = "-"
     ) {
         global $DIC;
 
@@ -52,7 +53,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
         // needed for notifications
         $this->setWikiRefId($a_wiki_ref_id);
 
-        parent::__construct("wpg", $a_id, $a_old_nr);
+        parent::__construct("wpg", $a_id, $a_old_nr, $lang);
         $this->getPageObject()->setWikiRefId($this->getWikiRefId());
 
         // content style
@@ -61,7 +62,6 @@ class ilWikiPageGUI extends ilPageObjectGUI
             ->wiki()
             ->internal()
             ->gui()
-            ->editing()
             ->request();
         $this->notes = $DIC->notes();
         $this->gui = $DIC->wiki()->internal()->gui();
@@ -229,20 +229,6 @@ class ilWikiPageGUI extends ilPageObjectGUI
         /** @var ilWikiPage $wp */
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getPageObject();
-    }
-
-    /**
-     * Get wiki page gui for id and title
-     */
-    public static function getGUIForTitle(
-        int $a_wiki_id,
-        string $a_title,
-        int $a_old_nr = 0,
-        int $a_wiki_ref_id = 0,
-        string $translation = "-"
-    ): ilWikiPageGUI {
-        $id = ilWikiPage::getPageIdForTitle($a_wiki_id, $a_title, $translation);
-        return new ilWikiPageGUI($id, $a_old_nr, $a_wiki_ref_id);
     }
 
     public function setSideBlock(): void
@@ -1003,7 +989,8 @@ class ilWikiPageGUI extends ilPageObjectGUI
         $note = $this->notes->domain()->getById($a_note_id);
         $text = $note->getText();
 
-        ilWikiUtil::sendNotification("comment", ilNotification::TYPE_WIKI_PAGE, $this->getWikiRefId(), $a_page_id, $text);
+        $noti = $this->gui->notification();
+        $noti->send("comment", ilNotification::TYPE_WIKI_PAGE, $this->getWikiRefId(), $a_page_id, $text, $this->getLanguage());
     }
 
     public function updateStatsRating(

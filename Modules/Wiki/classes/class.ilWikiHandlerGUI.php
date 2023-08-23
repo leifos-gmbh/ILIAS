@@ -49,7 +49,6 @@ class ilWikiHandlerGUI implements ilCtrlBaseClassInterface
             ->wiki()
             ->internal()
             ->gui()
-            ->editing()
             ->request();
         $this->requested_ref_id = $request->getRefId();
         $this->requested_page = $request->getPage();

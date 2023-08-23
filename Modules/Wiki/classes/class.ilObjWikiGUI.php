@@ -18,7 +18,7 @@
 
 use ILIAS\Wiki\Export;
 use ILIAS\GlobalScreen\ScreenContext\ContextServices;
-use ILIAS\Wiki\Editing\EditingGUIRequest;
+use ILIAS\Wiki\WikiGUIRequest;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -44,7 +44,7 @@ class ilObjWikiGUI extends ilObjectGUI
     protected ContextServices $tool_context;
     protected \ILIAS\DI\UIServices $ui;
     protected bool $req_with_comments = false;
-    protected EditingGUIRequest $edit_request;
+    protected WikiGUIRequest $edit_request;
     protected \ILIAS\Style\Content\GUIService $content_style_gui;
     protected \ILIAS\Style\Content\Object\ObjectFacade $content_style_domain;
 
@@ -56,36 +56,35 @@ class ilObjWikiGUI extends ilObjectGUI
     ) {
         global $DIC;
 
-        $this->ctrl = $DIC->ctrl();
-        $this->lng = $DIC->language();
-        $this->tabs = $DIC->tabs();
-        $this->help = $DIC->help();
-        $this->locator = $DIC["ilLocator"];
-        $ilCtrl = $DIC->ctrl();
-        $lng = $DIC->language();
-        $this->http = $DIC->http();
+        $gui = $DIC->wiki()->internal()->gui();
+        $domain = $DIC->wiki()->internal()->domain();
+        $this->gui = $gui;
+        $this->domain = $domain;
+
+        $this->ctrl = $gui->ctrl();
+        $this->lng = $domain->lng();
+        $this->tabs = $gui->tabs();
+        $this->help = $gui->help();
+        $this->locator = $gui->locator();
+        $this->http = $gui->http();
 
         $this->type = "wiki";
 
         $this->log = ilLoggerFactory::getLogger('wiki');
 
-        $this->tool_context = $DIC->globalScreen()->tool()->context();
-        $this->ui = $DIC->ui();
+        $this->tool_context = $gui->globalScreen()->tool()->context();
+        $this->ui = $gui->ui();
 
-        $this->edit_request = $DIC
-            ->wiki()
-            ->internal()
-            ->gui()
-            ->editing()
-            ->request();
+        $this->edit_request = $gui->request();
+        $this->content_gui = $gui->content();
 
         parent::__construct($a_data, $a_id, $a_call_by_reference, $a_prepare_output);
-        $lng->loadLanguageModule("obj");
-        $lng->loadLanguageModule("wiki");
+        $this->lng->loadLanguageModule("obj");
+        $this->lng->loadLanguageModule("wiki");
 
         $this->requested_page = $this->edit_request->getPage();
         if ($this->requested_page !== "") {
-            $ilCtrl->setParameter($this, "page", ilWikiUtil::makeUrlTitle($this->requested_page));
+            $this->ctrl->setParameter($this, "page", ilWikiUtil::makeUrlTitle($this->requested_page));
         }
         $this->ctrl->saveParameterByClass(self::class, "transl");
         $this->req_with_comments = $this->edit_request->getWithComments();
@@ -162,13 +161,7 @@ class ilObjWikiGUI extends ilObjectGUI
                         $this->edit_request->getTranslation()
                     );
                 }
-                $wpage_gui = ilWikiPageGUI::getGUIForTitle(
-                    $this->object->getId(),
-                    ilWikiUtil::makeDbTitle($requested_page),
-                    $this->edit_request->getOldNr(),
-                    $this->object->getRefId(),
-                    $this->edit_request->getTranslation()
-                );
+                $wpage_gui = $this->content_gui->getCurrentPageGUI();
                 $wpage_gui->setStyleId($this->content_style_domain->getEffectiveStyleId());
                 $this->setContentStyleSheet();
                 if (!$ilAccess->checkAccess("write", "", $this->object->getRefId()) &&
@@ -1071,7 +1064,7 @@ class ilObjWikiGUI extends ilObjectGUI
         $ilAccess = $DIC->access();
         $lng = $DIC->language();
         $ctrl = $DIC->ctrl();
-        $transl = $DIC->wiki()->internal()->gui()->editing()->request()->getTranslation();
+        $transl = $DIC->wiki()->internal()->gui()->request()->getTranslation();
         $DIC->ctrl()->setParameterByClass(self::class, "transl", $transl);
 
 
@@ -1165,29 +1158,13 @@ class ilObjWikiGUI extends ilObjectGUI
         $ilTabs->clearTargets();
         $tpl->setHeaderActionMenu("");
 
-        $page = ($this->requested_page !== "")
-            ? $this->requested_page
-            : $this->object->getStartPage();
-
-        if (!ilWikiPage::exists($this->object->getId(), $page)) {
-            $page = $this->object->getStartPage();
-        }
-
-        if (!ilWikiPage::exists($this->object->getId(), $page)) {
-            $this->tpl->setOnScreenMessage('info', $lng->txt("wiki_no_start_page"), true);
-            $ilCtrl->redirect($this, "infoScreen");
-            return;
-        }
+        $wpage_gui = $this->gui->content()->getCurrentPageGUI();
 
         // page exists, show it !
-        $ilCtrl->setParameter($this, "page", ilWikiUtil::makeUrlTitle($page));
-
-        $wpage_gui = ilWikiPageGUI::getGUIForTitle(
-            $this->object->getId(),
-            ilWikiUtil::makeDbTitle($page),
-            0,
-            $this->object->getRefId()
+        $ilCtrl->setParameter($this, "page",
+            ilWikiUtil::makeUrlTitle($wpage_gui->getPageObject()->getTitle())
         );
+
         $wpage_gui->setStyleId($this->content_style_domain->getEffectiveStyleId());
 
         $this->setContentStyleSheet();

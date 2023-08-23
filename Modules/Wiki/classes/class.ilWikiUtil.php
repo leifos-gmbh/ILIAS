@@ -311,7 +311,6 @@ class ilWikiUtil
             ->wiki()
             ->internal()
             ->gui()
-            ->editing()
             ->request();
 
         $ilCtrl = $DIC->ctrl();

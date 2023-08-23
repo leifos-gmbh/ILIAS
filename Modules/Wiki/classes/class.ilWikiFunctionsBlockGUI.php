@@ -37,7 +37,6 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
             ->wiki()
             ->internal()
             ->gui()
-            ->editing()
             ->request();
 
         $this->ctrl = $DIC->ctrl();

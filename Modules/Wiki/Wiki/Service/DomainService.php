@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,54 +16,46 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-namespace ILIAS\Wiki;
+declare(strict_types=1);
 
-use ILIAS\DI\Container;
-use ILIAS\Repository\GlobalDICDomainServices;
-use ILIAS\Wiki\Content;
-use ILIAS\Wiki\Wiki;
+namespace ILIAS\Wiki\Wiki;
+
+use ILIAS\Wiki\InternalDomainService;
+use ILIAS\Wiki\InternalRepoService;
+use ILIAS\Wiki\InternalDataService;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
-class InternalDomainService
+class DomainService
 {
-    use GlobalDICDomainServices;
-
+    protected InternalDomainService $domain_service;
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
 
     public function __construct(
-        Container $DIC,
+        InternalDataService $data_service,
         InternalRepoService $repo_service,
-        InternalDataService $data_service
+        InternalDomainService $domain_service
     ) {
         $this->repo_service = $repo_service;
         $this->data_service = $data_service;
-        $this->initDomainServices($DIC);
+        $this->domain_service = $domain_service;
     }
 
-    public function log() : \ilLogger
+    public function checkRefId(int $ref_id) : void
     {
-        return $this->logger()->wiki();
+        $obj_id = \ilObject::_lookupObjId($ref_id);
+        if (\ilObject::_lookupType($obj_id) !== "wiki") {
+            throw new \ilWikiException("Not a wiki ref id (".$ref_id.").");
+        }
     }
 
-    public function content() : Content\DomainService
+    public function object(
+        int $ref_id
+    ) : \ilObjWiki
     {
-        return new Content\DomainService(
-            $this->data_service,
-            $this->repo_service,
-            $this
-        );
+        $this->checkRefId($ref_id);
+        return new \ilObjWiki($ref_id);
     }
-
-    public function wiki() : Wiki\DomainService
-    {
-        return new Wiki\DomainService(
-            $this->data_service,
-            $this->repo_service,
-            $this
-        );
-    }
-
 }

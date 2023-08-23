@@ -16,7 +16,7 @@
  *
  *********************************************************************/
 
-use ILIAS\Wiki\Editing\EditingGUIRequest;
+use ILIAS\Wiki\WikiGUIRequest;
 
 /**
  * Wiki page template gui class
@@ -25,7 +25,7 @@ use ILIAS\Wiki\Editing\EditingGUIRequest;
  */
 class ilWikiPageTemplateGUI
 {
-    protected EditingGUIRequest $request;
+    protected WikiGUIRequest $request;
     protected ilObjWiki $wiki;
     protected ilToolbarGUI$toolbar;
     protected ilLanguage $lng;
@@ -56,7 +56,6 @@ class ilWikiPageTemplateGUI
             ->wiki()
             ->internal()
             ->gui()
-            ->editing()
             ->request();
     }
 

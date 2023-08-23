@@ -36,7 +36,19 @@ class ilWikiPage extends ilPageObject
 
     public function afterConstructor(): void
     {
+        global $DIC;
+
         $this->getPageConfig()->configureByObjectId($this->getParentId());
+    }
+
+    /**
+     * This currently violates the layer model, since
+     * notifications render the abstracts with a GUI class
+     */
+    protected function getNotificationGUI() : \ILIAS\Wiki\Notification\NotificationGUI
+    {
+        global $DIC;
+        return $DIC->wiki()->internal()->gui()->notification();
     }
 
     public function setTitle(string $a_title): void
@@ -156,7 +168,14 @@ class ilWikiPage extends ilPageObject
             $this->saveInternalLinks($this->getDomDoc());
 
             ilWikiStat::handleEvent(ilWikiStat::EVENT_PAGE_CREATED, $this);
-            ilWikiUtil::sendNotification("new", ilNotification::TYPE_WIKI, $this->getWikiRefId(), $this->getId());
+            $this->getNotificationGUI()->send(
+                "new",
+                ilNotification::TYPE_WIKI,
+                $this->getWikiRefId(),
+                $this->getId(),
+                null,
+                $this->getLanguage()
+            );
         }
 
         $this->updateNews();
@@ -222,7 +241,14 @@ class ilWikiPage extends ilPageObject
 
         if ($updated === true) {
             $this->log->debug("send notification");
-            ilWikiUtil::sendNotification("update", ilNotification::TYPE_WIKI_PAGE, $this->getWikiRefId(), $this->getId());
+            $this->getNotificationGUI()->send(
+                "update",
+                ilNotification::TYPE_WIKI_PAGE,
+                $this->getWikiRefId(),
+                $this->getId(),
+                null,
+                $this->getLanguage()
+            );
 
             $this->log->debug("update news");
             $this->updateNews(true);
@@ -282,7 +308,14 @@ class ilWikiPage extends ilPageObject
 
         ilWikiStat::handleEvent(ilWikiStat::EVENT_PAGE_DELETED, $this);
 
-        ilWikiUtil::sendNotification("delete", ilNotification::TYPE_WIKI_PAGE, $this->getWikiRefId(), $this->getId());
+        $this->getNotificationGUI()->send(
+            "delete",
+            ilNotification::TYPE_WIKI_PAGE,
+            $this->getWikiRefId(),
+            $this->getId(),
+            null,
+            $this->getLanguage()
+        );
 
         // remove all notifications
         ilNotification::removeForObject(ilNotification::TYPE_WIKI_PAGE, $this->getId());
@@ -530,6 +563,10 @@ class ilWikiPage extends ilPageObject
         string $lang = "-"
     ): bool {
         global $DIC;
+
+        if ($lang === "") {
+            $lang = "-";
+        }
 
         $ilDB = $DIC->database();
 

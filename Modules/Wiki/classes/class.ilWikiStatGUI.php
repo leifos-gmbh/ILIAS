@@ -16,7 +16,7 @@
  *
  *********************************************************************/
 
-use ILIAS\Wiki\Editing\EditingGUIRequest;
+use ILIAS\Wiki\WikiGUIRequest;
 
 /**
  * Wiki statistics GUI class
@@ -25,7 +25,7 @@ use ILIAS\Wiki\Editing\EditingGUIRequest;
  */
 class ilWikiStatGUI
 {
-    protected EditingGUIRequest $request;
+    protected WikiGUIRequest $request;
     protected ilCtrl $ctrl;
     protected ilToolbarGUI $toolbar;
     protected ilLanguage $lng;
@@ -49,7 +49,6 @@ class ilWikiStatGUI
             ->wiki()
             ->internal()
             ->gui()
-            ->editing()
             ->request();
     }
 

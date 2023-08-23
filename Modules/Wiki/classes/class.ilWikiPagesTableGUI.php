@@ -52,7 +52,6 @@ class ilWikiPagesTableGUI extends ilTable2GUI
             ->wiki()
             ->internal()
             ->gui()
-            ->editing()
             ->request()
             ->getRefId();
 

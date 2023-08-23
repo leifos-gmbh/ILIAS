@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,54 +16,45 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-namespace ILIAS\Wiki;
+declare(strict_types=1);
 
-use ILIAS\DI\Container;
-use ILIAS\Repository\GlobalDICDomainServices;
-use ILIAS\Wiki\Content;
-use ILIAS\Wiki\Wiki;
+namespace ILIAS\Wiki\Content;
+
+use ILIAS\Wiki\InternalDomainService;
+use ILIAS\Wiki\InternalRepoService;
+use ILIAS\Wiki\InternalDataService;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
-class InternalDomainService
+class DomainService
 {
-    use GlobalDICDomainServices;
-
+    protected InternalDomainService $domain_service;
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
 
     public function __construct(
-        Container $DIC,
+        InternalDataService $data_service,
         InternalRepoService $repo_service,
-        InternalDataService $data_service
+        InternalDomainService $domain_service
     ) {
         $this->repo_service = $repo_service;
         $this->data_service = $data_service;
-        $this->initDomainServices($DIC);
+        $this->domain_service = $domain_service;
     }
 
-    public function log() : \ilLogger
+    public function navigation(
+        \ilObjWiki $wiki,
+        int $wpg_id = 0,
+        string $page_title = "",
+        string $lang = "-"
+    ) : NavigationManager
     {
-        return $this->logger()->wiki();
-    }
-
-    public function content() : Content\DomainService
-    {
-        return new Content\DomainService(
-            $this->data_service,
-            $this->repo_service,
-            $this
+        return new NavigationManager(
+            $wiki,
+            $wpg_id,
+            $page_title,
+            $lang
         );
     }
-
-    public function wiki() : Wiki\DomainService
-    {
-        return new Wiki\DomainService(
-            $this->data_service,
-            $this->repo_service,
-            $this
-        );
-    }
-
 }

@@ -352,6 +352,8 @@ class ilWikiUtil
 
             if (!$a_offline) {
                 if ($url_title != "") {
+                    $ilCtrl->setParameterByClass("ilobjwikigui", "wpg_id", null);
+                    $ilCtrl->setParameterByClass("ilwikipagegui", "wpg_id", null);
                     $ilCtrl->setParameterByClass("ilobjwikigui", "page", $url_title);
                     $retVal = '<a ' . $wiki_link_class . ' href="' .
                         $ilCtrl->getLinkTargetByClass("ilobjwikigui", "gotoPage") . $anc .

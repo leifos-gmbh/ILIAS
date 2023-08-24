@@ -374,6 +374,9 @@ abstract class ilPageObject
         $res = xpath_eval($xpc, $path);
         if (count($res->nodeset) == 1) {
             $this->node = $res->nodeset[0];
+        } else {
+            throw new ilCOPageException("Invalid page xml (" .
+                $this->getId() . "," . $this->getLanguage() . "): " . $this->getXMLContent(true));
         }
 
         if (empty($error)) {
@@ -4842,14 +4845,20 @@ s     */
             0,
             $a_target_lang
         );
+        $this->setTranslationProperties($transl_page);
+        $transl_page->create(false);
+    }
+
+    protected function setTranslationProperties(self $transl_page) : void
+    {
         $transl_page->setId($this->getId());
         $transl_page->setParentId($this->getParentId());
         $transl_page->setXMLContent($this->copyXmlContent());
         $transl_page->setActive($this->getActive());
         $transl_page->setActivationStart($this->getActivationStart());
         $transl_page->setActivationEnd($this->getActivationEnd());
-        $transl_page->create(false);
     }
+
 
     ////
     //// Page locking

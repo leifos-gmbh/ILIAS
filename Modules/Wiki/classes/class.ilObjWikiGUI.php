@@ -87,6 +87,7 @@ class ilObjWikiGUI extends ilObjectGUI
             $this->ctrl->setParameter($this, "page", ilWikiUtil::makeUrlTitle($this->requested_page));
         }
         $this->ctrl->saveParameterByClass(self::class, "transl");
+        $this->ctrl->saveParameterByClass(self::class, "wpg_id");
         $this->req_with_comments = $this->edit_request->getWithComments();
         $cs = $DIC->contentStyle();
         $this->content_style_gui = $cs->gui();
@@ -1292,6 +1293,11 @@ class ilObjWikiGUI extends ilObjectGUI
                     );
                     $ilCtrl->redirectByClass("ilwikipagegui", "preview");
                 }
+
+                if ($this->isNewTranslatedPage()) {
+                    return;
+                }
+
                 $this->object->createWikiPage($a_page);
 
                 // redirect to newly created page
@@ -1307,6 +1313,36 @@ class ilObjWikiGUI extends ilObjectGUI
                 $ilCtrl->redirect($this, "showTemplateSelection");
             }
         }
+    }
+
+    protected function isNewTranslatedPage()
+    {
+        if (in_array($this->edit_request->getTranslation(), ["-", ""])) {
+            return false;
+        }
+        $page = $this->requested_page;
+        if (!ilWikiPage::_wikiPageExists(
+            $this->object->getId(),
+            ilWikiUtil::makeDbTitle($page),
+            $this->edit_request->getTranslation()))
+        {
+            $form = $this->getNewTranslatedPageForm();
+            $this->tpl->setContent($form->render());
+            return true;
+        }
+        return false;
+    }
+
+    protected function getNewTranslatedPageForm() : \ILIAS\Repository\Form\FormAdapterGUI
+    {
+        $form = $this->gui->form([self::class], "createNewTranslatedPage")
+            ->switch("type", $this->lng->txt("wiki_translated_page"))
+            ->group("new", $this->lng->txt("wiki_no_master"))
+            ->text("master_title", $this->lng->txt("wiki_master_title"))
+            ->group("existing", $this->lng->txt("wiki_master_existing"))
+            ->select("master_id", $this->lng->txt("wiki_master_page"), ["1" => "1"])
+            ->end();
+        return $form;
     }
 
     public function randomPageObject(): void

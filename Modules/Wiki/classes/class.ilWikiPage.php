@@ -23,6 +23,7 @@
  */
 class ilWikiPage extends ilPageObject
 {
+    protected \ILIAS\Wiki\InternalService $service;
     protected int $parent_ref_id = 0;
     protected string $title = "";
     protected bool $blocked = false;
@@ -37,7 +38,7 @@ class ilWikiPage extends ilPageObject
     public function afterConstructor(): void
     {
         global $DIC;
-
+        $this->service = $DIC->wiki()->internal();
         $this->getPageConfig()->configureByObjectId($this->getParentId());
     }
 
@@ -47,8 +48,7 @@ class ilWikiPage extends ilPageObject
      */
     protected function getNotificationGUI() : \ILIAS\Wiki\Notification\NotificationGUI
     {
-        global $DIC;
-        return $DIC->wiki()->internal()->gui()->notification();
+        return $this->service->gui()->notification();
     }
 
     public function setTitle(string $a_title): void
@@ -810,7 +810,7 @@ class ilWikiPage extends ilPageObject
 
             foreach ($sources as $s) {
                 if ($s["type"] === "wpg:pg" && ilPageObject::_exists("wpg", $s["id"])) {
-                    $wpage = new ilWikiPage($s["id"]);
+                    $wpage = new ilWikiPage($s["id"], 0, $s["lang"]);
 
                     $col = ilWikiUtil::collectInternalLinks(
                         $wpage->getXMLContent(),
@@ -1007,4 +1007,11 @@ class ilWikiPage extends ilPageObject
 
         return false;
     }
+
+    protected function setTranslationProperties(ilPageObject $transl_page) : void
+    {
+        parent::setTranslationProperties($transl_page);
+        $transl_page->setWikiRefId($this->getWikiRefId());
+    }
+
 }

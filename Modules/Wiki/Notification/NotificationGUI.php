@@ -52,6 +52,10 @@ class NotificationGUI
     ): void {
         global $DIC;
 
+        if ($a_wiki_ref_id === 0) {
+            return;
+        }
+
         if ($lang === "") {
             $lang = "-";
         }

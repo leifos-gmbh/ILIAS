@@ -47,8 +47,13 @@ class ilWikiPageGUI extends ilPageObjectGUI
     ) {
         global $DIC;
 
-        $this->settings = $DIC->settings();
-        $this->http = $DIC->http();
+        $service =  $DIC->wiki()->internal();
+        $domain = $service->domain();
+        $gui = $service->gui();
+
+        $this->domain = $domain;
+        $this->settings = $domain->settings();
+        $this->http = $gui->http();
 
         // needed for notifications
         $this->setWikiRefId($a_wiki_ref_id);
@@ -58,13 +63,9 @@ class ilWikiPageGUI extends ilPageObjectGUI
 
         // content style
         $this->tpl->addCss(ilObjStyleSheet::getSyntaxStylePath());
-        $this->wiki_request = $DIC
-            ->wiki()
-            ->internal()
-            ->gui()
-            ->request();
+        $this->wiki_request = $gui->request();
         $this->notes = $DIC->notes();
-        $this->gui = $DIC->wiki()->internal()->gui();
+        $this->gui = $gui;
         $this->ot = ilObjectTranslation::getInstance(
             ilObject::_lookupObjId($this->wiki_request->getRefId())
         );
@@ -482,6 +483,8 @@ class ilWikiPageGUI extends ilPageObjectGUI
         $toolbar = $this->toolbar;
         $f = $this->gui->ui()->factory();
 
+        $this->ctrl->setParameterByClass(self::class, "wpg_id", $this->getId());
+        $this->ctrl->setParameterByClass(self::class, "page", null);
         if ($this->ot->getContentActivated()) {
             $actions = [];
             foreach ($this->ot->getLanguages() as $language) {
@@ -1361,24 +1364,24 @@ class ilWikiPageGUI extends ilPageObjectGUI
         $form = $this->getTranslatePageFormAdapter();
         //if ($form->isValid()) {
 
-            $p = ilPageObjectFactory::getInstance(
-                $this->getPageObject()->getParentType(),
-                $this->getPageObject()->getId(),
-                0,
-                "-"
-            );
+        $p = $this->domain->page()->getWikiPage(
+            $this->getWikiRefId(),
+            $this->getPageObject()->getId(),
+            0,
+            "-"
+        );
 
-            $p->copyPageToTranslation($l);
+        $p->copyPageToTranslation($l);
 
-            $p2 = ilPageObjectFactory::getInstance(
-                $this->getPageObject()->getParentType(),
-                $this->getPageObject()->getId(),
-                0,
-                $l
-            );
-            $p2->setTitle($form->getData("title"));
-            $p2->update();
-            $this->ctrl->setParameter($this, "transl", $l);
+        $p2 = ilPageObjectFactory::getInstance(
+            $this->getPageObject()->getParentType(),
+            $this->getPageObject()->getId(),
+            0,
+            $l
+        );
+        $p2->setTitle($form->getData("title"));
+        $p2->update();
+        $this->ctrl->setParameter($this, "transl", $l);
         //}
 
         $this->ctrl->redirect($this, "edit");

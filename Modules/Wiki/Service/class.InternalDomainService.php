@@ -23,6 +23,7 @@ namespace ILIAS\Wiki;
 use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\Wiki\Content;
+use ILIAS\Wiki\Page;
 use ILIAS\Wiki\Wiki;
 
 /**
@@ -62,6 +63,15 @@ class InternalDomainService
     public function wiki() : Wiki\DomainService
     {
         return new Wiki\DomainService(
+            $this->data_service,
+            $this->repo_service,
+            $this
+        );
+    }
+
+    public function page() : Page\DomainService
+    {
+        return new Page\DomainService(
             $this->data_service,
             $this->repo_service,
             $this

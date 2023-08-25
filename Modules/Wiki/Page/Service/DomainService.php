@@ -58,4 +58,18 @@ class DomainService
         $wp->setWikiRefId($ref_id);
         return $wp;
     }
+
+    public function page(
+        int $ref_id
+    ) : PageManager
+    {
+        return new PageManager(
+            $this->data_service,
+            $this->repo_service->page(),
+            $this->domain_service->wiki(),
+            $this,
+            $ref_id
+        );
+    }
+
 }

@@ -51,6 +51,11 @@ class DomainService
         }
     }
 
+    public function getObjId(int $ref_id) : int
+    {
+        return \ilObject::_lookupObjId($ref_id);
+    }
+
     public function object(
         int $ref_id
     ) : \ilObjWiki

@@ -16910,6 +16910,7 @@ wiki#:#wiki_notification_comment_subject#:#Es wurde ein Kommentar zur Seite "%s:
 wiki#:#wiki_notification_deactivate_page#:#Benachrichtigung für Wiki-Seite deaktivieren
 wiki#:#wiki_notification_deactivate_wiki#:#Benachrichtigung für Wiki deaktivieren
 wiki#:#wiki_notification_deactivated#:#Benachrichtigungen deaktiviert
+wiki#:#wiki_not_existing#:#existiert noch nicht
 wiki#:#wiki_number_users_notes_or_comments#:#Anzahl Benutzer, die Notizen oder Kommentare zu dieser Seite verfasst haben.
 wiki#:#wiki_ordering#:#Reihenfolge
 wiki#:#wiki_ordering_and_indent_saved#:#Reihenfolge und Einzug wurde gespeichert.

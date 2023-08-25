@@ -1335,12 +1335,18 @@ class ilObjWikiGUI extends ilObjectGUI
 
     protected function getNewTranslatedPageForm() : \ILIAS\Repository\Form\FormAdapterGUI
     {
+        $pm = $this->domain->page()->page($this->object->getRefId());
+        $options = [];
+        foreach ($pm->getWikiPages() as $page) {
+            $options[$page->getId()] = $page->getTitle();
+        }
         $form = $this->gui->form([self::class], "createNewTranslatedPage")
-            ->switch("type", $this->lng->txt("wiki_translated_page"))
+            ->switch("type", $this->lng->txt("wiki_translated_page"), "", "new")
             ->group("new", $this->lng->txt("wiki_no_master"))
             ->text("master_title", $this->lng->txt("wiki_master_title"))
             ->group("existing", $this->lng->txt("wiki_master_existing"))
-            ->select("master_id", $this->lng->txt("wiki_master_page"), ["1" => "1"])
+            ->select("master_id", $this->lng->txt("wiki_master_page"), $options)
+            ->required()
             ->end();
         return $form;
     }

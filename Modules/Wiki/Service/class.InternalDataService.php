@@ -20,22 +20,35 @@ declare(strict_types=1);
 
 namespace ILIAS\Wiki;
 
+use ILIAS\Wiki\Page\Page;
+
 /**
  * Wiki internal data service
- * @author Alexander Killing <killing@leifos.de>
  */
 class InternalDataService
 {
-    // protected ...\DataFactory ..._factory;
-
     public function __construct()
     {
-        //$this->..._factory = new ...\DataFactory();
     }
 
-    /*
-    public function ...() : ...\...
+    public function page(
+        int $id,
+        int $wiki_id,
+        string $title,
+        string $lang = "-",
+        bool $blocked = false,
+        bool $rating = false,
+        bool $hide_adv_md = false
+    ) : Page
     {
-        return $this->..._factory->...();
-    }*/
+        return new Page(
+            $id,
+            $wiki_id,
+            $title,
+            $lang,
+            $blocked,
+            $rating,
+            $hide_adv_md
+        );
+    }
 }

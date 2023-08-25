@@ -20,9 +20,10 @@ declare(strict_types=1);
 
 namespace ILIAS\Wiki;
 
+use ILIAS\Wiki\Page\PageDBRepository;
+
 /**
  * Wiki repo service
- * @author Alexander Killing <killing@leifos.de>
  */
 class InternalRepoService
 {
@@ -35,12 +36,11 @@ class InternalRepoService
         $this->db = $db;
     }
 
-    /*
-    public function ...() : ...\RepoService
+    public function page() : PageDBRepository
     {
-        return new ...\RepoService(
+        return new PageDBRepository(
             $this->data,
             $this->db
         );
-    }*/
+    }
 }

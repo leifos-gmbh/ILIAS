@@ -278,7 +278,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
                 }
                 include_once("./Services/RTE/classes/class.ilRTE.php");
                 $data["answertext"] = ilRTE::_replaceMediaObjectImageSrc($data["answertext"], 1);
-                array_push($this->answers, new ASS_AnswerMultipleResponseImage($data["answertext"], $data["points"], $data["aorder"], $data["points_unchecked"], $data["imagefile"]));
+                array_push($this->answers, new ASS_AnswerMultipleResponseImage($data["answertext"], $data["points"], $data["aorder"], $data["points_unchecked"], $data["imagefile"], $data["answer_id"]));
             }
         }
 
@@ -435,6 +435,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
      * @param float   $points_unchecked The points for not selecting the answer (even positive points can be used)
      * @param integer $order      		A possible display order of the answer
      * @param string  $answerimage
+     * @param int     $answer_id        The Answer id used in the database
      *
      * @see      $answers
      * @see      ASS_AnswerBinaryStateImage
@@ -444,13 +445,14 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
         $points = 0.0,
         $points_unchecked = 0.0,
         $order = 0,
-        $answerimage = ""
+        $answerimage = "",
+        $answer_id = -1
     ) {
         include_once "./Modules/TestQuestionPool/classes/class.assAnswerMultipleResponseImage.php";
         $answertext = $this->getHtmlQuestionContentPurifier()->purify($answertext);
         if (array_key_exists($order, $this->answers)) {
             // insert answer
-            $answer = new ASS_AnswerMultipleResponseImage($answertext, $points, $order, $points_unchecked, $answerimage);
+            $answer = new ASS_AnswerMultipleResponseImage($answertext, $points, $order, $points_unchecked, $answerimage, $answer_id);
             $newchoices = array();
             for ($i = 0; $i < $order; $i++) {
                 array_push($newchoices, $this->answers[$i]);
@@ -464,7 +466,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
             $this->answers = $newchoices;
         } else {
             // add answer
-            $answer = new ASS_AnswerMultipleResponseImage($answertext, $points, count($this->answers), $points_unchecked, $answerimage);
+            $answer = new ASS_AnswerMultipleResponseImage($answertext, $points, count($this->answers), $points_unchecked, $answerimage, $answer_id);
             array_push($this->answers, $answer);
         }
     }
@@ -693,10 +695,9 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
         if ($this->isSingleline && ($this->getThumbSize())) {
             // get old thumbnail size
             $result = $ilDB->queryF(
-                "SELECT thumb_size FROM " . $this->getAdditionalTableName(
-                             ) . " WHERE question_fi = %s",
-                array( "integer" ),
-                array( $this->getId() )
+                "SELECT thumb_size FROM " . $this->getAdditionalTableName() . " WHERE question_fi = %s",
+                ['integer'],
+                [$this->getId()]
             );
             if ($result->numRows() == 1) {
                 $data = $ilDB->fetchAssoc($result);
@@ -711,46 +712,142 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
         // save additional data
         $ilDB->replace(
             $this->getAdditionalTableName(),
-            array(
+            [
                 'shuffle' => array('text', $this->getShuffle()),
                 'allow_images' => array('text', $this->isSingleline ? 0 : 1),
                 'thumb_size' => array('integer', strlen($this->getThumbSize()) ? $this->getThumbSize() : null),
                 'selection_limit' => array('integer', $this->getSelectionLimit()),
                 'feedback_setting' => array('integer', $this->getSpecificFeedbackSetting())
-            ),
-            array(
-                'question_fi' => array('integer', $this->getId())
-            )
+            ],
+            ['question_fi' => array('integer', $this->getId())]
         );
     }
 
+    /**
+     * Deletes all existing Answer data from a question and reintroduces old data and changes.
+     * Additionally, it updates the corresponding feedback.
+     * @return void
+     */
     public function saveAnswerSpecificDataToDb()
     {
         /** @var $ilDB ilDBInterface */
         global $DIC;
         $ilDB = $DIC['ilDB'];
+
+        // Get all feedback entries
+        $result = $ilDB->queryF(
+            "SELECT * FROM qpl_fb_specific WHERE question_fi = %s",
+            ['integer'],
+            [$this->getId()]
+        );
+        $db_feedback = $ilDB->fetchAll($result);
+
+        // Check if feedback exists and the regular editor is used and not the page editor
+        if (sizeof($db_feedback) >= 1 && $this->getAdditionalContentEditingMode() == 'default'){
+            // Get all existing answer data for question
+            $result = $ilDB->queryF(
+                "SELECT answer_id, aorder  FROM qpl_a_mc WHERE question_fi = %s",
+                ['integer'],
+                [$this->getId()]
+            );
+            $db_answers = $ilDB->fetchAll($result);
+
+            // Collect old and new order entries by ids and order to calculate a diff/intersection and remove/update feedback
+            $post_answer_order_for_id = [];
+            foreach ($this->answers as $answer){
+                // Only the first appearance of an id is used
+                if ($answer->getId() !== null && !in_array($answer->getId(), array_keys($post_answer_order_for_id))) {
+                    // -1 is happening while import and also if a new multi line answer is generated
+                    if ($answer->getId() == -1) {
+                        continue;
+                    }
+                    $post_answer_order_for_id[$answer->getId()] = $answer->getOrder();
+                }
+            }
+
+            // If there is no usable ids from post, it's better to not touch the feedback
+            // This is useful since the import is also using this function or the first creation of a new question in general
+            if (sizeof($post_answer_order_for_id) >= 1) {
+                $db_answer_order_for_id = [];
+                $db_answer_id_for_order = [];
+                foreach ($db_answers as $db_answer){
+                    $db_answer_order_for_id[intval($db_answer['answer_id'])] = intval($db_answer['aorder']);
+                    $db_answer_id_for_order[intval($db_answer['aorder'])] = intval($db_answer['answer_id']);
+                }
+
+                // Handle feedback
+                // the diff between the already existing answer ids from the Database and the answer ids from post
+                // feedback related to the answer ids should be deleted or in our case not recreated.
+                $db_answer_ids = array_keys($db_answer_order_for_id);
+                $post_answer_ids = array_keys($post_answer_order_for_id);
+                $diff_db_post_answer_ids = array_diff($db_answer_ids, $post_answer_ids);
+                $unused_answer_ids = array_keys($diff_db_post_answer_ids);
+
+                // Delete all feedback in the database
+                $this->feedbackOBJ->deleteSpecificAnswerFeedbacks($this->getId(), false);
+                // Recreate feedback
+                foreach ($db_feedback as $feedback_option) {
+                    // skip feedback which answer is deleted
+                    if (in_array(intval($feedback_option['answer']), $unused_answer_ids)) {
+                        continue;
+                    }
+
+                    // Reorder feedback
+                    $feedback_order_db = intval($feedback_option['answer']);
+                    $db_answer_id = $db_answer_id_for_order[$feedback_order_db];
+                    // This cuts feedback that currently would have no corresponding answer
+                    // This case can happen while copying "broken" questions
+                    // Or when saving a question with less answers than feedback
+                    if (is_null($db_answer_id) || $db_answer_id < 0) {
+                        continue;
+                    }
+                    $feedback_order_post = $post_answer_order_for_id[$db_answer_id];
+                    $feedback_option['answer'] = $feedback_order_post;
+
+                    // Recreate remaining feedback in database
+                    $next_id = $ilDB->nextId('qpl_fb_specific');
+                    $ilDB->manipulateF(
+                        "INSERT INTO qpl_fb_specific (feedback_id, question_fi, answer, tstamp, feedback, question) 
+                            VALUES (%s, %s, %s, %s, %s, %s)",
+                        ['integer', 'integer', 'integer', 'integer', 'text', 'integer'],
+                        [
+                            $next_id,
+                            $feedback_option['question_fi'],
+                            $feedback_option['answer'],
+                            time(),
+                            $feedback_option['feedback'],
+                            $feedback_option['question']
+                        ]
+                    );
+                }
+            }
+        }
+
+        // Delete all entries in qpl_a_mc for question
         $ilDB->manipulateF(
             "DELETE FROM qpl_a_mc WHERE question_fi = %s",
-            array( 'integer' ),
-            array( $this->getId() )
+            ['integer'],
+            [$this->getId()]
         );
 
+        // Recreate answers one by one
         foreach ($this->answers as $key => $value) {
             $answer_obj = $this->answers[$key];
             $next_id = $ilDB->nextId('qpl_a_mc');
             $ilDB->manipulateF(
-                "INSERT INTO qpl_a_mc (answer_id, question_fi, answertext, points, points_unchecked, aorder, imagefile, tstamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                array( 'integer', 'integer', 'text', 'float', 'float', 'integer', 'text', 'integer' ),
-                array(
-                                    $next_id,
-                                    $this->getId(),
-                                    ilRTE::_replaceMediaObjectImageSrc($answer_obj->getAnswertext(), 0),
-                                    $answer_obj->getPoints(),
-                                    $answer_obj->getPointsUnchecked(),
-                                    $answer_obj->getOrder(),
-                                    $answer_obj->getImage(),
-                                    time()
-                                )
+                "INSERT INTO qpl_a_mc (answer_id, question_fi, answertext, points, points_unchecked, aorder, imagefile, tstamp) 
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                ['integer', 'integer', 'text', 'float', 'float', 'integer', 'text', 'integer'],
+                [
+                    $next_id,
+                    $this->getId(),
+                    ilRTE::_replaceMediaObjectImageSrc($answer_obj->getAnswertext(), 0),
+                    $answer_obj->getPoints(),
+                    $answer_obj->getPointsUnchecked(),
+                    $answer_obj->getOrder(),
+                    $answer_obj->getImage(),
+                    time()
+                ]
             );
         }
         $this->rebuildThumbnails();
@@ -927,9 +1024,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
     {
         global $DIC;
         $ilLog = $DIC['ilLog'];
-
         $imagepath = $this->getImagePath();
-
         $question_id = $this->getOriginalId();
         $originalObjId = parent::lookupParentObjId($this->getOriginalId());
         $imagepath_original = $this->getImagePath($question_id, $originalObjId);

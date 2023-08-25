@@ -384,7 +384,11 @@ while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
                     $ilDB->quote($idx++, ilDBConstants::T_INTEGER) . ', ' .
                     $ilDB->quote($option, ilDBConstants::T_TEXT) .
                     ' ) ';
-                $ilDB->manipulate($query);
+                try {
+                    $ilDB->manipulate($query);
+                } catch (\Excpetion $e) {
+                    ;
+                }
             }
         }
     }
@@ -1731,12 +1735,56 @@ $ilDB->modifyTableColumn(
         'length' => '256'
     ]
 );
-$ilDB->modifyTableColumn(
-    'usr_sess_istorage',
-    'session_id',
-    [
-        'type' => ilDBConstants::T_TEXT,
-        'length' => '256'
-    ]
-);
+try {
+    $ilDB->modifyTableColumn(
+        'usr_sess_istorage',
+        'session_id',
+        [
+            'type' => ilDBConstants::T_TEXT,
+            'length' => '256'
+        ]
+    );
+} catch (\Exception $e) {
+    $message = "DB Hotfix 102: \n\n"
+        . "We could not Update the length of the column `session_id` in the table\n"
+        . "`usr_session_istorage` as the table engine is MyIsam.\n"
+        . "This step will be finished after updating to ILIAS 8. You could also change\n"
+        . "the ENGINE manually to InnoDB, if you require longer session_ids.";
+    global $ilLog;
+    $ilLog->warning($message);
+}
 ?>
+<#103>
+<?php
+// Add index
+if ($this->db->indexExistsByFields('tree', ['child'])) {
+    $this->db->dropIndex('tree', 'i1');
+}
+?>
+<#104>
+<?php
+if ($ilDB->tableExists('adv_md_values_text') &&
+    $ilDB->tableExists('adv_md_values_ltext')
+) {
+    // inserts all values from adv_md_values_text into adv_md_values_ltext WITHOUT
+    // adv_md_values_ltext.value_index, ignoring duplicate entries.
+    $ilDB->manipulate("
+        INSERT IGNORE INTO adv_md_values_ltext (field_id, obj_id, `value`, value_index, disabled, sub_type, sub_id)
+            SELECT val.field_id, val.obj_id, val.value, '', val.disabled, val.sub_type, val.sub_id
+                FROM adv_md_values_text AS val
+        ;
+    ");
+
+    // inserts all values from adv_md_values_text into adv_md_values_ltext WITH
+    // adv_md_values_ltext.value_index, whereas the value_index will be the default
+    // lang-code of adv_md_field_int because the old table didn't store this information.
+    $ilDB->manipulate("
+        INSERT IGNORE INTO adv_md_values_ltext (field_id, obj_id, `value`, value_index, disabled, sub_type, sub_id)
+            SELECT val.field_id, val.obj_id, val.value, field.lang_code, val.disabled, val.sub_type, val.sub_id
+                FROM adv_md_values_text AS val
+                JOIN adv_md_field_int AS field ON field.field_id = val.field_id
+        ;
+    ");
+}
+?>
+

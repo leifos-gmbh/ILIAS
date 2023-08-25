@@ -13,7 +13,7 @@ require_once 'Services/UIComponent/Glyph/classes/class.ilGlyphGUI.php';
 class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
 {
     /** @var string */
-    protected const ALLOWED_PAGE_HTML_TAGS = "<em>, <strong>";
+    protected const ALLOWED_PAGE_HTML_TAGS = '<em>, <strong>';
 
     protected $values = [];
     protected $allowMove = false;
@@ -22,19 +22,19 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
     protected $suffixes = [];
     protected $showPoints = true;
     protected $hideImages = false;
-    
+
     /**
     * Constructor
     *
     * @param	string	$a_title	Title
     * @param	string	$a_postvar	Post Variable
     */
-    public function __construct($a_title = "", $a_postvar = "")
+    public function __construct($a_title = '', $a_postvar = '')
     {
         parent::__construct($a_title, $a_postvar);
-        $this->setSuffixes(["jpg", "jpeg", "png", "gif"]);
+        $this->setSuffixes(['jpg', 'jpeg', 'png', 'gif']);
         $this->setSize('25');
-        $this->validationRegexp = "";
+        $this->validationRegexp = '';
     }
 
     /**
@@ -49,7 +49,7 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
             if (is_array($a_value['answer'])) {
                 foreach ($a_value['answer'] as $index => $value) {
                     include_once "./Modules/TestQuestionPool/classes/class.assAnswerBinaryStateImage.php";
-                    $answer = new ASS_AnswerBinaryStateImage($value, $a_value['points'][$index], $index, 1, $a_value['imagename'][$index]);
+                    $answer = new ASS_AnswerBinaryStateImage($value, $a_value['points'][$index], $index, 1, $a_value['imagename'][$index], $a_value['answer_id'][$index]);
                     array_push($this->values, $answer);
                 }
             }
@@ -85,17 +85,17 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
     {
         return $this->suffixes;
     }
-    
+
     public function setShowPoints($a_value)
     {
         $this->showPoints = $a_value;
     }
-    
+
     public function getShowPoints()
     {
         return $this->showPoints;
     }
-    
+
     /**
     * Set Values
     *
@@ -185,15 +185,21 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
     {
         global $DIC;
         $lng = $DIC['lng'];
-        
+
         include_once "./Services/AdvancedEditing/classes/class.ilObjAdvancedEditing.php";
 
         if (is_array($_POST[$this->getPostVar()]) && $_POST["types"] == 1) {
-            $_POST[$this->getPostVar()] = ilUtil::stripSlashesRecursive($_POST[$this->getPostVar()],
-                false, ilObjAdvancedEditing::_getUsedHTMLTagsAsString("assessment"));
+            $_POST[$this->getPostVar()] = ilUtil::stripSlashesRecursive(
+                $_POST[$this->getPostVar()],
+                false,
+                ilObjAdvancedEditing::_getUsedHTMLTagsAsString("assessment")
+            );
         } elseif (is_array($_POST[$this->getPostVar()]) && $_POST["types"] == 0) {
-            $_POST[$this->getPostVar()] = ilUtil::stripSlashesRecursive($_POST[$this->getPostVar()],
-                true, ilSingleChoiceWizardInputGUI::ALLOWED_PAGE_HTML_TAGS);
+            $_POST[$this->getPostVar()] = ilUtil::stripSlashesRecursive(
+                $_POST[$this->getPostVar()],
+                true,
+                ilSingleChoiceWizardInputGUI::ALLOWED_PAGE_HTML_TAGS
+            );
         }
 
         $foundvalues = $_POST[$this->getPostVar()];
@@ -201,7 +207,7 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
             // check answers
             if (is_array($foundvalues['answer'])) {
                 foreach ($foundvalues['answer'] as $aidx => $answervalue) {
-                    if (((strlen($answervalue)) == 0) && (strlen($foundvalues['imagename'][$aidx]) == 0)) {
+                    if (((strlen($answervalue)) == 0) && (!isset($foundvalues['imagename'][$aidx]) || strlen($foundvalues['imagename'][$aidx]) == 0)) {
                         $this->setAlert($lng->txt("msg_input_is_required"));
                         return false;
                     }
@@ -318,7 +324,7 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
             $this->setAlert($lng->txt("msg_input_is_required"));
             return false;
         }
-        
+
         return $this->checkSubItemsInput();
     }
 
@@ -329,7 +335,7 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
     {
         global $DIC;
         $lng = $DIC['lng'];
-        
+
         $tpl = new ilTemplate("tpl.prop_singlechoicewizardinput.html", true, true, "Modules/TestQuestionPool");
         $i = 0;
         foreach ($this->values as $value) {
@@ -369,6 +375,9 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
                         $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->getPoints()));
                         $tpl->parseCurrentBlock();
                     }
+                    $tpl->setCurrentBlock("prop_answer_id_propval");
+                    $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->getId()));
+                    $tpl->parseCurrentBlock();
                 }
                 $tpl->setCurrentBlock('singleline');
                 $tpl->setVariable("SIZE", $this->getSize());
@@ -387,6 +396,9 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
                         $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->getPoints()));
                         $tpl->parseCurrentBlock();
                     }
+                    $tpl->setCurrentBlock("prop_answer_id_propval");
+                    $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->getId()));
+                    $tpl->parseCurrentBlock();
                 }
                 $tpl->setCurrentBlock('multiline');
                 $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->getAnswertext()));
@@ -453,7 +465,7 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
             $tpl->setVariable("POINTS_TEXT", $lng->txt('points'));
             $tpl->parseCurrentBlock();
         }
-        
+
         $tpl->setVariable("ELEMENT_ID", $this->getPostVar());
         $tpl->setVariable("TEXT_YES", $lng->txt('yes'));
         $tpl->setVariable("TEXT_NO", $lng->txt('no'));
@@ -465,7 +477,7 @@ class ilSingleChoiceWizardInputGUI extends ilTextInputGUI
         $a_tpl->setCurrentBlock("prop_generic");
         $a_tpl->setVariable("PROP_GENERIC", $tpl->get());
         $a_tpl->parseCurrentBlock();
-        
+
         global $DIC;
         $tpl = $DIC['tpl'];
         $tpl->addJavascript("./Services/Form/js/ServiceFormWizardInput.js");

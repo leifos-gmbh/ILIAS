@@ -1671,7 +1671,6 @@ class ilLMPresentationGUI
         $this->renderPageTitle();
 
         $this->tpl->setCurrentBlock("ilMedia");
-
         $med_links = ilMediaItem::_getMapAreasIntLinks($this->requested_mob_id);
         $link_xml = $this->linker->getLinkXML($med_links);
 
@@ -2297,7 +2296,7 @@ class ilLMPresentationGUI
 
         $tabs->setBackTarget(
             $lng->txt("back"),
-            $ilCtrl->getLinkTarget($this, "showPrintViewSelection")
+            $ilCtrl->getLinkTarget($this, "layout")
         );
         
         $c_obj_id = $this->getCurrentPageId();

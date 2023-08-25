@@ -49,7 +49,16 @@ class GUIService
             true,
             false
         );
-
     }
+
+    public function translation() : \ilObjectTranslation
+    {
+        return $this->domain_service->wiki()->translation(
+            $this->domain_service->wiki()->getObjId(
+                $this->gui_service->request()->getRefId()
+            )
+        );
+    }
+
 
 }

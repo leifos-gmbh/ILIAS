@@ -35,6 +35,8 @@ use ILIAS\Wiki\WikiGUIRequest;
  */
 class ilObjWikiGUI extends ilObjectGUI
 {
+    protected \ILIAS\Wiki\Page\PageManager $pm;
+    protected ilObjectTranslation $ot;
     protected \ILIAS\HTTP\Services $http;
     protected string $requested_page;
     protected ilPropertyFormGUI $form_gui;
@@ -67,6 +69,7 @@ class ilObjWikiGUI extends ilObjectGUI
         $this->help = $gui->help();
         $this->locator = $gui->locator();
         $this->http = $gui->http();
+        $this->ot = $gui->wiki()->translation();
 
         $this->type = "wiki";
 
@@ -93,6 +96,7 @@ class ilObjWikiGUI extends ilObjectGUI
         $this->content_style_gui = $cs->gui();
         if (is_object($this->object)) {
             $this->content_style_domain = $cs->domain()->styleForRefId($this->object->getRefId());
+            $this->pm = $this->domain->page()->page($this->object->getRefId());
         }
     }
 
@@ -1298,7 +1302,11 @@ class ilObjWikiGUI extends ilObjectGUI
                     return;
                 }
 
-                $this->object->createWikiPage($a_page);
+                $this->pm->createWikiPage(
+                    $a_page,
+                    0,
+                    $this->edit_request->getTranslation()
+                );
 
                 // redirect to newly created page
                 $ilCtrl->setParameterByClass("ilwikipagegui", "page", ilWikiUtil::makeUrlTitle(($a_page)));
@@ -1315,7 +1323,7 @@ class ilObjWikiGUI extends ilObjectGUI
         }
     }
 
-    protected function isNewTranslatedPage()
+    protected function isNewTranslatedPage() : bool
     {
         if (in_array($this->edit_request->getTranslation(), ["-", ""])) {
             return false;
@@ -1327,28 +1335,61 @@ class ilObjWikiGUI extends ilObjectGUI
             $this->edit_request->getTranslation()))
         {
             $form = $this->getNewTranslatedPageForm();
-            $this->tpl->setContent($form->render());
+            $this->tpl->setContent($this->getRenderedTranslationInfo() . $form->render());
             return true;
         }
         return false;
+    }
+
+    protected function getRenderedTranslationInfo()
+    {
+        $mess = $this->gui->ui()->factory()->messageBox()->info(
+            $this->lng->txt("wiki_translate_page_master_info")
+        );
+        return $this->gui->ui()->renderer()->render($mess);
     }
 
     protected function getNewTranslatedPageForm() : \ILIAS\Repository\Form\FormAdapterGUI
     {
         $pm = $this->domain->page()->page($this->object->getRefId());
         $options = [];
-        foreach ($pm->getWikiPages() as $page) {
+        foreach ($pm->getMasterPagesWithoutTranslation($this->edit_request->getTranslation()) as $page) {
             $options[$page->getId()] = $page->getTitle();
         }
+        $append = " '" . $this->edit_request->getPage() . "'";
+        $append.= " (" . $this->lng->txt("meta_l_" . $this->edit_request->getTranslation()) . ")";
+        $append2 = " (" . $this->lng->txt("meta_l_" . $this->ot->getMasterLanguage()) . ")";
         $form = $this->gui->form([self::class], "createNewTranslatedPage")
-            ->switch("type", $this->lng->txt("wiki_translated_page"), "", "new")
+            ->section("sec", $this->lng->txt("wiki_translation_page") . $append)
+            ->switch("type", $this->lng->txt("wiki_page_in_master_language") . $append2, "", "existing")
+            ->group("existing", $this->lng->txt("wiki_master_existing"))
+            ->select("master_id", $this->lng->txt("wiki_master_title"), $options)
+            ->required()
             ->group("new", $this->lng->txt("wiki_no_master"))
             ->text("master_title", $this->lng->txt("wiki_master_title"))
-            ->group("existing", $this->lng->txt("wiki_master_existing"))
-            ->select("master_id", $this->lng->txt("wiki_master_page"), $options)
-            ->required()
             ->end();
         return $form;
+    }
+
+    protected function createNewTranslatedPageObject() : void
+    {
+        $form = $this->getNewTranslatedPageForm();
+        if ($form->isValid()) {
+            if ($form->getData("type") === "new") {
+                $wpg_id = $this->pm->createWikiPage(
+                    $form->getData("title")
+                );
+            } else {
+                $wpg_id = $form->getData("master_id");
+            }
+            $wpg_id = $this->pm->createWikiPage(
+                $this->edit_request->getPage(),
+                $wpg_id,
+                $this->edit_request->getTranslation()
+            );
+        }
+        $this->ctrl->setParameterByClass(ilWikiPageGUI::class, "wpg_id", $wpg_id);
+        $this->ctrl->redirectByClass(ilWikiPageGUI::class, "preview");
     }
 
     public function randomPageObject(): void
@@ -1810,8 +1851,10 @@ class ilObjWikiGUI extends ilObjectGUI
         $form = $this->initTemplateSelectionForm();
         if ($form->checkInput()) {
             $a_page = $this->edit_request->getPage();
-            $this->object->createWikiPage(
+            $this->pm->createWikiPage(
                 $a_page,
+                0,
+                $this->edit_request->getTranslation(),
                 $this->edit_request->getPageTemplateId()
             );
 

@@ -39,6 +39,19 @@ class PageDBRepository
         $this->db = $db;
     }
 
+    protected function getPageFromRecord($rec) : Page
+    {
+        return $this->data->page(
+            (int) $rec["id"],
+            (int) $rec["wiki_id"],
+            $rec["title"],
+            $rec["lang"],
+            (bool) $rec["blocked"],
+            (bool) $rec["rating"],
+            (bool) $rec["hide_adv_md"]
+        );
+    }
+
     /**
      * @return iterable<Page>
      */
@@ -50,15 +63,21 @@ class PageDBRepository
             [$lang, $wiki_id]
         );
         while ($rec = $this->db->fetchAssoc($set)) {
-            yield $this->data->page(
-                (int) $rec["id"],
-                (int) $rec["wiki_id"],
-                $rec["title"],
-                $rec["lang"],
-                (bool) $rec["blocked"],
-                (bool) $rec["rating"],
-                (bool) $rec["hide_adv_md"]
-            );
+            yield $this->getPageFromRecord($rec);
         }
     }
+
+    public function getMasterPagesWithoutTranslation(int $wiki_id, string $trans) : \Iterator
+    {
+        $set = $this->db->queryF("SELECT w1.* FROM il_wiki_page w1 LEFT JOIN il_wiki_page w2 " .
+            " ON w1.id = w2.id AND w2.lang = %s " .
+            " WHERE w1.lang = %s AND w1.wiki_id = %s AND w2.id IS NULL ORDER BY w1.title",
+            ["string", "string", "integer"],
+            [$trans, "-", $wiki_id]
+        );
+        while ($rec = $this->db->fetchAssoc($set)) {
+            yield $this->getPageFromRecord($rec);
+        }
+    }
+
 }

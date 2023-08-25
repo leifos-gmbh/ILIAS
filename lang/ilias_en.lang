@@ -16891,6 +16891,8 @@ wiki#:#wiki_link_md_values#:#Automatic Linking
 wiki#:#wiki_link_md_values_info#:#Autmatically links properties presented in the side block to wiki pages with the same name.
 wiki#:#wiki_link_text#:#Link Text
 wiki#:#wiki_mark#:#Mark
+wiki#:#wiki_master_existing#:#Page Exists in Master Language
+wiki#:#wiki_master_title#:#Title of Page in Master Language
 wiki#:#wiki_navigation#:#Wiki Navigation
 wiki#:#wiki_navigation_info#:#Here you can add and remove links to existing wiki pages to the navigation block in the wiki.
 wiki#:#wiki_new_page#:#New Page
@@ -16898,6 +16900,7 @@ wiki#:#wiki_new_page_name#:#New Title
 wiki#:#wiki_new_pages#:#New Pages
 wiki#:#wiki_news_page_changed#:#Wiki page has been updated.
 wiki#:#wiki_news_page_created#:#New wiki page has been created.
+wiki#:#wiki_no_master#:#Page Does Not Exist in Master Language
 wiki#:#wiki_no_page_found#:#No wiki page has been found for search term '$1'.
 wiki#:#wiki_no_search_term#:#No search term has been entered. All pages of the wiki are listed below.
 wiki#:#wiki_no_start_page#:#Wiki is missing a valid starting page.
@@ -16925,6 +16928,7 @@ wiki#:#wiki_page_deleted#:#Wiki page deleted.
 wiki#:#wiki_page_deletion_confirmation#:#Do you really want to delete this wiki page?
 wiki#:#wiki_page_exists#:#Existing Page
 wiki#:#wiki_page_hits#:#Page Hits
+wiki#:#wiki_page_in_master_language#:#Page in Master Language
 wiki#:#wiki_page_list_form_info#:#Adds a list of pages of this wiki that are all assigned to the selected metadata below. Only searchable metadata fields are listed.
 wiki#:#wiki_page_list_mode#:#Type of List
 wiki#:#wiki_page_list_mode_ordered#:#Numbered
@@ -17012,6 +17016,8 @@ wiki#:#wiki_templ_add_to_page#:#Available for Being Added to Existing Pages
 wiki#:#wiki_templ_new_pages#:#Available on Page Creation
 wiki#:#wiki_template_added#:#Template page added.
 wiki#:#wiki_template_status_removed#:#Template status removed.
+wiki#:#wiki_translate_page_master_info#:#You are creating a new wiki page translation. Please specify, if this translation belongs to an existing master version of the page, or if a completely new page is being created. In the second case you need to specify a page title for the master version.
+wiki#:#wiki_translation_page#:#Translation Page
 wiki#:#wiki_type_wiki_team#:#Team Wiki
 wiki#:#wiki_unblock_page#:#Grant Write Access
 wiki#:#wiki_unhide_meta_adv_records#:#Show additional properties

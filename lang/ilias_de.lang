@@ -16891,6 +16891,8 @@ wiki#:#wiki_link_md_values#:#Automatische Verlinkung
 wiki#:#wiki_link_md_values_info#:#Verlinkt automatisch Eigenschaftenwerte im Seitenblock mit gleichlautenden Wikiseiten (wenn vorhanden).
 wiki#:#wiki_link_text#:#Linktext
 wiki#:#wiki_mark#:#Note
+wiki#:#wiki_master_existing#:#Seite existiert in Basissprache
+wiki#:#wiki_master_title#:#Seitentitel in Basissprache
 wiki#:#wiki_navigation#:#Wiki-Navigation
 wiki#:#wiki_navigation_info#:#Hier können Sie bestehende Wikiseiten zum Navigationsblock hinzufügen und entfernen.
 wiki#:#wiki_new_page#:#Neue Seite
@@ -16898,6 +16900,7 @@ wiki#:#wiki_new_page_name#:#Neuer Seitentitel
 wiki#:#wiki_new_pages#:#Neue Seiten
 wiki#:#wiki_news_page_changed#:#Die Wikiseite wurde geändert.
 wiki#:#wiki_news_page_created#:#Die Wikiseite wurde erstellt.
+wiki#:#wiki_no_master#:#Seite existiert nicht in Basissprache
 wiki#:#wiki_no_page_found#:#Es wurden keine Seiten zum Suchbegriff '$1' gefunden.
 wiki#:#wiki_no_search_term#:#Es wurde kein Suchbegriff eingegeben. Nachfolgend werden alle Wikiseiten aufgelistet.
 wiki#:#wiki_no_start_page#:#Das Wiki hat keine gültige Startseite
@@ -16925,6 +16928,7 @@ wiki#:#wiki_page_deleted#:#Die Wiki-Seite wurde gelöscht.
 wiki#:#wiki_page_deletion_confirmation#:#Wollen Sie diese Wiki-Seite wirklich löschen?
 wiki#:#wiki_page_exists#:#Bestehende Seite
 wiki#:#wiki_page_hits#:#Seitenaufrufe
+wiki#:#wiki_page_in_master_language#:#Seite in Basissprache
 wiki#:#wiki_page_list_form_info#:#Fügt eine Liste mit Wiki-Seiten hinzu, die nachfolgenden Metadaten zugeordnet sind. Es werden nur durchsuchbare Metadatenfelder aus den Metadatensätzen des Wikis angeboten.
 wiki#:#wiki_page_list_mode#:#Listentyp
 wiki#:#wiki_page_list_mode_ordered#:#Nummeriert
@@ -17012,6 +17016,8 @@ wiki#:#wiki_templ_add_to_page#:#Verfügbar für bestehende Seite
 wiki#:#wiki_templ_new_pages#:#Verfügbar für neue Seite
 wiki#:#wiki_template_added#:#Inhaltsvorlage hinzugefügt
 wiki#:#wiki_template_status_removed#:#Nutzung als Inhaltsvorlage aufgehoben.
+wiki#:#wiki_translate_page_master_info#:#Sie erstellen eine neue Übersetzungsseite. Bitte geben Sie an, ob es sich um die Übersetzung einer bestehenden Seite handelt oder ob es eine komplett neue Seite ist. Im zweiten Fall müssen Sie den Titel in der Basissprache angeben.
+wiki#:#wiki_translation_page#:#Übersetzungsseite
 wiki#:#wiki_type_wiki_team#:#Team-Wiki
 wiki#:#wiki_unblock_page#:#Schreibschutz aufheben
 wiki#:#wiki_unhide_meta_adv_records#:#Benutzerdefinierte Metadaten anzeigen

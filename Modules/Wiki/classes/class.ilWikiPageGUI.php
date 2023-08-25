@@ -66,9 +66,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
         $this->wiki_request = $gui->request();
         $this->notes = $DIC->notes();
         $this->gui = $gui;
-        $this->ot = ilObjectTranslation::getInstance(
-            ilObject::_lookupObjId($this->wiki_request->getRefId())
-        );
+        $this->ot = $gui->wiki()->translation();
     }
 
     public function setScreenIdComponent(): void

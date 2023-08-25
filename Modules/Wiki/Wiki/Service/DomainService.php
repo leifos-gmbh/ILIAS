@@ -63,4 +63,10 @@ class DomainService
         $this->checkRefId($ref_id);
         return new \ilObjWiki($ref_id);
     }
+
+    public function translation(int $obj_id) : \ilObjectTranslation
+    {
+        return \ilObjectTranslation::getInstance($obj_id);
+    }
+
 }

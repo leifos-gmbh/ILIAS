@@ -80,4 +80,12 @@ class InternalGUIService
         );
     }
 
+    public function wiki() : Wiki\GUIService
+    {
+        return new Wiki\GUIService(
+            $this->domain_service,
+            $this
+        );
+    }
+
 }

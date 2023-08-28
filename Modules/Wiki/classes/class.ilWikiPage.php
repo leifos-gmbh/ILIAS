@@ -23,6 +23,7 @@
  */
 class ilWikiPage extends ilPageObject
 {
+    protected ilLogger $wiki_log;
     protected \ILIAS\Wiki\InternalService $service;
     protected int $parent_ref_id = 0;
     protected string $title = "";
@@ -40,6 +41,7 @@ class ilWikiPage extends ilPageObject
         global $DIC;
         $this->service = $DIC->wiki()->internal();
         $this->getPageConfig()->configureByObjectId($this->getParentId());
+        $this->wiki_log = $this->service->domain()->log();
     }
 
     /**
@@ -160,6 +162,7 @@ class ilWikiPage extends ilPageObject
             . "," . $ilDB->quote((int) $this->isAdvancedMetadataHidden(), "integer")
             . "," . $ilDB->quote($this->getLanguage(), "text")
             . ")";
+        $this->wiki_log->debug($query);
         $ilDB->manipulate($query);
 
         // create page object
@@ -187,7 +190,7 @@ class ilWikiPage extends ilPageObject
     ): void {
         // internal == wiki links
 
-        $this->log->debug("collect internal links");
+        $this->wiki_log->debug("collect internal links");
         $int_links = count(ilWikiUtil::collectInternalLinks($xml, $this->getWikiId(), true));
 
         $xpath = new DOMXPath($domdoc);
@@ -213,7 +216,7 @@ class ilWikiPage extends ilPageObject
             "num_words" => $num_words,
             "num_chars" => $num_chars
         );
-        $this->log->debug("handle stats");
+        $this->wiki_log->debug("handle stats");
         ilWikiStat::handleEvent(ilWikiStat::EVENT_PAGE_UPDATED, $this, null, $page_data);
     }
 
@@ -226,7 +229,7 @@ class ilWikiPage extends ilPageObject
         bool $a_no_history = false
     ) {
         $ilDB = $this->db;
-        $this->log->debug("start...");
+        $this->wiki_log->debug("start...");
         // update wiki page data
         $query = "UPDATE il_wiki_page SET " .
             " title = " . $ilDB->quote($this->getTitle(), "text") .
@@ -240,7 +243,7 @@ class ilWikiPage extends ilPageObject
         $updated = parent::update($a_validate, $a_no_history);
 
         if ($updated === true) {
-            $this->log->debug("send notification");
+            $this->wiki_log->debug("send notification");
             $this->getNotificationGUI()->send(
                 "update",
                 ilNotification::TYPE_WIKI_PAGE,
@@ -250,7 +253,7 @@ class ilWikiPage extends ilPageObject
                 $this->getLanguage()
             );
 
-            $this->log->debug("update news");
+            $this->wiki_log->debug("update news");
             $this->updateNews(true);
         } else {
             return $updated;
@@ -602,7 +605,7 @@ class ilWikiPage extends ilPageObject
     ): void {
         $ilDB = $this->db;
 
-        $this->log->debug("start...");
+        $this->wiki_log->debug("start...");
         // *** STEP 1: Standard Processing ***
 
         parent::saveInternalLinks($a_domdoc);
@@ -677,7 +680,7 @@ class ilWikiPage extends ilPageObject
                 );
             }
         }
-        $this->log->debug("...end");
+        $this->wiki_log->debug("...end");
     }
 
     /**

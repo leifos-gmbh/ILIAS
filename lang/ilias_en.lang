@@ -17017,6 +17017,7 @@ wiki#:#wiki_templ_new_pages#:#Available on Page Creation
 wiki#:#wiki_template_added#:#Template page added.
 wiki#:#wiki_template_status_removed#:#Template status removed.
 wiki#:#wiki_translate_page_master_info#:#You are creating a new wiki page translation. Please specify, if this translation belongs to an existing master version of the page, or if a completely new page is being created. In the second case you need to specify a page title for the master version.
+wiki#:#wiki_translations#:#Translations
 wiki#:#wiki_translation_page#:#Translation Page
 wiki#:#wiki_type_wiki_team#:#Team Wiki
 wiki#:#wiki_unblock_page#:#Grant Write Access

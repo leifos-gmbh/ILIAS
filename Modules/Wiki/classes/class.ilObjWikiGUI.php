@@ -1066,6 +1066,8 @@ class ilObjWikiGUI extends ilObjectGUI
         global $DIC;
         $main_tpl = $DIC->ui()->mainTemplate();
 
+        $wpg_id = 0;
+        $lang = "";
         $ilAccess = $DIC->access();
         $lng = $DIC->language();
         $ctrl = $DIC->ctrl();
@@ -1084,6 +1086,7 @@ class ilObjWikiGUI extends ilObjectGUI
             $a_page_arr = explode("_", $a_page);
             $wpg_id = (int) $a_page_arr[0];
             $ref_id = (int) ($a_page_arr[1] ?? 0);
+            $lang = ($a_page_arr[2] ?? "");
             $w_id = ilWikiPage::lookupWikiId($wpg_id);
             if ($ref_id > 0) {
                 $refs = array($ref_id);
@@ -1099,11 +1102,27 @@ class ilObjWikiGUI extends ilObjectGUI
         }
 
         if ($ilAccess->checkAccess("read", "", $a_target)) {
-            $ctrl->setParameterByClass(
-                "ilobjwikigui",
-                "page",
-                ilWikiUtil::makeUrlTitle($a_page)
-            );
+            if ($wpg_id > 0) {
+                $ctrl->setParameterByClass(
+                    "ilobjwikigui",
+                    "wpg_id",
+                    $wpg_id
+                );
+            }
+            else {
+                $ctrl->setParameterByClass(
+                    "ilobjwikigui",
+                    "page",
+                    ilWikiUtil::makeUrlTitle($a_page)
+                );
+            }
+            if ($lang != "") {
+                $ctrl->setParameterByClass(
+                    "ilobjwikigui",
+                    "transl",
+                    $lang
+                );
+            }
             $ctrl->setParameterByClass(
                 "ilwikihandlergui",
                 "ref_id",
@@ -1210,7 +1229,7 @@ class ilObjWikiGUI extends ilObjectGUI
             IL_WIKI_ALL_PAGES
         );
 
-        $this->setSideBlock();
+        //$this->setSideBlock();
         $tpl->setContent($table_gui->getHTML());
     }
 
@@ -1232,7 +1251,7 @@ class ilObjWikiGUI extends ilObjectGUI
             IL_WIKI_POPULAR_PAGES
         );
 
-        $this->setSideBlock();
+        //$this->setSideBlock();
         $tpl->setContent($table_gui->getHTML());
     }
 
@@ -1254,7 +1273,7 @@ class ilObjWikiGUI extends ilObjectGUI
             IL_WIKI_ORPHANED_PAGES
         );
 
-        $this->setSideBlock();
+        //$this->setSideBlock();
         $tpl->setContent($table_gui->getHTML());
     }
 
@@ -1377,7 +1396,7 @@ class ilObjWikiGUI extends ilObjectGUI
         if ($form->isValid()) {
             if ($form->getData("type") === "new") {
                 $wpg_id = $this->pm->createWikiPage(
-                    $form->getData("title")
+                    $form->getData("master_title")
                 );
             } else {
                 $wpg_id = $form->getData("master_id");
@@ -1414,7 +1433,7 @@ class ilObjWikiGUI extends ilObjectGUI
             $this->object->getId()
         );
 
-        $this->setSideBlock();
+        //$this->setSideBlock();
         $tpl->setContent($table_gui->getHTML());
     }
 
@@ -1511,7 +1530,7 @@ class ilObjWikiGUI extends ilObjectGUI
             IL_WIKI_NEW_PAGES
         );
 
-        $this->setSideBlock();
+        //$this->setSideBlock();
         $tpl->setContent($table_gui->getHTML());
     }
 

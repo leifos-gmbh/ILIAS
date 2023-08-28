@@ -52,6 +52,21 @@ class PageDBRepository
         );
     }
 
+    protected function getPageInfoFromRecord($rec) : PageInfo
+    {
+        return $this->data->pageInfo(
+            (int) $rec["id"],
+            $rec["lang"] ?? "",
+            $rec["title"],
+            (int) ($rec["last_change_user"] ?? 0),
+            $rec["last_change"] ?? "",
+            (int) ($rec["create_user"] ?? 0),
+            $rec["created"] ?? "",
+            (int) ($rec["cnt"] ?? 0),
+            (int) ($rec["nr"] ?? 0)
+        );
+    }
+
     /**
      * @return iterable<Page>
      */
@@ -67,6 +82,9 @@ class PageDBRepository
         }
     }
 
+    /**
+     * @return iterable<Page>
+     */
     public function getMasterPagesWithoutTranslation(int $wiki_id, string $trans) : \Iterator
     {
         $set = $this->db->queryF("SELECT w1.* FROM il_wiki_page w1 LEFT JOIN il_wiki_page w2 " .
@@ -78,6 +96,145 @@ class PageDBRepository
         while ($rec = $this->db->fetchAssoc($set)) {
             yield $this->getPageFromRecord($rec);
         }
+    }
+
+    /**
+     * Queries last change and user per page regardless of language
+     * @return iterable<PageInfo>
+     */
+    public function getAllPagesInfo(int $wiki_id) : \Iterator
+    {
+        $set = $this->db->queryF("SELECT w.id, p.last_change_user, p.last_change, w.title " . "FROM page_object p JOIN il_wiki_page w " .
+            " ON (w.wiki_id = %s AND p.parent_type = %s AND p.page_id = w.id AND w.lang = %s) " .
+            " JOIN ( select page_id, max(last_change) mlc FROM page_object " .
+            " WHERE parent_type='wpg' group by page_id) mp " .
+            " ON (mp.page_id = p.page_id AND mp.mlc = p.last_change)",
+            ["integer", "string", "string"],
+            [$wiki_id, "wpg", "-"]
+        );
+        $ids = [];
+        while ($rec = $this->db->fetchAssoc($set)) {
+            // note: the query may get multiple entries for a page id, if multiple
+            // languages share the same max(last_change). We only return one.
+            if (isset($ids[(int) $rec["id"]])) {
+                continue;
+            }
+            $ids[(int) $rec["id"]] = (int) $rec["id"];
+            yield $this->getPageInfoFromRecord($rec);
+        }
+    }
+
+    /**
+     * Queries last change and user per page regardless of language
+     * @return iterable<PageInfo>
+     */
+    public function getRecentChanges(
+        int $wiki_id,
+        int $period = 30
+    ): \Iterator {
+        $limit_ts = date('Y-m-d H:i:s', time() - ($period * 24 * 60 * 60));
+        $q1 = "SELECT w.id, p.last_change_user, p.last_change, w.title, w.lang, 0 nr FROM page_object p " .
+            " JOIN il_wiki_page w ON (w.id = p.page_id AND p.parent_type = %s AND w.lang = p.lang AND w.wiki_id = %s) " .
+            " WHERE p.last_change >= " . $this->db->quote($limit_ts, "timestamp");
+        $q2 = "SELECT w.id, p.user_id last_change_user, p.hdate last_change, w.title, w.lang, p.nr FROM page_history p " .
+            " JOIN il_wiki_page w ON (w.id = p.page_id AND p.parent_type = %s AND w.lang = p.lang AND w.wiki_id = %s) " .
+            " WHERE p.hdate >= " . $this->db->quote($limit_ts, "timestamp");
+        $q = $q1 . " UNION " . $q2 . " ORDER BY last_change DESC ";
+        $set = $this->db->queryF($q,
+            ["string", "integer", "string", "integer"],
+            ["wpg", $wiki_id,"wpg", $wiki_id]
+        );
+        while ($rec = $this->db->fetchAssoc($set)) {
+            yield $this->getPageInfoFromRecord($rec);
+        }
+    }
+
+    /**
+     * @return iterable<PageInfo>
+     */
+    public function getNewPages(int $wiki_id): \Iterator
+    {
+        $set = $this->db->queryF("SELECT w.id, p.created, p.create_user, w.title, w.lang FROM page_object p " .
+            " JOIN il_wiki_page w ".
+            " ON w.id = p.page_id AND p.parent_type = %s AND w.lang = p.lang AND w.wiki_id = %s ".
+            " ORDER BY created DESC",
+            ["string", "integer"],
+            ["wpg", $wiki_id]
+        );
+        while ($rec = $this->db->fetchAssoc($set)) {
+            yield $this->getPageInfoFromRecord($rec);
+        }
+    }
+
+    /**
+     * @return iterable<PageInfo>
+     */
+    public function getPopularPages(
+        int $a_wiki_id
+    ) : \Iterator {
+
+        $query = "SELECT wp.id, wp.title, wp.lang, po.view_cnt as cnt FROM il_wiki_page wp JOIN page_object po" .
+            " ON (wp.id = po.page_id AND wp.lang = po.lang) " .
+            " WHERE wp.wiki_id = " . $this->db->quote($a_wiki_id, "integer") .
+            " AND po.parent_type = " . $this->db->quote("wpg", "text") . " " .
+            " ORDER BY po.view_cnt";
+        $set = $this->db->query($query);
+
+        while ($rec = $this->db->fetchAssoc($set)) {
+            yield $this->getPageInfoFromRecord($rec);
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getLanguages(int $wpg_id) : array
+    {
+        $set = $this->db->queryF("SELECT DISTINCT lang FROM  " .
+            " il_wiki_page WHERE id = %s AND lang <> '-' ",
+            ["integer"],
+            [$wpg_id]
+        );
+        $langs = [];
+        while ($rec = $this->db->fetchAssoc($set)) {
+            $langs[] = $rec["lang"];
+        }
+        return $langs;
+    }
+
+    public function doesAtLeastOnePageExist(int $wiki_id, array $ids) : bool
+    {
+        // cross check existence of sources in il_wiki_page
+        $query = "SELECT count(*) cnt FROM il_wiki_page" .
+            " WHERE " . $this->db->in("id", $ids, false, "integer") .
+            " AND wiki_id = " . $this->db->quote($wiki_id, "integer") .
+            " GROUP BY wiki_id";
+        $set = $this->db->query($query);
+        $rec = $this->db->fetchAssoc($set);
+        return ((int) $rec["cnt"]) > 0;
+    }
+
+    public function getPageIdForTitle(
+        int $wiki_id,
+        string $title,
+        string $lang = "-"
+    ): ?int {
+        if ($lang === "") {
+            $lang = "-";
+        }
+
+        $title = \ilWikiUtil::makeDbTitle($title);
+
+        $query = "SELECT * FROM il_wiki_page" .
+            " WHERE wiki_id = " . $this->db->quote($wiki_id, "integer") .
+            " AND title = " . $this->db->quote($title, "text") .
+            " AND lang = " . $this->db->quote($lang, "text");
+        $set = $this->db->query($query);
+        if ($rec = $this->db->fetchAssoc($set)) {
+            return (int) $rec["id"];
+        }
+
+        return null;
     }
 
 }

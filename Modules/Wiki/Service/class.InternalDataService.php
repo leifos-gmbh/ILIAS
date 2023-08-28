@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\Wiki;
 
 use ILIAS\Wiki\Page\Page;
+use ILIAS\Wiki\Page\PageInfo;
 
 /**
  * Wiki internal data service
@@ -51,4 +52,30 @@ class InternalDataService
             $hide_adv_md
         );
     }
+
+    public function pageInfo(
+        int $id,
+        string $lang,
+        string $title,
+        int $last_change_user,
+        string $last_change,
+        int $create_user = 0,
+        string $created = "",
+        int $view_cnt = 0,
+        int $old_nr = 0
+    ) : PageInfo
+    {
+        return new PageInfo(
+            $id,
+            $lang,
+            $title,
+            $last_change_user,
+            $last_change,
+            $create_user,
+            $created,
+            $view_cnt,
+            $old_nr
+        );
+    }
+
 }

@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\UICore\PageContentProvider;
+
 /**
  * Class ilWikiPage GUI class
  *
@@ -28,6 +30,7 @@
  */
 class ilWikiPageGUI extends ilPageObjectGUI
 {
+    protected \ILIAS\Wiki\Page\PageManager $pm;
     protected ilObjectTranslation $ot;
     protected \ILIAS\Wiki\InternalGUIService $gui;
     protected \ILIAS\Notes\Service $notes;
@@ -57,8 +60,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 
         // needed for notifications
         $this->setWikiRefId($a_wiki_ref_id);
-
-        parent::__construct("wpg", $a_id, $a_old_nr, $lang);
+        parent::__construct("wpg", $a_id, $a_old_nr, false, $lang);
         $this->getPageObject()->setWikiRefId($this->getWikiRefId());
 
         // content style
@@ -67,6 +69,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
         $this->notes = $DIC->notes();
         $this->gui = $gui;
         $this->ot = $gui->wiki()->translation();
+        $this->pm = $this->domain->page()->page($this->getWikiRefId());
     }
 
     public function setScreenIdComponent(): void
@@ -113,14 +116,11 @@ class ilWikiPageGUI extends ilPageObjectGUI
             ": " . $this->getWikiPage()->getTitle();
         $tpl->setHeaderPageTitle($head_title);
         // see #13804
-        if ($this->wiki_request->getPage() !== "") {
-            $tpl->setPermanentLink(
-                "wiki",
-                null,
-                "wpage_" . $this->getPageObject()->getId() . "_" . $this->requested_ref_id,
-                "",
-                $head_title
-            );
+        if ($this->wiki_request->getWikiPageId() > 0) {
+            PageContentProvider::setPermaLink($this->pm->getPermaLink(
+                $this->getPageObject()->getId(),
+                $this->getPageObject()->getLanguage()
+            ));
         } else {
             $tpl->setPermanentLink("wiki", $this->requested_ref_id);
         }

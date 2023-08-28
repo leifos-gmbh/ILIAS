@@ -68,6 +68,8 @@ class NotificationGUI
 
         $wiki = $this->domain->wiki()->object($a_wiki_ref_id);
         $wiki_id = $wiki->getId();
+        $log->debug("page id: " . $a_page_id);
+        $log->debug("lang: " . $lang);
         $pgui = $this->gui->page()->getWikiPageGUI(
             $a_wiki_ref_id,
             $a_page_id,

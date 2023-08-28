@@ -2393,20 +2393,17 @@ s     */
      */
     public function createFromXML(): void
     {
-        echo "a";
         $empty = false;
         if ($this->getXMLContent() == "") {
             $this->setXMLContent("<PageObject></PageObject>");
             $empty = true;
         }
-        echo "b";
         $content = $this->getXMLContent();
         $this->buildDom(true);
         $dom_doc = $this->getDomDoc();
 
         $iel = $this->containsDeactivatedElements($content);
         $inl = $this->containsIntLinks($content);
-        echo "c";
         // create object
         $this->db->insert("page_object", array(
             "page_id" => array("integer", $this->getId()),
@@ -2426,7 +2423,6 @@ s     */
             "last_change" => array("timestamp", ilUtil::now()),
             "is_empty" => array("integer", $empty)
         ));
-        echo "d";
         // after update event
         $this->__afterUpdate($dom_doc, $content, true, $empty);
     }

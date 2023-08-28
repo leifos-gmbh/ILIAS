@@ -69,4 +69,15 @@ class DomainService
         return \ilObjectTranslation::getInstance($obj_id);
     }
 
+    public function getStartingPageId(int $wiki_ref_id) : ?int
+    {
+        $pm = $this->domain_service->page()->page($wiki_ref_id);
+        $wiki = $this->object($wiki_ref_id);
+        $start_page = $wiki->getStartPage();
+        if ($start_page === "") {
+            return null;
+        }
+        return $pm->getPageIdForTitle($start_page);
+    }
+
 }

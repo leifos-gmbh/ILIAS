@@ -39,7 +39,7 @@ class PageDBRepository
         $this->db = $db;
     }
 
-    protected function getPageFromRecord($rec) : Page
+    protected function getPageFromRecord(array $rec) : Page
     {
         return $this->data->page(
             (int) $rec["id"],
@@ -52,7 +52,7 @@ class PageDBRepository
         );
     }
 
-    protected function getPageInfoFromRecord($rec) : PageInfo
+    protected function getPageInfoFromRecord(array $rec) : PageInfo
     {
         return $this->data->pageInfo(
             (int) $rec["id"],
@@ -235,6 +235,41 @@ class PageDBRepository
         }
 
         return null;
+    }
+
+    public function exists(
+        int $id,
+        string $lang = "-"
+    ): bool {
+        if ($lang === "") {
+            $lang = "-";
+        }
+        $query = "SELECT w.id FROM il_wiki_page w " .
+            " JOIN page_object p ON (w.id = p.page_id AND w.lang = p.lang) " .
+            " WHERE w.id = " . $this->db->quote($id, "integer") .
+            " AND w.lang = " . $this->db->quote($lang, "text");
+        $set = $this->db->query($query);
+        if ($rec = $this->db->fetchAssoc($set)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getTitle(
+        int $id,
+        string $lang = "-"
+    ): string {
+        if ($lang === "") {
+            $lang = "-";
+        }
+        $query = "SELECT title FROM il_wiki_page " .
+            " WHERE id = " . $this->db->quote($id, "integer") .
+            " AND lang = " . $this->db->quote($lang, "text");
+        $set = $this->db->query($query);
+        if ($rec = $this->db->fetchAssoc($set)) {
+            return $rec["title"];
+        }
+        return "";
     }
 
 }

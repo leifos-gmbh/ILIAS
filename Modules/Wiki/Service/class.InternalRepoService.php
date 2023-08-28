@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\Wiki;
 
 use ILIAS\Wiki\Page\PageDBRepository;
+use ILIAS\Wiki\Navigation\ImportantPageDBRepository;
 
 /**
  * Wiki repo service
@@ -39,6 +40,14 @@ class InternalRepoService
     public function page() : PageDBRepository
     {
         return new PageDBRepository(
+            $this->data,
+            $this->db
+        );
+    }
+
+    public function importantPage() : ImportantPageDBRepository
+    {
+        return new ImportantPageDBRepository(
             $this->data,
             $this->db
         );

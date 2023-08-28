@@ -62,6 +62,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
         $this->setWikiRefId($a_wiki_ref_id);
         parent::__construct("wpg", $a_id, $a_old_nr, false, $lang);
         $this->getPageObject()->setWikiRefId($this->getWikiRefId());
+        $this->ctrl->saveParameterByClass(self::class, "wpg_id");
 
         // content style
         $this->tpl->addCss(ilObjStyleSheet::getSyntaxStylePath());
@@ -116,14 +117,14 @@ class ilWikiPageGUI extends ilPageObjectGUI
             ": " . $this->getWikiPage()->getTitle();
         $tpl->setHeaderPageTitle($head_title);
         // see #13804
-        if ($this->wiki_request->getWikiPageId() > 0) {
+        //if ($this->wiki_request->getWikiPageId() > 0) {
             PageContentProvider::setPermaLink($this->pm->getPermaLink(
                 $this->getPageObject()->getId(),
                 $this->getPageObject()->getLanguage()
             ));
-        } else {
-            $tpl->setPermanentLink("wiki", $this->requested_ref_id);
-        }
+        //} else {
+        //    $tpl->setPermanentLink("wiki", $this->requested_ref_id);
+        //}
 
 
         switch ($next_class) {
@@ -742,7 +743,6 @@ class ilWikiPageGUI extends ilPageObjectGUI
     {
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
-
         if (ilWikiPerm::check("delete_wiki_pages", $this->requested_ref_id)) {
             $this->getPageObject()->delete();
 
@@ -778,9 +778,8 @@ class ilWikiPageGUI extends ilPageObjectGUI
         if (count($ordering) === 0) {
             switch ($this->wiki_request->getSelectedPrintType()) {
                 case "wiki":
-                    $all_pages = ilWikiPage::getAllWikiPages($this->getPageObject()->getWikiId());
-                    foreach ($all_pages as $p) {
-                        $pg_ids[] = $p["id"];
+                    foreach ($this->pm->getWikiPages($this->getLanguage()) as $p) {
+                        $pg_ids[] = $p->getId();
                     }
                     break;
 
@@ -888,6 +887,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
             $this->requested_ref_id
         ) && !$this->getPageObject()->getBlocked())
             || $ilAccess->checkAccess("write", "", $this->requested_ref_id)) {
+            $this->ctrl->setParameterByClass(ilWikiPageGUI::class, "wpg_id", $this->wiki_request->getWikiPageId());
             $this->initRenameForm();
             $tpl->setContent($this->form->getHTML());
         }

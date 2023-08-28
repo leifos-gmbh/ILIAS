@@ -27,6 +27,7 @@
  */
 class ilWikiDataSet extends ilDataSet
 {
+    protected \ILIAS\Wiki\Navigation\ImportantPageDBRepository $imp_page_repo;
     protected ?ilObjWiki $current_obj = null;
     protected ilLogger $wiki_log;
 
@@ -37,6 +38,7 @@ class ilWikiDataSet extends ilDataSet
         $this->db = $DIC->database();
         parent::__construct();
         $this->wiki_log = ilLoggerFactory::getLogger('wiki');
+        $this->imp_page_repo = $DIC->wiki()->internal()->repo()->importantPage();
     }
 
     public function getSupportedVersions(): array
@@ -414,7 +416,7 @@ class ilWikiDataSet extends ilDataSet
                 $wiki_id = $a_mapping->getMapping("Modules/Wiki", "wiki", $a_rec["WikiId"]);
                 $page_id = $a_mapping->getMapping("Modules/Wiki", "wpg", $a_rec["PageId"]);
                 if ($wiki_id > 0 && $page_id > 0 && is_object($this->current_obj) && $this->current_obj->getId() === (int) $wiki_id) {
-                    $this->current_obj->addImportantPage((int) $page_id, (int) $a_rec["Ord"], (int) $a_rec["Indent"]);
+                    $this->imp_page_repo->add($this->current_obj->getId(), (int) $page_id, (int) $a_rec["Ord"], (int) $a_rec["Indent"]);
                 }
                 break;
         }

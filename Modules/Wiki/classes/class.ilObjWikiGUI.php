@@ -35,6 +35,7 @@ use ILIAS\Wiki\WikiGUIRequest;
  */
 class ilObjWikiGUI extends ilObjectGUI
 {
+    protected \ILIAS\Wiki\Navigation\ImportantPageManager $imp_pages;
     protected \ILIAS\Wiki\Page\PageManager $pm;
     protected ilObjectTranslation $ot;
     protected \ILIAS\HTTP\Services $http;
@@ -97,6 +98,7 @@ class ilObjWikiGUI extends ilObjectGUI
         if (is_object($this->object)) {
             $this->content_style_domain = $cs->domain()->styleForRefId($this->object->getRefId());
             $this->pm = $this->domain->page()->page($this->object->getRefId());
+            $this->imp_pages = $this->domain->importantPage($this->object->getRefId());
         }
     }
 
@@ -569,9 +571,9 @@ class ilObjWikiGUI extends ilObjectGUI
             if ($this->requested_page !== "") {
                 $this->tabs_gui->setBackTarget(
                     $lng->txt("wiki_last_visited_page"),
-                    self::getGotoLink(
-                        $this->requested_ref_id,
-                        ilWikiUtil::makeDbTitle($this->requested_page)
+                    $this->pm->getPermaLink(
+                        $this->edit_request->getWikiPageId(),
+                        $this->edit_request->getTranslation()
                     )
                 );
             }
@@ -788,9 +790,8 @@ class ilObjWikiGUI extends ilObjectGUI
         // Start Page
         $options = [];
         if ($a_mode === "edit") {
-            $pages = ilWikiPage::getAllWikiPages($this->object->getId());
-            foreach ($pages as $p) {
-                $options[$p["id"]] = ilStr::shortenTextExtended($p["title"], 60, true);
+            foreach ($this->pm->getWikiPages() as $page) {
+                $options[$page->getId()] = ilStr::shortenTextExtended($page->getTitle(), 60, true);
             }
             $si = new ilSelectInputGUI($lng->txt("wiki_start_page"), "startpage_id");
             $si->setOptions($options);
@@ -1638,18 +1639,14 @@ class ilObjWikiGUI extends ilObjectGUI
 
         $this->tpl->setOnScreenMessage('info', $lng->txt("wiki_navigation_info"));
 
-        $ipages = ilObjWiki::_lookupImportantPagesList($this->object->getId());
-        $ipages_ids = array();
-        foreach ($ipages as $i) {
-            $ipages_ids[] = $i["page_id"];
-        }
+        $ipages_ids = $this->imp_pages->getImportantPageIds();
 
         // list pages
-        $pages = ilWikiPage::getAllWikiPages($this->object->getId());
+        $pages = $this->pm->getAllPagesInfo();
         $options = array("" => $lng->txt("please_select"));
         foreach ($pages as $p) {
-            if (!in_array($p["id"], $ipages_ids)) {
-                $options[$p["id"]] = ilStr::shortenTextExtended($p["title"], 60, true);
+            if (!in_array($p->getId(), $ipages_ids)) {
+                $options[$p->getId()] = ilStr::shortenTextExtended($p->getTitle(), 60, true);
             }
         }
         if (count($options) > 0) {
@@ -1679,7 +1676,7 @@ class ilObjWikiGUI extends ilObjectGUI
 
         $imp_page_id = $this->edit_request->getImportantPageId();
         if ($imp_page_id > 0) {
-            $this->object->addImportantPage($imp_page_id);
+            $this->imp_pages->add($imp_page_id);
             $this->tpl->setOnScreenMessage('success', $lng->txt("wiki_imp_page_added"), true);
         }
         $ilCtrl->redirect($this, "editImportantPages");
@@ -1719,7 +1716,7 @@ class ilObjWikiGUI extends ilObjectGUI
 
         $imp_page_ids = $this->edit_request->getImportantPageIds();
         foreach ($imp_page_ids as $i) {
-            $this->object->removeImportantPage((int) $i);
+            $this->imp_pages->removeImportantPage($i);
         }
         $this->tpl->setOnScreenMessage('success', $lng->txt("wiki_removed_imp_pages"), true);
         $ilCtrl->redirect($this, "editImportantPages");
@@ -1734,7 +1731,7 @@ class ilObjWikiGUI extends ilObjectGUI
 
         $ordering = $this->edit_request->getImportantPageOrdering();
         $indentation = $this->edit_request->getImportantPageIndentation();
-        $this->object->saveOrderingAndIndentation($ordering, $indentation);
+        $this->imp_pages->saveOrderingAndIndentation($ordering, $indentation);
         $this->tpl->setOnScreenMessage('success', $lng->txt("wiki_ordering_and_indent_saved"), true);
         $ilCtrl->redirect($this, "editImportantPages");
     }
@@ -1750,7 +1747,7 @@ class ilObjWikiGUI extends ilObjectGUI
         if (count($imp_page_ids) !== 1) {
             $this->tpl->setOnScreenMessage('info', $lng->txt("wiki_select_one_item"), true);
         } else {
-            $this->object->removeImportantPage($imp_page_ids[0]);
+            $this->imp_pages->removeImportantPage($imp_page_ids[0]);
             $this->object->setStartPage(ilWikiPage::lookupTitle($imp_page_ids[0]));
             $this->object->update();
             $this->tpl->setOnScreenMessage('success', $this->lng->txt("msg_obj_modified"), true);

@@ -78,4 +78,14 @@ class InternalDomainService
         );
     }
 
+    public function importantPage(int $ref_id) : Navigation\ImportantPageManager
+    {
+        return new Navigation\ImportantPageManager(
+            $this->data_service,
+            $this->repo_service->importantPage(),
+            $this->wiki(),
+            $ref_id
+        );
+    }
+
 }

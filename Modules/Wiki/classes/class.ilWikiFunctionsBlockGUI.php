@@ -25,6 +25,7 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 {
     public static $block_type = "wikiside";
     public static $st_data;
+    protected int $wpg_id;
     protected int $ref_id;
     protected ilWikiPage $pageob;
     protected ilObjWiki $wiki;
@@ -54,6 +55,7 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
         $this->allow_moving = false;
 
         $this->ref_id = $request->getRefId();
+        $this->wpg_id = $request->getWikiPageId();
 
         $this->wiki = new ilObjWiki($this->ref_id);
 
@@ -117,6 +119,7 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
         $tpl = new ilTemplate("tpl.wiki_side_block_content.html", true, true, "Modules/Wiki");
 
         $wp = $this->getPageObject();
+        $ilCtrl->setParameterByClass(ilWikiPageGUI::class, "wpg_id", $this->wpg_id);
 
         // info
         $actions[] = array(

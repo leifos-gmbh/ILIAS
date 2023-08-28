@@ -58,6 +58,9 @@ class PageManager
         string $lang = "-",
         int $template_page = 0
     ) : int {
+        if ($lang === "") {
+            $lang = "-";
+        }
         // todo check if $wpg_id is given if lang is set
         // todo check if $wpg_id is not given if lang is not set
         // todo check if $wpg_id belongs to wiki, if given
@@ -224,7 +227,7 @@ class PageManager
         );
     }
 
-    public function getPermaLink(int $id, $lang = "-") : string
+    public function getPermaLink(int $id, string $lang = "-") : string
     {
         $lang = (!in_array($lang, ["", "-"]))
             ? "_" . $lang
@@ -236,4 +239,15 @@ class PageManager
             "wpage_" . $id . "_" . $this->wiki_ref_id . $lang
         );
     }
+
+    public function exists(int $id, string $lang = "-") : bool
+    {
+        return $this->page_repo->exists($id, $lang);
+    }
+
+    public function getTitle(int $id, string $lang = "-") : string
+    {
+        return $this->page_repo->getTitle($id, $lang);
+    }
+
 }

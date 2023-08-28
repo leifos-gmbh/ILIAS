@@ -22,6 +22,7 @@ namespace ILIAS\Wiki;
 
 use ILIAS\Wiki\Page\Page;
 use ILIAS\Wiki\Page\PageInfo;
+use ILIAS\Wiki\Navigation\ImportantPage;
 
 /**
  * Wiki internal data service
@@ -78,4 +79,16 @@ class InternalDataService
         );
     }
 
+    public function importantPage(
+        int $id,
+        int $order,
+        int $indent
+    ) : ImportantPage
+    {
+        return new ImportantPage(
+            $id,
+            $order,
+            $indent
+        );
+    }
 }

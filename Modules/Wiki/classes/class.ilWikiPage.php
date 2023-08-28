@@ -289,6 +289,8 @@ class ilWikiPage extends ilPageObject
 
     public function delete(): void
     {
+        $imp_pages = $this->service->domain()->importantPage($this->getWikiRefId());
+
         $ilDB = $this->db;
 
         // get other pages that link to this page
@@ -301,8 +303,8 @@ class ilWikiPage extends ilPageObject
         // note: the wiki might be already deleted here
         if (ilObject::_exists($this->getWikiId())) {
             $wiki = new ilObjWiki($this->getWikiId(), false);
-            if ($wiki->isImportantPage($this->getId())) {
-                $wiki->removeImportantPage($this->getId());
+            if ($imp_pages->isImportantPage($this->getId())) {
+                $imp_pages->removeImportantPage($this->getId());
             }
         }
 
@@ -518,46 +520,6 @@ class ilWikiPage extends ilPageObject
         }
 
         return $pages;
-    }
-
-    public static function getOrphanedPages(
-        int $a_wiki_id
-    ): array {
-        global $DIC;
-
-        $ilDB = $DIC->database();
-
-        $pages = self::getAllWikiPages($a_wiki_id);
-
-        $orphaned = array();
-        foreach ($pages as $k => $page) {
-
-            // find wiki page sources that link to page
-            $sources = ilInternalLink::_getSourcesOfTarget("wpg", $page["id"], 0);
-            $ids = array();
-            foreach ($sources as $source) {
-                if ($source["type"] === "wpg:pg") {
-                    $ids[] = $source["id"];
-                }
-            }
-
-            // cross check existence of sources in il_wiki_page
-            $query = "SELECT count(*) cnt FROM il_wiki_page" .
-                " WHERE " . $ilDB->in("id", $ids, false, "integer") .
-                " AND wiki_id = " . $ilDB->quote($a_wiki_id, "integer") .
-                " GROUP BY wiki_id";
-            $set = $ilDB->query($query);
-            $rec = $ilDB->fetchAssoc($set);
-
-            // if no sources found (or sources are not wiki pages, page is orphaned
-            if (count($ids) === 0 || ($rec && (int) $rec["cnt"] === 0)) {
-                if (ilObjWiki::_lookupStartPage($a_wiki_id) !== $page["title"]) {
-                    $orphaned[] = $page;
-                }
-            }
-        }
-
-        return $orphaned;
     }
 
     public static function _wikiPageExists(

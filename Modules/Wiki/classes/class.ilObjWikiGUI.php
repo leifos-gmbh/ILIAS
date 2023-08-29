@@ -163,7 +163,7 @@ class ilObjWikiGUI extends ilObjectGUI
                 $this->checkPermission("read");
                 $requested_page = $this->requested_page;
                 if ($this->edit_request->getWikiPageId() > 0) {
-                    $requested_page = ilWikiPage::lookupTitle(
+                    $requested_page = $this->pm->getTitle(
                         $this->edit_request->getWikiPageId(),
                         $this->edit_request->getTranslation()
                     );
@@ -1290,9 +1290,7 @@ class ilObjWikiGUI extends ilObjectGUI
             $a_page = $this->requested_page;
         }
 
-        if (ilWikiPage::_wikiPageExists(
-            $this->object->getId(),
-            ilWikiUtil::makeDbTitle($a_page),
+        if ($this->pm->existsByTitle(ilWikiUtil::makeDbTitle($a_page),
             $this->edit_request->getTranslation()
         )) {
             // to do: get rid of this redirect

@@ -23,12 +23,14 @@ namespace ILIAS\Wiki\Content;
 use ILIAS\Wiki\InternalGUIService;
 use ILIAS\Wiki\InternalDomainService;
 use ILIAS\Wiki\WikiGUIRequest;
+use ILIAS\Wiki\Page\PageManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
 class NavigationManager
 {
+    protected PageManager $pm;
     protected string $lang;
     protected string $page_title;
     protected int $wpg_id;
@@ -36,11 +38,13 @@ class NavigationManager
     protected bool $initialised = false;
 
     public function __construct(
+        PageManager $pm,
         \ilObjWiki $wiki,
         int $wpg_id = 0,
         string $page_title = "",
         string $lang = "-")
     {
+        $this->pm = $pm;
         $this->wiki = $wiki;
         $this->wpg_id = $wpg_id;
         $this->page_title = trim($page_title);
@@ -60,16 +64,16 @@ class NavigationManager
 
             // if no page id given, get page id from requested page title
             if ($this->wpg_id === 0 && $this->page_title !== "") {
-                $this->wpg_id = (int) \ilWikiPage::getPageIdForTitle($this->wiki->getId(), $this->page_title, $this->lang);
+                $this->wpg_id = (int) $this->pm->getPageIdForTitle($this->page_title, $this->lang);
             }
 
             // check if page exists and belongs to wiki
             if ($this->wpg_id > 0) {
-                if (!\ilPageObject::_exists("wpg", $this->wpg_id, $this->lang)) {
+                if (!$this->pm->exists($this->wpg_id, $this->lang)) {
                     throw new \ilWikiException("Wiki page does not exist (" .
                         $this->wpg_id . ",". $this->lang .")");
                 }
-                if (\ilWikiPage::lookupObjIdByPage($this->wpg_id) !== $this->wiki->getId()) {
+                if (!$this->pm->belongsToWiki($this->wpg_id)) {
                     throw new \ilWikiException("Wiki page does not belong to wiki (" .
                         $this->wpg_id . ",". $this->wiki->getId() .")");
                 }

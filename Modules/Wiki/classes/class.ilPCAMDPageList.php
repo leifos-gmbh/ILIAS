@@ -36,6 +36,7 @@ class ilPCAMDPageList extends ilPageContent
         $this->db = $DIC->database();
         $this->lng = $DIC->language();
         $this->setType("amdpl");
+        $this->wiki_domain = $DIC->wiki()->internal()->domain();
     }
 
     public static function getLangVars(): array
@@ -221,6 +222,7 @@ class ilPCAMDPageList extends ilPageContent
         }
         $end = 0;
         $wiki_id = $this->getPage()->getWikiId();
+        $pm = $this->wiki_domain->page()->page($this->getPage()->getWikiRefId());
 
         $start = strpos($a_output, "[[[[[AMDPageList;");
         if (is_int($start)) {
@@ -245,7 +247,8 @@ class ilPCAMDPageList extends ilPageContent
                     $frag->mFragment = null;
                     $frag->mTextform = $page_title;
 
-                    $ltpl->setVariable("PAGE", ilWikiUtil::makeLink($frag, $wiki_id, $page_title));
+                    $href = $pm->getPermaLink($page_id, $this->getPage()->getLanguage());
+                    $ltpl->setVariable("PAGE", "<a href='" . $href . "'>" . $page_title . "</a>");
                     $ltpl->parseCurrentBlock();
                 }
             } else {

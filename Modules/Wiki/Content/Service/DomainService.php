@@ -51,6 +51,7 @@ class DomainService
     ) : NavigationManager
     {
         return new NavigationManager(
+            $this->domain_service->page()->page($wiki->getRefId()),
             $wiki,
             $wpg_id,
             $page_title,

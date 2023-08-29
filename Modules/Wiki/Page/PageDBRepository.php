@@ -39,6 +39,17 @@ class PageDBRepository
         $this->db = $db;
     }
 
+    public function delete($id, $lang = "-") : void
+    {
+        $and = in_array($lang, ["", "-"])
+            ? ""
+            : " AND lang = " . $this->db->quote($lang, "text");
+        $query = "DELETE FROM il_wiki_page" .
+            " WHERE id = " . $this->db->quote($id, "integer") .
+            $and;
+        $this->db->manipulate($query);
+    }
+
     protected function getPageFromRecord(array $rec) : Page
     {
         return $this->data->page(
@@ -102,7 +113,7 @@ class PageDBRepository
      * Queries last change and user per page regardless of language
      * @return iterable<PageInfo>
      */
-    public function getAllPagesInfo(int $wiki_id) : \Iterator
+    public function getPagesInfo(int $wiki_id) : \Iterator
     {
         $set = $this->db->queryF("SELECT w.id, p.last_change_user, p.last_change, w.title " . "FROM page_object p JOIN il_wiki_page w " .
             " ON (w.wiki_id = %s AND p.parent_type = %s AND p.page_id = w.id AND w.lang = %s) " .
@@ -120,6 +131,23 @@ class PageDBRepository
                 continue;
             }
             $ids[(int) $rec["id"]] = (int) $rec["id"];
+            yield $this->getPageInfoFromRecord($rec);
+        }
+    }
+
+    public function getInfoOfSelected($wiki_id, array $ids, $lang = "-") : \Iterator
+    {
+        $query = "SELECT wp.id, p.last_change_user, p.last_change, wp.title, wp.lang ".
+            " FROM il_wiki_page wp JOIN page_object p " .
+            " ON (wp.id = p.page_id AND wp.lang = p.lang) " .
+            " WHERE " . $this->db->in("wp.id", $ids, false, "integer") .
+            " AND p.parent_type = " . $this->db->quote("wpg", "text") .
+            " AND wp.wiki_id = " . $this->db->quote($wiki_id, "integer") .
+            " AND wp.lang = " . $this->db->quote($lang, "text") .
+            " ORDER BY title";
+        $set = $this->db->query($query);
+
+        while ($rec = $this->db->fetchAssoc($set)) {
             yield $this->getPageInfoFromRecord($rec);
         }
     }
@@ -222,19 +250,31 @@ class PageDBRepository
         if ($lang === "") {
             $lang = "-";
         }
-
         $title = \ilWikiUtil::makeDbTitle($title);
 
-        $query = "SELECT * FROM il_wiki_page" .
-            " WHERE wiki_id = " . $this->db->quote($wiki_id, "integer") .
-            " AND title = " . $this->db->quote($title, "text") .
-            " AND lang = " . $this->db->quote($lang, "text");
+        $query = "SELECT w.id  FROM il_wiki_page w " .
+            " JOIN page_object p ON (w.id = p.page_id AND w.lang = p.lang) " .
+            " WHERE w.wiki_id = " . $this->db->quote($wiki_id, "integer") .
+            " AND w.title = " . $this->db->quote($title, "text") .
+            " AND w.lang = " . $this->db->quote($lang, "text");
         $set = $this->db->query($query);
         if ($rec = $this->db->fetchAssoc($set)) {
             return (int) $rec["id"];
         }
 
         return null;
+    }
+
+    public function existsByTitle(
+        int $wiki_id,
+        string $title,
+        string $lang = "-"
+    ) : bool {
+        $id = $this->getPageIdForTitle($wiki_id, $title, $lang);
+        if (is_null($id)) {
+            return false;
+        }
+        return $this->exists($id, $lang);
     }
 
     public function exists(
@@ -270,6 +310,19 @@ class PageDBRepository
             return $rec["title"];
         }
         return "";
+    }
+
+    public function getWikiIdByPageId(
+        int $id
+    ): ?int {
+        $query = "SELECT wiki_id FROM il_wiki_page" .
+            " WHERE id = " . $this->db->quote($id, "integer") .
+            " AND lang = " . $this->db->quote('-', "text");
+        $set = $this->db->query($query);
+        if ($rec = $this->db->fetchAssoc($set)) {
+            return (int) $rec["wiki_id"];
+        }
+        return null;
     }
 
 }

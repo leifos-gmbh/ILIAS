@@ -25,6 +25,7 @@ use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\Wiki\Content;
 use ILIAS\Wiki\Page;
 use ILIAS\Wiki\Wiki;
+use ILIAS\Wiki\Links\LinkManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -84,6 +85,16 @@ class InternalDomainService
             $this->data_service,
             $this->repo_service->importantPage(),
             $this->wiki(),
+            $ref_id
+        );
+    }
+
+    public function links(int $ref_id) : LinkManager
+    {
+        return new LinkManager(
+            $this->data_service,
+            $this->repo_service->missingPage(),
+            $this,
             $ref_id
         );
     }

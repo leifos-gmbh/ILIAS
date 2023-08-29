@@ -3028,12 +3028,18 @@ class ilPageObjectGUI
     {
         $l = $this->request->getString("totransl");
         $p = $this->getPageObject();
-        if (!ilPageObject::_exists($p->getParentType(), $p->getId(), $l)) {
+        if (!$this->checkLangPageAvailable($p->getId(), $l)) {
             $this->confirmPageTranslationCreation();
             return;
         }
         $this->ctrl->setParameter($this, "transl", $l);
         $this->ctrl->redirect($this, "edit");
+    }
+
+    protected function checkLangPageAvailable(int $id, string $lang) : bool
+    {
+        $p = $this->getPageObject();
+        return ilPageObject::_exists($this->getParentType(), $id, $lang);
     }
 
     /**

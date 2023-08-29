@@ -2699,7 +2699,9 @@ s     */
             $this->buildDom();
             $mobs = $this->collectMediaObjects(false);
         }
-        $mobs2 = ilObjMediaObject::_getMobsOfObject($this->getParentType() . ":pg", $this->getId(), false);
+        $mobs2 = ilObjMediaObject::_getMobsOfObject($this->getParentType() . ":pg", $this->getId(), false,
+            $this->getLanguage());
+
         foreach ($mobs2 as $m) {
             if (!in_array($m, $mobs)) {
                 $mobs[] = $m;
@@ -2723,17 +2725,22 @@ s     */
         ilObjMediaObject::_deleteAllUsages($this->getParentType() . ":pg", $this->getId());
 
         // delete news
-        ilNewsItem::deleteNewsOfContext(
-            $this->getParentId(),
-            $this->getParentType(),
-            $this->getId(),
-            "pg"
-        );
+        if (!$this->isTranslationPage()) {
+            ilNewsItem::deleteNewsOfContext(
+                $this->getParentId(),
+                $this->getParentType(),
+                $this->getId(),
+                "pg"
+            );
+        }
 
         // delete page_object entry
+        $and = $this->isTranslationPage()
+            ? " AND lang = " . $this->db->quote($this->getLanguage(), "text")
+            : "";
         $this->db->manipulate("DELETE FROM page_object " .
             "WHERE page_id = " . $this->db->quote($this->getId(), "integer") .
-            " AND parent_type= " . $this->db->quote($this->getParentType(), "text"));
+            " AND parent_type= " . $this->db->quote($this->getParentType(), "text") . $and);
 
         // delete media objects
         foreach ($mobs as $mob_id) {
@@ -2755,6 +2762,11 @@ s     */
         }
 
         $this->__afterDelete();
+    }
+
+    protected function isTranslationPage() : bool
+    {
+        return !in_array($this->getLanguage(), ["", "-"]);
     }
 
     /**

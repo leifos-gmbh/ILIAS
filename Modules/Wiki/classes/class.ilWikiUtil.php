@@ -86,7 +86,7 @@ class ilWikiUtil
      * (internal)
      * @return array|false|string
      */
-    public static function processInternalLinks(
+    protected static function processInternalLinks(
         string $s,
         int $a_wiki_id,
         string $a_mode = IL_WIKI_MODE_REPLACE,
@@ -94,6 +94,9 @@ class ilWikiUtil
         bool $a_offline = false,
         string $lang = "-"
     ) {
+        global $DIC;
+        $page_repo = $DIC->wiki()->internal()->repo()->page();
+
         include_once("./Modules/Wiki/libs/Sanitizer.php");
         $collect = array();
         // both from mediawiki DefaulSettings.php
@@ -262,7 +265,7 @@ class ilWikiUtil
             } else {
                 $db_title = self::makeDbTitle($nt->mTextform);
 
-                if ((ilWikiPage::_wikiPageExists($a_wiki_id, $db_title) ||
+                if (($page_repo->existsByTitle($a_wiki_id, $db_title, $lang) ||
                     $a_collect_non_ex)
                 &&
                     !in_array($db_title, $collect)) {
@@ -281,7 +284,7 @@ class ilWikiUtil
         }
     }
 
-    public static function removeUnsafeCharacters(
+    protected static function removeUnsafeCharacters(
         string $a_str
     ): string {
         return str_replace(array("\x00", "\n", "\r", "\\", "'", '"', "\x1a"), "", $a_str);
@@ -296,7 +299,7 @@ class ilWikiUtil
      * [[Page Title#Anchor|Presentation Text]]
      * [[#Anchor|Presentation Text]] (link to anchor on same wiki page)
      */
-    public static function makeLink(
+    protected static function makeLink(
         object $nt,
         int $a_wiki_id,
         string $text = '',
@@ -312,6 +315,7 @@ class ilWikiUtil
             ->internal()
             ->gui()
             ->request();
+        $page_repo = $DIC->wiki()->internal()->repo()->page();
 
         $ilCtrl = $DIC->ctrl();
 
@@ -337,7 +341,7 @@ class ilWikiUtil
             $url_title = self::makeUrlTitle($nt->mTextform);
             $db_title = self::makeDbTitle($nt->mTextform);
             if ($db_title != "") {
-                $pg_exists = ilWikiPage::_wikiPageExists($a_wiki_id, $db_title, $lang);
+                $pg_exists = $page_repo->existsByTitle($a_wiki_id, $db_title, $lang);
             } else {
                 // links on same page (only anchor used)
                 $pg_exists = true;

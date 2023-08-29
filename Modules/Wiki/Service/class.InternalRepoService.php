@@ -22,6 +22,7 @@ namespace ILIAS\Wiki;
 
 use ILIAS\Wiki\Page\PageDBRepository;
 use ILIAS\Wiki\Navigation\ImportantPageDBRepository;
+use ILIAS\Wiki\Links\MissingPageDBRepository;
 
 /**
  * Wiki repo service
@@ -48,6 +49,14 @@ class InternalRepoService
     public function importantPage() : ImportantPageDBRepository
     {
         return new ImportantPageDBRepository(
+            $this->data,
+            $this->db
+        );
+    }
+
+    public function missingPage() : MissingPageDBRepository
+    {
+        return new MissingPageDBRepository(
             $this->data,
             $this->db
         );

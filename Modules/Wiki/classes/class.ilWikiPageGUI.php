@@ -490,7 +490,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
                 $lang_code = ($language->getLanguageCode() === $this->ot->getMasterLanguage())
                     ? "-"
                     : $language->getLanguageCode();
-                $exists = (ilPageObject::_exists("wpg", $this->getId(), $lang_code));
+                $exists = $this->pm->exists($this->getId(), $lang_code);
                 $this->ctrl->setParameterByClass(self::class, "transl", $lang_code);
                 $action = ($lang_code !== "-" && !$exists)
                     ? "switchToLanguage"
@@ -605,13 +605,14 @@ class ilWikiPageGUI extends ilPageObjectGUI
     {
         $tpl = $this->tpl;
 
-        $this->setSideBlock();
+        //$this->setSideBlock();
         $table_gui = new ilWikiPagesTableGUI(
             $this,
             "whatLinksHere",
             $this->getWikiPage()->getWikiId(),
             IL_WIKI_WHAT_LINKS_HERE,
-            $this->wiki_request->getWikiPageId()
+            $this->wiki_request->getWikiPageId(),
+            $this->wiki_request->getTranslation()
         );
 
         $tpl->setContent($table_gui->getHTML());
@@ -637,20 +638,6 @@ class ilWikiPageGUI extends ilPageObjectGUI
                 "ilwikistatgui"
             );
         }
-
-        $ilCtrl->setParameterByClass(
-            "ilobjwikigui",
-            "wpg_id",
-            ilWikiPage::getPageIdForTitle(
-                $this->getPageObject()->getParentId(),
-                ilWikiUtil::makeDbTitle($this->wiki_request->getPage())
-            )
-        );
-        $ilCtrl->setParameterByClass(
-            "ilobjwikigui",
-            "page",
-            ilWikiUtil::makeUrlTitle($this->wiki_request->getPage())
-        );
 
         $ilTabs->addTarget(
             "wiki_what_links_here",
@@ -1383,6 +1370,11 @@ class ilWikiPageGUI extends ilPageObjectGUI
         //}
 
         $this->ctrl->redirect($this, "edit");
+    }
+
+    protected function checkLangPageAvailable(int $id, string $lang) : bool
+    {
+        return $this->pm->exists($id, $lang);
     }
 
 }

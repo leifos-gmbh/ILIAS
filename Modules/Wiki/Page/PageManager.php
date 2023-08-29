@@ -47,7 +47,7 @@ class PageManager
         $this->wiki = $this->wiki_domain->object($ref_id);
     }
 
-    protected function getWikiId() : int
+    public function getWikiId() : int
     {
         return $this->wiki_domain->getObjId($this->wiki_ref_id);
     }
@@ -126,6 +126,18 @@ class PageManager
     {
         return $this->page_repo->getWikiPages(
             $this->getWikiId(),
+            $lang
+        );
+    }
+
+    /**
+     * @return iterable<PageInfo>
+     */
+    public function getInfoOfSelected(array $ids, string $lang = "-") : \Iterator
+    {
+        return $this->page_repo->getInfoOfSelected(
+            $this->getWikiId(),
+            $ids,
             $lang
         );
     }
@@ -240,14 +252,40 @@ class PageManager
         );
     }
 
+    public function getPermaLinkByTitle(string $title, string $lang = "-") : string
+    {
+        $id = $this->getPageIdForTitle($title, $lang);
+        if (!is_null($id)) {
+            return $this->getPermaLink($id, $lang);
+        }
+        return \ilLink::_getStaticLink(
+            $this->wiki_ref_id,
+            "wiki"
+        );
+    }
+
     public function exists(int $id, string $lang = "-") : bool
     {
         return $this->page_repo->exists($id, $lang);
     }
 
+    public function existsByTitle(
+        string $title,
+        string $lang = "-"
+    ) : bool
+    {
+        return $this->page_repo->existsByTitle($this->getWikiId(), $title, $lang);
+    }
+
     public function getTitle(int $id, string $lang = "-") : string
     {
         return $this->page_repo->getTitle($id, $lang);
+    }
+
+    public function belongsToWiki(
+        int $id
+    ): bool {
+        return $this->page_repo->getWikiIdByPageId($id) === $this->getWikiId();
     }
 
 }

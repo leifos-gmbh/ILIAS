@@ -29,6 +29,7 @@ const IL_WIKI_ORPHANED_PAGES = "orphaned";
  */
 class ilWikiPagesTableGUI extends ilTable2GUI
 {
+    protected string $lang;
     protected ilObjectTranslation $ot;
     protected \ILIAS\Wiki\Page\PageManager $pm;
     protected int $requested_ref_id;
@@ -41,10 +42,14 @@ class ilWikiPagesTableGUI extends ilTable2GUI
         string $a_parent_cmd,
         int $a_wiki_id,
         string $a_mode = IL_WIKI_ALL_PAGES,
-        int $a_page_id = 0
+        int $a_page_id = 0,
+        string $lang = "-"
     ) {
         global $DIC;
 
+        $this->lang = ($lang == "")
+            ? "-"
+            : $lang;
         $service = $DIC->wiki()->internal();
         $gui = $service->gui();
         $domain = $service->domain();
@@ -53,7 +58,9 @@ class ilWikiPagesTableGUI extends ilTable2GUI
         $this->requested_ref_id = $gui
             ->request()
             ->getRefId();
+        $this->requested_lang = $gui->request()->getTranslation();
         $this->pm = $domain->page()->page($this->requested_ref_id);
+        $this->link_manager = $domain->links($this->requested_ref_id);
         $this->ot = $domain->wiki()->translation($a_wiki_id);
 
         parent::__construct($a_parent_obj, $a_parent_cmd);
@@ -95,7 +102,9 @@ class ilWikiPagesTableGUI extends ilTable2GUI
             default:
                 $this->addColumn($this->lng->txt("wiki_page"), "title");
                 $this->addColumn($this->lng->txt("wiki_last_changed"), "date");
-                $this->addTranslationsColumn();
+                if ($this->pg_list_mode !== IL_WIKI_WHAT_LINKS_HERE) {
+                    $this->addTranslationsColumn();
+                }
                 $this->addColumn($this->lng->txt("wiki_last_changed_by"), "user_sort");
                 $this->setRowTemplate(
                     "tpl.table_row_wiki_page.html",
@@ -146,7 +155,15 @@ class ilWikiPagesTableGUI extends ilTable2GUI
 
         switch ($this->pg_list_mode) {
             case IL_WIKI_WHAT_LINKS_HERE:
-                $pages = ilWikiPage::getLinksToPage($this->wiki_id, $this->page_id);
+                foreach ($this->link_manager->getLinksToPage($this->page_id, $this->lang) as $pi) {
+                    $pages[] = [
+                        "date" => $pi->getLastChange(),
+                        "id" => $pi->getId(),
+                        "user" => $pi->getLastChangedUser(),
+                        "title" => $pi->getTitle(),
+                        "lang" => $pi->getLanguage()
+                    ];
+                }
                 break;
 
             case IL_WIKI_ALL_PAGES:
@@ -225,7 +242,8 @@ class ilWikiPagesTableGUI extends ilTable2GUI
         $ilCtrl = $this->ctrl;
 
         if ($this->pg_list_mode === IL_WIKI_NEW_PAGES) {
-            if ($this->ot->getContentActivated()) {
+            if ($this->ot->getContentActivated() && $this->pg_list_mode !== IL_WIKI_WHAT_LINKS_HERE)
+            {
                 $l = $a_set["lang"] === "-"
                     ? $this->ot->getMasterLanguage()
                     : $a_set["lang"];
@@ -255,7 +273,7 @@ class ilWikiPagesTableGUI extends ilTable2GUI
                 "DATE",
                 ilDatePresentation::formatDate(new ilDateTime($a_set["date"], IL_CAL_DATETIME))
             );
-            if ($this->ot->getContentActivated()) {
+            if ($this->ot->getContentActivated() && $this->pg_list_mode !== IL_WIKI_WHAT_LINKS_HERE) {
                 $this->tpl->setCurrentBlock("lang");
                 $this->tpl->setVariable("LANG", implode(", ", $this->pm->getLanguages($a_set["id"])));
                 $this->tpl->parseCurrentBlock();

@@ -572,11 +572,11 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
      * is activated -> return true
      * @return bool true, if manual template selection needed
      */
-    public function getTemplateSelectionOnCreation(): bool
+    public function getTemplateSelectionOnCreation(string $lang = "-"): bool
     {
         $num = (int) $this->getEmptyPageTemplate();
         $wt = new ilWikiPageTemplate($this->getId());
-        $ts = $wt->getAllInfo(ilWikiPageTemplate::TYPE_NEW_PAGES);
+        $ts = $wt->getAllInfo(ilWikiPageTemplate::TYPE_NEW_PAGES, $lang);
         $num += count($ts);
         if ($num > 1) {
             return true;

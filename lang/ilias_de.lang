@@ -13160,6 +13160,7 @@ rbac#:#activate_wiki_protection#:#Schreibschutz aktivieren
 rbac#:#active_preconditions#:#Definierte Vorbedingungen
 rbac#:#add_consultation_hours#:#Sprechstundentermine anlegen
 rbac#:#add_consume_provider#:#Eigene LTI-Provider-Einstellungen hinzufügen
+rbac#:#add_pages#:#Seiten erstellen
 rbac#:#add_reply#:#Antwort anlegen
 rbac#:#add_thread#:#Thema anlegen
 rbac#:#adm_edit_permission#:#Rechteeinstellungen für die Allgemeinen Einstellungen der Administration ändern
@@ -14024,10 +14025,11 @@ rbac#:#wfe_read#:#Lesezugriff auf Administration der Workflow Engine
 rbac#:#wfe_visible#:#Administration der Workflow Engine ist sichtbar
 rbac#:#wfe_write#:#Einstellungen der Administration der Workflow Engine bearbeiten
 rbac#:#wiki_activate_wiki_protection#:#Schreibschutz für einzelne Wikiseiten aktivieren
+rbac#:#wiki_add_pages#:#Wiki-Seiten erstellen
 rbac#:#wiki_copy#:#Wiki kopieren
 rbac#:#wiki_delete#:#Wiki löschen oder verschieben
 rbac#:#wiki_delete_wiki_pages#:#Wikiseiten löschen
-rbac#:#wiki_edit_content#:#Wiki-Seiten anlegen und bearbeiten
+rbac#:#wiki_edit_content#:#Wiki-Seiten bearbeiten
 rbac#:#wiki_edit_page_meta#:#Wikiseitenmetadaten bearbeiten
 rbac#:#wiki_edit_permission#:#Rechteeinstellungen ändern
 rbac#:#wiki_edit_wiki_navigation#:#Wiki-Navigation bearbeiten

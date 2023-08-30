@@ -854,7 +854,7 @@ class ilWikiPage extends ilPageObject
     {
         $wt = new ilWikiPageTemplate($this->getWikiId());
         $templates = array();
-        foreach ($wt->getAllInfo(ilWikiPageTemplate::TYPE_ADD_TO_PAGE) as $t) {
+        foreach ($wt->getAllInfo(ilWikiPageTemplate::TYPE_ADD_TO_PAGE, $this->getLanguage()) as $t) {
             $templates[] = array("id" => $t["wpage_id"], "parent_type" => "wpg", "title" => $t["title"]);
         }
         return $templates;
@@ -901,6 +901,11 @@ class ilWikiPage extends ilPageObject
     {
         parent::setTranslationProperties($transl_page);
         $transl_page->setWikiRefId($this->getWikiRefId());
+    }
+
+    protected function setCopyProperties(ilPageObject $new_page) : void
+    {
+        $new_page->setWikiRefId($this->getWikiRefId());
     }
 
 }

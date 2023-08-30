@@ -113,7 +113,7 @@ class PageDBRepository
      * Queries last change and user per page regardless of language
      * @return iterable<PageInfo>
      */
-    public function getPagesInfo(int $wiki_id) : \Iterator
+    public function getAllPagesInfo(int $wiki_id) : \Iterator
     {
         $set = $this->db->queryF("SELECT w.id, p.last_change_user, p.last_change, w.title " . "FROM page_object p JOIN il_wiki_page w " .
             " ON (w.wiki_id = %s AND p.parent_type = %s AND p.page_id = w.id AND w.lang = %s) " .

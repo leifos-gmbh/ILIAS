@@ -53,7 +53,6 @@ class ilSettingsPermissionGUI
         $this->review = $DIC->rbac()->review();
         $this->admin = $DIC->rbac()->admin();
         $this->tpl = $DIC->ui()->mainTemplate();
-
         foreach (ilRbacReview::_getOperationList($this->obj->getType()) as $p) {
             $this->base_permissions[$p["ops_id"]] = $p["operation"];
             $this->base_permissions_by_op[$p["operation"]] = $p["ops_id"];

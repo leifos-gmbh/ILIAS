@@ -566,10 +566,11 @@ class ilWikiPageGUI extends ilPageObjectGUI
     {
         $ilCtrl = $this->ctrl;
 
+        $title = $this->getPageObject()->getTitle();
         $ilCtrl->setParameterByClass(
             "ilobjwikigui",
             "from_page",
-            ilWikiUtil::makeUrlTitle($this->wiki_request->getPage())
+            ilWikiUtil::makeUrlTitle($title)
         );
         if ($this->getEnabledHref() && $this->getOutputMode() !== self::EDIT) {
             $output = ilWikiUtil::replaceInternalLinks(
@@ -611,7 +612,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
             "whatLinksHere",
             $this->getWikiPage()->getWikiId(),
             IL_WIKI_WHAT_LINKS_HERE,
-            $this->wiki_request->getWikiPageId(),
+            $this->getId(),
             $this->wiki_request->getTranslation()
         );
 

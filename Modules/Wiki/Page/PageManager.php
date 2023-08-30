@@ -70,11 +70,11 @@ class PageManager
         // check if template has to be used
         if ($template_page === 0) {
             if (!$this->wiki->getEmptyPageTemplate()) {
-                $wt = new \ilWikiPageTemplate($this->getId());
-                $ts = $wt->getAllInfo(\ilWikiPageTemplate::TYPE_NEW_PAGES);
+                $wt = new \ilWikiPageTemplate($this->getWikiId());
+                $ts = $wt->getAllInfo(\ilWikiPageTemplate::TYPE_NEW_PAGES, $lang);
                 if (count($ts) === 1) {
                     $t = current($ts);
-                    $a_template_page = $t["wpage_id"];
+                    $template_page = (int) $t["wpage_id"];
                 }
             }
         }
@@ -102,16 +102,23 @@ class PageManager
         // copy template into new page
         if ($template_page > 0) {
             $t_page = $this->page_domain->getWikiPage($this->wiki_ref_id, $template_page, 0, $lang);
-            $t_page->copy($page->getId());
+            $t_page->copy(
+                $page->getId(),
+                "",
+                0,
+                false,
+                0,
+                false
+            );
 
             // #15718
             if ($lang === "-") {
                 \ilAdvancedMDValues::_cloneValues(
                     0,
-                    $this->getId(),
-                    $this->getId(),
+                    $this->getWikiId(),
+                    $this->getWikiId(),
                     "wpg",
-                    $a_template_page,
+                    $template_page,
                     $page->getId()
                 );
             }

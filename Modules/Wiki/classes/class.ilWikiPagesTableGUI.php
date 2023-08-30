@@ -46,7 +46,6 @@ class ilWikiPagesTableGUI extends ilTable2GUI
         string $lang = "-"
     ) {
         global $DIC;
-
         $this->lang = ($lang == "")
             ? "-"
             : $lang;

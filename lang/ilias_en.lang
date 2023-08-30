@@ -13160,6 +13160,7 @@ rbac#:#activate_wiki_protection#:#Set Read-Only
 rbac#:#active_preconditions#:#Preconditions
 rbac#:#add_consultation_hours#:#Add Consultation Hours
 rbac#:#add_consume_provider#:#Add Own LTI Provider Settings
+rbac#:#add_pages#:#Add Pages
 rbac#:#add_reply#:#Add Reply
 rbac#:#add_thread#:#Add Thread
 rbac#:#adm_edit_permission#:#User can change permissions of General Settings in Administration.
@@ -14023,11 +14024,12 @@ rbac#:#wfe_edit_permission#:#User can change permission settings of Workflow Eng
 rbac#:#wfe_read#:#User has read access to administration of Workflow Engine
 rbac#:#wfe_visible#:#Administration of Workflow Engine is visible
 rbac#:#wfe_write#:#User can edit settings of Workflow Engine administration
+rbac#:#wiki_add_pages#:#User can create wiki pages
 rbac#:#wiki_activate_wiki_protection#:#Set Wiki Pages to Read-Only
 rbac#:#wiki_copy#:#User can copy wiki
 rbac#:#wiki_delete#:#User can move or delete wiki
 rbac#:#wiki_delete_wiki_pages#:#Delete Wiki Pages
-rbac#:#wiki_edit_content#:#User can create and edit wiki pages
+rbac#:#wiki_edit_content#:#User can edit wiki pages
 rbac#:#wiki_edit_page_meta#:#Edit Wiki Page Metadata
 rbac#:#wiki_edit_permission#:#User can change permission settings
 rbac#:#wiki_edit_wiki_navigation#:#Edit Wiki Navigation

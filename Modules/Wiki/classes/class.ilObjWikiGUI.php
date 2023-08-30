@@ -142,7 +142,7 @@ class ilObjWikiGUI extends ilObjectGUI
                 $ilTabs->activateTab("settings");
                 $this->setSettingsSubTabs("permission_settings");
                 $perm_gui = new ilSettingsPermissionGUI($this);
-                $perm_gui->setPermissions(array("edit_wiki_navigation", "delete_wiki_pages", "activate_wiki_protection",
+                $perm_gui->setPermissions(array("edit_wiki_navigation", "add_pages", "delete_wiki_pages", "activate_wiki_protection",
                     "wiki_html_export"));
                 $perm_gui->setRoleRequiredPermissions(array("edit_content"));
                 $perm_gui->setRoleProhibitedPermissions(array("write"));
@@ -1296,9 +1296,13 @@ class ilObjWikiGUI extends ilObjectGUI
             // to do: get rid of this redirect
             ilUtil::redirect(self::getGotoLink($this->object->getRefId(), $a_page, $this->edit_request->getTranslation()));
         } else {
-            if (!$this->access->checkAccess("edit_content", "", $this->object->getRefId())) {
+            if (!$this->access->checkAccess("add_pages", "", $this->object->getRefId())) {
                 $this->tpl->setOnScreenMessage("failure", $this->lng->txt("no_permission"), true);
-                ilUtil::redirect(ilObjWikiGUI::getGotoLink($this->object->getRefId(), $this->edit_request->getFromPage()));
+                $from_page_id = $this->pm->getPageIdForTitle($this->edit_request->getFromPage(),$this->edit_request->getTranslation());
+                ilUtil::redirect($this->pm->getPermaLink($from_page_id, $this->edit_request->getTranslation()));
+            }
+            if ($this->isNewTranslatedPage()) {
+                return;
             }
             if (!$this->object->getTemplateSelectionOnCreation()) {
                 // check length
@@ -1314,10 +1318,6 @@ class ilObjWikiGUI extends ilObjectGUI
                         ilWikiUtil::makeUrlTitle($this->edit_request->getFromPage())
                     );
                     $ilCtrl->redirectByClass("ilwikipagegui", "preview");
-                }
-
-                if ($this->isNewTranslatedPage()) {
-                    return;
                 }
 
                 $this->pm->createWikiPage(
@@ -1386,6 +1386,19 @@ class ilObjWikiGUI extends ilObjectGUI
             ->group("new", $this->lng->txt("wiki_no_master"))
             ->text("master_title", $this->lng->txt("wiki_master_title"))
             ->end();
+
+        if ($this->object->getTemplateSelectionOnCreation($this->edit_request->getTranslation())) {
+            $form = $form->radio("page_templ", $this->lng->txt("wiki_page_template"), "", "0")->required();
+            if ($this->object->getEmptyPageTemplate()) {
+                $form = $form->radioOption("0", $this->lng->txt("wiki_empty_page"));
+            }
+            $wt = new ilWikiPageTemplate($this->object->getId());
+            $ts = $wt->getAllInfo(ilWikiPageTemplate::TYPE_NEW_PAGES, $this->edit_request->getTranslation());
+            foreach ($ts as $t) {
+                $form = $form->radioOption($t["wpage_id"], $t["title"]);
+            }
+        }
+
         return $form;
     }
 
@@ -1393,6 +1406,10 @@ class ilObjWikiGUI extends ilObjectGUI
     {
         $form = $this->getNewTranslatedPageForm();
         if ($form->isValid()) {
+            $page_template_id = 0;
+            if ($this->object->getTemplateSelectionOnCreation($this->edit_request->getTranslation())) {
+                $page_template_id = (int) $form->getData("page_templ");
+            }
             if ($form->getData("type") === "new") {
                 $wpg_id = $this->pm->createWikiPage(
                     $form->getData("master_title")
@@ -1403,7 +1420,8 @@ class ilObjWikiGUI extends ilObjectGUI
             $wpg_id = $this->pm->createWikiPage(
                 $this->edit_request->getPage(),
                 $wpg_id,
-                $this->edit_request->getTranslation()
+                $this->edit_request->getTranslation(),
+                $page_template_id
             );
         }
         $this->ctrl->setParameterByClass(ilWikiPageGUI::class, "wpg_id", $wpg_id);
@@ -1838,7 +1856,7 @@ class ilObjWikiGUI extends ilObjectGUI
         }
 
         $wt = new ilWikiPageTemplate($this->object->getId());
-        $ts = $wt->getAllInfo(ilWikiPageTemplate::TYPE_NEW_PAGES);
+        $ts = $wt->getAllInfo(ilWikiPageTemplate::TYPE_NEW_PAGES, $this->edit_request->getTranslation());
         foreach ($ts as $t) {
             $op = new ilRadioOption($t["title"], $t["wpage_id"]);
             $radg->addOption($op);

@@ -4785,7 +4785,8 @@ s     */
         string $a_parent_type = "",
         int $a_new_parent_id = 0,
         bool $a_clone_mobs = false,
-        int $obj_copy_id = 0
+        int $obj_copy_id = 0,
+        bool $overwrite_existing = true
     ): void {
         if ($a_parent_type == "") {
             $a_parent_type = $this->getParentType();
@@ -4798,6 +4799,9 @@ s     */
             $existed = false;
             $orig_page = ilPageObjectFactory::getInstance($this->getParentType(), $this->getId(), 0, $l);
             if (ilPageObject::_exists($a_parent_type, $a_id, $l)) {
+                if (!$overwrite_existing) {
+                    continue;
+                }
                 $new_page_object = ilPageObjectFactory::getInstance($a_parent_type, $a_id, 0, $l);
                 $existed = true;
             } else {
@@ -4809,6 +4813,7 @@ s     */
             $new_page_object->setActive($orig_page->getActive());
             $new_page_object->setActivationStart($orig_page->getActivationStart());
             $new_page_object->setActivationEnd($orig_page->getActivationEnd());
+            $this->setCopyProperties($new_page_object);
             if ($existed) {
                 $new_page_object->buildDom();
                 $new_page_object->update();
@@ -4817,6 +4822,11 @@ s     */
             }
         }
     }
+
+    protected function setCopyProperties(ilPageObject $new_page) : void
+    {
+    }
+
 
     /**
      * Lookup translations

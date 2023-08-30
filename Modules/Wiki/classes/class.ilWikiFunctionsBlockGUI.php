@@ -268,6 +268,7 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 
         if ($ilAccess->checkAccess("write", "", $this->ref_id)) {
             $wpt = new ilWikiPageTemplate($this->getPageObject()->getParentId());
+            $ilCtrl->setParameterByClass(ilWikiPageTemplateGUI::class, "wpg_id", $this->getPageObject()->getId());
             if (!$wpt->isPageTemplate($this->getPageObject()->getId())) {
                 $list->addItem(
                     $lng->txt("wiki_add_template"),

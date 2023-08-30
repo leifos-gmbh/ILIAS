@@ -254,6 +254,7 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
             $start_page = new ilWikiPage();
             $start_page->setWikiId($this->getId());
             $start_page->setTitle($this->getStartPage());
+            $start_page->setWikiRefId($this->getRefId());
             $start_page->create();
         }
 

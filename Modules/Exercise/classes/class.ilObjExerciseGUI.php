@@ -92,8 +92,15 @@ class ilObjExerciseGUI extends ilObjectGUI
         $this->requested_offset = $this->exercise_request->getOffset();
         $this->requested_ref_id = $this->exercise_request->getRefId();
         $this->requested_ass_id_goto = $this->exercise_request->getAssIdGoto();
-
+        $this->ui = $this->service->gui()->ui();
         $this->certificateDownloadValidator = new ilCertificateDownloadValidator();
+
+        if ($this->object) {
+            $this->ass_manager = $this->service->domain()->assignment()->assignments($this->object->getRefId());
+            $this->item_builder = $this->service->gui()->assignment()->itemBuilder(
+                $this->service->domain()->assignment()->mandatoryAssignments($this->object)
+            );
+        }
     }
 
     /**
@@ -548,6 +555,11 @@ class ilObjExerciseGUI extends ilObjectGUI
             "content",
             $lng->txt("view"),
             $ilCtrl->getLinkTarget($this, "showOverview")
+        );
+        $ilTabs->addSubTab(
+            "list",
+            $lng->txt("view"). " (" . $lng->txt("new") . ")",
+            $ilCtrl->getLinkTarget($this, "showOverviewNew")
         );
         if ($this->checkPermissionBool("write")) {
             $ilTabs->addSubTab(
@@ -1025,7 +1037,88 @@ class ilObjExerciseGUI extends ilObjectGUI
         $mtpl = new ilTemplate("tpl.exc_ass_overview.html", true, true, "Modules/Exercise");
         $mtpl->setVariable("CONTENT", $acc->getHTML());
 
-        $tpl->setContent($mtpl->get());
+        $html = "";
+        $html.= $mtpl->get();
+
+        $tpl->setContent(
+            $html
+        );
+    }
+
+    /**
+     * @throws ilObjectNotFoundException
+     * @throws ilCtrlException
+     * @throws ilDatabaseException
+     * @throws ilObjectException
+     * @throws ilExcUnknownAssignmentTypeException
+     * @throws ilDateTimeException
+     */
+    public function showOverviewNewObject(): void
+    {
+        $user = $this->service->domain()->user();
+        $toolbar = $this->service->gui()->toolbar();
+        $tabs = $this->service->gui()->tabs();
+
+        $this->checkPermission("read");
+
+        $tabs->activateTab("content");
+        $this->addContentSubTabs("list");
+
+        if ($this->handleRandomAssignmentEntryPage()) {
+            return;
+        }
+
+        //$tpl->addJavaScript("./Modules/Exercise/js/ilExcPresentation.js");
+
+        $exc = $this->object;
+
+        ilLearningProgress::_tracProgress(
+            $user->getId(),
+            $exc->getId(),
+            $exc->getRefId(),
+            'exc'
+        );
+
+        if ($this->certificateDownloadValidator->isCertificateDownloadable(
+            $user->getId(),
+            $exc->getId()
+        )) {
+            $toolbar->addButton(
+                $this->lng->txt("certificate"),
+                $this->ctrl->getLinkTarget($this, "outCertificate")
+            );
+        }
+
+        $ass_gui = new ilExAssignmentGUI($exc, $this->getService());
+
+        $f = $this->ui->factory();
+        $r = $this->ui->renderer();
+
+        $view_type = $this->ass_manager::TYPE_ONGOING;
+        $items[$view_type] = [];
+
+        $ass_data = ilExAssignment::getInstancesByExercise($exc->getId());
+        $random_manager = $this->service->domain()->assignment()->randomAssignments($exc);
+        foreach ($this->ass_manager->getList() as $ass) {
+            if (!$random_manager->isAssignmentVisible($ass->getId(), $this->user->getId())) {
+                continue;
+            }
+            $items[$view_type][] = $this->item_builder->getItem($ass, $user->getId());
+        }
+
+        // new
+        $groups = [];
+        foreach ($items as $view_type => $items) {
+            $groups[] = $f->item()->group($this->lng->txt("exc_overview_mode_" . $view_type), $items);
+        }
+        $panel = $f->panel()->listing()->standard($this->lng->txt("exc_assignments"), $groups);
+
+        $html = "";
+        $html.= $r->render($panel);
+
+        $this->tpl->setContent(
+            $html
+        );
     }
 
     /**

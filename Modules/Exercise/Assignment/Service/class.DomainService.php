@@ -44,6 +44,15 @@ class DomainService
         $this->repo_service = $repo_service;
     }
 
+
+    public function assignments(int $ref_id): AssignmentManager
+    {
+        return new AssignmentManager(
+            $this->repo_service,
+            $ref_id
+        );
+    }
+
     /**
      * Get random assignment manager.
      * The manager is used if the "Pass Mode" is set to "Random Selection" in the exercise settings.

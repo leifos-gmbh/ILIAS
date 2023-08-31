@@ -16,143 +16,174 @@
  *
  *********************************************************************/
 
-use ILIAS\DI\UIServices;
-use ILIAS\Exercise\InternalService;
+declare(strict_types=1);
+
+namespace ILIAS\Exercise\Assignment;
+
+use ILIAS\Exercise\InternalDomainService;
+use ILIAS\Exercise\InternalGUIService;
 use ILIAS\Exercise\Assignment\Mandatory\MandatoryAssignmentsManager;
 
-/**
- * GUI class for exercise assignments
- *
- * @author Alexander Killing <killing@leifos.de>
- */
-class ilExAssignmentGUI
+class PropertyAndActionBuilderUI
 {
-    protected \ILIAS\MediaObjects\MediaType\MediaTypeManager $media_type;
-    protected ilLanguage $lng;
-    protected ilObjUser $user;
-    protected ilCtrl $ctrl;
-    protected ilObjExercise $exc;
-    protected int $current_ass_id;
-    protected InternalService $service;
-    protected MandatoryAssignmentsManager $mandatory_manager;
-    protected UIServices $ui;
-    protected int $requested_ass_id;
+    public const PROP_DEADLINE = "deadline";
+    public const PROP_REQUIREMENT = "requirement";
+    protected int $user_id;
+    protected string $lead_text = "";
+    protected array $head_properties = [];
+    protected array $additional_head_properties = [];
 
-
-    /**
-     * @throws ilExcUnknownAssignmentTypeException
-     */
     public function __construct(
-        ilObjExercise $a_exc,
-        InternalService $service
+        MandatoryAssignmentsManager $mandatory_manager,
+        InternalDomainService $domain_service,
+        InternalGUIService $gui_service
     ) {
-        /** @var \ILIAS\DI\Container $DIC */
-        global $DIC;
-
-        $request = $DIC->exercise()->internal()->gui()->request();
-        $this->requested_ass_id = $request->getAssId();
-
-        $this->lng = $DIC->language();
-        $this->user = $DIC->user();
-        $this->ctrl = $DIC->ctrl();
-        $this->ui = $DIC->ui();
-
-        $this->exc = $a_exc;
-        $this->service = $service;
-        $this->mandatory_manager = $service->domain()->assignment()->mandatoryAssignments($this->exc);
-        $this->media_type = $DIC->mediaObjects()->internal()->domain()->mediaType();
+        $this->domain_service = $domain_service;
+        $this->gui_service = $gui_service;
+        $this->lng = $domain_service->lng();
+        $this->mandatory_manager = $mandatory_manager;
+        $this->lng->loadLanguageModule("exc");
     }
 
-    /**
-     * Get assignment header for overview
-     * @throws ilDateTimeException
-     */
-    public function getOverviewHeader(ilExAssignment $a_ass): string
+    public function build(Assignment $ass, int $user_id) : void
     {
+        $this->assignment = $ass;
+        $this->user_id = $user_id;
+        $this->state = \ilExcAssMemberState::getInstanceByIds($ass->getId(), $user_id);
+        $this->lead_text = "";
+        $this->buildHead();
+    }
+
+    public function getLeadText() : string
+    {
+        return $this->lead_text;
+    }
+
+    public function getHeadProperty(string $type) : ?array
+    {
+        return $this->head_properties[$type] ?? null;
+    }
+
+    public function getAdditionalHeadProperties() : array
+    {
+        return $this->additional_head_properties;
+    }
+
+    protected function setLeadText(string $text) : void
+    {
+        $this->lead_text = $text;
+    }
+
+
+    protected function setHeadProperty(string $type, string $prop, string $val) : void
+    {
+        $this->head_properties[$type] = [
+            "prop" => $prop,
+            "val" => $val
+        ];
+    }
+
+    protected function addAdditionalHeadProperty(string $prop, string $val) : void
+    {
+        $this->additional_head_properties[] = [
+            "prop" => $prop,
+            "val" => $val
+        ];
+    }
+
+    protected function buildHead() : void
+    {
+        $state = $this->state;
         $lng = $this->lng;
-        $ilUser = $this->user;
 
-        $lng->loadLanguageModule("exc");
-
-        $state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
-
-        $tpl = new ilTemplate("tpl.assignment_head.html", true, true, "Modules/Exercise");
-
-        // we are completely ignoring the extended deadline here
-
-        // :TODO: meaning of "ended on"
         if ($state->exceededOfficialDeadline()) {
-            $tpl->setCurrentBlock("prop");
-            $tpl->setVariable("PROP", $lng->txt("exc_ended_on"));
-            $tpl->setVariable("PROP_VAL", $state->getCommonDeadlinePresentation());
-            $tpl->parseCurrentBlock();
+            $this->setLeadText (
+                $lng->txt("exc_ended_on") . ": " . $state->getCommonDeadlinePresentation()
+            );
 
-            // #14077						// this currently shows the feedback deadline during grace period
+            $this->setHeadProperty(
+                self::PROP_DEADLINE,
+                $lng->txt("exc_ended_on"),
+                $state->getCommonDeadlinePresentation()
+            );
+
+            // #14077 // this currently shows the feedback deadline during grace period
             if ($state->getPeerReviewDeadline()) {
-                $tpl->setCurrentBlock("prop");
-                $tpl->setVariable("PROP", $lng->txt("exc_peer_review_deadline"));
-                $tpl->setVariable("PROP_VAL", $state->getPeerReviewDeadlinePresentation());
-                $tpl->parseCurrentBlock();
+                $this->addAdditionalHeadProperty(
+                    $lng->txt("exc_peer_review_deadline"),
+                    $state->getPeerReviewDeadlinePresentation()
+                );
             }
         } elseif (!$state->hasGenerallyStarted()) {
-            $tpl->setCurrentBlock("prop");
             if ($state->getRelativeDeadline()) {
-                $tpl->setVariable("PROP", $lng->txt("exc_earliest_start_time"));
+                $prop = $lng->txt("exc_earliest_start_time");
             } else {
-                $tpl->setVariable("PROP", $lng->txt("exc_starting_on"));
+                $prop = $lng->txt("exc_starting_on");
             }
-            $tpl->setVariable("PROP_VAL", $state->getGeneralStartPresentation());
-            $tpl->parseCurrentBlock();
+            $this->setLeadText (
+                $prop . ": " . $state->getGeneralStartPresentation()
+            );
+            $this->setHeadProperty(
+                self::PROP_DEADLINE,
+                $prop,
+                $state->getGeneralStartPresentation()
+            );
         } else {
             if ($state->getCommonDeadline() > 0) {
-                $tpl->setCurrentBlock("prop");
-                $tpl->setVariable("PROP", $lng->txt("exc_time_to_send"));
-                $tpl->setVariable("PROP_VAL", $state->getRemainingTimePresentation());
-                $tpl->parseCurrentBlock();
-
-                $tpl->setCurrentBlock("prop");
-                $tpl->setVariable("PROP", $lng->txt("exc_edit_until"));
-                $tpl->setVariable("PROP_VAL", $state->getCommonDeadlinePresentation());
-                $tpl->parseCurrentBlock();
+                $this->setLeadText (
+                    $lng->txt("exc_time_to_send") . ": " . $state->getRemainingTimePresentation()
+                );
+                $this->setHeadProperty(
+                    self::PROP_DEADLINE,
+                    $lng->txt("exc_edit_until"),
+                    $state->getCommonDeadlinePresentation()
+                );
             } elseif ($state->getRelativeDeadline()) {		// if we only have a relative deadline (not started yet)
-                $tpl->setCurrentBlock("prop");
-                $tpl->setVariable("PROP", $lng->txt("exc_rem_time_after_start"));
-                $tpl->setVariable("PROP_VAL", $state->getRelativeDeadlinePresentation());
-                $tpl->parseCurrentBlock();
+                $this->setHeadProperty(
+                    self::PROP_DEADLINE,
+                    $lng->txt("exc_rem_time_after_start"),
+                    $state->getRelativeDeadlinePresentation()
+                );
 
                 if ($state->getLastSubmissionOfRelativeDeadline()) {		// if we only have a relative deadline (not started yet)
-                    $tpl->setCurrentBlock("prop");
-                    $tpl->setVariable("PROP", $lng->txt("exc_rel_last_submission"));
-                    $tpl->setVariable("PROP_VAL", $state->getLastSubmissionOfRelativeDeadlinePresentation());
-                    $tpl->parseCurrentBlock();
+                    $this->addAdditionalHeadProperty(
+                        $lng->txt("exc_rel_last_submission"),
+                        $state->getLastSubmissionOfRelativeDeadlinePresentation()
+                    );
                 }
             }
 
-
             if ($state->getIndividualDeadline() > 0) {
-                $tpl->setCurrentBlock("prop");
-                $tpl->setVariable("PROP", $lng->txt("exc_individual_deadline"));
-                $tpl->setVariable("PROP_VAL", $state->getIndividualDeadlinePresentation());
-                $tpl->parseCurrentBlock();
+                $this->addAdditionalHeadProperty(
+                    $lng->txt("exc_individual_deadline"),
+                    $state->getIndividualDeadlinePresentation()
+                );
             }
         }
 
-        $mand = "";
-        if ($this->mandatory_manager->isMandatoryForUser($a_ass->getId(), $this->user->getId())) {
-            $mand = " (" . $lng->txt("exc_mandatory") . ")";
+        if ($this->mandatory_manager->isMandatoryForUser($this->assignment->getId(), $this->user_id)) {
+            $this->setHeadProperty(
+                self::PROP_REQUIREMENT,
+                $lng->txt("exc_requirement"),
+                $lng->txt("exc_mandatory")
+            );
+        } else {
+            $this->setHeadProperty(
+                self::PROP_REQUIREMENT,
+                $lng->txt("exc_requirement"),
+                $lng->txt("exc_optional")
+            );
         }
-        $tpl->setVariable("TITLE", $a_ass->getTitle() . $mand);
 
         // status icon
+        /*
         $tpl->setVariable(
             "ICON_STATUS",
             $this->getIconForStatus(
                 $a_ass->getMemberStatus()->getStatus(),
                 ilLPStatusIcons::ICON_VARIANT_SHORT
             )
-        );
-
-        return $tpl->get();
+        );*/
     }
 
     /**
@@ -162,7 +193,7 @@ class ilExAssignmentGUI
      * @throws ilDatabaseException
      * @throws ilDateTimeException
      */
-    public function getOverviewBody(ilExAssignment $a_ass): string
+    protected function getOverviewBody(ilExAssignment $a_ass): string
     {
         global $DIC;
 
@@ -436,7 +467,7 @@ class ilExAssignmentGUI
             }
 
             if ($status != "" && $status != "notgraded") {
-                $img = $this->getIconForStatus($status);
+                //$img = $this->getIconForStatus($status);
                 $a_info->addProperty(
                     $lng->txt("status"),
                     $img . " " . $lng->txt("exc_" . $status)
@@ -476,7 +507,7 @@ class ilExAssignmentGUI
      * Get time string for deadline
      * @throws ilDateTimeException
      */
-    public function getTimeString(int $a_deadline): string
+    protected function getTimeString(int $a_deadline): string
     {
         $lng = $this->lng;
 
@@ -546,8 +577,4 @@ class ilExAssignmentGUI
                 );
         }
     }
-
-    ////
-    //// Listing panels
-    ////
 }

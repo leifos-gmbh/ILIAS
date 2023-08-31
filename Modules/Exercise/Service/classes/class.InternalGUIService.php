@@ -21,6 +21,11 @@ namespace ILIAS\Exercise;
 use ILIAS\DI\UIServices;
 use ILIAS\HTTP;
 use ILIAS\Refinery;
+use ILIAS\DI\Container;
+use ILIAS\Repository\GlobalDICGUIServices;
+use ILIAS\Exercise\InternalDataService;
+use ILIAS\Exercise\InternalDomainService;
+use ILIAS\Exercise\Assignment;
 
 /**
  * Exercise UI frontend presentation service class
@@ -29,12 +34,15 @@ use ILIAS\Refinery;
  */
 class InternalGUIService
 {
+    use GlobalDICGUIServices;
+
+    /*
     protected \ilLanguage $lng;
     protected \ilCtrl $ctrl;
     protected \ilToolbarGUI $toolbar;
     protected UIServices $ui;
     protected HTTP\Services $http;
-    protected Refinery\Factory $refinery;
+    protected Refinery\Factory $refinery;*/
 
     protected InternalService $service;
 
@@ -43,6 +51,26 @@ class InternalGUIService
     protected \ilObjExercise $exc;
 
     public function __construct(
+        Container $DIC,
+        InternalDataService $data_service,
+        InternalDomainService $domain_service
+    ) {
+        $this->data_service = $data_service;
+        $this->domain_service = $domain_service;
+        $this->initGUIServices($DIC);
+    }
+
+    public function assignment(): Assignment\GUIService
+    {
+        return new Assignment\GUIService(
+            $this->domain_service,
+            $this
+        );
+    }
+
+    /*
+    public function __construct(
+        Container $DIC,
         InternalService $service,
         HTTP\Services $http,
         Refinery\Factory $refinery,
@@ -66,16 +94,24 @@ class InternalGUIService
             $query_params,
             $post_data
         );
-    }
+    }*/
 
     /**
      * Get request wrapper. If dummy data is provided the usual http wrapper will
      * not be used.
      * @return GUIRequest
      */
-    public function request(): GUIRequest
+    public function request(
+        ?array $query_params = null,
+        ?array $post_data = null
+    ): GUIRequest
     {
-        return $this->request;
+        return new GUIRequest(
+            $this->http(),
+            $this->domain_service->refinery(),
+            $query_params,
+            $post_data
+        );
     }
 
     /**
@@ -95,10 +131,10 @@ class InternalGUIService
             $exc = $this->request->getExercise();
         }
         return new \ilExcRandomAssignmentGUI(
-            $this->ui,
-            $this->toolbar,
-            $this->lng,
-            $this->ctrl,
+            $this->ui(),
+            $this->toolbar(),
+            $this->lng(),
+            $this->ctrl(),
             $this->service->domain()->assignment()->randomAssignments($exc)
         );
     }

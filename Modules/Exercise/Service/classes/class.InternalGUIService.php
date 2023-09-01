@@ -58,6 +58,11 @@ class InternalGUIService
         $this->data_service = $data_service;
         $this->domain_service = $domain_service;
         $this->initGUIServices($DIC);
+        $this->request = new GUIRequest(
+            $this->http(),
+            $this->domain_service->refinery()
+        );
+
     }
 
     public function assignment(): Assignment\GUIService

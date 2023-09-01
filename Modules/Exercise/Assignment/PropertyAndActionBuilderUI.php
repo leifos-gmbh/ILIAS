@@ -23,14 +23,26 @@ namespace ILIAS\Exercise\Assignment;
 use ILIAS\Exercise\InternalDomainService;
 use ILIAS\Exercise\InternalGUIService;
 use ILIAS\Exercise\Assignment\Mandatory\MandatoryAssignmentsManager;
+use ILIAS\UI\Component\Button\Shy as ButtonShy;
+use ILIAS\UI\Component\Link\Standard as LinkStandard;
+use ILIAS\UI\Component\Button\Standard as ButtonStandard;
+use ILIAS\UI\Component\Component;
+
 
 class PropertyAndActionBuilderUI
 {
     public const PROP_DEADLINE = "deadline";
     public const PROP_REQUIREMENT = "requirement";
+    public const SEC_INSTRUCTIONS = "instructions";
+    public const SEC_FILES = "files";
+    public const SEC_SUBMISSION = "submission";
+    public const SEC_SCHEDULE = "schedule";
+
+
     protected int $user_id;
     protected string $lead_text = "";
     protected array $head_properties = [];
+    protected array $properties = [];
     protected array $additional_head_properties = [];
 
     public function __construct(
@@ -51,7 +63,10 @@ class PropertyAndActionBuilderUI
         $this->user_id = $user_id;
         $this->state = \ilExcAssMemberState::getInstanceByIds($ass->getId(), $user_id);
         $this->lead_text = "";
+        $this->head_properties = [];
+        $this->additional_head_properties = [];
         $this->buildHead();
+        $this->buildBody();
     }
 
     public function getLeadText() : string
@@ -89,6 +104,34 @@ class PropertyAndActionBuilderUI
             "prop" => $prop,
             "val" => $val
         ];
+    }
+
+    protected function addProperty(string $section, string $prop, string $val) : void
+    {
+        $this->properties[$section][] = [
+            "prop" => $prop,
+            "val" => $val
+        ];
+    }
+
+    protected function addAction(string $section, Component $button_or_link) : void
+    {
+        $this->actions[$section][] = $button_or_link;
+    }
+
+    public function getActions(string $section) : ?array
+    {
+        return $this->actions[$section] ?? null;
+    }
+
+    protected function setMainAction(ButtonStandard $button) : void
+    {
+        $this->main_action = $button;
+    }
+
+    public function getMainAction():ButtonStandard
+    {
+        return $this->main_action;
     }
 
     protected function buildHead() : void
@@ -186,41 +229,18 @@ class PropertyAndActionBuilderUI
         );*/
     }
 
-    /**
-     * Get assignment body for overview
-     * @throws ilObjectNotFoundException
-     * @throws ilCtrlException
-     * @throws ilDatabaseException
-     * @throws ilDateTimeException
-     */
-    protected function getOverviewBody(ilExAssignment $a_ass): string
+    protected function buildBody() : void
     {
-        global $DIC;
-
-        $ilUser = $DIC->user();
-
-        $this->current_ass_id = $a_ass->getId();
-
-        $tpl = new ilTemplate("tpl.assignment_body.html", true, true, "Modules/Exercise");
-
-        $state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
-
-        $info = new ilInfoScreenGUI(null);
-        $info->setTableClass("");
-        if ($state->areInstructionsVisible()) {
-            $this->addInstructions($info, $a_ass);
-            $this->addFiles($info, $a_ass);
+        if ($this->state->areInstructionsVisible()) {
+            $this->buildInstructions();
+            $this->buildFiles();
         }
 
-        $this->addSchedule($info, $a_ass);
+        $this->buildSchedule();
 
         if ($state->hasSubmissionStarted()) {
-            $this->addSubmission($info, $a_ass);
+            $this->buildSubmission();
         }
-
-        $tpl->setVariable("CONTENT", $info->getHTML());
-
-        return $tpl->get();
     }
 
 

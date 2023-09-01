@@ -43,13 +43,13 @@ class AssignmentsDBRepository
             (string) $rec["title"],
             (int) $rec["order_nr"],
             (int) $rec["type"],
-            (string) $rec["instructions"],
+            (string) $rec["instruction"],
             (bool) $rec["mandatory"],
             (int) $rec["deadline_mode"],
             (int) $rec["time_stamp"],
             (int) $rec["deadline2"],
             (int) $rec["relative_deadline"],
-            (int) $rec["rel_deadline_last_submission"]
+            (int) $rec["rel_deadline_last_subm"]
         );
     }
 

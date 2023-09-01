@@ -26,7 +26,7 @@ use ILIAS\Exercise;
  * @ilCtrl_Calls ilObjExerciseGUI: ilPermissionGUI, ilLearningProgressGUI, ilInfoScreenGUI
  * @ilCtrl_Calls ilObjExerciseGUI: ilObjectCopyGUI, ilExportGUI
  * @ilCtrl_Calls ilObjExerciseGUI: ilCommonActionDispatcherGUI, ilCertificateGUI
- * @ilCtrl_Calls ilObjExerciseGUI: ilExAssignmentEditorGUI, ilExSubmissionGUI
+ * @ilCtrl_Calls ilObjExerciseGUI: ilExAssignmentEditorGUI, ilExSubmissionGUI, ilAssignmentPresentationGUI
  * @ilCtrl_Calls ilObjExerciseGUI: ilExerciseManagementGUI, ilExcCriteriaCatalogueGUI, ilObjectMetaDataGUI, ilPortfolioExerciseGUI, ilExcRandomAssignmentGUI
  */
 class ilObjExerciseGUI extends ilObjectGUI
@@ -245,6 +245,11 @@ class ilObjExerciseGUI extends ilObjectGUI
                 $this->tabs_gui->setTabActive('meta_data');
                 $md_gui = new ilObjectMetaDataGUI($this->object);
                 $this->ctrl->forwardCommand($md_gui);
+                break;
+
+            case strtolower(ilAssignmentPresentationGUI::class):
+                $gui = $this->exercise_ui->assignment()->assignmentPresentationGUI($this->object);
+                $this->ctrl->forwardCommand($gui);
                 break;
 
             default:

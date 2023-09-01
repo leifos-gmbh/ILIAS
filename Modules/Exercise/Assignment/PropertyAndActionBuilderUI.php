@@ -37,7 +37,7 @@ class PropertyAndActionBuilderUI
     public const SEC_FILES = "files";
     public const SEC_SUBMISSION = "submission";
     public const SEC_SCHEDULE = "schedule";
-
+    protected \ilExAssignmentInfo $info;
 
     protected int $user_id;
     protected string $lead_text = "";
@@ -62,6 +62,7 @@ class PropertyAndActionBuilderUI
         $this->assignment = $ass;
         $this->user_id = $user_id;
         $this->state = \ilExcAssMemberState::getInstanceByIds($ass->getId(), $user_id);
+        $this->info = new \ilExAssignmentInfo($ass->getId(), $user_id);
         $this->lead_text = "";
         $this->head_properties = [];
         $this->additional_head_properties = [];
@@ -112,6 +113,11 @@ class PropertyAndActionBuilderUI
             "prop" => $prop,
             "val" => $val
         ];
+    }
+
+    public function getProperties(string $section) : array
+    {
+        return $this->properties[$section] ?? [];
     }
 
     protected function addAction(string $section, Component $button_or_link) : void
@@ -233,27 +239,25 @@ class PropertyAndActionBuilderUI
     {
         if ($this->state->areInstructionsVisible()) {
             $this->buildInstructions();
-            $this->buildFiles();
+            //$this->buildFiles();
         }
 
-        $this->buildSchedule();
+        //$this->buildSchedule();
 
-        if ($state->hasSubmissionStarted()) {
-            $this->buildSubmission();
+        if ($this->state->hasSubmissionStarted()) {
+            //$this->buildSubmission();
         }
     }
 
 
-    protected function addInstructions(
-        ilInfoScreenGUI $a_info,
-        ilExAssignment $a_ass
-    ): void {
-        $ilUser = $this->user;
-        $info = new ilExAssignmentInfo($a_ass->getId(), $ilUser->getId());
-        $inst = $info->getInstructionInfo();
+    protected function buildInstructions(): void {
+        $inst = $this->info->getInstructionInfo();
         if (count($inst) > 0) {
-            $a_info->addSection($inst["instruction"]["txt"]);
-            $a_info->addProperty("", $inst["instruction"]["value"]);
+            $this->addProperty(
+                self::SEC_INSTRUCTIONS,
+                $inst["instruction"]["txt"],
+                $inst["instruction"]["value"]
+            );
         }
     }
 

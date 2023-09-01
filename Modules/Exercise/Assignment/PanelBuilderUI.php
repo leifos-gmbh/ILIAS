@@ -22,20 +22,23 @@ namespace ILIAS\Exercise\Assignment;
 
 use ILIAS\Exercise\Assignment\Mandatory\MandatoryAssignmentsManager;
 
-class ItemBuilderUI
+class PanelBuilderUI
 {
+    protected \ilLanguage $lng;
     protected PropertyAndActionBuilderUI $prop_builder;
     protected \ILIAS\UI\Factory $ui_factory;
 
     public function __construct(
         PropertyAndActionBuilderUI $prop_builder,
         \ILIAS\UI\Factory $ui_factory,
-        \ilCtrl $ctrl
+        \ilCtrl $ctrl,
+        \ilLanguage $lng
     )
     {
         $this->ui_factory = $ui_factory;
         $this->prop_builder = $prop_builder;
         $this->ctrl = $ctrl;
+        $this->lng = $lng;
     }
 
     protected function addPropertyToItemProperties(array &$props, ?array $prop) : void
@@ -45,28 +48,35 @@ class ItemBuilderUI
         }
     }
 
-    public function getItem(Assignment $ass, int $user_id) : \ILIAS\UI\Component\Item\Standard
+    public function getPanel(Assignment $ass, int $user_id) : \ILIAS\UI\Component\Panel\Standard
     {
         $pb = $this->prop_builder;
         $pb->build($ass, $user_id);
 
-        $props = [];
-        $this->addPropertyToItemProperties($props, $pb->getHeadProperty($pb::PROP_DEADLINE));
-        $this->addPropertyToItemProperties($props, $pb->getHeadProperty($pb::PROP_REQUIREMENT));
-        foreach ($pb->getAdditionalHeadProperties() as $p) {
-            $this->addPropertyToItemProperties($props, $p);
+        $sub_panels = [];
+        foreach ([$pb::SEC_INSTRUCTIONS] as $sec) {
+            $title = "";
+            switch ($sec) {
+                case $pb::SEC_INSTRUCTIONS:
+                    $title = $this->lng->txt("exc_instructions");
+                    break;
+            }
+            $content = "";
+            foreach ($pb->getProperties($sec) as $prop) {
+                $content.= "<div>".$prop["prop"].": " .$prop["val"]."</div>";
+            }
+            $sub_panels[] = $this->ui_factory->panel()->sub(
+                $title,
+                $this->ui_factory->legacy($content)
+            );
         }
 
-        $this->ctrl->setParameterByClass(\ilAssignmentPresentationGUI::class, "ass_id", $ass->getId());
-        $title = $this->ui_factory->link()->standard(
+        $panel = $this->ui_factory->panel()->standard(
             $ass->getTitle(),
-            $this->ctrl->getLinkTargetByClass(\ilAssignmentPresentationGUI::class, "")
+            $sub_panels
         );
-        $item =  $this->ui_factory->item()->standard(
-            $title
-        )->withProperties($props)->withLeadText($pb->getLeadText() . " ");
-        $this->ctrl->setParameterByClass(\ilAssignmentPresentationGUI::class, "ass_id", null);
-        return $item;
+
+        return $panel;
     }
 
 

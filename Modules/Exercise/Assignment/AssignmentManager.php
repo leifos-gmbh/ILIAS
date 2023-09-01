@@ -58,4 +58,14 @@ class AssignmentManager
     {
         return $this->repo->getList($this->getExcId());
     }
+
+    public function get(int $ass_id) : Assignment
+    {
+        $ass = $this->repo->get($this->getExcId(), $ass_id);
+        if (is_null($ass)) {
+            throw new \ilExerciseException("Assignment not found (".$this->getExcId().",".$ass_id.").");
+        }
+        return $ass;
+    }
+
 }

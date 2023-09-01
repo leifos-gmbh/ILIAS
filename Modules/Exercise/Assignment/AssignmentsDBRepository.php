@@ -69,4 +69,17 @@ class AssignmentsDBRepository
         }
     }
 
+    public function get(int $exc_id, int $ass_id) : ?Assignment
+    {
+        $set = $this->db->queryF("SELECT * FROM exc_assignment " .
+            " WHERE exc_id = %s AND id = %s",
+            ["integer", "integer"],
+            [$exc_id, $ass_id]
+        );
+        if ($rec = $this->db->fetchAssoc($set)) {
+            return $this->getAssignmentFromRecord($rec);
+        }
+        return null;
+    }
+
 }

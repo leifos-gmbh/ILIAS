@@ -428,6 +428,24 @@ class ilExcAssMemberState
         return false;
     }
 
+    /**
+     * Check if assignment has ended for current user
+     */
+    public function hasEnded() : bool
+    {
+        if ($this->hasSubmissionEnded()) {
+            if (!$this->assignment->getPeerReview() || $this->getPeerReviewDeadline() === 0 || $this->getPeerReviewDeadline() > $this->time) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isFuture() : bool
+    {
+        return !$this->hasSubmissionStarted();
+    }
+
     // Has submission ended for all users
     public function hasSubmissionEndedForAllUsers(): bool
     {

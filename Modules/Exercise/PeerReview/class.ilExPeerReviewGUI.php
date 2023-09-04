@@ -215,7 +215,7 @@ class ilExPeerReviewGUI
                 $button = ilLinkButton::getInstance();				// edit peer review
                 $button->setPrimary($nr_missing_fb);
                 $button->setCaption($lng->txt("exc_peer_review_give") . $dl_info, false);
-                $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExPeerReviewGUI"), "editPeerReview"));
+                $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExPeerReviewGUI"), "editPeerReview"));
                 $edit_pc = $button->render();
             } elseif ($ass->getPeerReviewDeadline()) {
                 $edit_pc = $lng->txt("exc_peer_review_deadline_reached");
@@ -229,7 +229,7 @@ class ilExPeerReviewGUI
                     $a_submission->getPeerReview()->countGivenFeedback(false)) {
                     $button = ilLinkButton::getInstance();
                     $button->setCaption("exc_peer_review_given");
-                    $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExPeerReviewGUI"), "showGivenPeerReview"));
+                    $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExPeerReviewGUI"), "showGivenPeerReview"));
                     $view_pc = $button->render() . " ";
                 }
 
@@ -240,7 +240,7 @@ class ilExPeerReviewGUI
                     if ($received) {
                         $button = ilLinkButton::getInstance();
                         $button->setCaption("exc_peer_review_show");
-                        $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExPeerReviewGUI"), "showReceivedPeerReview"));
+                        $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExPeerReviewGUI"), "showReceivedPeerReview"));
                         $view_pc .= $button->render();
                     }
                     // received none

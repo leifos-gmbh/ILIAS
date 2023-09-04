@@ -73,10 +73,10 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
         if ($a_submission->canSubmit()) {
             $button->setPrimary(true);
             $button->setCaption("exc_text_assignment_edit");
-            $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionTextGUI"), "editAssignmentText"));
+            $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionTextGUI"), "editAssignmentText"));
         } else {
             $button->setCaption("exc_text_assignment_show");
-            $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionTextGUI"), "showAssignmentText"));
+            $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionTextGUI"), "showAssignmentText"));
         }
         $files_str = $button->render();
 

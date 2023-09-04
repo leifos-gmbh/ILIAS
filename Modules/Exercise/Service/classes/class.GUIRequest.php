@@ -495,4 +495,9 @@ class GUIRequest
     {
         return $this->int("vw");
     }
+
+    public function getMode(): string
+    {
+        return $this->str("mode");
+    }
 }

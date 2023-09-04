@@ -26,7 +26,7 @@ use ILIAS\Exercise;
  * @ilCtrl_Calls ilObjExerciseGUI: ilPermissionGUI, ilLearningProgressGUI, ilInfoScreenGUI
  * @ilCtrl_Calls ilObjExerciseGUI: ilObjectCopyGUI, ilExportGUI
  * @ilCtrl_Calls ilObjExerciseGUI: ilCommonActionDispatcherGUI, ilCertificateGUI
- * @ilCtrl_Calls ilObjExerciseGUI: ilExAssignmentEditorGUI, ilExSubmissionGUI, ilAssignmentPresentationGUI
+ * @ilCtrl_Calls ilObjExerciseGUI: ilExAssignmentEditorGUI, ilAssignmentPresentationGUI
  * @ilCtrl_Calls ilObjExerciseGUI: ilExerciseManagementGUI, ilExcCriteriaCatalogueGUI, ilObjectMetaDataGUI, ilPortfolioExerciseGUI, ilExcRandomAssignmentGUI
  */
 class ilObjExerciseGUI extends ilObjectGUI
@@ -70,7 +70,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 
         $lng->loadLanguageModule("exercise");
         $lng->loadLanguageModule("exc");
-        $this->ctrl->saveParameter($this, "ass_id");
+        $this->ctrl->saveParameter($this, ["ass_id", "mode"]);
 
         $this->service = $DIC->exercise()->internal();
         $this->exercise_request = $DIC->exercise()->internal()->gui()->request();
@@ -96,7 +96,10 @@ class ilObjExerciseGUI extends ilObjectGUI
         $this->certificateDownloadValidator = new ilCertificateDownloadValidator();
 
         if ($this->object) {
-            $this->ass_manager = $this->service->domain()->assignment()->assignments($this->object->getRefId());
+            $this->ass_manager = $this->service->domain()->assignment()->assignments(
+                $this->object->getRefId(),
+                $this->user->getId()
+            );
             $this->item_builder = $this->service->gui()->assignment()->itemBuilder(
                 $this->object,
                 $this->service->domain()->assignment()->mandatoryAssignments($this->object)
@@ -192,19 +195,6 @@ class ilObjExerciseGUI extends ilObjectGUI
                 $this->ctrl->forwardCommand($ass_gui);
                 break;
 
-            case "ilexsubmissiongui":
-                $this->checkPermission("read");
-                $random_manager = $this->service->domain()->assignment()->randomAssignments($exc);
-                if (!$random_manager->isAssignmentVisible($this->requested_ass_id, $this->user->getId())) {
-                    return;
-                }
-                $ilTabs->activateTab("content");
-                $this->addContentSubTabs("content");
-                $this->ctrl->setReturn($this, "showOverview");
-                $sub_gui = $this->exercise_ui->getSubmissionGUI();
-                $this->ctrl->forwardCommand($sub_gui);
-                break;
-
             case "ilexercisemanagementgui":
                 // rbac or position access
                 if ($GLOBALS['DIC']->access()->checkRbacOrPositionPermissionAccess(
@@ -249,6 +239,7 @@ class ilObjExerciseGUI extends ilObjectGUI
                 break;
 
             case strtolower(ilAssignmentPresentationGUI::class):
+                $this->checkPermission("read");
                 $gui = $this->exercise_ui->assignment()->assignmentPresentationGUI($this->object);
                 $this->ctrl->forwardCommand($gui);
                 break;
@@ -579,6 +570,11 @@ class ilObjExerciseGUI extends ilObjectGUI
 
     protected function getTabs(): void
     {
+        if ($this->ctrl->getNextClass() === strtolower(ilAssignmentPresentationGUI::class)) {
+            return;
+        }
+
+
         $lng = $this->lng;
         $ilHelp = $this->help;
         /** @var $ctrl ilCtrl */
@@ -1100,31 +1096,66 @@ class ilObjExerciseGUI extends ilObjectGUI
         $f = $this->ui->factory();
         $r = $this->ui->renderer();
 
-        $view_type = $this->ass_manager::TYPE_ONGOING;
-        $items[$view_type] = [];
-
         $ass_data = ilExAssignment::getInstancesByExercise($exc->getId());
         $random_manager = $this->service->domain()->assignment()->randomAssignments($exc);
-        foreach ($this->ass_manager->getList() as $ass) {
-            if (!$random_manager->isAssignmentVisible($ass->getId(), $this->user->getId())) {
-                continue;
+        $am = $this->ass_manager;
+        if ($this->getCurrentMode() === $am::TYPE_ALL) {
+            $list_modes = [$am::TYPE_ONGOING,$am::TYPE_FUTURE,$am::TYPE_PAST];
+        } else {
+            $list_modes = [$this->getCurrentMode()];
+        }
+        foreach ($list_modes as $lm) {
+            $items[$lm] = [];
+            foreach ($this->ass_manager->getList($lm) as $ass) {
+                if (!$random_manager->isAssignmentVisible($ass->getId(), $this->user->getId())) {
+                    continue;
+                }
+                $items[$lm][] = $this->item_builder->getItem($ass, $user->getId());
             }
-            $items[$view_type][] = $this->item_builder->getItem($ass, $user->getId());
         }
 
         // new
         $groups = [];
-        foreach ($items as $view_type => $items) {
-            $groups[] = $f->item()->group($this->lng->txt("exc_overview_mode_" . $view_type), $items);
+        foreach ($items as $lm => $it) {
+            if (count($it) > 0) {
+                $groups[] = $f->item()->group($this->lng->txt("exc_" . $lm), $it);
+            }
         }
-        $panel = $f->panel()->listing()->standard($this->lng->txt("exc_assignments"), $groups);
+        if (count($groups) > 0) {
+            $panel = $f->panel()->listing()->standard($this->lng->txt("exc_assignments"), $groups);
+        } else {
+            $panel = $f->panel()->standard($this->lng->txt("exc_assignments"), $f->messageBox()->info($this->lng->txt("exc_no_assignments")));
+        }
+
+        $mode_options = [];
+        foreach ($am->getListModes() as $mode => $txt) {
+            $mode_options[$txt] = $this->getModeLink($mode);
+        }
+        $mode = $f->viewControl()->mode(
+            $mode_options,
+            $this->lng->txt("exc_mode_selection")
+        )->withActive($am->getListModeLabel($this->getCurrentMode()));
 
         $html = "";
-        $html.= $r->render($panel);
+        $l = $f->legacy("<br><br>");
+        $html.= $r->render([$mode, $l, $panel]);
 
         $this->tpl->setContent(
             $html
         );
+    }
+
+    protected function getCurrentMode() : string
+    {
+        return $this->ass_manager->getValidListMode($this->exercise_request->getMode());
+    }
+
+    protected function getModeLink(string $mode) : string
+    {
+        $this->ctrl->setParameterByClass(self::class, "mode", $mode);
+        $link = $this->ctrl->getLinkTargetByClass(self::class, "showOverviewNew");
+        $this->ctrl->setParameterByClass(self::class, "mode", null);
+        return $link;
     }
 
     /**

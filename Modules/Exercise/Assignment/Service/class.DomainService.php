@@ -45,11 +45,13 @@ class DomainService
     }
 
 
-    public function assignments(int $ref_id): AssignmentManager
+    public function assignments(int $ref_id, int $user_id): AssignmentManager
     {
         return new AssignmentManager(
             $this->repo_service,
-            $ref_id
+            $this->domain_service,
+            $ref_id,
+            $user_id
         );
     }
 
@@ -82,5 +84,10 @@ class DomainService
                 new Mandatory\MandatoryAssignmentsManager($exercise, $this->randomAssignments($exercise));
         }
         return self::$managers[Mandatory\MandatoryAssignmentsManager::class][$exercise->getId()];
+    }
+
+    public function state(int $ass_id, int $user_id) : \ilExcAssMemberState
+    {
+        return \ilExcAssMemberState::getInstanceByIds($ass_id, $user_id);
     }
 }

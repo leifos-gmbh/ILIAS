@@ -79,18 +79,29 @@ class ilExAssTypeUploadGUI implements ilExAssignmentTypeGUIInterface
                     ? $lng->txt("exc_hand_in")
                     : $lng->txt("exc_edit_submission"));
 
+                $url = $ctrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionFileGUI"), "submissionScreen");
                 $main_button = $f->button()->primary(
                     $title,
-                    $ctrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionFileGUI"), "submissionScreen")
+                    $url
                 );
                 $builder->setMainAction($builder::SEC_SUBMISSION, $main_button);
+                $builder->addView(
+                    "submission",
+                    $lng->txt("exc_submission"),
+                    $url
+                );
             } else {
                 if (count($titles) > 0) {
                     $link = $f->link()->standard(
                         $lng->txt("already_delivered_files"),
-                        $ctrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionFileGUI"), "submissionScreen")
+                        $ctrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionFileGUI"), "submissionScreen")
                     );
                     $builder->addAction($builder::SEC_SUBMISSION, $link);
+                    $builder->addView(
+                        "submission",
+                        $lng->txt("exc_submission"),
+                        $link
+                    );
                 }
             }
         }

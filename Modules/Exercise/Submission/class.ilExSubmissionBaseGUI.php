@@ -89,6 +89,7 @@ abstract class ilExSubmissionBaseGUI
 
     protected function handleTabs(): void
     {
+        return;
         $this->tabs_gui->clearTargets();
         $this->tabs_gui->setBackTarget(
             $this->lng->txt("back"),

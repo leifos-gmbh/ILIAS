@@ -59,44 +59,59 @@ class PanelBuilderUI
         $pb = $this->prop_builder;
         $pb->build($ass, $user_id);
 
+        // schedule card
+        $sections = [];
+        foreach ($pb->getProperties($pb::SEC_SCHEDULE) as $prop) {
+            $sections[] = $this->ui_factory->legacy($prop["prop"] . ": ". $prop["val"]);
+        }
+        $schedule_card = $this->ui_factory->card()->standard($this->lng->txt("exc_schedule"))
+            ->withSections($sections);
+
         $sub_panels = [];
-        foreach ([$pb::SEC_INSTRUCTIONS, $pb::SEC_FILES, $pb::SEC_SUBMISSION] as $sec) {
-            $title = "";
-            switch ($sec) {
-                case $pb::SEC_INSTRUCTIONS:
-                    $title = $this->lng->txt("exc_instructions");
-                    break;
-                case $pb::SEC_FILES:
-                    $title = $this->lng->txt("exc_files");
-                    break;
-                case $pb::SEC_SUBMISSION:
-                    $title = $this->lng->txt("exc_submission");
-                    break;
-            }
+        foreach ($pb->getSections(false) as $sec => $title) {
+            $sec_empty = $sec !== $pb::SEC_INSTRUCTIONS;
             $ctpl = new \ilTemplate("tpl.panel_content.html", true, true,
             "Modules/Exercise/Assignment");
 
             // properties
             foreach ($pb->getProperties($sec) as $prop) {
-                $ctpl->setCurrentBlock("entry");
-                $ctpl->setVariable("LABEL", $prop["prop"]);
-                $ctpl->setVariable("VALUE", $prop["val"]);
-                $ctpl->parseCurrentBlock();
+                if ($prop["prop"] === "") {
+                    $ctpl->setCurrentBlock("entry_no_label");
+                    $ctpl->setVariable("VALUE_NO_LABEL", $prop["val"]);
+                    $ctpl->parseCurrentBlock();
+                } else {
+                    $ctpl->setCurrentBlock("entry");
+                    $ctpl->setVariable("LABEL", $prop["prop"]);
+                    $ctpl->setVariable("VALUE", $prop["val"]);
+                    $ctpl->parseCurrentBlock();
+                }
+                $sec_empty = false;
             }
 
             // actions
             $this->renderActionButton($ctpl, $pb->getMainAction($sec));
             foreach ($pb->getActions($sec) as $action) {
                 $this->renderActionButton($ctpl, $action);
+                $sec_empty = false;
+            }
+
+            if (count($pb->getActions($sec)) > 0) {
+                $sec_empty = false;
             }
 
             // links
             $this->renderLinkList($ctpl, $sec);
 
-            $sub_panels[] = $this->ui_factory->panel()->sub(
+            $sub_panel = $this->ui_factory->panel()->sub(
                 $title,
                 $this->ui_factory->legacy($ctpl->get())
             );
+            if ($sec === $pb::SEC_INSTRUCTIONS) {
+                $sub_panel = $sub_panel->withFurtherInformation($schedule_card);
+            }
+            if (!$sec_empty) {
+                $sub_panels[] = $sub_panel;
+            }
         }
 
         $panel = $this->ui_factory->panel()->standard(
@@ -127,4 +142,10 @@ class PanelBuilderUI
         }
     }
 
+    public function getPanelViews(Assignment $ass, int $user_id) : array
+    {
+        $pb = $this->prop_builder;
+        $pb->build($ass, $user_id);
+        return $pb->getViews();
+    }
 }

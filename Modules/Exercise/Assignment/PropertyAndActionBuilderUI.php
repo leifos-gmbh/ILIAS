@@ -35,8 +35,16 @@ class PropertyAndActionBuilderUI
     public const PROP_REQUIREMENT = "requirement";
     public const SEC_INSTRUCTIONS = "instructions";
     public const SEC_FILES = "files";
-    public const SEC_SUBMISSION = "submission";
     public const SEC_SCHEDULE = "schedule";
+    public const SEC_TEAM = "team";
+    public const SEC_SUBMISSION = "submission";
+    public const SEC_PEER_FEEDBACK = "peer_feedback";
+    public const SEC_TUTOR_EVAL = "tutor_eval";
+    public const SEC_SAMPLE_SOLUTION = "sample_solution";
+
+    protected int $user_builded = 0;
+    protected int $ass_builded = 0;
+    protected \ilExcAssMemberState $state;
     protected \ilExSubmission $submission;
     protected \ilExAssignmentTypesGUI $types_gui;
     protected \ilObjExercise $exc;
@@ -50,6 +58,7 @@ class PropertyAndActionBuilderUI
     protected array $head_properties = [];
     protected array $properties = [];
     protected array $actions = [];
+    protected array $views = [];
     protected array $main_action = [];
     protected array $additional_head_properties = [];
 
@@ -77,6 +86,9 @@ class PropertyAndActionBuilderUI
         int $user_id
     ) : void
     {
+        if ($this->user_builded === $user_id && $this->ass_builded === $ass->getId()) {
+            return;
+        }
         $this->assignment = $ass;
         $this->user_id = $user_id;
         $this->state = \ilExcAssMemberState::getInstanceByIds($ass->getId(), $user_id);
@@ -85,9 +97,35 @@ class PropertyAndActionBuilderUI
         $this->submission = new \ilExSubmission($this->ex_ass, $user_id);
         $this->lead_text = "";
         $this->head_properties = [];
+        $this->views = [];
         $this->additional_head_properties = [];
         $this->buildHead();
         $this->buildBody();
+        $this->user_builded = $user_id;
+        $this->ass_builded = $ass->getId();
+    }
+
+    public function getSections(bool $include_schedule = true) : array
+    {
+        $secs = [];
+        $secs[self::SEC_INSTRUCTIONS] = $this->lng->txt("exc_instruction");
+        if ($include_schedule) {
+            $secs[self::SEC_SCHEDULE] = $this->lng->txt("exc_schedule");
+        }
+        $secs[self::SEC_FILES] = $this->lng->txt("exc_files");
+        $secs[self::SEC_TEAM] = $this->lng->txt("exc_team");
+        $secs[self::SEC_SUBMISSION] = $this->lng->txt("exc_submission");
+        $secs[self::SEC_PEER_FEEDBACK] = $this->lng->txt("exc_peer_feedback");
+        $secs[self::SEC_TUTOR_EVAL] = $this->lng->txt("exc_tutor_evaluation");
+        $secs[self::SEC_SAMPLE_SOLUTION] = $this->lng->txt("exc_sample_solution");
+
+        return $secs;
+    }
+
+    public function getSectionTitle(string $sec) : string
+    {
+        $secs = $this->getSections();
+        return $secs[$sec] ?? "";
     }
 
     public function getLeadText() : string
@@ -158,6 +196,20 @@ class PropertyAndActionBuilderUI
     public function getMainAction(string $section):?ButtonPrimary
     {
         return $this->main_action[$section] ?? null;
+    }
+
+    public function addView(string $id, string $txt, string $url) : void
+    {
+        $this->views[] = [
+            "id" => $id,
+            "txt" => $txt,
+            "url" => $url
+        ];
+    }
+
+    public function getViews() : array
+    {
+        return $this->views;
     }
 
     protected function buildHead() : void
@@ -257,12 +309,20 @@ class PropertyAndActionBuilderUI
 
     protected function buildBody() : void
     {
+        // main view
+        $this->ctrl->setParameterByClass(\ilAssignmentPresentationGUI::class, "ass_id", $this->assignment->getId());
+        $this->addView(
+            "ass",
+            $this->lng->txt("exc_assignment"),
+            $this->ctrl->getLinkTargetByClass(\ilAssignmentPresentationGUI::class, "")
+        );
+
         if ($this->state->areInstructionsVisible()) {
             $this->buildInstructions();
             $this->buildFiles();
         }
 
-        //$this->buildSchedule();
+        $this->buildSchedule();
 
         if ($this->state->hasSubmissionStarted()) {
             $this->buildSubmission();
@@ -275,7 +335,7 @@ class PropertyAndActionBuilderUI
         if (count($inst) > 0) {
             $this->addProperty(
                 self::SEC_INSTRUCTIONS,
-                $inst["instruction"]["txt"],
+                "",
                 $inst["instruction"]["value"]
             );
         }
@@ -284,27 +344,28 @@ class PropertyAndActionBuilderUI
     /**
      * @throws ilDateTimeException|ilExcUnknownAssignmentTypeException
      */
-    protected function addSchedule(
-        ilInfoScreenGUI $a_info,
-        ilExAssignment $a_ass
-    ): void {
-        $lng = $this->lng;
-        $ilUser = $this->user;
-        $ilCtrl = $this->ctrl;
+    protected function buildSchedule(): void {
 
-        $info = new ilExAssignmentInfo($a_ass->getId(), $ilUser->getId());
+        $info = $this->info;
         $schedule = $info->getScheduleInfo();
 
-        $state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
+        $state = $this->state;
 
-        $a_info->addSection($lng->txt("exc_schedule"));
         if ($state->getGeneralStart() > 0) {
-            $a_info->addProperty($schedule["start_time"]["txt"], $schedule["start_time"]["value"]);
+            $this->addProperty(
+                self::SEC_SCHEDULE,
+                $schedule["start_time"]["txt"],
+                $schedule["start_time"]["value"]
+            );
         }
 
 
         if ($state->getCommonDeadline()) {		// if we have a common deadline (target timestamp)
-            $a_info->addProperty($schedule["until"]["txt"], $schedule["until"]["value"]);
+            $this->addProperty(
+                self::SEC_SCHEDULE,
+                $schedule["until"]["txt"],
+                $schedule["until"]["value"]
+            );
         } elseif ($state->getRelativeDeadline()) {		// if we only have a relative deadline (not started yet)
             $but = "";
             if ($state->hasGenerallyStarted()) {
@@ -312,11 +373,20 @@ class PropertyAndActionBuilderUI
                 $but = $this->ui->factory()->button()->primary($lng->txt("exc_start_assignment"), $ilCtrl->getLinkTargetByClass("ilobjexercisegui", "startAssignment"));
                 $ilCtrl->setParameterByClass("ilobjexercisegui", "ass_id", $this->requested_ass_id);
                 $but = $this->ui->renderer()->render($but);
+                $this->setMainAction(
+                    self::SEC_INSTRUCTIONS,
+                    $but
+                );
             }
+            $this->addProperty(
+                self::SEC_SCHEDULE,
+                $schedule["time_after_start"]["txt"],
+                $schedule["time_after_start"]["value"]
+            );
 
-            $a_info->addProperty($schedule["time_after_start"]["txt"], $schedule["time_after_start"]["value"] . " " . $but);
             if ($state->getLastSubmissionOfRelativeDeadline()) {		// if we only have a relative deadline (not started yet)
-                $a_info->addProperty(
+                $this->addProperty(
+                    self::SEC_SCHEDULE,
                     $lng->txt("exc_rel_last_submission"),
                     $state->getLastSubmissionOfRelativeDeadlinePresentation()
                 );
@@ -324,11 +394,19 @@ class PropertyAndActionBuilderUI
         }
 
         if ($state->getOfficialDeadline() > $state->getCommonDeadline()) {
-            $a_info->addProperty($schedule["individual_deadline"]["txt"], $schedule["individual_deadline"]["value"]);
+            $this->addProperty(
+                self::SEC_SCHEDULE,
+                $schedule["individual_deadline"]["txt"],
+                $schedule["individual_deadline"]["value"]
+            );
         }
 
         if ($state->hasSubmissionStarted()) {
-            $a_info->addProperty($schedule["time_to_send"]["txt"], $schedule["time_to_send"]["value"]);
+            $this->addProperty(
+                self::SEC_SCHEDULE,
+                $schedule["time_to_send"]["txt"],
+                $schedule["time_to_send"]["value"]
+            );
         }
     }
 
@@ -451,11 +529,10 @@ class PropertyAndActionBuilderUI
             $this->assignment->getId()
         );
 
-        // todo
-        /*
-        if ($a_submission->getAssignment()->hasTeam()) {
-            ilExSubmissionTeamGUI::getOverviewContent($a_info, $a_submission);
-        }*/
+        if ($this->submission->getAssignment()->hasTeam()) {
+            $team_gui = $this->gui->getTeamSubmissionGUI($this->exc, $this->submission);
+            $team_gui->buildSubmissionPropertiesAndActions($this);
+        }
 
         $type_gui = $this->types_gui->getById($this->ex_ass->getType());
         $type_gui->setSubmission($this->submission);

@@ -164,4 +164,11 @@ class InternalGUIService
             $member_id
         );
     }
+
+    public function getTeamSubmissionGUI(
+        \ilObjExercise $exc,
+        \ilExSubmission $submission
+    ): \ilExSubmissionTeamGUI {
+        return new \ilExSubmissionTeamGUI($exc, $submission);
+    }
 }

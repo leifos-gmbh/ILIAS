@@ -9031,6 +9031,7 @@ exc#:#exc_adopt_group_teams_blocked#:#%s User were already assigned.
 exc#:#exc_adopt_group_teams_conflict#:#User "%1$s" is already selected for group "%2$s".
 exc#:#exc_adopt_group_teams_no_members#:#No members
 exc#:#exc_after_submission#:#After submission
+exc#:#exc_all#:#All
 exc#:#exc_all_new_files_offered_already#:#All new files have already been offered for download. For another download, please click on the action links below.
 exc#:#exc_ass_submission_zip#:#Submissions
 exc#:#exc_ass_team_wiki#:#Assignment Team Wiki
@@ -9110,6 +9111,7 @@ exc#:#exc_find_zip_error#:#The submission can not be opened. The original files 
 exc#:#exc_fixed_date#:#Fixed Date
 exc#:#exc_fixed_date_info#:#Initially all users get the same fixed deadline.
 exc#:#exc_fullscreen#:#Fullscreen
+exc#:#exc_future#:#Upcoming
 exc#:#exc_global_feedback_file#:#Sample Solution
 exc#:#exc_global_feedback_file_after_date#:#After set Date
 exc#:#exc_global_feedback_file_cron#:#Notification
@@ -9188,6 +9190,7 @@ exc#:#exc_note_for_tutor#:#Note for Tutors
 exc#:#exc_notification#:#Personal Notification
 exc#:#exc_nr_random_mand#:#Number of Mandatory Assignments
 exc#:#exc_num_teams#:#Number
+exc#:#exc_ongoing#:#Ongoing
 exc#:#exc_order_by_deadline#:#Order by Deadline
 exc#:#exc_overview#:#Overview
 exc#:#exc_participant#:#Participant
@@ -9201,6 +9204,7 @@ exc#:#exc_pass_mode#:#Pass Mode
 exc#:#exc_pass_mode_not_changeable_info#:#The pass mode cannot be changed anymore.
 exc#:#exc_passed_status_determination#:#Determination of Status ‘Passed’
 exc#:#exc_passing_exc#:#Passing the Exercise
+exc#:#exc_past#:#Past
 exc#:#exc_peer_deadline_mismatch#:#As feedback is given after the deadline has passed the feedback deadline must not be earlier than the assignment deadline.
 exc#:#exc_peer_review#:#Peer-Feedback
 exc#:#exc_peer_review_ass_setting_info#:#Users can rate the solutions of their peers after the deadline and if granted the grace period lapsed. Specific settings on peer-feedback are made in the respective tab. After activation this option and saving it, the tab 'Peer-Feedback' will be displayed.
@@ -9296,6 +9300,7 @@ exc#:#exc_reminder_submit_setting#:#Remind Users to Submit
 exc#:#exc_reminder_submit_subject#:#Assignment "%s" was not finished
 exc#:#exc_reminders_cron#:#Reminders for Assignments
 exc#:#exc_reminders_cron_info#:#If enabled, 3 reminders will be active: Users to Submit, Tutors to Grade and Participants to Feedback.
+exc#:#exc_requirement#:#Anforderung
 exc#:#exc_save_all#:#Save All
 exc#:#exc_save_order#:#Save Order
 exc#:#exc_save_selected#:#Save Selected

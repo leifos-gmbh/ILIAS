@@ -170,7 +170,6 @@ class ilExSubmissionGUI
         ilObjExercise $a_exc
     ): void {
         global $DIC;
-
         $ilCtrl = $DIC->ctrl();
 
         if (!$a_submission->canView()) {

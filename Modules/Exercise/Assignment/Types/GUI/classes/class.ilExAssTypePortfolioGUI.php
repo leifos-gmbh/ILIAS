@@ -94,4 +94,9 @@ class ilExAssTypePortfolioGUI implements ilExAssignmentTypeGUIInterface
     public function getOverviewContent(ilInfoScreenGUI $a_info, ilExSubmission $a_submission): void
     {
     }
+
+    public function buildSubmissionPropertiesAndActions(\ILIAS\Exercise\Assignment\PropertyAndActionBuilderUI $builder) : void
+    {
+    }
+
 }

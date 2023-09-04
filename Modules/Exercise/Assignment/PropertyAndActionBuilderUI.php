@@ -25,7 +25,7 @@ use ILIAS\Exercise\InternalGUIService;
 use ILIAS\Exercise\Assignment\Mandatory\MandatoryAssignmentsManager;
 use ILIAS\UI\Component\Button\Shy as ButtonShy;
 use ILIAS\UI\Component\Link\Standard as LinkStandard;
-use ILIAS\UI\Component\Button\Standard as ButtonStandard;
+use ILIAS\UI\Component\Button\Primary as ButtonPrimary;
 use ILIAS\UI\Component\Component;
 
 
@@ -37,32 +37,52 @@ class PropertyAndActionBuilderUI
     public const SEC_FILES = "files";
     public const SEC_SUBMISSION = "submission";
     public const SEC_SCHEDULE = "schedule";
+    protected \ilExSubmission $submission;
+    protected \ilExAssignmentTypesGUI $types_gui;
+    protected \ilObjExercise $exc;
+    protected \ilExAssignment $ex_ass;
+    protected \ILIAS\MediaObjects\MediaType\MediaTypeManager $media_type;
+    protected Assignment $assignment;
     protected \ilExAssignmentInfo $info;
 
     protected int $user_id;
     protected string $lead_text = "";
     protected array $head_properties = [];
     protected array $properties = [];
+    protected array $actions = [];
+    protected array $main_action = [];
     protected array $additional_head_properties = [];
 
     public function __construct(
+        \ilObjExercise $exc,
         MandatoryAssignmentsManager $mandatory_manager,
         InternalDomainService $domain_service,
         InternalGUIService $gui_service
     ) {
-        $this->domain_service = $domain_service;
-        $this->gui_service = $gui_service;
+        global $DIC;
+
+        $this->exc = $exc;
+        $this->media_type = $DIC->mediaObjects()->internal()->domain()->mediaType();
+        $this->domain = $domain_service;
+        $this->gui = $gui_service;
         $this->lng = $domain_service->lng();
         $this->mandatory_manager = $mandatory_manager;
         $this->lng->loadLanguageModule("exc");
+        $this->ctrl = $gui_service->ctrl();
+        $this->types_gui = $gui_service->assignment()->types();
     }
 
-    public function build(Assignment $ass, int $user_id) : void
+    public function build(
+        Assignment $ass,
+        int $user_id
+    ) : void
     {
         $this->assignment = $ass;
         $this->user_id = $user_id;
         $this->state = \ilExcAssMemberState::getInstanceByIds($ass->getId(), $user_id);
         $this->info = new \ilExAssignmentInfo($ass->getId(), $user_id);
+        $this->ex_ass = new \ilExAssignment($this->assignment->getId());
+        $this->submission = new \ilExSubmission($this->ex_ass, $user_id);
         $this->lead_text = "";
         $this->head_properties = [];
         $this->additional_head_properties = [];
@@ -107,7 +127,7 @@ class PropertyAndActionBuilderUI
         ];
     }
 
-    protected function addProperty(string $section, string $prop, string $val) : void
+    public function addProperty(string $section, string $prop, string $val) : void
     {
         $this->properties[$section][] = [
             "prop" => $prop,
@@ -120,24 +140,24 @@ class PropertyAndActionBuilderUI
         return $this->properties[$section] ?? [];
     }
 
-    protected function addAction(string $section, Component $button_or_link) : void
+    public function addAction(string $section, Component $button_or_link) : void
     {
         $this->actions[$section][] = $button_or_link;
     }
 
-    public function getActions(string $section) : ?array
+    public function getActions(string $section) : array
     {
-        return $this->actions[$section] ?? null;
+        return $this->actions[$section] ?? [];
     }
 
-    protected function setMainAction(ButtonStandard $button) : void
+    public function setMainAction(string $section, ButtonPrimary $button) : void
     {
-        $this->main_action = $button;
+        $this->main_action[$section] = $button;
     }
 
-    public function getMainAction():ButtonStandard
+    public function getMainAction(string $section):?ButtonPrimary
     {
-        return $this->main_action;
+        return $this->main_action[$section] ?? null;
     }
 
     protected function buildHead() : void
@@ -239,13 +259,13 @@ class PropertyAndActionBuilderUI
     {
         if ($this->state->areInstructionsVisible()) {
             $this->buildInstructions();
-            //$this->buildFiles();
+            $this->buildFiles();
         }
 
         //$this->buildSchedule();
 
         if ($this->state->hasSubmissionStarted()) {
-            //$this->buildSubmission();
+            $this->buildSubmission();
         }
     }
 
@@ -336,45 +356,36 @@ class PropertyAndActionBuilderUI
         }
     }
 
-    protected function addFiles(
-        ilInfoScreenGUI $a_info,
-        ilExAssignment $a_ass
-    ): void {
+    protected function buildFiles(): void {
         $lng = $this->lng;
-        $lng->loadLanguageModule("exc");
-        $files = $a_ass->getFiles();
+        $ui_factory = $this->gui->ui()->factory();
+        $ui_renderer = $this->gui->ui()->renderer();
+
+        $ass = $this->ex_ass;
+        $files = $ass->getFiles();
         if (count($files) > 0) {
-            $a_info->addSection($lng->txt("exc_files"));
-
-            global $DIC;
-
-            //file has -> name,fullpath,size,ctime
             $cnt = 0;
             foreach ($files as $file) {
                 $cnt++;
                 // get mime type
-                $mime = ilObjMediaObject::getMimeType($file['fullpath']);
-
-                $ui_factory = $DIC->ui()->factory();
-                $ui_renderer = $DIC->ui()->renderer();
-
+                $mime = \ilObjMediaObject::getMimeType($file['fullpath']);
                 $output_filename = htmlspecialchars($file['name']);
 
                 if ($this->media_type->isImage($mime)) {
-                    $item_id = "il-ex-modal-img-" . $a_ass->getId() . "-" . $cnt;
+                    $item_id = "il-ex-modal-img-" . $ass->getId() . "-" . $cnt;
 
 
                     $image = $ui_renderer->render($ui_factory->image()->responsive($file['fullpath'], $output_filename));
-                    $image_lens = ilUtil::getImagePath("enlarge.svg");
+                    $image_lens = \ilUtil::getImagePath("enlarge.svg");
 
-                    $modal = ilModalGUI::getInstance();
+                    $modal = \ilModalGUI::getInstance();
                     $modal->setId($item_id);
-                    $modal->setType(ilModalGUI::TYPE_LARGE);
+                    $modal->setType(\ilModalGUI::TYPE_LARGE);
                     $modal->setBody($image);
                     $modal->setHeading($output_filename);
                     $modal = $modal->getHTML();
 
-                    $img_tpl = new ilTemplate("tpl.image_file.html", true, true, "Modules/Exercise");
+                    $img_tpl = new \ilTemplate("tpl.image_file.html", true, true, "Modules/Exercise");
                     $img_tpl->setCurrentBlock("image_content");
                     $img_tpl->setVariable("MODAL", $modal);
                     $img_tpl->setVariable("ITEM_ID", $item_id);
@@ -383,9 +394,14 @@ class PropertyAndActionBuilderUI
                     $img_tpl->setvariable("ALT_LENS", $lng->txt("exc_fullscreen"));
                     $img_tpl->parseCurrentBlock();
 
-                    $a_info->addProperty($output_filename, $img_tpl->get());
+                    $this->addProperty(
+                        self::SEC_FILES,
+                        $output_filename,
+                        $img_tpl->get()
+                    );
+
                 } elseif ($this->media_type->isAudio($mime) || $this->media_type->isVideo($mime)) {
-                    $media_tpl = new ilTemplate("tpl.media_file.html", true, true, "Modules/Exercise");
+                    $media_tpl = new \ilTemplate("tpl.media_file.html", true, true, "Modules/Exercise");
 
                     if ($this->media_type->isAudio($mime)) {
                         $p = $ui_factory->player()->audio($file['fullpath']);
@@ -399,9 +415,21 @@ class PropertyAndActionBuilderUI
                         $this->getSubmissionLink("downloadFile", array("file" => urlencode($file["name"])))
                     );
                     $media_tpl->setVariable("DOWNLOAD_BUTTON", $ui_renderer->render($but));
-                    $a_info->addProperty($output_filename, $media_tpl->get());
+                    $this->addProperty(
+                        self::SEC_FILES,
+                        $output_filename,
+                        $media_tpl->get()
+                    );
                 } else {
-                    $a_info->addProperty($output_filename, $lng->txt("download"), $this->getSubmissionLink("downloadFile", array("file" => urlencode($file["name"]))));
+                    $l = $ui_factory->link()->standard(
+                        $lng->txt("download"),
+                        $this->getSubmissionLink("downloadFile", array("file" => urlencode($file["name"])))
+                    );
+                    $this->addProperty(
+                        self::SEC_FILES,
+                        $output_filename,
+                        $ui_renderer->render($l)
+                    );
                 }
             }
         }
@@ -411,20 +439,33 @@ class PropertyAndActionBuilderUI
      * @throws ilCtrlException
      * @throws ilDateTimeException
      */
-    protected function addSubmission(
-        ilInfoScreenGUI $a_info,
-        ilExAssignment $a_ass
-    ): void {
-        $lng = $this->lng;
-        $ilUser = $this->user;
+    protected function buildSubmission(): void {
 
-        $state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
+        if (!$this->submission->canView()) {
+            return;
+        }
 
-        $a_info->addSection($lng->txt("exc_your_submission"));
+        $this->ctrl->setParameterByClass(
+            "ilExSubmissionGUI",
+            "ass_id",
+            $this->assignment->getId()
+        );
 
-        $submission = new ilExSubmission($a_ass, $ilUser->getId());
+        // todo
+        /*
+        if ($a_submission->getAssignment()->hasTeam()) {
+            ilExSubmissionTeamGUI::getOverviewContent($a_info, $a_submission);
+        }*/
 
-        ilExSubmissionGUI::getOverviewContent($a_info, $submission, $this->exc);
+        $type_gui = $this->types_gui->getById($this->ex_ass->getType());
+        $type_gui->setSubmission($this->submission);
+        $type_gui->setExercise($this->exc);
+        $type_gui->buildSubmissionPropertiesAndActions($this);
+
+        //\ilExSubmissionGUI::getOverviewContent($a_info, $this->submission, $this->exc);
+
+
+        return;
 
         $last_sub = null;
         if ($submission->hasSubmitted()) {
@@ -560,7 +601,7 @@ class PropertyAndActionBuilderUI
             }
         }
 
-        $ilCtrl->setParameterByClass("ilexsubmissiongui", "ass_id", $this->current_ass_id);
+        $ilCtrl->setParameterByClass("ilexsubmissiongui", "ass_id", $this->assignment->getId());
         $url = $ilCtrl->getLinkTargetByClass("ilexsubmissiongui", $a_cmd);
         $ilCtrl->setParameterByClass("ilexsubmissiongui", "ass_id", "");
 

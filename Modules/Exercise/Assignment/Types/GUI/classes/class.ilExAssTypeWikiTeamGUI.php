@@ -295,4 +295,9 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
         $this->main_tpl->setOnScreenMessage('success', $lng->txt("wiki_exc_wiki_created"), true);
         $this->ctrl->returnToParent($this);
     }
+
+    public function buildSubmissionPropertiesAndActions(\ILIAS\Exercise\Assignment\PropertyAndActionBuilderUI $builder) : void
+    {
+    }
+
 }

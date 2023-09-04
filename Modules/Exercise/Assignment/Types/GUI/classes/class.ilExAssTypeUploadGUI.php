@@ -53,4 +53,53 @@ class ilExAssTypeUploadGUI implements ilExAssignmentTypeGUIInterface
     public function getOverviewContent(ilInfoScreenGUI $a_info, ilExSubmission $a_submission): void
     {
     }
+
+    public function buildSubmissionPropertiesAndActions(\ILIAS\Exercise\Assignment\PropertyAndActionBuilderUI $builder) : void
+    {
+        global $DIC;
+
+        $lng = $DIC->language();
+        $ctrl = $DIC->ctrl();
+        $submission = $this->getSubmission();
+        $f = $DIC->ui()->factory();
+
+        $titles = array();
+        foreach ($submission->getFiles() as $file) {
+            $titles[] = htmlentities($file["filetitle"]);
+        }
+        $files_str = implode("<br>", $titles);
+        if ($files_str == "") {
+            $files_str = $lng->txt("message_no_delivered_files");
+        }
+
+        // no team == no submission
+        if (!$submission->hasNoTeamYet()) {
+            if ($submission->canSubmit()) {
+                $title = (count($titles) == 0
+                    ? $lng->txt("exc_hand_in")
+                    : $lng->txt("exc_edit_submission"));
+
+                $main_button = $f->button()->primary(
+                    $title,
+                    $ctrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionFileGUI"), "submissionScreen")
+                );
+                $builder->setMainAction($builder::SEC_SUBMISSION, $main_button);
+            } else {
+                if (count($titles) > 0) {
+                    $link = $f->link()->standard(
+                        $lng->txt("already_delivered_files"),
+                        $ctrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionFileGUI"), "submissionScreen")
+                    );
+                    $builder->addAction($builder::SEC_SUBMISSION, $link);
+                }
+            }
+        }
+
+        $builder->addProperty(
+            $builder::SEC_SUBMISSION,
+            $lng->txt("exc_files_returned"),
+            $files_str
+        );
+    }
+
 }

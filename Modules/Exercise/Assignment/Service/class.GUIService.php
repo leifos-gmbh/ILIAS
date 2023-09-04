@@ -39,33 +39,38 @@ class GUIService
     }
 
     public function itemBuilder(
+        \ilObjExercise $exc,
         MandatoryAssignmentsManager $mandatory_manager
     ): ItemBuilderUI
     {
         return new ItemBuilderUI(
-            $this->propertyAndActionBuilder($mandatory_manager),
+            $this->propertyAndActionBuilder($exc, $mandatory_manager),
             $this->gui_service->ui()->factory(),
             $this->gui_service->ctrl()
         );
     }
 
     public function panelBuilder(
+        \ilObjExercise $exc,
         MandatoryAssignmentsManager $mandatory_manager
     ): PanelBuilderUI
     {
         return new PanelBuilderUI(
-            $this->propertyAndActionBuilder($mandatory_manager),
+            $this->propertyAndActionBuilder($exc, $mandatory_manager),
             $this->gui_service->ui()->factory(),
+            $this->gui_service->ui()->renderer(),
             $this->gui_service->ctrl(),
             $this->domain_service->lng()
         );
     }
 
     public function propertyAndActionBuilder(
+        \ilObjExercise $exc,
         MandatoryAssignmentsManager $mandatory_manager
     ): PropertyAndActionBuilderUI
     {
         return new PropertyAndActionBuilderUI(
+            $exc,
             $mandatory_manager,
             $this->domain_service,
             $this->gui_service
@@ -81,4 +86,8 @@ class GUIService
         );
     }
 
+    public function types() : \ilExAssignmentTypesGUI
+    {
+        return new \ilExAssignmentTypesGUI();
+    }
 }

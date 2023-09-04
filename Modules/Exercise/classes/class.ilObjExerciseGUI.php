@@ -98,6 +98,7 @@ class ilObjExerciseGUI extends ilObjectGUI
         if ($this->object) {
             $this->ass_manager = $this->service->domain()->assignment()->assignments($this->object->getRefId());
             $this->item_builder = $this->service->gui()->assignment()->itemBuilder(
+                $this->object,
                 $this->service->domain()->assignment()->mandatoryAssignments($this->object)
             );
         }

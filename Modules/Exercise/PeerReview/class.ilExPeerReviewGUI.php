@@ -25,6 +25,8 @@
  */
 class ilExPeerReviewGUI
 {
+    protected \ILIAS\Exercise\InternalGUIService $gui;
+    protected \ILIAS\Exercise\InternalDomainService $domain;
     protected ilCtrl $ctrl;
     protected ilTabsGUI $tabs_gui;
     protected ilLanguage $lng;
@@ -42,23 +44,19 @@ class ilExPeerReviewGUI
         ilExAssignment $a_ass,
         ilExSubmission $a_submission = null
     ) {
-        /** @var \ILIAS\DI\Container $DIC */
         global $DIC;
 
-        $this->user = $DIC->user();
-        $ilCtrl = $DIC->ctrl();
-        $ilTabs = $DIC->tabs();
-        $lng = $DIC->language();
-        $tpl = $DIC["tpl"];
+        $service = $DIC->exercise()->internal();
+        $this->domain =$service->domain();
+        $this->gui = $service->gui();
+        $this->user = $this->domain->user();
+        $this->ctrl = $this->gui->ctrl();
+        $this->tabs_gui = $this->gui->tabs();
+        $this->lng = $this->domain->lng();
+        $this->tpl =$this->gui->ui()->mainTemplate();
 
         $this->ass = $a_ass;
         $this->submission = $a_submission;
-
-        // :TODO:
-        $this->ctrl = $ilCtrl;
-        $this->tabs_gui = $ilTabs;
-        $this->lng = $lng;
-        $this->tpl = $tpl;
 
         $request = $DIC->exercise()->internal()->gui()->request();
         $this->requested_review_giver_id = $request->getReviewGiverId();
@@ -266,6 +264,117 @@ class ilExPeerReviewGUI
 
             $a_info->addProperty($lng->txt("exc_peer_review"), $edit_pc . $sep . $view_pc);
 
+            $ilCtrl->setParameterByClass("ilExPeerReviewGUI", "ass_id", "");
+        }
+    }
+
+    public function buildSubmissionPropertiesAndActions(\ILIAS\Exercise\Assignment\PropertyAndActionBuilderUI $builder) : void
+    {
+        $f = $this->gui->ui()->factory();
+        $lng = $this->lng;
+        $ilCtrl = $this->ctrl;
+        $submission = $this->submission;
+        $ass = $submission->getAssignment();
+        $state = $this->domain->assignment()->state($ass->getId(), $submission->getUserId());
+
+        $view_pc = "";
+        $edit_pc = "";
+
+
+        //if($ass->afterDeadlineStrict() &&
+        //	$ass->getPeerReview())
+        if ($state->hasSubmissionEndedForAllUsers() &&
+            $ass->getPeerReview()) {
+            $ilCtrl->setParameterByClass("ilExPeerReviewGUI", "ass_id", $submission->getAssignment()->getId());
+
+            $nr_missing_fb = $submission->getPeerReview()->getNumberOfMissingFeedbacksForReceived();
+
+            // before deadline (if any)
+            // if(!$ass->getPeerReviewDeadline() ||
+            //  	$ass->getPeerReviewDeadline() > time())
+            if ($state->isPeerReviewAllowed()) {
+                $button = $f->button()->primary(
+                    $lng->txt("exc_peer_review_give"),
+                    $ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExPeerReviewGUI"), "editPeerReview")
+                );
+                $builder->setMainAction(
+                    $builder::SEC_PEER_FEEDBACK,
+                    $button
+                );
+                if ($ass->getPeerReviewDeadline()) {
+                    $deadline = $state->getPeerReviewDeadlinePresentation();
+                } else {
+                    $deadline = $lng->txt("exc_no_peer_feedback_deadline");
+                }
+                $builder->addProperty(
+                    $builder::SEC_PEER_FEEDBACK,
+                    $lng->txt("exc_peer_review_deadline"),
+                    $deadline
+                );
+            } elseif ($ass->getPeerReviewDeadline()) {
+                $edit_pc = $lng->txt("exc_peer_review_deadline_reached");
+                $builder->addProperty(
+                    $builder::SEC_PEER_FEEDBACK,
+                    $lng->txt("exc_give_peer_feedback"),
+                    $lng->txt("exc_peer_review_deadline_reached")
+                );
+            }
+            if ($ass->getPeerReviewDeadline()) {
+                $builder->addProperty(
+                    $builder::SEC_SCHEDULE,
+                    $lng->txt("exc_peer_review_deadline"),
+                    $state->getPeerReviewDeadlinePresentation()
+                );
+            }
+
+            // after deadline (if any)
+            if ((!$ass->getPeerReviewDeadline() ||
+                $ass->getPeerReviewDeadline() < time())) {
+                // given peer review should be accessible at all times (read-only when not editable - see above)
+                if ($ass->getPeerReviewDeadline() &&
+                    $submission->getPeerReview()->countGivenFeedback(false)) {
+                    $link = $f->link()->standard(
+                        $lng->txt("exc_peer_review_given"),
+                        $ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExPeerReviewGUI"), "showGivenPeerReview")
+                    );
+                    $builder->addAction(
+                        $builder::SEC_PEER_FEEDBACK,
+                        $link
+                    );
+                }
+
+                // did give enough feedback
+                if (!$nr_missing_fb) {
+                    // received any?
+                    $received = (bool) sizeof($submission->getPeerReview()->getPeerReviewsByPeerId($submission->getUserId(), true));
+                    if ($received) {
+                        $link = $f->link()->standard(
+                            $lng->txt("exc_peer_review_show"),
+                            $ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExPeerReviewGUI"), "showReceivedPeerReview")
+                        );
+                        $builder->addAction(
+                            $builder::SEC_PEER_FEEDBACK,
+                            $link
+                        );
+                    }
+                    // received none
+                    else {
+                        $builder->addProperty(
+                            $builder::SEC_PEER_FEEDBACK,
+                            $lng->txt("exc_received_peer_feedback"),
+                            $lng->txt("exc_peer_review_show_received_none")
+                        );
+                    }
+                }
+                // did not give enough
+                else {
+                    $builder->addProperty(
+                        $builder::SEC_PEER_FEEDBACK,
+                        $lng->txt("exc_peer_feedback_status"),
+                        $lng->txt("exc_peer_review_show_missing")
+                    );
+                }
+            }
             $ilCtrl->setParameterByClass("ilExPeerReviewGUI", "ass_id", "");
         }
     }

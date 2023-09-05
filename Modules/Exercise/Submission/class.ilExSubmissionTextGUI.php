@@ -277,7 +277,6 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
                 $text->setValue(nl2br(ilRTE::_replaceMediaObjectImageSrc($files["atext"], 1)));
             }
         }
-
         $this->tpl->setContent($a_form->getHTML());
     }
 }

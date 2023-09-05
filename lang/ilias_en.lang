@@ -9094,6 +9094,7 @@ exc#:#exc_download_selected#:#Download Selected Submission
 exc#:#exc_download_zip_structure#:#Download ZIP Structure
 exc#:#exc_earliest_start_time#:#Earliest Start Time
 exc#:#exc_edit_assignment#:#Edit Assignment
+exc#:#exc_edit_blog#:#Edit Blog
 exc#:#exc_edit_assignments#:#Edit Assignments
 exc#:#exc_edit_criterias#:#Edit Criteria
 exc#:#exc_edit_submission#:#Edit Submission
@@ -9182,6 +9183,7 @@ exc#:#exc_no_feedback_dir_found_in_zip#:#The directory structure of the uploaded
 exc#:#exc_no_get_target#:#A valid target has not been sent.
 exc#:#exc_no_participants#:#There are currently no participants.
 exc#:#exc_no_portfolio_templates#:#There are no Portfolio Templates available.
+exc#:#exc_no_submission_yet#:#No submission yet.
 exc#:#exc_no_team_yet#:#Not assigned to a team
 exc#:#exc_no_team_yet_info#:#You can create a team yourself or be added to an existing team by its team members.
 exc#:#exc_no_team_yet_info_tutor#:#Teams are managed by the exercise tutors.

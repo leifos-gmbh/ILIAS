@@ -115,9 +115,9 @@ class PropertyAndActionBuilderUI
         $secs[self::SEC_FILES] = $this->lng->txt("exc_files");
         $secs[self::SEC_TEAM] = $this->lng->txt("exc_team");
         $secs[self::SEC_SUBMISSION] = $this->lng->txt("exc_submission");
-        $secs[self::SEC_PEER_FEEDBACK] = $this->lng->txt("exc_peer_feedback");
-        $secs[self::SEC_TUTOR_EVAL] = $this->lng->txt("exc_tutor_evaluation");
-        $secs[self::SEC_SAMPLE_SOLUTION] = $this->lng->txt("exc_sample_solution");
+        $secs[self::SEC_PEER_FEEDBACK] = $this->lng->txt("exc_peer_review");
+        $secs[self::SEC_TUTOR_EVAL] = $this->lng->txt("exc_feedback_from_tutor");
+        $secs[self::SEC_SAMPLE_SOLUTION] = $this->lng->txt("exc_global_feedback_file");
 
         return $secs;
     }
@@ -313,7 +313,7 @@ class PropertyAndActionBuilderUI
         $this->ctrl->setParameterByClass(\ilAssignmentPresentationGUI::class, "ass_id", $this->assignment->getId());
         $this->addView(
             "ass",
-            $this->lng->txt("exc_assignment"),
+            $this->lng->txt("overview"),
             $this->ctrl->getLinkTargetByClass(\ilAssignmentPresentationGUI::class, "")
         );
 
@@ -326,6 +326,8 @@ class PropertyAndActionBuilderUI
 
         if ($this->state->hasSubmissionStarted()) {
             $this->buildSubmission();
+            $this->buildPeerFeedback();
+            $this->buildSampleSolution();
         }
     }
 
@@ -410,26 +412,27 @@ class PropertyAndActionBuilderUI
         }
     }
 
-    protected function addPublicSubmissions(
-        ilInfoScreenGUI $a_info,
-        ilExAssignment $a_ass
-    ): void {
-        $lng = $this->lng;
-        $ilUser = $this->user;
-
-        $state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
-
+    protected function builPublicSubmissions(): void {
         // submissions are visible, even if other users may still have a larger individual deadline
-        if ($state->hasSubmissionEnded()) {
-            $button = ilLinkButton::getInstance();
-            $button->setCaption("exc_list_submission");
-            $button->setUrl($this->getSubmissionLink("listPublicSubmissions"));
-
-            $a_info->addProperty($lng->txt("exc_public_submission"), $button->render());
+        if ($this->state->hasSubmissionEnded()) {
+            $link = $this->gui->ui()->factory()->link()->standard(
+                $this->lng->txt("exc_public_submission"),
+                $this->getSubmissionLink("listPublicSubmissions")
+            );
+            $this->addAction(
+                self::SEC_SUBMISSION,
+                $link
+            );
+            $this->addView(
+                "public_submissions",
+                $this->lng->txt("exc_public_submission"),
+                $this->getSubmissionLink("listPublicSubmissions")
+            );
         } else {
-            $a_info->addProperty(
-                $lng->txt("exc_public_submission"),
-                $lng->txt("exc_msg_public_submission")
+            $this->addProperty(
+                self::SEC_SUBMISSION,
+                $this->lng->txt("exc_public_submission"),
+                $this->lng->txt("exc_msg_public_submission")
             );
         }
     }
@@ -539,80 +542,112 @@ class PropertyAndActionBuilderUI
         $type_gui->setExercise($this->exc);
         $type_gui->buildSubmissionPropertiesAndActions($this);
 
-        //\ilExSubmissionGUI::getOverviewContent($a_info, $this->submission, $this->exc);
-
-
-        return;
-
         $last_sub = null;
-        if ($submission->hasSubmitted()) {
-            $last_sub = $submission->getLastSubmission();
+        if ($this->submission->hasSubmitted()) {
+            $last_sub = $this->submission->getLastSubmission();
             if ($last_sub) {
-                $last_sub = ilDatePresentation::formatDate(new ilDateTime($last_sub, IL_CAL_DATETIME));
-                $a_info->addProperty($lng->txt("exc_last_submission"), $last_sub);
+                $last_sub = \ilDatePresentation::formatDate(new \ilDateTime($last_sub, IL_CAL_DATETIME));
+                $this->addProperty(
+                    self::SEC_SUBMISSION,
+                    $this->lng->txt("exc_last_submission"),
+                    $last_sub
+                );
             }
+        } else {
+            $this->addProperty(
+                self::SEC_SUBMISSION,
+                $this->lng->txt("exc_last_submission"),
+                $this->lng->txt("exc_no_submission_yet")
+            );
         }
 
         if ($this->exc->getShowSubmissions()) {
-            $this->addPublicSubmissions($a_info, $a_ass);
+            $this->builPublicSubmissions();
         }
+    }
 
-        ilExPeerReviewGUI::getOverviewContent($a_info, $submission);
+    protected function buildPeerFeedback() : void
+    {
+        if (!$this->submission->canView()) {
+            return;
+        }
+        $peer_review_gui = $this->gui->peerReview()->getPeerReviewGUI(
+            $this->ex_ass,
+            $this->submission
+        );
+        $peer_review_gui->buildSubmissionPropertiesAndActions($this);
+    }
+
+    protected function buildSampleSolution() : void
+    {
+        $ass = $this->ex_ass;
+        $state = $this->state;
+        $submission = $this->submission;
 
         // global feedback / sample solution
-        if ($a_ass->getFeedbackDate() == ilExAssignment::FEEDBACK_DATE_DEADLINE) {
-            $show_global_feedback = ($state->hasSubmissionEndedForAllUsers() && $a_ass->getFeedbackFile());
+        if ($ass->getFeedbackDate() === \ilExAssignment::FEEDBACK_DATE_DEADLINE) {
+            $show_global_feedback = ($state->hasSubmissionEndedForAllUsers() && $ass->getFeedbackFile());
         }
         //If it is not well configured...(e.g. show solution before deadline)
         //the user can get the solution before he summit it.
         //we can check in the elseif $submission->hasSubmitted()
-        elseif ($a_ass->getFeedbackDate() == ilExAssignment::FEEDBACK_DATE_CUSTOM) {
-            $show_global_feedback = ($a_ass->afterCustomDate() && $a_ass->getFeedbackFile());
+        elseif ($ass->getFeedbackDate() === \ilExAssignment::FEEDBACK_DATE_CUSTOM) {
+            $show_global_feedback = ($ass->afterCustomDate() && $ass->getFeedbackFile());
         } else {
-            $show_global_feedback = ($last_sub && $a_ass->getFeedbackFile());
+            $show_global_feedback = ($last_sub && $ass->getFeedbackFile());
         }
-        $this->addSubmissionFeedback($a_info, $a_ass, $submission->getFeedbackId(), $show_global_feedback);
+        $this->buildSubmissionFeedback($show_global_feedback);
     }
 
-    protected function addSubmissionFeedback(
-        ilInfoScreenGUI $a_info,
-        ilExAssignment $a_ass,
-        string $a_feedback_id,
+    protected function buildSubmissionFeedback(
         bool $a_show_global_feedback
     ): void {
+
+        $f = $this->gui->ui()->factory();
+        $r = $this->gui->ui()->renderer();
+
+        $ass = $this->ex_ass;
+        $feedback_id = $this->submission->getFeedbackId();
         $lng = $this->lng;
 
-        $storage = new ilFSStorageExercise($a_ass->getExerciseId(), $a_ass->getId());
-        $cnt_files = $storage->countFeedbackFiles($a_feedback_id);
+        $storage = new \ilFSStorageExercise($ass->getExerciseId(), $ass->getId());
+        $cnt_files = $storage->countFeedbackFiles($feedback_id);
 
-        $lpcomment = $a_ass->getMemberStatus()->getComment();
-        $mark = $a_ass->getMemberStatus()->getMark();
-        $status = $a_ass->getMemberStatus()->getStatus();
+        $lpcomment = $ass->getMemberStatus()->getComment();
+        $mark = $ass->getMemberStatus()->getMark();
+        $status = $ass->getMemberStatus()->getStatus();
 
         if ($lpcomment != "" ||
             $mark != "" ||
             $status != "notgraded" ||
             $cnt_files > 0 ||
             $a_show_global_feedback) {
+
             $a_info->addSection($lng->txt("exc_feedback_from_tutor"));
-            if ($lpcomment != "") {
-                $a_info->addProperty(
+            if ($lpcomment !== "") {
+                $this->addProperty(
+                    self::SEC_TUTOR_EVAL,
                     $lng->txt("exc_comment"),
                     nl2br($lpcomment)
                 );
             }
-            if ($mark != "") {
-                $a_info->addProperty(
+            if ($mark !== "") {
+                $this->addProperty(
+                    self::SEC_TUTOR_EVAL,
                     $lng->txt("exc_mark"),
                     $mark
                 );
             }
 
-            if ($status != "" && $status != "notgraded") {
-                //$img = $this->getIconForStatus($status);
-                $a_info->addProperty(
+            if ($status !== "" && $status !== "notgraded") {
+                $this->addProperty(
+                    self::SEC_TUTOR_EVAL,
                     $lng->txt("status"),
-                    $img . " " . $lng->txt("exc_" . $status)
+                    $lng->txt("exc_" . $status)
+                );
+                $this->addAdditionalHeadProperty(
+                    $lng->txt("status"),
+                    $lng->txt("exc_" . $status)
                 );
             }
 
@@ -623,10 +658,14 @@ class PropertyAndActionBuilderUI
                 if ($cnt_files > 0) {
                     $files = $storage->getFeedbackFiles($a_feedback_id);
                     foreach ($files as $file) {
-                        $a_info->addProperty(
-                            $file,
+                        $link = $f->link()->standard(
                             $lng->txt("download"),
                             $this->getSubmissionLink("downloadFeedbackFile", array("file" => urlencode($file)))
+                        );
+                        $this->addProperty(
+                            self::SEC_TUTOR_EVAL,
+                            $file,
+                            $r->render($link)
                         );
                     }
                 }
@@ -634,12 +673,14 @@ class PropertyAndActionBuilderUI
 
             // #15002 - global feedback
             if ($a_show_global_feedback) {
-                $a_info->addSection($lng->txt("exc_global_feedback_file"));
-
-                $a_info->addProperty(
-                    $a_ass->getFeedbackFile(),
+                $link = $f->link()->standard(
                     $lng->txt("download"),
                     $this->getSubmissionLink("downloadGlobalFeedbackFile")
+                );
+                $this->addProperty(
+                    self::SEC_SAMPLE_SOLUTION,
+                    $a_ass->getFeedbackFile(),
+                    $r->render($link)
                 );
             }
         }

@@ -116,7 +116,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
             if (!$valid_blog) {
                 $button = ilLinkButton::getInstance();
                 $button->setCaption("exc_create_blog");
-                $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "createBlog"));
+                $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "createBlog"));
                 $buttons_str .= $button->render();
             }
             // #10462
@@ -125,7 +125,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
                 || ($valid_blog && $blogs > 1)) {
                 $button = ilLinkButton::getInstance();
                 $button->setCaption("exc_select_blog" . ($valid_blog ? "_change" : ""));
-                $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "selectBlog"));
+                $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "selectBlog"));
                 $buttons_str .= " " . $button->render();
             }
         }
@@ -206,7 +206,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
             if (!$valid_prtf) {
                 $button = ilLinkButton::getInstance();
                 $button->setCaption("exc_create_portfolio");
-                $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "createPortfolioFromAssignment"));
+                $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "createPortfolioFromAssignment"));
 
                 $buttons_str .= $button->render();
             }
@@ -217,13 +217,13 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
                 || ($valid_prtf && $prtfs > 1)) {
                 $button = ilLinkButton::getInstance();
                 $button->setCaption("exc_select_portfolio" . ($valid_prtf ? "_change" : ""));
-                $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "selectPortfolio"));
+                $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "selectPortfolio"));
                 $buttons_str .= " " . $button->render();
             }
             if ($valid_prtf) {
                 $button = ilLinkButton::getInstance();
                 $button->setCaption('exc_select_portfolio_unlink');
-                $button->setUrl($ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "askUnlinkPortfolio"));
+                $button->setUrl($ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionObjectGUI"), "askUnlinkPortfolio"));
                 $buttons_str .= " " . $button->render();
             }
         }
@@ -236,7 +236,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
         }
         if ($a_submission->hasSubmitted()) {
             $ilCtrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", $selected_prtf["returned_id"]);
-            $dl_link = $ilCtrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionFileGUI"), "download");
+            $dl_link = $ilCtrl->getLinkTargetByClass(array(ilAssignmentPresentationGUI::class, "ilExSubmissionGUI", "ilExSubmissionFileGUI"), "download");
             $ilCtrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", "");
 
             $button = ilLinkButton::getInstance();

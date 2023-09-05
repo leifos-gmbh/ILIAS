@@ -9095,6 +9095,7 @@ exc#:#exc_download_zip_structure#:#ZIP-Verzeichnisstruktur herunterladen
 exc#:#exc_earliest_start_time#:#Frühester Starttermin
 exc#:#exc_edit_assignment#:#Einstellungen der Übungseinheit
 exc#:#exc_edit_assignments#:#Übungseinheiten bearbeiten
+exc#:#exc_edit_blog#:#Blog bearbeiten
 exc#:#exc_edit_criterias#:#Kriterien bearbeiten
 exc#:#exc_edit_submission#:#Eingereichte Lösungen ändern
 exc#:#exc_ended_on#:#Beendet am
@@ -9182,6 +9183,7 @@ exc#:#exc_no_feedback_dir_found_in_zip#:#Die Verzeichnisstruktur des hochgeladen
 exc#:#exc_no_get_target#:#Kein gültiges Link-Ziel gefunden.
 exc#:#exc_no_participants#:#Zur Zeit gibt es keine Teilnehmer.
 exc#:#exc_no_portfolio_templates#:#Es sind keine Portfoliovorlagen vorhanden.
+exc#:#exc_no_submission_yet#:#Bisher keine Abgabe
 exc#:#exc_no_team_yet#:#Keinem Team zugeordnet
 exc#:#exc_no_team_yet_info#:#Sie können selbst ein Team erstellen oder in ein anderes Team von dessen Teammitgliedern hinzugefügt werden.
 exc#:#exc_no_team_yet_info_tutor#:#Teams werden von den Übungstutoren verwaltet.

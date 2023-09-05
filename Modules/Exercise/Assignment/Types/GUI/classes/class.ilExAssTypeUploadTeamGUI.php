@@ -21,9 +21,9 @@
  *
  * @author Alex Killing <killing@leifos.de>
  */
-class ilExAssTypeUploadTeamGUI implements ilExAssignmentTypeGUIInterface
+class ilExAssTypeUploadTeamGUI extends ilExAssTypeUploadGUI
 {
-    use ilExAssignmentTypeGUIBase;
+    //use ilExAssignmentTypeGUIBase;
 
     /**
      * @inheritdoc
@@ -56,6 +56,7 @@ class ilExAssTypeUploadTeamGUI implements ilExAssignmentTypeGUIInterface
 
     public function buildSubmissionPropertiesAndActions(\ILIAS\Exercise\Assignment\PropertyAndActionBuilderUI $builder) : void
     {
+        parent::buildSubmissionPropertiesAndActions($builder);
     }
 
 }

@@ -208,7 +208,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
             if (!$valid_wiki && $team_available) {
                 $button = ilLinkButton::getInstance();
                 $button->setCaption("exc_create_wiki");
-                $button->setUrl($ctrl->getLinkTarget($this, "createWiki"));
+                $button->setUrl($ctrl->getLinkTargetByClass([ilAssignmentPresentationGUI::class, ilExSubmissionGUI::class, self::class], "createWiki"));
 
                 $files_str .= $button->render();
             }
@@ -298,6 +298,93 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 
     public function buildSubmissionPropertiesAndActions(\ILIAS\Exercise\Assignment\PropertyAndActionBuilderUI $builder) : void
     {
+        global $DIC;
+
+        $f = $DIC->ui()->factory();
+        $lng = $this->lng;
+        $ctrl = $this->ctrl;
+
+
+        $files_str = "";
+        $valid_wiki = false;
+
+        $submission = $this->getSubmission();
+
+        $team_members = $submission->getTeam()->getMembers();
+        $team_available = (count($team_members));
+
+        $selected_wiki = $submission->getSelectedObject();
+        if ($selected_wiki) {
+            $wiki_ref_id = (int) $selected_wiki["filetitle"];
+
+            // #11746
+            if (\ilObject::_exists($wiki_ref_id, true, "wiki") && $this->tree->isInTree($wiki_ref_id)) {
+                $wiki = new \ilObjWiki($wiki_ref_id);
+                if ($wiki->getTitle()) {
+                    // #10116 / #12791
+                    $ctrl->setParameterByClass("ilobjwikigui", "ref_id", $wiki_ref_id);
+                    $wiki_link = ilLink::_getLink($wiki_ref_id);
+                    $files_str = '<a href="' . $wiki_link .
+                        '">' . $wiki->getTitle() . '</a>';
+                    $valid_wiki = true;
+                    $builder->addProperty(
+                        $builder::SEC_SUBMISSION,
+                        $lng->txt("exc_ass_team_wiki"),
+                        $wiki->getTitle()
+                    );
+                    if ($submission->canSubmit()) {
+                        $button = $f->button()->primary(
+                            $lng->txt("exc_edit_wiki"),
+                            $wiki_link
+                        );
+                        $builder->setMainAction(
+                            $builder::SEC_SUBMISSION,
+                            $button
+                        );
+                    } else {
+                        $link = $f->link()->standard(
+                            $lng->txt("exc_view_wiki"),
+                            $wiki_link
+                        );
+                        $builder->addAction(
+                            $builder::SEC_SUBMISSION,
+                            $wiki_link
+                        );
+                    }
+                }
+            }
+            // remove invalid resource if no upload yet (see download below)
+            elseif (substr($selected_wiki["filename"], -1) == "/") {
+                // #16887
+                $submission->deleteResourceObject();
+            }
+        }
+        if ($submission->canSubmit()) {
+            if (!$valid_wiki && $team_available) {
+                $button = $f->button()->primary(
+                    $lng->txt("exc_create_wiki"),
+                    $ctrl->getLinkTargetByClass([ilAssignmentPresentationGUI::class, ilExSubmissionGUI::class, self::class], "createWiki")
+                );
+                $builder->setMainAction(
+                    $builder::SEC_SUBMISSION,
+                    $button
+                );
+            }
+        }
+        if ($submission->hasSubmitted()) {
+            $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", $selected_wiki["returned_id"]);
+            $dl_link = $ctrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionFileGUI"), "download");
+            $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", "");
+
+            $link = $f->link()->standard(
+                $lng->txt("download"),
+                $dl_link
+            );
+            $builder->addAction(
+                $builder::SEC_SUBMISSION,
+                $link
+            );
+        }
     }
 
 }

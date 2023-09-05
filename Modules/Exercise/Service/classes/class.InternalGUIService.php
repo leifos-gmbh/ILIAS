@@ -26,6 +26,7 @@ use ILIAS\Repository\GlobalDICGUIServices;
 use ILIAS\Exercise\InternalDataService;
 use ILIAS\Exercise\InternalDomainService;
 use ILIAS\Exercise\Assignment;
+use ILIAS\Exercise\PeerReview;
 
 /**
  * Exercise UI frontend presentation service class
@@ -68,6 +69,14 @@ class InternalGUIService
     public function assignment(): Assignment\GUIService
     {
         return new Assignment\GUIService(
+            $this->domain_service,
+            $this
+        );
+    }
+
+    public function peerReview(): PeerReview\GUIService
+    {
+        return new PeerReview\GUIService(
             $this->domain_service,
             $this
         );

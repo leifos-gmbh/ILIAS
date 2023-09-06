@@ -53,9 +53,31 @@ class ItemBuilderUI
         $props = [];
         $this->addPropertyToItemProperties($props, $pb->getHeadProperty($pb::PROP_DEADLINE));
         $this->addPropertyToItemProperties($props, $pb->getHeadProperty($pb::PROP_REQUIREMENT));
+        $this->addPropertyToItemProperties($props, $pb->getHeadProperty($pb::PROP_SUBMISSION));
+        $this->addPropertyToItemProperties($props, $pb->getHeadProperty($pb::PROP_TYPE));
+        $this->addPropertyToItemProperties($props, $pb->getHeadProperty($pb::PROP_GRADING));
+        $this->addPropertyToItemProperties($props, $pb->getHeadProperty($pb::PROP_MARK));
         foreach ($pb->getAdditionalHeadProperties() as $p) {
             $this->addPropertyToItemProperties($props, $p);
         }
+
+        // actions
+        $actions = [];
+        foreach ($pb->getSections() as $sec => $txt) {
+            if ($act = $pb->getMainAction($sec)) {
+                $actions[] = $this->ui_factory->button()->shy(
+                    $act->getLabel(),
+                    $act->getAction()
+                );
+            }
+        }
+
+        foreach ($pb->getSections() as $sec => $txt) {
+            foreach ($pb->getActions($sec) as $act) {
+                $actions[] = $act;
+            }
+        }
+
 
         $this->ctrl->setParameterByClass(\ilAssignmentPresentationGUI::class, "ass_id", $ass->getId());
         $title = $this->ui_factory->link()->standard(
@@ -65,6 +87,9 @@ class ItemBuilderUI
         $item =  $this->ui_factory->item()->standard(
             $title
         )->withProperties($props)->withLeadText($pb->getLeadText() . " ");
+        if (count($actions) > 0) {
+            $item = $item->withActions($this->ui_factory->dropdown()->standard($actions));
+        }
         $this->ctrl->setParameterByClass(\ilAssignmentPresentationGUI::class, "ass_id", null);
         return $item;
     }

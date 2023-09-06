@@ -33,6 +33,11 @@ class PropertyAndActionBuilderUI
 {
     public const PROP_DEADLINE = "deadline";
     public const PROP_REQUIREMENT = "requirement";
+    public const PROP_SUBMISSION = "submission";
+    public const PROP_TYPE = "type";
+    public const PROP_GRADING = "grading";
+    public const PROP_MARK = "mark";
+
     public const SEC_INSTRUCTIONS = "instructions";
     public const SEC_FILES = "files";
     public const SEC_SCHEDULE = "schedule";
@@ -41,6 +46,7 @@ class PropertyAndActionBuilderUI
     public const SEC_PEER_FEEDBACK = "peer_feedback";
     public const SEC_TUTOR_EVAL = "tutor_eval";
     public const SEC_SAMPLE_SOLUTION = "sample_solution";
+    protected \ilExAssignmentTypes $types;
 
     protected int $user_builded = 0;
     protected int $ass_builded = 0;
@@ -61,6 +67,7 @@ class PropertyAndActionBuilderUI
     protected array $views = [];
     protected array $main_action = [];
     protected array $additional_head_properties = [];
+    protected bool $instructions_hidden = false;
 
     public function __construct(
         \ilObjExercise $exc,
@@ -79,6 +86,7 @@ class PropertyAndActionBuilderUI
         $this->lng->loadLanguageModule("exc");
         $this->ctrl = $gui_service->ctrl();
         $this->types_gui = $gui_service->assignment()->types();
+        $this->types = \ilExAssignmentTypes::getInstance();
     }
 
     public function build(
@@ -99,6 +107,8 @@ class PropertyAndActionBuilderUI
         $this->head_properties = [];
         $this->views = [];
         $this->additional_head_properties = [];
+        $this->main_action = [];
+        $this->actions = [];
         $this->buildHead();
         $this->buildBody();
         $this->user_builded = $user_id;
@@ -148,6 +158,15 @@ class PropertyAndActionBuilderUI
         $this->lead_text = $text;
     }
 
+    protected function setInstructionsHidden(bool $hidden) : void
+    {
+        $this->instructions_hidden = $hidden;
+    }
+
+    public function getInstructionsHidden() : bool
+    {
+        return $this->instructions_hidden;
+    }
 
     protected function setHeadProperty(string $type, string $prop, string $val) : void
     {
@@ -157,7 +176,7 @@ class PropertyAndActionBuilderUI
         ];
     }
 
-    protected function addAdditionalHeadProperty(string $prop, string $val) : void
+    public function addAdditionalHeadProperty(string $prop, string $val) : void
     {
         $this->additional_head_properties[] = [
             "prop" => $prop,
@@ -217,10 +236,19 @@ class PropertyAndActionBuilderUI
         $state = $this->state;
         $lng = $this->lng;
 
+        // after official deadline...
         if ($state->exceededOfficialDeadline()) {
-            $this->setLeadText (
-                $lng->txt("exc_ended_on") . ": " . $state->getCommonDeadlinePresentation()
-            );
+
+            // both submission and peer review ended
+            if ($state->hasEnded()) {
+                $this->setLeadText (
+                    $lng->txt("exc_ended")
+                );
+            } else {
+                $this->setLeadText (
+                    $state->getPeerReviewLeadText()
+                );
+            }
 
             $this->setHeadProperty(
                 self::PROP_DEADLINE,
@@ -235,6 +263,7 @@ class PropertyAndActionBuilderUI
                     $state->getPeerReviewDeadlinePresentation()
                 );
             }
+        // not started yet
         } elseif (!$state->hasGenerallyStarted()) {
             if ($state->getRelativeDeadline()) {
                 $prop = $lng->txt("exc_earliest_start_time");
@@ -242,7 +271,7 @@ class PropertyAndActionBuilderUI
                 $prop = $lng->txt("exc_starting_on");
             }
             $this->setLeadText (
-                $prop . ": " . $state->getGeneralStartPresentation()
+                $prop . " " . $state->getGeneralStartPresentation()
             );
             $this->setHeadProperty(
                 self::PROP_DEADLINE,
@@ -250,20 +279,25 @@ class PropertyAndActionBuilderUI
                 $state->getGeneralStartPresentation()
             );
         } else {
+            // deadline, but not reached
             if ($state->getCommonDeadline() > 0) {
                 $this->setLeadText (
-                    $lng->txt("exc_time_to_send") . ": " . $state->getRemainingTimePresentation()
+                    $state->getRemainingTimeLeadText()
                 );
                 $this->setHeadProperty(
                     self::PROP_DEADLINE,
                     $lng->txt("exc_edit_until"),
                     $state->getCommonDeadlinePresentation()
                 );
+            // relative deadline
             } elseif ($state->getRelativeDeadline()) {		// if we only have a relative deadline (not started yet)
                 $this->setHeadProperty(
                     self::PROP_DEADLINE,
                     $lng->txt("exc_rem_time_after_start"),
                     $state->getRelativeDeadlinePresentation()
+                );
+                $this->setLeadText(
+                    $state->getRelativeDeadlineStartLeadText()
                 );
 
                 if ($state->getLastSubmissionOfRelativeDeadline()) {		// if we only have a relative deadline (not started yet)
@@ -272,6 +306,16 @@ class PropertyAndActionBuilderUI
                         $state->getLastSubmissionOfRelativeDeadlinePresentation()
                     );
                 }
+            } else {
+                // no deadline
+                $this->setLeadText (
+                    $this->lng->txt("exc_submit_anytime")
+                );
+                $this->setHeadProperty(
+                    self::PROP_DEADLINE,
+                    $lng->txt("exc_edit_until"),
+                    $lng->txt("exc_no_deadline")
+                );
             }
 
             if ($state->getIndividualDeadline() > 0) {
@@ -294,6 +338,57 @@ class PropertyAndActionBuilderUI
                 $lng->txt("exc_requirement"),
                 $lng->txt("exc_optional")
             );
+        }
+
+        // submission property
+        if ($this->submission->hasSubmitted()) {
+            $last_sub = $this->submission->getLastSubmission();
+            if ($last_sub) {
+                $last_sub = \ilDatePresentation::formatDate(new \ilDateTime($last_sub, IL_CAL_DATETIME));
+                $this->setHeadProperty(
+                    self::PROP_SUBMISSION,
+                    $this->lng->txt("exc_last_submission"),
+                    $last_sub
+                );
+            }
+        } else {
+            $this->setHeadProperty(
+                self::PROP_SUBMISSION,
+                $this->lng->txt("exc_last_submission"),
+                $this->lng->txt("exc_no_submission_yet")
+            );
+        }
+
+        // type property
+        $ass_type = $this->types->getById($this->assignment->getType());
+        $this->setHeadProperty(
+            self::PROP_TYPE,
+            $this->lng->txt("exc_type"),
+            $ass_type->getTitle()
+        );
+
+        // grading property
+        if (!$this->state->isFuture()) {
+            $status = $this->ex_ass->getMemberStatus($this->user_id)->getStatus();
+            if ($status !== "") {
+                $this->setHeadProperty(
+                    self::PROP_GRADING,
+                    $lng->txt("status"),
+                    $lng->txt("exc_" . $status)
+                );
+            }
+        }
+
+        // mark
+        if (!$this->state->isFuture()) {
+            $mark = $this->ex_ass->getMemberStatus($this->user_id)->getMark();
+            if ($mark !== "") {
+                $this->setHeadProperty(
+                    self::PROP_MARK,
+                    $lng->txt("mark"),
+                    $lng->txt($mark)
+                );
+            }
         }
 
         // status icon
@@ -320,6 +415,8 @@ class PropertyAndActionBuilderUI
         if ($this->state->areInstructionsVisible()) {
             $this->buildInstructions();
             $this->buildFiles();
+        } else {
+            $this->setInstructionsHidden(true);
         }
 
         $this->buildSchedule();
@@ -350,6 +447,8 @@ class PropertyAndActionBuilderUI
 
         $info = $this->info;
         $schedule = $info->getScheduleInfo();
+        $ilCtrl = $this->ctrl;
+        $lng = $this->lng;
 
         $state = $this->state;
 
@@ -371,12 +470,11 @@ class PropertyAndActionBuilderUI
         } elseif ($state->getRelativeDeadline()) {		// if we only have a relative deadline (not started yet)
             $but = "";
             if ($state->hasGenerallyStarted()) {
-                $ilCtrl->setParameterByClass("ilobjexercisegui", "ass_id", $a_ass->getId());
-                $but = $this->ui->factory()->button()->primary($lng->txt("exc_start_assignment"), $ilCtrl->getLinkTargetByClass("ilobjexercisegui", "startAssignment"));
-                $ilCtrl->setParameterByClass("ilobjexercisegui", "ass_id", $this->requested_ass_id);
-                $but = $this->ui->renderer()->render($but);
+                $ilCtrl->setParameterByClass("ilobjexercisegui", "ass_id", $this->assignment->getId());
+                $but = $this->gui->ui()->factory()->button()->primary($lng->txt("exc_start_assignment"), $ilCtrl->getLinkTargetByClass("ilobjexercisegui", "startAssignment"));
+                $ilCtrl->setParameterByClass("ilobjexercisegui", "ass_id", null);
                 $this->setMainAction(
-                    self::SEC_INSTRUCTIONS,
+                    self::SEC_SCHEDULE,
                     $but
                 );
             }
@@ -645,10 +743,6 @@ class PropertyAndActionBuilderUI
                     $lng->txt("status"),
                     $lng->txt("exc_" . $status)
                 );
-                $this->addAdditionalHeadProperty(
-                    $lng->txt("status"),
-                    $lng->txt("exc_" . $status)
-                );
             }
 
             if ($cnt_files > 0) {
@@ -720,7 +814,7 @@ class PropertyAndActionBuilderUI
         }
 
         $ilCtrl->setParameterByClass("ilexsubmissiongui", "ass_id", $this->assignment->getId());
-        $url = $ilCtrl->getLinkTargetByClass("ilexsubmissiongui", $a_cmd);
+        $url = $ilCtrl->getLinkTargetByClass([\ilAssignmentPresentationGUI::class, "ilexsubmissiongui"], $a_cmd);
         $ilCtrl->setParameterByClass("ilexsubmissiongui", "ass_id", "");
 
         if (is_array($a_params)) {

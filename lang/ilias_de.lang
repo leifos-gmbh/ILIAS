@@ -9098,6 +9098,7 @@ exc#:#exc_edit_assignments#:#Übungseinheiten bearbeiten
 exc#:#exc_edit_blog#:#Blog bearbeiten
 exc#:#exc_edit_criterias#:#Kriterien bearbeiten
 exc#:#exc_edit_submission#:#Eingereichte Lösungen ändern
+exc#:#exc_ended#:#Beendet
 exc#:#exc_ended_on#:#Beendet am
 exc#:#exc_export_excel#:#Export (Excel)
 exc#:#exc_fb_files#:#Bewertungsdateien
@@ -9113,6 +9114,7 @@ exc#:#exc_fixed_date#:#Festes Datum
 exc#:#exc_fixed_date_info#:#Alle Teilnehmenden erhalten zunächst das gleiche feste Abgabedatum.
 exc#:#exc_fullscreen#:#Vollbild
 exc#:#exc_future#:#Kommende
+exc#:#exc_given_feedback#:#Gegebene Feedbacks
 exc#:#exc_global_feedback_file#:#Musterlösung
 exc#:#exc_global_feedback_file_after_date#:#Nach festem Datum
 exc#:#exc_global_feedback_file_cron#:#Benachrichtigung bei Verfügbarkeit
@@ -9124,6 +9126,7 @@ exc#:#exc_go_to_exercise#:#Zur Übung
 exc#:#exc_grades#:#Notenübersicht
 exc#:#exc_grades_overview#:#Notenübersicht
 exc#:#exc_hand_in#:#Datei abgeben
+exc#:#exc_hand_in_lead_text#:#In %s abzugeben
 exc#:#exc_import#:#Übung importieren
 exc#:#exc_individual_deadline#:#Individueller Abgabetermin
 exc#:#exc_individual_deadline_action#:#Individuellen Abgabetermin setzen
@@ -9178,6 +9181,7 @@ exc#:#exc_needs_deadline#:#Diese Option benötigt einen Abgabetermin.
 exc#:#exc_needs_fixed_deadline#:#Diese Funktion benötigt ein festes Abgabedatum.
 exc#:#exc_new_assignment#:#Neue Übungseinheit
 exc#:#exc_no_assignments_available#:#Keine Übungseinheiten vorhanden. Bitte wählen Sie "Übungseinheiten" und "Bearbeiten", um eine Übungseinheit zu erstellen.
+exc#:#exc_no_deadline#:#Keine Abgabefrist
 exc#:#exc_no_deadline_specified#:#Es wurde kein Abgabetermin festgelegt.
 exc#:#exc_no_feedback_dir_found_in_zip#:#Die Verzeichnisstruktur des hochgeladenen Zip-Archivs konnte nicht verarbeitet werden.
 exc#:#exc_no_get_target#:#Kein gültiges Link-Ziel gefunden.
@@ -9208,6 +9212,7 @@ exc#:#exc_passed_status_determination#:#Bewertung als „Bestanden“
 exc#:#exc_passing_exc#:#Bestehen der Übung
 exc#:#exc_past#:#Vergangene
 exc#:#exc_peer_deadline_mismatch#:#Da das Feedback erst nach dem Abgabetermin der Übungseinheit gegeben werden kann, darf die Deadline für das Feedback nicht vor dem Abgabedatum liegen.
+exc#:#exc_peer_reviews_in_lead_text#:#In %s Feedback geben
 exc#:#exc_peer_review#:#Peer-Feedback
 exc#:#exc_peer_review_ass_setting_info#:#Nachdem der Abgabetermin und ggfs. die Nachfrist verstrichen sind, können Teilnehmer ihre Arbeitsergebnisse gegenseitig bewerten. Genaue Einstellungen zum Peer-Feedback werden im gleichnamigen Reiter vorgenommen. Der Reiter wird eingeblendet, wenn diese Option aktiviert und gespeichert wurde.
 exc#:#exc_peer_review_chars_invalid#:#Sie haben noch nicht die erforderliche Länge des Textes von %s Zeichen erreicht.
@@ -9276,8 +9281,11 @@ exc#:#exc_random_assignment_info#:#Wenn Sie die Übung starten, wird Ihnen eine 
 exc#:#exc_random_selection#:#Zufällige Auswahl
 exc#:#exc_random_selection_info#:#Jedem Benutzer wird eine zufällige Auswahl an verpflichtenden Übungseinheiten zugeordnet.
 exc#:#exc_random_selection_not_changeable_info#:#Diese Option kann nicht aktiviert werden.
+exc#:#exc_received_feedback#:#Erhaltene Feedbacks
 exc#:#exc_rel_last_submission#:#Letzt möglicher Abgabetermin
 exc#:#exc_rel_last_submission_info#:#Wird dieses Datum gesetzt, so müssen alle Abgaben vor diesem Datum getätigt werden.
+exc#:#exc_rel_start_lead_text#:#%s Tage nach Starten abgeben
+exc#:#exc_rel_start_latest_lead_text#:#spätestens am %s
 exc#:#exc_relative_date#:#Relatives Datum
 exc#:#exc_relative_date_info#:#Das Abgabedatum ergibt sich aus dem Bearbeitungszeitraum und dem durch den Teilnehmer gewählten Startzeitpunkt.
 exc#:#exc_rem_time_after_start#:#Bearbeitungszeitraum nach Start
@@ -9302,7 +9310,7 @@ exc#:#exc_reminder_submit_setting#:#Teilnehmer an Abgaben erinnern
 exc#:#exc_reminder_submit_subject#:#Übungseinheit "%s" wurde noch nicht abgegeben
 exc#:#exc_reminders_cron#:#Erinnerungen für Übungseinheiten
 exc#:#exc_reminders_cron_info#:#Bei Aktivierung werden drei Erinnerungen versendet: Ausstehende Abgaben, ausstehende Bewertungen und ausstehende Peer-Feedbacks
-exc#:#exc_requirement#:#Requirement
+exc#:#exc_requirement#:#Anforderung
 exc#:#exc_save_all#:#Alle speichern
 exc#:#exc_save_order#:#Reihenfolge speichern
 exc#:#exc_save_selected#:#Ausgewählte Eingaben speichern
@@ -9343,6 +9351,7 @@ exc#:#exc_submission_notification_link#:#Link zur Übung: %s
 exc#:#exc_submission_notification_subject#:#Eine neue Abgabe für die Übung "%s" liegt vor
 exc#:#exc_submission_text#:#Textabgabe
 exc#:#exc_submissions_and_grades#:#Abgaben und Noten
+exc#:#exc_submit_anytime#:#Jederzeit abgeben
 exc#:#exc_submit_convenience_no_deadline#:#Geben Sie nach Bearbeitung der Übungseinheit ab. Es gibt keinen festen Abgabetermin.
 exc#:#exc_submitted_files_deleted#:#Die ausgewählten Dateien wurden gelöscht.
 exc#:#exc_sure_unlink_portfolio#:#Möchten Sie das Portfolio aus dieser Übungseinheit entfernen?
@@ -9429,6 +9438,7 @@ exc#:#exc_text_assignment_show#:#Text anzeigen
 exc#:#exc_text_saved#:#Der Text wurde gespeichert.
 exc#:#exc_total_exc#:#Gesamte Übung
 exc#:#exc_total_members#:#Gesamtanzahl an Teilnehmern
+exc#:#exc_type#:#Type
 exc#:#exc_type_blog#:#Blog
 exc#:#exc_type_portfolio#:#Portfolio
 exc#:#exc_type_text#:#Text
@@ -9447,6 +9457,7 @@ exc#:#exc_without_template_info#:#Teilnehmer erstellen ihre Portfolios selbstst�
 exc#:#exc_without_wiki_template#:#Ohne Vorlage
 exc#:#exc_without_wiki_template_info#:#Teilnehmer starten mit leerem Wiki.
 exc#:#exc_work_instructions#:#Arbeitsanweisung
+exc#:#exc_x_of_y#:#von
 exc#:#exc_your_text#:#Ihr Text
 exc#:#feedback#:#Feedback
 exc#:#feedback_from#:#Feedback von

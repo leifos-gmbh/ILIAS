@@ -68,8 +68,9 @@ class PanelBuilderUI
             ->withSections($sections);
 
         $sub_panels = [];
-        foreach ($pb->getSections(false) as $sec => $title) {
-            $sec_empty = $sec !== $pb::SEC_INSTRUCTIONS;
+        $include_schedule = $pb->getInstructionsHidden();
+        foreach ($pb->getSections($include_schedule) as $sec => $title) {
+            $sec_empty = true;
             $ctpl = new \ilTemplate("tpl.panel_content.html", true, true,
             "Modules/Exercise/Assignment");
 
@@ -106,8 +107,9 @@ class PanelBuilderUI
                 $title,
                 $this->ui_factory->legacy($ctpl->get())
             );
-            if ($sec === $pb::SEC_INSTRUCTIONS) {
+            if ($sec === $pb::SEC_INSTRUCTIONS && !$pb->getInstructionsHidden()) {
                 $sub_panel = $sub_panel->withFurtherInformation($schedule_card);
+                $sec_empty = false;
             }
             if (!$sec_empty) {
                 $sub_panels[] = $sub_panel;

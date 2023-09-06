@@ -9098,6 +9098,7 @@ exc#:#exc_edit_blog#:#Edit Blog
 exc#:#exc_edit_assignments#:#Edit Assignments
 exc#:#exc_edit_criterias#:#Edit Criteria
 exc#:#exc_edit_submission#:#Edit Submission
+exc#:#exc_ended#:#Ended
 exc#:#exc_ended_on#:#Ended On
 exc#:#exc_export_excel#:#Export (Excel)
 exc#:#exc_fb_files#:#Evaluation Files
@@ -9113,6 +9114,7 @@ exc#:#exc_fixed_date#:#Fixed Date
 exc#:#exc_fixed_date_info#:#Initially all users get the same fixed deadline.
 exc#:#exc_fullscreen#:#Fullscreen
 exc#:#exc_future#:#Upcoming
+exc#:#exc_given_feedback#:#Given Feedback
 exc#:#exc_global_feedback_file#:#Sample Solution
 exc#:#exc_global_feedback_file_after_date#:#After set Date
 exc#:#exc_global_feedback_file_cron#:#Notification
@@ -9124,6 +9126,7 @@ exc#:#exc_go_to_exercise#:#Go to Exercise
 exc#:#exc_grades#:#Grades Overview
 exc#:#exc_grades_overview#:#Grades View
 exc#:#exc_hand_in#:#Hand In
+exc#:#exc_hand_in_lead_text#:#%s to Submit
 exc#:#exc_import#:#Import Exercise
 exc#:#exc_individual_deadline#:#Individual Deadline
 exc#:#exc_individual_deadline_action#:#Set Individual Deadline
@@ -9178,6 +9181,7 @@ exc#:#exc_needs_deadline#:#This feature does only work with an assignment deadli
 exc#:#exc_needs_fixed_deadline#:#This feature only works with a fixed deadline.
 exc#:#exc_new_assignment#:#New Assignment
 exc#:#exc_no_assignments_available#:#No assignments created yet. Please open ‘Assignments’ and ‘Edit’ to create a first assignment.
+exc#:#exc_no_deadline#:#No Deadline
 exc#:#exc_no_deadline_specified#:#No deadline specified.
 exc#:#exc_no_feedback_dir_found_in_zip#:#The directory structure of the uploaded zip-archive could not be processed.
 exc#:#exc_no_get_target#:#A valid target has not been sent.
@@ -9229,6 +9233,7 @@ exc#:#exc_peer_review_given#:#Show Given Feedback
 exc#:#exc_peer_review_giver#:#Feedback Giver
 exc#:#exc_peer_review_invalid_giver_ids#:#Peer givers who are not exercise members anymore or do not have a submission
 exc#:#exc_peer_review_invalid_peer_ids#:#Peer recipients who are not exercise members anymore or do not have a submission
+exc#:#exc_peer_reviews_in_lead_text#:#%s to Give Feedback
 exc#:#exc_peer_review_min_chars#:#Mininum Number of Characters
 exc#:#exc_peer_review_min_chars_info#:#The required number of characters for a valid feedback.
 exc#:#exc_peer_review_min_chars_tgl#:#Mininum Length
@@ -9276,8 +9281,11 @@ exc#:#exc_random_assignment_info#:#When starting the exercise some assignments w
 exc#:#exc_random_selection#:#Random Selection
 exc#:#exc_random_selection_info#:#Each user gets assigned a random selection of mandatory assignments.
 exc#:#exc_random_selection_not_changeable_info#:#This mode cannot be activated.
+exc#:#exc_received_feedback#:#Received Feedbacks
 exc#:#exc_rel_last_submission#:#Last Possible Submission
 exc#:#exc_rel_last_submission_info#:#If this optional date is set, all user have to submit until this deadline is reached.
+exc#:#exc_rel_start_lead_text#:#Submit %s Days After Start
+exc#:#exc_rel_start_latest_lead_text#:#%s the Latest
 exc#:#exc_relative_date#:#Relative Date
 exc#:#exc_relative_date_info#:#The deadline is set individually relative to the time when a user started the assignment.
 exc#:#exc_rem_time_after_start#:#Remaining Time after Start
@@ -9302,7 +9310,7 @@ exc#:#exc_reminder_submit_setting#:#Remind Users to Submit
 exc#:#exc_reminder_submit_subject#:#Assignment "%s" was not finished
 exc#:#exc_reminders_cron#:#Reminders for Assignments
 exc#:#exc_reminders_cron_info#:#If enabled, 3 reminders will be active: Users to Submit, Tutors to Grade and Participants to Feedback.
-exc#:#exc_requirement#:#Anforderung
+exc#:#exc_requirement#:#Requirement
 exc#:#exc_save_all#:#Save All
 exc#:#exc_save_order#:#Save Order
 exc#:#exc_save_selected#:#Save Selected
@@ -9343,6 +9351,7 @@ exc#:#exc_submission_notification_link#:#Link to exercise: %s
 exc#:#exc_submission_notification_subject#:#Exercise "%s" - New submission uploaded
 exc#:#exc_submission_text#:#Submission Text
 exc#:#exc_submissions_and_grades#:#Submissions and Grades
+exc#:#exc_submit_anytime#:#Submit Anytime
 exc#:#exc_submit_convenience_no_deadline#:#Submit your at your convenience. There is no  specific  deadline.
 exc#:#exc_submitted_files_deleted#:#The selected files have been deleted.
 exc#:#exc_sure_unlink_portfolio#:#Are you sure to remove this portfolio form this assignment?
@@ -9429,6 +9438,7 @@ exc#:#exc_text_assignment_show#:#Show Text
 exc#:#exc_text_saved#:#Text has been saved.
 exc#:#exc_total_exc#:#Total Exercise
 exc#:#exc_total_members#:#Total Exercise Participants
+exc#:#exc_type#:#Type
 exc#:#exc_type_blog#:#Blog
 exc#:#exc_type_portfolio#:#Portfolio
 exc#:#exc_type_text#:#Text
@@ -9447,6 +9457,7 @@ exc#:#exc_without_template_info#:#Participants will create their Portfolio from 
 exc#:#exc_without_wiki_template#:#Without Wiki Template
 exc#:#exc_without_wiki_template_info#:#Participants will create their wiki from scratch.
 exc#:#exc_work_instructions#:#Work instructions
+exc#:#exc_x_of_y#:#of
 exc#:#exc_your_text#:#Your Text
 exc#:#feedback#:#Feedback
 exc#:#feedback_from#:#Feedback from

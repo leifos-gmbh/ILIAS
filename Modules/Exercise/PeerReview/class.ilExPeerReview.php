@@ -315,6 +315,14 @@ class ilExPeerReview
         return $res;
     }
 
+    public function countReceivedFeedbacks(
+        int $user_id,
+        bool $only_valid = true
+    ) : int
+    {
+        return count($this->getPeerReviewsByPeerId($user_id, $only_valid));
+    }
+
     public function getAllPeerReviews(
         bool $a_only_valid = true
     ): array {

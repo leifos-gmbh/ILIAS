@@ -189,6 +189,51 @@ class ilExcAssMemberState
         return $calculated_deadline;
     }
 
+    public function getRelativeDeadlineStartLeadText() : string
+    {
+        $start_in_time = true;
+        if ($this->assignment->getRelDeadlineLastSubmission() > 0) {
+            $starting_now = time() + ($this->assignment->getRelativeDeadline() * 24 * 60 * 60);
+            if ($starting_now > $this->assignment->getRelDeadlineLastSubmission()) {
+                $start_in_time = false;
+            }
+        }
+        if ($start_in_time) {
+            $lead_text = sprintf($this->lng->txt("exc_rel_start_lead_text"),
+                $this->assignment->getRelativeDeadline()
+            );
+            if ($this->assignment->getRelDeadlineLastSubmission() > 0) {
+                $lead_text.= ", <br>" . sprintf($this->lng->txt("exc_rel_start_latest_lead_text"),
+                        $this->getLastSubmissionOfRelativeDeadlinePresentation()
+                    );
+            }
+        } else {
+            return sprintf($this->lng->txt("exc_hand_in_lead_text"),
+                $this->getRemainingTimePresentationOfLastSubmissionOfRelativeDeadline()
+            );
+        }
+        return $lead_text;
+    }
+
+    /**
+     * Remaining time for last submission of relative deadline
+     * @return string
+     * @throws ilDateTimeException
+     */
+    public function getRemainingTimePresentationOfLastSubmissionOfRelativeDeadline(): string
+    {
+        $lng = $this->lng;
+        $last_deadline = $this->assignment->getRelDeadlineLastSubmission();
+        if ($last_deadline - $this->time <= 0) {
+            $time_str = $lng->txt("exc_time_over_short");
+        } else {
+            $time_str = ilLegacyFormElementsUtil::period2String(new ilDateTime($last_deadline, IL_CAL_UNIX));
+        }
+
+        return $time_str;
+    }
+
+
     public function getRelativeDeadline(): int
     {
         if ($this->assignment->getDeadlineMode() == ilExAssignment::DEADLINE_RELATIVE) {
@@ -285,6 +330,39 @@ class ilExcAssMemberState
         }
 
         return $time_str;
+    }
+
+    public function getRemainingPeerReviewPresentation(): string
+    {
+        $lng = $this->lng;
+        $official_deadline = $this->getPeerReviewDeadline();
+        if ($official_deadline == 0) {
+            return $lng->txt("exc_no_deadline_specified");
+        }
+        if ($official_deadline - $this->time <= 0) {
+            $time_str = $lng->txt("exc_time_over_short");
+        } else {
+            $time_str = ilLegacyFormElementsUtil::period2String(new ilDateTime($official_deadline, IL_CAL_UNIX));
+        }
+
+        return $time_str;
+    }
+
+    public function getRemainingTimeLeadText(): string
+    {
+        $lng = $this->lng;
+        return sprintf($this->lng->txt("exc_hand_in_lead_text"), $this->getRemainingTimePresentation());
+    }
+
+    public function getPeerReviewLeadText(): string
+    {
+        $lng = $this->lng;
+        if ($this->assignment->getPeerReviewDeadline() > 0) {
+            return sprintf($this->lng->txt("exc_peer_reviews_in_lead_text"),
+                $this->getRemainingPeerReviewPresentation());
+        } else {
+            return $this->lng->txt("exc_review_anytime");
+        }
     }
 
     public function getIndividualDeadline(): int
@@ -443,7 +521,7 @@ class ilExcAssMemberState
 
     public function isFuture() : bool
     {
-        return !$this->hasSubmissionStarted();
+        return !$this->hasGenerallyStarted();
     }
 
     // Has submission ended for all users

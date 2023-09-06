@@ -142,11 +142,12 @@ class ilExSubmissionGUI
                 break;
 
             case "ilexpeerreviewgui":
+                /*
                 $this->tabs_gui->clearTargets();
                 $this->tabs_gui->setBackTarget(
                     $this->lng->txt("back"),
                     $this->ctrl->getLinkTarget($this, "returnToParent")
-                );
+                );*/
 
                 $peer_gui = new ilExPeerReviewGUI($this->assignment, $this->submission);
                 $this->ctrl->forwardCommand($peer_gui);

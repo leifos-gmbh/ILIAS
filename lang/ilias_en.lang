@@ -9180,6 +9180,7 @@ exc#:#exc_multi_feedback_files#:#Multi-Feedback Files
 exc#:#exc_needs_deadline#:#This feature does only work with an assignment deadline.
 exc#:#exc_needs_fixed_deadline#:#This feature only works with a fixed deadline.
 exc#:#exc_new_assignment#:#New Assignment
+exc#:#exc_no_assignments#:#No assignments available.
 exc#:#exc_no_assignments_available#:#No assignments created yet. Please open ‘Assignments’ and ‘Edit’ to create a first assignment.
 exc#:#exc_no_deadline#:#No Deadline
 exc#:#exc_no_deadline_specified#:#No deadline specified.

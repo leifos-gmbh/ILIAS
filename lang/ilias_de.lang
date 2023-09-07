@@ -9180,6 +9180,7 @@ exc#:#exc_multi_feedback_files#:#Multi-Feedback-Dateien
 exc#:#exc_needs_deadline#:#Diese Option benötigt einen Abgabetermin.
 exc#:#exc_needs_fixed_deadline#:#Diese Funktion benötigt ein festes Abgabedatum.
 exc#:#exc_new_assignment#:#Neue Übungseinheit
+exc#:#exc_no_assignments#:#Keine Übungseinheiten vorhanden.
 exc#:#exc_no_assignments_available#:#Keine Übungseinheiten vorhanden. Bitte wählen Sie "Übungseinheiten" und "Bearbeiten", um eine Übungseinheit zu erstellen.
 exc#:#exc_no_deadline#:#Keine Abgabefrist
 exc#:#exc_no_deadline_specified#:#Es wurde kein Abgabetermin festgelegt.

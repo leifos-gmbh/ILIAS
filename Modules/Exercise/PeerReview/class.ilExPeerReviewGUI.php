@@ -22,9 +22,11 @@
  * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
  * @author Alexander Killing <killing@leifos.de>
  * @ilCtrl_Calls ilExPeerReviewGUI: ilFileSystemGUI, ilRatingGUI, ilExSubmissionTextGUI, ilInfoScreenGUI
+ * @ilCtrl_Calls ilExPeerReviewGUI: ilMessageGUI
  */
 class ilExPeerReviewGUI
 {
+    protected \ILIAS\Notes\Service $notes;
     protected \ILIAS\Exercise\InternalGUIService $gui;
     protected \ILIAS\Exercise\InternalDomainService $domain;
     protected ilCtrl $ctrl;
@@ -64,6 +66,7 @@ class ilExPeerReviewGUI
         $this->requested_review_crit_id = $request->getReviewCritId();
         $this->requested_peer_id = $request->getPeerId();
         $this->requested_crit_id = $request->getCritId();
+        $this->notes = $DIC->notes();
     }
 
     /**
@@ -156,6 +159,11 @@ class ilExPeerReviewGUI
                     $this->ctrl->setReturn($this, "showGivenPeerReview");
                 }
                 $gui = new ilExSubmissionTextGUI(new ilObjExercise($this->ass->getExerciseId(), false), $this->submission);
+                $ilCtrl->forwardCommand($gui);
+                break;
+
+            case "ilmessagegui":
+                $gui = $this->getMessagesGUI();
                 $ilCtrl->forwardCommand($gui);
                 break;
 
@@ -819,7 +827,20 @@ class ilExPeerReviewGUI
             $a_form = $this->initPeerReviewItemForm($this->requested_peer_id);
         }
 
-        $tpl->setContent($a_form->getHTML());
+        $message_gui = $this->getMessagesGUIForGiver();
+
+        $tpl->setContent($a_form->getHTML() . $message_gui->getListHTML());
+    }
+
+    protected function getMessagesGUIForGiver():ilMessageGUI
+    {
+        $pr = $this->domain->peerReview();
+        return $this->notes->gui()->getMessagesGUI(
+            $this->requested_peer_id,
+            $this->ass->getExerciseId(),
+            $pr->getReviewId($this->user->getId(), $this->requested_peer_id),
+            "excpf"
+        );
     }
 
     protected function isValidPeer(int $a_peer_id): bool

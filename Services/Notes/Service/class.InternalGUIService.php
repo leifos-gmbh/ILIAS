@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 namespace ILIAS\Notes;
 
@@ -128,6 +128,34 @@ class InternalGUIService
             $this->http(),
             $this->ui(),
             $this->domain_service->lng()
+        );
+    }
+    
+    public function getCommentsGUI(
+        int $rep_obj_id,
+        int $obj_id,
+        string $obj_type
+    ) : \ilCommentGUI
+    {
+        return new \ilCommentGUI(
+            $rep_obj_id,
+            $obj_id,
+            $obj_type
+        );
+    }
+
+    public function getMessagesGUI(
+        int $recipient,
+        int $rep_obj_id,
+        int $obj_id,
+        string $obj_type
+    ) : \ilMessageGUI
+    {
+        return new \ilMessageGUI(
+            $recipient,
+            $rep_obj_id,
+            $obj_id,
+            $obj_type
         );
     }
 }

@@ -53,4 +53,12 @@ class InternalDomainService
     {
         return $this->assignment_service;
     }
+
+    public function peerReview(\ilExAssignment $ass): ?\ilExPeerReview
+    {
+        if ($ass->getPeerReview()) {
+            return new \ilExPeerReview($ass);
+        }
+        return null;
+    }
 }

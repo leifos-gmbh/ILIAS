@@ -54,6 +54,17 @@ class ilExPeerReview
         $cnt = $ilDB->fetchAssoc($set);
         return (bool) $cnt["cnt"];
     }
+    
+    public function getReviewId(int $giver_id, int $peer_id) : int
+    {
+        $set = $db->queryF("SELECT id FROM exc_assignment_peer " .
+            " WHERE ass_id = %s AND giver_id = %s  AND peer_id = %s",
+            ["integer","integer","integer"],
+            [$this->assignment_id, $giver_id, $peer_id]
+        );
+        $rec = $db->fetchAssoc($set);
+        return $rec["id"] ?? 0;
+    }
 
     /**
      * @return int[]
@@ -92,9 +103,11 @@ class ilExPeerReview
 
             foreach ($user_ids as $rater_id) {
                 foreach ($distribution->getPeersOfRater($rater_id) as $peer_id) {
+                    $next_id = $ilDB->nextId("exc_assignment_peer");
                     $ilDB->manipulate("INSERT INTO exc_assignment_peer" .
-                        " (ass_id, giver_id, peer_id)" .
-                        " VALUES (" . $ilDB->quote($this->assignment_id, "integer") .
+                        " (id, ass_id, giver_id, peer_id)" .
+                        " VALUES (" . $ilDB->quote($next_id, "integer") .
+                        ", " . $ilDB->quote($this->assignment_id, "integer") .
                         ", " . $ilDB->quote($rater_id, "integer") .
                         ", " . $ilDB->quote($peer_id, "integer") . ")");
                 }

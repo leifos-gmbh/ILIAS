@@ -24,7 +24,7 @@ use ILIAS\UICore\PageContentProvider;
  * @author Alexander Killing <killing@leifos.de>
  *
  * @ilCtrl_Calls ilWikiPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMediaPoolTargetSelector
- * @ilCtrl_Calls ilWikiPageGUI: ilPublicUserProfileGUI, ilPageObjectGUI, ilNoteGUI
+ * @ilCtrl_Calls ilWikiPageGUI: ilPublicUserProfileGUI, ilPageObjectGUI, ilNoteGUI, ilCommentGUI
  * @ilCtrl_Calls ilWikiPageGUI: ilCommonActionDispatcherGUI, ilRatingGUI, ilWikiStatGUI
  * @ilCtrl_Calls ilWikiPageGUI: ilObjectMetaDataGUI, ilPropertyFormGUI
  */
@@ -129,6 +129,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 
         switch ($next_class) {
             case "ilnotegui":
+            case "ilcommentgui":
                 $this->getTabs();
                 $ilTabs->setTabActive("pg");
                 return $this->preview();
@@ -355,13 +356,12 @@ class ilWikiPageGUI extends ilPageObjectGUI
             $this->tpl->setOnScreenMessage('info', $lng->txt("wiki_page_status_blocked"));
         }
 
-
         $this->increaseViewCount();
 
         $this->addHeaderAction();
 
         // content
-        if ($ilCtrl->getNextClass() !== "ilnotegui") {
+        if (!in_array($ilCtrl->getNextClass(), ["ilnotegui", "ilcommentgui"])) {
             $this->setSideBlock();
         }
 

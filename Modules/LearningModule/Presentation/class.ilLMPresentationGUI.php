@@ -20,13 +20,14 @@
  * Class ilLMPresentationGUI
  * GUI class for learning module presentation
  * @author Alexander Killing <killing@leifos.de>
- * @ilCtrl_Calls ilLMPresentationGUI: ilNoteGUI, ilInfoScreenGUI
+ * @ilCtrl_Calls ilLMPresentationGUI: ilCommentGUI, ilInfoScreenGUI
  * @ilCtrl_Calls ilLMPresentationGUI: ilLMPageGUI, ilGlossaryDefPageGUI, ilCommonActionDispatcherGUI
  * @ilCtrl_Calls ilLMPresentationGUI: ilLearningProgressGUI, ilAssGenFeedbackPageGUI
  * @ilCtrl_Calls ilLMPresentationGUI: ilRatingGUI
  */
 class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
 {
+    protected \ILIAS\Notes\GUIService $notes_gui;
     protected \ILIAS\GlobalScreen\Services $global_screen;
     protected \ILIAS\Notes\DomainService $notes;
     protected \ILIAS\LearningModule\ReadingTime\ReadingTimeManager $reading_time_manager;
@@ -175,6 +176,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
         }
         $this->reading_time_manager = new \ILIAS\LearningModule\ReadingTime\ReadingTimeManager();
         $this->notes = $DIC->notes()->domain();
+        $this->notes_gui = $DIC->notes()->gui();
     }
 
     public function getUnsafeGetCommands(): array
@@ -305,7 +307,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
         $this->ctrl->setParameter($this, "obj_id", $obj_id);
 
         switch ($next_class) {
-            case "ilnotegui":
+            case "ilcommentgui":
                 $ret = $this->layout();
                 break;
 
@@ -848,7 +850,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
         $dispatcher->setSubObject("pg", $this->getCurrentPageId());
 
         $this->ctrl->setParameter($this, "embed_mode", (int) $this->embed_mode);
-        $this->ctrl->setParameterByClass("ilnotegui", "embed_mode", (int) $this->embed_mode);
+        $this->ctrl->setParameterByClass("ilcommentgui", "embed_mode", (int) $this->embed_mode);
         $this->ctrl->setParameterByClass("iltagginggui", "embed_mode", (int) $this->embed_mode);
         ilObjectListGUI::prepareJsLinks(
             $this->ctrl->getLinkTarget($this, "redrawHeaderAction", "", true),
@@ -971,7 +973,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
         if ($pg_id == 0) {
             return "";
         }
-        $notes_gui = new ilNoteGUI($this->lm->getId(), $this->getCurrentPageId(), "pg");
+        $notes_gui = $this->notes_gui->getCommentsGUI($this->lm->getId(), $this->getCurrentPageId(), "pg");
         $notes_gui->setUseObjectTitleHeader(false);
 
         if ($ilAccess->checkAccess("write", "", $this->requested_ref_id) &&
@@ -990,10 +992,10 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
         $callback = array($this, "observeNoteAction");
         $notes_gui->addObserver($callback);
 
-        if ($next_class == "ilnotegui") {
+        if ($next_class == "ilcommentgui") {
             $html = $this->ctrl->forwardCommand($notes_gui);
         } else {
-            $html = $notes_gui->getCommentsHTML();
+            $html = $notes_gui->getListHTML();
         }
         return $html;
     }

@@ -99,11 +99,12 @@ class ilCommentGUI extends ilNoteGUI
         return $this->lng->txt("notes_delete_comment");
     }
 
+    /*
     public function getHTML(): string
     {
         $this->gui->initJavascript();
         return $this->getCommentsWidget();
-    }
+    }*/
 
     public function getListHTML(bool $a_init_form = true): string
     {
@@ -167,72 +168,6 @@ class ilCommentGUI extends ilNoteGUI
     }
 
 
-    protected function getCommentsWidget(): string
-    {
-        $f = $this->ui->factory();
-        $r = $this->ui->renderer();
-        $lng = $this->lng;
-        $ctrl = $this->ctrl;
-        $ctrl->setParameter($this, "news_id", $this->news_id);
-        $hash = ilCommonActionDispatcherGUI::buildAjaxHash(
-            ilCommonActionDispatcherGUI::TYPE_REPOSITORY,
-            null,
-            ilObject::_lookupType($this->rep_obj_id),
-            $this->rep_obj_id,
-            $this->obj_type,
-            $this->obj_id,
-            $this->news_id
-        );
-
-        $context = $this->data->context(
-            $this->rep_obj_id,
-            $this->obj_id,
-            $this->obj_type,
-            $this->news_id
-        );
-
-        $cnt[$this->rep_obj_id][Note::PUBLIC] = $this->manager->getNrOfNotesForContext($context, Note::PUBLIC);
-        $cnt = $cnt[$this->rep_obj_id][Note::PUBLIC] ?? 0;
-
-        $tpl = new ilTemplate("tpl.note_widget_header.html", true, true, "Services/Notes");
-        $widget_el_id = "notew_" . str_replace(";", "_", $hash);
-        $ctrl->setParameter($this, "hash", $hash);
-        $update_url = $ctrl->getLinkTarget($this, "updateWidget", "", true, false);
-        $comps = array();
-        if ($cnt > 0) {
-            $c = $f->counter()->status((int) $cnt);
-            $comps[] = $f->symbol()->glyph()->comment()->withCounter($c)->withAdditionalOnLoadCode(function ($id) use ($hash, $update_url, $widget_el_id) {
-                return "$(\"#$id\").click(function(event) { " . self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"" . $widget_el_id . "\",\"" . $update_url . "\");") . "});";
-            });
-            $comps[] = $f->divider()->vertical();
-            $tpl->setVariable("GLYPH", $r->render($comps));
-            $tpl->setVariable("TXT_LATEST", $lng->txt("notes_latest_comment"));
-        }
-
-        $b = $f->button()->shy($lng->txt("notes_add_edit_comment"), "#")->withAdditionalOnLoadCode(function ($id) use ($hash, $update_url, $widget_el_id) {
-            return "$(\"#$id\").click(function(event) { " . self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"" . $widget_el_id . "\",\"" . $update_url . "\");") . "});";
-        });
-        if ($ctrl->isAsynch()) {
-            $tpl->setVariable("SHY_BUTTON", $r->renderAsync($b));
-        } else {
-            $tpl->setVariable("SHY_BUTTON", $r->render($b));
-        }
-
-        $this->widget_header = $tpl->get();
-
-        $this->hide_new_form = true;
-        $this->only_latest = true;
-        $this->no_actions = true;
-        $html = "<div id='" . $widget_el_id . "'>" . $this->getNoteListHTML() . "</div>";
-        $ctrl->setParameter($this, "news_id", $this->requested_news_id);
-        return $html;
-    }
-
-    protected function updateWidget(): void
-    {
-        echo $this->getCommentsWidget();
-        exit;
-    }
 
     protected function getListTitle() : string
     {

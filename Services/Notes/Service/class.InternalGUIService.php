@@ -63,26 +63,8 @@ class InternalGUIService
         global $DIC;
         $ref_id = $DIC->repository()->internal()->gui()->standardRequest()->getRefId();
         $type = \ilObject::_lookupType($ref_id, true);
-        switch ($type) {
-            /*
-            case "cat":
-                $path = ["ilrepositorygui", "ilobjcategorygui", "ilcommonactiondispatchergui", "ilnotegui"];
-                break;
-            case "root":
-                $path = ["ilrepositorygui", "ilobjrootfoldergui", "ilcommonactiondispatchergui", "ilnotegui"];
-                break;
-            case "lm":
-                $path = ["illmpresentationgui", "ilcommonactiondispatchergui", "ilnotegui"];
-                break;
-            case "wiki":
-                $path = ["ilwikihandlergui", "ilobjwikigui", "ilcommonactiondispatchergui", "ilnotegui"];
-                break;*/
-            default:    // not working
-                $path = ["ilcommonactiondispatchergui", "ilnotegui"];
-                break;
-        }
-
         if ($ajax_url === "") {
+            $path = ["ilcommonactiondispatchergui", "ilnotegui"];
             $ajax_url = $this->ctrl()->getLinkTargetByClass(
                 $path,
                 "",
@@ -134,13 +116,16 @@ class InternalGUIService
     public function getCommentsGUI(
         int $rep_obj_id,
         int $obj_id,
-        string $obj_type
+        string $obj_type,
+        int $news_id = 0
     ) : \ilCommentGUI
     {
         return new \ilCommentGUI(
             $rep_obj_id,
             $obj_id,
-            $obj_type
+            $obj_type,
+            false,
+            $news_id
         );
     }
 

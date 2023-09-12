@@ -40,13 +40,15 @@ class GUIService
     public function getCommentsGUI(
         int $rep_obj_id,
         int $obj_id,
-        string $obj_type
+        string $obj_type,
+        int $news_id = 0
     ) : \ilCommentGUI
     {
         return $this->internal_gui_service->getCommentsGUI(
             $rep_obj_id,
             $obj_id,
-            $obj_type
+            $obj_type,
+            $news_id
         );
     }
 

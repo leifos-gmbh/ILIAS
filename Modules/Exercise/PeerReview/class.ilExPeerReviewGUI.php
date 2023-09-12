@@ -65,8 +65,10 @@ class ilExPeerReviewGUI
         $this->requested_review_peer_id = $request->getReviewPeerId();
         $this->requested_review_crit_id = $request->getReviewCritId();
         $this->requested_peer_id = $request->getPeerId();
+        $this->requested_giver_id = $request->getGiverId();
         $this->requested_crit_id = $request->getCritId();
         $this->notes = $DIC->notes();
+        $this->ctrl->saveParameter($this, array("peer_id"));
     }
 
     /**
@@ -163,7 +165,10 @@ class ilExPeerReviewGUI
                 break;
 
             case "ilmessagegui":
-                $gui = $this->getMessagesGUI();
+                $gui = $this->getMessagesGUI(
+                    $this->requested_giver_id,
+                    $this->requested_peer_id
+                );
                 $ilCtrl->forwardCommand($gui);
                 break;
 
@@ -375,7 +380,6 @@ class ilExPeerReviewGUI
                     );
                 }
 
-                // did give enough feedback
                 if (!$nr_missing_fb) {
                     // received any?
                     $received = (bool) sizeof($submission->getPeerReview()->getPeerReviewsByPeerId($submission->getUserId(), true));
@@ -528,6 +532,9 @@ class ilExPeerReviewGUI
         }
 
         if ($a_by_peer) {
+
+            // list received feedbacks
+
             // submission
             $props = [];
             $submission = new ilExSubmission($this->ass, $this->submission->getUserId());
@@ -561,12 +568,22 @@ class ilExPeerReviewGUI
                 $peer_id = $peer["peer_id"];
                 $id_title = $lng->txt("exc_peer_review_recipient");
                 $user_id = $peer_id;
+                $mess_gui = $this->getMessagesGUI(
+                    $giver_id
+                );
             } else {
+
+                // list received feedbacks
+
                 $giver_id = $peer["giver_id"];
                 $peer_id = $this->submission->getUserId();
                 $id_title = $lng->txt("exc_peer_review_giver");
                 $user_id = $giver_id;
             }
+            $mess_gui = $this->getMessagesGUI(
+                $giver_id,
+                $peer_id
+            );
 
             // peer info
             if ($this->submission->isTutor()) {
@@ -626,7 +643,8 @@ class ilExPeerReviewGUI
             }
             $sub_panels[] = $this->getSubPanel(
                 $id_title . ": " . $id_value,
-                $props
+                $props,
+                $mess_gui
             );
         }
         return $this->gui->ui()->factory()->panel()->standard(
@@ -637,9 +655,14 @@ class ilExPeerReviewGUI
         );
     }
 
-    protected function getSubPanel(string $title, array $props):\ILIAS\UI\Component\Panel\Sub
+    protected function getSubPanel(
+        string $title,
+        array $props,
+        ?ilMessageGUI $mess_gui = null
+    ):\ILIAS\UI\Component\Panel\Sub
     {
         $f = $this->gui->ui()->factory();
+        $r = $this->gui->ui()->renderer();
         $tpl = new \ilTemplate("tpl.panel_items.html", true, true, "Modules/Exercise/PeerReview");
         foreach ($props as $prop) {
             $tpl->setCurrentBlock("entry");
@@ -647,9 +670,15 @@ class ilExPeerReviewGUI
             $tpl->setVariable("VALUE", $prop["value"]);
             $tpl->parseCurrentBlock();
         }
+        $mess_html = "";
+        if ($mess_gui) {
+            $mess_html = $r->render($f->divider()->horizontal()) .
+                $mess_gui->getListHTML();
+        }
+
         return $f->panel()->sub(
             $title,
-            $f->legacy($tpl->get())
+            $f->legacy($tpl->get() . $mess_html)
         );
     }
 
@@ -827,18 +856,23 @@ class ilExPeerReviewGUI
             $a_form = $this->initPeerReviewItemForm($this->requested_peer_id);
         }
 
-        $message_gui = $this->getMessagesGUIForGiver();
+        $message_gui = $this->getMessagesGUI(
+            $this->user->getId(),
+            $this->requested_peer_id
+        );
 
         $tpl->setContent($a_form->getHTML() . $message_gui->getListHTML());
     }
 
-    protected function getMessagesGUIForGiver():ilMessageGUI
+    protected function getMessagesGUI(int $giver_id, int $peer_id):ilMessageGUI
     {
-        $pr = $this->domain->peerReview();
+        $this->ctrl->setParameter($this, "giver_id", $giver_id);
+        $this->ctrl->setParameter($this, "peer_id", $peer_id);
+        $pr = $this->domain->peerReview($this->ass);
         return $this->notes->gui()->getMessagesGUI(
-            $this->requested_peer_id,
+            $peer_id,
             $this->ass->getExerciseId(),
-            $pr->getReviewId($this->user->getId(), $this->requested_peer_id),
+            $pr->getReviewId($giver_id, $peer_id),
             "excpf"
         );
     }

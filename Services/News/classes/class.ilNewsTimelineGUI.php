@@ -24,10 +24,11 @@ use ILIAS\HTTP\Response\Sender\ResponseSendingException;
  * Timeline for news
  *
  * @author Alexander Killing <killing@leifos.de>
- * @ilCtrl_Calls ilNewsTimelineGUI: ilLikeGUI, ilNoteGUI
+ * @ilCtrl_Calls ilNewsTimelineGUI: ilLikeGUI, ilCommentGUI
  */
 class ilNewsTimelineGUI
 {
+    protected \ILIAS\Notes\Service $notes;
     protected \ILIAS\HTTP\Services $http;
     protected int $news_id;
     protected bool $include_auto_entries;
@@ -57,6 +58,7 @@ class ilNewsTimelineGUI
         $this->include_auto_entries = $a_include_auto_entries;
         $this->access = $DIC->access();
         $this->http = $DIC->http();
+        $this->notes = $DIC->notes();
 
         $this->std_request = new StandardGUIRequest(
             $DIC->http(),
@@ -117,21 +119,20 @@ class ilNewsTimelineGUI
                 $ret = $ctrl->forwardCommand($like_gui);
                 break;
 
-            case "ilnotegui":
+            case strtolower(ilCommentGUI::class):
                 $i = new ilNewsItem($this->news_id);
                 $ctrl->saveParameter($this, "news_id");
                 $notes_obj_type = ($i->getContextSubObjType() == "")
                     ? $i->getContextObjType()
                     : $i->getContextSubObjType();
-                $note_gui = new ilNoteGUI(
+                $comment_gui = $this->notes->gui()->getCommentsGUI(
                     $i->getContextObjId(),
                     $i->getContextSubObjId(),
                     $notes_obj_type,
-                    false,
                     $i->getId()
                 );
-                $note_gui->setShowHeader(false);
-                $ret = $ctrl->forwardCommand($note_gui);
+                $comment_gui->setShowHeader(false);
+                $ret = $ctrl->forwardCommand($comment_gui);
                 break;
 
             default:

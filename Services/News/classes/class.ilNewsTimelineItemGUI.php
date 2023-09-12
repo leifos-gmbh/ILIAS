@@ -24,6 +24,7 @@ use ILIAS\News\StandardGUIRequest;
  */
 class ilNewsTimelineItemGUI implements ilTimelineItemInt
 {
+    protected \ILIAS\Notes\Service $notes;
     protected ilLanguage $lng;
     protected ilNewsItem $news_item;
     protected ilObjectDefinition $obj_def;
@@ -55,6 +56,7 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
             $DIC->refinery()
         );
         $this->ref_id = $this->std_request->getRefId();
+        $this->notes = $DIC->notes();
     }
 
     public static function getInstance(
@@ -279,17 +281,17 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
         $notes_obj_type = ($i->getContextSubObjType() == "")
             ? $i->getContextObjType()
             : $i->getContextSubObjType();
-        $note_gui = new ilNoteGUI(
+        $comments_gui = $this->notes->gui()->getCommentsGUI(
             $i->getContextObjId(),
             $i->getContextSubObjId(),
             $notes_obj_type,
-            false,
             $i->getId()
         );
-        $note_gui->setDefaultCommand("getWidget");
-        $note_gui->setShowEmptyListMessage(false);
-        $note_gui->setShowHeader(false);
-        $html .= $this->ctrl->getHTML($note_gui);
+        $comments_gui->setDefaultCommand("getWidget");
+        $comments_gui->setShowEmptyListMessage(false);
+        $comments_gui->setShowHeader(false);
+        $html .= $comments_gui->getWidget();
+        //$html .= $this->ctrl->getHTML($comments_gui);
 
         $this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $this->std_request->getNewsId());
 

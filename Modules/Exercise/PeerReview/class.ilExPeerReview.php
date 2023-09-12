@@ -57,12 +57,12 @@ class ilExPeerReview
     
     public function getReviewId(int $giver_id, int $peer_id) : int
     {
-        $set = $db->queryF("SELECT id FROM exc_assignment_peer " .
+        $set = $this->db->queryF("SELECT id FROM exc_assignment_peer " .
             " WHERE ass_id = %s AND giver_id = %s  AND peer_id = %s",
             ["integer","integer","integer"],
             [$this->assignment_id, $giver_id, $peer_id]
         );
-        $rec = $db->fetchAssoc($set);
+        $rec = $this->db->fetchAssoc($set);
         return $rec["id"] ?? 0;
     }
 

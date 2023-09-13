@@ -489,6 +489,8 @@ class ilExPeerReviewGUI
             $this->returnToParentObject();
         }
 
+        $this->gui->permanentLink()->setReceivedFeedbackPermanentLink();
+
         /*
         $this->tabs_gui->clearTargets();
         $this->tabs_gui->setBackTarget($this->lng->txt("back"), $this->ctrl->getLinkTarget($this, "returnToParent"));*/
@@ -568,9 +570,6 @@ class ilExPeerReviewGUI
                 $peer_id = $peer["peer_id"];
                 $id_title = $lng->txt("exc_peer_review_recipient");
                 $user_id = $peer_id;
-                $mess_gui = $this->getMessagesGUI(
-                    $giver_id
-                );
             } else {
 
                 // list received feedbacks
@@ -580,10 +579,6 @@ class ilExPeerReviewGUI
                 $id_title = $lng->txt("exc_peer_review_giver");
                 $user_id = $giver_id;
             }
-            $mess_gui = $this->getMessagesGUI(
-                $giver_id,
-                $peer_id
-            );
 
             // peer info
             if ($this->submission->isTutor()) {
@@ -593,6 +588,11 @@ class ilExPeerReviewGUI
             } else {
                 $id_value = ilUserUtil::getNamePresentation($user_id);
             }
+
+            $mess_gui = $this->getMessagesGUI(
+                $giver_id,
+                $peer_id
+            );
 
             // submission info
 
@@ -673,7 +673,7 @@ class ilExPeerReviewGUI
         $mess_html = "";
         if ($mess_gui) {
             $mess_html = $r->render($f->divider()->horizontal()) .
-                $mess_gui->getListHTML();
+                $mess_gui->getWidget();
         }
 
         return $f->panel()->sub(
@@ -797,7 +797,7 @@ class ilExPeerReviewGUI
                 $row["valid"] = false;
             }
             if (!$row["valid"]) {
-                $this->invalid++;
+//                $this->invalid++;
             }
 
             $ilCtrl = $this->ctrl;
@@ -856,12 +856,15 @@ class ilExPeerReviewGUI
             $a_form = $this->initPeerReviewItemForm($this->requested_peer_id);
         }
 
+        $sep = $this->gui->ui()->renderer()->render($this->gui->ui()->factory()->divider()->horizontal());
         $message_gui = $this->getMessagesGUI(
             $this->user->getId(),
             $this->requested_peer_id
         );
 
-        $tpl->setContent($a_form->getHTML() . $message_gui->getListHTML());
+        $this->gui->permanentLink()->setGivenFeedbackPermanentLink();
+
+        $tpl->setContent($a_form->getHTML() . $sep . $message_gui->getListHTML());
     }
 
     protected function getMessagesGUI(int $giver_id, int $peer_id):ilMessageGUI
@@ -869,12 +872,21 @@ class ilExPeerReviewGUI
         $this->ctrl->setParameter($this, "giver_id", $giver_id);
         $this->ctrl->setParameter($this, "peer_id", $peer_id);
         $pr = $this->domain->peerReview($this->ass);
-        return $this->notes->gui()->getMessagesGUI(
+        $gui = $this->notes->gui()->getMessagesGUI(
             $peer_id,
             $this->ass->getExerciseId(),
             $pr->getReviewId($giver_id, $peer_id),
             "excpf"
         );
+        if (!$this->ass->hasPeerReviewPersonalized()) {
+            if ($giver_id === $this->user->getId()) {
+                $counterpart_name = $this->lng->txt("exc_peer_review_recipient");
+            } else {
+                $counterpart_name = $this->lng->txt("exc_peer_review_giver");
+            }
+            $gui->setAnonymised(true, $counterpart_name);
+        }
+        return $gui;
     }
 
     protected function isValidPeer(int $a_peer_id): bool

@@ -582,6 +582,16 @@ class ilNoteGUI
         return $this->lng->txt("notes_note_deleted");
     }
 
+    protected function getLatestItemText() : string
+    {
+        return "";
+    }
+
+    protected function getAddEditItemText() : string
+    {
+        return $this->lng->txt("notes_add_edit_note");
+    }
+
     protected function getNoEntriesText(bool $search) : string
     {
         if (!$search) {
@@ -1334,19 +1344,23 @@ class ilNoteGUI
         $comps = array();
         if ($cnt > 0) {
             $c = $f->counter()->status((int) $cnt);
-            $comps[] = $f->symbol()->glyph()->comment()->withCounter($c)->withAdditionalOnLoadCode(function ($id) use ($hash, $update_url, $widget_el_id) {
-                return "$(\"#$id\").click(function(event) { " . self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"" . $widget_el_id . "\",\"" . $update_url . "\");") . "});";
+            $comps[] = $f->symbol()->glyph()->comment()->withCounter($c)->withAdditionalOnLoadCode(function ($id) use ($hash, $query_url) {
+                $code = "$('#$id').attr('data-note-key','$hash');\n";
+                $code.= "$('#$id').attr('data-note-ui-type','trigger');\n";
+                $code.= "$('#$id').attr('data-note-query-url','" . $query_url . "');\n";
+                $code.= "$(\"#$id\").click(function(event) { ilNotes.clickTrigger(event)});";
+                return $code;
             });
             $comps[] = $f->divider()->vertical();
             $tpl->setVariable("GLYPH", $r->render($comps));
-            $tpl->setVariable("TXT_LATEST", $lng->txt("notes_latest_comment"));
+            $tpl->setVariable("TXT_LATEST", $this->getLatestItemText());
         }
 
-        $b = $f->button()->shy($lng->txt("notes_add_edit_comment"), "#")->withAdditionalOnLoadCode(function ($id) use ($hash, $update_url, $widget_el_id, $query_url) {
+        $b = $f->button()->shy($this->getAddEditItemText(), "#")->withAdditionalOnLoadCode(function ($id) use ($hash, $query_url) {
             $code = "$('#$id').attr('data-note-key','$hash');\n";
+            $code.= "$('#$id').attr('data-note-ui-type','trigger');\n";
             $code.= "$('#$id').attr('data-note-query-url','" . $query_url . "');\n";
             $code.= "$(\"#$id\").click(function(event) { ilNotes.clickTrigger(event)});";
-            //$code.= "$(\"#$id\").click(function(event) { " . self::getListCommentsJSCall($hash, "ilNotes. updateWidget(\"" . $widget_el_id . "\",\"" . $update_url . "\");") . "});";
             return $code;
         });
         if ($ctrl->isAsynch()) {

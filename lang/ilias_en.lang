@@ -9187,6 +9187,7 @@ exc#:#exc_no_deadline_specified#:#No deadline specified.
 exc#:#exc_no_feedback_dir_found_in_zip#:#The directory structure of the uploaded zip-archive could not be processed.
 exc#:#exc_no_get_target#:#A valid target has not been sent.
 exc#:#exc_no_participants#:#There are currently no participants.
+exc#:#exc_no_peer_feedback_deadline#:#No Deadline for Giving Feedback
 exc#:#exc_no_portfolio_templates#:#There are no Portfolio Templates available.
 exc#:#exc_no_submission_yet#:#No submission yet.
 exc#:#exc_no_team_yet#:#Not assigned to a team
@@ -9311,6 +9312,7 @@ exc#:#exc_reminder_submit_setting#:#Remind Users to Submit
 exc#:#exc_reminder_submit_subject#:#Assignment "%s" was not finished
 exc#:#exc_reminders_cron#:#Reminders for Assignments
 exc#:#exc_reminders_cron_info#:#If enabled, 3 reminders will be active: Users to Submit, Tutors to Grade and Participants to Feedback.
+exc#:#exc_review_anytime#:#Give Feedback Anytime
 exc#:#exc_requirement#:#Requirement
 exc#:#exc_save_all#:#Save All
 exc#:#exc_save_order#:#Save Order
@@ -12192,15 +12194,19 @@ note#:#note_enable_notes#:#Enable Notes
 note#:#note_html_export_include_comments#:#Should comments be included in the export?
 notes#:#comments_feature_currently_not_activated_for_object#:#The public comments feature is currently not activated for this resource.
 notes#:#note_add_comment#:#Add Comment
+notes#:#note_add_message#:#Add Message
 notes#:#note_add_note#:#Add Note
 notes#:#note_content_removed#:#The content has been removed.
 notes#:#note_text#:#Text
 notes#:#note_update_comment#:#Update Comment
+notes#:#note_update_message#:#Update Message
 notes#:#note_update_note#:#Update Note
 notes#:#note_without_object#:#Without reference
 notes#:#notes_activate_comments#:#Activate Public Comments
 notes#:#notes_add_comment#:#Add Comment
 notes#:#notes_add_edit_comment#:#Add/Edit Comment
+notes#:#notes_add_edit_message#:#Add/Edit Message
+notes#:#notes_add_edit_note#:#Add/Edit Note
 notes#:#notes_all_comments#:#All Comments
 notes#:#notes_comment#:#Comment
 notes#:#notes_comment_deleted#:#The comment has been deleted.
@@ -12208,13 +12214,20 @@ notes#:#notes_comments#:#Comments
 notes#:#notes_comments_deleted#:#The comments have been deleted.
 notes#:#notes_deactivate_comments#:#Deactivate Public Comments
 notes#:#notes_delete_comment#:#Do you really want to delete this comment?
+notes#:#notes_delete_message#:#Do you really want to delete this message?
 notes#:#notes_delete_note#:#Do you really want to delete this note?
 notes#:#notes_hide_comments#:#Hide Comments
 notes#:#notes_html_export#:#HTML Export
 notes#:#notes_latest_comment#:#Latest Comment
+notes#:#notes_latest_message#:#Latest Message
+notes#:#notes_messages#:#Messages
+notes#:#notes_message_author_counterpart#:#Respondent
+notes#:#notes_message_author_you#:#You
 notes#:#notes_my_comments#:#My Comments
 notes#:#notes_no_comments#:#No comment has been posted yet.
 notes#:#notes_no_comments_found#:#No comments found that match your seach criteria.
+notes#:#notes_no_messages#:#No messages have been attached yet.
+notes#:#notes_no_messages_found#:#No messages found that match your seach criteria.
 notes#:#notes_no_notes#:#No notes have been attached yet.
 notes#:#notes_no_notes_found#:#No notes found that match your seach criteria.
 notes#:#notes_note_deleted#:#The note has been deleted.

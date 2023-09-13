@@ -40,9 +40,20 @@ const ilNotes = {
   },
 
   clickTrigger(e) {
-    const tr = e.target;
+    let tr = e.target;
+
+    // unfortunately glyphs currently set the ID on the surrounding <a> tag
+    // but the events are coming from the inner span
+    if (tr.dataset.noteType !== "trigger") {
+      tr = tr.closest("[data-note-ui-type='trigger']");
+    }
+
     const queryUrl = tr.dataset.noteQueryUrl;
     const noteKey = tr.dataset.noteKey;
+    console.log("_--");
+    console.log(e.target);
+    console.log(queryUrl);
+    console.log(noteKey);
     e.preventDefault();
     e.stopPropagation(); // #11546 - list properties not working
     this.update_code = '';
@@ -72,10 +83,18 @@ const ilNotes = {
     let head_str;
     const t = ilNotes;
 
-    if (comments) {
-      head_str = il.Language.txt("notes_public_comments");
+    head_str = il.Language.txt("private_notes");
+    if (queryUrl) {
+      if (queryUrl.includes("ilCommentGUI")) {
+        head_str = il.Language.txt("notes_public_comments");
+      }
+      if (queryUrl.includes("ilMessageGUI")) {
+        head_str = il.Language.txt("notes_messages");
+      }
     } else {
-      head_str = il.Language.txt("private_notes");
+      if (comments) {
+        head_str = il.Language.txt("notes_public_comments");
+      }
     }
 
     il.Modal.dialogue({

@@ -26,6 +26,8 @@ use ILIAS\Notes\Note;
 class ilMessageGUI extends ilNoteGUI
 {
     protected int $note_type = Note::MESSAGE;
+    protected bool $anonymised = false;
+    protected string $counterpart_name = "";
 
     public function __construct(
         int $recipient,
@@ -73,6 +75,16 @@ class ilMessageGUI extends ilNoteGUI
 
     protected function getItemTitle(Note $note) : string
     {
+        if ($this->anonymised) {
+            if ($note->getAuthor() === $this->user->getId()) {
+                return $this->lng->txt("notes_message_author_you");
+            } else {
+                if ($this->counterpart_name !== "") {
+                    return $this->counterpart_name;
+                }
+                return $this->lng->txt("notes_message_counterpart");
+            }
+        }
         $avatar = ilObjUser::_getAvatar($note->getAuthor());
         return ilUserUtil::getNamePresentation($note->getAuthor(), false, false);
     }
@@ -122,6 +134,22 @@ class ilMessageGUI extends ilNoteGUI
     protected function getDeletedSingleText() : string
     {
         return $this->lng->txt("notes_message_deleted");
+    }
+
+    protected function getLatestItemText() : string
+    {
+        return $this->lng->txt("notes_latest_message");
+    }
+
+    protected function getAddEditItemText() : string
+    {
+        return $this->lng->txt("notes_add_edit_message");
+    }
+
+    public function setAnonymised(bool $anonymised, string $counterpart_name)
+    {
+        $this->anonymised = $anonymised;
+        $this->counterpart_name = $counterpart_name;
     }
 
 }

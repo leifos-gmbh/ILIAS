@@ -76,7 +76,7 @@ class InternalGUIService
         $lng->loadLanguageModule("notes");
         \ilModalGUI::initJS($tpl);
 
-        $lng->toJS(array("private_notes", "notes_public_comments", "cancel"), $tpl);
+        $lng->toJS(array("private_notes", "notes_public_comments", "cancel", "notes_messages"), $tpl);
         \iljQueryUtil::initjQuery($tpl);
         \ilYuiUtil::initConnection($tpl);
         $tpl->addJavaScript("./Services/Notes/js/ilNotes.js");

@@ -512,7 +512,7 @@ class ilExcAssMemberState
     public function hasEnded() : bool
     {
         if ($this->hasSubmissionEnded()) {
-            if (!$this->assignment->getPeerReview() || $this->getPeerReviewDeadline() === 0 || $this->getPeerReviewDeadline() < $this->time) {
+            if (!$this->assignment->getPeerReview() || ($this->getPeerReviewDeadline() !== 0 && $this->getPeerReviewDeadline() < $this->time)) {
                 return true;
             }
         }

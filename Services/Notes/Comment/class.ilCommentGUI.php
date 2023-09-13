@@ -99,6 +99,17 @@ class ilCommentGUI extends ilNoteGUI
         return $this->lng->txt("notes_delete_comment");
     }
 
+    protected function getLatestItemText() : string
+    {
+        return $this->lng->txt("notes_latest_comment");
+    }
+
+    protected function getAddEditItemText() : string
+    {
+        return $this->lng->txt("notes_add_edit_comment");
+    }
+
+
     /*
     public function getHTML(): string
     {

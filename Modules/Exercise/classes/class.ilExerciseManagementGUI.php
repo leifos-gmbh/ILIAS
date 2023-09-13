@@ -46,6 +46,7 @@ class ilExerciseManagementGUI
     public const GRADE_NOT_GRADED = "notgraded";
     public const GRADE_PASSED = "passed";
     public const GRADE_FAILED = "failed";
+    protected \ILIAS\Exercise\InternalGUIService $gui;
     protected \ILIAS\HTTP\Services $http;
 
     protected ilCtrl $ctrl;
@@ -141,6 +142,7 @@ class ilExerciseManagementGUI
         $this->requested_files = $request->getFiles();
         $this->requested_filter_status = $request->getFilterStatus();
         $this->requested_filter_feedback = $request->getFilterFeedback();
+        $this->gui = $this->service->gui();
 
         $this->ctrl->saveParameter($this, array("vw", "member_id"));
         $this->http = $DIC->http();
@@ -364,6 +366,7 @@ class ilExerciseManagementGUI
         $lng = $this->lng;
 
         $this->addSubTabs("assignment");
+        $this->gui->permanentLink()->setGradesPermanentLink();
 
         // assignment selection
         $ass = ilExAssignment::getInstancesByExercise($this->exercise->getId());

@@ -32,6 +32,7 @@ use ILIAS\Exercise;
 class ilObjExerciseGUI extends ilObjectGUI
 {
     private ilCertificateDownloadValidator $certificateDownloadValidator;
+    protected Exercise\InternalGUIService $gui;
     protected ilTabsGUI $tabs;
     protected ilHelpGUI $help;
     protected ?ilExAssignment $ass = null;
@@ -73,6 +74,7 @@ class ilObjExerciseGUI extends ilObjectGUI
         $this->ctrl->saveParameter($this, ["ass_id", "mode"]);
 
         $this->service = $DIC->exercise()->internal();
+        $this->gui = $this->service->gui();
         $this->exercise_request = $DIC->exercise()->internal()->gui()->request();
         $this->exercise_ui = $DIC->exercise()->internal()->gui();
         $this->requested_ass_id = $this->exercise_request->getAssId();
@@ -124,7 +126,7 @@ class ilObjExerciseGUI extends ilObjectGUI
         $exc = $this->object;
 
         if (!$this->getCreationMode() && isset($this->object)) {
-            $this->tpl->setPermanentLink("exc", $this->object->getRefId());
+            $this->gui->permanentLink()->setPermanentLink();
         }
 
         //echo "-".$next_class."-".$cmd."-"; exit;
@@ -846,95 +848,7 @@ class ilObjExerciseGUI extends ilObjectGUI
     ): void {
         global $DIC;
 
-        $main_tpl = $DIC->ui()->mainTemplate();
-
-        $request = $DIC->exercise()->internal()->gui()->request();
-        $ass_id = $request->getAssId();
-
-        $lng = $DIC->language();
-        $ilAccess = $DIC->access();
-        $ilCtrl = $DIC->ctrl();
-
-        //we don't have baseClass here...
-        $ilCtrl->setTargetScript("ilias.php");
-
-        //ilExerciseMailNotification has links to:
-        // "Assignments", "Submission and Grades" and Downnoad the NEW files if the assignment type is "File Upload".
-        $parts = explode("_", $a_raw);
-        $action = null;
-        $member = null;
-        if (!$ass_id) {
-            $ass_id = null;
-
-            switch (end($parts)) {
-                case "download":
-                case "setdownload":
-                    $action = $parts[3];
-                    $member = $parts[2];
-                    $ass_id = $parts[1];
-                    break;
-
-                case "grades":
-                    $action = $parts[2];
-                    $ass_id = $parts[1];
-                    break;
-            }
-        }
-
-        $ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "ref_id", $a_target);
-
-        if ($ilAccess->checkAccess("read", "", $a_target)) {
-            $ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "target", $a_raw);
-
-            if ($ass_id) {
-                $ilCtrl->setParameterByClass("ilExerciseManagementGUI", "ass_id", $ass_id);
-            }
-
-            switch ($action) {
-                case "grades":
-                    $ilCtrl->redirectByClass(
-                        array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI", "ilExerciseManagementGUI"),
-                        "members"
-                    );
-                    break;
-
-                /*case "download":
-                    $ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "member_id", $member);
-                    $ilCtrl->redirectByClass(array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI", "ilExerciseManagementGUI", "ilExSubmissionFileGUI"),"downloadNewReturned");
-                    break;*/
-
-                case "setdownload":
-                    $ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "member_id", $member);
-                    $ilCtrl->redirectByClass(
-                        array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI", "ilExerciseManagementGUI"),
-                        "waitingDownload"
-                    );
-                    break;
-
-                default:
-                    if (($parts[1] ?? "") != "") {
-                        $ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "ass_id", $parts[1]);
-                        $ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "ass_id_goto", $parts[1]);
-                    }
-                    $ilCtrl->redirectByClass(
-                        array("ilExerciseHandlerGUI", "ilObjExerciseGUI"),
-                        "showOverview"
-                    );
-                    break;
-
-            }
-        } elseif ($ilAccess->checkAccess("visible", "", $a_target)) {
-            $ilCtrl->redirectByClass(
-                array("ilExerciseHandlerGUI", "ilObjExerciseGUI"),
-                "infoScreen"
-            );
-        } elseif ($ilAccess->checkAccess("read", "", ROOT_FOLDER_ID)) {
-            $main_tpl->setOnScreenMessage('failure', sprintf(
-                $lng->txt("msg_no_perm_read_item"),
-                ilObject::_lookupTitle(ilObject::_lookupObjId($a_target))
-            ), true);
-            ilObjectGUI::_gotoRepositoryRoot();
-        }
+        $DIC->exercise()->internal()->gui()->permanentLink()->goto($a_target, $a_raw);
     }
 
     /**

@@ -39,6 +39,19 @@ const ilNotes = {
     this.initPanel(false, e);
   },
 
+  clickTrigger(e) {
+    const tr = e.target;
+    const queryUrl = tr.dataset.noteQueryUrl;
+    const noteKey = tr.dataset.noteKey;
+    e.preventDefault();
+    e.stopPropagation(); // #11546 - list properties not working
+    this.update_code = '';
+    if (noteKey) {
+      this.hash = noteKey;
+    }
+    this.initPanel(null, e, queryUrl);
+  },
+
   listComments: function (e, hash, update_code) {
     // prevent the default action
     e.preventDefault();
@@ -55,7 +68,7 @@ const ilNotes = {
   },
 
   // init the notes editing panel
-  initPanel: function (comments, e) {
+  initPanel: function (comments, e, queryUrl) {
     let head_str;
     const t = ilNotes;
 
@@ -74,12 +87,16 @@ const ilNotes = {
     $("#il_notes_modal .modal-body").html("");
     $("#il_notes_modal").data("status", "loading");
 
-    if (comments) {
-      this.sendAjaxGetRequest({ cmd: "getCommentsHTML", cadh: this.hash },
-        { mode: 'list_notes' });
+    if (queryUrl) {
+      this.sendAjaxGetRequestToUrl(queryUrl, {}, {});
     } else {
-      this.sendAjaxGetRequest({ cmd: "getNotesHTML", cadh: this.hash },
-        { mode: 'list_notes' });
+      if (comments) {
+        this.sendAjaxGetRequest({ cmd: "getCommentsHTML", cadh: this.hash },
+          { mode: 'list_notes' });
+      } else {
+        this.sendAjaxGetRequest({ cmd: "getNotesHTML", cadh: this.hash },
+          { mode: 'list_notes' });
+      }
     }
   },
 
@@ -178,6 +195,15 @@ const ilNotes = {
               ))) {
             eval(ilNotes.update_code);
           }
+        } else {
+          if (ilNotes.hash) {
+            document.querySelectorAll("[data-note-ui-type='widget'][data-note-key='" + ilNotes.hash + "']").forEach(el => {
+              const url = el.dataset.noteUpdateUrl;
+              if (url) {
+                ilNotes.updateWidget(el.id, url);
+              }
+            });
+          }
         }
       }
     }
@@ -224,7 +250,6 @@ const ilNotes = {
           b.style.display = '';
         }
       });
-
       // add listener to "add" comment/note button -> show form
       b.addEventListener("click", (event) => {
         const mess = document.querySelector(".il-notes-section .alert-success");

@@ -69,6 +69,7 @@ class ilExPeerReviewGUI
         $this->requested_crit_id = $request->getCritId();
         $this->notes = $DIC->notes();
         $this->ctrl->saveParameter($this, array("peer_id"));
+        $this->notification = $this->domain->notification($request->getRefId());
     }
 
     /**
@@ -847,6 +848,10 @@ class ilExPeerReviewGUI
 
         $this->tabs_gui->activateTab("give_feedback");
 
+        if (!$this->canGive() && $this->canView()) {
+            $this->ctrl->redirectByClass(self::class, "showGivenPeerReview");
+        }
+
         if (!$this->canGive() ||
             !$this->isValidPeer($this->requested_peer_id)) {
             $this->returnToParentObject();
@@ -886,8 +891,52 @@ class ilExPeerReviewGUI
             }
             $gui->setAnonymised(true, $counterpart_name);
         }
+
+        $gui->addObserver(function (
+            int $exc_id,
+            int $pf_id,
+            string $type,
+            string $action,
+            int $note_id) use ($giver_id, $peer_id) {
+                $this->observeMessageAction(
+                    $giver_id,
+                    $peer_id,
+                    $note_id,
+                    $action
+                );
+        });
+
         return $gui;
     }
+
+    public function observeMessageAction(
+        int $giver_id,
+        int $peer_id,
+        int $note_id,
+        string $action
+    ): void {
+        if ($action !== "new") {
+            return;
+        }
+        $note = $this->notes->domain()->getById($note_id);
+        $text = $note->getText();
+
+        if ($note->getAuthor() === $giver_id) {
+            $this->notification->sendMessageFromPeerfeedbackGiverNotification(
+                $this->ass->getId(),
+                $peer_id,
+                $text
+            );
+        } else {
+            $this->notification->sendMessageFromPeerfeedbackRecipientNotification(
+                $this->ass->getId(),
+                $peer_id,
+                $giver_id,
+                $text
+            );
+        }
+    }
+
 
     protected function isValidPeer(int $a_peer_id): bool
     {

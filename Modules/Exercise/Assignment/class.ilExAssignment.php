@@ -52,6 +52,7 @@ class ilExAssignment
 
     public const DEADLINE_ABSOLUTE = 0;
     public const DEADLINE_RELATIVE = 1;
+    protected \ILIAS\Exercise\InternalDomainService $domain;
     protected \ILIAS\Refinery\String\Group $string_transform;
 
     protected ilDBInterface $db;
@@ -107,6 +108,7 @@ class ilExAssignment
     {
         global $DIC;
 
+        $this->domain = $DIC->exercise()->internal()->domain();
         $this->db = $DIC->database();
         $this->lng = $DIC->language();
         $this->user = $DIC->user();
@@ -1472,6 +1474,8 @@ class ilExAssignment
             return;
         }
 
+        $notification = $this->domain->notification($a_exc->getRefId());
+
         $fstorage = new ilFSStorageExercise($this->getExerciseId(), $this->getId());
         $fstorage->create();
 
@@ -1503,10 +1507,10 @@ class ilExAssignment
                             $member_status->update();
                         }
 
-                        $a_exc->sendFeedbackFileNotification(
-                            $file_name,
+                        $notification->sendFeedbackNotification(
+                            $this->getId(),
                             $noti_rec_ids,
-                            $this->getId()
+                            $file_name
                         );
                     }
                 }

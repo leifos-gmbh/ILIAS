@@ -97,4 +97,10 @@ trait GlobalDICDomainServices
     {
         return $this->DIC["objDefinition"];
     }
+
+    public function backgroundTasks() : \ILIAS\BackgroundTasks\BackgroundTaskServices
+    {
+        return $this->DIC->backgroundTasks();
+    }
+
 }

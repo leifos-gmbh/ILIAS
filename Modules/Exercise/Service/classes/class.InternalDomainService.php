@@ -22,6 +22,9 @@ namespace ILIAS\Exercise;
 
 use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\DI\Container;
+use ILIAS\Exercise\Object\ObjectManager;
+use ILIAS\Exercise\Notification\NotificationManager;
+use ILIAS\Refinery\Logical\Not;
 
 /**
  * Exercise domain service (business logic)
@@ -49,6 +52,16 @@ class InternalDomainService
         );
     }
 
+    public function log(): \ilLogger
+    {
+        return $this->logger()->exc();
+    }
+
+    public function object(int $ref_id): ObjectManager
+    {
+        return new ObjectManager($ref_id);
+    }
+
     public function assignment(): Assignment\DomainService
     {
         return $this->assignment_service;
@@ -60,5 +73,13 @@ class InternalDomainService
             return new \ilExPeerReview($ass);
         }
         return null;
+    }
+
+    public function notification(int $ref_id):NotificationManager
+    {
+        return new NotificationManager(
+            $this,
+            $ref_id
+        );
     }
 }

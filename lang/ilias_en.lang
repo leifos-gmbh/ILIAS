@@ -9169,6 +9169,10 @@ exc#:#exc_msg_new_feedback_file_uploaded#:#A new feedback file has been added to
 exc#:#exc_msg_new_feedback_file_uploaded2#:#a tutor has uploaded a new feedback file for you.
 exc#:#exc_msg_new_feedback_text_uploaded#:#A new comment has been added to exercise "%s".
 exc#:#exc_msg_new_feedback_text_uploaded2#:#a tutor has added a new comment for you.
+exc#:#exc_msg_new_message_from_pf_giver#:#A new message from a peer feedback giver has been added to exercise "%s".
+exc#:#exc_msg_new_message_from_pf_giver2#:#a peer feedback giver has added a new message for you:
+exc#:#exc_msg_new_message_from_pf_recipient#:#A new message from a peer feedback recipient has been added to exercise "%s".
+exc#:#exc_msg_new_message_from_pf_recipient2#:#a peer feedback recipient has added a new message for you:
 exc#:#exc_msg_participants_removed#:#The participants have been removed from the exercise.
 exc#:#exc_msg_public_submission#:#All submissions will be published after the deadline.
 exc#:#exc_msg_saved_grades#:#Grades and comments have been saved.

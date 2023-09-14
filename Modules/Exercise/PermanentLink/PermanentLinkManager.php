@@ -159,39 +159,85 @@ class PermanentLinkManager
         }
     }
 
-    public function setPermanentLink() : void
+    protected function _setPermanentLink(string $append) : void
     {
         $request = $this->gui->request();
         $main_tpl = $this->gui->ui()->mainTemplate();
+        $main_tpl->setPermanentLink(
+            "exc",
+            $request->getRefId(),
+            $append
+        );
+    }
+
+    public function setPermanentLink() : void
+    {
+        $request = $this->gui->request();
+        $this->_setPermanentLink(
+            $this->getDefaultAppend(
+                $request->getAssId()
+            )
+        );
+    }
+
+    public function getDefaultAppend(int $ass_id) : string
+    {
         $append = "";
-        if ($request->getAssId() > 0) {
-            $append = "_" . $request->getAssId();
+        if ($ass_id > 0) {
+            $append = "_" . $ass_id;
         }
-        $main_tpl->setPermanentLink("exc", $request->getRefId(), $append);
+        return $append;
+    }
+
+    public function getDownloadSubmissionAppend(int $ass_id, int $user_id) : string
+    {
+        return "_" . $ass_id . "_" . $user_id . "_setdownload";
     }
 
     public function setGradesPermanentLink() : void
     {
         $request = $this->gui->request();
-        $main_tpl = $this->gui->ui()->mainTemplate();
-        $append = "_" . $request->getAssId() . "_grades";
-        $main_tpl->setPermanentLink("exc", $request->getRefId(), $append);
+        $this->_setPermanentLink(
+            $this->getGradesAppend(
+                $request->getAssId()
+            )
+        );
+    }
+
+    public function getGradesAppend(int $ass_id) : string
+    {
+        return "_" . $ass_id . "_grades";
     }
 
     public function setGivenFeedbackPermanentLink() : void
     {
         $request = $this->gui->request();
-        $main_tpl = $this->gui->ui()->mainTemplate();
-        $append = "_" . $request->getAssId() ."_" . $request->getPeerId() . "_given";
-        $main_tpl->setPermanentLink("exc", $request->getRefId(), $append);
+        $this->_setPermanentLink(
+            $this->getGivenFeedbackAppend(
+                $request->getAssId(),
+                $request->getPeerId()
+            )
+        );
+    }
+
+    public function getGivenFeedbackAppend(int $ass_id, int $peer_id) : string
+    {
+        return "_" . $ass_id ."_" . $peer_id . "_given";
     }
 
     public function setReceivedFeedbackPermanentLink() : void
     {
         $request = $this->gui->request();
-        $main_tpl = $this->gui->ui()->mainTemplate();
-        $append = "_" . $request->getAssId() . "_received";
-        $main_tpl->setPermanentLink("exc", $request->getRefId(), $append);
+        $this->_setPermanentLink(
+            $this->getReceivedFeedbackAppend(
+                $request->getAssId()
+            )
+        );
+    }
+
+    public function getReceivedFeedbackAppend(int $ass_id) : string
+    {
+        return "_" . $ass_id . "_received";
     }
 
 }

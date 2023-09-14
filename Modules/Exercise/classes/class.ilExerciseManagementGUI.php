@@ -96,27 +96,26 @@ class ilExerciseManagementGUI
      */
     public function __construct(InternalService $service, ilExAssignment $a_ass = null)
     {
-        /** @var \ILIAS\DI\Container $DIC */
-        global $DIC;
-
-        $this->ui_factory = $DIC->ui()->factory();
-        $this->ui_renderer = $DIC->ui()->renderer();
-        $this->user = $DIC->user();
-        $this->toolbar = $DIC->toolbar();
-        $this->log = ilLoggerFactory::getLogger("exc");
-        $this->access = $DIC->access();
-
-        $this->ctrl = $DIC->ctrl();
-        $this->tabs_gui = $DIC->tabs();
-        $this->lng = $DIC->language();
-        $this->tpl = $DIC["tpl"];
-
-        $this->task_factory = $DIC->backgroundTasks()->taskFactory();
-
-        $this->request = $DIC->exercise()->internal()->gui()->request();
-        $request = $this->request;
-
         $this->service = $service;
+        $this->gui = $gui = $service->gui();
+        $this->domain = $domain = $service->domain();
+
+        $this->user = $domain->user();
+        $this->log = $domain->logger()->exc();
+        $this->access = $domain->access();
+        $this->lng = $domain->lng();
+
+        $this->toolbar = $gui->toolbar();
+        $this->ui_factory = $gui->ui()->factory();
+        $this->ui_renderer = $gui->ui()->renderer();
+        $this->ctrl = $gui->ctrl();
+        $this->tabs_gui = $gui->tabs();
+        $this->tpl = $gui->ui()->mainTemplate();
+        $this->http = $gui->http();
+
+        $this->task_factory = $domain->backgroundTasks()->taskFactory();
+        $this->request = $gui->request();
+        $request = $this->request;
 
         $this->exercise = $request->getExercise();
         if ($a_ass !== null) {
@@ -142,10 +141,10 @@ class ilExerciseManagementGUI
         $this->requested_files = $request->getFiles();
         $this->requested_filter_status = $request->getFilterStatus();
         $this->requested_filter_feedback = $request->getFilterFeedback();
-        $this->gui = $this->service->gui();
+
+        $this->notification = $domain->notification($request->getRefId());
 
         $this->ctrl->saveParameter($this, array("vw", "member_id"));
-        $this->http = $DIC->http();
     }
 
     /**
@@ -198,10 +197,10 @@ class ilExerciseManagementGUI
                         $member_status->update();
                     }
 
-                    $this->exercise->sendFeedbackFileNotification(
-                        $pcommand["name"] ?? "",
+                    $this->notification->sendFeedbackNotification(
+                        $this->assignment->getId(),
                         $noti_rec_ids,
-                        $this->assignment->getId()
+                        $pcommand["name"] ?? ""
                     );
                 }
                 $this->ctrl->forwardCommand($fs_gui);
@@ -1488,10 +1487,10 @@ class ilExerciseManagementGUI
 
                 if ($reci_ids !== []) {
                     // send notification
-                    $this->exercise->sendFeedbackFileNotification(
-                        "",
-                        $reci_ids,
+                    $this->notification->sendFeedbackNotification(
                         $ass_id,
+                        $reci_ids,
+                        "",
                         true
                     );
                 }

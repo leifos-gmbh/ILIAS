@@ -73,7 +73,7 @@ class NotificationManager
     public function sendMessageFromPeerfeedbackGiverNotification(
         int $ass_id,
         int $rcp_id,
-        string $text,
+        string $text
     ): void {
         $not = new \ilExerciseMailNotification();
         $not->setType(\ilExerciseMailNotification::TYPE_MESSAGE_FROM_PF_GIVER);
@@ -88,7 +88,7 @@ class NotificationManager
         int $ass_id,
         int $peer_id,
         int $notification_rcp_id,
-        string $text,
+        string $text
     ): void {
         $not = new \ilExerciseMailNotification();
         $not->setType(\ilExerciseMailNotification::TYPE_MESSAGE_FROM_PF_RECIPIENT);

@@ -395,6 +395,8 @@ class ilExAssignmentEditorGUI
         // Deadline Mode
         $radg = new ilRadioGroupInputGUI($lng->txt("exc_deadline"), "deadline_mode");
         $radg->setValue(0);
+        $op0 = new ilRadioOption($lng->txt("exc_no_deadline"), -1, $lng->txt("exc_no_deadline_info"));
+        $radg->addOption($op0);
         $op1 = new ilRadioOption($lng->txt("exc_fixed_date"), 0, $lng->txt("exc_fixed_date_info"));
         $radg->addOption($op1);
         $op2 = new ilRadioOption($lng->txt("exc_relative_date"), 1, $lng->txt("exc_relative_date_info"));
@@ -403,6 +405,7 @@ class ilExAssignmentEditorGUI
 
         // Deadline fixed date
         $deadline = new ilDateTimeInputGUI($lng->txt("date"), "deadline");
+        $deadline->setRequired(true);
         $deadline->setShowTime(true);
         $op1->addSubItem($deadline);
 
@@ -641,7 +644,12 @@ class ilExAssignmentEditorGUI
             $time_deadline = null;
             $time_deadline_ext = null;
 
-            if ((int) $a_form->getInput("deadline_mode") == ilExAssignment::DEADLINE_ABSOLUTE) {
+            $deadline_mode = (int) $a_form->getInput("deadline_mode");
+            if ($deadline_mode === -1) {
+                $deadline_mode = 0;
+            }
+
+            if ($deadline_mode === ilExAssignment::DEADLINE_ABSOLUTE) {
                 $time_deadline = $a_form->getItemByPostVar("deadline")->getDate();
                 $time_deadline = $time_deadline
                     ? $time_deadline->get(IL_CAL_UNIX)
@@ -756,7 +764,7 @@ class ilExAssignmentEditorGUI
                     }
                 }
 
-                $res["deadline_mode"] = $a_form->getInput("deadline_mode");
+                $res["deadline_mode"] = $deadline_mode;
 
                 if ($res["deadline_mode"] == ilExAssignment::DEADLINE_RELATIVE) {
                     $res["relative_deadline"] = $a_form->getInput("relative_deadline");
@@ -1048,6 +1056,9 @@ class ilExAssignmentEditorGUI
 
 
         $values["deadline_mode"] = $this->assignment->getDeadlineMode();
+        if ($values["deadline_mode"] === 0 && !$this->assignment->getDeadline()) {
+            $values["deadline_mode"] = -1;
+        }
         $values["relative_deadline"] = $this->assignment->getRelativeDeadline();
         $dt = new ilDateTime($this->assignment->getRelDeadlineLastSubmission(), IL_CAL_UNIX);
         $values["rel_deadline_last_subm"] = $dt->get(IL_CAL_DATETIME);

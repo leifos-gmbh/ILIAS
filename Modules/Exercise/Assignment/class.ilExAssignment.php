@@ -237,7 +237,7 @@ class ilExAssignment
 
     /**
      * Set deadline mode
-     * @param int $a_val deadline mode (self::DEADLINE_ABSOLUTE | self::DEADLINE_ABSOLUTE)
+     * @param int $a_val deadline mode (self::DEADLINE_ABSOLUTE | self::DEADLINE_RELATIVE)
      */
     public function setDeadlineMode(int $a_val): void
     {

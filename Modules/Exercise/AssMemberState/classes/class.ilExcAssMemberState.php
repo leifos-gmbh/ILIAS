@@ -486,8 +486,19 @@ class ilExcAssMemberState
      */
     public function hasSubmissionStarted(): bool
     {
-        if ($this->hasGenerallyStarted() && ($this->assignment->getDeadlineMode() == ilExAssignment::DEADLINE_ABSOLUTE ||
-                $this->getIndividualStart() > 0)) {
+        $deadline_type_specific_started = false;
+        switch ($this->assignment->getDeadlineMode()) {
+            case ilExAssignment::DEADLINE_ABSOLUTE:
+                $deadline_type_specific_started = true;
+                break;
+            case ilExAssignment::DEADLINE_RELATIVE:
+                $deadline_type_specific_started = ($this->getIndividualStart() > 0);
+                break;
+            case ilExAssignment::DEADLINE_ABSOLUTE_INDIVIDUAL:
+                $deadline_type_specific_started = ($this->idl->getIndividualDeadline() > 0);
+                break;
+        }
+        if ($deadline_type_specific_started && $this->hasGenerallyStarted()) {
             return true;
         }
         return false;
@@ -565,4 +576,18 @@ class ilExcAssMemberState
 
         return $access;
     }
+
+    public function needsIndividualDeadline(): bool
+    {
+        if ($this->assignment->getDeadlineMode() === ilExAssignment::DEADLINE_ABSOLUTE_INDIVIDUAL && $this->idl->getIndividualDeadline() === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function hasRequestedIndividualDeadline(): bool
+    {
+        return $this->idl->getRequested();
+    }
+
 }

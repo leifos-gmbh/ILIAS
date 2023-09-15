@@ -306,9 +306,35 @@ class PropertyAndActionBuilderUI
                         $state->getLastSubmissionOfRelativeDeadlinePresentation()
                     );
                 }
+            } elseif ($this->assignment->getDeadlineMode() === \ilExAssignment::DEADLINE_ABSOLUTE_INDIVIDUAL) {
+                if ($state->needsIndividualDeadline()) {
+                    if ($state->hasRequestedIndividualDeadline()) {
+                        $this->setLeadText(
+                            $this->lng->txt("exc_lead_wait_for_idl")
+                        );
+                    } else {
+                        $this->setLeadText(
+                            $this->lng->txt("exc_lead_request_idl")
+                        );
+                    }
+                    $this->setHeadProperty(
+                        self::PROP_DEADLINE,
+                        $lng->txt("exc_deadline"),
+                        $lng->txt("exc_deadline_not_set_yet")
+                    );
+                } else {
+                    $this->setLeadText (
+                        $state->getRemainingTimeLeadText()
+                    );
+                    $this->setHeadProperty(
+                        self::PROP_DEADLINE,
+                        $lng->txt("exc_edit_until"),
+                        $state->getIndividualDeadlinePresentation()
+                    );
+                }
             } else {
                 // no deadline
-                $this->setLeadText (
+                $this->setLeadText(
                     $this->lng->txt("exc_submit_anytime")
                 );
                 $this->setHeadProperty(
@@ -318,7 +344,8 @@ class PropertyAndActionBuilderUI
                 );
             }
 
-            if ($state->getIndividualDeadline() > 0) {
+            if ($state->getIndividualDeadline() > 0 &&
+                $this->assignment->getDeadlineMode() !== \ilExAssignment::DEADLINE_ABSOLUTE_INDIVIDUAL) {
                 $this->addAdditionalHeadProperty(
                     $lng->txt("exc_individual_deadline"),
                     $state->getIndividualDeadlinePresentation()
@@ -460,7 +487,6 @@ class PropertyAndActionBuilderUI
             );
         }
 
-
         if ($state->getCommonDeadline()) {		// if we have a common deadline (target timestamp)
             $this->addProperty(
                 self::SEC_SCHEDULE,
@@ -489,6 +515,27 @@ class PropertyAndActionBuilderUI
                     self::SEC_SCHEDULE,
                     $lng->txt("exc_rel_last_submission"),
                     $state->getLastSubmissionOfRelativeDeadlinePresentation()
+                );
+            }
+        } elseif ($state->needsIndividualDeadline()) {
+            if ($state->hasRequestedIndividualDeadline()) {
+                $this->addProperty(
+                    self::SEC_SCHEDULE,
+                    $this->lng->txt("exc_deadline"),
+                    $this->lng->txt("exc_idl_tutor_needed")
+                );
+            } else {
+                $this->addProperty(
+                    self::SEC_SCHEDULE,
+                    $this->lng->txt("exc_deadline"),
+                    $this->lng->txt("exc_idl_request_and_tutor_needed")
+                );
+                $ilCtrl->setParameterByClass("ilobjexercisegui", "ass_id", $this->assignment->getId());
+                $but = $this->gui->ui()->factory()->button()->primary($lng->txt("exc_request_deadline"), $ilCtrl->getLinkTargetByClass("ilobjexercisegui", "requestDeadline"));
+                $ilCtrl->setParameterByClass("ilobjexercisegui", "ass_id", null);
+                $this->setMainAction(
+                    self::SEC_SCHEDULE,
+                    $but
                 );
             }
         }

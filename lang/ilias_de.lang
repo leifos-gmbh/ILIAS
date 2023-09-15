@@ -9177,6 +9177,13 @@ exc#:#exc_msg_participants_removed#:#Die Teilnehmer wurden aus der Übung entfer
 exc#:#exc_msg_public_submission#:#Alle Lösungsabgaben werden nach dem Abgabetermin veröffentlicht.
 exc#:#exc_msg_saved_grades#:#Die Änderungen wurden gespeichert.###Modified as part of gender mainstreaming activities for ILIAS 8
 exc#:#exc_msg_sure_to_deassign_participant#:#Wollen Sie wirklich die folgenden Teilnehmer aus allen Übungseinheiten der Übung entfernen? Alle Lösungsabgaben aus allen Übungseinheiten der Teilnehmer werden gelöscht.
+exc#:#exc_msg_deadline_request_subject#:#Es wurde eine Abgabefrist in Übung "%s" angefragt.
+exc#:#exc_msg_deadline_request_body#:#Der folgende Benutzer hat eine individuelle Abgabefrist angefragt.
+exc#:#exc_msg_idl_set_subject#:#Es wurde eine Abgabefrist in Übung "%s" gesetzt.
+exc#:#exc_msg_idl_set_body#:#Es wurde eine individuelle Abgabefrist für Sie durch den Tutor gesetzt.
+exc#:#exc_fixed_date_individual#:#Nur individuelle Termine
+exc#:#exc_fixed_date_individual_info#:#Es gibt keinen gemeinsamen Abgabetermin. Es müssen individuelle Termine für alle Teilnehmer gesetzt werden.
+exc#:#exc_no_deadline_info#:#Es gibt keinen Abgabetermin für die Teilnehmer.
 exc#:#exc_multi_feedb_info#:#Auf dieser Seite können Sie die Feedback-Dateien für mehrere Übungsteilnehmer auf einmal hochladen.<br /> <br />Klicken Sie zunächst unten auf den Button "ZIP-Verzeichnisstruktur herunterladen" und speichern Sie die ZIP-Datei auf Ihrem Computer. Dort öffnen Sie im nächsten Schritt die ZIP-Datei, um die Verzeichnisstruktur zu entpacken. Legen Sie nun die Feedback-Dateien in die entsprechenden Ordner der Übungsteilnehmer und komprimieren abschließend das Verzeichnis wieder als ZIP-Datei. Wählen Sie nun auf dieser Seite unten diese ZIP-Datei als Multi-Feedback-Datei aus und laden diese hoch. Die Bestätigungsseite führt alle hochgeladenen Dateien auf. <br /> <br /><b>Wichtig</b>: Vermeiden Sie auf jeden Fall Umlaute und Sonderzeichen in den Dateinamen, da hierdurch Probleme bei der Zuordnung der Dateien entstehen.
 exc#:#exc_multi_feedback#:#Rückmeldung an mehrere Teilnehmer
 exc#:#exc_multi_feedback_file#:#Multi-Feedback-Datei
@@ -9318,6 +9325,13 @@ exc#:#exc_reminders_cron#:#Erinnerungen für Übungseinheiten
 exc#:#exc_reminders_cron_info#:#Bei Aktivierung werden drei Erinnerungen versendet: Ausstehende Abgaben, ausstehende Bewertungen und ausstehende Peer-Feedbacks
 exc#:#exc_requirement#:#Anforderung
 exc#:#exc_review_anytime#:#Jederzeit Feedback geben
+exc#:#exc_lead_request_idl#:#Abgabefrist anfragen
+exc#:#exc_request_deadline#:#Abgabefrist anfragen
+exc#:#exc_deadline_not_set_yet#:#Noch nicht gesetzt
+exc#:#exc_idl_request_and_tutor_needed#:#Bitte senden Sie eine Anfrage an Ihren Tutor. Dieser muss Ihnen eine individuelle Abgabefrist zuweisen.
+exc#:#exc_idl_tutor_needed#:#Ihre Anfrage wurde bereits gesendet und ist noch offen. Sie werden benachrichtigt, sobald Ihr Tutor Ihnen einen individuelle Abgabefrist zugeordnet hat.
+exc#:#exc_lead_wait_for_idl#:#Wartet auf individuelle Abgabefrist
+exc#:#exc_deadline_requested#:#Angefragt
 exc#:#exc_save_all#:#Alle speichern
 exc#:#exc_save_order#:#Reihenfolge speichern
 exc#:#exc_save_selected#:#Ausgewählte Eingaben speichern
@@ -9353,7 +9367,7 @@ exc#:#exc_submission_file#:#Dateiabgabe
 exc#:#exc_submission_no_new_files#:#Keine neuen Abgaben vorhanden.
 exc#:#exc_submission_notification#:#Benachrichtigung bei Abgabe
 exc#:#exc_submission_notification_body#:#Eine neue Abgabe für die Übung "%s" liegt vor.
-exc#:#exc_submission_notification_info#:#Sie werden per Mail benachrichtigt, sobald neue Lösungen abgegeben wurden. Dies ist eine persönliche Einstellung, die nur für Sie gilt. Andere Tutoren der Übung sind davon nicht betroffen.
+exc#:#exc_submission_notification_info#:#Sie werden per Mail benachrichtigt, sobald neue Lösungen abgegeben wurden oder Abgabefristen beantragt werden. Dies ist eine persönliche Einstellung, die nur für Sie gilt. Andere Tutoren der Übung sind davon nicht betroffen.
 exc#:#exc_submission_notification_link#:#Link zur Übung: %s
 exc#:#exc_submission_notification_subject#:#Eine neue Abgabe für die Übung "%s" liegt vor
 exc#:#exc_submission_text#:#Textabgabe

@@ -32,6 +32,7 @@ use ILIAS\Exercise;
 class ilObjExerciseGUI extends ilObjectGUI
 {
     private ilCertificateDownloadValidator $certificateDownloadValidator;
+    protected Exercise\Notification\NotificationManager $notification;
     protected Exercise\InternalGUIService $gui;
     protected ilTabsGUI $tabs;
     protected ilHelpGUI $help;
@@ -96,6 +97,7 @@ class ilObjExerciseGUI extends ilObjectGUI
         $this->requested_ass_id_goto = $this->exercise_request->getAssIdGoto();
         $this->ui = $this->service->gui()->ui();
         $this->certificateDownloadValidator = new ilCertificateDownloadValidator();
+        $this->notification = $this->service->domain()->notification($this->requested_ref_id);
 
         if ($this->object) {
             $this->ass_manager = $this->service->domain()->assignment()->assignments(
@@ -1133,7 +1135,30 @@ class ilObjExerciseGUI extends ilObjectGUI
             }
         }
 
-        $ctrl->redirect($this, "showOverview");
+        $ctrl->setParameterByClass(ilAssignmentPresentationGUI::class, "ass_id", $this->ass->getId());
+        $ctrl->redirectByClass(ilAssignmentPresentationGUI::class, "");
+    }
+
+    /**
+     * Request deadline for assignment with absolute individual deadline only
+     */
+    public function requestDeadlineObject(): void
+    {
+        $ctrl = $this->ctrl;
+        $user = $this->user;
+
+        if ($this->ass !== null) {
+            $state = ilExcAssMemberState::getInstanceByIds($this->ass->getId(), $user->getId());
+            if ($state->needsIndividualDeadline() && !$state->hasRequestedIndividualDeadline()) {
+                $idl = $state->getIndividualDeadlineObject();
+                $idl->setRequested(true);
+                $idl->save();
+                $this->notification->sendDeadlineRequestNotification($this->ass->getId());
+            }
+        }
+
+        $ctrl->setParameterByClass(ilAssignmentPresentationGUI::class, "ass_id", $this->ass->getId());
+        $ctrl->redirectByClass(ilAssignmentPresentationGUI::class, "");
     }
 
     /**

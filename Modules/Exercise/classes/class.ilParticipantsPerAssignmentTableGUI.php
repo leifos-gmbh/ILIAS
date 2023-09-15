@@ -91,6 +91,7 @@ class ilParticipantsPerAssignmentTableGUI extends ilExerciseSubmissionTableGUI
 
 
         $idl = $this->ass->getIndividualDeadlines();
+        $rdl = $this->ass->getRequestedDeadlines();
         $calc_deadline = $this->ass->getCalculatedDeadlines();
 
         // team upload?  (1 row == 1 team)
@@ -249,6 +250,8 @@ class ilParticipantsPerAssignmentTableGUI extends ilExerciseSubmissionTableGUI
                 if (array_key_exists($item["usr_id"], $idl)) {
                     $data[$idx]["idl"] = $idl[$item["usr_id"]];
                 }
+
+                $data[$idx]["requested_idl"] = array_key_exists($item["usr_id"], $rdl);
 
                 if (isset($calc_deadline["user"][$item["usr_id"]])) {
                     $data[$idx]["calc_deadline"] = $calc_deadline["user"][$item["usr_id"]]["calculated_deadline"];

@@ -140,14 +140,16 @@ class ilAssignmentsTableGUI extends ilTable2GUI
                 $dl = ilDatePresentation::formatDate(new ilDateTime($a_set["deadline"], IL_CAL_UNIX));
                 if ($a_set["deadline2"] > 0) {
                     $dl .= "<br />(" . ilDatePresentation::formatDate(new ilDateTime(
-                        $a_set["deadline2"],
-                        IL_CAL_UNIX
-                    )) . ")";
+                            $a_set["deadline2"],
+                            IL_CAL_UNIX
+                        )) . ")";
                 }
                 $this->tpl->setVariable("TXT_DEADLINE", $dl);
             } else {
                 $this->tpl->setVariable("TXT_DEADLINE", "-");
             }
+        } elseif ($ass->getDeadlineMode() === ilExAssignment::DEADLINE_ABSOLUTE_INDIVIDUAL) {
+            $this->tpl->setVariable("TXT_DEADLINE", $this->lng->txt("exc_fixed_date_individual"));
         } else {
             if ($ass->getRelativeDeadline() > 0) {
                 $dl = "" . $ass->getRelativeDeadline() . " " . $this->lng->txt("days");

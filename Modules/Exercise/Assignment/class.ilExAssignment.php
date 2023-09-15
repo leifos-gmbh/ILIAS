@@ -52,6 +52,7 @@ class ilExAssignment
 
     public const DEADLINE_ABSOLUTE = 0;
     public const DEADLINE_RELATIVE = 1;
+    public const DEADLINE_ABSOLUTE_INDIVIDUAL = 2;
     protected \ILIAS\Exercise\InternalDomainService $domain;
     protected \ILIAS\Refinery\String\Group $string_transform;
 
@@ -237,7 +238,7 @@ class ilExAssignment
 
     /**
      * Set deadline mode
-     * @param int $a_val deadline mode (self::DEADLINE_ABSOLUTE | self::DEADLINE_RELATIVE)
+     * @param int $a_val deadline mode (self::DEADLINE_ABSOLUTE | self::DEADLINE_ABSOLUTE_INDIVIDUAL | self::DEADLINE_RELATIVE)
      */
     public function setDeadlineMode(int $a_val): void
     {
@@ -1865,9 +1866,29 @@ class ilExAssignment
         return $res;
     }
 
+    public function getRequestedDeadlines(): array
+    {
+        $ilDB = $this->db;
+
+        $res = array();
+
+        $set = $ilDB->query("SELECT * FROM exc_idl" .
+            " WHERE ass_id = " . $ilDB->quote($this->getId(), "integer") .
+            " AND requested = " . $ilDB->quote(1, "integer"));
+        while ($row = $ilDB->fetchAssoc($set)) {
+            if ($row["is_team"]) {
+                $row["member_id"] = "t" . $row["member_id"];
+            }
+
+            $res[$row["member_id"]] = $row["requested"];
+        }
+
+        return $res;
+    }
+
     public function hasActiveIDl(): bool
     {
-        return (bool) $this->getDeadline();
+        return (bool) ($this->getDeadline() || $this->getDeadlineMode() === self::DEADLINE_ABSOLUTE_INDIVIDUAL);
     }
 
     public function hasReadOnlyIDl(): bool

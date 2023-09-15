@@ -399,6 +399,10 @@ class ilExAssignmentEditorGUI
         $radg->addOption($op0);
         $op1 = new ilRadioOption($lng->txt("exc_fixed_date"), 0, $lng->txt("exc_fixed_date_info"));
         $radg->addOption($op1);
+        if (!$ass_type->usesTeams()) {
+            $op3 = new ilRadioOption($lng->txt("exc_fixed_date_individual"), 2, $lng->txt("exc_fixed_date_individual_info"));
+            $radg->addOption($op3);
+        }
         $op2 = new ilRadioOption($lng->txt("exc_relative_date"), 1, $lng->txt("exc_relative_date_info"));
         $radg->addOption($op2);
         $form->addItem($radg);

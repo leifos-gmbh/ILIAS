@@ -2000,6 +2000,9 @@ class ilExerciseManagementGUI
 
                     foreach ($users as $id => $date) {
                         $ass->setIndividualDeadline($id, $date);
+                        if (is_numeric($id)) {
+                            $this->notification->sendDeadlineSetNotification($ass_id, $id);
+                        }
                     }
 
                     $ass->recalculateLateSubmissions();

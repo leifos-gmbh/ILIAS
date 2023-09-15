@@ -26,6 +26,8 @@ class ilExerciseMailNotification extends ilMailNotification
     public const TYPE_FEEDBACK_TEXT_ADDED = 40;
     public const TYPE_MESSAGE_FROM_PF_GIVER = 50;
     public const TYPE_MESSAGE_FROM_PF_RECIPIENT = 60;
+    public const TYPE_DEADLINE_REQUESTED = 70;
+    public const TYPE_IDL_DEADLINE_SET = 80;
     protected string $additional_text = "";
     protected int $peer_id = 0;
     protected \ILIAS\Exercise\PermanentLink\PermanentLinkManager $permanent_link;
@@ -245,6 +247,38 @@ class ilExerciseMailNotification extends ilMailNotification
                         $this->getLanguageText('exc_msg_new_message_from_pf_recipient2') .
                         "\n\n" . $this->getAdditionalText(),
                         $perma->getGivenFeedbackAppend($this->getAssignmentId(), $this->getPeerId())
+                    );
+                }
+                break;
+
+            case self::TYPE_DEADLINE_REQUESTED:
+                foreach ($this->getRecipients() as $rcp) {
+                    $this->initLanguage($rcp);
+                    $this->sendExerciseNotification(
+                        $rcp,
+                        sprintf(
+                            $this->getLanguageText('exc_msg_deadline_request_subject'),
+                            $this->getObjectTitle(true)
+                        ),
+                        $this->getLanguageText('exc_msg_deadline_request_body') .
+                        "\n\n" . $this->getLanguageText('user') . ": " .
+                            $ilUser->getFullname(),
+                        $perma->getGradesAppend($this->getAssignmentId())
+                    );
+                }
+                break;
+
+            case self::TYPE_IDL_DEADLINE_SET:
+                foreach ($this->getRecipients() as $rcp) {
+                    $this->initLanguage($rcp);
+                    $this->sendExerciseNotification(
+                        $rcp,
+                        sprintf(
+                            $this->getLanguageText('exc_msg_idl_set_subject'),
+                            $this->getObjectTitle(true)
+                        ),
+                        $this->getLanguageText('exc_msg_idl_set_body'),
+                        $perma->getDefaultAppend($this->getAssignmentId())
                     );
                 }
                 break;

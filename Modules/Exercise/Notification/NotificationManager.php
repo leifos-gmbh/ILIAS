@@ -100,4 +100,29 @@ class NotificationManager
         $not->send();
     }
 
+    public function sendDeadlineRequestNotification(int $ass_id) : void
+    {
+        $users = \ilNotification::getNotificationsForObject(
+            \ilNotification::TYPE_EXERCISE_SUBMISSION,
+            $this->object->getId()
+        );
+
+        $not = new \ilExerciseMailNotification();
+        $not->setType(\ilExerciseMailNotification::TYPE_DEADLINE_REQUESTED);
+        $not->setAssignmentId($ass_id);
+        $not->setRefId($this->ref_id);
+        $not->setRecipients($users);
+        $not->send();
+    }
+
+    public function sendDeadlineSetNotification(int $ass_id, int $part_id) : void
+    {
+        $not = new \ilExerciseMailNotification();
+        $not->setType(\ilExerciseMailNotification::TYPE_IDL_DEADLINE_SET);
+        $not->setAssignmentId($ass_id);
+        $not->setRefId($this->ref_id);
+        $not->setRecipients([$part_id]);
+        $not->send();
+    }
+
 }

@@ -9177,6 +9177,13 @@ exc#:#exc_msg_participants_removed#:#The participants have been removed from the
 exc#:#exc_msg_public_submission#:#All submissions will be published after the deadline.
 exc#:#exc_msg_saved_grades#:#Grades and comments have been saved.
 exc#:#exc_msg_sure_to_deassign_participant#:#Are you sure that you want to remove the participants from all assignments of the exercise? This will also delete all their handed in resources!
+exc#:#exc_msg_deadline_request_subject#:#A deadline has been requested in exercise "%s".
+exc#:#exc_msg_deadline_request_body#:#the following user requested an individual deadline.
+exc#:#exc_msg_idl_set_subject#:#A new deadline has been set in exercise "%s".
+exc#:#exc_msg_idl_set_body#:#a new individual deadline has been set.
+exc#:#exc_fixed_date_individual#:#Individual Deadlines Only
+exc#:#exc_fixed_date_individual_info#:#There is no common deadline. Tutors must set individual deadlines for each participant individually.
+exc#:#exc_no_deadline_info#:#There is no submission deadline for participants.
 exc#:#exc_multi_feedb_info#:#On this screen you can upload multiple feedbacks in one file. First click on ‘Download ZIP Structure’, save the ZIP file and extract it on your local computer. Put the feedback files into the corresponding user directories. Now compress the whole directory as one ZIP file again. Browse your local filesystem for the file and select it as the ‘Multi-Feedback File’ in the form below. After that click ‘Upload’. A confirmation screen will list the files. Please avoid using any special characters in your file names.
 exc#:#exc_multi_feedback#:#Evaluation for many Participants
 exc#:#exc_multi_feedback_file#:#Multi-Feedback File
@@ -9317,6 +9324,13 @@ exc#:#exc_reminder_submit_subject#:#Assignment "%s" was not finished
 exc#:#exc_reminders_cron#:#Reminders for Assignments
 exc#:#exc_reminders_cron_info#:#If enabled, 3 reminders will be active: Users to Submit, Tutors to Grade and Participants to Feedback.
 exc#:#exc_review_anytime#:#Give Feedback Anytime
+exc#:#exc_lead_request_idl#:#Request Deadline
+exc#:#exc_request_deadline#:#Request Deadline
+exc#:#exc_deadline_not_set_yet#:#Not Set Yet
+exc#:#exc_idl_request_and_tutor_needed#:#Please send a request to your tutor for setting an individual deadline for you.
+exc#:#exc_idl_tutor_needed#:#You already requested a deadline. The request is still pending. You will be notified once the individual deadline is set.
+exc#:#exc_lead_wait_for_idl#:#Waiting For Individual Deadline
+exc#:#exc_deadline_requested#:#Requested
 exc#:#exc_requirement#:#Requirement
 exc#:#exc_save_all#:#Save All
 exc#:#exc_save_order#:#Save Order
@@ -9353,7 +9367,7 @@ exc#:#exc_submission_file#:#Submission File
 exc#:#exc_submission_no_new_files#:#No new submissions available.
 exc#:#exc_submission_notification#:#E-Mail Notification on Submissions
 exc#:#exc_submission_notification_body#:#A new submission for exercise "%s" has been uploaded.
-exc#:#exc_submission_notification_info#:#You will be notified when submissions are uploaded. This is a personal setting which does not affect other administrators of the exercise.
+exc#:#exc_submission_notification_info#:#You will be notified when submissions are uploaded or individual deadlines are requested. This is a personal setting which does not affect other administrators of the exercise.
 exc#:#exc_submission_notification_link#:#Link to exercise: %s
 exc#:#exc_submission_notification_subject#:#Exercise "%s" - New submission uploaded
 exc#:#exc_submission_text#:#Submission Text

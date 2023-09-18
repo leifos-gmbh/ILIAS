@@ -18,11 +18,36 @@
 
 namespace ILIAS\MediaObjects\MediaType;
 
-/**
- * @author Alexander Killing <killing@leifos.de>
- */
 class MediaTypeManager
 {
+    protected const TYPE_VIDEO = "video";
+    protected const TYPE_AUDIO = "audio";
+    protected const TYPE_IMAGE = "image";
+    protected const TYPE_OTHER = "other";
+    protected const TYPES = [
+        self::TYPE_VIDEO => [
+            "video/vimeo" => [],
+            "video/youtube" => [],
+            "video/mp4" => ["mp4"],
+            "video/webm" => ["webm"]
+        ],
+        self::TYPE_AUDIO => [
+            "audio/mpeg" => ["mp3"]
+        ],
+        self::TYPE_IMAGE => [
+            "image/png" => ["png"],
+            "image/jpeg" => ["jpg", "jpeg"],
+            "image/gif" => ["gif"],
+            "image/webp" => ["webp"],
+            "image/svg+xml" => ["svg"]
+        ],
+        self::TYPE_OTHER => [
+            "text/html" => ["html", "htm"],
+            "application/pdf" => ["pdf"]
+        ]
+    ];
+
+
     public function __construct()
     {
     }
@@ -33,8 +58,7 @@ class MediaTypeManager
      */
     public function usesParameterProperty(string $mime): bool
     {
-        return !in_array($mime, ["image/x-ms-bmp", "image/gif", "image/jpeg", "image/x-portable-bitmap",
-                     "image/png", "image/psd", "image/tiff", "application/pdf"]);
+        return false;
     }
 
     /**
@@ -49,13 +73,8 @@ class MediaTypeManager
     ): bool {
         $lpath = pathinfo($location);
         $ext = $lpath["extension"] ?? "";
-        if ($ext === "mp3" && $mime === "audio/mpeg") {
-            return true;
-        }
-        if ($ext === "flv") {
-            return true;
-        }
-        if (in_array($mime, array("video/mp4", "video/webm"))) {
+
+        if ($this->isVideo() || $this->isAudio()) {
             return true;
         }
         return false;
@@ -63,7 +82,7 @@ class MediaTypeManager
 
     public function isImage(string $mime): bool
     {
-        return in_array($mime, ["image/jpeg", "image/svg+xml", "image/gif", "image/png"]);
+        return in_array($mime, $this->getImageMimeTypes());
     }
 
     public function isAudio(string $mime): bool
@@ -81,16 +100,23 @@ class MediaTypeManager
         return $this->isImage($mime);
     }
 
+    protected function mergeSuffixes(array ...$arr) : array
+    {
+        $suffixes = [];
+        foreach ($arr as $type) {
+            foreach ($type as $item){
+                $suffixes = array_merge($suffixes, array_values($item));
+            }
+        }
+        return $suffixes;
+    }
+
     /**
      * @return string[]
      */
     public function getVideoMimeTypes(): array
     {
-        return [
-            "video/vimeo",
-            "video/youtube",
-            "video/mp4"
-        ];
+        return array_keys(self::TYPES[self::TYPE_VIDEO]);
     }
 
     /**
@@ -98,9 +124,7 @@ class MediaTypeManager
      */
     public function getVideoSuffixes(): array
     {
-        return [
-            "mp4"
-        ];
+        return $this->mergeSuffixes(self::TYPES[self::TYPE_VIDEO]);
     }
 
     /**
@@ -108,9 +132,7 @@ class MediaTypeManager
      */
     public function getAudioMimeTypes(): array
     {
-        return [
-            "audio/mpeg"
-        ];
+        return array_keys(self::TYPES[self::TYPE_AUDIO]);
     }
 
     /**
@@ -118,9 +140,7 @@ class MediaTypeManager
      */
     public function getAudioSuffixes(): array
     {
-        return [
-            "mp3"
-        ];
+        return $this->mergeSuffixes(self::TYPES[self::TYPE_AUDIO]);
     }
 
     /**
@@ -128,11 +148,7 @@ class MediaTypeManager
      */
     public function getImageMimeTypes(): array
     {
-        return [
-            "image/png",
-            "image/jpeg",
-            "image/gif"
-        ];
+        return array_keys(self::TYPES[self::TYPE_IMAGE]);
     }
 
     /**
@@ -140,8 +156,23 @@ class MediaTypeManager
      */
     public function getImageSuffixes(): array
     {
-        return [
-            "jpeg", "jpg", "png"
-        ];
+        return $this->mergeSuffixes(self::TYPES[self::TYPE_IMAGE]);
     }
+
+    /**
+     * @return string[]
+     */
+    public function getOtherMimeTypes(): array
+    {
+        return array_keys(self::TYPES[self::TYPE_OTHER]);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getOtherSuffixes(): array
+    {
+        return $this->mergeSuffixes(self::TYPES[self::TYPE_OTHER]);
+    }
+
 }

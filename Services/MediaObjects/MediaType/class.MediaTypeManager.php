@@ -48,8 +48,16 @@ class MediaTypeManager
     ];
 
 
-    public function __construct()
+    public function __construct(?array $suffix_blacklist = null)
     {
+        if (is_null($suffix_blacklist)) {
+            $suffix_blacklist = [];
+            $mset = new \ilSetting("mobs");
+            foreach (explode(",", $mset->set("black_list_file_types") as $suffix) {
+                $suffix_blacklist[] = strtolower(trim($suffix));
+            }
+        }
+        $this->suffix_blacklist = $suffix_blacklist;
     }
 
     /**
@@ -117,6 +125,23 @@ class MediaTypeManager
     public function getVideoMimeTypes(): array
     {
         return array_keys(self::TYPES[self::TYPE_VIDEO]);
+    }
+
+    protected function getAllowedSubset(array $types) : array
+    {
+        return array_filter($types, function ($val, $key) {
+            foreach ($val as $suffix) {
+                if (in_array($suffix, $this->suffix_blacklist, true)) {
+                    return false;
+                }
+                return true;
+            }
+        }, ARRAY_FILTER_USE_BOTH);
+    }
+
+    public function getAllowedVideoMimeTypes(): array
+    {
+        return $this->getAllowedSubset($this->getVideoMimeTypes());
     }
 
     /**

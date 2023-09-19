@@ -46,7 +46,14 @@ class ilForcedUserPasswordChangeStartUpStep extends StartUpSequenceStep
             !isset($this->request->getQueryParams()['baseClass']) ||
             strtolower($this->request->getQueryParams()['baseClass']) !== 'ildashboardgui'
         ) {
-            return false;
+            // cdpatch: out-commented
+            //return false;
+
+            // cdpatch start
+            if (strtolower($this->request->getQueryParams()['baseClass'] ?? "") != 'iluihookplugingui') {
+                return false;
+            }
+            // cdpatch end
         }
 
         return (

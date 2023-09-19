@@ -159,6 +159,12 @@ class ilObjSystemFolderGUI extends ilObjectGUI
                 break;
             
             default:
+				// cdpatch start
+				if (($ret = $this->ctrl->forwardToPlugin()) !== false)
+				{
+					break;
+				}
+				// cdpatch end
 //var_dump($_POST);
                 $cmd = $this->ctrl->getCmd("view");
 
@@ -916,6 +922,10 @@ class ilObjSystemFolderGUI extends ilObjectGUI
         $rbacsystem = $this->rbacsystem;
         $ilHelp = $this->help;
         
+		// cdpatch start
+		$this->tabs_gui->setContextInfo("Modules/SystemFolder");
+		// cdpatch end
+
         //		$ilHelp->setScreenIdComponent($this->object->getType());
 
         $this->ctrl->setParameter($this, "ref_id", $this->object->getRefId());
@@ -978,6 +988,18 @@ class ilObjSystemFolderGUI extends ilObjectGUI
         exit;
     }
 
+	// cdpatch start
+	function createCDTablesObject()
+	{
+		include_once("./Services/CD/classes/class.ilCDDBCreator.php");
+		$db_creator = new ilCDDBCreator();
+		$db_creator->createTables();
+
+		ilUtil::sendSuccess("Tables are updated.", true);
+		$this->viewObject();
+	}
+	// cdpatch end
+
     //
     //
     // Server Info
@@ -1033,6 +1055,14 @@ class ilObjSystemFolderGUI extends ilObjectGUI
 //        $this->tabs->setTabActive("server");
         $this->setServerInfoSubTabs("server_data");
         
+		// cdpatch start
+		$this->tabs_gui->activateTab("server_data");
+
+		$ilToolbar->addButton("Update CD Tables",
+			$ilCtrl->getLinkTarget($this, "createCDTables"));
+		// cdpatch end
+
+
         $btpl = new ilTemplate("tpl.server_data.html", true, true, "Modules/SystemFolder");
         $btpl->setVariable("FORM", $this->form->getHTML());
         $btpl->setVariable("PHP_INFO_TARGET", $ilCtrl->getLinkTarget($this, "showPHPInfo"));

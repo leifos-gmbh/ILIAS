@@ -28,14 +28,21 @@
 /install_client.php
 /Services/GlobalScreen/artifacts/global_screen_providers.php
 /Services/Style/System/data/data.php
+/einverstaednis_de.pdf
+/einverstaednis_en.pdf
+/internet_agb_en.pdf
+/internet_agb.pdf
+/internet_de.pdf
+/internet_en.pdf
+/foto_notes.pdf
 
 # Directories
 /data
-/Customizing/global
-/Customizing/clients
 /setup/sql/ilDBTemplate
 virtual-data
 /libs/composer/vendor
+/Customizing/global/plugins/Services/Repository
+/etest
 
 # /dicto
 /dicto/results/*
@@ -43,3 +50,4 @@ virtual-data
 override.php
 captainhook.config.json
 captainhook.local.json
+/.htaccess

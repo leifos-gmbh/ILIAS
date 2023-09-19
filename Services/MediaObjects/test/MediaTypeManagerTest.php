@@ -6,102 +6,151 @@ class MediaTypeManagerTest extends TestCase
 {
     protected \ILIAS\MediaObjects\MediaType\MediaTypeManager $types;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         parent::setUp();
-        $this->types = new \ILIAS\MediaObjects\MediaType\MediaTypeManager();
     }
 
-    protected function tearDown(): void
+    protected function tearDown() : void
     {
     }
 
-    public function testIsImage(): void
+    protected function getTypeManager(array $mime_blacklist = []) : \ILIAS\MediaObjects\MediaType\MediaTypeManager
     {
-        $this->assertEquals(
-            true,
-            $this->types->isImage("image/png")
-        );
+        return new \ILIAS\MediaObjects\MediaType\MediaTypeManager($mime_blacklist);
     }
 
-    public function testIsVideo(): void
+    public function testIsImage() : void
     {
         $this->assertEquals(
             true,
-            $this->types->isVideo("video/webm")
+            $this->getTypeManager()->isImage("image/png")
         );
     }
 
-    public function testIsAudio(): void
+    public function testIsVideo() : void
     {
         $this->assertEquals(
             true,
-            $this->types->isAudio("audio/mpeg")
+            $this->getTypeManager()->isVideo("video/webm")
         );
     }
 
-    public function testGetAudioSuffixes(): void
+    public function testIsAudio() : void
+    {
+        $this->assertEquals(
+            true,
+            $this->getTypeManager()->isAudio("audio/mpeg")
+        );
+    }
+
+    public function testGetAudioSuffixes() : void
     {
         $this->assertEquals(
             ["mp3"],
-            $this->types->getAudioSuffixes()
+            iterator_to_array($this->getTypeManager()->getAudioSuffixes())
         );
     }
 
-    public function testGetVideoSuffixes(): void
+    public function testGetVideoSuffixes() : void
     {
         $this->assertEquals(
             ["mp4", "webm"],
-            $this->types->getVideoSuffixes()
+            iterator_to_array($this->getTypeManager()->getVideoSuffixes())
         );
     }
 
-    public function testGetImageSuffixes(): void
+    public function testGetImageSuffixes() : void
     {
         $this->assertEquals(
             true,
-            in_array("png", $this->types->getImageSuffixes())
+            in_array("png", iterator_to_array($this->getTypeManager()->getImageSuffixes()))
         );
     }
 
-    public function testGetOtherSuffixes(): void
+    public function testGetOtherSuffixes() : void
     {
         $this->assertEquals(
             true,
-            in_array("html", $this->types->getOtherSuffixes())
+            in_array("html", iterator_to_array($this->getTypeManager()->getOtherSuffixes()))
         );
     }
 
-    public function testGetAudioMimeTypes(): void
+    public function testGetAudioMimeTypes() : void
     {
         $this->assertEquals(
             ["audio/mpeg"],
-            $this->types->getAudioMimeTypes()
+            iterator_to_array($this->getTypeManager()->getAudioMimeTypes())
         );
     }
 
-    public function testGetVideoMimeTypes(): void
+    public function testGetVideoMimeTypes() : void
     {
         $this->assertEquals(
             true,
-            in_array("video/mp4", $this->types->getVideoMimeTypes())
+            in_array("video/mp4", iterator_to_array($this->getTypeManager()->getVideoMimeTypes()))
         );
     }
 
-    public function testGetImageMimeTypes(): void
+    public function testGetImageMimeTypes() : void
     {
         $this->assertEquals(
             true,
-            in_array("image/jpeg", $this->types->getImageMimeTypes())
+            in_array("image/jpeg", iterator_to_array($this->getTypeManager()->getImageMimeTypes()))
         );
     }
 
-    public function testGetOtherMimeTypes(): void
+    public function testGetOtherMimeTypes() : void
     {
         $this->assertEquals(
             true,
-            in_array("text/html", $this->types->getOtherMimeTypes())
+            in_array("text/html", iterator_to_array($this->getTypeManager()->getOtherMimeTypes()))
         );
     }
 
+    public function testGetAllowedVideoMimeTypes() : void
+    {
+        $tm = $this->getTypeManager(["video/webm"]);
+
+        $this->assertEquals(
+            true,
+            in_array("video/mp4", iterator_to_array($tm->getAllowedVideoMimeTypes()), true)
+        );
+        $this->assertEquals(
+            false,
+            in_array("video/webm", iterator_to_array($tm->getAllowedVideoMimeTypes()), true)
+        );
+    }
+
+    public function testGetAllowedVideoSuffixes() : void
+    {
+        $tm = $this->getTypeManager(["video/webm"]);
+
+        $this->assertEquals(
+            true,
+            in_array("mp4", iterator_to_array($tm->getAllowedVideoSuffixes()), true)
+        );
+        $this->assertEquals(
+            false,
+            in_array("webm", iterator_to_array($tm->getAllowedVideoSuffixes()), true)
+        );
+        $this->assertEquals(
+            false,
+            in_array("png", iterator_to_array($tm->getAllowedVideoSuffixes()), true)
+        );
+    }
+
+    public function testIsHtmlAllowed() : void
+    {
+        $tm = $this->getTypeManager([""]);
+        $this->assertEquals(
+            true,
+            $tm->isHtmlAllowed()
+        );
+        $tm = $this->getTypeManager(["text/html"]);
+        $this->assertEquals(
+            false,
+            $tm->isHtmlAllowed()
+        );
+    }
 }

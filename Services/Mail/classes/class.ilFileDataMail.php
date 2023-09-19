@@ -175,7 +175,6 @@ class ilFileDataMail extends ilFileData
         if (is_writable($this->mail_path) && is_readable($this->mail_path)) {
             return true;
         }
-
         $this->ilias->raiseError(
             "Mail directory is not readable/writable by webserver: " .
             $this->mail_path,

@@ -24,6 +24,8 @@ class MediaTypeManager
     protected const TYPE_AUDIO = "audio";
     protected const TYPE_IMAGE = "image";
     protected const TYPE_OTHER = "other";
+
+    /*
     protected const TYPES = [
         self::TYPE_VIDEO => [
             "video/vimeo" => [],
@@ -45,19 +47,69 @@ class MediaTypeManager
             "text/html" => ["html", "htm"],
             "application/pdf" => ["pdf"]
         ]
+    ];*/
+
+    protected const TYPES = [
+        "video/vimeo" => [
+            "type" => self::TYPE_VIDEO,
+            "suffixes" => []
+        ],
+        "video/youtube" => [
+            "type" => self::TYPE_VIDEO,
+            "suffixes" => []
+        ],
+        "video/mp4" => [
+            "type" => self::TYPE_VIDEO,
+            "suffixes" => ["mp4"]
+        ],
+        "video/webm" => [
+            "type" => self::TYPE_VIDEO,
+            "suffixes" => ["webm"]
+        ],
+        "audio/mpeg" => [
+            "type" => self::TYPE_AUDIO,
+            "suffixes" => ["mp3"]
+        ],
+        "image/png" => [
+            "type" => self::TYPE_IMAGE,
+            "suffixes" => ["png"]
+        ],
+        "image/jpeg" => [
+            "type" => self::TYPE_IMAGE,
+            "suffixes" => ["jpg", "jpeg"]
+        ],
+        "image/gif" => [
+            "type" => self::TYPE_IMAGE,
+            "suffixes" => ["gif"]
+        ],
+        "image/webp" => [
+            "type" => self::TYPE_IMAGE,
+            "suffixes" => ["webp"]
+        ],
+        "image/svg+xml" => [
+            "type" => self::TYPE_IMAGE,
+            "suffixes" => ["svg"]
+        ],
+        "text/html" => [
+            "type" => self::TYPE_OTHER,
+            "suffixes" => ["html", "htm"]
+        ],
+        "application/pdf" => [
+            "type" => self::TYPE_OTHER,
+            "suffixes" => ["pdf"]
+        ]
     ];
 
-
-    public function __construct(?array $suffix_blacklist = null)
+    public function __construct(?array $mime_blacklist = null)
     {
-        if (is_null($suffix_blacklist)) {
-            $suffix_blacklist = [];
+        if (is_null($mime_blacklist)) {
+            $mime_blacklist = [];
             $mset = new \ilSetting("mobs");
-            foreach (explode(",", $mset->set("black_list_file_types") as $suffix) {
-                $suffix_blacklist[] = strtolower(trim($suffix));
+            foreach (explode(",", $mset->get("black_list_file_types")) as $suffix) {
+                $mime_blacklist[] = strtolower(trim($suffix));
             }
         }
-        $this->suffix_blacklist = $suffix_blacklist;
+        $this->mime_blacklist = $mime_blacklist;
     }
 
     /**
@@ -82,25 +134,30 @@ class MediaTypeManager
         $lpath = pathinfo($location);
         $ext = $lpath["extension"] ?? "";
 
-        if ($this->isVideo() || $this->isAudio()) {
+        if ($this->isVideo($mime) || $this->isAudio($mime)) {
             return true;
         }
         return false;
     }
 
+    protected function isType(string $mime, string $type): bool
+    {
+        return in_array($mime, iterator_to_array($this->getMimeTypesOfType($type)), true);
+    }
+
     public function isImage(string $mime): bool
     {
-        return in_array($mime, $this->getImageMimeTypes());
+        return $this->isType($mime, self::TYPE_IMAGE);
     }
 
     public function isAudio(string $mime): bool
     {
-        return in_array($mime, $this->getAudioMimeTypes());
+        return $this->isType($mime, self::TYPE_AUDIO);
     }
 
     public function isVideo(string $mime): bool
     {
-        return in_array($mime, $this->getVideoMimeTypes());
+        return $this->isType($mime, self::TYPE_VIDEO);
     }
 
     public function usesAltTextProperty(string $mime): bool
@@ -119,85 +176,156 @@ class MediaTypeManager
         return $suffixes;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getVideoMimeTypes(): array
+    protected function getMimeTypesOfType(string $type): \Iterator
     {
-        return array_keys(self::TYPES[self::TYPE_VIDEO]);
-    }
-
-    protected function getAllowedSubset(array $types) : array
-    {
-        return array_filter($types, function ($val, $key) {
-            foreach ($val as $suffix) {
-                if (in_array($suffix, $this->suffix_blacklist, true)) {
-                    return false;
-                }
-                return true;
+        foreach (self::TYPES as $mime => $def) {
+            if ($def["type"] === $type) {
+                yield $mime;
             }
-        }, ARRAY_FILTER_USE_BOTH);
+        }
     }
 
-    public function getAllowedVideoMimeTypes(): array
+    protected function getSuffixesOfType(string $type): \Iterator
+    {
+        foreach (self::TYPES as $mime => $def) {
+            foreach ($def["suffixes"] as $suffix) {
+                if ($def["type"] === $type) {
+                    yield $suffix;
+                }
+            }
+        }
+    }
+
+    protected function getSuffixes(): \Iterator
+    {
+        foreach (self::TYPES as $mime => $def) {
+            foreach ($def["suffixes"] as $suffix) {
+                yield $suffix;
+            }
+        }
+    }
+
+    public function getAllowedSuffixes(): \Iterator
+    {
+        foreach (self::TYPES as $mime => $def) {
+            if (!in_array($mime, $this->mime_blacklist, true)) {
+                foreach ($def["suffixes"] as $suffix) {
+                    yield $suffix;
+                }
+            }
+        }
+    }
+
+    protected function getAllowedSuffixesOfType($type): \Iterator
+    {
+        foreach (self::TYPES as $mime => $def) {
+            if ($def["type"] === $type && !in_array($mime, $this->mime_blacklist, true)) {
+                foreach ($def["suffixes"] as $suffix) {
+                    yield $suffix;
+                }
+            }
+        }
+    }
+
+    protected function getAllowedSubset(\Iterator $types) : \Iterator
+    {
+        foreach ($types as $type) {
+            if (!in_array($type, $this->mime_blacklist, true)) {
+                yield $type;
+            }
+        }
+    }
+
+    public function getMimeTypes(): \Iterator
+    {
+        foreach (self::TYPES as $mime => $def) {
+            yield $mime;
+        }
+    }
+
+    public function getAllowedMimeTypes(): \Iterator
+    {
+        return $this->getAllowedSubset($this->getMimeTypes());
+    }
+
+    public function getVideoMimeTypes(): \Iterator
+    {
+        return $this->getMimeTypesOfType(self::TYPE_VIDEO);
+    }
+
+    public function getAllowedVideoMimeTypes(): \Iterator
     {
         return $this->getAllowedSubset($this->getVideoMimeTypes());
     }
 
-    /**
-     * @return string[]
-     */
-    public function getVideoSuffixes(): array
+    public function getVideoSuffixes(): \Iterator
     {
-        return $this->mergeSuffixes(self::TYPES[self::TYPE_VIDEO]);
+        return $this->getSuffixesOfType(self::TYPE_VIDEO);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getAudioMimeTypes(): array
+    public function getAllowedVideoSuffixes(): \Iterator
     {
-        return array_keys(self::TYPES[self::TYPE_AUDIO]);
+        return $this->getAllowedSuffixesOfType(self::TYPE_VIDEO);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getAudioSuffixes(): array
+    public function getAudioMimeTypes(): \Iterator
     {
-        return $this->mergeSuffixes(self::TYPES[self::TYPE_AUDIO]);
+        return $this->getMimeTypesOfType(self::TYPE_AUDIO);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getImageMimeTypes(): array
+    public function getAudioSuffixes(): \Iterator
     {
-        return array_keys(self::TYPES[self::TYPE_IMAGE]);
+        return $this->getSuffixesOfType(self::TYPE_AUDIO);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getImageSuffixes(): array
+    public function getAllowedAudioMimeTypes(): \Iterator
     {
-        return $this->mergeSuffixes(self::TYPES[self::TYPE_IMAGE]);
+        return $this->getAllowedSubset($this->getAudioMimeTypes());
     }
 
-    /**
-     * @return string[]
-     */
-    public function getOtherMimeTypes(): array
+    public function getAllowedAudioSuffixes(): \Iterator
     {
-        return array_keys(self::TYPES[self::TYPE_OTHER]);
+        return $this->getAllowedSuffixesOfType(self::TYPE_AUDIO);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getOtherSuffixes(): array
+    public function getImageMimeTypes(): \Iterator
     {
-        return $this->mergeSuffixes(self::TYPES[self::TYPE_OTHER]);
+        return $this->getMimeTypesOfType(self::TYPE_IMAGE);
+    }
+
+    public function getImageSuffixes(): \Iterator
+    {
+        return $this->getSuffixesOfType(self::TYPE_IMAGE);
+    }
+
+    public function getAllowedImageMimeTypes(): \Iterator
+    {
+        return $this->getAllowedSubset($this->getImageMimeTypes());
+    }
+
+    public function getAllowedImageSuffixes(): \Iterator
+    {
+        return $this->getAllowedSuffixesOfType(self::TYPE_IMAGE);
+    }
+
+    public function getOtherMimeTypes(): \Iterator
+    {
+        return $this->getMimeTypesOfType(self::TYPE_OTHER);
+    }
+
+    public function getOtherSuffixes(): \Iterator
+    {
+        return $this->getSuffixesOfType(self::TYPE_OTHER);
+    }
+
+    public function getAllowedOtherMimeTypes(): \Iterator
+    {
+        return $this->getAllowedSubset($this->getOtherMimeTypes());
+    }
+
+    public function isHtmlAllowed() : bool
+    {
+        return in_array("text/html", iterator_to_array($this->getAllowedOtherMimeTypes()), true);
     }
 
 }

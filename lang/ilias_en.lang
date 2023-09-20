@@ -9097,7 +9097,9 @@ exc#:#exc_edit_assignment#:#Edit Assignment
 exc#:#exc_edit_blog#:#Edit Blog
 exc#:#exc_edit_assignments#:#Edit Assignments
 exc#:#exc_edit_criterias#:#Edit Criteria
+exc#:#exc_edit_portfolio#:#Edit Portfolio
 exc#:#exc_edit_submission#:#Edit Submission
+exc#:#exc_edit_wiki#:#Edit Wiki
 exc#:#exc_ended#:#Ended
 exc#:#exc_ended_on#:#Ended On
 exc#:#exc_export_excel#:#Export (Excel)

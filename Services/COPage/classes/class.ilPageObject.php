@@ -2388,14 +2388,19 @@ s     */
         unset($xpc);
     }
 
+    public function setEmptyPageXml() : void
+    {
+        $this->setXMLContent("<PageObject></PageObject>");
+    }
+
     /**
      * Create new page object with current xml content
      */
     public function createFromXML(): void
     {
         $empty = false;
-        if ($this->getXMLContent() == "") {
-            $this->setXMLContent("<PageObject></PageObject>");
+        if ($this->getXMLContent() === "") {
+            $this->setEmptyPageXml();
             $empty = true;
         }
         $content = $this->getXMLContent();

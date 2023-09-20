@@ -70,6 +70,7 @@ class ilAssignmentPresentationGUI
         switch ($next_class) {
 
             case "ilexsubmissiongui":
+                $ctrl->setReturn($this, "");
                 $random_manager = $this->domain_service->assignment()->randomAssignments($this->exc);
                 if (!$random_manager->isAssignmentVisible($this->ass_id, $this->user->getId())) {
                     return;

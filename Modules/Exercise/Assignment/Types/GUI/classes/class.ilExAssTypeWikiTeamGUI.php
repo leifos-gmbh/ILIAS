@@ -218,7 +218,10 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
         }
         if ($a_submission->hasSubmitted()) {
             $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", $selected_wiki["returned_id"]);
-            $dl_link = $ctrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionFileGUI"), "download");
+            $dl_link = $ctrl->getLinkTargetByClass([
+                ilAssignmentPresentationGUI::class,
+                ilExSubmissionGUI::class,
+                ilExSubmissionFileGUI::class], "download");
             $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", "");
 
             $button = ilLinkButton::getInstance();
@@ -373,7 +376,10 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
         }
         if ($submission->hasSubmitted()) {
             $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", $selected_wiki["returned_id"]);
-            $dl_link = $ctrl->getLinkTargetByClass(array("ilExSubmissionGUI", "ilExSubmissionFileGUI"), "download");
+            $dl_link = $ctrl->getLinkTargetByClass([
+                ilAssignmentPresentationGUI::class,
+                ilExSubmissionGUI::class,
+                ilExSubmissionFileGUI::class], "download");
             $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", "");
 
             $link = $f->link()->standard(

@@ -71,7 +71,7 @@ abstract class ilExSubmissionBaseGUI
             ->assignment()
             ->mandatoryAssignments($this->exercise);
 
-        $this->request = $this->gui()->request();
+        $this->request = $this->gui->request();
         $this->requested_ref_id = $this->request->getRefId();
         $this->notification = $this->domain->notification($this->requested_ref_id);
 

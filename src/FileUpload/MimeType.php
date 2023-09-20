@@ -331,6 +331,7 @@ class MimeType
     public const IMAGE__PNG = 'image/png';
     public const IMAGE__SVG_XML = 'image/svg+xml';
     public const IMAGE__TIFF = 'image/tiff';
+    public const IMAGE__WEBP = 'image/webp';
     public const IMAGE__VASA = 'image/vasa';
     public const IMAGE__VND_DWG = 'image/vnd.dwg';
     public const IMAGE__VND_FPX = 'image/vnd.fpx';

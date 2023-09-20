@@ -1656,7 +1656,7 @@ class ilObjMediaObject extends ilObject
 
         $logger->debug("Generate preview pic...");
         $logger->debug("..." . $item->getFormat());
-        if (is_int(strpos($item->getFormat(), "video/mp4"))) {
+        if (in_array($item->getFormat(), ["video/mp4", "video/webm"])) {
             try {
                 if ($sec < 0) {
                     $sec = 0;

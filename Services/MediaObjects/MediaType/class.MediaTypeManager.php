@@ -248,14 +248,18 @@ class MediaTypeManager
         return $this->getAllowedSubset($this->getMimeTypes());
     }
 
-    public function getVideoMimeTypes(): \Iterator
+    public function getVideoMimeTypes(bool $local_only = false): \Iterator
     {
-        return $this->getMimeTypesOfType(self::TYPE_VIDEO);
+        foreach ($this->getMimeTypesOfType(self::TYPE_VIDEO) as $mime) {
+            if (!$local_only || !in_array($mime, ["video/vimeo", "video/youtube"])) {
+                yield $mime;
+            }
+        }
     }
 
-    public function getAllowedVideoMimeTypes(): \Iterator
+    public function getAllowedVideoMimeTypes(bool $local_only = false): \Iterator
     {
-        return $this->getAllowedSubset($this->getVideoMimeTypes());
+        return $this->getAllowedSubset($this->getVideoMimeTypes($local_only));
     }
 
     public function getVideoSuffixes(): \Iterator

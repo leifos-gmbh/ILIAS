@@ -32,6 +32,7 @@ use ILIAS\Filesystem\Util\LegacyPathHelper;
  */
 class ilObjMediaCastGUI extends ilObjectGUI
 {
+    protected \ILIAS\MediaCast\InternalGUIService $gui;
     protected \ILIAS\MediaCast\MediaCastManager $mc_manager;
     protected ilPropertyFormGUI $form_gui;
     protected ilNewsItem $mcst_item;
@@ -40,8 +41,6 @@ class ilObjMediaCastGUI extends ilObjectGUI
     protected ilLogger $log;
     protected ilHelpGUI $help;
     private array $additionalPurposes = [];
-    private array $purposeSuffixes = [];
-    private array $mimeTypes = [];
     protected FileSystem $filesystem;
 
     /**
@@ -82,20 +81,10 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $ilCtrl->saveParameter($this, "item_id");
 
         $settings = ilMediaCastSettings::_getInstance();
-        $this->purposeSuffixes = $settings->getPurposeSuffixes();
-        $this->mimeTypes = array();
-        $mime_types = $settings->getMimeTypes();
-        foreach ($mime_types as $mt) {
-            $this->mimeTypes[$mt] = $mt;
-        }
-
-        foreach (MimeType::getExt2MimeMap() as $mt) {
-//            $this->mimeTypes[$mt] = $mt;
-        }
-        asort($this->mimeTypes);
 
         $this->mc_manager = $DIC->mediaCast()->internal()
             ->domain()->mediaCast();
+        $this->gui = $DIC->mediaCast()->internal()->gui();
     }
 
     public function executeCommand(): void
@@ -135,9 +124,6 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 }, function ($mob_id) {
                     $this->onMobUpdate($mob_id);
                 });
-                /*
-                $creation->setAllSuffixes($this->purposeSuffixes["Standard"]);
-                $creation->setAllMimeTypes($this->mimeTypes);*/
                 $this->ctrl->forwardCommand($creation);
                 break;
 
@@ -277,7 +263,16 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $table_gui->setHeaderHTML($feed_icon_html);
         }
 
-        $tpl->setContent($table_gui->getHTML());
+        $new_table = new ilMediaCastManageTableGUI($this, "tableCommand");
+
+        $tpl->setContent($this->gui->ui()->renderer()->render($new_table->get()) .
+            $table_gui->getHTML());
+    }
+
+    public function tableCommand() : void
+    {
+        $new_table = new ilMediaCastManageTableGUI($this, "tableCommand");
+        $new_table->handleCommand();
     }
 
     public function getFeedIconsHTML(): string
@@ -512,17 +507,6 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 //
                 $ne = new ilNonEditableValueGUI($lng->txt("mcst_mimetype"), "mimetype_" . $purpose);
                 $this->form_gui->addItem($ne);
-
-                // mime type selection
-                /*
-                $mimeTypeSelection = new ilSelectInputGUI();
-                $mimeTypeSelection->setPostVar("mimetype_" . $purpose);
-                $mimeTypeSelection->setTitle($lng->txt("mcst_mimetype"));
-                $mimeTypeSelection->setInfo($lng->txt("mcst_mimetype_info"));
-                $options = array("" => $lng->txt("mcst_automatic_detection"));
-                $options = array_merge($options, $this->mimeTypes);
-                $mimeTypeSelection->setOptions($options);
-                $this->form_gui->addItem($mimeTypeSelection);*/
 
                 // preview picure
                 $pp = new ilImageFileInputGUI($lng->txt("mcst_preview_picture"), "preview_pic");

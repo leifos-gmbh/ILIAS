@@ -1706,6 +1706,10 @@ class ilObjMediaObject extends ilObject
         $ppics = array("mob_vpreview.jpg",
             "mob_vpreview.jpeg",
             "mob_vpreview.png");
+        $med = $this->getMediaItem("Standard");
+        if ($med && $med->getFormat() === "image/svg+xml" && $med->getLocationType() === "LocalFile") {
+            $ppics[] = $med->getLocation();
+        }
         foreach ($ppics as $p) {
             if (is_file($dir . "/" . $p)) {
                 if ($a_filename_only) {

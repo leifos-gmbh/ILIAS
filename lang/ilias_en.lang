@@ -11155,6 +11155,7 @@ mcst#:#mcst_autoplay#:#Autoplay
 mcst#:#mcst_autoplay_active#:#Autoplay (Default on)
 mcst#:#mcst_autoplay_inactive#:#Autoplay (Default off)
 mcst#:#mcst_clear_purpose_title#:#Delete
+mcst#:#mcst_confirm_deletion#:#Confirm Deletion
 mcst#:#mcst_converted_file#:#File has been converted.
 mcst#:#mcst_copy#:#Copy Mediacast
 mcst#:#mcst_current_value_info#:#Shows the current value of this format.
@@ -11181,6 +11182,7 @@ mcst#:#mcst_import#:#Import Mediacast
 mcst#:#mcst_incl_files_in_rss#:#Include Media Files as Attachment
 mcst#:#mcst_incl_files_in_rss_info#:#If enabled, media files are includes as attachments in the RSS feed. Otherwise the feed just notifies subscribers about new items.
 mcst#:#mcst_input_either_file_or_url#:#Please specify a file or an URL. If you provide a file, please note the maximum allowed upload file size.
+mcst#:#mcst_items#:#Items
 mcst#:#mcst_last_submission#:#Last Submission
 mcst#:#mcst_list#:#List
 mcst#:#mcst_manage#:#Manage

@@ -148,7 +148,7 @@ class VideoViewGUI
                 $video->getTitle(),
                 "#"
             )->withOnLoadCode(function (string $id) use ($video) {
-                return "document.getElementById('$id').addEventListener('click', () => {il.VideoPlaylist.toggleItem('mcst_playlist', '" . $video->getId() . "');});";
+                return "document.getElementById('$id').addEventListener('click', () => {il.VideoPlaylist.toggleItem('mcst_playlist', '" . $video->getId() . "'); $('.ilToolbarStickyItem .dropdown.open').removeClass('open');});";
             });
         }
         if (count($actions) > 0) {

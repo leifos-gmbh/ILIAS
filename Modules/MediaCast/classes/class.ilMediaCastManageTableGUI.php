@@ -23,9 +23,16 @@ use ILIAS\UI\URLBuilder;
 use ILIAS\UI\Component\Table;
 use ILIAS\Data\Range;
 use ILIAS\Data\Order;
+use ILIAS\UI\URLBuilderToken;
 
 class ilMediaCastManageTableGUI implements Table\DataRetrieval
 {
+    protected bool $preview;
+    protected bool $playtime;
+    protected ?ilObjMediaCast $mediacast;
+    protected URLBuilderToken $action_parameter_token;
+    protected URLBuilderToken $row_id_token;
+
     protected ilObjMediaCastGUI $parent_gui;
     protected \ILIAS\MediaObjects\MediaType\MediaTypeManager $media_type;
     protected bool $presentation_mode;
@@ -36,8 +43,8 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
     protected \ILIAS\DI\UIServices $ui;
 
     public function __construct(
-        ilObjMediaCastGUI $a_parent_obj,
-        string $a_parent_cmd = "",
+        ilObjMediaCastGUI $parent_gui,
+        string $parent_cmd = "",
         bool $a_edit_order = false,
         bool $a_presentation_mode = false
     ) {
@@ -55,12 +62,29 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
         $this->ui = $DIC->ui();
         $this->edit_order = $a_edit_order;
         $this->presentation_mode = $a_presentation_mode;
-        $this->mediacast = new ilObjMediaCast($a_parent_obj->getObject()->getRefId());
+        $this->mediacast = $parent_gui->getObject();
         $this->downloadable = $this->mediacast->getDownloadable();
-        $this->parent_gui = $a_parent_obj;
+
+        $this->parent_gui = $parent_gui;
+        $this->parent_cmd = $parent_cmd;
         $this->media_type = $DIC->mediaObjects()->internal()->domain()->mediaType();
         $this->df = new \ILIAS\Data\Factory();
         $this->http = $DIC->http();
+
+        $this->playtime = ($this->mediacast->getViewMode() !== ilObjMediaCast::VIEW_IMG_GALLERY);
+        $this->preview = ($this->mediacast->getViewMode() !== ilObjMediaCast::VIEW_PODCAST);
+
+        $form_action = $this->df->uri(
+            ILIAS_HTTP_PATH . '/' .
+            $this->ctrl->getLinkTarget($this->parent_gui, $this->parent_cmd)
+        );
+        $this->url_builder = new URLBuilder($form_action);
+        [$this->url_builder, $this->action_parameter_token, $this->row_id_token] =
+            $this->url_builder->acquireParameters(
+                ["mcst"], // namespace
+                "table_action", //this is the actions's parameter name
+                "ids"   //this is the parameter name to be used for row-ids
+            );
     }
 
     protected function getColumns() : array
@@ -68,14 +92,19 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
         $f = $this->ui->factory();
         $c = $f->table()->column();
         $columns = [
-            'title' => $c->text($this->lng->txt("title")),
-            'type' => $c->text($this->lng->txt("type")),
-            'size' => $c->text($this->lng->txt("size")),
-            'playtime' => $c->text($this->lng->txt("mcst_playtime")),
-            'creation_date' => $c->text($this->lng->txt("creation_date")),
-            'update_date' => $c->text($this->lng->txt("update_date")),
-            'preview' => $c->statusIcon($this->lng->txt("mcst_preview"))
+            'title' => $c->text($this->lng->txt("title"))->withIsSortable(false),
+            'type' => $c->text($this->lng->txt("type"))->withIsSortable(false),
+            'size' => $c->text($this->lng->txt("size"))->withIsSortable(false)
         ];
+        if ($this->playtime) {
+            $columns['playtime'] = $c->text($this->lng->txt("mcst_play_time"))->withIsSortable(false);
+        }
+        $columns['creation_date'] = $c->text($this->lng->txt("created"))->withIsSortable(false);
+        $columns['update_date'] = $c->text($this->lng->txt("last_update"))->withIsSortable(false);
+        if ($this->preview) {
+            $columns['preview'] = $c->statusIcon($this->lng->txt("preview"))->withIsSortable(false);
+        }
+
         return $columns;
     }
 
@@ -88,8 +117,45 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
         ?array $additional_parameters
     ): \Generator {
         foreach ($this->mediacast->getSortedItemsArray() as $item) {
+
             $row_id = (string) $item['id'];
+            $mob = new ilObjMediaObject($item["mob_id"]);
+            $med = $mob->getMediaItem("Standard");
+
+
             $data['title'] = $item["title"];
+            $data['creation_date'] = ilDatePresentation::formatDate(new ilDateTime($item["creation_date"], IL_CAL_DATETIME));
+            if ($item["update_date"] !== $item["creation_date"]) {
+                $data['update_date'] =
+                    ilDatePresentation::formatDate(new ilDateTime($item["update_date"], IL_CAL_DATETIME));
+            } else {
+                $data['update_date'] = "-";
+            }
+            if ($item["playtime"] !== "00:00:00") {
+                $data['playtime'] = $item["playtime"];
+            } else {
+                $data['playtime'] = "-";
+            }
+
+            $file = ilObjMediaObject::_lookupItemPath($med->getMobId(), false, false, "Standard");
+            if (is_file($file)) {
+                $size = filesize($file);
+                $size = sprintf("%.1f MB", $size / 1024 / 1024);
+                $data['size'] = $size;
+            } else {
+                $data['size'] = "-";
+            }
+            $data['type'] = $med->getFormat();
+            if ($mob->getVideoPreviewPic() !== "") {
+                // workaround since we dont have image columns yet
+                $image = $this->ui->factory()->image()->responsive($mob->getVideoPreviewPic(), $item["title"]);
+                $html = $this->ui->renderer()->render($image);
+                $html = str_replace("<img ", "<img style='max-width:150px;' ", $html);
+                $data['preview'] = $html;
+            } else {
+                $data['preview'] = "";
+            }
+
 
             yield $row_builder->buildDataRow($row_id, $data);
         }
@@ -102,6 +168,17 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
         return null;
     }
 
+    public function handleCommand() : void
+    {
+        $action = $this->request->getTableAction($this->action_parameter_token->getName());
+        if ($action !== "") {
+            $action .= "Object";
+            // currently done in request wrapper
+            //$ids = $this->request->getTableIds($this->row_id_token->getName());
+            $this->parent_gui->$action();
+        }
+    }
+
     public function get() : Table\Data
     {
         $f = $this->ui->factory();
@@ -109,25 +186,44 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
 
         $form_action = $this->df->uri(
             ILIAS_HTTP_PATH . '/' .
-            $this->ctrl->getLinkTarget($this->parent_gui, "handleTableAction")
+            $this->ctrl->getLinkTarget($this->parent_gui, $this->parent_cmd)
         );
 
-        $url_builder = new URLBuilder($form_action);
-        $query_params_namespace = ['mcst'];
-        [$url_builder, $action_parameter_token, $row_id_token] =
-            $url_builder->acquireParameters(
-                $query_params_namespace,
-                "table_action", //this is the actions's parameter name
-                "ids"   //this is the parameter name to be used for row-ids
-            );
+        $url_builder = $this->url_builder;
+        $action_parameter_token = $this->action_parameter_token;
+        $row_id_token = $this->row_id_token;
 
-        $actions = [
-            "edit" => $a->single(
-                $this->lng->txt("edit"),
-                $url_builder->withParameter($action_parameter_token, "edit"),
+        $actions["editCastItem"] = $a->single(
+            $this->lng->txt("edit"),
+            $url_builder->withParameter($action_parameter_token, "editCastItem"),
+            $row_id_token);
+
+        $actions["showCastItem"] = $a->single(
+            $this->lng->txt("show"),
+            $url_builder->withParameter($action_parameter_token, "showCastItem"),
+            $row_id_token)->withAsync();
+
+        if ($this->playtime) {
+            $actions["determinePlaytime"] = $a->single(
+                $this->lng->txt("mcst_det_playtime"),
+                $url_builder->withParameter($action_parameter_token, "determinePlaytime"),
                 $row_id_token
-            )
-        ];
+            );
+        }
+
+        if ($this->downloadable) {
+            $actions["downloadItem"] = $a->single(
+                $this->lng->txt("download"),
+                $url_builder->withParameter($action_parameter_token, "downloadItem"),
+                $row_id_token
+            );
+        }
+
+        $actions["confirmItemDeletion"] = $a->standard(
+            $this->lng->txt("delete"),
+            $url_builder->withParameter($action_parameter_token, "confirmItemDeletion"),
+            $row_id_token
+        )->withAsync();
 
         $table = $f->table()
                    ->data($this->lng->txt("mcst_items"), $this->getColumns(), $this)
@@ -166,52 +262,19 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
         $ilCtrl->setParameterByClass("ilobjmediacastgui", "item_id", "");
 
         if (ilObject::_exists($a_set["mob_id"])) {
-            if ($a_set["update_date"] != "") {
-                $this->tpl->setCurrentBlock("last_update");
-                $this->tpl->setVariable(
-                    "TXT_LAST_UPDATE",
-                    $lng->txt("last_update")
-                );
-                $this->tpl->setVariable(
-                    "VAL_LAST_UPDATE",
-                    ilDatePresentation::formatDate(new ilDateTime($a_set["update_date"], IL_CAL_DATETIME))
-                );
-                $this->tpl->parseCurrentBlock();
-            }
 
             $mob = new ilObjMediaObject($a_set["mob_id"]);
             $med = $mob->getMediaItem("Standard");
 
             $this->tpl->setVariable(
-                "VAL_TITLE",
-                $a_set["title"]
-            );
-            $this->tpl->setVariable(
                 "VAL_DESCRIPTION",
                 $a_set["content"]
-            );
-            $this->tpl->setVariable(
-                "TXT_CREATED",
-                $lng->txt("created")
-            );
-            $this->tpl->setVariable(
-                "VAL_CREATED",
-                ilDatePresentation::formatDate(new ilDateTime($a_set["creation_date"], IL_CAL_DATETIME))
             );
 
             $this->tpl->setVariable(
                 "TXT_DURATION",
                 $lng->txt("mcst_play_time")
             );
-
-            if ($a_set["playtime"] != "00:00:00") {
-                $this->tpl->setVariable(
-                    "VAL_DURATION",
-                    $a_set["playtime"]
-                );
-            } else {
-                $this->tpl->setVariable("VAL_DURATION", "-");
-            }
 
             if (!$this->edit_order) {
                 if ($this->downloadable) {
@@ -225,15 +288,9 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
                         }
                         $ilCtrl->setParameterByClass("ilobjmediacastgui", "purpose", $a_mob->getPurpose());
                         $file = ilObjMediaObject::_lookupItemPath($a_mob->getMobId(), false, false, $a_mob->getPurpose());
-                        if (is_file($file)) {
-                            $size = filesize($file);
-                            $size = ", " . sprintf("%.1f MB", $size / 1024 / 1024);
-                        }
-                        $format = ($a_mob->getFormat() != "") ? $a_mob->getFormat() : "audio/mpeg";
                         $this->tpl->setCurrentBlock("downloadable");
                         $this->tpl->setVariable("TXT_DOWNLOAD", $lng->txt("mcst_download_" . strtolower($a_mob->getPurpose())));
                         $this->tpl->setVariable("CMD_DOWNLOAD", $ilCtrl->getLinkTargetByClass("ilobjmediacastgui", "downloadItem"));
-                        $this->tpl->setVariable("TITLE_DOWNLOAD", "(" . $format . $size . ")");
                         $this->tpl->parseCurrentBlock();
                     }
                 }
@@ -279,12 +336,6 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
                 $ilCtrl->setParameterByClass("ilobjmediacastgui", "item_id", $a_set["id"]);
                 if ($ilAccess->checkAccess("write", "", $this->request->getRefId()) &&
                     !$this->presentation_mode) {
-                    $this->tpl->setCurrentBlock("edit");
-                    $this->tpl->setVariable("TXT_EDIT", $lng->txt("edit"));
-                    $this->tpl->setVariable(
-                        "CMD_EDIT",
-                        $ilCtrl->getLinkTargetByClass("ilobjmediacastgui", "editCastItem")
-                    );
 
                     if (!is_int(strpos($med->getFormat(), "image/"))) {
                         $this->tpl->setVariable("TXT_DET_PLAYTIME", $lng->txt("mcst_det_playtime"));

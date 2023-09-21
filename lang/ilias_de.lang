@@ -11162,6 +11162,7 @@ mcst#:#mcst_autoplay#:#Autoplay
 mcst#:#mcst_autoplay_active#:#Autoplay (Standard 'an')
 mcst#:#mcst_autoplay_inactive#:#Autoplay (Standard 'aus')
 mcst#:#mcst_clear_purpose_title#:#Löschen
+mcst#:#mcst_confirm_deletion#:#Löschbestätigung
 mcst#:#mcst_converted_file#:#Datei wurde umgewandelt.
 mcst#:#mcst_copy#:#Mediacast kopieren
 mcst#:#mcst_current_value_info#:#Aktueller Wert des Formats
@@ -11188,6 +11189,7 @@ mcst#:#mcst_import#:#Mediacast importieren
 mcst#:#mcst_incl_files_in_rss#:#Dateianhänge
 mcst#:#mcst_incl_files_in_rss_info#:#Die Dateien der Mediacast-Beiträge werden als Anhang im Webfeed bereitgestellt.
 mcst#:#mcst_input_either_file_or_url#:#Bitte geben Sie entweder eine Datei oder eine URL an. Achten Sie bei Angabe einer Datei bitte auf die maximal erlaubte Upload-Größe.
+mcst#:#mcst_items#:#Einträge
 mcst#:#mcst_last_submission#:#Letzter Beitrag
 mcst#:#mcst_list#:#Liste
 mcst#:#mcst_manage#:#Verwalten

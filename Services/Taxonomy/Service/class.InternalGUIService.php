@@ -40,11 +40,26 @@ class InternalGUIService
         $this->initGUIServices($DIC);
     }
 
-    public function getObjTaxonomyGUI(int $assigned_obj_id) : \ilObjTaxonomyGUI
+    public function getObjTaxonomyGUI(int $rep_obj_id) : \ilObjTaxonomyGUI
     {
         $tax_gui = new \ilObjTaxonomyGUI();
-        $tax_gui->setAssignedObject($assigned_obj_id);
+        $tax_gui->setAssignedObject($rep_obj_id);
         return $tax_gui;
+    }
+
+    public function addSubTab(int $rep_obj_id) : void
+    {
+        $tabs = $this->tabs();
+        $ctrl = $this->ctrl();
+        $lng = $this->domain_service->lng();
+        if ($this->domain_service->settings()->isActivated($rep_obj_id)) {
+            $lng->loadLanguageModule("tax");
+            $tabs->addSubTab(
+                "tax_settings",
+                $lng->txt("tax_taxonomy"),
+                $ctrl->getLinkTargetByClass(\ilObjTaxonomyGUI::class, "listTaxonomySetting")
+            );
+        }
     }
 
 }

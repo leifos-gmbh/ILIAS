@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\Category\StandardGUIRequest;
 
@@ -36,6 +36,7 @@ use ILIAS\Category\StandardGUIRequest;
 class ilObjCategoryGUI extends ilContainerGUI
 {
     public const CONTAINER_SETTING_TAXBLOCK = "tax_sblock_";
+    protected \ILIAS\Taxonomy\Service $taxonomy;
 
     protected ilNavigationHistory $nav_history;
     protected ilHelpGUI $help;
@@ -81,12 +82,14 @@ class ilObjCategoryGUI extends ilContainerGUI
                 ilObjectServiceSettingsGUI::INFO_TAB_VISIBILITY,
                 '1'
             );
+
         }
         $this->cat_request = $DIC
             ->category()
             ->internal()
             ->gui()
             ->standardRequest();
+        $this->taxonomy = $DIC->taxonomy();
     }
 
     public function executeCommand(): void
@@ -247,12 +250,10 @@ class ilObjCategoryGUI extends ilContainerGUI
             case 'ilobjtaxonomygui':
                 $this->checkPermissionBool("write");
                 $this->prepareOutput();
-                $this->initTaxSubTabs();
-                $tax = new ilObjTaxonomyGUI();
-                $tax->setAssignedObject($this->object->getId());
-                $tax->setMultiple(true);
-                $tax->setListInfo($this->lng->txt("cntr_tax_list_info"));
-                $this->ctrl->forwardCommand($tax);
+                $tax_gui = $this->taxonomy->gui()->getObjTaxonomyGUI($this->object->getId());
+                $tax_gui->setMultiple(true);
+                $tax_gui->setListInfo($this->lng->txt("cntr_tax_list_info"));
+                $this->ctrl->forwardCommand($tax_gui);
                 break;
 
             case 'ilobjectmetadatagui':
@@ -704,6 +705,10 @@ class ilObjCategoryGUI extends ilContainerGUI
             $this->lng->txt("cont_filter"),
             $this->ctrl->getLinkTargetByClass("ilcontainerfilteradmingui", "")
         );
+
+        if ($obj = $this->getObject()) {
+            $this->taxonomy->gui()->addSubTab($obj->getId());
+        }
 
         $this->tabs_gui->activateTab("settings");
         $this->tabs_gui->activateSubTab($active_tab);

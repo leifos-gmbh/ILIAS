@@ -18,24 +18,21 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Taxonomy;
+namespace ILIAS\Taxonomy\Settings;
 
-use ILIAS\Taxonomy\Usage\UsageDBRepository;
-use ILIAS\Taxonomy\Usage\UsageManager;
-
-class InternalRepoService
+class SettingsManager
 {
-    protected InternalDataService $data;
-    protected \ilDBInterface $db;
-
-    public function __construct(InternalDataService $data, \ilDBInterface $db)
+    public function __construct()
     {
-        $this->data = $data;
-        $this->db = $db;
+
     }
 
-    public function usage(): UsageDBRepository
+    public function isActivated(int $rep_obj_id) : bool
     {
-        return new UsageDBRepository($this->db);
+        return (bool) \ilContainer::_lookupContainerSetting(
+            $rep_obj_id,
+            \ilObjectServiceSettingsGUI::TAXONOMIES,
+            '0'
+        );
     }
 }

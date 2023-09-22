@@ -18,24 +18,18 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Taxonomy;
+namespace ILIAS\Taxonomy\Usage;
 
-use ILIAS\Taxonomy\Usage\UsageDBRepository;
-use ILIAS\Taxonomy\Usage\UsageManager;
-
-class InternalRepoService
+class UsageManager
 {
-    protected InternalDataService $data;
-    protected \ilDBInterface $db;
-
-    public function __construct(InternalDataService $data, \ilDBInterface $db)
+    public function __construct(
+        UsageDBRepository $db_repo)
     {
-        $this->data = $data;
-        $this->db = $db;
+        $this->db_repo = $db_repo;
     }
 
-    public function usage(): UsageDBRepository
+    public function getUsageOfObject(int $obj_id, bool $include_titles = false): array
     {
-        return new UsageDBRepository($this->db);
+        return $this->db_repo->getUsageOfObject($obj_id, $include_titles);
     }
 }

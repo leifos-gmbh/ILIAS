@@ -22,6 +22,8 @@ namespace ILIAS\Taxonomy;
 
 use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICDomainServices;
+use ILIAS\Taxonomy\Settings\SettingsManager;
+use ILIAS\Taxonomy\Usage\UsageManager;
 
 class InternalDomainService
 {
@@ -38,5 +40,17 @@ class InternalDomainService
         $this->repo_service = $repo_service;
         $this->data_service = $data_service;
         $this->initDomainServices($DIC);
+    }
+
+    public function settings() : SettingsManager
+    {
+        return new SettingsManager();
+    }
+
+    public function usage() : UsageManager
+    {
+        return new UsageManager(
+            $this->repo_service->usage()
+        );
     }
 }

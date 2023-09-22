@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -16,26 +18,26 @@
  *
  *********************************************************************/
 
-declare(strict_types=1);
-
 namespace ILIAS\Taxonomy;
 
-use ILIAS\Taxonomy\Usage\UsageDBRepository;
-use ILIAS\Taxonomy\Usage\UsageManager;
-
-class InternalRepoService
+/**
+ * Domain facade
+ */
+class DomainService
 {
-    protected InternalDataService $data;
-    protected \ilDBInterface $db;
+    protected InternalDomainService $internal_domain;
 
-    public function __construct(InternalDataService $data, \ilDBInterface $db)
-    {
-        $this->data = $data;
-        $this->db = $db;
+    public function __construct(
+        InternalDomainService $internal_domain
+    ) {
+        $this->internal_domain = $internal_domain;
     }
 
-    public function usage(): UsageDBRepository
+    /**
+     * Returns the taxonomies (ids or array with id/title) used by a repository object
+     */
+    public function getUsageOfObject(int $obj_id, bool $include_titles = false): array
     {
-        return new UsageDBRepository($this->db);
+        return $this->internal_domain->getUsageOfObject($obj_id, $include_titles);
     }
 }

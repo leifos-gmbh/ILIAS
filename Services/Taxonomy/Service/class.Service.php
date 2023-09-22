@@ -39,4 +39,23 @@ class Service
         return new InternalService($this->DIC);
     }
 
+    /**
+     * External GUI service
+     */
+    public function gui(): GUIService
+    {
+        return new GUIService(
+            $this->internal()->gui()
+        );
+    }
+
+    /**
+     * External domain service
+     */
+    public function domain(): DomainService
+    {
+        return new DomainService(
+            $this->internal()->domain()
+        );
+    }
 }

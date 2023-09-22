@@ -20,22 +20,23 @@ declare(strict_types=1);
 
 namespace ILIAS\Taxonomy;
 
-use ILIAS\Taxonomy\Usage\UsageDBRepository;
-use ILIAS\Taxonomy\Usage\UsageManager;
-
-class InternalRepoService
+class GUIService
 {
-    protected InternalDataService $data;
-    protected \ilDBInterface $db;
+    protected InternalGUIService $internal_gui_service;
 
-    public function __construct(InternalDataService $data, \ilDBInterface $db)
+    public function __construct(InternalGUIService $internal_gui_service)
     {
-        $this->data = $data;
-        $this->db = $db;
+        $this->internal_gui_service = $internal_gui_service;
     }
 
-    public function usage(): UsageDBRepository
+    public function addSubTab(int $rep_obj_id) : void
     {
-        return new UsageDBRepository($this->db);
+        $this->internal_gui_service->addSubTab($rep_obj_id);
     }
+
+    public function getObjTaxonomyGUI(int $rep_obj_id) : \ilObjTaxonomyGUI
+    {
+        return $this->internal_gui_service->getObjTaxonomyGUI($rep_obj_id);
+    }
+
 }

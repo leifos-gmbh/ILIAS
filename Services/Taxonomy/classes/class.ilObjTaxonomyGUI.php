@@ -23,6 +23,8 @@
  */
 class ilObjTaxonomyGUI extends ilObject2GUI
 {
+    protected \ILIAS\Taxonomy\InternalGUIService $gui;
+    protected \ILIAS\Taxonomy\InternalDomainService $domain;
     protected ilTabsGUI $tabs;
     protected ilHelpGUI $help;
     protected bool $multiple = false;
@@ -44,26 +46,31 @@ class ilObjTaxonomyGUI extends ilObject2GUI
     {
         global $DIC;
 
-        $this->ctrl = $DIC->ctrl();
-        $this->lng = $DIC->language();
-        $this->user = $DIC->user();
-        $this->tabs = $DIC->tabs();
-        $this->toolbar = $DIC->toolbar();
-        $this->tpl = $DIC["tpl"];
-        $this->help = $DIC[ilHelp::class];
-        $ilCtrl = $DIC->ctrl();
-        $lng = $DIC->language();
+        $service = $DIC->taxonomy()->internal();
+        $this->gui = $gui = $service->gui();
+        $this->domain = $domain = $service->domain();
+
+        $this->ctrl = $gui->ctrl();
+        $this->tabs = $gui->tabs();
+        $this->toolbar = $gui->toolbar();
+        $this->tpl = $gui->ui()->mainTemplate();
+        $this->help = $gui->help();
+        // @todo introduce request wrapper
+        $this->request = $gui->request();
+
+        $this->lng = $domain->language();
+        $this->user = $domain->user();
+
 
         parent::__construct(0, ilObject2GUI::OBJECT_ID);
 
-        $ilCtrl->saveParameter($this, "tax_node");
-        $ilCtrl->saveParameter($this, "tax_id");
+        $this->ctrl->saveParameter($this, "tax_node");
+        $this->ctrl->saveParameter($this, "tax_id");
 
-        $lng->loadLanguageModule("tax");
+        $this->lng->loadLanguageModule("tax");
 
         // @todo introduce request wrapper
-        $this->request = $DIC->http()->request();
-        $params = $DIC->http()->request()->getQueryParams();
+        $params = $this->request->getQueryParams();
         $this->current_tax_node = (int) ($params["tax_node"] ?? null);
         $this->requested_tax_id = (int) ($params["tax_id"] ?? null);
         $this->requested_move_ids = (string) ($params["move_ids"] ?? "");
@@ -711,6 +718,22 @@ class ilObjTaxonomyGUI extends ilObject2GUI
         );
 
         $tpl->setContent($tab->getHTML());
+    }
+
+    public function listTaxonomySettings() : void
+    {
+        $f = $this->gui->ui()->factory();
+        $r = $this->gui->ui()->renderer();
+        $um = $this->domain->usage();
+        $tax_ids = $um->getUsageOfObject($this->getAssignedObject());
+        if (count($tax_ids) === 0 || $this->getMultiple()) {
+            $this->toolbar->addButton(
+                $this->lng->txt("tax_add_taxonomy"),
+                $this->ctrl->getLinkTarget($this, "createAssignedTaxonomy")
+            );
+        } else {
+            $this->tpl->setOnScreenMessage('info', $this->lng->txt("tax_max_one_tax"));
+        }
     }
 
     /**

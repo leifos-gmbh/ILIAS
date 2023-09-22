@@ -40,7 +40,7 @@ class ilObjTaxonomyGUI extends ilObject2GUI
     /**
      * @inheritDoc
      */
-    public function __construct($a_id = 0)
+    public function __construct()
     {
         global $DIC;
 
@@ -54,7 +54,7 @@ class ilObjTaxonomyGUI extends ilObject2GUI
         $ilCtrl = $DIC->ctrl();
         $lng = $DIC->language();
 
-        parent::__construct($a_id, ilObject2GUI::OBJECT_ID);
+        parent::__construct(0, ilObject2GUI::OBJECT_ID);
 
         $ilCtrl->saveParameter($this, "tax_node");
         $ilCtrl->saveParameter($this, "tax_id");

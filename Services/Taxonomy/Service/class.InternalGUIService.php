@@ -40,6 +40,14 @@ class InternalGUIService
         $this->initGUIServices($DIC);
     }
 
+    public function settings() : \ILIAS\Taxonomy\Settings\GUIService
+    {
+        return new \ILIAS\Taxonomy\Settings\GUIService(
+            $this->domain_service,
+            $this
+        );
+    }
+
     public function getObjTaxonomyGUI(int $rep_obj_id) : \ilObjTaxonomyGUI
     {
         $tax_gui = new \ilObjTaxonomyGUI();
@@ -47,19 +55,5 @@ class InternalGUIService
         return $tax_gui;
     }
 
-    public function addSubTab(int $rep_obj_id) : void
-    {
-        $tabs = $this->tabs();
-        $ctrl = $this->ctrl();
-        $lng = $this->domain_service->lng();
-        if ($this->domain_service->settings()->isActivated($rep_obj_id)) {
-            $lng->loadLanguageModule("tax");
-            $tabs->addSubTab(
-                "tax_settings",
-                $lng->txt("tax_taxonomy"),
-                $ctrl->getLinkTargetByClass(\ilObjTaxonomyGUI::class, "listTaxonomySetting")
-            );
-        }
-    }
 
 }

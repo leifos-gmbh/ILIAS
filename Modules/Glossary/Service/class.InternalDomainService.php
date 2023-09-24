@@ -23,6 +23,7 @@ namespace ILIAS\Glossary;
 use ILIAS\DI\Container;
 use ILIAS\Glossary\Term\TermManager;
 use ILIAS\Repository\GlobalDICDomainServices;
+use ILIAS\Glossary\Taxonomy\TaxonomyManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -44,16 +45,10 @@ class InternalDomainService
         $this->initDomainServices($DIC);
     }
 
-    /*
-    public function access(int $ref_id, int $user_id) : Access\AccessManager
+    public function log() : \ilLogger
     {
-        return new Access\AccessManager(
-            $this,
-            $this->access,
-            $ref_id,
-            $user_id
-        );
-    }*/
+        return $this->logger()->glo();
+    }
 
     public function term(\ilObjGlossary $glossary, int $user_id = 0): TermManager
     {
@@ -65,6 +60,14 @@ class InternalDomainService
             $this->repo_service->termSession(),
             $glossary,
             $user_id
+        );
+    }
+
+    public function taxonomy(\ilObjGlossary $glossary): TaxonomyManager
+    {
+        return new TaxonomyManager(
+            $this->DIC->taxonomy()->domain(),
+            $glossary
         );
     }
 }

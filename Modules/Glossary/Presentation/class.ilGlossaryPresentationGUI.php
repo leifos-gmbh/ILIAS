@@ -24,6 +24,9 @@ use ILIAS\Glossary\Presentation;
  */
 class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
 {
+    protected \ILIAS\GlobalScreen\Services $global_screen;
+    protected \ILIAS\Glossary\InternalGUIService $gui;
+    protected \ILIAS\Glossary\InternalDomainService $domain;
     protected array $mobs;
     protected bool $fill_on_load_code;
     protected string $offline_dir;
@@ -63,29 +66,33 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
     ) {
         global $DIC;
 
+        $service = $DIC->glossary()->internal();
+
+        $this->domain = $domain = $service->domain();
+        $this->gui = $gui = $service->gui();
+
+        $this->access = $DIC->access();
+        $this->user = $domain->user();
+        $this->lng = $DIC->language();
+
+        $this->toolbar = $gui->toolbar();
+        $this->help = $gui->help();
+        $this->nav_history = $DIC["ilNavigationHistory"];
+        $this->tpl = $gui->ui()->mainTemplate();
+        $this->ctrl = $gui->ctrl();
+        $this->tabs_gui = $gui->tabs();
+        $this->global_screen = $gui->globalScreen();
+
         $this->export_format = $export_format;
         $this->setOfflineDirectory($export_dir);
-        $this->offline = ($export_format != "");
-        $this->access = $DIC->access();
-        $this->nav_history = $DIC["ilNavigationHistory"];
-        $this->toolbar = $DIC->toolbar();
-        $this->user = $DIC->user();
-        $this->help = $DIC["ilHelp"];
-        $lng = $DIC->language();
-        $tpl = $DIC->ui()->mainTemplate();
-        $ilCtrl = $DIC->ctrl();
-        $ilTabs = $DIC->tabs();
+        $this->offline = ($export_format !== "");
 
-        $this->tabs_gui = $ilTabs;
-        $this->tpl = $tpl;
-        $this->lng = $lng;
-        $this->ctrl = $ilCtrl;
         $this->ctrl->saveParameter($this, array("ref_id", "letter", "tax_node"));
-        $this->service = $DIC->glossary()
-                       ->internal();
         $this->content_style_service =
             $DIC->contentStyle();
         $this->initByRequest();
+
+        $this->tax_manager = $domain->taxonomy($this->glossary);
     }
 
     /**
@@ -97,15 +104,13 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
      */
     public function initByRequest(?array $query_params = null): void
     {
-        $service = $this->service;
-        $request = $service
-            ->gui()
+        $request = $this->gui
             ->presentation()
             ->request($query_params);
 
         $this->requested_ref_id = $request->getRefId();
         $this->term_id = $request->getTermId();
-        $this->glossary_gui = $service->gui()->presentation()->ObjGlossaryGUI($this->requested_ref_id);
+        $this->glossary_gui = $this->gui->presentation()->ObjGlossaryGUI($this->requested_ref_id);
         $this->glossary = $this->glossary_gui->getGlossary();
         $this->requested_def_page_id = $request->getDefinitionPageId();
         $this->requested_search_str = $request->getSearchString();
@@ -1164,51 +1169,35 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
 
     public function showTaxonomy(): void
     {
-        global $DIC;
         $ctrl = $this->ctrl;
-        if (!$this->offlineMode() && $this->glossary->getShowTaxonomy()) {
-            $tax_ids = ilObjTaxonomy::getUsageOfObject($this->glossary->getId());
-            if (count($tax_ids) > 0) {
-                $tax_id = $tax_ids[0];
-                $DIC->globalScreen()->tool()->context()->current()
-                    ->addAdditionalData(
-                        ilTaxonomyGSToolProvider::SHOW_TAX_TREE,
-                        true
-                    );
-                $DIC->globalScreen()->tool()->context()->current()
-                    ->addAdditionalData(
-                        ilTaxonomyGSToolProvider::TAX_TREE_GUI_PATH,
-                        [self::class]
-                    );
-                $DIC->globalScreen()->tool()->context()->current()
-                    ->addAdditionalData(
-                        ilTaxonomyGSToolProvider::TAX_ID,
-                        $tax_id
-                    );
-                $DIC->globalScreen()->tool()->context()->current()
-                    ->addAdditionalData(
-                        ilTaxonomyGSToolProvider::TAX_TREE_CMD,
-                        "listTerms"
-                    );
-                $DIC->globalScreen()->tool()->context()->current()
-                    ->addAdditionalData(
-                        ilTaxonomyGSToolProvider::TAX_TREE_PARENT_CMD,
-                        "showTaxonomy"
-                    );
 
-                $tax_exp = new ilTaxonomyExplorerGUI(
-                    get_class($this),
-                    "showTaxonomy",
-                    $tax_id,
-                    "ilglossarypresentationgui",
-                    "listTerms"
-                );
-                /*
-                if (!$tax_exp->handleCommand()) {
-                    //$tpl->setLeftNavContent($tax_exp->getHTML());
-                    //$tpl->setLeftContent($tax_exp->getHTML()."&nbsp;");
-                }*/
-            }
+        if ($this->offlineMode() || !$this->tax_manager->showInPresentation()) {
+            return;
         }
+
+        $tax_id = $this->tax_manager->getTaxonomyId();
+
+        $tool_context = $this->global_screen->tool()->context()->current();
+
+        $tool_context->addAdditionalData(
+                ilTaxonomyGSToolProvider::SHOW_TAX_TREE,
+                true
+            );
+        $tool_context->addAdditionalData(
+                ilTaxonomyGSToolProvider::TAX_TREE_GUI_PATH,
+                [self::class]
+            );
+        $tool_context->addAdditionalData(
+                ilTaxonomyGSToolProvider::TAX_ID,
+                $tax_id
+            );
+        $tool_context->addAdditionalData(
+                ilTaxonomyGSToolProvider::TAX_TREE_CMD,
+                "listTerms"
+            );
+        $tool_context->addAdditionalData(
+                ilTaxonomyGSToolProvider::TAX_TREE_PARENT_CMD,
+                "showTaxonomy"
+            );
     }
 }

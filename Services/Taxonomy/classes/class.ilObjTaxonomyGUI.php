@@ -23,6 +23,8 @@
  */
 class ilObjTaxonomyGUI extends ilObject2GUI
 {
+    protected ?\ILIAS\Taxonomy\TaxonomyModifierGUI $modifier = null;
+    protected \ILIAS\DI\UIServices $ui;
     protected \ILIAS\Taxonomy\InternalGUIService $gui;
     protected \ILIAS\Taxonomy\InternalDomainService $domain;
     protected ilTabsGUI $tabs;
@@ -56,10 +58,11 @@ class ilObjTaxonomyGUI extends ilObject2GUI
         $this->tpl = $gui->ui()->mainTemplate();
         $this->help = $gui->help();
         // @todo introduce request wrapper
-        $this->request = $gui->request();
+        $this->request = $gui->http()->request();
 
-        $this->lng = $domain->language();
+        $this->lng = $domain->lng();
         $this->user = $domain->user();
+        $this->ui = $gui->ui();
 
 
         parent::__construct(0, ilObject2GUI::OBJECT_ID);
@@ -108,6 +111,11 @@ class ilObjTaxonomyGUI extends ilObject2GUI
         return $this->multiple;
     }
 
+    public function setModifier(?\ILIAS\Taxonomy\TaxonomyModifierGUI $modifier): void
+    {
+        $this->modifier = $modifier;
+    }
+
     public function setListInfo(string $a_val): void
     {
         $this->list_info = trim($a_val);
@@ -140,6 +148,7 @@ class ilObjTaxonomyGUI extends ilObject2GUI
     public function executeCommand(): void
     {
         $ilCtrl = $this->ctrl;
+        $this->tabs->activateSubTab("tax_settings");
 
         $cmd = $ilCtrl->getCmd("listTaxonomies");
         $this->$cmd();
@@ -257,7 +266,7 @@ class ilObjTaxonomyGUI extends ilObject2GUI
     {
         $ilCtrl = $this->ctrl;
         if ($this->getAssignedObject() > 0) {
-            $ilCtrl->redirect($this, "listTaxonomies");
+            $ilCtrl->redirectToURL($this->getSettingsBackUrl());
         }
         parent::cancel();
     }
@@ -667,7 +676,7 @@ class ilObjTaxonomyGUI extends ilObject2GUI
         $cgui = new ilConfirmationGUI();
         $cgui->setFormAction($ilCtrl->getFormAction($this));
         $cgui->setHeaderText($lng->txt("tax_confirm_deletion"));
-        $cgui->setCancel($lng->txt("cancel"), "listTaxonomies");
+        $cgui->setCancel($lng->txt("cancel"), "returnToSettingsParent");
         $cgui->setConfirm($lng->txt("delete"), "deleteTaxonomy");
 
         $cgui->addItem("id[]", 0, $tax->getTitle());
@@ -687,7 +696,7 @@ class ilObjTaxonomyGUI extends ilObject2GUI
         $tax->delete();
 
         $this->tpl->setOnScreenMessage('success', $lng->txt("tax_tax_deleted"), true);
-        $ilCtrl->redirect($this, "listTaxonomies");
+        $this->returnToSettingsParent();
     }
 
     /**
@@ -720,20 +729,14 @@ class ilObjTaxonomyGUI extends ilObject2GUI
         $tpl->setContent($tab->getHTML());
     }
 
-    public function listTaxonomySettings() : void
+    protected function getSettingsBackUrl() : string
     {
-        $f = $this->gui->ui()->factory();
-        $r = $this->gui->ui()->renderer();
-        $um = $this->domain->usage();
-        $tax_ids = $um->getUsageOfObject($this->getAssignedObject());
-        if (count($tax_ids) === 0 || $this->getMultiple()) {
-            $this->toolbar->addButton(
-                $this->lng->txt("tax_add_taxonomy"),
-                $this->ctrl->getLinkTarget($this, "createAssignedTaxonomy")
-            );
-        } else {
-            $this->tpl->setOnScreenMessage('info', $this->lng->txt("tax_max_one_tax"));
-        }
+        return $this->ctrl->getParentReturn($this);
+    }
+
+    protected function returnToSettingsParent() : void
+    {
+        $this->ctrl->redirectToURL($this->getSettingsBackUrl());
     }
 
     /**
@@ -757,7 +760,7 @@ class ilObjTaxonomyGUI extends ilObject2GUI
 
         $ilTabs->setBackTarget(
             $lng->txt("back"),
-            $ilCtrl->getLinkTarget($this, "listTaxonomies")
+            $this->getSettingsBackUrl()
         );
 
         $ilTabs->addTab(

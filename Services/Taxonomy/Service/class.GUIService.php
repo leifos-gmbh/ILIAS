@@ -29,14 +29,24 @@ class GUIService
         $this->internal_gui_service = $internal_gui_service;
     }
 
-    public function addSubTab(int $rep_obj_id) : void
+    public function addSettingsSubTab(int $rep_obj_id) : void
     {
-        $this->internal_gui_service->addSubTab($rep_obj_id);
+        $this->internal_gui_service->settings()->addSubTab($rep_obj_id);
     }
 
-    public function getObjTaxonomyGUI(int $rep_obj_id) : \ilObjTaxonomyGUI
+    public function getSettingsGUI(
+        int $rep_obj_id,
+        string $list_info = "",
+        bool $multiple = true,
+        \ILIAS\Taxonomy\Settings\ModifierGUIInterface $modifier = null
+    ) : \ilTaxonomySettingsGUI
     {
-        return $this->internal_gui_service->getObjTaxonomyGUI($rep_obj_id);
+        return $this->internal_gui_service->settings()->getSettingsGUI(
+            $rep_obj_id,
+            $list_info,
+            $multiple,
+            $modifier
+        );
     }
 
 }

@@ -20,21 +20,15 @@ declare(strict_types=1);
 
 namespace ILIAS\Taxonomy\Settings;
 
-class SettingsManager
+interface ModifierGUIInterface
 {
-    protected $rep_obj_id;
+    public function getProperties(
+        int $tax_id
+    ): array;
 
-    public function __construct($rep_obj_id)
-    {
-        $this->rep_obj_id = $rep_obj_id;
-    }
+    public function getActions(
+        int $tax_id
+    ): array;
 
-    public function isActivated() : bool
-    {
-        return (bool) \ilContainer::_lookupContainerSetting(
-            $this->rep_obj_id,
-            \ilObjectServiceSettingsGUI::TAXONOMIES,
-            '0'
-        );
-    }
 }
+

@@ -29,11 +29,12 @@ use ILIAS\Category\StandardGUIRequest;
  * @ilCtrl_Calls ilObjCategoryGUI: ilPermissionGUI, ilContainerPageGUI, ilObjUserGUI, ilObjUserFolderGUI
  * @ilCtrl_Calls ilObjCategoryGUI: ilInfoScreenGUI, ilObjStyleSheetGUI, ilCommonActionDispatcherGUI, ilObjectTranslationGUI, ilObjectContentStyleSettingsGUI
  * @ilCtrl_Calls ilObjCategoryGUI: ilColumnGUI, ilObjectCopyGUI, ilUserTableGUI, ilDidacticTemplateGUI, ilExportGUI
- * @ilCtrl_Calls ilObjCategoryGUI: ilObjTaxonomyGUI, ilObjectMetaDataGUI, ilContainerNewsSettingsGUI, ilContainerFilterAdminGUI
+ * @ilCtrl_Calls ilObjCategoryGUI: ilTaxonomySettingsGUI, ilObjectMetaDataGUI, ilContainerNewsSettingsGUI, ilContainerFilterAdminGUI
  * @ilCtrl_Calls ilObjCategoryGUI: ilRepositoryTrashGUI
  * @ingroup      ModulesCategory
  */
 class ilObjCategoryGUI extends ilContainerGUI
+    implements \ILIAS\Taxonomy\Settings\ModifierGUIInterface
 {
     public const CONTAINER_SETTING_TAXBLOCK = "tax_sblock_";
     protected \ILIAS\Taxonomy\Service $taxonomy;
@@ -247,12 +248,16 @@ class ilObjCategoryGUI extends ilContainerGUI
                 $this->ctrl->forwardCommand($transgui);
                 break;
 
-            case 'ilobjtaxonomygui':
+            case strtolower(ilTaxonomySettingsGUI::class):
                 $this->checkPermissionBool("write");
                 $this->prepareOutput();
-                $tax_gui = $this->taxonomy->gui()->getObjTaxonomyGUI($this->object->getId());
-                $tax_gui->setMultiple(true);
-                $tax_gui->setListInfo($this->lng->txt("cntr_tax_list_info"));
+                $this->setEditTabs("taxonomy");
+                $tax_gui = $this->taxonomy->gui()->getSettingsGUI(
+                    $this->object->getId(),
+                    $this->lng->txt("cntr_tax_settings_info"),
+                    true,
+                    $this
+                );
                 $this->ctrl->forwardCommand($tax_gui);
                 break;
 
@@ -331,6 +336,7 @@ class ilObjCategoryGUI extends ilContainerGUI
     public function getObjectMetadataGUI(): ilObjectMetaDataGUI
     {
         $md_gui = new ilObjectMetaDataGUI($this->object);
+        /*
         if (ilContainer::_lookupContainerSetting(
             $this->object->getId(),
             ilObjectServiceSettingsGUI::TAXONOMIES,
@@ -397,9 +403,76 @@ class ilObjCategoryGUI extends ilContainerGUI
                     }
                 });
             }
-        }
+        }*/
         return $md_gui;
     }
+
+    protected function showTaxAsSideBlockObject() : void
+    {
+        $prefix = self::CONTAINER_SETTING_TAXBLOCK;
+        $tax_id = $this->cat_request->getTaxId();
+        ilContainer::_writeContainerSetting(
+            $this->object->getId(),
+            $prefix . $tax_id,
+            '1'
+        );
+        $this->ctrl->redirectByClass(ilTaxonomySettingsGUI::class, "");
+    }
+
+    protected function hideTaxAsSideBlockObject() : void
+    {
+        $prefix = self::CONTAINER_SETTING_TAXBLOCK;
+        $tax_id = $this->cat_request->getTaxId();
+        ilContainer::_deleteContainerSettings(
+            $this->object->getId(),
+            $prefix . $tax_id
+        );
+        $this->ctrl->redirectByClass(ilTaxonomySettingsGUI::class, "");
+    }
+
+    public function getProperties(
+        int $tax_id
+    ): array
+    {
+        $active =  in_array($tax_id, $this->getActiveBlocks());
+        $value = $active
+            ? $this->lng->txt("yes")
+            : $this->lng->txt("no");
+
+        return [
+            $this->lng->txt("cntr_taxonomy_show_sideblock") => $value
+        ];
+    }
+
+    public function getActions(
+        int $tax_id
+    ): array
+    {
+        $actions = [];
+        $this->ctrl->setParameterByClass(self::class, "cat_tax_id", $tax_id);
+        $active =  in_array($tax_id, $this->getActiveBlocks());
+        if (!$active) {
+            $actions[] = $this->ui->factory()->button()->shy(
+                $this->lng->txt("cat_show_tax_in_side_block"),
+                $this->ctrl->getLinkTargetByClass(
+                    self::class,
+                    "showTaxAsSideBlock"
+                )
+            );
+        } else {
+            $actions[] = $this->ui->factory()->button()->shy(
+                $this->lng->txt("cat_hide_tax_in_side_block"),
+                $this->ctrl->getLinkTargetByClass(
+                    self::class,
+                    "hideTaxAsSideBlock"
+                )
+            );
+        }
+        $this->ctrl->setParameterByClass(self::class, "cat_tax_id", null);
+
+        return $actions;
+    }
+
 
     protected function getTabs(): void
     {
@@ -455,13 +528,13 @@ class ilObjCategoryGUI extends ilContainerGUI
 
             // metadata / taxonomies
             $mdgui = new ilObjectMetaDataGUI($this->object);
-            if (ilContainer::_lookupContainerSetting(
+            /*if (ilContainer::_lookupContainerSetting(
                 $this->object->getId(),
                 ilObjectServiceSettingsGUI::TAXONOMIES,
                 '0'
             )) {
                 $mdgui->enableTaxonomyDefinition(true);
-            }
+            }*/
             $mdtab = $mdgui->getTab();
             if ($mdtab) {
                 $this->tabs_gui->addTab(
@@ -707,7 +780,7 @@ class ilObjCategoryGUI extends ilContainerGUI
         );
 
         if ($obj = $this->getObject()) {
-            $this->taxonomy->gui()->addSubTab($obj->getId());
+            $this->taxonomy->gui()->addSettingsSubTab($obj->getId());
         }
 
         $this->tabs_gui->activateTab("settings");

@@ -25,12 +25,12 @@ namespace ILIAS\Taxonomy;
  */
 class DomainService
 {
-    protected InternalDomainService $internal_domain;
+    protected InternalDomainService $domain;
 
     public function __construct(
-        InternalDomainService $internal_domain
+        InternalDomainService $domain
     ) {
-        $this->internal_domain = $internal_domain;
+        $this->domain = $domain;
     }
 
     /**
@@ -38,6 +38,11 @@ class DomainService
      */
     public function getUsageOfObject(int $obj_id, bool $include_titles = false): array
     {
-        return $this->internal_domain->getUsageOfObject($obj_id, $include_titles);
+        return $this->domain->usage()->getUsageOfObject($obj_id, $include_titles);
+    }
+
+    public function isActivated(int $obj_id) : bool
+    {
+        return $this->domain->settings($obj_id)->isActivated();
     }
 }

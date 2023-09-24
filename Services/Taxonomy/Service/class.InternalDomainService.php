@@ -42,9 +42,9 @@ class InternalDomainService
         $this->initDomainServices($DIC);
     }
 
-    public function settings() : SettingsManager
+    public function settings(int $rep_obj_id) : SettingsManager
     {
-        return new SettingsManager();
+        return new SettingsManager($rep_obj_id);
     }
 
     public function usage() : UsageManager

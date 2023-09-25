@@ -793,7 +793,7 @@ class PropertyAndActionBuilderUI
 
             if ($cnt_files > 0) {
                 $a_info->addSection($lng->txt("exc_fb_files") .
-                    '<a id="fb' . $a_ass->getId() . '"></a>');
+                    '<a id="fb' . $ass->getId() . '"></a>');
 
                 if ($cnt_files > 0) {
                     $files = $storage->getFeedbackFiles($a_feedback_id);
@@ -819,7 +819,7 @@ class PropertyAndActionBuilderUI
                 );
                 $this->addProperty(
                     self::SEC_SAMPLE_SOLUTION,
-                    $a_ass->getFeedbackFile(),
+                    $ass->getFeedbackFile(),
                     $r->render($link)
                 );
             }

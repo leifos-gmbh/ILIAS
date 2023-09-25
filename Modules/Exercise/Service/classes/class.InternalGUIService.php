@@ -161,7 +161,7 @@ class InternalGUIService
             $this->toolbar(),
             $this->domain_service->lng(),
             $this->ctrl(),
-            $this->service->domain()->assignment()->randomAssignments($exc)
+            $this->domain_service->assignment()->randomAssignments($exc)
         );
     }
 

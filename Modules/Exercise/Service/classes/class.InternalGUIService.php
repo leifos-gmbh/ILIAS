@@ -159,7 +159,7 @@ class InternalGUIService
         return new \ilExcRandomAssignmentGUI(
             $this->ui(),
             $this->toolbar(),
-            $this->lng(),
+            $this->domain_service->lng(),
             $this->ctrl(),
             $this->service->domain()->assignment()->randomAssignments($exc)
         );

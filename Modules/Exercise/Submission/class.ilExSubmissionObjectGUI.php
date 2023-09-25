@@ -692,7 +692,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
         } else {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt("msg_failed"), true);
         }
-        $this->ctrl->redirectByClass([ilExerciseHandlerGUI::class, ilObjExerciseGUI::class, ilExSubmissionGUI::class, ilExSubmissionObjectGUI::class], "returnToParent");
+        $this->ctrl->redirectByClass([ilExerciseHandlerGUI::class, ilObjExerciseGUI::class, ilAssignmentPresentationGUI::class, ilExSubmissionGUI::class, ilExSubmissionObjectGUI::class], "returnToParent");
     }
 
     /**

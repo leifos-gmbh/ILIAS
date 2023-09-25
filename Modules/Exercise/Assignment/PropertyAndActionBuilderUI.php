@@ -767,7 +767,7 @@ class PropertyAndActionBuilderUI
             $status != "notgraded" ||
             $cnt_files > 0 ||
             $a_show_global_feedback) {
-            
+
             if ($lpcomment !== "") {
                 $this->addProperty(
                     self::SEC_TUTOR_EVAL,

@@ -128,7 +128,7 @@ class ilExAssTypePortfolioGUI implements ilExAssignmentTypeGUIInterface
                     $ilCtrl->setParameterByClass("ilobjportfoliogui", "ref_id", $ref_id);
                     $ilCtrl->setParameterByClass("ilobjportfoliogui", "exc_back_ref_id", $back_ref_id);
 
-                    $prtf_view = $ilCtrl->getLinkTargetByClass(array("ildashboardgui", "ilportfoliorepositorygui", "ilobjportfoliogui"), "view");
+                    $prtf_view = $ilCtrl->getLinkTargetByClass(array("ildashboardgui", "ilportfoliorepositorygui", "ilobjportfoliogui"), "preview");
                     $prtf_edit = $ilCtrl->getLinkTargetByClass(array("ildashboardgui", "ilportfoliorepositorygui", "ilobjportfoliogui"), "view");
                     $ilCtrl->setParameterByClass("ilobjportfoliogui", "prt_id", "");
                     $ilCtrl->setParameterByClass("ilobjportfoliogui", "ref_id", "");
@@ -150,7 +150,7 @@ class ilExAssTypePortfolioGUI implements ilExAssignmentTypeGUIInterface
                     } else {
                         $link = $f->link()->standard(
                             $lng->txt("exc_view_portfolio"),
-                            $prtf_link
+                            $prtf_view
                         );
                         $builder->addAction(
                             $builder::SEC_SUBMISSION,

@@ -9468,6 +9468,7 @@ exc#:#exc_type_text#:#Text
 exc#:#exc_type_upload#:#Datei
 exc#:#exc_type_upload_team#:#Datei als Team einreichen
 exc#:#exc_value_can_not_set#:#Dieser Wert kann nicht gesetzt werden
+exc#:#exc_view_portfolio#:#Portfolio anzeigen
 exc#:#exc_wait_for_files#:#Der Download sollte automatisch starten. Bei Problemen klicken Sie bitte hier.
 exc#:#exc_wiki_container#:#Wiki-Container
 exc#:#exc_wiki_container_info#:#Ort in dem neue Wikis der Teilnehmer angelegt werden.

@@ -411,8 +411,8 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
                 case "calc_deadline":
                 case "idl":
 
-                    if ($this->ass->getDeadlineMode() === ilExAssignment::DEADLINE_ABSOLUTE_INDIVIDUAL && ($a_row[$col] ?? 0) == 0) {
-                        if ($a_row["requested_idl"]) {
+                    if ($a_ass->getDeadlineMode() === ilExAssignment::DEADLINE_ABSOLUTE_INDIVIDUAL && ($a_row[$col] ?? 0) == 0) {
+                        if ($a_row["requested_idl"] ?? false) {
                             $this->tpl->setVariable(
                                 "VAL_" . strtoupper($col),
                                 $this->lng->txt("exc_deadline_requested")

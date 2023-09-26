@@ -27,11 +27,16 @@ class ilObjHelpSettings extends ilObject2
 
     public function __construct()
     {
-        parent::__construct();
         global $DIC;
 
+        parent::__construct();
+
+        $domain = $DIC->help()->internal()->domain();
+
         $this->db = $DIC->database();
-        $this->settings = $DIC->settings();
+        $this->settings = $domain->settings();
+        $this->help_map = $domain->map();
+        $this->tooltips = $domain->tooltips();
     }
 
     protected function initType(): void
@@ -175,10 +180,10 @@ class ilObjHelpSettings extends ilObject2
         }
 
         // delete mappings
-        ilHelpMapping::deleteEntriesOfModule($a_id);
+        $this->help_map->deleteEntriesOfModule($a_id);
 
         // delete tooltips
-        ilHelp::deleteTooltipsOfModule($a_id);
+        $this->tooltips->deleteTooltipsOfModule($a_id);
 
         // delete help module record
         $ilDB->manipulate("DELETE FROM help_module WHERE " .

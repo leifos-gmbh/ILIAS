@@ -104,7 +104,7 @@ class TooltipsManager
         string $a_text,
         int $a_module_id = 0
     ): void {
-        $this->repo->getAllTooltips($a_tt_id, $a_text, $a_module_id);
+        $this->repo->addTooltip($a_tt_id, $a_text, $a_module_id);
     }
 
     public function updateTooltip(
@@ -119,9 +119,7 @@ class TooltipsManager
     public function getTooltipComponents(
         int $a_module_id = 0
     ): array {
-        $lng = $DIC->language();
-
-        $comps[""] = "- " . $lng->txt("help_all") . " -";
+        $comps[""] = "- " . $this->lng->txt("help_all") . " -";
         foreach ($this->repo->getTooltipComponents($a_module_id) as $c) {
             $comps[$c] = $c;
         }

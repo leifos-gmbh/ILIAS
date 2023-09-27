@@ -18,28 +18,21 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Help;
+namespace ILIAS\Help\Setup;
 
-use ILIAS\DI\Container;
+use ILIAS\Setup;
+use ILIAS\Setup\Objective;
+use ILIAS\Setup\Metrics;
 
-class Service
+class Agent extends Setup\Agent\NullAgent
 {
-    static protected ?InternalService $internal_service = null;
-    protected Container $DIC;
-
-    public function __construct(Container $DIC)
+    public function getUpdateObjective(Setup\Config $config = null): Setup\Objective
     {
-        $this->DIC = $DIC;
+        return new \ilDatabaseUpdateStepsExecutedObjective(new ilHelpDBUpdateSteps());
     }
 
-    /**
-     * Internal service, do not use in other components
-     */
-    public function internal(): InternalService
+    public function getStatusObjective(Metrics\Storage $storage): Objective
     {
-        if (is_null(self::$internal_service)) {
-            self::$internal_service = new InternalService($this->DIC);
-        }
-        return self::$internal_service;
+        return new \ilDatabaseUpdateStepsMetricsCollectedObjective($storage, new ilHelpDBUpdateSteps());
     }
 }

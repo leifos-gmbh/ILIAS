@@ -33,12 +33,14 @@ class TooltipsDBRepository
 
     public function getTooltipPresentationText(
         string $a_tt_id,
-        int $module_id
+        array $module_ids
     ): string {
         $set = $this->db->query(
-            "SELECT tt_text FROM help_tooltip " .
-            " WHERE tt_id = " . $this->db->quote($a_tt_id, "text") .
-            " AND module_id = " . $this->db->quote($module_id, "integer")
+            "SELECT tt.tt_text FROM help_tooltip tt JOIN help_module hmod " .
+            " ON (tt.module_id = hmod.id) " .
+            " WHERE tt.tt_id = " . $this->db->quote($a_tt_id, "text") .
+            " AND " . $this->db->in("tt.module_id", $module_ids, false, "integer") .
+            " ORDER BY hmod.order_nr "
         );
         $rec = $this->db->fetchAssoc($set);
         if (is_array($rec) && $rec["tt_text"] != "") {
@@ -51,14 +53,16 @@ class TooltipsDBRepository
             $fu = (int) strpos($a_tt_id, "_");
             $gen_tt_id = "*" . substr($a_tt_id, $fu);
             $set = $this->db->query(
-                "SELECT tt_text FROM help_tooltip " .
-                " WHERE tt_id = " . $this->db->quote($gen_tt_id, "text") .
-                " AND module_id = " . $this->db->quote($module_id, "integer")
+                "SELECT tt.tt_text FROM help_tooltip tt JOIN help_module hmod " .
+                " ON (tt.module_id = hmod.id) " .
+                " WHERE tt.tt_id = " . $this->db->quote($gen_tt_id, "text") .
+                " AND " . $this->db->in("tt.module_id", $module_ids, false, "integer") .
+                " ORDER BY hmod.order_nr "
             );
             $rec = $this->db->fetchAssoc($set);
             if (is_array($rec) && $rec["tt_text"] != "") {
                 $t = $rec["tt_text"];
-                if ($module_id === 0) {
+                if (count($module_ids) === 1 && current($module_ids) === 0) {
                     $t .= "<br/><i>(" . $a_tt_id . ")</i>";
                 }
                 return $t;

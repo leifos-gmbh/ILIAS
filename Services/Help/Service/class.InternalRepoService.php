@@ -22,6 +22,7 @@ namespace ILIAS\Help;
 
 use ILIAS\Help\Map\MapDBRepository;
 use ILIAS\Help\Tooltips\TooltipsDBRepository;
+use ILIAS\Help\Module\ModuleDBRepository;
 
 class InternalRepoService
 {
@@ -42,6 +43,11 @@ class InternalRepoService
     public function tooltips(): TooltipsDBRepository
     {
         return new TooltipsDBRepository($this->db);
+    }
+
+    public function module(): ModuleDBRepository
+    {
+        return new ModuleDBRepository($this->db);
     }
 
 }

@@ -126,7 +126,7 @@ class MapDBRepository
 
     public function getChaptersForScreenId(
         string $a_screen_id,
-        int $module_id
+        array $module_ids
     ) : \Generator
     {
         $sc_id = explode("/", $a_screen_id);
@@ -145,7 +145,7 @@ class MapDBRepository
                 " OR component = " . $this->db->quote("*", "text") . ")" .
                 " AND screen_id = " . $this->db->quote($sc_id[1], "text") .
                 " AND screen_sub_id = " . $this->db->quote($sc_id[2], "text") .
-                " AND module_id = " . $this->db->quote($module_id, "integer") .
+                " AND ". $this->db->in("module_id", $module_ids, false, "integer") .
                 " ORDER BY lm_tree.lft"
             );
             while ($rec = $this->db->fetchAssoc($set)) {

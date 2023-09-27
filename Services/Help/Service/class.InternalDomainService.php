@@ -25,10 +25,13 @@ use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\Help\Map\MapManager;
 use ILIAS\Help\Tooltips\TooltipsManager;
 use ILIAS\Help\Module\ModuleManager;
+use ILIAS\Help\Presentation\PresentationManager;
 
 class InternalDomainService
 {
     use GlobalDICDomainServices;
+
+    protected array $container = [];
 
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
@@ -45,25 +48,39 @@ class InternalDomainService
 
     public function map(): MapManager
     {
-        return new MapManager(
-            $this->repo_service,
-            $this
-        );
+        return $this->container["map"] ??
+            $this->container["map"] = new MapManager(
+                $this->repo_service,
+                $this
+            );
     }
 
     public function tooltips(): TooltipsManager
     {
-        return new TooltipsManager(
-            $this->repo_service,
-            $this
-        );
+        return $this->container["tooltips"] ??
+            $this->container["tooltips"] = new TooltipsManager(
+                $this->repo_service,
+                $this
+            );
     }
 
     public function module(): ModuleManager
     {
-        return new ModuleManager(
-            $this
-        );
+        if (!isset($this->container["module"])) {
+            $this->container["module"] = new ModuleManager(
+                $this->repo_service->module(),
+                $this
+            );
+        }
+        return $this->container["module"];
+    }
+
+    public function presentation(): PresentationManager
+    {
+        return $this->container["presentation"] ??
+            $this->container["presentation"] = new PresentationManager(
+                $this
+            );
     }
 
 }

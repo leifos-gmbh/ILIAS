@@ -18,28 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Help;
-
-use ILIAS\DI\Container;
-
-class Service
+class ilObjHelpSettings extends ilObject2
 {
-    static protected ?InternalService $internal_service = null;
-    protected Container $DIC;
-
-    public function __construct(Container $DIC)
+    protected function initType(): void
     {
-        $this->DIC = $DIC;
-    }
-
-    /**
-     * Internal service, do not use in other components
-     */
-    public function internal(): InternalService
-    {
-        if (is_null(self::$internal_service)) {
-            self::$internal_service = new InternalService($this->DIC);
-        }
-        return self::$internal_service;
+        $this->type = "hlps";
     }
 }

@@ -96,16 +96,13 @@ class MapManager
         string $a_screen_id,
         int $a_ref_id
     ): array {
-        if (defined('OH_REF_ID') && (int) OH_REF_ID > 0) {
-            $module = 0;
+        if ($this->domain->module()->isAuthoringMode()) {
+            $module_ids = [0];
         } else {
-            $module = (int) $this->settings->get("help_module");
-            if ($module === 0) {
-                return array();
-            }
+            $module_ids = $this->domain->module()->getActiveModules();
         }
         $chaps = [];
-        foreach ($this->repo->getChaptersForScreenId($a_screen_id, $module) as $rec) {
+        foreach ($this->repo->getChaptersForScreenId($a_screen_id, $module_ids) as $rec) {
             if ($rec["perm"] != "" && $rec["perm"] != "-") {
                 // check special "create*" permission
                 if ($rec["perm"] === "create*") {
@@ -156,16 +153,13 @@ class MapManager
             return false;
         }
 
-        if (defined('OH_REF_ID') && (int) OH_REF_ID > 0) {
-            $module = 0;
+        if ($this->domain->module()->isAuthoringMode()) {
+            $module_ids = [0];
         } else {
-            $module = (int) $ilSetting->get("help_module");
-            if ($module === 0) {
-                return false;
-            }
+            $module_ids = $this->domain->module()->getActiveModules();
         }
 
-        foreach ($this->getChaptersForScreenId($a_screen_id, $module) as $rec) {
+        foreach ($this->repo->getChaptersForScreenId($a_screen_id, $module_ids) as $rec) {
             return true;
         }
         return false;

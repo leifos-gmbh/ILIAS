@@ -24,48 +24,48 @@ use ILIAS\DI\Container;
 
 class InternalService
 {
-    protected InternalDataService $data;
-    protected InternalRepoService $repo;
     protected InternalDomainService $domain;
     protected InternalGUIService $gui;
 
+    protected array $container = [];
+
     public function __construct(Container $DIC)
     {
-        $this->data = new InternalDataService();
-
-        $this->repo = new InternalRepoService(
-            $this->data(),
-            $DIC->database()
-        );
-        $this->domain = new InternalDomainService(
-            $DIC,
-            $this->repo,
-            $this->data
-        );
-        $this->gui = new InternalGUIService(
-            $DIC,
-            $this->data,
-            $this->domain
-        );
+        $this->DIC = $DIC;
     }
 
     public function data(): InternalDataService
     {
-        return $this->data;
+        return $this->container["data"] ??
+            $this->container["data"] = new InternalDataService();
     }
 
     public function repo(): InternalRepoService
     {
-        return $this->repo;
+        return $this->container["repo"] ??
+            $this->container["repo"] = new InternalRepoService(
+                $this->data(),
+                $this->DIC->database()
+            );
     }
 
     public function domain(): InternalDomainService
     {
-        return $this->domain;
+        return $this->container["domain"] ??
+            $this->container["domain"] = new InternalDomainService(
+                $this->DIC,
+                $this->repo(),
+                $this->data()
+            );
     }
 
     public function gui(): InternalGUIService
     {
-        return $this->gui;
+        return $this->container["gui"] ??
+            $this->container["gui"] = new InternalGUIService(
+            $this->DIC,
+            $this->data(),
+            $this->domain()
+        );
     }
 }

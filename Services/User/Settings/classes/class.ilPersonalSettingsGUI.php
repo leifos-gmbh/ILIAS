@@ -23,6 +23,7 @@
  */
 class ilPersonalSettingsGUI
 {
+    protected ilHelpGUI $help;
     protected ilPropertyFormGUI $form;
     protected string $entered_new_password;
     protected string $entered_current_password;
@@ -56,6 +57,7 @@ class ilPersonalSettingsGUI
         );
         $this->entered_new_password = $this->request->getNewPassword();
         $this->entered_current_password = $this->request->getCurrentPassword();
+        $this->help = $DIC->help();
     }
 
     /**
@@ -445,9 +447,7 @@ class ilPersonalSettingsGUI
         }
 
         // help tooltips
-        $module_id = (int) $ilSetting->get("help_module");
-        if (((int) OH_REF_ID > 0 || $module_id > 0) && $ilUser->getLanguage() == "de" &&
-            $ilSetting->get("help_mode") != "1") {
+        if ($this->help->showTooltips()) {
             $this->lng->loadLanguageModule("help");
             $cb = new ilCheckboxInputGUI($this->lng->txt("help_toggle_tooltips"), "help_tooltips");
             $cb->setChecked(!($ilUser->prefs["hide_help_tt"] ?? false));
@@ -651,9 +651,7 @@ class ilPersonalSettingsGUI
             }
 
             // help tooltips
-            $module_id = (int) $ilSetting->get("help_module");
-            if (((int) OH_REF_ID > 0 || $module_id > 0) && $ilUser->getLanguage() == "de" &&
-                $ilSetting->get("help_mode") != "1") {
+            if ($this->help->showTooltips()) {
                 $ilUser->setPref("hide_help_tt", (int) !$this->form->getInput("help_tooltips"));
             }
 

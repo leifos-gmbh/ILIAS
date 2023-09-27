@@ -59,18 +59,15 @@ class TooltipsManager
             return "";
         }
 
-        if (defined('OH_REF_ID') && (int) OH_REF_ID > 0) {
-            $module_id = 0;
+        if ($this->domain->module()->isAuthoringMode()) {
+            $module_ids = [0];
         } else {
-            $module_id = (int) $this->settings->get("help_module");
-            if ($module_id === 0) {
-                return "";
-            }
+            $module_ids = $this->domain->module()->getActiveModules();
         }
 
         return $this->repo->getTooltipPresentationText(
             $a_tt_id,
-            $module_id
+            $module_ids
         );
     }
 

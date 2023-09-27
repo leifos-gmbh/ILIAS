@@ -36,7 +36,7 @@ class TooltipsDBRepository
         array $module_ids
     ): string {
         $set = $this->db->query(
-            "SELECT tt.tt_text FROM help_tooltip tt JOIN help_module hmod " .
+            "SELECT tt.tt_text FROM help_tooltip tt LEFT JOIN help_module hmod " .
             " ON (tt.module_id = hmod.id) " .
             " WHERE tt.tt_id = " . $this->db->quote($a_tt_id, "text") .
             " AND " . $this->db->in("tt.module_id", $module_ids, false, "integer") .
@@ -45,7 +45,7 @@ class TooltipsDBRepository
         $rec = $this->db->fetchAssoc($set);
         if (is_array($rec) && $rec["tt_text"] != "") {
             $t = $rec["tt_text"];
-            if ($module_id === 0) {
+            if (count($module_ids) === 1 && current($module_ids) === 0) {
                 $t .= "<br/><i>(" . $a_tt_id . ")</i>";
             }
             return $t;
@@ -53,7 +53,7 @@ class TooltipsDBRepository
             $fu = (int) strpos($a_tt_id, "_");
             $gen_tt_id = "*" . substr($a_tt_id, $fu);
             $set = $this->db->query(
-                "SELECT tt.tt_text FROM help_tooltip tt JOIN help_module hmod " .
+                "SELECT tt.tt_text FROM help_tooltip tt LEFT JOIN help_module hmod " .
                 " ON (tt.module_id = hmod.id) " .
                 " WHERE tt.tt_id = " . $this->db->quote($gen_tt_id, "text") .
                 " AND " . $this->db->in("tt.module_id", $module_ids, false, "integer") .
@@ -68,7 +68,7 @@ class TooltipsDBRepository
                 return $t;
             }
         }
-        if ($module_id === 0) {
+        if (count($module_ids) === 1 && current($module_ids) === 0) {
             return "<i>" . $a_tt_id . "</i>";
         }
         return "";

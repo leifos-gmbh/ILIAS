@@ -301,7 +301,29 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
             if ($this->port_request->getCopyFormProcess() && isset($forms[self::CFORM_CLONE])) {
                 $forms = array(self::CFORM_CLONE => $forms[self::CFORM_CLONE]);
             }
-            $tpl->setContent($this->getCreateInfoMessage() . $this->getCreationFormsHTML($forms));
+            $tpl->setContent($this->getCreationFormsHTML($forms));
+        }
+    }
+
+    public function createFromTemplate(): void
+    {
+        $tpl = $this->tpl;
+        $ilErr = $this->error;
+
+        $new_type = $this->port_request->getNewType();
+
+        // add new object to custom parent container
+        $this->ctrl->saveParameter($this, "crtptrefid");
+        // use forced callback after object creation
+        $this->ctrl->saveParameter($this, "crtcb");
+
+        if (!$this->checkPermissionBool("create", "", $new_type)) {
+            $ilErr->raiseError($this->lng->txt("permission_denied"), $ilErr->MESSAGE);
+        } else {
+            $this->lng->loadLanguageModule($new_type);
+            $this->ctrl->setParameter($this, "new_type", $new_type);
+            $form = $this->initCreateFromTemplateForm();
+            $tpl->setContent($form->getHTML());
         }
     }
 
@@ -370,6 +392,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
         $ti->setRequired(true);
         $form->addItem($ti);
 
+        /*
         $main = new ilRadioGroupInputGUI($this->lng->txt("prtf_creation_mode"), "mode");
         $main->setValue("mode_scratch");
         $form->addItem($main);
@@ -457,7 +480,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
                 $tmpl->setValue($template_id);
                 $main->setValue("mode_tmpl");
             }
-        }
+        }*/
 
 
         $form->setTitle($this->lng->txt("prtf_create_portfolio"));
@@ -467,24 +490,82 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
         return $form;
     }
 
+    protected function initCreateFromTemplateForm(): ilPropertyFormGUI
+    {
+        $ilSetting = $this->settings;
+
+        $this->ctrl->setParameter($this, "new_type", $this->getType());
+
+        $form = new ilPropertyFormGUI();
+        $form->setFormAction($this->ctrl->getFormAction($this));
+
+        // title
+        $ti = new ilTextInputGUI($this->lng->txt("title"), "title");
+        $ti->setSize(min(40, ilObject::TITLE_LENGTH));
+        $ti->setMaxLength(ilObject::TITLE_LENGTH);
+        $ti->setRequired(true);
+        $form->addItem($ti);
+
+        // portfolio templates
+        $templates = ilObjPortfolioTemplate::getAvailablePortfolioTemplates();
+        if (!count($templates)) {
+            $opt_tmpl->setDisabled(true);
+        } else {
+            $tmpl = new ilSelectInputGUI($this->lng->txt("obj_prtt"), "prtt");
+            $tmpl->setRequired(true);
+            $tmpl->setOptions(array("" => $this->lng->txt("please_select")) + $templates);
+            $form->addItem($tmpl);
+
+            // incoming from repository
+            $template_id = $this->port_request->getPortfolioTemplateId();
+            if ($template_id > 0) {
+                $tmpl->setValue($template_id);
+            }
+        }
+
+        $form->setTitle($this->lng->txt("prtf_create_portfolio"));
+        $form->addCommandButton("saveFromTemplate", $this->lng->txt("create"));
+        $form->addCommandButton("toRepository", $this->lng->txt("cancel"));
+
+        return $form;
+    }
+
     public function save(): void
     {
         $form = $this->initCreateForm("prtf");
         // trigger portfolio template "import" process
+        /*
         if ($form->checkInput() && $form->getInput("mode") == "mode_tmpl") {
             $this->createFromTemplateDirect(
                 $form->getInput("title"),
                 $this->port_request->getPortfolioTemplate()
             );
             return;
-        }
+        }*/
 
         parent::save();
+    }
+
+    public function saveFromTemplate(): void
+    {
+        $form = $this->initCreateFromTemplateForm();
+        // trigger portfolio template "import" process
+        if ($form->checkInput()) {
+            $this->createFromTemplateDirect(
+                $form->getInput("title"),
+                $this->port_request->getPortfolioTemplate()
+            );
+            return;
+        } else {
+            $form->setValuesByPost();
+            $this->tpl->setContent($form->getHTML());
+        }
     }
 
     protected function afterSave(ilObject $new_object): void
     {
         // create 1st page / blog
+        /*
         $page = $this->getPageInstance(null, $new_object->getId());
         if ($this->port_request->getPageType() === "page") {
             $page->setType(ilPortfolioPage::TYPE_PAGE);
@@ -500,7 +581,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
             $page->setType(ilPortfolioPage::TYPE_BLOG);
             $page->setTitle($this->port_request->getBlogTitle());
         }
-        $page->create();
+        $page->create();*/
 
         $this->tpl->setOnScreenMessage('success', $this->lng->txt("prtf_portfolio_created"), true);
         $this->ctrl->setParameter($this, "prt_id", $new_object->getId());

@@ -12892,6 +12892,7 @@ prtf#:#prtf_add_new_blog#:#Add New Blog
 prtf#:#prtf_add_new_blog_info#:#The new blog will be added to your personal resources.
 prtf#:#prtf_add_page#:#Add Page
 prtf#:#prtf_add_portfolio#:#Add Portfolio
+prtf#:#prtf_add_portfolio_from_template#:#Add Portfolio From Template
 prtf#:#prtf_all_pages#:#All Pages
 prtf#:#prtf_allow_html#:#Allow HTML/Javascript
 prtf#:#prtf_allow_html_info#:#Enables users to include HTML and/or Javascript in their portfolio pages. This can lead to security issues.

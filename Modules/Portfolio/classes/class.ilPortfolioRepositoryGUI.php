@@ -182,6 +182,13 @@ class ilPortfolioRepositoryGUI
         $button->setCaption("prtf_add_portfolio");
         $button->setUrl($ilCtrl->getLinkTargetByClass("ilObjPortfolioGUI", "create"));
         $ilToolbar->addButtonInstance($button);
+        $templates = ilObjPortfolioTemplate::getAvailablePortfolioTemplates();
+        if (count($templates) > 0) {
+            $button = ilLinkButton::getInstance();
+            $button->setCaption("prtf_add_portfolio_from_template");
+            $button->setUrl($ilCtrl->getLinkTargetByClass("ilObjPortfolioGUI", "createFromTemplate"));
+            $ilToolbar->addButtonInstance($button);
+        }
         $portfolio_list = $this->getPortfolioList();
 
         $tpl->setContent($portfolio_list);

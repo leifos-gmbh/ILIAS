@@ -534,4 +534,18 @@ class ilWorkspaceAccessHandler
             " WHERE ref.wsp_id = " . $ilDB->quote($a_node_id, "integer"));
         return $ilDB->fetchAssoc($set);
     }
+
+    public function addMissingPermissionForObjects(int $node_id, array $objects) : bool
+    {
+        $existing = $this->getPermissions($node_id);
+        $added = false;
+        foreach ($a_obj_ids as $object_id) {
+            if (!in_array($object_id, $existing, true)) {
+                $this->addPermission($node_id, $object_id);
+                $added = true;
+            }
+        }
+        return $added;
+    }
+
 }

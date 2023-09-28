@@ -516,7 +516,7 @@ class ilPortfolioRepositoryGUI
 
         $prtf_id = $this->port_request->getPortfolioId();
         if ($prtf_id && $this->checkAccess("write")) {
-            $this->access_handler->addPermission($prtf_id, ilWorkspaceAccessGUI::PERMISSION_ALL);
+            $this->access_handler->addMissingPermissionForObjects($prtf_id, ilWorkspaceAccessGUI::PERMISSION_ALL);
             $this->setDefault($prtf_id);
         }
         $ilCtrl->redirect($this, "show");
@@ -528,7 +528,7 @@ class ilPortfolioRepositoryGUI
 
         $prtf_id = $this->port_request->getPortfolioId();
         if ($prtf_id && $this->checkAccess("write")) {
-            $this->access_handler->addPermission($prtf_id, ilWorkspaceAccessGUI::PERMISSION_REGISTERED);
+            $this->access_handler->addMissingPermissionForObjects($prtf_id, ilWorkspaceAccessGUI::PERMISSION_REGISTERED);
             $this->setDefault($prtf_id);
         }
         $ilCtrl->redirect($this, "show");

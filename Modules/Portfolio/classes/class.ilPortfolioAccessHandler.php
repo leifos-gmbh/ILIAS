@@ -621,4 +621,31 @@ class ilPortfolioAccessHandler implements ilWACCheckingClass
     {
         return (bool) $this->settings->get('user_portfolios');
     }
+
+    public function addMissingPermissionForObjects(int $node_id, array $objects) : bool
+    {
+        $existing = $this->getPermissions($node_id);
+        $added_obj_ids = [];
+        foreach ($a_obj_ids as $object_id) {
+            if (!in_array($object_id, $existing, true)) {
+                $added_obj_ids[] = $object_id;
+                $this->addPermission($node_id, $object_id);
+                $added = true;
+            }
+        }
+        $this->sendSharedNotification($node_id, $added_obj_ids);
+        return (count($added_obj_ids) > 0);
+    }
+
+    protected function sendSharedNotification(int $node_id, array $object_ids) : void
+    {
+        if (count($object_ids) === 0) {
+            return;
+        }
+        $not = new \ILIAS\Portfolio\Notification\SharedNotification();
+        $not->setObjId($node_id);
+        $not->setSharedToObjectIds($object_ids);
+        //$not->setRecipients($user_ids);
+        $not->send();
+    }
 }

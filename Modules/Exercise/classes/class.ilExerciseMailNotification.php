@@ -33,6 +33,7 @@ class ilExerciseMailNotification extends ilMailNotification
         global $DIC;
 
         $this->user = $DIC->user();
+        $this->domain = $DIC->exercise()->internal()->domain();
         parent::__construct();
     }
 
@@ -44,6 +45,25 @@ class ilExerciseMailNotification extends ilMailNotification
     public function getAssignmentId(): int
     {
         return $this->ass_id;
+    }
+
+    protected function addOpenSubmission() : void
+    {
+        $ass = new ilExAssignment($this->getAssignmentId());
+        $types = ilExAssignmentTypes::getInstance();
+        $type = $types->getById($ass->getType());
+        if ($type->supportsWebDirAccess())
+        {
+            $submission = new ilExSubmission($ass, $this->user->getId());
+            if ($submission->hasSubmittedPrintVersion())
+            {
+                $this->appendBody("\n\n");
+                $this->appendBody(sprintf(
+                    $this->getLanguageText('exc_submission_open_notification_link'),
+                    $this->createPermanentLink(array(), "_" . $this->getAssignmentId() . "_" . $this->user->getId() . "_opensubmission")
+                ));
+            }
+        }
     }
 
     public function send(): bool
@@ -141,6 +161,7 @@ class ilExerciseMailNotification extends ilMailNotification
                         //		$this->getLanguageText("exc_submission_no_new_files")));
                         //}
                     }
+                    $this->addOpenSubmission();
 
                     $this->appendBody("\n\n");
                     $this->appendBody(sprintf(

@@ -306,14 +306,19 @@ class ilPortfolioRepositoryGUI
             // ... handed in
             // exercise portfolio?
             $exercises = ilPortfolioExerciseGUI::checkExercise($this->user_id, $port["id"], false, true);
+            $visible_to_tutor = false;
             foreach ($exercises as $exinfo) {
                 if ($exinfo["submitted"]) {
+                    $visible_to_tutor = true;
                     $props[$exinfo["ass_title"]] =
                         str_replace("$1", $exinfo["submitted_date"], $lng->txt("prtf_submission_on"));
                 } else {
                     $props[$exinfo["ass_title"]] = $lng->txt("prtf_no_submission");
                     //$props[$exinfo["ass_title"]] = "<span class='il_ItemAlertProperty'>" . $lng->txt("prtf_no_submission") . "</span>";
                 }
+            }
+            if ($visible_to_tutor) {
+                $props[$lng->txt("prtf_visible_for_tutor")] = $lng->txt("yes");
             }
 
 

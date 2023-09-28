@@ -626,8 +626,8 @@ class ilPortfolioAccessHandler implements ilWACCheckingClass
     {
         $existing = $this->getPermissions($node_id);
         $added_obj_ids = [];
-        foreach ($a_obj_ids as $object_id) {
-            if (!in_array($object_id, $existing, true)) {
+        foreach ($objects as $object_id) {
+            if (!in_array($object_id, $existing)) {
                 $added_obj_ids[] = $object_id;
                 $this->addPermission($node_id, $object_id);
                 $added = true;

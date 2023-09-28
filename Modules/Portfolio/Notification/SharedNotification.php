@@ -49,25 +49,19 @@ class SharedNotification extends \ilMailNotification
                 $this->getObjectTitle(true)
             )
         );
-        $this->setBody(ilMail::getSalutation($rcp, $this->getLanguage()));
+        $this->setBody(\ilMail::getSalutation($rcp, $this->getLanguage()));
         $this->appendBody("\n\n");
         $this->appendBody(
-            $this->getLanguageText('exc_msg_new_feedback_file_uploaded2')
+            sprintf(
+                $this->getLanguageText('prtf_successfully_shared_prtf_body'),
+                $this->getObjectTitle(false)
+            )
         );
-        $this->appendBody("\n");
-        $this->appendBody(
-            $this->getLanguageText('obj_exc') . ": " . $this->getObjectTitle(true)
-        );
-        $this->appendBody("\n");
-        $this->appendBody(
-            $this->getLanguageText('exc_assignment') . ": " .
-            ilExAssignment::lookupTitle($this->getAssignmentId())
-        );
+        $this->appendObjectInformation();
         $this->appendBody("\n\n");
-        $this->appendBody($this->getLanguageText('exc_mail_permanent_link'));
+        $this->appendBody($this->getLanguageText('prtf_permanent_link'));
         $this->appendBody("\n");
-        $this->appendBody($this->createPermanentLink(array(), '_' . $this->getAssignmentId()) .
-            '#fb' . $this->getAssignmentId());
+        $this->appendBody(\ilLink::_getStaticLink($this->getObjId(), "prtf"));
         $this->getMail()->appendInstallationSignature(true);
 
         $this->sendMail(array($rcp));
@@ -75,9 +69,47 @@ class SharedNotification extends \ilMailNotification
         return true;
     }
 
+    protected function appendObjectInformation() : void
+    {
+        $users = [];
+        foreach ($this->shared_to_obj_ids as $obj_id) {
+            $type = \ilObject::_lookupType($obj_id);
+            switch ($type) {
+                case "crs":
+                case "grp":
+                    $this->appendBody("\n\n" . $this->getLanguage()->txt("obj_" . $type) . ": " .
+                        \ilObject::_lookupTitle($obj_id));
+                    break;
+                case "usr":
+                    $users[] = \ilUserUtil::getNamePresentation($obj_id);
+                    break;
+            }
+        }
+        if (count($users) > 1) {
+            $this->appendBody("\n\n" . $this->getLanguage()->txt("users") . ": ");
+            $this->appendBody("\n" . implode("\n", $users));
+        }
+        if (count($users) === 1) {
+            $this->appendBody("\n\n" . $this->getLanguage()->txt("user") . ": ".current($users));
+        }
+        if (in_array(\ilWorkspaceAccessGUI::PERMISSION_REGISTERED, $this->shared_to_obj_ids, true))
+        {
+            $this->appendBody("\n\n" . $this->getLanguage()->txt("wsp_set_permission_registered"));
+        }
+        if (in_array(\ilWorkspaceAccessGUI::PERMISSION_ALL, $this->shared_to_obj_ids, true))
+        {
+            $this->appendBody("\n\n" . $this->getLanguage()->txt("wsp_set_permission_all"));
+        }
+        if (in_array(\ilWorkspaceAccessGUI::PERMISSION_ALL_PASSWORD, $this->shared_to_obj_ids, true))
+        {
+            $this->appendBody("\n\n" . $this->getLanguage()->txt("wsp_set_permission_all_password"));
+        }
+    }
+
     protected function initLanguage(int $a_usr_id): void
     {
         parent::initLanguage($a_usr_id);
         $this->getLanguage()->loadLanguageModule('prtf');
+        $this->getLanguage()->loadLanguageModule('wsp');
     }
 }

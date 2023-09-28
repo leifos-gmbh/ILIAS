@@ -12980,6 +12980,8 @@ prtf#:#prtf_signature#:#Feld für Unterschrift
 prtf#:#prtf_signature_date#:#Datum, Unterschrift
 prtf#:#prtf_signature_info#:#Das PDF enthält ein Feld, in welchem die Benutzer unterschreiben können.
 prtf#:#prtf_style#:#Portfolio-Style
+prtf#:#prtf_successfully_shared_prtf#:#Bestätigung der Freigabe Ihres Portfolios "%s"
+prtf#:#prtf_successfully_shared_prtf_body#:#Sie haben Ihr Portfolio "%s" erfolgreich freigegeben für:
 prtf#:#prtf_submission_on#:#Abgabe am $1
 prtf#:#prtf_sure_delete_portfolio_pages#:#Wollen Sie die folgende Portfolio- bzw. Blog-Seite wirklich löschen?
 prtf#:#prtf_sure_delete_portfolios#:#Wollen Sie das folgende Portfolio wirklich löschen?

@@ -12980,6 +12980,8 @@ prtf#:#prtf_signature#:#Signature Field
 prtf#:#prtf_signature_date#:#Date, Signature
 prtf#:#prtf_signature_info#:#Adds a field to the print where the author can sign the portfolio.
 prtf#:#prtf_style#:#Portfolio Style
+prtf#:#prtf_successfully_shared_prtf#:#Confirmation Shared Portfolio '%s'
+prtf#:#prtf_successfully_shared_prtf_body#:#You have shared your portfolio '%s' with:
 prtf#:#prtf_submission_on#:#Submitted on $1
 prtf#:#prtf_sure_delete_portfolio_pages#:#Are you sure you want to delete the following portfolio page / blog page?
 prtf#:#prtf_sure_delete_portfolios#:#Are you sure you want to delete the following portfolio?

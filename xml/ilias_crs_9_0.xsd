@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Overview
+
+Course
+    attribute: exportVersion (nonNegativeInteger)
+    attribute: id (string)
+    attribute: showMembers (token:Yes|No)
+
+    CourseSettings
+        courseTitle (string)
+        courseDescription (string)
+
+        Period
+            attribute: withTime (token:Yes|No)
+            start (nonNegativeInteger)
+            end (nonNegativeInteger)
+
+        Availability
+            attribute: alwaysVisible (token:Yes|No)
+            choice:
+                notAvailable (undefined)
+                unlimited (undefined)
+                TemporarilyAvailable
+                    start (nonNegativeInteger)
+                    end (nonNegativeInteger)
+
+        Registration
+            attribute: notification (token:Yes|No)
+            choice:
+                disabled
+                unlimited
+                TemporarilyAvailable
+            leaveEnd (nonNegativeInteger)
+            RegistrationType
+                choice:
+                    direct
+                    Password
+                        attribute: password (string)
+                    confirmation
+                    assign
+            MemberLimitation
+                attribute: enabled (token:Yes|No)
+                attribute: waitingListType (token:none|enabledWithoutAutofill|enabledWithAutofill)
+                maxMembers (nonNegativeInteger)
+                minMembers (nonNegativeInteger)
+
+        CoursePresentation
+                ViewMode
+                    choice:
+                        Session
+                            attribute: linitAcitive (token:Yes|No)
+                            attribute: previous (nonNegativeInteger)
+                            attribute: next (nonNegativeInteger)
+                        simple (undefined)
+                        groupedByType (undefined)
+                        learningObjectives (undefined)
+                        timings (undefined)
+                Sort
+                    attribute: type (token:Manual|Title|Activation|Creation)
+                    attribute: direction (token:ASC|DESC)
+                    attribute: position (token:TOP|BOTTOM)
+                    attribute: order (token:Title|Activation|Creation)
+
+        AdditionalFeatures
+            statusDetermination (string)
+            WelcomeMail
+                attribute: enabled (token:Yes|No)
+            MailToMembersType
+                attribute: enabled (token:Yes|No)
+            showMembers
+                attribute: enabled (token:Yes|No)
+
+        CourseMap
+            attribute: enabled (token:0|1)
+            attribute: latitude (string)
+            attribute: longitude (string)
+            attribute: location_zoom (string)
+
+    CourseInformation
+        importantInformation (string)
+        syllabus (string)
+        targetGroup (string)
+        Contact
+
+    ContainerSettings
+        choice:
+            ContainerSetting
+                attribute: id (undefined)
+
+-->
+
+<xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace = "http://www.ilias.de/Modules/Course/exp/9_0"
+        elementFormDefault="qualified">
+
+    <xs:element name="Course">
+        <xs:complexType>
+            <xs:all>
+                <xs:element minOccurs="0" ref="CourseSettings"/>
+                <xs:element minOccurs="0" ref="CourseInformation"/>
+                <xs:element minOccurs="0" ref="ContainerSettings"/>
+            </xs:all>
+            <xs:attribute name="exportVersion" type="xs:nonNegativeInteger" use="required"/>
+            <xs:attribute name="id" type="xs:string"/>
+            <xs:attribute name="showMembers" default="No">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CourseSettings">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="courseTitle"/>
+                <xs:element minOccurs="0" ref="courseDescription"/>
+                <xs:element minOccurs="0" ref="Period"/>
+                <xs:element minOccurs="0" ref="Availability"/>
+                <xs:element minOccurs="0" ref="Registration"/>
+                <xs:element minOccurs="0" ref="CoursePresentation"/>
+                <xs:element minOccurs="0" ref="AdditionalFeatures"/>
+                <xs:element minOccurs="0" ref="CourseMap"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--################################################################################################################
+    ## + EDIT COURSE ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
+    #################################################################################################################-->
+
+    <xs:element name="courseTitle" type="xs:string"/>
+
+    <xs:element name="courseDescription" type="xs:string"/>
+
+    <!-- PERIOD -->
+    <xs:element name="Period">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="start"/>
+                <xs:element ref="end"/>
+            </xs:all>
+            <xs:attribute name="withTime" default="Yes">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="start" type="xs:nonNegativeInteger"/>
+
+    <xs:element name="end" type="xs:nonNegativeInteger"/>
+
+    <!--################################################################################################################
+    ## + AVAILABILITY +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
+    #################################################################################################################-->
+
+    <xs:element name="Availability">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element minOccurs="0" name="notAvailable"/>
+                <xs:element minOccurs="0" name="unlimited"/>
+                <xs:element minOccurs="0" ref="TemporarilyAvailable"/>
+            </xs:choice>
+            <xs:attribute name="alwaysVisible">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="TemporarilyAvailable">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="start"/>
+                <xs:element ref="end"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--################################################################################################################
+    ## + REGISTRATION SETTINGS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
+    #################################################################################################################-->
+
+    <!-- Registration settings -->
+    <xs:element name="Registration">
+        <xs:complexType>
+            <xs:all>
+                <xs:choice>
+                    <xs:element name="disabled"/>
+                    <xs:element name="unlimited"/>
+                    <xs:element ref="TemporarilyAvailable"/>
+                </xs:choice>
+                <xs:element ref="RegistrationType"/>
+                <xs:element minOccurs="0" ref="MemberLimitation"/>
+                <xs:element minOccurs="0" name="leaveEnd" type="xs:nonNegativeInteger" default="0"/>
+            </xs:all>
+            <!--
+            notification:
+            if enabled all course admins/tutors whose status is
+            'notification will receive a message about new registrations
+            -->
+            <xs:attribute name="notification">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+
+            <xs:attribute name="waitingList">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="RegistrationType">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element name="direct"/>
+                <xs:element name="Password">
+                    <xs:complexType>
+                        <xs:attribute name="password" type="xs:string" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="confirmation"/>
+                <xs:element name="assign"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="MemberLimitation">
+        <xs:complexType>
+            <xs:all>
+                <xs:element minOccurs="0" name="maxMembers" type="xs:nonNegativeInteger" default="0"/>
+                <xs:element minOccurs="0" name="minMembers" type="xs:nonNegativeInteger" default="0"/>
+            </xs:all>
+            <xs:attribute name="enabled" default="No" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="waitingList" default="none" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="none"/>
+                        <xs:enumeration value="enabledWithoutAutofill"/>
+                        <xs:enumeration value="enabledWithAutofill"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <!--################################################################################################################
+    ## + COURSE PRESENTATION ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
+    #################################################################################################################-->
+
+    <xs:element name="CoursePresentation">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="Sort"/>
+                <xs:element ref="ViewMode"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ViewMode">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element ref="Session"/>
+                <xs:element name="simple"/>
+                <xs:element name="groupedByType"/>
+                <xs:element name="learningObjectives"/>
+                <xs:element name="timings"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Sort">
+        <xs:complexType>
+            <xs:attribute name="type" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Manual"/>
+                        <xs:enumeration value="Title"/>
+                        <xs:enumeration value="Activation"/>
+                        <xs:enumeration value="Creation"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="direction">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="ASC"/>
+                        <xs:enumeration value="DESC"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="position">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="TOP"/>
+                        <xs:enumeration value="Bottom"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="order">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Title"/>
+                        <xs:enumeration value="Activation"/>
+                        <xs:enumeration value="Creation"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Session">
+        <xs:complexType>
+            <xs:attribute name="limitActive" use="required" default="No">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="previous" type="xs:nonNegativeInteger" use="required"/>
+            <xs:attribute name="next" type="xs:nonNegativeInteger" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!--################################################################################################################
+    ## + ADDITIONAL FEATURES ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
+    #################################################################################################################-->
+
+    <xs:element name="AdditionalFeatures">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="WelcomeMail"/>
+                <xs:element ref="MailToMembersType"/>
+                <xs:element name="statusDetermination" type="xs:string"/>
+                <xs:element ref="showMembers"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="showMembers" default="Yes">
+        <xs:complexType>
+            <xs:attribute name="enabled" use="required" default="No">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="WelcomeMail">
+        <xs:complexType>
+            <xs:attribute name="enabled" use="required" default="No">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="MailToMembersType">
+        <xs:complexType>
+            <xs:attribute name="enabled" use="required" default="No">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Yes"/>
+                        <xs:enumeration value="No"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <!--################################################################################################################
+    ## + COURSE INFORMATION +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
+    #################################################################################################################-->
+
+    <xs:element name="CourseInformation">
+        <xs:complexType>
+            <xs:all>
+                <xs:element minOccurs="0" name="importantInformation" type="xs:string"/>
+                <xs:element minOccurs="0" name="syllabus" type="xs:string"/>
+                <xs:element minOccurs="0" name="targetGroup" type="xs:string"/>
+                <xs:element minOccurs="0" ref="Contact"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Contact">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="name" type="xs:string"/>
+                <xs:element minOccurs="0" name="responsibility" type="xs:string"/>
+                <xs:element minOccurs="0" name="phone" type="xs:string"/>
+                <xs:element minOccurs="0" name="email" type="xs:string"/>
+                <xs:element minOccurs="0" name="consultation" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--################################################################################################################
+    ## + COURSE MAP +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
+    #################################################################################################################-->
+
+    <xs:element name="CourseMap">
+        <xs:complexType>
+            <xs:attribute name="enabled" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="0"/>
+                        <xs:enumeration value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="latitude" use="required" type="xs:string"/>
+            <xs:attribute name="longitude" use="required" type="xs:string"/>
+            <xs:attribute name="location_zoom" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!--################################################################################################################
+    ## + CONTAINER SETTINGS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
+    #################################################################################################################-->
+
+    <xs:element name="ContainerSettings">
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+                <xs:element ref="ContainerSetting"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ContainerSetting">
+        <xs:complexType mixed="true">
+            <xs:attribute name="id" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

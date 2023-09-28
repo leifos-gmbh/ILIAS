@@ -12947,6 +12947,7 @@ prtf#:#prtf_page_element_teaser_skills#:#The portfolio will display your compete
 prtf#:#prtf_page_type_prtf#:#Portfolio Page
 prtf#:#prtf_page_type_prtt#:#Portfolio Template Page
 prtf#:#prtf_pages_copied#:#The pages have been copied.
+prtf#:#prtf_permanent_link#:#Link to Portfolio:
 prtf#:#prtf_pdf#:#Export as PDF
 prtf#:#prtf_portfolio_created#:#Portfolio added
 prtf#:#prtf_portfolio_created_from_template#:#This is the preview of your new portfolio. To add pages and manage the content of the portfolio click on "Edit Portfolio" on top of this page.
@@ -17048,6 +17049,7 @@ wsp#:#wsp_permission_registered_info#:#This object is shared with all registered
 wsp#:#wsp_permission_removed#:#Entry has been removed.
 wsp#:#wsp_permissions#:#Share
 wsp#:#wsp_personal_resources_description#:#Here you can manage your private files, blogs and artifacts.
+wsp#:#wsp_send_mail#:#Send Mail
 wsp#:#wsp_set_permission_all#:#World Wide Web
 wsp#:#wsp_set_permission_all_password#:#World Wide Web with Password
 wsp#:#wsp_set_permission_course#:#Members of Course

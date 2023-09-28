@@ -604,4 +604,33 @@ class ilPortfolioRepositoryGUI
 
         $this->showOther();
     }
+
+    public function redirectSendMailToSharer(): void
+    {
+        $owner_id = $this->port_request->getOwnerId();
+        $prt_id = $this->port_request->getPortfolioId();
+
+        if ($owner_id > 0) {
+            $login = ilObjUser::_lookupLogin($owner_id);
+
+            // #16530 - see ilObjCourseGUI::createMailSignature
+            $sig = chr(13) . chr(10) . chr(13) . chr(10);
+            $sig .= $this->lng->txt('prtf_permanent_link');
+            $sig .= chr(13) . chr(10) . chr(13) . chr(10);
+            $sig .= ilLink::_getStaticLink($prt_id, "prtf", true);
+            $sig = rawurlencode(base64_encode($sig));
+
+            ilUtil::redirect(ilMailFormCall::getRedirectTarget(
+                $this,
+                "showotherFilter",
+                array(),
+                array(
+                    'type' => 'new',
+                    'rcp_to' => $login,
+                    ilMailFormCall::SIGNATURE_KEY => $sig
+                )
+            ));
+        }
+    }
+
 }

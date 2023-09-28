@@ -12947,6 +12947,7 @@ prtf#:#prtf_page_element_teaser_skills#:#Innerhalb des Portfolios erscheint an d
 prtf#:#prtf_page_type_prtf#:#Portfolioseite
 prtf#:#prtf_page_type_prtt#:#Portfoliovorlagenseite
 prtf#:#prtf_pages_copied#:#Die Seiten wurden kopiert.
+prtf#:#prtf_permanent_link#:#Link zum Portfolio:
 prtf#:#prtf_pdf#:#Exportieren als PDF
 prtf#:#prtf_portfolio_created#:#Portfolio wurde hinzugefügt
 prtf#:#prtf_portfolio_created_from_template#:#Dies ist die Vorschau Ihres neuen Portfolios. Um neue Seiten und Inhalte hinzuzufügen klicken Sie bitte auf "Bearbeiten" oben in dieser Ansicht.
@@ -17048,6 +17049,7 @@ wsp#:#wsp_permission_registered_info#:#Dieses Objekt ist für alle registrierten
 wsp#:#wsp_permission_removed#:#Der Eintrag wurde gelöscht.
 wsp#:#wsp_permissions#:#Freigabe
 wsp#:#wsp_personal_resources_description#:#Hier können Sie persönliche Dateien, Blogs und Nachweise verwalten.
+wsp#:#wsp_send_mail#:#Mail senden
 wsp#:#wsp_set_permission_all#:#Internet/WWW
 wsp#:#wsp_set_permission_all_password#:#Internet/WWW mit Passwort
 wsp#:#wsp_set_permission_course#:#Kursmitglieder

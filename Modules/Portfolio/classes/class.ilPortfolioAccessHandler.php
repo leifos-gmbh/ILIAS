@@ -421,7 +421,6 @@ class ilPortfolioAccessHandler implements ilWACCheckingClass
         $ilDB = $this->db;
         $ilUser = $this->user;
         $obj_ids = [];
-
         if (!$a_filter["acl_type"]) {
             $obj_ids = self::getPossibleSharedTargets();
         } else {
@@ -489,7 +488,7 @@ class ilPortfolioAccessHandler implements ilWACCheckingClass
             $sql .= " AND acl.tstamp > " . $ilDB->quote($dt->get(IL_CAL_UNIX), "integer");
         }
 
-        if ($a_filter["crsgrp"]) {
+        if ($a_filter["crsgrp"] ?? false) {
             $part = ilParticipants::getInstanceByObjId($a_filter['crsgrp']);
             $part = $part->getParticipants();
             if (!count($part)) {

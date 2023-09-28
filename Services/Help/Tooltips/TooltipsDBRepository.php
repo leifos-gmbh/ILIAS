@@ -35,7 +35,7 @@ class TooltipsDBRepository
         string $a_tt_id,
         array $module_ids
     ): string {
-        $set = $this->db->query(
+        $set = $this->db->query($q =
             "SELECT tt.tt_text FROM help_tooltip tt LEFT JOIN help_module hmod " .
             " ON (tt.module_id = hmod.id) " .
             " WHERE tt.tt_id = " . $this->db->quote($a_tt_id, "text") .

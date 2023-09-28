@@ -52,7 +52,7 @@ class ModuleManager
             $conf = $imp->getConfig("Services/Help");
             $conf->setModuleId($id);
             $new_id = $imp->importObject(null, $file["tmp_name"], $file["name"], "lm", "Modules/LearningModule"); //
-            $newObj = new ilObjLearningModule($new_id, false);
+            $newObj = new \ilObjLearningModule($new_id, false);
 
             $this->repo->writeHelpModuleLmId($id, $newObj->getId());
         } catch (\ilManifestFileNotFoundImportException $e) {

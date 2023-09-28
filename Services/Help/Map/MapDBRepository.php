@@ -131,25 +131,27 @@ class MapDBRepository
     {
         $sc_id = explode("/", $a_screen_id);
         $chaps = array();
-        if ($sc_id[0] != "") {
-            if ($sc_id[1] == "") {
-                $sc_id[1] = "-";
-            }
-            if ($sc_id[2] == "") {
-                $sc_id[2] = "-";
-            }
-            $set = $this->db->query(
-                "SELECT chap, perm FROM help_map JOIN lm_tree" .
-                " ON (help_map.chap = lm_tree.child) " .
-                " WHERE (component = " . $this->db->quote($sc_id[0], "text") .
-                " OR component = " . $this->db->quote("*", "text") . ")" .
-                " AND screen_id = " . $this->db->quote($sc_id[1], "text") .
-                " AND screen_sub_id = " . $this->db->quote($sc_id[2], "text") .
-                " AND ". $this->db->in("module_id", $module_ids, false, "integer") .
-                " ORDER BY lm_tree.lft"
-            );
-            while ($rec = $this->db->fetchAssoc($set)) {
-                yield $rec;
+        foreach ($module_ids as $module_id) {
+            if ($sc_id[0] != "") {
+                if ($sc_id[1] == "") {
+                    $sc_id[1] = "-";
+                }
+                if ($sc_id[2] == "") {
+                    $sc_id[2] = "-";
+                }
+                $set = $this->db->query(
+                    "SELECT chap, perm FROM help_map JOIN lm_tree" .
+                    " ON (help_map.chap = lm_tree.child) " .
+                    " WHERE (component = " . $this->db->quote($sc_id[0], "text") .
+                    " OR component = " . $this->db->quote("*", "text") . ")" .
+                    " AND screen_id = " . $this->db->quote($sc_id[1], "text") .
+                    " AND screen_sub_id = " . $this->db->quote($sc_id[2], "text") .
+                    " AND module_id = " . $this->db->quote($module_id, "integer") .
+                    " ORDER BY lm_tree.lft"
+                );
+                while ($rec = $this->db->fetchAssoc($set)) {
+                    yield $rec;
+                }
             }
         }
     }

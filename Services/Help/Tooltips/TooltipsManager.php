@@ -64,7 +64,6 @@ class TooltipsManager
         } else {
             $module_ids = $this->domain->module()->getActiveModules();
         }
-
         return $this->repo->getTooltipPresentationText(
             $a_tt_id,
             $module_ids

@@ -6,51 +6,51 @@ Course
     attribute: id (string)
     attribute: showMembers (token:Yes|No)
 
-    CourseSettings
-        courseTitle (string)
-        courseDescription (string)
 
-        Period
-            attribute: withTime (token:Yes|No)
-            start (nonNegativeInteger)
-            end (nonNegativeInteger)
+    courseTitle (string)
+    courseDescription (string)
 
-        Availability
-            attribute: alwaysVisible (token:Yes|No)
+    Period
+        attribute: withTime (token:Yes|No)
+        start (nonNegativeInteger)
+        end (nonNegativeInteger)
+
+    Availability
+        attribute: alwaysVisible (token:Yes|No)
+        choice:
+            notAvailable (undefined)
+            unlimited (undefined)
+            TemporarilyAvailable
+                start (nonNegativeInteger)
+                end (nonNegativeInteger)
+
+    Registration
+        attribute: notification (token:Yes|No)
+        choice:
+            disabled
+            unlimited
+            TemporarilyAvailable
+        leaveEnd (nonNegativeInteger)
+        RegistrationType
             choice:
-                notAvailable (undefined)
-                unlimited (undefined)
-                TemporarilyAvailable
-                    start (nonNegativeInteger)
-                    end (nonNegativeInteger)
+                direct
+                Password
+                    attribute: password (string)
+                confirmation
+                assign
+        MemberLimitation
+            attribute: enabled (token:Yes|No)
+            attribute: waitingListType (token:none|enabledWithoutAutofill|enabledWithAutofill)
+            maxMembers (nonNegativeInteger)
+            minMembers (nonNegativeInteger)
 
-        Registration
-            attribute: notification (token:Yes|No)
+   CoursePresentation
+        ViewMode
             choice:
-                disabled
-                unlimited
-                TemporarilyAvailable
-            leaveEnd (nonNegativeInteger)
-            RegistrationType
-                choice:
-                    direct
-                    Password
-                        attribute: password (string)
-                    confirmation
-                    assign
-            MemberLimitation
-                attribute: enabled (token:Yes|No)
-                attribute: waitingListType (token:none|enabledWithoutAutofill|enabledWithAutofill)
-                maxMembers (nonNegativeInteger)
-                minMembers (nonNegativeInteger)
-
-        CoursePresentation
-                ViewMode
-                    choice:
-                        Session
-                            attribute: linitAcitive (token:Yes|No)
-                            attribute: previous (nonNegativeInteger)
-                            attribute: next (nonNegativeInteger)
+                Session
+                    attribute: linitAcitive (token:Yes|No)
+                    attribute: previous (nonNegativeInteger)
+                    attribute: next (nonNegativeInteger)
                         simple (undefined)
                         groupedByType (undefined)
                         learningObjectives (undefined)
@@ -61,20 +61,14 @@ Course
                     attribute: position (token:TOP|BOTTOM)
                     attribute: order (token:Title|Activation|Creation)
 
-        AdditionalFeatures
-            statusDetermination (string)
-            WelcomeMail
-                attribute: enabled (token:Yes|No)
-            MailToMembersType
-                attribute: enabled (token:Yes|No)
-            showMembers
-                attribute: enabled (token:Yes|No)
-
-        CourseMap
-            attribute: enabled (token:0|1)
-            attribute: latitude (string)
-            attribute: longitude (string)
-            attribute: location_zoom (string)
+    AdditionalFeatures
+        statusDetermination (string)
+        WelcomeMail
+            attribute: enabled (token:Yes|No)
+        MailToMembersType
+            attribute: enabled (token:Yes|No)
+        showMembers
+            attribute: enabled (token:Yes|No)
 
     CourseInformation
         importantInformation (string)
@@ -87,6 +81,12 @@ Course
             ContainerSetting
                 attribute: id (undefined)
 
+    CourseMap
+        attribute: enabled (token:0|1)
+        attribute: latitude (string)
+        attribute: longitude (string)
+        attribute: location_zoom (string)
+
 -->
 
 <xs:schema
@@ -97,9 +97,17 @@ Course
     <xs:element name="Course">
         <xs:complexType>
             <xs:all>
-                <xs:element minOccurs="0" ref="CourseSettings"/>
+                <xs:element minOccurs="0" name="courseTitle" type="xs:string" default=""/>
+                <xs:element minOccurs="0" name="courseDescription" type="xs:string" default=""/>
+                <xs:element minOccurs="0" ref="Period"/>
+                <xs:element minOccurs="0" ref="Availability"/>
+                <xs:element minOccurs="0" ref="Registration"/>
+                <xs:element minOccurs="0" ref="CoursePresentation"/>
+                <xs:element minOccurs="0" ref="AdditionalFeatures"/>
                 <xs:element minOccurs="0" ref="CourseInformation"/>
+                <xs:element minOccurs="0" ref="CourseMap"/>
                 <xs:element minOccurs="0" ref="ContainerSettings"/>
+                <xs:element minOccurs="0" ref="CourseMap"/>
             </xs:all>
             <xs:attribute name="exportVersion" type="xs:nonNegativeInteger" use="required"/>
             <xs:attribute name="id" type="xs:string"/>
@@ -111,21 +119,6 @@ Course
                     </xs:restriction>
                 </xs:simpleType>
             </xs:attribute>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:element name="CourseSettings">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" name="courseTitle" type="xs:string" default=""/>
-                <xs:element minOccurs="0" name="courseDescription" type="xs:string" default=""/>
-                <xs:element minOccurs="0" ref="Period"/>
-                <xs:element minOccurs="0" ref="Availability"/>
-                <xs:element minOccurs="0" ref="Registration"/>
-                <xs:element minOccurs="0" ref="CoursePresentation"/>
-                <xs:element minOccurs="0" ref="AdditionalFeatures"/>
-                <xs:element minOccurs="0" ref="CourseMap"/>
-            </xs:sequence>
         </xs:complexType>
     </xs:element>
 
@@ -158,9 +151,9 @@ Course
     <xs:element name="Availability">
         <xs:complexType>
             <xs:choice>
-                <xs:element minOccurs="0" name="notAvailable"/>
-                <xs:element minOccurs="0" name="unlimited"/>
-                <xs:element minOccurs="0" ref="TemporarilyAvailable"/>
+                <xs:element name="notAvailable"/>
+                <xs:element name="unlimited"/>
+                <xs:element ref="TemporarilyAvailable"/>
             </xs:choice>
             <xs:attribute name="alwaysVisible">
                 <xs:simpleType>
@@ -272,8 +265,8 @@ Course
     <xs:element name="CoursePresentation">
         <xs:complexType>
             <xs:all>
-                <xs:element ref="Sort"/>
                 <xs:element ref="ViewMode"/>
+                <xs:element ref="Sort"/>
             </xs:all>
         </xs:complexType>
     </xs:element>

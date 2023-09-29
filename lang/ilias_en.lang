@@ -9116,6 +9116,7 @@ exc#:#exc_global_feedback_file_date#:#Availability
 exc#:#exc_global_feedback_file_date_deadline#:#After deadline
 exc#:#exc_global_feedback_file_date_upload#:#After submission
 exc#:#exc_go_to_exercise#:#Go to Exercise
+exc#:#exc_graded_mem_notified#:#All graded participants have been notified.
 exc#:#exc_grades#:#Grades Overview
 exc#:#exc_grades_overview#:#Grades View
 exc#:#exc_hand_in#:#Hand In
@@ -9178,6 +9179,7 @@ exc#:#exc_no_assignments_available#:#No assignments created yet. Please open ‘
 exc#:#exc_no_deadline_specified#:#No deadline specified.
 exc#:#exc_no_feedback_dir_found_in_zip#:#The directory structure of the uploaded zip-archive could not be processed.
 exc#:#exc_no_get_target#:#A valid target has not been sent.
+exc#:#exc_no_graded_mem_selected#:#Please select at least one graded participant.
 exc#:#exc_no_participants#:#There are currently no participants.
 exc#:#exc_no_portfolio_templates#:#There are no Portfolio Templates available.
 exc#:#exc_no_team_yet#:#Not assigned to a team

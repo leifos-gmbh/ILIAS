@@ -226,7 +226,10 @@ class ilExerciseMailNotification extends ilMailNotification
                     $this->setBody(ilMail::getSalutation($rcp, $this->getLanguage()));
                     $this->appendBody("\n\n");
                     $this->appendBody(
-                        $this->getLanguageText('exc_msg_grading_done_body')
+                        sprintf(
+                            $this->getLanguageText('exc_msg_grading_done_body'),
+                            $this->getObjectTitle(false)
+                        )
                     );
                     $this->appendBody("\n");
                     $this->appendBody(

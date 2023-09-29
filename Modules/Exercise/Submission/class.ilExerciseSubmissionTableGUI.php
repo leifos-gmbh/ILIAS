@@ -128,7 +128,10 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
         }
 
         $this->addMultiCommand("sendMembers", $this->lng->txt("exc_send_assignment"));
-        $this->addMultiCommand("sendGradingNotification", $this->lng->txt("exc_send_grading_notification"));
+
+        if ($this->mode == self::MODE_BY_ASSIGNMENT) {
+            $this->addMultiCommand("sendGradingNotification", $this->lng->txt("exc_send_grading_notification"));
+        }
 
         if ($this->mode == self::MODE_BY_ASSIGNMENT &&
             $this->ass &&

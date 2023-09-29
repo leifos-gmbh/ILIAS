@@ -2329,20 +2329,18 @@ class ilExerciseManagementGUI
 
         if (count($graded_users) === 0) {
             $this->tpl->setOnScreenMessage("failure", $this->lng->txt("exc_no_graded_mem_selected"), true);
-            $ilCtrl->redirect($this, $this->getViewBack());
+            $this->ctrl->redirect($this, $this->getViewBack());
         }
 
         $not = new ilExerciseMailNotification();
         $not->setType(ilExerciseMailNotification::TYPE_GRADING_DONE);
         $not->setAssignmentId($ass_id);
         $not->setObjId($this->exercise->getId());
-        if ($this->getRefId() > 0) {
-            $not->setRefId($this->exercise->getRefId());
-        }
-        $not->setRecipients($user_ids);
+        $not->setRefId($this->exercise->getRefId());
+        $not->setRecipients($graded_users);
         $not->send();
-        $this->tpl->setOnScreenMessage("failure", $this->lng->txt("exc_no_graded_mem_notified"), true);
-        $ilCtrl->redirect($this, $this->getViewBack());
+        $this->tpl->setOnScreenMessage("success", $this->lng->txt("exc_graded_mem_notified"), true);
+        $this->ctrl->redirect($this, $this->getViewBack());
     }
 
 }

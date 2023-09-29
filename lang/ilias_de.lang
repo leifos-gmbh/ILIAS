@@ -9155,6 +9155,8 @@ exc#:#exc_min_nr_info#:#Dieser Wert muss mindestens so hoch sein, wie die Anzahl
 exc#:#exc_min_team_participants#:#Minimale Anzahl
 exc#:#exc_msg_all_mandatory_ass#:#Sie müssen alle verpflichtenden Übungseinheiten bestehen, um die Übung als ganze zu bestehen.
 exc#:#exc_msg_failed_mandatory#:#Sie haben mindestens eine obgligatorische Übungseinheit nicht bestanden.
+exc#:#exc_msg_grading_done#:#Es wurde eine Übungseinheit in Übung "%s" bewertet.
+exc#:#exc_msg_grading_done_body#:#Ein Tutor hat Ihre Lösungsabgabe in Übung "%s" bewertet.
 exc#:#exc_msg_min_number_ass#:#Sie müssen mindestens %s Übungseinheiten bestehen, um die Übung zu bestehen.
 exc#:#exc_msg_missed_minimum_number#:#Sie haben die Mindestanzahl an Übungseinheiten nicht bestanden.
 exc#:#exc_msg_new_feedback_file_uploaded#:#Es wurde eine neue Feedback-Datei zur Übung "%s" hinzugefügt.
@@ -9308,6 +9310,7 @@ exc#:#exc_select_portfolio_change#:#Anderes Portfolio benutzen
 exc#:#exc_select_portfolio_info#:#Bitte wählen Sie eines Ihrer Portfolios, um es in dieser Übungseinheit zu benutzen.
 exc#:#exc_select_portfolio_unlink#:#Portfolio entfernen
 exc#:#exc_send_assignment#:#Übungseinheit per Mail verschicken
+exc#:#exc_send_grading_notification#:#Benachrichtigung über Bewertung schicken
 exc#:#exc_settings_feedback#:#Rückmeldung
 exc#:#exc_settings_feedback_file#:#Datei
 exc#:#exc_settings_feedback_file_info#:#Tutoren laden ihre Datei hoch. Der jeweilige Teilnehmer erhält eine Benachrichtigung und die Datei wird ihm in der Übungseinheiten-Übersicht angezeigt.

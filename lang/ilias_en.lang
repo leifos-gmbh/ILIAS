@@ -9155,6 +9155,8 @@ exc#:#exc_min_nr_info#:#This value must be equal or higher than the number of co
 exc#:#exc_min_team_participants#:#Minimal Number
 exc#:#exc_msg_all_mandatory_ass#:#You must pass all mandatory assignments to pass the exercise.
 exc#:#exc_msg_failed_mandatory#:#You failed in at least one mandatory assignment.
+exc#:#exc_msg_grading_done#:#An assignment has been graded in exercise "%s".
+exc#:#exc_msg_grading_done_body#:#a tutor has graded your submission in exercise "%s".
 exc#:#exc_msg_min_number_ass#:#You must pass a minimum of %s assignments to pass the exercise.
 exc#:#exc_msg_missed_minimum_number#:#You did not pass the minimum number of assignments.
 exc#:#exc_msg_new_feedback_file_uploaded#:#A new feedback file has been added to exercise "%s".
@@ -9308,6 +9310,7 @@ exc#:#exc_select_portfolio_change#:#Use different portfolio
 exc#:#exc_select_portfolio_info#:#Please select one of your portfolios to use it with this assignment.
 exc#:#exc_select_portfolio_unlink#:#Remove Portfolio
 exc#:#exc_send_assignment#:#Send Assignment by Mail
+exc#:#exc_send_grading_notification#:#Send Grading Notification
 exc#:#exc_settings_feedback#:#Evaluation
 exc#:#exc_settings_feedback_file#:#By File
 exc#:#exc_settings_feedback_file_info#:#Tutors upload a file. The participant receives a notification about it and can access the file at the assignment overview.

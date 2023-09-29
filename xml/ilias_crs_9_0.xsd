@@ -117,8 +117,8 @@ Course
     <xs:element name="CourseSettings">
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="0" ref="courseTitle"/>
-                <xs:element minOccurs="0" ref="courseDescription"/>
+                <xs:element minOccurs="0" name="courseTitle" type="xs:string" default=""/>
+                <xs:element minOccurs="0" name="courseDescription" type="xs:string" default=""/>
                 <xs:element minOccurs="0" ref="Period"/>
                 <xs:element minOccurs="0" ref="Availability"/>
                 <xs:element minOccurs="0" ref="Registration"/>
@@ -133,16 +133,12 @@ Course
     ## + EDIT COURSE ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
     #################################################################################################################-->
 
-    <xs:element name="courseTitle" type="xs:string"/>
-
-    <xs:element name="courseDescription" type="xs:string"/>
-
     <!-- PERIOD -->
     <xs:element name="Period">
         <xs:complexType>
             <xs:all>
-                <xs:element ref="start"/>
-                <xs:element ref="end"/>
+                <xs:element name="start" type="xs:nonNegativeInteger"/>
+                <xs:element name="end" type="xs:nonNegativeInteger"/>
             </xs:all>
             <xs:attribute name="withTime" default="Yes">
                 <xs:simpleType>
@@ -154,10 +150,6 @@ Course
             </xs:attribute>
         </xs:complexType>
     </xs:element>
-
-    <xs:element name="start" type="xs:nonNegativeInteger"/>
-
-    <xs:element name="end" type="xs:nonNegativeInteger"/>
 
     <!--################################################################################################################
     ## + AVAILABILITY +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
@@ -184,8 +176,8 @@ Course
     <xs:element name="TemporarilyAvailable">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="start"/>
-                <xs:element ref="end"/>
+                <xs:element name="start" type="xs:nonNegativeInteger"/>
+                <xs:element name="end" type="xs:nonNegativeInteger"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -348,8 +340,8 @@ Course
                     </xs:restriction>
                 </xs:simpleType>
             </xs:attribute>
-            <xs:attribute name="previous" type="xs:nonNegativeInteger" use="required"/>
-            <xs:attribute name="next" type="xs:nonNegativeInteger" use="required"/>
+            <xs:attribute name="previous" type="xs:integer" use="required"/>
+            <xs:attribute name="next" type="xs:integer" use="required"/>
         </xs:complexType>
     </xs:element>
 

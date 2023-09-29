@@ -30,7 +30,7 @@ Group
             start (nonNegativeInteger)
             end (nonNegativeInteger)
         CancellationEnd
-            cancelDate (dateTime)
+            leaveDate (dateTime)
         MemberLimitation
             attribute: enabled (token:Yes|No)
             attribute: waitingList (token:none|enabledWithoutAutofill|enabledWithAutofill)
@@ -86,30 +86,15 @@ Group
     <xs:element name="Group">
         <xs:complexType>
             <xs:all>
-                <!-- MISC -->
                 <xs:element ref="Owner"/>
-
-                <!-- GROUP INFORMATION -->
-                <xs:element minOccurs="0" ref="information"/>
-
-                <!-- EDIT GROUP -->
-                <xs:element ref="title"/>
-                <xs:element ref="description"/>
+                <xs:element minOccurs="0" name="information" type="xs:string"/>
+                <xs:element name="title" type="xs:string" maxLength="255" default=""/>
+                <xs:element name="description" type="xs:string" default=""/>
                 <xs:element minOccurs="0" ref="Period"/>
-
-                <!-- GROUP REGISTRATION -->
                 <xs:element minOccurs="0" ref="Registration"/>
-
-                <!-- GROUP PRESENTATION -->
                 <xs:element minOccurs="0" ref="GroupPresentation"/>
-
-                <!-- CONTAINER SETTINGS -->
                 <xs:element minOccurs="0" ref="ContainerSettings"/>
-
-                <!-- GROUP MAP -->
                 <xs:element minOccurs="0" ref="GroupMap"/>
-
-                <!-- ADDITIONAL FEATURES -->
                 <xs:element minOccurs="0" ref="AdditionalFeatures"/>
             </xs:all>
             <xs:attribute name="exportVersion" type="xs:nonNegativeInteger" use="required"/>
@@ -126,28 +111,15 @@ Group
     </xs:element>
 
     <!--################################################################################################################
-    ## + GROUP INFORMATION ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
-    #################################################################################################################-->
-
-    <!-- INFORMATION -->
-    <xs:element name="information" type="xs:string"/>
-
-    <!--################################################################################################################
     ## + EDIT GROUP +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
     #################################################################################################################-->
-
-    <!-- TITLE -->
-    <xs:element name="title" type="xs:string" maxLength="255" default=""/>
-
-    <!-- DESCRIPTION -->
-    <xs:element name="description" type="xs:string" default=""/>
 
     <!-- PERIOD -->
     <xs:element name="Period">
         <xs:complexType>
             <xs:all>
-                <xs:element ref="start"/>
-                <xs:element ref="end"/>
+                <xs:element name="start" type="xs:nonNegativeInteger" default="0"/>
+                <xs:element name="end" type="xs:nonNegativeInteger" default="0"/>
             </xs:all>
             <xs:attribute name="withTime" default="Yes">
                 <xs:simpleType>
@@ -160,12 +132,6 @@ Group
         </xs:complexType>
     </xs:element>
 
-    <!-- START TIME (unix time stamp) -->
-    <xs:element name="start" type="xs:nonNegativeInteger" default="0"/>
-
-    <!-- END TIME (unix time stamp) -->
-    <xs:element name="end" type="xs:nonNegativeInteger" default="0"/>
-
     <!--################################################################################################################
     ## + GROUP REGISTRATION +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
     #################################################################################################################-->
@@ -176,7 +142,7 @@ Group
             <xs:all>
                 <xs:element ref="Type"/>
                 <xs:element minOccurs="0" ref="TemporarilyAvailable"/>
-                <xs:element minOccurs="0" ref="CancellationEnd"/>
+                <xs:element minOccurs="0" name="leaveDate" type="xs:nonNegativeInteger" default="0"/>
                 <xs:element minOccurs="0" ref="MemberLimitation"/>
                 <xs:element minOccurs="0" ref="AdmissionPerLink"/>
             </xs:all>
@@ -202,23 +168,11 @@ Group
     <xs:element name="TemporarilyAvailable">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="start"/>
-                <xs:element ref="end"/>
+                <xs:element name="start" type="xs:nonNegativeInteger" default="0"/>
+                <xs:element name="end" type="xs:nonNegativeInteger" default="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
-    <!-- LIMITED UNSUBSCRIBE FROM GROUP -->
-    <xs:element name="CancellationEnd">
-        <xs:complexType>
-            <xs:all>
-                <xs:element ref="cancelDate"/>
-            </xs:all>
-        </xs:complexType>
-    </xs:element>
-
-    <!-- CANCEL DATE  (unix time stamp) -->
-    <xs:element name="cancelDate" type="xs:nonNegativeInteger" default="0"/>
 
     <!-- MEMBER LIMITATION -->
     <xs:element name="MemberLimitation">
@@ -269,7 +223,7 @@ Group
     <xs:element name="GroupPresentation">
         <xs:complexType>
             <xs:all>
-                <xs:element minOccurs="0" ref="tileImage"/>
+                <xs:element minOccurs="0" name="tileImage" type="xs:base64Binary" default=""/>
                 <xs:element minOccurs="0" ref="SessionLimit"/>
                 <xs:element ref="Sort"/>
             </xs:all>
@@ -309,9 +263,6 @@ Group
         </xs:complexType>
     </xs:element>
 
-    <!-- TILE IMAGE -->
-    <xs:element name="tileImage" type="xs:base64Binary" default=""/>
-
     <!-- PRESENTATION TYPE -->
     <xs:element name="PresentationType">
         <xs:complexType>
@@ -331,8 +282,8 @@ Group
                     </xs:restriction>
                 </xs:simpleType>
             </xs:attribute>
-            <xs:attribute name="previous" type="xs:nonNegativeInteger" default="0" use="required"/>
-            <xs:attribute name="next" type="xs:nonNegativeInteger" default="0" use="required"/>
+            <xs:attribute name="previous" type="xs:integer" default="0" use="required"/>
+            <xs:attribute name="next" type="xs:integer" default="0" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -380,6 +331,7 @@ Group
             </xs:restriction>
         </xs:simpleType>
     </xs:element>
+
     <!--################################################################################################################
     ## + ADDITIONAL FEATURES ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ##
     #################################################################################################################-->

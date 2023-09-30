@@ -6354,6 +6354,7 @@ content#:#cont_ed_insert_grid#:#Insert Column Layout
 content#:#cont_ed_insert_grid_info#:#Adds a responsive column layout based on a grid with 12 units per row.
 content#:#cont_ed_insert_iim#:#Insert Interactive Image
 content#:#cont_ed_insert_incl#:#Insert Content Snippet
+content#:#cont_ed_insert_lay#:#Insert Layout Template
 content#:#cont_ed_insert_lhist#:#Insert Learning History
 content#:#cont_ed_insert_list#:#Insert Advanced List
 content#:#cont_ed_insert_lpe#:#Insert Login Page Element

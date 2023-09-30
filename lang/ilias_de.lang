@@ -6354,6 +6354,7 @@ content#:#cont_ed_insert_grid#:#Spaltenlayout einfügen
 content#:#cont_ed_insert_grid_info#:#Fügt ein responsives Spaltenlayout basierend auf einem Raster mit 12 Einheiten je Zeile ein.
 content#:#cont_ed_insert_iim#:#Interaktives Bild einfügen
 content#:#cont_ed_insert_incl#:#Inhaltsbaustein einfügen
+content#:#cont_ed_insert_lay#:#Layoutvorlage einfügen
 content#:#cont_ed_insert_lhist#:#Lernverlauf einfügen
 content#:#cont_ed_insert_list#:#Erweiterte Liste einfügen
 content#:#cont_ed_insert_lpe#:#Login-Seitenelement einfügen

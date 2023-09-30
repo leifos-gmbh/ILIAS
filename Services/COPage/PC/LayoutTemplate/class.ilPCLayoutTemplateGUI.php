@@ -70,7 +70,7 @@ class ilPCLayoutTemplateGUI extends ilPageContentGUI
     /**
      * Init creation from
      */
-    public function initForm(): ilPropertyFormGUI
+    public function initCreationForm(): ilPropertyFormGUI
     {
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;

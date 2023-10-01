@@ -45,6 +45,7 @@ export default class PlaceHolderUIActionHandler {
         this.actionFactory = actionFactory;
         this.client = client;
         this.ui = null;
+        this.pageUi = null;
         this.dispatcher = null;
     }
 
@@ -53,6 +54,13 @@ export default class PlaceHolderUIActionHandler {
      */
     setUI(ui) {
         this.ui = ui;
+    }
+
+    /**
+     * @param {PageUI} ui
+     */
+    setPageUI(ui) {
+        this.pageUi = ui;
     }
 
     /**
@@ -113,8 +121,9 @@ export default class PlaceHolderUIActionHandler {
         const client = this.client;
 
         if (this.ui.uiModel.config.editPlaceholders) {
-            client.sendForm(actionFactory.page().command().editLegacy(params.cname, params.pcid,
-                params.hierid));
+            this.pageUi.loadGenericEditingForm(params.cname, params.pcid, params.hierid);
+            //client.sendForm(actionFactory.page().command().editLegacy(params.cname, params.pcid,
+            //    params.hierid));
             //form_sent = true;
         } else {
             let pcModel = page_model.getPCModel(page_model.getCurrentPCId());

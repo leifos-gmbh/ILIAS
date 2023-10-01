@@ -20,7 +20,7 @@ import PAGE_ACTIONS from "../../page/actions/page-action-types.js";
 /**
  * placeholder ui
  */
-export default class MediaUI {
+export default class PlaceholderUI {
 
 
     /**
@@ -123,5 +123,4 @@ export default class MediaUI {
     showPlaceholder(pcid) {
         this.pageModifier.showComponent(pcid);
     }
-
 }

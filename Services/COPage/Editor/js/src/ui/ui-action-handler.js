@@ -107,6 +107,7 @@ export default class UIActionHandler {
     this.mediaActionHandler.setUI(this.ui.media);
     this.tableActionHandler.setUI(this.ui.table);
     this.placeholderActionHandler.setUI(this.ui.placeholder);
+    this.placeholderActionHandler.setPageUI(this.ui.page);
   }
 
   /**

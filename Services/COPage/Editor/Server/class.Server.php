@@ -27,6 +27,7 @@ use ILIAS\COPage\Editor\Components\Section;
 use ILIAS\COPage\Editor\Components\MediaObject;
 use ILIAS\COPage\Editor\Components\Table;
 use ILIAS\COPage\Editor\Components\LayoutTemplate;
+use ILIAS\COPage\Editor\Components\PlaceHolder;
 
 /**
  * Page editor json server
@@ -129,6 +130,9 @@ class Server
                 break;
             case "LayoutTemplate":
                 $handler = new LayoutTemplate\LayoutTemplateCommandActionHandler($this->page_gui);
+                break;
+            case "PlaceHolder":
+                $handler = new PlaceHolder\PlaceHolderCommandActionHandler($this->page_gui);
                 break;
         }
 

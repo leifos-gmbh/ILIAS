@@ -909,6 +909,8 @@ class ilObjectGUI implements ImplementsCreationCallback
 
     public function editObject(): void
     {
+        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+        exit;
         if (!$this->checkPermissionBool("write")) {
             $this->error->raiseError($this->lng->txt("msg_no_perm_write"), $this->error->MESSAGE);
         }

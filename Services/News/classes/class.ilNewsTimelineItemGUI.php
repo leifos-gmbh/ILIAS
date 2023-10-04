@@ -229,8 +229,15 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
         } elseif (in_array($mime, ["audio/mpeg"])) {
             $audio = $ui_factory->player()->audio($media_path);
             $html = $ui_renderer->render($audio);
+        } elseif (in_array($mime, ["application/pdf"])) {
+            $this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $i->getId());
+            $link = $ui_factory->link()->standard(
+                basename($media_path),
+                $this->ctrl->getLinkTargetByClass("ilnewstimelinegui", "downloadMob")
+            );
+            $html = $ui_renderer->render($link);
+            $this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", null);
         } else {
-            // download?
             $html = "";
         }
         return $html;

@@ -136,7 +136,7 @@ class ilNewsTimelineGUI
                 break;
 
             default:
-                if (in_array($cmd, ["show", "save", "update", "loadMore", "remove", "updateNewsItem"])) {
+                if (in_array($cmd, ["show", "save", "update", "loadMore", "remove", "updateNewsItem", "downloadMob"])) {
                     $this->$cmd();
                 }
         }
@@ -451,5 +451,12 @@ class ilNewsTimelineGUI
             ilUtil::getSystemMessageHTML($this->lng->txt("news_really_delete_news"), "question"));
 
         return $modal->getHTML();
+    }
+
+    protected function downloadMob() : void
+    {
+        $news_id = $this->std_request->getNewsId();
+        $news = new ilNewsItem($news_id);
+        $news->deliverMobFile("Standard", true);
     }
 }

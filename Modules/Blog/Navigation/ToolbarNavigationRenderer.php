@@ -26,6 +26,9 @@ use ILIAS\Blog\Access\BlogAccess;
 
 class ToolbarNavigationRenderer
 {
+    protected int $portfolio_page;
+    protected bool $prtf_embed;
+    protected int $blog_page;
     protected \ILIAS\Blog\Presentation\Util $util;
     protected $current_month;
     protected \ilCtrl $ctrl;
@@ -35,7 +38,7 @@ class ToolbarNavigationRenderer
 
     public function __construct(
         InternalDomainService $domain,
-        InternalGUIService $gui,
+        InternalGUIService $gui
     )
     {
         $this->domain = $domain;
@@ -60,67 +63,36 @@ class ToolbarNavigationRenderer
         $f = $this->gui->ui()->factory();
         $this->items = $a_items;
         $this->current_month = $month;
+        $this->blog_page = $blog_page;
+        $this->prtf_embed = $prtf_embed;
+        $this->portfolio_page = $portfolio_page;
 
         $cmd = ($prtf_embed)
             ? "previewEmbedded"
             : "previewFullscreen";
 
         if ($single_posting) {	// single posting view
-            $latest_posting = $this->getLatestPosting();
-            if ($latest_posting > 0 && $blog_page !== $latest_posting) {
-                $ctrl->setParameterByClass(\ilBlogPostingGUI::class, "blpg", $latest_posting);
-                $mb = $f->button()->standard(
-                    $lng->txt("blog_latest_posting"),
-                    $ctrl->getLinkTargetByClass(\ilBlogPostingGUI::class, $cmd)
-                );
+            $next_posting = $this->getNextPosting($blog_page);
+            if ($next_posting > 0) {
+                $this->renderPreviousButton($this->getPostingTarget($next_posting, $cmd));
             } else {
-                $mb = $f->button()->standard($lng->txt("blog_latest_posting"), "#")->withUnavailableAction();
+                $this->renderPreviousButton("");
             }
+
+            $this->renderPostingDropdown($cmd);
 
             $prev_posting = $this->getPreviousPosting($blog_page);
             if ($prev_posting > 0) {
-                $ctrl->setParameterByClass(\ilBlogPostingGUI::class, "blpg", $prev_posting);
-                $pb = $f->button()->standard(
-                    $lng->txt("previous"),
-                    $ctrl->getLinkTargetByClass(\ilBlogPostingGUI::class, $cmd)
-                );
+                $this->renderNextButton($this->getPostingTarget($prev_posting, $cmd));
             } else {
-                $pb = $f->button()->standard($lng->txt("previous"), "#")->withUnavailableAction();
+                $this->renderNextButton("");
             }
 
-            $next_posting = $this->getNextPosting($blog_page);
-            if ($next_posting > 0) {
-                $ctrl->setParameterByClass(\ilBlogPostingGUI::class, "blpg", $next_posting);
-                $nb = $f->button()->standard(
-                    $lng->txt("next"),
-                    $ctrl->getLinkTargetByClass(\ilBlogPostingGUI::class, $cmd)
-                );
-            } else {
-                $nb = $f->button()->standard($lng->txt("next"), "#")->withUnavailableAction();
-            }
+
             $ctrl->setParameterByClass(\ilObjBlogGUI::class, "blpg", $blog_page);
-            $vc = $f->viewControl()->section($pb, $mb, $nb);
-            $toolbar->addComponent($vc);
-            if ($blog_acces->mayContribute() && $blog_acces->mayEditPosting($blog_page)) {
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "prvm", "");
 
+            $this->renderActionDropdown(true);
 
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "bmn", "");
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "blpg", "");
-                $link = $ctrl->getLinkTargetByClass(\ilObjBlogGUI::class, "");
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "blpg", $blog_page);
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "bmn", $month);
-                $toolbar->addSeparator();
-                $toolbar->addComponent($f->button()->standard($lng->txt("blog_edit"), $link));
-
-
-                $ctrl->setParameterByClass(\ilBlogPostingGUI::class, "blpg", $blog_page);
-                if ($prtf_embed) {
-                    $ctrl->setParameterByClass(\ilObjPortfolioGUI::class, "ppage", $portfolio_page);
-                }
-                $link = $ctrl->getLinkTargetByClass(\ilBlogPostingGUI::class, "edit");
-                $toolbar->addComponent($f->button()->standard($lng->txt("blog_edit_posting"), $link));
-            }
         } else {		// month view
             $next_month = $this->getNextMonth($month);
             if ($next_month !== "") {
@@ -140,18 +112,44 @@ class ToolbarNavigationRenderer
 
             $ctrl->setParameterByClass(\ilObjBlogGUI::class, "bmn", $month);
 
+            $this->renderActionDropdown(false);
+        }
+    }
 
-            if ($blog_acces->mayContribute()) {
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "prvm", "");
+    protected function renderActionDropdown(bool $single_posting) : void
+    {
+        $lng = $this->domain->lng();
+        $toolbar = $this->gui->toolbar();
+        $f = $this->gui->ui()->factory();
+        $ctrl = $this->ctrl;
+        $actions = [];
+        if ($this->blog_access->mayContribute()) {
+            $ctrl->setParameterByClass(\ilObjBlogGUI::class, "prvm", "");
 
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "bmn", "");
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "blpg", "");
-                $link = $ctrl->getLinkTargetByClass(\ilObjBlogGUI::class, "");
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "blpg", $blog_page);
-                $ctrl->setParameterByClass(\ilObjBlogGUI::class, "bmn", $month);
-                $toolbar->addSeparator();
-                $toolbar->addComponent($f->button()->standard($lng->txt("blog_edit"), $link));
+            $ctrl->setParameterByClass(\ilObjBlogGUI::class, "bmn", "");
+            $ctrl->setParameterByClass(\ilObjBlogGUI::class, "blpg", "");
+            $link = $ctrl->getLinkTargetByClass(\ilObjBlogGUI::class, "");
+            $ctrl->setParameterByClass(\ilObjBlogGUI::class, "blpg", $this->blog_page);
+            $ctrl->setParameterByClass(\ilObjBlogGUI::class, "bmn", $this->current_month);
+            $actions[] = $f->button()->shy(
+                $lng->txt("blog_edit"),
+                $link
+            );
+        }
+
+        if ($single_posting && $this->blog_access->mayContribute() && $this->blog_access->mayEditPosting($this->blog_page)) {
+            $ctrl->setParameterByClass(\ilBlogPostingGUI::class, "blpg", $this->blog_page);
+            if ($this->prtf_embed) {
+                $ctrl->setParameterByClass(\ilObjPortfolioGUI::class, "ppage", $this->portfolio_page);
             }
+            $link = $ctrl->getLinkTargetByClass(\ilBlogPostingGUI::class, "edit");
+            $actions[] = $f->button()->shy(
+                $lng->txt("blog_edit_posting"),
+                $link
+            );
+        }
+        if (count($actions) > 0) {
+            $toolbar->addStickyItem($f->dropdown()->standard($actions));
         }
     }
 
@@ -202,6 +200,12 @@ class ToolbarNavigationRenderer
         return $prev_blpg;
     }
 
+    protected function getPostingTarget(int $posting, string $cmd) : string
+    {
+        $this->ctrl->setParameterByClass(\ilBlogPostingGUI::class, "blpg", (string) $posting);
+        return $this->ctrl->getLinkTargetByClass(\ilBlogPostingGUI::class, $cmd);
+    }
+
     protected function getMonthTarget(string $month) : string
     {
         $this->ctrl->setParameterByClass(\ilObjBlogGUI::class, "bmn", $month);
@@ -225,7 +229,7 @@ class ToolbarNavigationRenderer
         }
         if (count($m) > 0) {
             $toolbar->addStickyItem($f->dropdown()->standard($m)->withLabel(
-                $this->util->getMonthPresentation($this->current_month)
+                $this->getDropdownLabel($this->util->getMonthPresentation($this->current_month))
             ));
         }
     }
@@ -287,5 +291,41 @@ class ToolbarNavigationRenderer
         $toolbar->addStickyItem($b);
     }
 
+    protected function renderPostingDropdown(string $cmd) : void
+    {
+        $toolbar = $this->gui->toolbar();
+        $f = $this->gui->ui()->factory();
+        $m = [];
+        $dd_title = "";
+        foreach ($this->items as $month => $items) {
+            $label = $this->util->getMonthPresentation($month);
+            $m[] = $f->button()->shy(
+                $label,
+                $this->getMonthTarget($month)
+            )->withUnavailableAction();
+            foreach ($items as $item) {
+                $label = $item["title"];
+                if ((int) $item["id"] === $this->blog_page) {
+                    $label = "» " . $label;
+                    $dd_title = $item["title"];
+                }
+                $label = str_pad("", 12, "&nbsp;") . $label;
+                $m[] = $f->link()->standard(
+                    $label,
+                    $this->getPostingTarget((int) $item["id"], $cmd)
+                );
+            }
+        }
+        if (count($m) > 0) {
+            $toolbar->addStickyItem($f->dropdown()->standard($m)->withLabel(
+                $this->getDropdownLabel($dd_title)
+            ));
+        }
+    }
+
+    protected function getDropdownLabel(string $label) : string
+    {
+        return "<span style='vertical-align: bottom; max-width:60px; display: inline-block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;'>" . $label . "</span>";
+    }
 
 }

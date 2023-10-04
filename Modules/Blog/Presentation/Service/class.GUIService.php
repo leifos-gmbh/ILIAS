@@ -30,7 +30,7 @@ class GUIService
 
     public function __construct(
         InternalDomainService $domain,
-        InternalGUIService $gui,
+        InternalGUIService $gui
     ) {
         $this->domain = $domain;
         $this->gui = $gui;

@@ -183,6 +183,10 @@ class SkillDeletionManager
         $this->profile_manager->deleteProfileLevelsForSkill($sktp_id);
         $this->resources_manager->removeResourcesForSkill($sktp_id);
         $this->event_handler->raise("Services/Skill", "deleteSkill", ["node_id" => $sktp_id, "is_reference" => false]);
+
+        foreach (\ilSkillTemplateReference::_lookupTrefIdsForTemplateId($sktp_id) as $tref_id) {
+            $this->deleteNode($tref_id);
+        }
     }
 
     protected function deleteSkillCategoryTemplate(int $sctp_id, \ilSkillTree $tree): void
@@ -193,6 +197,10 @@ class SkillDeletionManager
         );
         foreach ($childs as $node) {
             $this->deleteNode((int) $node["obj_id"], $tree);
+        }
+
+        foreach (\ilSkillTemplateReference::_lookupTrefIdsForTemplateId($sctp_id) as $tref_id) {
+            $this->deleteNode($tref_id);
         }
     }
 

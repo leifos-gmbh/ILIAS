@@ -97,6 +97,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $o->uiModel->loader = $this->getLoader();
         $o->uiModel->popupDummy = $this->getPopupDummy();
         $o->uiModel->lore = $this->getLore();
+        $o->uiModel->backUrl = $ctrl->getLinkTarget($this->page_gui, "edit") . "#pc" . $this->pc_id;
 
         $o->iimModel = $this->getIIMModel();
         /*

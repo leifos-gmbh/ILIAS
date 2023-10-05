@@ -144,6 +144,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
                 (string) $ilCtrl->getParentReturn($this)
             );
 
+            /*
             $ilTabs->addTab(
                 "editor",
                 $lng->txt("edit"),
@@ -172,7 +173,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
                 "edit_base_image",
                 $lng->txt("cont_base_image") . " & " . $lng->txt("cont_caption"),
                 $ilCtrl->getLinkTarget($this, "editBaseImage")
-            );
+            );*/
         }
     }
 

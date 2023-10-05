@@ -36,6 +36,10 @@ export default class IIMEditorActionFactory {
     this.editorActionFactory = editorActionFactory;
   }
 
+  componentBack() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_COMPONENT_BACK, {});
+  }
+
   /**
    * @returns {EditorAction}
    */

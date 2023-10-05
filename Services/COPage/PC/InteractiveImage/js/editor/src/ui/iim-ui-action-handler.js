@@ -178,6 +178,10 @@ export default class IIMUIActionHandler {
                     this.sendSaveSettings(params, model);
                     break;
 
+                case ACTIONS.E_COMPONENT_BACK:
+                    this.ui.redirectToPage();
+                    break;
+
             }
         }
     }

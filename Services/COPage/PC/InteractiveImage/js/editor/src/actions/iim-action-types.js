@@ -51,6 +51,7 @@ const ACTIONS = {
   E_SWITCH_SETTINGS: "switch.settings",
   E_SWITCH_OVERLAYS: "switch.overlays",
   E_SWITCH_POPUPS: "switch.popups",
-  E_SAVE_SETTINGS: "component.save"
+  E_SAVE_SETTINGS: "component.save",
+  E_COMPONENT_BACK: "component.back",         // component sends back (to main page) request
 };
 export default ACTIONS;

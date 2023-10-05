@@ -149,6 +149,9 @@ export default class UI {
           case ACTIONS.E_ADD_TRIGGER:
             dispatch.dispatch(action.interactiveImage().editor().addTrigger());
             break;
+          case ACTIONS.E_COMPONENT_BACK:
+            dispatch.dispatch(action.interactiveImage().editor().componentBack());
+            break;
         }
       });
     });
@@ -813,5 +816,10 @@ export default class UI {
     // ensure img is not scaled
     const img = document.querySelector("#il-copg-iim-main .ilc_Mob img");
     img.style.width = 'auto';
+  }
+
+  redirectToPage() {
+    //this.pageUI.uiModel.backUrl + "#pc" + pcid
+    window.location.replace(this.uiModel.backUrl);
   }
 }

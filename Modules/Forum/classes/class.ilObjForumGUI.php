@@ -105,27 +105,11 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
 
         $ref_id = $this->retrieveRefId();
         $thr_pk = $this->retrieveThrPk();
-        $pos_pk = $this->retrieveIntOrZeroFrom($this->http->wrapper()->query(), 'pos_pk');
 
         $this->objProperties = ilForumProperties::getInstance($this->ilObjDataCache->lookupObjId($ref_id));
         $this->is_moderator = $this->access->checkAccess('moderate_frm', '', $ref_id);
 
         $this->objCurrentTopic = new ilForumTopic($thr_pk, $this->is_moderator);
-        $this->checkUsersViewMode();
-        if ($this->selectedSorting === ilForumProperties::VIEW_TREE && ($this->selected_post_storage->get($thr_pk) > 0)) {
-            $this->objCurrentPost = new ilForumPost(
-                $this->selected_post_storage->get($thr_pk) ?? 0,
-                $this->is_moderator
-            );
-            $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
-        } else {
-            $this->selected_post_storage->set($this->objCurrentTopic->getId(), 0);
-            $this->objCurrentPost = new ilForumPost(
-                $pos_pk,
-                $this->is_moderator
-            );
-        }
-
         $this->requestAction = (string) ($this->httpRequest->getQueryParams()['action'] ?? '');
         $cs = $DIC->contentStyle();
         $this->content_style_gui = $cs->gui();
@@ -265,7 +249,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
             );
 
             $this->tpl->addOnLoadCode('il.ForumDraftsAutosave.init(' . json_encode([
-                'loading_img_src' => ilUtil::getImagePath('loader.svg'),
+                'loading_img_src' => ilUtil::getImagePath('media/loader.svg'),
                 'draft_id' => $draft_id,
                 'interval' => $interval * 1000,
                 'url' => $this->ctrl->getFormAction($this, $autosave_cmd, '', true),
@@ -339,6 +323,25 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
 
         if (!in_array($cmd, $exclude_cmds, true)) {
             $this->prepareOutput();
+        }
+
+        if (!$this->creation_mode) {
+            $this->checkUsersViewMode();
+            $pos_pk = $this->retrieveIntOrZeroFrom($this->http->wrapper()->query(), 'pos_pk');
+            if ($this->selectedSorting === ilForumProperties::VIEW_TREE &&
+                $this->selected_post_storage->get($this->objCurrentTopic->getId()) > 0) {
+                $this->objCurrentPost = new ilForumPost(
+                    $this->selected_post_storage->get($this->objCurrentTopic->getId()) ?? 0,
+                    $this->is_moderator
+                );
+                $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
+            } else {
+                $this->selected_post_storage->set($this->objCurrentTopic->getId(), 0);
+                $this->objCurrentPost = new ilForumPost(
+                    $pos_pk,
+                    $this->is_moderator
+                );
+            }
         }
 
         $ref_id = $this->retrieveRefId();
@@ -1204,7 +1207,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
         if ($this->selectedSorting === ilForumProperties::VIEW_TREE
             && $node->getId() !== $this->selected_post_storage->get($node->getThreadId())) {
             $target = $this->uiFactory->symbol()->icon()->custom(
-                ilUtil::getImagePath('target.svg'),
+                ilUtil::getImagePath('object/target.svg'),
                 $this->lng->txt('target_select')
             );
 
@@ -1473,7 +1476,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
         $tbl->setId('il_frm_statistic_table_' . $this->object->getRefId());
         $tbl->setTitle(
             $this->lng->txt('statistic'),
-            'icon_usr.svg',
+            'standard/icon_usr.svg',
             $this->lng->txt('obj_' . $this->object->getType())
         );
 
@@ -4350,13 +4353,13 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
         if ($isForumNotificationEnabled || $isThreadNotificationEnabled) {
             $lg->addHeaderIcon(
                 'not_icon',
-                ilUtil::getImagePath('notification_on.svg'),
+                ilUtil::getImagePath('object/notification_on.svg'),
                 $this->lng->txt('frm_notification_activated')
             );
         } else {
             $lg->addHeaderIcon(
                 'not_icon',
-                ilUtil::getImagePath('notification_off.svg'),
+                ilUtil::getImagePath('object/notification_off.svg'),
                 $this->lng->txt('frm_notification_deactivated')
             );
         }

@@ -48,6 +48,11 @@ See https://mantis.ilias.de/view.php?id=29680
 
 This code is copied from an older mediawiki version. I compares two versions of page HTML outputs and marks differences. The code should either be replaced by a lib that provides the same functionality, refactored and integrated into own code or at least replaced by an up-to-date code excerpt from mediawiki.
 
+
+### Accordions and Media
+
+Currently media players continue to play if accordions are being closed. A generalised event handling should allow components to act on show/hide events.
+
 ### Lower Cyclomatic Complexity (Ongoing)
 
 This component suffers from record high cyclomatic complexity numbers. Refactorings should target and split up methods and classes to gain better maintainability.
@@ -78,8 +83,11 @@ If i18n is enabled and a page is copied (e.g. because of a new translation), it 
 
 See also https://mantis.ilias.de/view.php?id=29057
 
-
 ## Long Term
+
+### Internal Links for More Contexts
+
+Internal links are not supported in all contexts. The behaviour of the different link targets is not well defined and thus a general usability issue. A separate activation of these (e.g. only in the learning module) might be feasible. If possible the link concepts should be revised completely.
 
 ### Integration of new question service
 

@@ -593,10 +593,8 @@ assessment#:#counter#:#Zähler
 assessment#:#create_date#:#Erzeugt
 assessment#:#create_gaps#:#Lücken erzeugen und aktualisieren
 assessment#:#create_new#:#Erstelle neue
-assessment#:#ctm_cannot_be_changed#:#Wiedervorlagetests können nicht mehr geändert werden.
-assessment#:#ctm_cannot_be_started#:#Wiedervorlagetests können nicht mehr gestartet werden.
 assessment#:#customstyle#:#Eigenes Stylesheet
-assessment#:#dashboard_tab#:#Dashboard
+assessment#:#dashboard_tab#:#Teilnehmer
 assessment#:#definition#:#Definition
 assessment#:#definition_image#:#Bild
 assessment#:#definition_text#:#Text
@@ -830,7 +828,6 @@ assessment#:#legend#:#Legende
 assessment#:#locked#:#gesperrt
 assessment#:#log_added_extratime#:#Es wurden zusätzliche %d Minuten Bearbeitungsdauer für die Teilnehmer-ID %d hinzugefügt
 assessment#:#log_answer_changed_points#:#Manuelles Setzen der Punkte des Teilnehmers %s von %d auf %d Punkte durch %s
-assessment#:#log_could_not_enter_test_due_to_simultaneous_users#:#Der Teilnehmer konnte den Test nicht starten, da die maximale Anzahl der gleichzeitiger Teilnehmer für diesen Kurs bereits erreicht ist.
 assessment#:#log_create_new_test#:#Neuer Test erzeugt
 assessment#:#log_manual_feedback#:#%s hat eine manuelle Bewertung für den Teilnehmer %s und die Frage %s erstellt: %s
 assessment#:#log_mark_added#:#Note hinzugefügt
@@ -890,6 +887,7 @@ assessment#:#new_category#:#Neue Einheiten-Kategorie
 assessment#:#new_unit#:#Neue Einheit
 assessment#:#next_question#:#Weiter
 assessment#:#next_question_rows#:#Fragen %d - %d von %d >>
+assessment#:#no_manual_feedback_export_info#:#Manuelle Rückmeldungen werden nicht exportiert.
 assessment#:#no_passed_mark#:#Sie müssen wenigstens einen Notenschritt als BESTANDEN markieren! Das Notenschema wurde nicht gespeichert!
 assessment#:#no_question_selected_for_move#:#Bitte wählen Sie mindestens eine Frage aus, um sie zu verschieben!
 assessment#:#no_questions_available#:#Es sind keine Fragen verfügbar!
@@ -1079,7 +1077,7 @@ assessment#:#question_marking#:#Fragen markieren
 assessment#:#question_marking_description#:#Teilnehmer erhalten die Möglichkeit, Fragen für sich zu markieren. Die Markierungen werden auch in der Übersicht 'Bearbeitungsstand' angezeigt, sofern diese aktiviert ist.
 assessment#:#question_not_answered#:#Die Frage wurde nicht beantwortet
 assessment#:#question_saved_for_upload#:#Die Frage wurde automatisch gespeichert, um das Hochladen einer Datei zu ermöglichen. Wenn Sie die Bearbeitung dieser Frage jetzt abbrechen, beachten Sie bitte, dass Sie die Frage im Fragenpool löschen müssen, wenn Sie sie nicht behalten wollen.
-assessment#:#question_summary#:#Stand der Bearbeitung
+assessment#:#question_summary#:#Bearbeitungsstand
 assessment#:#question_summary_btn#:#Bearbeitungsstand
 assessment#:#question_title#:#Fragentitel
 assessment#:#question_type#:#Fragetyp
@@ -1180,8 +1178,6 @@ assessment#:#show_old_introduction#:#Alten Einleitungstext anzeigen
 assessment#:#show_pass_overview#:#Ergebnisübersicht (bewerteter Testdurchlauf)
 assessment#:#show_user_answers#:#Antworten (bewerteter Testdurchlauf)
 assessment#:#shuffle_answers#:#Antworten mischen
-assessment#:#sign_submission#:#Digitale Signatur
-assessment#:#sign_submission_info#:#Das Signatur-Plugin muss installiert und aktiviert sein, damit Teilnehmer aufgefordert werden, ihre Testabgabe zu signieren.
 assessment#:#skip_question#:#Nicht antworten und weiter
 assessment#:#solutionText#:#Text
 assessment#:#solution_contain_keywords#:#Punkte werden auf Basis des Vorkommens der folgenden Begriffe vergeben:
@@ -1260,11 +1256,6 @@ assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Erlaubt formatierten Text f
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#Sie haben den Test bestanden. Der Test kann nicht noch einmal gestartet werden.
 assessment#:#tst_all_test_competences#:#Alle Test-Kompetenzen
 assessment#:#tst_all_user_data_deleted#:#Die Daten aller Testteilnehmer wurden gelöscht!
-assessment#:#tst_allowed_users#:#Anzahl gleichzeitiger Teilnehmer begrenzen
-assessment#:#tst_allowed_users_desc#:#ILIAS prüft die Anzahl der gleichzeitigen Teilnehmer des Tests. Wenn über die maximal erlaubte Anzahl hinaus weitere Benutzer versuchen, den Test zu starten, werden sie am Zugriff gehindert.
-assessment#:#tst_allowed_users_max#:#Maximale Anzahl
-assessment#:#tst_allowed_users_time_gap#:#Inaktivitätszeit der Teilnehmer
-assessment#:#tst_allowed_users_time_gap_desc#:#Teilnehmer die im Ablauf der angegeben Sekunden keinen Klick im Test ausführen, werden als ‚inaktiv‘ eingestuft und aus dem Test entfernt.
 assessment#:#tst_already_submitted#:#Der Test wurde bereits beendet und die Antworten abgeschickt.
 assessment#:#tst_analysis#:#Analyse
 assessment#:#tst_anonymity#:#Datenschutz
@@ -1345,19 +1336,6 @@ assessment#:#tst_derive_new_pool#:#Neuen Fragenpool ableiten
 assessment#:#tst_derive_new_pools#:#Neue Fragenpools ableiten
 assessment#:#tst_dont_show_msg_again_in_current_session#:#Diese Meldung in meiner aktuellen Sitzung nicht mehr anzeigen.
 assessment#:#tst_dont_use_previous_answers#:#Ihre vorherigen Antworten werden in zukünftigen Testdurchläufen nicht als vorgegebene Werte verwendet
-assessment#:#tst_dyn_keep_answ_freeze#:#Belasse festgeschriebene Antworten
-assessment#:#tst_dyn_quest_set_pool_deleted#:#Der aktuell konfigurierte Fragenpool "%s" ist gelöscht worden.
-assessment#:#tst_dyn_quest_set_src_qpl_summary_string_deleted#:#%s (Endgültig gelöscht)
-assessment#:#tst_dyn_quest_set_src_qpl_summary_string_trashed#:#%s (Aktuell im Papierkorb) [%s Fragen]
-assessment#:#tst_dyn_test_msg_currently_finished_completely#:#Aktuell haben Sie alle Fragen des Quellfragenpool erfolgreich beantwortet. Sowie neue oder veränderte Fragen im Quellfragenpool vorliegen können Sie den Test fortführen.
-assessment#:#tst_dyn_test_msg_currently_finished_selection#:#In der aktuellen Fragenauswahl haben Sie alle Fragen erfolgreich beantwortet. Ändern Sie die Fragenauswahl um den Test fort zu führen.
-assessment#:#tst_dyn_test_msg_pass_deletion_link#:#Bisherige Antworten entfernen
-assessment#:#tst_dyn_test_pass_deletion_button#:#Zurücksetzen sämtlicher Testantworten
-assessment#:#tst_dyn_unfreeze_answers#:#Erneut beantworten
-assessment#:#tst_dyn_unfreeze_answers_confirmation#:#Es sind Fragen enthalten, zu denen ihre initialen Antworten festgeschrieben wurden, so dass Sie keine Änderungen an den Antworten vornehmen können. Möchten Sie die Fragen jetzt erneut beantworten und die festgeschriebenen Antworten lösen?
-assessment#:#tst_dynamic_question_set_complete#:#Bearbeitungsstand aller verfügbaren Fragen
-assessment#:#tst_dynamic_question_set_selection#:#Auswahl der Testfragen und Auswahlstatistik
-assessment#:#tst_dynamic_question_set_source_questionpool_summary_string#:#%s (Pfad: %s) [%s Fragen]
 assessment#:#tst_edit_competence_assign#:#Bearbeite Zuordnungs-Eigenschaften
 assessment#:#tst_edit_scoring#:#Ändere Bewertung
 assessment#:#tst_ending_time#:#Ende
@@ -1392,7 +1370,8 @@ assessment#:#tst_filter_taxonomy#:#Taxonomie
 assessment#:#tst_final_information#:#Test abschließen
 assessment#:#tst_finish_confirm_button#:#Ja, ich will den Test beenden
 assessment#:#tst_finish_confirm_cancel_button#:#Nein, ich will zur letzten Antwort zurückgehen
-assessment#:#tst_finish_confirmation_question#:#Sie sind dabei, diesen Test zu beenden und die maximale Anzahl erlaubter Testdurchläufe zu erreichen. Danach werden Sie nicht mehr in der Lage sein, den Test erneut aufzurufen, um Ihre Antworten zu ändern. Wollen Sie den Test wirklich beenden?
+assessment#:#tst_finish_confirmation_question#:#Sie sind dabei, diesen Test zu beenden. Danach werden Sie nicht mehr in der Lage sein, den Test erneut aufzurufen, um Ihre Antworten zu ändern. Wollen Sie den Test wirklich beenden?
+assessment#:#tst_finish_confirmation_question_no_attempts_left#:#Sie sind dabei, diesen Test zu beenden und die maximale Anzahl erlaubter Testdurchläufe zu erreichen. Danach werden Sie nicht mehr in der Lage sein, den Test erneut aufzurufen, um Ihre Antworten zu ändern. Wollen Sie den Test wirklich beenden?
 assessment#:#tst_finish_notification#:#Benachrichtigung
 assessment#:#tst_finish_notification_advanced#:#Komplettes Testergebnis pro Benutzer
 assessment#:#tst_finish_notification_content_type#:#Inhalt der Benachrichtigung
@@ -1510,8 +1489,6 @@ assessment#:#tst_mark_minimum_level#:#Mindestprozentsatz
 assessment#:#tst_mark_official_form#:#Offizielle Bezeichnung
 assessment#:#tst_mark_passed#:#Bestanden
 assessment#:#tst_mark_short_form#:#Kurzbezeichnung
-assessment#:#tst_max_allowed_users_heading#:#Die maximale Anzahl von gleichzeitiger Teilnehmern für diesen Test wurde erreicht
-assessment#:#tst_max_allowed_users_message#:#Die maximale Anzahl gleichzeitiger Teilnehmer für diesen Test wurde erreicht. Bitte versuchen Sie etwas später wieder den Test zu starten oder fortzusetzen. Wenn aktive Teilnehmer für mehr als %s Sekunden inaktiv sind, besteht für Sie die Möglichkeit, an diesem Test teilzunehmen. Wir danken Ihnen für Ihr Verständnis.
 assessment#:#tst_max_comp_points#:#Max. Kompetenz-Punkte
 assessment#:#tst_maximum_points#:#Maximale Punktezahl
 assessment#:#tst_mc_label_none_above#:#Keine der obigen Antworten
@@ -1619,6 +1596,7 @@ assessment#:#tst_password_form#:#Eingabe Testpasswort
 assessment#:#tst_password_introduction#:#Dieser Test kann nur mit einem Testpasswort gestartet bzw. fortgeführt werden. Bitte tragen Sie das Passwort hier ein.
 assessment#:#tst_percent_solved#:#Prozent gelöst
 assessment#:#tst_player_answer_saved_and_locked#:#Antwort wird gespeichert und gesperrt. Dadurch kann die Antwort nicht mehr geändert werden.
+assessment#:#tst_please_select_source_pool#:#Bitte wählen Sie einen Fragenpool aus.
 assessment#:#tst_please_select_target_for_pool_derives#:#Bitte wählen Sie einen Zielcontainer aus.
 assessment#:#tst_position#:#Frage %s von %s
 assessment#:#tst_position_without_total#:#Frage %s
@@ -1715,6 +1693,7 @@ assessment#:#tst_questions_hints_toolbar_cmd_reset_ordering_clipboard#:#Zwischen
 assessment#:#tst_questions_inserted#:#Fragen angefügt!
 assessment#:#tst_questions_removed#:#Fragen entfernt!
 assessment#:#tst_random_nr_of_questions#:#Wie viele Fragen?
+assessment#:#tst_random_question_set_source_questionpool_summary_string#:#%s (Pfad: %s) [%s Fragen]
 assessment#:#tst_random_select_questionpool#:#Wählen Sie einen Fragenpool, von dem die Fragen verwendet werden sollen.
 assessment#:#tst_reached_points#:#Erreichte Punkte
 assessment#:#tst_reached_points_of_max#:#%s von %s
@@ -2140,6 +2119,7 @@ badge#:#badge_backpack_no_groups#:#Das Mozilla Backpack ist leer bzw. nicht öff
 badge#:#badge_badge#:#Badge
 badge#:#badge_course_lp#:#Nach Leistung vergebenes Badge
 badge#:#badge_course_lp_invalid#:#Die folgenden Objekte verwenden einen nicht unterstützten Lernfortschrittsmodus: %s.
+badge#:#badge_create#:#Badge erstellen
 badge#:#badge_criteria#:#Kriterien
 badge#:#badge_crs_merit#:#Händisch vergebenes Badge
 badge#:#badge_deletion_confirmation#:#Wollen Sie wirklich die folgenden Badges und alle ihre jeweiligen Zuweisungen löschen?
@@ -2906,7 +2886,6 @@ chatroom#:#delete_private_room#:#Séparée löschen
 chatroom#:#delete_private_room_question#:#Separée wirklich löschen?
 chatroom#:#dhparam#:#Diffie-Hellman Parameter
 chatroom#:#display_past_msgs#:#Chat-Rückblick
-chatroom#:#display_past_msgs_suffix#:#Beiträge
 chatroom#:#duration_from#:#Von
 chatroom#:#duration_to#:#Bis
 chatroom#:#end_whisper#:#Beenden
@@ -5023,7 +5002,6 @@ common#:#obj_wbrs#:#Weblink
 common#:#obj_wbrs_desc#:#Allgemeine Einstellungen für Weblinks
 common#:#obj_webr#:#Weblink
 common#:#obj_webr_duplicate#:#Weblink-Sammlung kopieren
-common#:#obj_wfe#:#Workflow Engine
 common#:#obj_wfld#:#Ordner
 common#:#obj_wiki#:#Wiki
 common#:#obj_wiki_duplicate#:#Wiki kopieren
@@ -5248,7 +5226,7 @@ common#:#pro#:#Pro
 common#:#proceed#:#Fortfahren
 common#:#profile#:#Profil
 common#:#profile_changed#:#ILIAS eLearning - Ihre Profildaten wurden geändert
-common#:#profile_incomplete#:#Ihr Profil ist nicht vollständig. Bitte geben Sie alle erforderlichen Daten an
+common#:#profile_incomplete#:#Ihr Profil ist nicht vollständig. Bitte geben Sie alle erforderlichen Daten an.
 common#:#profile_of#:#Profil von
 common#:#properties#:#Eigenschaften
 common#:#proxy#:#Proxy
@@ -5699,7 +5677,6 @@ common#:#udf_delete_sure#:#Sind Sie sicher, dass Sie dieses Feld und alle zugeh�
 common#:#udf_duplicate_entries#:#Die Werte müssen eindeutig sein.
 common#:#udf_field_deleted#:#Das Feld wurde gelöscht.
 common#:#udf_name_already_exists#:#Ein Feld mit diesem Namen existiert bereits. Bitte wählen Sie einen anderen Feldnamen.
-common#:#udf_required_and_visible_requires_changeable#:#Wenn die Einstellungen "Erforderliche Angabe" und "Sichtbar in den persönlichen Daten" aktiviert sind, muss auch "Kann durch Benutzer selbst im Profil geändert werden" aktiviert sein
 common#:#udf_required_requires_visib_reg#:#Die Einstellung "Erforderliche Angabe" erfordert die Einstellung "Sichtbar im Registrierungsformular"
 common#:#udf_type_date#:#Datum
 common#:#udf_type_datetime#:#Datum und Uhrzeit
@@ -5774,7 +5751,7 @@ common#:#user_not_found#:#Der Benutzer wurde nicht gefunden
 common#:#user_not_found_to_delete#:#Ein Benutzer, der gelöscht werden sollte, konnte nicht gefunden werden.
 common#:#user_not_known#:#Bitte geben Sie einen gültigen Anmeldenamen ein.###Modified as part of gender mainstreaming activities for ILIAS 8
 common#:#user_profile_other#:#Weitere Informationen
-common#:#user_send_new_account_mail#:#Sende
+common#:#user_send_new_account_mail#:#Begrüssungsmail versenden
 common#:#user_status#:#Benutzerstatus
 common#:#user_toggle_noti#:#Benachrichtigungen können nicht deaktiviert werden.
 common#:#userdata#:#Benutzerdaten
@@ -5827,6 +5804,7 @@ common#:#usrimport_no_insert_ext_account_exists#:#Import nicht möglich. Externe
 common#:#usrimport_no_update_ext_account_exists#:#Update nicht möglich. Externes Anmeldekonto existiert bereits.
 common#:#usrimport_with_specified_role_not_permitted#:#Sie haben keine Berechtigung zum Importieren von Benutzern mit der angegebenen Rolle.
 common#:#usrimport_wrong_file_count#:#Zu viele Dateien im Import-Ordner. Bitte versuchen Sie es erneut.
+common#:#usrimport_xml_anonymous_or_root_not_allowed#:#Weder das Systemkonto noch das anonyme Konto können mit dem Import geändert werden.
 common#:#usrimport_xml_attribute_missing#:#Attribut "%2$s" fehlt in Element "%1$s".
 common#:#usrimport_xml_attribute_value_illegal#:#Wert "%3$s" des Attributs "%2$s" in Element "%1$s" ist ungültig.
 common#:#usrimport_xml_attribute_value_inapplicable#:#Wert "%3$s" des Attributs "%2$s" in Element "%1$s" ist nicht anwendbar bei Aktion "%4$s".
@@ -6001,7 +5979,7 @@ cont#:#cont_std_filter_title_3#:#Titel/Beschreibung
 cont#:#cont_std_filter_title_4#:#Schlagwort
 cont#:#cont_std_filter_title_5#:#Autor
 cont#:#cont_std_filter_title_6#:#Copyright
-cont#:#cont_std_filter_title_7#:#Tutorielle Betreuung
+cont#:#cont_std_filter_title_7#:#Kontaktperson
 cont#:#cont_std_filter_title_8#:#Objekttyp
 cont#:#cont_std_filter_title_9#:#Online/Offline
 cont#:#cont_std_record_title#:#Standard
@@ -7391,7 +7369,7 @@ crs#:#crs_info_agree#:#Ich bin damit einverstanden, dass die oben angegebenen Da
 crs#:#crs_info_agreement#:#Falls die folgenden Angaben in Ihrem Persönliche Profil vorliegen, können sie von der Kursadministration eingesehen werden:
 crs#:#crs_info_download#:#Dateien zum Herunterladen
 crs#:#crs_info_reg#:#Aufnahmeverfahren
-crs#:#crs_info_reg_confirmation#:#Sie müssen einen Aufnahmeantrag stellen, um in die Gruppe aufgenommen zu werden. Beschreiben Sie im Feld Nachricht, warum Sie beitreten möchten. Sobald Ihr Antrag angenommen oder abgelehnt wurde, erhalten Sie eine Benachrichtigung.
+crs#:#crs_info_reg_confirmation#:#Sie müssen einen Aufnahmeantrag stellen, um in den Kurs aufgenommen zu werden. Beschreiben Sie im Feld Nachricht, warum Sie beitreten möchten. Sobald Ihr Antrag angenommen oder abgelehnt wurde, erhalten Sie eine Benachrichtigung.
 crs#:#crs_info_reg_deactivated#:#Zur Zeit ist keine Aufnahme möglich.
 crs#:#crs_info_reg_direct#:#Sie können diesem Kurs direkt beitreten.
 crs#:#crs_info_reg_password#:#Wenn Sie das Kurspasswort von einem Kursadministrator erhalten haben, können Sie in diesen Kurs beitreten.
@@ -7529,8 +7507,8 @@ crs#:#crs_max_and_min_members_invalid#:#Die minimale Anzahl muss kleiner als die
 crs#:#crs_max_and_min_members_needed#:#Setzen Sie eine minimale oder maximale Anzahl - oder beides.
 crs#:#crs_max_members_needed#:#Für die Warteliste wird eine maximale Anzahl Mitglieder benötigt.
 crs#:#crs_max_members_reached#:#Die maximale Mitgliederanzahl wurde überschritten
-crs#:#crs_mem_contact#:#Tutorielle Betreuung
-crs#:#crs_mem_contacts#:#Tutorielle Betreuung
+crs#:#crs_mem_contact#:#Kontaktperson
+crs#:#crs_mem_contacts#:#Kontaktpersonen
 crs#:#crs_mem_send_mail#:#Mail verschicken
 crs#:#crs_mem_tbl_header#:#Kursteilnehmer
 crs#:#crs_member#:#Mitglied
@@ -7697,7 +7675,7 @@ crs#:#crs_status_changed_body#:#Ihr Status in Kurs "%s" wurde geändert.
 crs#:#crs_status_determination#:#Bestimmung des Status "Bestanden"
 crs#:#crs_status_determination_lp#:#Aus Lernfortschritt ableiten
 crs#:#crs_status_determination_lp_info#:#Wechselt der Lernfortschritt auf „Bearbeitet“, wird der Status „Bestanden“ gesetzt. Die Kursadministration oder Kursbetreuung kann den Status manuell im Reiter „Lernfortschritt » Benutzer“ überschreiben.
-crs#:#crs_status_determination_manual#:#Nur manuell setzen
+crs#:#crs_status_determination_manual#:#Manuell setzen
 crs#:#crs_status_determination_sync#:#Der Lernfortschritt dieses Kurses wird automatisch auf „Bestanden“ gesetzt, sobald jemand alle dafür erforderlichen Aktivitäten abgeschlossen hat. Bereits erzielte Lernfortschritte werden berücksichtigt. Ein manuell gesetzter Status bleibt unverändert. Möchten Sie den Status „Bestanden“ jetzt automatisch bestimmen?###Modified as part of gender mainstreaming activities for ILIAS 8
 crs#:#crs_structure#:#Kursstruktur
 crs#:#crs_subject_course_group_notification#:#Mail-Zusammenfassung für %s
@@ -7930,7 +7908,7 @@ dash#:#dash_enable_task#:#To-Dos
 dash#:#dash_favourites#:#Favoriten
 dash#:#dash_info_sure_remove_from_favs#:#Sollen die folgenden Objekte wirklich aus Ihren Favoriten entfernt werden?
 dash#:#dash_item_removed#:#Der Eintrag wurde aus der Liste entfernt.
-dash#:#dash_learningsequences#:#Meine Lernsequenzen
+dash#:#dash_learning_sequences#:#Meine Lernsequenzen
 dash#:#dash_list#:#Liste
 dash#:#dash_main_panel#:#Hauptbereich
 dash#:#dash_make_favourite#:#Zu Favoriten hinzufügen
@@ -7945,12 +7923,13 @@ dash#:#dash_sort_by_location#:#Nach Ort sortieren
 dash#:#dash_sort_by_start_date#:#Nach Veranstaltungszeitraum sortieren
 dash#:#dash_sort_by_type#:#Nach Typ sortieren
 dash#:#dash_sortation#:#Sortierung
-dash#:#dash_studyprogramme#:#Meine Studienprogramme
+dash#:#dash_study_programmes#:#Meine Studienprogramme
 dash#:#dash_tile#:#Kacheln
 dash#:#dash_view_courses_groups#:#Block ‘Meine Kurse und Gruppen’
 dash#:#dash_view_favourites#:#Block ‘Favoriten’
 dash#:#favourites_disabled_info#:#Das Setzen von Favoriten ist deaktiviert. Sie können dieses in den Magazin-Einstellungen ändern.
 dash#:#memberships_disabled_info#:#Das Setzen von Mitgliedschaften ist deaktiviert. Sie können dieses in den Kurs-Einstellungen ändern.
+dash#:#topitem_block#:#Block
 dateplaner#:#Fr_long#:#Freitag
 dateplaner#:#Fr_short#:#Fr
 dateplaner#:#Mo_long#:#Montag
@@ -8105,6 +8084,8 @@ dateplaner#:#cal_create#:#Erzeuge
 dateplaner#:#cal_created_appointment#:#Ein neuer Termin wurde angelegt.
 dateplaner#:#cal_created_milestone#:#Der Meilenstein wurde angelegt.
 dateplaner#:#cal_created_milestone_resp_q#:#Der Meilenstein wurde angelegt. Bitte wählen Sie die Mitglieder aus, die für den Meilenstein verantwortlich sein sollen.
+dateplaner#:#cal_cronjob_remote_description#:#Wenn aktiviert, werden Termine des Kalendertyps "Web-Kalender" automatisch nach dem vorgegeben Zeitintervall synchronisiert.
+dateplaner#:#cal_cronjob_remote_title#:#Synchronisierung externer Kalender
 dateplaner#:#cal_crs_info#:#Course Information
 dateplaner#:#cal_crs_new_notification_body#:#ein neuer Termin ist im Kurs "%s" angelegt worden.
 dateplaner#:#cal_crs_new_notification_sub#:#Neuer Termin in Kurs "%s"
@@ -8387,16 +8368,16 @@ dcl#:#dcl_confirm_delete_detailed_view_text#:#Die Vorlage für Einzelansicht wir
 dcl#:#dcl_confirm_delete_detailed_view_title#:#Vorlage für Einzelansicht wirklich löschen?
 dcl#:#dcl_confirm_delete_field#:#Möchten Sie dieses Feld wirklich löschen?
 dcl#:#dcl_confirm_delete_fields#:#Möchten Sie diese Felder wirklich löschen?
-dcl#:#dcl_confirm_delete_record#:#Möchten Sie diesen Eintrag wirklich löschen?
-dcl#:#dcl_confirm_delete_records#:#Sind Sie sicher, dass die folgenden Datensätze gelöscht werden sollen?
-dcl#:#dcl_confirm_delete_table#:#Wollen Sie diese Tabelle wirklich löschen inkl. Inhalt und Struktur?
+dcl#:#dcl_confirm_delete_record#:#Möchten Sie diesen Datensatz wirklich löschen?
+dcl#:#dcl_confirm_delete_records#:#Möchten Sie die folgenden Datensätze wirklich löschen?
+dcl#:#dcl_confirm_delete_table#:#Wollen Sie diese Tabelle einschließlich Inhalt und Struktur wirklich löschen?
 dcl#:#dcl_confirm_storing_records#:#Bitte überprüfen Sie die Angaben vor dem Speichern.
 dcl#:#dcl_confirm_storing_records_no_permission#:#Sie haben keine Rechte, den Datensatz später nochmals zu bearbeiten.
 dcl#:#dcl_copy#:#Datensammlung kopieren
 dcl#:#dcl_create_date#:#Erstellungsdatum
 dcl#:#dcl_create_entry_rules#:#Eintragserstellung
 dcl#:#dcl_create_field#:#Feld hinzufügen
-dcl#:#dcl_create_fields#:#Klicken Sie in der Registerkarte "Tabellen" auf eine Tabelle und erstellen Sie mithilfe des Button "Feld hinzufügen" neue Felder.
+dcl#:#dcl_create_fields#:#Klicken Sie in der Registerkarte „Tabellen“ auf eine Tabelle und erstellen Sie mithilfe des Button „Feld hinzufügen“ neue Felder.
 dcl#:#dcl_creation_date#:#Erstellungsdatum
 dcl#:#dcl_creation_date_description#:#Das Datum, an dem dieser Eintrag erstellt wurde.
 dcl#:#dcl_datatype#:#Datentyp
@@ -8409,14 +8390,14 @@ dcl#:#dcl_default_sort_field#:#Sortierung
 dcl#:#dcl_default_sort_field_desc#:#Tabelle wird standardmässig nach dem ausgewählten Feld sortiert.
 dcl#:#dcl_default_sort_field_order#:#Sortierrichtung
 dcl#:#dcl_delete_fields#:#Felder löschen
-dcl#:#dcl_delete_fields_no_selection#:#Zum Löschen muss mindestens ein Feld ausgewählt werden
+dcl#:#dcl_delete_fields_no_selection#:#Zum Löschen muss mindestens ein Feld ausgewählt werden.
 dcl#:#dcl_delete_perm#:#Einträge löschen
 dcl#:#dcl_delete_records#:#Datensätze löschen
 dcl#:#dcl_delete_tables#:#Tabellen löschen
-dcl#:#dcl_delete_tables_no_selection#:#Zum Löschen muss mindestens eine Tabelle ausgewählt werden
+dcl#:#dcl_delete_tables_no_selection#:#Zum Löschen muss mindestens eine Tabelle ausgewählt werden.
 dcl#:#dcl_delete_views#:#Ansichten löschen
-dcl#:#dcl_delete_views_no_selection#:#Zum Löschen muss mindestens eine Ansicht ausgewählt werden
-dcl#:#dcl_deleted_records#:#Es wurden %s Datensätze gelöscht
+dcl#:#dcl_delete_views_no_selection#:#Zum Löschen muss mindestens eine Ansicht ausgewählt werden.
+dcl#:#dcl_deleted_records#:#Es wurden %s Datensätze gelöscht.
 dcl#:#dcl_desc#:#Absteigende Reihenfolge (DESC)
 dcl#:#dcl_description#:#Beschreibung
 dcl#:#dcl_detailed_view#:#Einzelansicht
@@ -8434,7 +8415,7 @@ dcl#:#dcl_empty_detailed_view_success#:#Die Vorlage wurde erfolgreich gelöscht.
 dcl#:#dcl_err_formula_field_not_found#:#Feld mit dem Titel '%s' existiert nicht
 dcl#:#dcl_error_parsing_expression#:#Fehler beim Evaluieren des Ausdrucks
 dcl#:#dcl_export_enabled#:#Tabelle exportieren
-dcl#:#dcl_export_enabled_desc#:#Alle Benutzer können die Daten der Tabelle selbst exportieren. Dazu müssen in der Übersicht "Felder der ausgewählten Tabelle" die Felder einzeln als exportierbar ausgewählt werden.
+dcl#:#dcl_export_enabled_desc#:#Alle Benutzer können die Daten der Tabelle selbst exportieren. Dazu müssen in der Übersicht „Felder der ausgewählten Tabelle“ die Felder einzeln als exportierbar ausgewählt werden.
 dcl#:#dcl_export_finished#:#Export abgeschlossen
 dcl#:#dcl_export_started#:#Asynchroner Export gestartet
 dcl#:#dcl_field_datatype#:#Feld Datentyp
@@ -8475,7 +8456,7 @@ dcl#:#dcl_last_update_description#:#Das Datum, an dem dieser Eintrag zuletzt ge�
 dcl#:#dcl_learning_progress#:#Lernfortschritt anzeigen
 dcl#:#dcl_legend_placeholders#:#Platzhalter
 dcl#:#dcl_length#:#Länge
-dcl#:#dcl_length_info#:#Anzahl von Zeichen, die ein Benutzer eingeben kann (Maximal 4000). Bei mehr als 200 Zeichen aktivieren Sie zusätzlich die Option "Mehrzeiliges Texteingabefeld".
+dcl#:#dcl_length_info#:#Anzahl von Zeichen, die ein Benutzer eingeben kann (Maximal 4000). Bei mehr als 200 Zeichen aktivieren Sie zusätzlich die Option „Mehrzeiliges Texteingabefeld“.
 dcl#:#dcl_limit_end#:#Ende
 dcl#:#dcl_limit_start#:#Start
 dcl#:#dcl_limited#:#Zeitlich begrenzte Bearbeitung
@@ -8484,41 +8465,41 @@ dcl#:#dcl_link_detail_page#:#Link zur Einzelansicht
 dcl#:#dcl_list_fields#:#Felder
 dcl#:#dcl_list_visibility_and_filter#:#Übersicht
 dcl#:#dcl_locked#:#Gesperrt
-dcl#:#dcl_locked_tooltip#:#Ein gesperrtes Feld lässt sich von Benutzern nicht mehr bearbeiten. Gilt nicht für Rollen mit dem Recht 'Einstellungen bearbeiten'
+dcl#:#dcl_locked_tooltip#:#Ein gesperrtes Feld lässt sich von Benutzern nicht mehr bearbeiten. Dies gilt nicht für Rollen mit dem Recht „Einstellungen bearbeiten“.
 dcl#:#dcl_manage#:#Verwalten
 dcl#:#dcl_max_digits#:#Maximale Anzahl Ziffern
 dcl#:#dcl_max_import#:#Die maximal erlaubte Anzahl an importierten Datensätze wurde überschritten.
 dcl#:#dcl_max_text_length#:#Maximale Länge
 dcl#:#dcl_mob#:#Medienobjekt
 dcl#:#dcl_mob_desc#:#Möglichkeit zum Hochladen von Bild-, Audio- oder Video-Dateien, die direkt in der Datensammlung präsentiert werden. Erlaubte Dateitypen: %s
-dcl#:#dcl_msg_field_modified#:#Feld wurde aktualisiert
+dcl#:#dcl_msg_field_modified#:#Feld wurde aktualisiert.
 dcl#:#dcl_msg_fields_deleted#:#Gelöschte Felder
-dcl#:#dcl_msg_info_alternatives#:#Die gewünschte Einzelansicht konnte nicht angezeigt werden, da entweder keine Einzelansicht für diese Tabellenansicht existiert oder Sie nicht genügend Zugriffsrechte besitzen. Wählen Sie aus der Liste eine für Sie verfügbare Einzelansicht, um den Datensatz dennoch anzuzeigen.
-dcl#:#dcl_msg_mc_to_sc_confirmation#:#Ein Wechsel von Mehrfachauswahl auf Einfachauswahl kann bei existierenden Datensätzen zu Datenverlust führen. Sind Sie sicher, dass Sie fortfahren möchten?
-dcl#:#dcl_msg_no_perm_edit#:#Keine Berechtigung um diesen Eintrag zu bearbeiten
-dcl#:#dcl_msg_no_perm_view#:#Keine Berechtigung um diesen Eintrag anzusehen
+dcl#:#dcl_msg_info_alternatives#:#Die gewünschte Einzelansicht konnte nicht angezeigt werden. Entweder existiert keine Einzelansicht für diese Tabellenansicht oder Sie besitzen nicht die notwendigen Zugriffsrechte. Wählen Sie aus der Liste eine für Sie verfügbare Einzelansicht, um den Datensatz dennoch anzuzeigen.
+dcl#:#dcl_msg_mc_to_sc_confirmation#:#Ein Wechsel von Mehrfachauswahl auf Einfachauswahl kann bei existierenden Datensätzen zu einem Datenverlust führen. Sind Sie sicher, dass Sie fortfahren möchten?
+dcl#:#dcl_msg_no_perm_edit#:#Keine Berechtigung zum Bearbeiten dieses Eintrags
+dcl#:#dcl_msg_no_perm_view#:#Keine Berechtigung zum Ansehen dieses Eintrags
 dcl#:#dcl_msg_table_created#:#Tabelle angelegt
 dcl#:#dcl_msg_table_edited#:#Tabelleneinstellungen wurden gespeichert.
-dcl#:#dcl_msg_tables_delete_all#:#Löschen nicht möglich: Es muss mindestens eine Tabelle existieren
-dcl#:#dcl_msg_tables_deleted#:#Tabellen gelöscht
-dcl#:#dcl_msg_tableview_created#:#Ansicht hinzugefügt
-dcl#:#dcl_msg_tableview_deleted#:#Ansicht gelöscht
-dcl#:#dcl_msg_tableview_updated#:#Ansicht aktualisiert
-dcl#:#dcl_msg_tableviews_delete_all#:#Löschen nicht möglich: Es muss mindestens eine Ansicht existieren
-dcl#:#dcl_msg_tableviews_deleted#:#Ansichten gelöscht
-dcl#:#dcl_msg_tableviews_order_updated#:#Anordnung der Ansichten aktualisiert
+dcl#:#dcl_msg_tables_delete_all#:#Löschen nicht möglich: Es muss mindestens eine Tabelle existieren.
+dcl#:#dcl_msg_tables_deleted#:#Tabellen gelöscht.
+dcl#:#dcl_msg_tableview_created#:#Ansicht hinzugefügt.
+dcl#:#dcl_msg_tableview_deleted#:#Ansicht gelöscht.
+dcl#:#dcl_msg_tableview_updated#:#Ansicht aktualisiert.
+dcl#:#dcl_msg_tableviews_delete_all#:#Löschen nicht möglich: Es muss mindestens eine Ansicht existieren.
+dcl#:#dcl_msg_tableviews_deleted#:#Ansichten gelöscht.
+dcl#:#dcl_msg_tableviews_order_updated#:#Anordnung der Ansichten aktualisiert.
 dcl#:#dcl_multiple_selection#:#Mehrfachauswahl
 dcl#:#dcl_new#:#Neue Datensammlung anlegen
 dcl#:#dcl_new_field#:#Neues Feld
 dcl#:#dcl_new_table#:#Neue Tabelle
 dcl#:#dcl_next_record#:#Nächster Eintrag
-dcl#:#dcl_no_content_warning#:#Achtung, die Datensammlung ist bereits online, hat aber noch keinen Inhalt!
+dcl#:#dcl_no_content_warning#:#Achtung: die Datensammlung ist bereits online, hat aber noch keinen Inhalt!
 dcl#:#dcl_no_entry#:#Kein Eintrag
 dcl#:#dcl_no_export_content_available#:#Keine Daten für den Export verfügbar.
 dcl#:#dcl_no_export_data_available#:#Keine Daten oder Felder für den Export verfügbar.
-dcl#:#dcl_no_export_fields_available#:#Keine Felder für den Export aktiviert. Markieren Sie mindestens ein Feld als "Exportierbar" in den <a href="%s">Tabelleneinstellungen</a>.
-dcl#:#dcl_no_fields_yet#:#Es wurden noch keine Felder für diese Tabelle erstellt, daher können noch keine Einträge eingefügt werden.
-dcl#:#dcl_no_read_access_on_any_standard_view#:#Sie haben auf keine Standard Tabellenansicht Lesezugriff.
+dcl#:#dcl_no_export_fields_available#:#Keine Felder für den Export aktiviert. Markieren Sie mindestens ein Feld als „Exportierbar“ in den <a href="%s">Tabelleneinstellungen</a>.
+dcl#:#dcl_no_fields_yet#:#Es wurden noch keine Felder für diese Tabelle erstellt. Daher können noch keine Einträge eingefügt werden.
+dcl#:#dcl_no_read_access_on_any_standard_view#:#Sie haben auf keine Standard-Tabellenansicht Lesezugriff.
 dcl#:#dcl_no_search_results_found_for#:#Es wurden keine Module gefunden mit:
 dcl#:#dcl_no_such_reference#:#Der folgende Wert ist in der Referenztabelle nicht vorhanden:
 dcl#:#dcl_no_warnings#:#Der Import wurde reibungslos abgeschlossen.
@@ -8536,30 +8517,30 @@ dcl#:#dcl_number_desc#:#Eingabefeld für ganze Zahlen (maximal 9 Ziffern). Nicht
 dcl#:#dcl_online_info#:#Nur wenn die Datensammlung online geschaltet ist, können Benutzer die Datensammlung sehen und benutzen.
 dcl#:#dcl_order#:#Sortierung
 dcl#:#dcl_own_entries#:#Nur eigene Einträge
-dcl#:#dcl_owner#:#Eigener Eintrag von ###Modified as part of gender mainstreaming activities for ILIAS 8
-dcl#:#dcl_owner_description#:#Eigene Einträge bleiben stets sichtbar.###Modified as part of gender mainstreaming activities for ILIAS 8
+dcl#:#dcl_owner#:#Eigener Eintrag von
+dcl#:#dcl_owner_description#:#Eigene Einträge bleiben stets sichtbar.
 dcl#:#dcl_owner_name#:#Im Besitz von (Name)
 dcl#:#dcl_page_type_dclf#:#Detailansicht
 dcl#:#dcl_permissions_form#:#Berechtigungen für diese Tabelle
 dcl#:#dcl_please_select#:#--- Bitte wählen ---
 dcl#:#dcl_plugin#:#Plugin
-dcl#:#dcl_plugin_desc#:#DataCollection Feld Erweiterungen
+dcl#:#dcl_plugin_desc#:#DataCollection-Feld Erweiterungen
 dcl#:#dcl_plugin_hooks#:#Verfügbare Erweiterungen
-dcl#:#dcl_plugin_no_hooks_available#:#Keine aktiven Field-Type Plugins gefunden
+dcl#:#dcl_plugin_no_hooks_available#:#Keine aktiven Field-Type Plugins gefunden.
 dcl#:#dcl_prev_record#:#Vorheriger Eintrag
 dcl#:#dcl_prop_expression#:#Ausdruck
 dcl#:#dcl_prop_expression_info#:#Gültige Operatoren: <b>%s</b><br>Unterstützte Funktionen: <b>%s</b><br>Verwenden Sie Klammern <b>"(", ")"</b> zum Gruppieren von Ausdrücken.<br>Zeichenketten und Platzhalter verbinden mit &: <b>"Das Resultat ist " & [[Int 1]] * [[Int 2]]</b><br>Verwenden der Funktionen: <b>SUM([[Int 1]];[[Int 2]])</b><br><br>Gültige Felder (auf den Titel klicken um als Platzhalter in Ausdruck einzufügen):<br>%s
 dcl#:#dcl_public_comments#:#Kommentare
-dcl#:#dcl_public_comments_desc#:#Benutzer können Datensätze dieser Tabelle kommentieren
+dcl#:#dcl_public_comments_desc#:#Benutzer können Datensätze dieser Tabelle kommentieren.
 dcl#:#dcl_rating#:#Bewertung
-dcl#:#dcl_rating_desc#:#Benutzer können Einträge mit bis zu fünf Sternen bewerten.
-dcl#:#dcl_rbac_roles_without_read_access_on_any_standard_view#:#Die folgenden RBAC Rollen haben Lesezugriff auf die Datensammlung, jedoch auf keine Standard Ansicht der Tabellen:
+dcl#:#dcl_rating_desc#:#Benutzer können Einträge mit ein bis fünf Sternen bewerten.
+dcl#:#dcl_rbac_roles_without_read_access_on_any_standard_view#:#Die folgenden Rollen haben Lesezugriff auf die Datensammlung, jedoch auf keine Standard-Ansicht der Tabellen:
 dcl#:#dcl_record#:#Eintrag
-dcl#:#dcl_record_deleted#:#Eintrag gelöscht
+dcl#:#dcl_record_deleted#:#Eintrag gelöscht.
 dcl#:#dcl_record_from_total#:#%d von %d
 dcl#:#dcl_reference#:#Referenz
-dcl#:#dcl_reference_desc#:#Bereitstellen von Auswahloptionen, die in einem anderen Feld einer Tabelle gepflegt werden
-dcl#:#dcl_reference_link#:#Als Link zum referenzierten Eintrag darstellen
+dcl#:#dcl_reference_desc#:#Bereitstellen von Auswahloptionen, die in einem anderen Feld einer Tabelle gepflegt werden.
+dcl#:#dcl_reference_link#:#Als Link zum referenzierten Eintrag darstellen.
 dcl#:#dcl_reference_link_info#:#Die Vorlage für Einzelansicht muss in der referenzierten Tabelle aktiv sein.
 dcl#:#dcl_reference_title#:#Referenz zu Tabelle und Feld
 dcl#:#dcl_regex#:#Regulärer Ausdruck
@@ -8568,15 +8549,15 @@ dcl#:#dcl_required#:#Verpflichtend
 dcl#:#dcl_row_not_found#:# - Dieses Feld wurde in der Tabelle nicht gefunden.
 dcl#:#dcl_save#:#Speichern
 dcl#:#dcl_save_confirmation#:#Speicherbestätigung
-dcl#:#dcl_save_confirmation_desc#:#Benutzer muss das Eintragen von neuen Datensätzen bestätigen
-dcl#:#dcl_save_order#:#Sortierung Speichern
+dcl#:#dcl_save_confirmation_desc#:#Benutzer muss das Eintragen von neuen Datensätzen bestätigen.
+dcl#:#dcl_save_order#:#Sortierung speichern
 dcl#:#dcl_save_record#:#Eintrag speichern
 dcl#:#dcl_select#:#Auswahl der Tabelle
 dcl#:#dcl_selection_options#:#Optionen
 dcl#:#dcl_selection_type#:#Typ
-dcl#:#dcl_selection_type_combobox#:#Combobox (Dropdown)
+dcl#:#dcl_selection_type_combobox#:#Einfachauswahl (Dropdown)
 dcl#:#dcl_selection_type_multi#:#Mehrfachauswahl
-dcl#:#dcl_selection_type_single#:#Einfachauswahl
+dcl#:#dcl_selection_type_single#:#Einfachauswahl (Liste)
 dcl#:#dcl_simulate_import#:#Import simulieren
 dcl#:#dcl_simulate_info#:#Hierbei werden keine Datensätze angelegt, sondern nur Feedback zu Fehlern in der Import-Datei gegeben. Dadurch können Sie fehlerhafte Imports vermeiden.
 dcl#:#dcl_skipped_delete_records#:#%s Datensätze wurden aufgrund der Rechteeinstellungen nicht gelöscht
@@ -8585,25 +8566,27 @@ dcl#:#dcl_std_field_not_importable#:# - Standardfelder sind nicht importierbar.
 dcl#:#dcl_std_filter#:#Filtervorbelegung
 dcl#:#dcl_supported_filetypes#:#Erlaubte Dateiendungen
 dcl#:#dcl_supported_filetypes_desc#:#Sie können hier kommagetrennt Dateiendungen angeben. Zum Beispiel: pdf, docx
+dcl#:#dcl_switch_table#:#Tabelle wechseln
+dcl#:#dcl_switch_view#:#Ansicht ändern
 dcl#:#dcl_table#:#Tabelle
 dcl#:#dcl_table_create#:#Erstelle Tabelle
 dcl#:#dcl_table_edit#:#Speichern
 dcl#:#dcl_table_id#:#Tabellen ID
-dcl#:#dcl_table_info#:#Nachfolgend legen Sie fest, was Benutzer in dieser Tabelle tun dürfen, die für die Datensammlung das Recht "Eintragen" besitzen.
+dcl#:#dcl_table_info#:#Nachfolgend legen Sie fest, was Benutzer in dieser Tabelle tun dürfen, die für die Datensammlung das Recht „Eintragen“ besitzen.
 dcl#:#dcl_table_info_title#:#Info
 dcl#:#dcl_table_list_fields#:#Felder der ausgewählten Tabelle
 dcl#:#dcl_table_list_tables#:#Verfügbare Tabellen
 dcl#:#dcl_table_settings_saved#:#Tabellen Einstellungen wurden gespeichert.
-dcl#:#dcl_table_title_not_matching#:#Die Titel des Excel-Arbeitsblatts und der Tabelle in der Datensammlung stimmen nicht überein. Benennen Sie das Arbeitsblatt um, um einen korrekten Import durchzuführen.
-dcl#:#dcl_table_title_unique#:#Es existiert bereits eine Tabelle mit diesem Titel. Titel muss eindeutig sein.
+dcl#:#dcl_table_title_not_matching#:#Die Titel des Excel-Arbeitsblatts und der Tabelle in der Datensammlung stimmen nicht überein. Benennen Sie das Arbeitsblatt um, um einen korrekten Import zu gewährleisten.
+dcl#:#dcl_table_title_unique#:#Es existiert bereits eine Tabelle mit diesem Titel. Der Titel muss eindeutig sein.
 dcl#:#dcl_tables#:#Tabellen
 dcl#:#dcl_tables_confirm_delete#:#Sind Sie sicher, dass die folgenden Tabellen gelöscht werden sollen?
 dcl#:#dcl_tableview#:#Ansicht
 dcl#:#dcl_tableview_add#:#Neue Ansicht hinzufügen
-dcl#:#dcl_tableview_confirm_delete#:#Sind Sie sicher, dass die folgende Ansicht gelöscht werden sollen?
-dcl#:#dcl_tableview_copy#:#Ansicht erfolgreich kopiert
+dcl#:#dcl_tableview_confirm_delete#:#Sind Sie sicher, dass die folgende Ansicht gelöscht werden soll?
+dcl#:#dcl_tableview_copy#:#Ansicht erfolgreich kopiert.
 dcl#:#dcl_tableview_default_value#:#Standardwert
-dcl#:#dcl_tableview_default_value_fail#:#Einige numerische Standardwerte konnten nicht kopiert werden, da sich Zeichen darin befanden. Bitte versuchen Sie es erneut.
+dcl#:#dcl_tableview_default_value_fail#:#Einige numerische Standardwerte konnten nicht kopiert werden, da sich Zeichen darin befinden. Bitte versuchen Sie es erneut.
 dcl#:#dcl_tableview_field_access#:#Zugriffsrecht
 dcl#:#dcl_tableview_fieldsettings#:#Feldspezifische Einstellungen
 dcl#:#dcl_tableview_fieldtitle#:#Feld-Titel
@@ -8639,12 +8622,12 @@ dcl#:#dcl_view_viewdefinition#:#Vorlage für Einzelansicht
 dcl#:#dcl_visible#:#Für alle Benutzer sichtbar
 dcl#:#dcl_visible_desc#:#Benutzer haben Zugriff auf diese Tabelle.
 dcl#:#dcl_width#:#Breite
-dcl#:#dcl_wrong_input_type#:#Der eingegebene Text passt nicht zum Typ dieses Feldes (Falscher Typ).
+dcl#:#dcl_wrong_input_type#:#Der eingegebene Text passt nicht zum Typ dieses Feldes (falscher Typ).
 dcl#:#dcl_wrong_length#:#Der eingegebene Text ist zu lang.
-dcl#:#dcl_wrong_regex#:#Der eingegebene Text passt nicht zur Spezifikation dieses Feldes (Regulärer Ausdruck).
-dcl#:#dlc_xls_async_export#:#Asynchroner XLSX export
+dcl#:#dcl_wrong_regex#:#Der eingegebene Text passt nicht zur Spezifikation dieses Feldes (regulärer Ausdruck).
+dcl#:#dlc_xls_async_export#:#Asynchroner XLSX-Export
 dcl#:#fieldtitle_allow_chars#:#Nicht Erlaubte Zeichen: %s
-dcl#:#fileupload_not_migrated#:#Die Datei wurde noch nicht migriert und kann nicht angezeigt werden. Bitte wenden Sie sich an Ihre System-Administration.
+dcl#:#fileupload_not_migrated#:#Die Datei wurde noch nicht migriert und kann deshalb nicht angezeigt werden. Bitte wenden Sie sich an Ihre Systemadministration.
 didactic#:#activate_exclusive_template#:#Standard ausgrauen
 didactic#:#activate_exclusive_template_info#:#Die Standard-Vorlage wird überall dort ausgegraut, wo diese didaktische Vorlage aktiv ist.
 didactic#:#activate_local_didactic_template#:#Gültigkeitsbereich
@@ -9003,8 +8986,8 @@ exc#:#exc_comment_for_learner_info#:#Es wird eine Benachrichtigung an den Teilne
 exc#:#exc_compare_selected_submissions#:#Vergleiche ausgewählte Lösungsabgaben
 exc#:#exc_compare_submissions#:#Vergleiche Lösungsabgaben
 exc#:#exc_completion_by_submission#:#Automatisch bei Abgabe
-exc#:#exc_completion_by_submission_info#:#Reicht ein Teilnehmer eine Lösung ein, wird der Lernfortschrittstatus automatisch auf „Bestanden“ gesetzt. Personen mit dem Recht „Abgaben und Noten bearbeiten“ können den Status manuell überschreiben. Das Ändern dieser Einstellung hat keine Auswirkung auf bereits erfolgte Bewertungen.
-exc#:#exc_completion_by_tutor#:#Nur manuell setzen
+exc#:#exc_completion_by_submission_info#:#Wird für eine Übungseinheit eine Lösung eingereicht, setzt ILIAS den Status automatisch auf „Bestanden“. Personen mit dem Recht „Abgaben und Noten bearbeiten“ können den Status manuell überschreiben. Das Ändern dieser Einstellung hat keine Auswirkung auf bereits erfolgte Bewertungen.
+exc#:#exc_completion_by_tutor#:#Manuell setzen
 exc#:#exc_conf_del_assignments#:#Möchten Sie die folgenden Übungseinheiten wirklich löschen?
 exc#:#exc_copy#:#Übung kopieren
 exc#:#exc_copy_zip_error#:#Die Abgabe kann nicht geöffnet werden. Es ist ein Fehler beim Kopieren der Dateien aufgetreten.
@@ -9266,11 +9249,11 @@ exc#:#exc_select_portfolio_unlink#:#Portfolio entfernen
 exc#:#exc_send_assignment#:#Übungseinheit per Mail verschicken
 exc#:#exc_settings_feedback#:#Rückmeldung
 exc#:#exc_settings_feedback_file#:#Datei
-exc#:#exc_settings_feedback_file_info#:#Tutoren laden ihre Datei hoch. Der jeweilige Teilnehmer erhält eine Benachrichtigung und die Datei wird ihm in der Übungseinheiten-Übersicht angezeigt.
+exc#:#exc_settings_feedback_file_info#:#Rückmeldungen werden als Datei hochgeladen und im Reiter „Übungseinheiten“ angezeigt. Die Teilnehmerinnen und Teilnehmer werden darüber per Mail benachrichtigt.
 exc#:#exc_settings_feedback_mail#:#per Mail
-exc#:#exc_settings_feedback_mail_info#:#Tutoren geben ihre Rückmeldungen zur Abgabe in ein Mail-Formular ein. Die Mail wird dem entsprechenden Teilnehmer gesendet.
+exc#:#exc_settings_feedback_mail_info#:#Rückmeldungen zur jeweiligen Abgabe werden in ein Mailformular eingegeben und von ILIAS versandt.
 exc#:#exc_settings_feedback_text#:#Texteingabe
-exc#:#exc_settings_feedback_text_info#:#Tutoren geben ihre Rückmeldungen in ein Textfeld ein. Der jeweilige Teilnehmer erhält eine Benachrichtigung und der Text wird ihm in der Übungseinheiten-Übersicht angezeigt.
+exc#:#exc_settings_feedback_text_info#:#Rückmeldungen zur jeweiligen Abgabe werden in ein Textfeld eingegeben und im Reiter „Übungseinheiten“ angezeigt. Zusätzlich erhalten Teilnehmerinnen und Teilnehmer eine Benachrichtigung per Mail.
 exc#:#exc_show_peer_review#:#Peer-Feedback anzeigen
 exc#:#exc_show_submissions#:#Lösungsabgaben veröffentlichen
 exc#:#exc_show_submissions_info#:#Alle Lösungsabgaben einer Übungseinheit können nach dem Abgabetermin von allen Teilnehmern eingesehen werden.
@@ -9284,7 +9267,7 @@ exc#:#exc_submission_file#:#Dateiabgabe
 exc#:#exc_submission_no_new_files#:#Keine neuen Abgaben vorhanden.
 exc#:#exc_submission_notification#:#Benachrichtigung bei Abgabe
 exc#:#exc_submission_notification_body#:#Eine neue Abgabe für die Übung "%s" liegt vor.
-exc#:#exc_submission_notification_info#:#Sie werden per Mail benachrichtigt, sobald neue Lösungen abgegeben wurden. Dies ist eine persönliche Einstellung, die nur für Sie gilt. Andere Tutoren der Übung sind davon nicht betroffen.
+exc#:#exc_submission_notification_info#:#Sie werden per Mail benachrichtigt, sobald neue Lösungen abgegeben wurden. Dies ist eine persönliche Einstellung, die nur für Sie gilt. Andere Personen, die Abgaben bewerten erhalten nur dann eine Mail, wenn auch sie diese Checkbox aktivieren.
 exc#:#exc_submission_notification_link#:#Link zur Übung: %s
 exc#:#exc_submission_notification_subject#:#Eine neue Abgabe für die Übung "%s" liegt vor
 exc#:#exc_submission_text#:#Textabgabe
@@ -9315,7 +9298,7 @@ exc#:#exc_tbl_filter_has_submission#:#Hat abgegeben
 exc#:#exc_tbl_filter_submission#:#Abgabe
 exc#:#exc_tbl_individual_deadline#:#Individueller Abgabetermin
 exc#:#exc_tbl_mark#:#Note
-exc#:#exc_tbl_notice#:#Notiz für Tutoren
+exc#:#exc_tbl_notice#:#Interne Anmerkung
 exc#:#exc_tbl_sent_time#:#Übungseinheit verschickt am
 exc#:#exc_tbl_status#:#Bewertung
 exc#:#exc_tbl_status_time#:#Bewertet am
@@ -9339,7 +9322,7 @@ exc#:#exc_team_by_random_info#:#Teilnehmer werden automatisch und zufällig zu T
 exc#:#exc_team_by_tutors#:#Durch Tutoren
 exc#:#exc_team_by_tutors_info#:#Tutoren organisieren die Teams.
 exc#:#exc_team_by_tutors_manual#:#Manuell
-exc#:#exc_team_by_tutors_manual_info#:#Tutoren ordnen die Teilnehmer manuell den Teams zu.
+exc#:#exc_team_by_tutors_manual_info#:#Personen mit dem Recht „Abgaben und Noten bearbeiten“ ordnen die Teilnehmerinnen und Teilnehmer manuell den Teams zu.
 exc#:#exc_team_creation#:#Erstellung
 exc#:#exc_team_formation#:#Organisation der Teams
 exc#:#exc_team_log#:#Team Log
@@ -9349,7 +9332,6 @@ exc#:#exc_team_log_create_team#:#Team erstellt.
 exc#:#exc_team_log_remove_file#:#Datei %s entfernt.
 exc#:#exc_team_log_remove_member#:#Mitglied %s entfernt.
 exc#:#exc_team_management_tutor#:#Team-Management durch Tutoren
-exc#:#exc_team_management_tutor_info#:#Bei Aktivierung dieser Option können Teilnehmer ihre Teams nicht selbst organisieren.
 exc#:#exc_team_max_small_than_members#:#Die maximale Anzahl von Teilnehmern kann nicht auf %s gesetzt werden, da einige Teams %s Teilnehmer erhalten müssen.
 exc#:#exc_team_member_add#:#Team-Mitglied hinzufügen (Suche)
 exc#:#exc_team_member_container_add#:#Team-Mitglied aus Kurs/Gruppe hinzufügen
@@ -9409,7 +9391,7 @@ exercise#:#exc_admin_settings#:#Übungs-Administration
 exercise#:#exc_comment#:#Stellungnahme
 exercise#:#exc_comment_for_learner#:#Rückmeldung für Teilnehmer
 exercise#:#exc_failed#:#Nicht bestanden
-exercise#:#exc_feedback_from_tutor#:#Bewertung des Tutors
+exercise#:#exc_feedback_from_tutor#:#Bewertung
 exercise#:#exc_grading#:#Bewertung
 exercise#:#exc_mark#:#Note
 exercise#:#exc_notgraded#:#Nicht bewertet
@@ -9815,6 +9797,8 @@ glo#:#glo_box_last_presented#:#Fach zuletzt angezeigt
 glo#:#glo_boxes#:#Fächer
 glo#:#glo_boxes_really_reset#:#Möchten Sie wirklich alle Fächer zurücksetzen? Alle Lernkarten werden in das erste Fach verschoben.
 glo#:#glo_boxes_reset#:#Die Fächer wurden erfolgreich zurückgesetzt.
+glo#:#glo_bulk_confirmation#:#Bitte überprüfen Sie, ob alle Begriffe und Definitionen korrekt gelistet sind.
+glo#:#glo_bulk_creation#:#Massenerstellung
 glo#:#glo_change_to_collection_unavailable_info#:#Um die Zusammenstellung der Inhalte auf "Sammelglossar" zu ändern, müssen Sie zuerst alle bestehenden Begriffe innerhalb dieses Glossars im Reiter "Inhalt" löschen.
 glo#:#glo_change_to_standard_unavailable_info#:#Um die Zusammenstellung der Inhalte auf "Normales Glossar" zu ändern, müssen Sie zuerst die ausgewählten Glossare im Reiter "Inhalt" entfernen.
 glo#:#glo_col_ordering_info#:#Sortieren Sie die Titel der Metadatenfelder, die in der Präsentationsansicht des Glossars als Spaltenüberschriften angezeigt werden.
@@ -9824,6 +9808,7 @@ glo#:#glo_collection_info#:#Das Glossar sammelt automatisch alle Begriffe aus de
 glo#:#glo_content_assembly#:#Zusammenstellung der Inhalte
 glo#:#glo_copy#:#Glossar kopieren
 glo#:#glo_copy_terms#:#Begriffe kopieren
+glo#:#glo_create_term_definition_pairs#:#Begriffs/Definitions-Paare erstellen
 glo#:#glo_days_ago#:#vor %s Tagen
 glo#:#glo_def_vs_term#:#Definition vs. Begriff
 glo#:#glo_def_vs_term_info#:#Zeige zuerst eine Definition, der Lernende muss den Begriff erraten.
@@ -9854,9 +9839,13 @@ glo#:#glo_selected_terms_have_been_copied#:#Die ausgewählten Begriffe wurden in
 glo#:#glo_show_definition#:#Definition zeigen
 glo#:#glo_show_term#:#Begriff zeigen
 glo#:#glo_term#:#Glossarbegriff
+glo#:#glo_term_definition_pairs#:#Begriffs/Definitions-Paare
+glo#:#glo_term_definition_pairs_info#:#Bitte geben Sie pro Zeile ein Begriffs/Definitions-Paar ein. Begriff und Definition müssen getrennt sein durch ein Semikolon oder ein TAB-Zeichen (werden überlicherweise durch Zwischenablage-Aktionen von Tabellenkalkulationsprogramm unterstützt).
+glo#:#glo_term_letter#:#Buchstabe
 glo#:#glo_term_reference#:#Begriffslink
 glo#:#glo_term_vs_def#:#Begriff vs. Definition
 glo#:#glo_term_vs_def_info#:#Zeige zuerst einen Begriff, der Lernende muss die Definition erraten.
+glo#:#glo_terms_per_page#:#Begriffe pro Seite
 glo#:#glo_use_all_flashcards#:#Alle Lernkarten nutzen (%s)
 glo#:#glo_use_remaining_flashcards#:#Verbleibende Lernkarten nutzen (%s)
 grp#:#crs_add_grouping#:#Neue Mitgliedschaftsbeschränkung
@@ -9953,7 +9942,7 @@ grp#:#grp_mail_wl_sub#:#Ihre Anmeldung für Gruppe "%s"
 grp#:#grp_map_location#:#Standort auf Gruppenkarte
 grp#:#grp_map_settings#:#Einstellungen Karte
 grp#:#grp_max_and_min_members_invalid#:#Die minimale Anzahl muss kleiner als die maximale Anzahl sein.
-grp#:#grp_mem_contacts#:#Tutorielle Betreuung
+grp#:#grp_mem_contacts#:#Kontaktperson
 grp#:#grp_mem_tbl_header#:#Gruppenteilnehmer
 grp#:#grp_member_administration#:#Teilnehmerverwaltung
 grp#:#grp_members#:#Mitglieder
@@ -10417,6 +10406,8 @@ link#:#link_wpages#:#Wikiseiten
 lm#:#lm_btn_lp_toggle_state_completed#:#Auf "Nicht bearbeitet" setzen
 lm#:#lm_btn_lp_toggle_state_not_completed#:#Auf "Bearbeitet" setzen
 lm#:#lm_copy#:#ILIAS-Lernmodul kopieren
+lm#:#lm_edit_chapters#:#Kapitel bearbeiten
+lm#:#lm_edit_lm_settings#:#Lernmoduleinstellungen bearbeiten
 lm#:#lm_est_reading_time#:#Geschätzte Lesedauer
 lm#:#lm_est_reading_time_info#:#In Lernmodulen kann eine geschätzte Lesezeit ermittelt und angezeigt werden.
 lm#:#lm_page_type_lm#:#Lernmodulseite
@@ -10861,7 +10852,7 @@ mail#:#mail_absence_status#:#Abwesenheit konfigurieren
 mail#:#mail_absence_status_info#:#Aktivierung des automatischen Versands einer Abwesenheitsnachricht.
 mail#:#mail_absent_from#:#Abwesend von
 mail#:#mail_absent_until#:#Abwesend bis einschließlich
-mail#:#mail_account_mail#:#Anmeldekonten-Mail
+mail#:#mail_account_mail#:#Über neues Konto informieren
 mail#:#mail_add_folder#:#Neuen Ordner erstellen
 mail#:#mail_add_recipient#:#Bitte geben Sie an, wer die Mail erhalten soll. Geben Sie ILIAS-Anmeldenamen oder gültige E-Mail-Adressen an.###Modified as part of gender mainstreaming activities for ILIAS 8
 mail#:#mail_add_subfolder#:#Unterordner hinzufügen
@@ -10968,6 +10959,8 @@ mail#:#mail_members_search_continue#:#Weiter
 mail#:#mail_message_send#:#Die Mail wurde versandt
 mail#:#mail_move_error#:#Fehler beim Mailversand
 mail#:#mail_move_to#:#Verschieben nach:
+mail#:#mail_move_to_folder_btn_label#:#Mail verschieben
+mail#:#mail_move_to_folder_x#:#nach "%s"
 mail#:#mail_moved#:#Ihre Mail(s) wurden verschoben
 mail#:#mail_moved_to_trash#:#Die Mail(s) wurde(n) in den Papierkorb verschoben
 mail#:#mail_multiple_role_recipients_found#:#Die Angabe %1$s im „An”-Feld ist nicht eindeutig: Versenden Sie diese Mail bitte direkt aus dem Mitglieder-Reiter des gewünschten Kurses bzw. der gewünschten Gruppe.###Modified as part of gender mainstreaming activities for ILIAS 8
@@ -11044,6 +11037,7 @@ mail#:#mail_smtp_status_info#:#Falls aktiviert, delegiert ILIAS den Versand exte
 mail#:#mail_smtp_user#:#Benutzer
 mail#:#mail_subject_prefix#:#Mail-Betreff
 mail#:#mail_subject_prefix_info#:#Sie können hier einen Text eingeben, der der Betreffzeile ausgehender, automatisch generierter E-Mails vorangestellt wird. Es wird empfohlen einen Präfix anzugeben, um Nutzern das Filtern der Nachrichten zu vereinfachen.
+mail#:#mail_subject_too_long#:#Der Betreff ist zu lang.
 mail#:#mail_sure_delete#:#Sind Sie sicher, dass die markierten Mails gelöscht werden sollen?
 mail#:#mail_sure_delete_entry#:#Sind Sie sicher, dass die markierten Einträge gelöscht werden sollen?
 mail#:#mail_sure_delete_file#:#Sind Sie sicher, dass die ausgewählten Dateien gelöscht werden sollen?
@@ -11377,9 +11371,19 @@ meta#:#md_advanced#:#Benutzerdefinierte Metadaten
 meta#:#md_aria_language_selection#:#Sprachauswahl
 meta#:#md_copyright#:#Copyright
 meta#:#md_copyright_add#:#Neue Vorgabe
+meta#:#md_copyright_alt_text#:#Alternativtext
+meta#:#md_copyright_alt_text_info#:#Wird für das ‘alt’ Attribut des Bildes verwendet
 meta#:#md_copyright_edit#:#Copyright-Vorgabe bearbeiten
 meta#:#md_copyright_enable_info#:#Aktivieren Sie diese Einstellung, um vordefinierte Nutzungslizenzen anzubieten.
 meta#:#md_copyright_enabled#:#Copyright-Auswahl aktivieren
+meta#:#md_copyright_full_name#:#Vollständiger Name
+meta#:#md_copyright_image#:#Bild
+meta#:#md_copyright_image_file#:#Datei
+meta#:#md_copyright_image_is_file#:#Datei hochladen
+meta#:#md_copyright_image_is_link#:#URL eingeben
+meta#:#md_copyright_image_link#:#URL
+meta#:#md_copyright_link#:#URL
+meta#:#md_copyright_link_info#:#Link zu der Lizenz
 meta#:#md_copyright_preview#:#Copyright (Vorschau)
 meta#:#md_copyright_selection#:#Copyright-Vorgaben
 meta#:#md_copyright_settings#:#Copyright-Einstellungen
@@ -11398,14 +11402,27 @@ meta#:#md_record_list_table#:#Benutzerdefinierte Metadatensätze
 meta#:#md_separated_by#:#Getrennt mit %s
 meta#:#md_time#:#Zeit:
 meta#:#md_used#:#Verwendung (Anzahl)
+meta#:#meta_1#:#1
+meta#:#meta_2#:#2
+meta#:#meta_3#:#3
+meta#:#meta_4#:#4
 meta#:#meta_accessibility_restrictions#:#Zugangsbeschränkungen
 meta#:#meta_active#:#Aktiv
 meta#:#meta_add#:#Hinzufügen
+meta#:#meta_add_element#:#%s hinzufügen
+meta#:#meta_add_element_success#:#Element erfolgreich hinzugefügt
+meta#:#meta_advmd_add_field#:#Neues Feld hinzufügen
 meta#:#meta_advmd_select_options#:#Einträge
+meta#:#meta_aggregation_level#:#Aggregationsstufe
+meta#:#meta_amaya#:#Amaya
 meta#:#meta_annotation#:#Anmerkung
+meta#:#meta_annotation_plural#:#Anmerkungen
+meta#:#meta_any#:#Beliebig
 meta#:#meta_atomic#:#Atomar
 meta#:#meta_author#:#Autor
+meta#:#meta_authors#:#Beitragende Personen
 meta#:#meta_browser#:#Browser
+meta#:#meta_button_to_full_editor_label#:#Vollständige Lernobjekt-Metadaten bearbeiten
 meta#:#meta_c_AD#:#Andorra
 meta#:#meta_c_AE#:#Vereinigte Arabische Emirate
 meta#:#meta_c_AF#:#Afghanistan
@@ -11655,50 +11672,70 @@ meta#:#meta_c_ZM#:#Sambia
 meta#:#meta_c_ZW#:#Simbabwe
 meta#:#meta_catalog#:#Katalog
 meta#:#meta_classification#:#Klassifizierung
+meta#:#meta_classification_plural#:#Klassifizierungen
 meta#:#meta_collection#:#Sammlung
 meta#:#meta_competency#:#Kompetenz
 meta#:#meta_contentprovider#:#Content angeboten von###Modified as part of gender mainstreaming activities for ILIAS 8
 meta#:#meta_context#:#Kontext
+meta#:#meta_context_plural#:#Kontexte
 meta#:#meta_contribute#:#Beitrag
+meta#:#meta_contribute_plural#:#Beiträge
 meta#:#meta_copyright#:#Copyright
 meta#:#meta_copyright_and_other_restrictions#:#Copyright und andere Einschränkungen
 meta#:#meta_copyright_change_info#:#Beachten Sie unbedingt das Urheberrecht, wenn Sie die Lizenz für dieses Objekt ändern. Bitte fahren Sie nur fort, wenn Sie befugt sind, über die Nutzungsrechte an dem Objekt zu entscheiden.###Modified as part of gender mainstreaming activities for ILIAS 8
 meta#:#meta_copyright_change_warning_title#:#Lizenz ändern###Modified as part of gender mainstreaming activities for ILIAS 8
 meta#:#meta_copyright_in_use#:#Aktuell
 meta#:#meta_copyright_outdated#:#Veraltet
+meta#:#meta_copyright_outdated_error#:#Die ausgewählt Lizenz ist veraltet und darf nicht mehr benutzt werden.
 meta#:#meta_copyright_show_usages#:#Verwendung anzeigen
 meta#:#meta_copyright_status#:#Status
 meta#:#meta_copyright_sub_items#:#Sub Items
 meta#:#meta_copyright_usage#:#Verwendung
 meta#:#meta_cost#:#Kosten
 meta#:#meta_coverage#:#Anwendungsbereich
+meta#:#meta_coverage_plural#:#Anwendungsbereiche
 meta#:#meta_cp_own#:#Eigene Angabe:
 meta#:#meta_creator#:#Ersteller
 meta#:#meta_current_value#:#Aktueller Wert
 meta#:#meta_date#:#Datum
+meta#:#meta_date_time#:#Datum
 meta#:#meta_delete#:#Löschen
+meta#:#meta_delete_confirm#:#Sind Sie sicher, dass sie dieses Element und dessen Inhalt löschen wollen?
+meta#:#meta_delete_element#:#%s löschen
+meta#:#meta_delete_element_success#:#Element erfolgreich gelöscht
+meta#:#meta_delete_this_element#:#Dieses Element Löschen
 meta#:#meta_description#:#Beschreibung
+meta#:#meta_description_plural#:#Beschreibungen
 meta#:#meta_diagramm#:#Diagramm
 meta#:#meta_difficult#:#Schwierig
 meta#:#meta_difficulty#:#Schwierigkeit
+meta#:#meta_discipline#:#Disziplin
 meta#:#meta_draft#:#Entwurf
 meta#:#meta_duration#:#Dauer
 meta#:#meta_easy#:#Leicht
+meta#:#meta_edit_element#:#%s bearbeiten
+meta#:#meta_edit_element_success#:#Element erfolgreich bearbeitet
 meta#:#meta_editor#:#Redakteur
 meta#:#meta_education#:#Ausbildung
 meta#:#meta_educational#:#Pädagogik
 meta#:#meta_educational_level#:#Ausbildungsstufe
 meta#:#meta_educational_objective#:#Ausbildungsziel
+meta#:#meta_educational_plural#:#Pädagogik
 meta#:#meta_educationalvalidator#:#Pädagogische Abnahme
 meta#:#meta_entity#:#Instanz
+meta#:#meta_entity_plural#:#Instanzen
 meta#:#meta_entry#:#Eintrag
+meta#:#meta_error_empty_input#:#Mindestens eines der folgenden Formularfelder muss ausgefüllt sein.
 meta#:#meta_exam#:#Prüfung
 meta#:#meta_exercise#:#Übung
 meta#:#meta_experiment#:#Experiment
 meta#:#meta_expositive#:#Erklärend
 meta#:#meta_figure#:#Abbildung
 meta#:#meta_final#:#Endfassung
+meta#:#meta_first_author#:#Erste Person
 meta#:#meta_format#:#Format
+meta#:#meta_format_plural#:#Formate
+meta#:#meta_full_editor_navigation_info#:#Um dieses Metadaten-Set zu navigieren und zu bearbeiten, benutzen Sie den "LOM"-Baum im "Tools" Eintrag des Hauptmenüs.
 meta#:#meta_general#:#Allgemein
 meta#:#meta_global#:#Global
 meta#:#meta_graph#:#Graph
@@ -11712,13 +11749,14 @@ meta#:#meta_higher_education#:#Hochschulbildung
 meta#:#meta_id#:#Id
 meta#:#meta_idea#:#Idee
 meta#:#meta_identifier#:#Kennung
+meta#:#meta_identifier_plural#:#Kennungen
 meta#:#meta_index#:#Index
 meta#:#meta_info_only_repository_objects#:#Nachfolgend werden nur Magazinobjekte angezeigt, nicht aber Medienobjekte oder Lernmodulseiten.
-meta#:#meta_info_tlt_not_valid#:#Der aktuelle Wert ist nicht gültig und kann deswegen in anderen Bereichen (z.B Lernfortschritt) nicht verwertet werden. Bitte geben Sie eine Zeit in Stunden und/oder Minuten an.
 meta#:#meta_initiator#:#Initiator
 meta#:#meta_installation_remarks#:#Installationsanmerkungen
 meta#:#meta_instructionaldesigner#:#Lern-Designer
 meta#:#meta_intended_end_user_role#:#Beabsichtige Endbenutzer Rolle
+meta#:#meta_intended_end_user_role_plural#:#Beabsichtige Endbenutzer Rollen
 meta#:#meta_interactivity_level#:#Stufe der Interaktivität
 meta#:#meta_interactivity_type#:#Art der Interaktivität
 meta#:#meta_is_based_on#:#Basiert auf
@@ -11729,6 +11767,7 @@ meta#:#meta_is_referenced_by#:#...ist referenziert von...
 meta#:#meta_is_required_by#:#...wird benötigt von...
 meta#:#meta_is_version_of#:#...ist Version von...
 meta#:#meta_keyword#:#Schlagwort
+meta#:#meta_keyword_plural#:#Schlagwörter
 meta#:#meta_kind#:#Art
 meta#:#meta_l_aa#:#Afar
 meta#:#meta_l_ab#:#Abchasisch
@@ -11864,40 +11903,45 @@ meta#:#meta_l_vi#:#Vietnamesisch
 meta#:#meta_l_vo#:#Volapük
 meta#:#meta_l_wo#:#Wolof
 meta#:#meta_l_xh#:#Xhosa
+meta#:#meta_l_xx#:#keine
 meta#:#meta_l_yi#:#Jiddish
 meta#:#meta_l_yo#:#Yoruba
 meta#:#meta_l_za#:#Zhuang
 meta#:#meta_l_zh#:#Chinesisch
 meta#:#meta_l_zu#:#Zulu
 meta#:#meta_language#:#Sprache
+meta#:#meta_language_plural#:#Sprachen
 meta#:#meta_learner#:#Lernender
 meta#:#meta_learning_resource_type#:#Art des Lernmittels
+meta#:#meta_learning_resource_type_plural#:#Arten des Lernmittels
 meta#:#meta_lecture#:#Lektüre
 meta#:#meta_lifecycle#:#Lebenszyklus
 meta#:#meta_linear#:#Linear
 meta#:#meta_local#:#Lokal
 meta#:#meta_location#:#Standort
+meta#:#meta_location_plural#:#Standorte
+meta#:#meta_lom#:#Lernobjekt-Metadaten
+meta#:#meta_lom_short#:#LOM
 meta#:#meta_low#:#niedrig
+meta#:#meta_macos#:#MAC-OS
 meta#:#meta_manager#:#Manager
 meta#:#meta_maximum_version#:#Maximum-Version
 meta#:#meta_medium#:#Mittel
 meta#:#meta_meta_metadata#:#Meta-Metadaten
 meta#:#meta_metadatascheme#:#Metadaten-Schema
+meta#:#meta_metadatascheme_plural#:#Metadaten-Schemas
 meta#:#meta_minimum_version#:#Minimal-Version
 meta#:#meta_mixed#:#Gemischt
+meta#:#meta_ms-internet_explorer#:#MS-Internet Explorer
+meta#:#meta_ms-windows#:#MS-Windows
+meta#:#meta_multi-os#:#Multi-OS
 meta#:#meta_name#:#Name
 meta#:#meta_narrative_text#:#Erzählender Text
+meta#:#meta_netscape_communicator#:#Netscape Communicator
 meta#:#meta_networked#:#Vernetzt
 meta#:#meta_new_element#:#Neues Element
 meta#:#meta_no#:#Nein
-meta#:#meta_no_annotation#:#Keine Metadaten für den Bereich 'Anmerkung' vorhanden.
-meta#:#meta_no_classification#:#Keine Metadaten für den Bereich 'Klassifizierung' vorhanden.
-meta#:#meta_no_educational#:#Keine Metadaten für den Bereich 'Pädagogik' vorhanden.
-meta#:#meta_no_lifecycle#:#Keine Metadaten für den Bereich 'Lebenszyklus' vorhanden.
-meta#:#meta_no_meta_metadata#:#Keine Metadaten für den Bereich 'Meta-Metadaten' vorhanden.
-meta#:#meta_no_relation#:#Keine Metadaten für den Bereich 'Beziehungen' vorhanden.
-meta#:#meta_no_rights#:#Keine Metadaten für den Bereich 'Rechte und Lizenzen' vorhanden.
-meta#:#meta_no_technical#:#Keine Metadaten für den Bereich 'Technische Angaben' vorhanden.
+meta#:#meta_none#:#Keines
 meta#:#meta_obj_type_active#:#Datensatz anbieten
 meta#:#meta_obj_type_inactive#:#Datensatz nicht anbieten
 meta#:#meta_obj_type_mandatory#:#Immer zum Ausfüllen anbieten
@@ -11909,23 +11953,25 @@ meta#:#meta_oer_copyright_selection_info#:#Nur Objekte, die unter den/der ausgew
 meta#:#meta_oer_harvester#:#OER Harvester
 meta#:#meta_oer_harvester_desc#:#Scannt alle Dateiobjekte im Magazin auf ihre Lizenz. Der OER-Harvester fügt alle Ressourcen unter ausgewählten CC-Lizenzen der in den Cron-Job-Einstellungen definierten Kategorie hinzu. Damit dieser Cronjob Ergebnisse liefern kann, muss die Copyright-Auswahl in der Metadaten-Administration aktiviert und konfiguriert sein.
 meta#:#meta_oer_target#:#Kategorie für OER-Freigaben
+meta#:#meta_opera#:#Opera
 meta#:#meta_operating_system#:#Betriebssystem
 meta#:#meta_or_composite#:#... oder zusammengesetzt ...
+meta#:#meta_or_composite_plural#:#... oder zusammengesetzt ...
 meta#:#meta_order#:#Order
 meta#:#meta_other#:#Andere
 meta#:#meta_other_plattform_requirements#:#Andere Plattform-Anforderungen
-meta#:#meta_pc_dos#:#PC-DOS
-meta#:#meta_please_select#:#Bitte wählen Sie
+meta#:#meta_pc-dos#:#PC-DOS
 meta#:#meta_pointofcontact#:#Kontakt
 meta#:#meta_prerequisite#:#Voraussetzung
 meta#:#meta_problem_statement#:#Problemstellung
 meta#:#meta_publisher#:#Herausgeber
 meta#:#meta_purpose#:#Zweck
 meta#:#meta_questionnaire#:#Fragebogen
-meta#:#meta_quickedit#:#Schnellbearbeitung
 meta#:#meta_references#:#Referenzen
 meta#:#meta_relation#:#Beziehung
+meta#:#meta_relation_plural#:#Beziehungen
 meta#:#meta_requirement#:#Anforderung
+meta#:#meta_requirement_plural#:#Anforderungen
 meta#:#meta_requires#:#Benötigt
 meta#:#meta_resource#:#Ressource
 meta#:#meta_revised#:#Überarbeitete Fassung
@@ -11934,6 +11980,7 @@ meta#:#meta_role#:#Rolle
 meta#:#meta_save_order#:#Reihenfolge speichern
 meta#:#meta_school#:#Schule
 meta#:#meta_scriptwriter#:#Werbetexter
+meta#:#meta_second_author#:#Zweite Person
 meta#:#meta_section#:#Bereich
 meta#:#meta_security_level#:#Sicherheitsstufe
 meta#:#meta_self_assessment#:#Selbsttest
@@ -11944,6 +11991,7 @@ meta#:#meta_skill_level#:#Stufe der Kompetenz
 meta#:#meta_slide#:#Folie
 meta#:#meta_source#:#Quelle
 meta#:#meta_status#:#Status
+meta#:#meta_string#:#Text
 meta#:#meta_structure#:#Struktur
 meta#:#meta_subjectmatterexpert#:#Experte für das Thema
 meta#:#meta_tab_advmd#:#Benutzerdefinierte Metadaten
@@ -11952,17 +12000,22 @@ meta#:#meta_tab_lom#:#LOM
 meta#:#meta_table#:#Tabelle
 meta#:#meta_taxon#:#Taxon
 meta#:#meta_taxon_path#:#Taxon-Pfad
+meta#:#meta_taxon_path_plural#:#Taxon-Pfade
+meta#:#meta_taxon_plural#:#Taxa
 meta#:#meta_teacher#:#Lehrer
 meta#:#meta_technical#:#Technische Angaben
 meta#:#meta_technicalimplementer#:#Technische Umsetzung
 meta#:#meta_technicalvalidator#:#Technische Überprüfung
 meta#:#meta_terminator#:#Schlussredakteur
+meta#:#meta_third_author#:#Dritte Person
 meta#:#meta_title#:#Titel
 meta#:#meta_training#:#Training
 meta#:#meta_type#:#Typ
 meta#:#meta_typical_age_range#:#Typische Altersspanne
+meta#:#meta_typical_age_range_plural#:#Typische Altersspannen
 meta#:#meta_typical_learning_time#:#Typische Lerndauer
 meta#:#meta_unavailable#:#Nicht verfügbar
+meta#:#meta_unix#:#Unix
 meta#:#meta_unknown#:#Unbekannt
 meta#:#meta_validator#:#Überprüfung
 meta#:#meta_value#:#Eintrag
@@ -11972,7 +12025,6 @@ meta#:#meta_very_easy#:#Sehr leicht
 meta#:#meta_very_high#:#Sehr hoch
 meta#:#meta_very_low#:#Sehr niedrig
 meta#:#meta_yes#:#Ja
-meta#:#sco_propagate#:#Auf alle SCOs übertragen
 meta#:#udf_type_address#:#Adresse
 meta#:#udf_type_externallink#:#Externer Link
 meta#:#udf_type_float#:#Gleitkommazahl
@@ -12346,7 +12398,9 @@ obj#:#obj_tool_setting_use_news_open_settings#:#Einstellungen für Block und Tim
 obj#:#obj_user_decides_notification#:#Mitglieder müssen Benachrichtigungen selbst aktivieren
 obj#:#obj_user_not_disable_not#:#Mitglieder können die Benachrichtigung nicht deaktiveren
 obj#:#online_input_byline#:#Objekt ist veröffentlicht und kann von allen Personen mit dem Recht „Lesezugriff“ genutzt werden. Die Verfügbarkeit kann aber noch durch Vorbedingungen oder zeitliche Zugriffsbeschränkungen eingeschränkt sein. Diese Einstellungen wirkt sich auf alle Referenzen des Objektes aus.
+obj#:#select_object_type#:#Objekttyp wählen
 obj#:#svy_results#:#Ergebnisse
+obj#:#user_owns_no_objects#:#Keine Magazin-Objekte vorhanden
 objref#:#objref_custom_title#:#Eigenen Titel eingeben
 objref#:#objref_edit_ref#:#Ziel des Links
 objref#:#objref_edit_title#:#Titel
@@ -12588,30 +12642,36 @@ poll#:#poll_answer#:#Antwort
 poll#:#poll_answers#:#Mögliche Antworten
 poll#:#poll_barchart#:#Balkendiagramm
 poll#:#poll_block_message_already_voted#:#Sie haben bereits abgestimmt.
-poll#:#poll_block_message_inactive#:#Diese Abstimmung ist verfügbar ab dem %s.
 poll#:#poll_block_message_no_answers#:#Diese Abstimmung ist nicht komplett.
-poll#:#poll_block_message_offline#:#Diese Abstimmung ist offline.
-poll#:#poll_block_results_available_on#:#Die Ergebnisse werden am %s veröffentlicht.
+poll#:#poll_block_results_available_on#:#Die Ergebnisse werden %s veröffentlicht.
+poll#:#poll_cannot_set_online_no_answers#:#Der Status kann nicht auf &quot;online (aktiviert)&quot; geändert werden, da der Abstimmung noch keine Frage hinzugefügt wurde!
 poll#:#poll_comments#:#Kommentare
 poll#:#poll_copy#:#Abstimmung kopieren
-poll#:#poll_delete_votes#:#Alle Stimmen löschen
-poll#:#poll_delete_votes_sure#:#Sind Sie sicher, dass Sie alle Stimmen löschen möchten?
+poll#:#poll_delete_votes#:#Stimmen aller Teilnehmenden löschen
+poll#:#poll_delete_votes_sure#:#Sind Sie sicher, dass Sie die Stimmen aller Teilnehmenden dieser Abstimmung löschen möchten?
 poll#:#poll_edit#:#Abstimmung editieren
+poll#:#poll_edit_question#:#Frage bearbeiten
 poll#:#poll_image#:#Bild
 poll#:#poll_import#:#Abstimmung importieren
-poll#:#poll_max_number_of_answers#:#Maximale Anzahl Antworten je Teilnehmer
+poll#:#poll_limit_not_below_answer_count#:#Die begrenzte Anzahl muss kleiner sein als die Anzahl der möglichen Antworten.
+poll#:#poll_limit_number_of_answers#:#Anzahl Antworten je Teilnehmer begrenzen
+poll#:#poll_max_number_of_answers#:#Max. Antworten
+poll#:#poll_max_number_of_answers_info#:#Sie dürfen bis zu %s Antworten auswählen.
 poll#:#poll_mode#:#Modus
-poll#:#poll_mode_anonymous#:#Anonym
-poll#:#poll_mode_anonymous_info#:#Abgegebene Stimmen können den Teilnehmenden nicht zugeordnet werden.
-poll#:#poll_mode_personal#:#Personalisiert
-poll#:#poll_mode_personal_info#:#Eine Liste der Teilnehmenden mit den abgegebenen Stimmen ist mit ausreichenden Rechten verfügbar.
+poll#:#poll_mode_anonymous#:#Ohne Namen / Anonym
+poll#:#poll_mode_anonymous_info#:#Im Tab "Abstimmungsergebnisse" werden Namen der Teilnehmenden nicht aufgeführt.
+poll#:#poll_mode_personal#:#Mit Namen
+poll#:#poll_mode_personal_info#:#Im Tab "Abstimmungsergebnisse" werden die Namen der Teilnehmenden mit ihren Antworten aufgeführt. Wer Zugriff auf diesen Tab hat, kann prüfen, wer welche Antwort gegeben hat.
 poll#:#poll_new#:#Neue Abstimmung anlegen
 poll#:#poll_non_anonymous_warning#:#Ihr Name und Votum ist in den Abstimmungsergebnissen für Administratoren sichtbar.
+poll#:#poll_notification_activated#:#Änderungs-Benachrichtigung aktiviert
+poll#:#poll_notification_deactivated#:#Änderungs-Benachrichtigung deaktiviert
 poll#:#poll_notification_subscribe#:#Benachrichtigung aktivieren
 poll#:#poll_notification_unsubscribe#:#Benachrichtigung deaktivieren
 poll#:#poll_percentage#:#Aktueller Anteil
 poll#:#poll_piechart#:#Kuchendiagramm
-poll#:#poll_population#:#%s Teilnehmer
+poll#:#poll_population#:#%s Teilnehmende
+poll#:#poll_population_singular#:#1 Teilnehmer
 poll#:#poll_question#:#Frage
 poll#:#poll_result#:#Abstimmungsergebnisse
 poll#:#poll_result_answers#:#Stimmen
@@ -12629,6 +12689,7 @@ poll#:#poll_view_results_always#:#Immer
 poll#:#poll_view_results_never#:#Niemals
 poll#:#poll_vote#:#Abstimmen
 poll#:#poll_vote_error_multi#:#Wählen Sie maximal %s Antworten aus.
+poll#:#poll_vote_error_multi_no_answer#:#Wählen Sie mindestens eine Antwort aus.
 poll#:#poll_vote_error_single#:#Wählen Sie eine Antwort aus.
 poll#:#poll_vote_notification_body#:#die folgende Abstimmung hat eine Stimme erhalten
 poll#:#poll_vote_notification_link#:#Link zur Abstimmung
@@ -12636,8 +12697,9 @@ poll#:#poll_vote_notification_reason#:#Sie erhalten diese Nachricht, da Sie die 
 poll#:#poll_vote_notification_subject#:#Abstimmung "%s": neue Stimme
 poll#:#poll_votes_no_edit#:#Diese Abstimmung beinhaltet bereits Stimmen. Sie kann nicht bearbeitet werden so lange Sie die Stimmen nicht löschen.
 poll#:#poll_voting_period_and_results#:#Stimmperiode und Ergebnisse
+poll#:#poll_voting_period_ended_info#:#Das Ende der Abstimmung war %s.
 poll#:#poll_voting_period_full_info#:#Abstimmung von %s bis %s
-poll#:#poll_voting_period_info#:#Ende der Abstimmung: %s
+poll#:#poll_voting_period_info#:#Das Ende der Abstimmung ist %s.
 poll#:#poll_voting_period_limited#:#Zeitlich begrenzte Stimmperiode
 prg#:#access_ctr_by_orgu_position#:#Berechtigungen anhand Positionen in Organisationseinheiten
 prg#:#active_only#:#nur aktive
@@ -13240,7 +13302,7 @@ rbac#:#adve_edit_permission#:#Rechteeinstellungen ändern
 rbac#:#adve_read#:#Zugriff auf die Editoreinstellungen
 rbac#:#adve_visible#:#Editoreinstellungen sind sichtbar
 rbac#:#adve_write#:#Editoreinstellungen bearbeiten
-rbac#:#amend_grading#:#Finalisierte Bewertung ändern
+rbac#:#amend_grading#:#Abschließende Bewertung ändern
 rbac#:#assf_edit_permission#:#Rechteeinstellungen ändern
 rbac#:#assf_read#:#Zugriff auf die Test und Assessment-Administration
 rbac#:#assf_visible#:#Test und Assessment-Administration ist sichtbar
@@ -13825,7 +13887,7 @@ rbac#:#rbac_delete_local_policies_info#:#Wählen Sie diese Einstellung, um alle 
 rbac#:#rbac_delete_role#:#Rolle löschen
 rbac#:#rbac_edit_condition#:#Vorbedingung bearbeiten
 rbac#:#rbac_form_copy_roles_adjust_button#:#Rechte anpassen
-rbac#:#rbac_form_copy_roles_adjust_type#:#Typ der Rechteanpassung
+rbac#:#rbac_form_copy_roles_adjust_type#:#Art der Rechteanpassung
 rbac#:#rbac_form_copy_roles_adjust_type_add#:#Rechte hinzufügen
 rbac#:#rbac_form_copy_roles_adjust_type_add_info#:#Fügt MARKIERTE Rechte der ausgewählten globalen Rollenvorlage zu den lokalen Rechtevorgabe hinzu.
 rbac#:#rbac_form_copy_roles_adjust_type_clone#:#Rechte kopieren
@@ -14084,10 +14146,6 @@ rbac#:#webr_edit_permission#:#Rechteeinstellungen ändern
 rbac#:#webr_read#:#Weblinks aufrufen
 rbac#:#webr_visible#:#Weblinks sind sichtbar
 rbac#:#webr_write#:#Einstellungen der Weblinks bearbeiten
-rbac#:#wfe_edit_permission#:#Rechteeinstellung der Administration der Workflow Engine ändern
-rbac#:#wfe_read#:#Lesezugriff auf Administration der Workflow Engine
-rbac#:#wfe_visible#:#Administration der Workflow Engine ist sichtbar
-rbac#:#wfe_write#:#Einstellungen der Administration der Workflow Engine bearbeiten
 rbac#:#wiki_activate_wiki_protection#:#Schreibschutz für einzelne Wikiseiten aktivieren
 rbac#:#wiki_copy#:#Wiki kopieren
 rbac#:#wiki_delete#:#Wiki löschen oder verschieben
@@ -14227,7 +14285,7 @@ rep#:#rep_add_new_def_grp_organisation#:#Organisation
 rep#:#rep_add_new_def_grp_templates#:#Vorlagen
 rep#:#rep_add_to_favourites#:#Zu Favoriten hinzufügen
 rep#:#rep_added_rec_content#:#Empfohlener Inhalt wurde hinzugefügt.
-rep#:#rep_added_to_favourites#:#Das Objekt wurden den Favoriten hinzugefügt.
+rep#:#rep_added_to_favourites#:#Das Objekt wurde den Favoriten hinzugefügt.
 rep#:#rep_allowed_types#:#Allowed Types
 rep#:#rep_breadcr_crs#:#Brotkrumennavigation beginnt mit Kurs
 rep#:#rep_breadcr_crs_config#:#Konfiguration
@@ -14281,7 +14339,7 @@ rep#:#rep_rec_content_removed#:#Empfohlener Inhalt wurde entfernt.
 rep#:#rep_recommended_content#:#Empfohlene Inhalte
 rep#:#rep_remove_from_favourites#:#Von Favoriten entfernen
 rep#:#rep_remove_rec_content#:#Sollen die folgenden Empfehlungen wirklich entfernt werden? Die entsprechenden Inhalte bleiben weiterhin erhalten.
-rep#:#rep_removed_from_favourites#:#Das Objekt wurden aus den Favoriten entfernt.
+rep#:#rep_removed_from_favourites#:#Das Objekt wurde aus den Favoriten entfernt.
 rep#:#rep_target_location#:#Zielort
 rep#:#rep_target_location_info#:#Bitte wählen sie den Zielort aus, an dem die ausgewählten Objekte wiederhergestellt werden sollen.
 rep#:#rep_time_period#:#Zeitraum
@@ -14771,7 +14829,7 @@ sess#:#sess_mail_type#:#Mail an Teilnehmer
 sess#:#sess_material_assigned#:#Zugeordnet
 sess#:#sess_material_not_assigned#:#Nicht zugeordnet
 sess#:#sess_max_members_needed#:#Für die Warteliste wird eine maximale Anzahl Mitglieder benötigt.
-sess#:#sess_mem_contacts#:#Tutorielle Betreuung
+sess#:#sess_mem_contacts#:#Kontaktperson
 sess#:#sess_mem_tbl_header#:#Sitzungsteilnehmer
 sess#:#sess_member_administration#:#Teilnehmerverwaltung
 sess#:#sess_members#:#Teilnehmer
@@ -14994,6 +15052,10 @@ skmg#:#skmg_selected_skills#:#Ausgewählte Kompetenzen
 skmg#:#skmg_self_evaluation#:#Selbsteinschätzung
 skmg#:#skmg_self_evaluation_byline#:#Die Selbsteinschätzung wird bei der Erreichung Ihres Kompetenzziels nicht berücksichtigt. Sie dient zur Orientierung.
 skmg#:#skmg_self_evaluations#:#Selbsteinschätzungen
+skmg#:#skmg_set_as_lp_trigger#:#Als Lernfortschritt-Auslöser setzen
+skmg#:#skmg_set_as_no_lp_trigger#:#Als Lernfortschritt-Auslöser entfernen
+skmg#:#skmg_set_as_no_suggested#:#Als Lerninhalt entfernen
+skmg#:#skmg_set_as_suggested#:#Als Lerninhalt setzen
 skmg#:#skmg_settings#:#Kompetenzmanagement Einstellungen
 skmg#:#skmg_show_all#:#Alle anzeigen
 skmg#:#skmg_show_latest_entries#:#Letzte Einträge anzeigen
@@ -16488,7 +16550,7 @@ trac#:#trac_lp_determination_info_crs#:#Auswahl der Materialien, anhand derer de
 trac#:#trac_lp_determination_info_crs_tutor#:#Wählen Sie diejenigen Objekte aus, welche zur Bestimmung des Lernfortschritts beitragen sollen.
 trac#:#trac_lp_determination_info_mob#:#Auswahl der Medienobjekte, anhand derer der Gesamtstatus des Mediacast ermittelt wird.
 trac#:#trac_lp_determination_info_sco#:#Auswahl der SCOx, anhand derer der Gesamtstatus des SCORM-Moduls ermittelt wird.
-trac#:#trac_lp_determination_tutor#:#Auswahl von Objekten, die den Lernfortschrittschritt bestimmen
+trac#:#trac_lp_determination_tutor#:#Auswahl von Objekten, die den Lernfortschritt bestimmen
 trac#:#trac_lp_filter#:#Filter
 trac#:#trac_lp_learner_access#:#Eigenen Lernfortschritt einsehen
 trac#:#trac_lp_learner_access_info#:#Wenn aktiviert, können Benutzer ihren eigenen Lernfortschritt einsehen.
@@ -16671,6 +16733,13 @@ ui#:#datetime_required#:#Zeit/Datum erforderlich
 ui#:#duration_default_label_end#:#Ende
 ui#:#duration_default_label_start#:#Beginn
 ui#:#duration_end_must_not_be_earlier_than_start#:#Der Beginn muss zeitlich vor dem Ende liegen.
+ui#:#label_fieldselection#:#Spaltenauswahl
+ui#:#label_fieldselection_refresh#:#Anwenden
+ui#:#label_pagination_limit#:#Pagination - Anzahl der Zeilen
+ui#:#label_pagination_offset#:#Pagination - Start
+ui#:#label_sortation#:#Sortierung
+ui#:#presentaion_table_collapse#:#alle minimieren
+ui#:#presentaion_table_expand#:#alle zeigen
 ui#:#ui_chars_max#:#Maximum:
 ui#:#ui_chars_min#:#Minimum:
 ui#:#ui_chars_remaining#:#Verbleibende Buchstaben
@@ -16686,6 +16755,7 @@ ui#:#ui_link_url#:#URL
 ui#:#ui_md_input_edit#:#Bearbeiten
 ui#:#ui_md_input_view#:#Vorschau
 ui#:#ui_numeric_only#:#Bitte geben sie eine ganze Zahl ein.
+ui#:#ui_table_no_records#:#Keine Einträge
 ui#:#ui_tag_required#:#Bitte geben sie mindestens ein Tag ein.
 ui#:#ui_transcription#:#Abschrift
 user#:#all_roles_has_starting_point#:#Alle Rollen mit definierter Startseite
@@ -16697,6 +16767,7 @@ user#:#clipboard_remove_btn#:#Aus Zwischenablage entfernen
 user#:#clipboard_table_title#:#Zwischenablage (Anmeldekonten)
 user#:#clipboard_user_added#:#Die ausgewählten Benutzer wurden der Zwischenablage hinzugefügt.
 user#:#confirm_delete_starting_point#:#Sind Sie sich sicher, dass diese Regel gelöscht werden soll?
+user#:#confirm_logout_for_email_change#:#Sie haben Ihre E-Mail-Adresse geändert. Um diese Änderung abzuschliessen, ist die Eingabe Ihres Passworts notwendig. Sie werden daher abgemeldet und haben daraufhin 5 Minuten Zeit, sich wieder anzumelden, um die Änderungen abzuschliessen. Alle anderen Änderungen werden gespeichert, bevor Sie abgemeldet werden.
 user#:#create_starting_point#:#Regel erstellen
 user#:#criteria#:#Kriterium
 user#:#del_mail_body#:#Hallo %1$s, %2$s Sie haben sich seit längerer Zeit nicht mehr auf %3$s angemeldet. Daher wird ihr ILIAS-Konto voraussichtlich am %4$s gelöscht. Um Ihr ILIAS-Konto zu behalten, müssen Sie sich vor dem genannten Tag erneut einloggen.
@@ -16704,6 +16775,7 @@ user#:#del_mail_subject#:#Ihr ILIAS-Konto wird bald gelöscht
 user#:#delete_inactive_user_accounts_frequency#:#Intervall
 user#:#delete_inactive_user_accounts_frequency_desc#:#Intervall, mit welchem auf Löschung sowie auf E-Mail-Versand getestet wird.
 user#:#editing_this_role#:#Regel editieren
+user#:#email_could_not_be_changed#:#Ihre E-Mail-Adresse konnte nicht geändert werden.
 user#:#enable_local_user_administration#:#Lokale Konten
 user#:#enable_local_user_administration_info#:#In Kategorien und Organisationseinheiten erscheint ein Reiter „Lokale Konten”. Dort können lokale ILIAS-Konten angelegt, importiert und verwaltet werden. Damit können auch Personen ohne Zugriff auf die Administration neue ILIAS-Konten anlegen.
 user#:#feedhash#:#Newsfeed-Hash
@@ -16796,7 +16868,7 @@ user#:#user_profile_info_std#:#Infotext###Modified as part of gender mainstreami
 user#:#user_profile_info_text_info#:#Dieser Text erscheint über dem Eingabeformular der persönlichen Daten.
 user#:#user_profile_portfolio#:#Wenn Sie ein Portfolio als Ihr Profil nutzen möchten, setzen Sie im Portfolio-Bereich das Attribut "Mein Profil".
 user#:#user_profile_portfolio_selected#:#Sie benutzen momentan ein Portfolio als Ihr Profil. Die Aktivierung erfolgt dort über den Reiter "Freigabe".
-user#:#user_profile_preview#:#Vorschau
+user#:#user_profile_preview#:#Vorschau des Profils
 user#:#user_profile_prompt_text_info#:#Dieser Text ersetzt den obigen Infotext, wenn Sie die Aufforderung zur Profilveröffentlichung nutzen.###Modified as part of gender mainstreaming activities for ILIAS 8
 user#:#user_prompt_incomplete#:#Nie
 user#:#user_prompt_incomplete_info#:#Der Benutzer wird niemals zur Veröffentlichung seines Profils aufgefordert.
@@ -16869,37 +16941,6 @@ webr#:#webr_set_to_list#:#In Weblink-Sammlung umwandeln
 webr#:#webr_sort_manual#:#Manuelle Sortierung
 webr#:#webr_sort_title#:#Alphabetisch nach Titel
 webr#:#webr_sorting#:#Sortierung der Weblinks
-wfe#:#context_by_id#:#Kontext nach ID
-wfe#:#context_by_mask#:#Maskierter Kontext
-wfe#:#context_id#:#Kontext ID
-wfe#:#context_type#:#Kontext Typ
-wfe#:#dashboard#:#Dashboard
-wfe#:#definition_deleted#:#Workflow-Definition gelöscht.
-wfe#:#definitions#:#Prozessdefinitionen
-wfe#:#delete_definition#:#Definition löschen
-wfe#:#input_static_variables_desc#:#Der Prozess benötigt zu seinen Starts folgende Angaben:
-wfe#:#input_variables_desc#:#Der Prozess benötigt zum Start folgende Angaben:
-wfe#:#input_variables_required#:#Eingaben erforderlich
-wfe#:#instances#:#Prozessinstanzen
-wfe#:#obj_wfe_desc#:#Prozessautomatisierung
-wfe#:#process_definition_file#:#Prozessdefinitionsdatei
-wfe#:#process_definition_file_info#:#BPMN2-Modelle
-wfe#:#process_started#:#Prozess gestartet
-wfe#:#start_event_form_header#:#Relevante Ereignisse für den Start der Workflows
-wfe#:#start_listening#:#Listener aktivieren
-wfe#:#start_process#:#Prozess starten
-wfe#:#static_input_form_header#:#Eingabedaten für alle Instanzen des Workflows
-wfe#:#stop_listening#:#Listener deaktivieren
-wfe#:#subject_by_id#:#Subjekt nach ID
-wfe#:#subject_by_mask#:#Maskiertes Subjekt
-wfe#:#subject_id#:#Subjekt ID
-wfe#:#subject_type#:#Subjekt Typ
-wfe#:#upload_parse_success#:#Prozessdefinition hochgeladen, geparst und abgelegt.
-wfe#:#upload_process#:#Prozessdefinition hochladen
-wfe#:#wfe_request_missing_process_id#:#Für die gewählte Aktion wurde keine Prozess-ID übertragen.
-wfe#:#wfe_started_listening#:#Der Prozess wurde scharf geschaltet.
-wfe#:#wfe_stopped_listening#:#Der Prozess wurde unscharf geschaltet, das Event wird nicht berücksichtigt.
-wfe#:#wfe_sure_to_delete_process_def#:#Sind Sie sicher, dass Sie die Definition löschen möchten?
 wfld#:#wfld_add#:#Ordner anlegen
 wfld#:#wfld_alphabetically_asc#:#Alphabetisch, aufst.
 wfld#:#wfld_alphabetically_desc#:#Alphabetisch, abst.

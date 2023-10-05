@@ -16,7 +16,10 @@
  *
  *********************************************************************/
 
-use ILIAS\DI\UIServices;
+declare(strict_types=1);
+
+use ILIAS\UI\Factory as UIFactory;
+use ILIAS\UI\Renderer as UIRenderer;
 
 /**
  *
@@ -28,25 +31,24 @@ use ILIAS\DI\UIServices;
 
 class ilParticipantsTestResultsTableGUI extends ilTable2GUI
 {
-    private UIServices $ui;
-
     protected bool $accessResultsCommandsEnabled = false;
     protected bool $manageResultsCommandsEnabled = false;
 
-    protected $anonymity;
+    protected bool $anonymity = false;
 
-    public function __construct($a_parent_obj, $a_parent_cmd)
-    {
-        $this->setId('tst_participants_' . $a_parent_obj->getTestObj()->getRefId());
-        parent::__construct($a_parent_obj, $a_parent_cmd);
-
-        global $DIC;
-        $this->ui = $DIC->ui();
+    public function __construct(
+        ilParticipantsTestResultsGUI $parent_obj,
+        string $parent_cmd,
+        private UIFactory $ui_factory,
+        private UIRenderer $ui_renderer
+    ) {
+        $this->setId('tst_participants_' . $parent_obj->getTestObj()->getRefId());
+        parent::__construct($parent_obj, $parent_cmd);
 
         $this->setStyle('table', 'fullwidth');
 
         $this->setFormName('partResultsForm');
-        $this->setFormAction($this->ctrl->getFormAction($a_parent_obj, $a_parent_cmd));
+        $this->setFormAction($this->ctrl->getFormAction($parent_obj, $parent_cmd));
 
         $this->setRowTemplate("tpl.il_as_tst_scorings_row.html", "Modules/Test");
 
@@ -79,12 +81,12 @@ class ilParticipantsTestResultsTableGUI extends ilTable2GUI
         $this->manageResultsCommandsEnabled = $manageResultsCommandsEnabled;
     }
 
-    public function getAnonymity()
+    private function getAnonymity(): bool
     {
         return $this->anonymity;
     }
 
-    public function setAnonymity($anonymity)
+    public function setAnonymity(bool $anonymity): void
     {
         $this->anonymity = $anonymity;
     }
@@ -220,21 +222,21 @@ class ilParticipantsTestResultsTableGUI extends ilTable2GUI
 
     protected function buildPassedIcon(): string
     {
-        return $this->buildImageIcon(ilUtil::getImagePath("icon_ok.svg"), $this->lng->txt("passed"));
+        return $this->buildImageIcon(ilUtil::getImagePath("standard/icon_ok.svg"), $this->lng->txt("passed"));
     }
 
     protected function buildFailedIcon(): string
     {
-        return $this->buildImageIcon(ilUtil::getImagePath("icon_not_ok.svg"), $this->lng->txt("failed"));
+        return $this->buildImageIcon(ilUtil::getImagePath("standard/icon_not_ok.svg"), $this->lng->txt("failed"));
     }
 
     protected function buildImageIcon(string $icon_name, string $label): string
     {
-        $icon = $this->ui->factory()->symbol()->icon()->custom(
+        $icon = $this->ui_factory->symbol()->icon()->custom(
             $icon_name,
             $label
         );
-        return $this->ui->renderer()->render($icon);
+        return $this->ui_renderer->render($icon);
     }
 
     protected function buildFormattedAccessDate(array $data): string

@@ -168,7 +168,7 @@ class ilPasswordAssistanceGUI
         $this->help->setSubScreenId('password_assistance');
 
         $tpl = ilStartUpGUI::initStartUpTemplate('tpl.pwassist_assistance.html', true);
-        $this->tpl->setVariable('IMG_PAGEHEADLINE', ilUtil::getImagePath('icon_auth.svg'));
+        $this->tpl->setVariable('IMG_PAGEHEADLINE', ilUtil::getImagePath('standard/icon_auth.svg'));
         $this->tpl->setVariable('TXT_PAGEHEADLINE', $this->lng->txt('password_assistance'));
 
         $tpl->setVariable(
@@ -379,6 +379,7 @@ class ilPasswordAssistanceGUI
         $password = new ilPasswordInputGUI($this->lng->txt('password'), 'password');
         $password->setInfo(ilSecuritySettingsChecker::getPasswordRequirementsInfo());
         $password->setRequired(true);
+        $password->setUseStripSlashes(false);
         $form->addItem($password);
 
         $key = new ilHiddenInputGUI('key');
@@ -424,7 +425,7 @@ class ilPasswordAssistanceGUI
             $this->showAssistanceForm(null);
         } else {
             $tpl = ilStartUpGUI::initStartUpTemplate('tpl.pwassist_assignpassword.html', true);
-            $tpl->setVariable('IMG_PAGEHEADLINE', ilUtil::getImagePath('icon_auth.svg'));
+            $tpl->setVariable('IMG_PAGEHEADLINE', ilUtil::getImagePath('standard/icon_auth.svg'));
             $tpl->setVariable('TXT_PAGEHEADLINE', $this->lng->txt('password_assistance'));
 
             $tpl->setVariable(
@@ -575,7 +576,7 @@ class ilPasswordAssistanceGUI
         $this->help->setSubScreenId('username_assistance');
 
         $tpl = ilStartUpGUI::initStartUpTemplate('tpl.pwassist_username_assistance.html', true);
-        $tpl->setVariable('IMG_PAGEHEADLINE', ilUtil::getImagePath('icon_auth.svg'));
+        $tpl->setVariable('IMG_PAGEHEADLINE', ilUtil::getImagePath('standard/icon_auth.svg'));
         $tpl->setVariable('TXT_PAGEHEADLINE', $this->lng->txt('password_assistance'));
 
         $tpl->setVariable(
@@ -701,7 +702,7 @@ class ilPasswordAssistanceGUI
     {
         $tpl = ilStartUpGUI::initStartUpTemplate('tpl.pwassist_message.html', true);
         $tpl->setVariable('TXT_PAGEHEADLINE', $this->lng->txt('password_assistance'));
-        $tpl->setVariable('IMG_PAGEHEADLINE', ilUtil::getImagePath('icon_auth.svg'));
+        $tpl->setVariable('IMG_PAGEHEADLINE', ilUtil::getImagePath('standard/icon_auth.svg'));
 
         $tpl->setVariable('TXT_TEXT', str_replace("\\n", '<br />', $text));
         $this->fillPermanentLink($permanent_link_context);

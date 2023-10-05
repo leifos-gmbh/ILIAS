@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\Filesystem\Filesystem;
 use ILIAS\FileUpload\FileUpload;
@@ -1816,12 +1816,12 @@ class ilObject
                         return call_user_func(array($class_name, "_getIcon"), $type, $size, $obj_id);
                     }
                 }
-                return ilUtil::getImagePath("icon_cmps.svg");
+                return ilUtil::getImagePath("standard/icon_cmps.svg");
             }
 
-            return ilUtil::getImagePath("icon_" . $type . ".svg");
+            return ilUtil::getImagePath("standard/icon_" . $type . ".svg");
         } else {
-            return "./images/icon_" . $type . ".svg";
+            return "./images/standard/icon_" . $type . ".svg";
         }
     }
 
@@ -1991,7 +1991,7 @@ class ilObject
 
         $res = $db->query($sql);
 
-        $all = array();
+        $all = [];
         while ($row = $db->fetchAssoc($res)) {
             $all[$row["type"]][$row["obj_id"]] = $row["title"];
         }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * @author Marvin Beym <mbeym@databay.de>
@@ -49,7 +49,8 @@ class ilObjTestSettingsMainGUITest extends ilTestBaseTestCase
             $this->createMock(ilDBInterface::class),
             $this->createMock(ilComponentRepository::class),
             $this->getMockBuilder(ilObjUser::class)->disableOriginalConstructor()->getMock(),
-            $objTestGui_mock
+            $objTestGui_mock,
+            $this->createMock(ILIAS\TestQuestionPool\QuestionInfoService::class)
         );
     }
 

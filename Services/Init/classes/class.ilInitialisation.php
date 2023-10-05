@@ -32,6 +32,7 @@ use ILIAS\HTTP\Wrapper\SuperGlobalDropInReplacement;
 use ILIAS\Filesystem\Definitions\SuffixDefinitions;
 use ILIAS\FileUpload\Processor\InsecureFilenameSanitizerPreProcessor;
 use ILIAS\FileUpload\Processor\SVGBlacklistPreProcessor;
+use ILIAS\FileDelivery\Init;
 
 require_once("libs/composer/vendor/autoload.php");
 
@@ -645,8 +646,11 @@ class ilInitialisation
 
         define('IL_COOKIE_HTTPONLY', true); // Default Value
         define('IL_COOKIE_EXPIRE', 0);
-        define('IL_COOKIE_PATH', $cookie_path);
         define('IL_COOKIE_DOMAIN', '');
+        if (!defined('IL_COOKIE_PATH')) {
+            // Might be already defined by ./sso/index.php or other scripts (like those in ./Services/SAML/lib/*)
+            define('IL_COOKIE_PATH', $cookie_path);
+        }
     }
 
     /**
@@ -1123,6 +1127,7 @@ class ilInitialisation
         if (ilContext::initClient()) {
             self::initClient();
             self::initFileUploadService($GLOBALS["DIC"]);
+            Init::init($GLOBALS["DIC"]);
             self::initSession();
 
             if (ilContext::hasUser()) {

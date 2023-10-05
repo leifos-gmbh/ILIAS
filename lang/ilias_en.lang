@@ -593,10 +593,8 @@ assessment#:#counter#:#Counter
 assessment#:#create_date#:#Created
 assessment#:#create_gaps#:#Create and Refresh Gaps
 assessment#:#create_new#:#Create New
-assessment#:#ctm_cannot_be_changed#:#This is a test in CTM-Mode. Settings cannot be changed anymore as CTM has been abandoned.
-assessment#:#ctm_cannot_be_started#:#This is a test in CTM-Mode. The test cannot be started anymore as CTM has been abandoned.
 assessment#:#customstyle#:#Custom Style
-assessment#:#dashboard_tab#:#Dashboard
+assessment#:#dashboard_tab#:#Participants
 assessment#:#definition#:#Definition
 assessment#:#definition_image#:#Definition Image
 assessment#:#definition_text#:#Definition Text
@@ -830,7 +828,6 @@ assessment#:#legend#:#Legend
 assessment#:#locked#:#locked
 assessment#:#log_added_extratime#:#Added extra %d minutes for participant id %d
 assessment#:#log_answer_changed_points#:#Manual change of points of test person %s from %d to %d points by %s
-assessment#:#log_could_not_enter_test_due_to_simultaneous_users#:#The user could not enter the test because the maximum number of simultaneous users has been reached
 assessment#:#log_create_new_test#:#Created new test
 assessment#:#log_manual_feedback#:#%s added manual feedback for test person %s and question %s: %s
 assessment#:#log_mark_added#:#Mark added
@@ -890,6 +887,7 @@ assessment#:#new_category#:#New Unit Category
 assessment#:#new_unit#:#New Unit
 assessment#:#next_question#:#Next
 assessment#:#next_question_rows#:#Questions %d - %d of %d →
+assessment#:#no_manual_feedback_export_info#:#Manual feedbacks will not be exported.
 assessment#:#no_passed_mark#:#At least one grade has to be a passing grade. For a grade to be a passing grade, it needs to have the appropriate box in the ‘Passed’ column checked.
 assessment#:#no_question_selected_for_move#:#Please check at least one question to move it!
 assessment#:#no_questions_available#:#There are no questions available!
@@ -1079,8 +1077,8 @@ assessment#:#question_marking#:#Flagging Questions
 assessment#:#question_marking_description#:#Participants are given the option to flag test questions for themselves. The flags are shown in the ‘List of Questions’, if that feature it has been activated.
 assessment#:#question_not_answered#:#The question was not answered
 assessment#:#question_saved_for_upload#:#The question was saved automatically in order to reserve hard disk space to store the uploaded file. If you cancel this form now, be aware that you must delete the question in the question pool if you do not want to keep it!
-assessment#:#question_summary#:#Dashboard
-assessment#:#question_summary_btn#:#Dashboard
+assessment#:#question_summary#:#Test Attempt Overview
+assessment#:#question_summary_btn#:#Test Attempt Overview
 assessment#:#question_title#:#Question Title
 assessment#:#question_type#:#Question Type
 assessment#:#questionpool_not_entered#:#Please enter a name for a question pool!
@@ -1180,8 +1178,6 @@ assessment#:#show_old_introduction#:#Show old introduction
 assessment#:#show_pass_overview#:#Show Marked Pass Overview
 assessment#:#show_user_answers#:#Show User’s Marked Answers
 assessment#:#shuffle_answers#:#Shuffle Answers
-assessment#:#sign_submission#:#Digitally Sign Test Submissions
-assessment#:#sign_submission_info#:#Enable the use of external signature plugins that can be used to require participants to digitally sign their submissions.
 assessment#:#skip_question#:#Do not Answer and Next
 assessment#:#solutionText#:#Text
 assessment#:#solution_contain_keywords#:#Score is granted based on the occurrence of the following keywords:
@@ -1260,11 +1256,6 @@ assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Allows text formatting of q
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#You have passed the test. The test cannot be started again.
 assessment#:#tst_all_test_competences#:#All Test Competence
 assessment#:#tst_all_user_data_deleted#:#All user data for this test has been removed!
-assessment#:#tst_allowed_users#:#Limit Number of Concurrent Participants
-assessment#:#tst_allowed_users_desc#:#ILIAS will monitor the number of participants taking the test at the same time. If the maximum number of users taking the test at the same time has been reached, ILIAS will prevent additional users from starting the test.
-assessment#:#tst_allowed_users_max#:#Max. Number of Participants
-assessment#:#tst_allowed_users_time_gap#:#Max. Idle Time Permitted for Active Participants
-assessment#:#tst_allowed_users_time_gap_desc#:#Participants who have not clicked on anything in the test for the indicated amount of time, will be categorised as ‘inactive’ and removed from the test.
 assessment#:#tst_already_submitted#:#The test has already been completed and submitted.
 assessment#:#tst_analysis#:#Analysis
 assessment#:#tst_anonymity#:#Privacy
@@ -1345,19 +1336,6 @@ assessment#:#tst_derive_new_pool#:#Derive New Question Pool
 assessment#:#tst_derive_new_pools#:#Derive New Question Pools
 assessment#:#tst_dont_show_msg_again_in_current_session#:#Don't show this message again in my current session.
 assessment#:#tst_dont_use_previous_answers#:#Your previous answers will not be used as default values in future test passes
-assessment#:#tst_dyn_keep_answ_freeze#:#Keep my current answers frozen
-assessment#:#tst_dyn_quest_set_pool_deleted#:#The currently configured question pool "%s" has been deleted.
-assessment#:#tst_dyn_quest_set_src_qpl_summary_string_deleted#:#%s (Removed Permanently)
-assessment#:#tst_dyn_quest_set_src_qpl_summary_string_trashed#:#%s (Removed) [%s Questions]
-assessment#:#tst_dyn_test_msg_currently_finished_completely#:#Currently you have answered all questions from the selected question pool successfully. You can proceed the test when there are new or edited questions in the question pool.
-assessment#:#tst_dyn_test_msg_currently_finished_selection#:#With the current question selection you have answered all questions successfully. Change the question selection to proceed the test.
-assessment#:#tst_dyn_test_msg_pass_deletion_link#:#Remove Previous Answers
-assessment#:#tst_dyn_test_pass_deletion_button#:#Reset All Answers
-assessment#:#tst_dyn_unfreeze_answers#:#Answer once more
-assessment#:#tst_dyn_unfreeze_answers_confirmation#:#There are questions to which your initial answers were fixed and you could not make any changes. Do you want to answer them one more time now and thus unfreeze your answers?
-assessment#:#tst_dynamic_question_set_complete#:#Total-Statistic
-assessment#:#tst_dynamic_question_set_selection#:#Test Question Selection and Selection-Statistic
-assessment#:#tst_dynamic_question_set_source_questionpool_summary_string#:#%s (Path: %s) [%s Questions]
 assessment#:#tst_edit_competence_assign#:#Edit Assignment Properties
 assessment#:#tst_edit_scoring#:#Edit Scoring
 assessment#:#tst_ending_time#:#Finishing Time
@@ -1392,7 +1370,8 @@ assessment#:#tst_filter_taxonomy#:#Taxonomy
 assessment#:#tst_final_information#:#Finishing the Test
 assessment#:#tst_finish_confirm_button#:#Yes, I want to finish the test
 assessment#:#tst_finish_confirm_cancel_button#:#No, go back to the previous question
-assessment#:#tst_finish_confirmation_question#:#You are going to finish this test and reach the maximum number of allowed test passes. You won’t be able to enter this test again to change your answers. Do you really want to finish the test?
+assessment#:#tst_finish_confirmation_question#:#You are going to finish this test. You won’t be able to enter this test attempt again to change your answers. Do you really want to finish this test?
+assessment#:#tst_finish_confirmation_question_no_attempts_left#:#You are going to finish this test and reach the maximum number of allowed test passes. You won’t be able to enter this test again to change your answers. Do you really want to finish the test?
 assessment#:#tst_finish_notification#:#Notification
 assessment#:#tst_finish_notification_advanced#:#Send complete test result
 assessment#:#tst_finish_notification_content_type#:#Content of e-mail
@@ -1510,8 +1489,6 @@ assessment#:#tst_mark_minimum_level#:#Minimum Level (in %)
 assessment#:#tst_mark_official_form#:#Official Form
 assessment#:#tst_mark_passed#:#Passed
 assessment#:#tst_mark_short_form#:#Short Form
-assessment#:#tst_max_allowed_users_heading#:#The maximum number of simultaneous users in this test has been reached
-assessment#:#tst_max_allowed_users_message#:#The maximum number of simultaneous active users in the test has been reached. Please try again later to start or resume the test. If one of the active users is inactive for more than %s seconds, you may be able to enter this test. Thank you for your understanding.
 assessment#:#tst_max_comp_points#:#Max. Competence Points
 assessment#:#tst_maximum_points#:#Maximum Points
 assessment#:#tst_mc_label_none_above#:#None of the answers above###fau: testNav
@@ -1619,6 +1596,7 @@ assessment#:#tst_password_form#:#Enter Test Password
 assessment#:#tst_password_introduction#:#This test can only be accessed with a test password. Please enter the test password to start the test.
 assessment#:#tst_percent_solved#:#Percent Solved
 assessment#:#tst_player_answer_saved_and_locked#:#Answer is saved and locked and can no longer be changed
+assessment#:#tst_please_select_source_pool#:#Please select a question pool.
 assessment#:#tst_please_select_target_for_pool_derives#:#Please select a target conatainer.
 assessment#:#tst_position#:#Question %s of %s
 assessment#:#tst_position_without_total#:#Question %s
@@ -1715,6 +1693,7 @@ assessment#:#tst_questions_hints_toolbar_cmd_reset_ordering_clipboard#:#Reset Hi
 assessment#:#tst_questions_inserted#:#Question(s) inserted!
 assessment#:#tst_questions_removed#:#Question(s) removed!
 assessment#:#tst_random_nr_of_questions#:#How many questions?
+assessment#:#tst_random_question_set_source_questionpool_summary_string#:#%s (Path: %s) [%s Questions]
 assessment#:#tst_random_select_questionpool#:#Select the question pool to choose the questions from
 assessment#:#tst_reached_points#:#Reached Points
 assessment#:#tst_reached_points_of_max#:#%s of %s
@@ -2140,6 +2119,7 @@ badge#:#badge_backpack_no_groups#:#The Mozilla Backpack is empty or non-public.
 badge#:#badge_badge#:#Badge
 badge#:#badge_course_lp#:#Course LP
 badge#:#badge_course_lp_invalid#:#The following objects have a LP mode which is not supported: %s.
+badge#:#badge_create#:#Create Badge
 badge#:#badge_criteria#:#Criteria
 badge#:#badge_crs_merit#:#Merit
 badge#:#badge_deletion_confirmation#:#Are you sure you want to delete the following badges and all their respective assignments?
@@ -2906,7 +2886,6 @@ chatroom#:#delete_private_room#:#Delete Private Room
 chatroom#:#delete_private_room_question#:#Confirm delete private room?
 chatroom#:#dhparam#:#Diffie-Hellman Parameter
 chatroom#:#display_past_msgs#:#Number of Past Messages
-chatroom#:#display_past_msgs_suffix#:#Messages
 chatroom#:#duration_from#:#From
 chatroom#:#duration_to#:#To
 chatroom#:#end_whisper#:#Cancel
@@ -5019,7 +4998,6 @@ common#:#obj_wbrs#:#Weblink
 common#:#obj_wbrs_desc#:#General settings for Web Links
 common#:#obj_webr#:#Weblink
 common#:#obj_webr_duplicate#:#Copy Weblink list
-common#:#obj_wfe#:#Workflow Engine
 common#:#obj_wfld#:#Folder
 common#:#obj_wiki#:#Wiki
 common#:#obj_wiki_duplicate#:#Copy Wiki
@@ -5695,7 +5673,6 @@ common#:#udf_delete_sure#:#Are you sure you want to delete this field and all as
 common#:#udf_duplicate_entries#:#The values have to be unique.
 common#:#udf_field_deleted#:#Deleted field.
 common#:#udf_name_already_exists#:#This field name already exists. Please choose a different name.
-common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data‘, it must also be ‘Changeable in Profile’
 common#:#udf_required_requires_visib_reg#:#When a field is ‘Required’, it must also be ‘Visible in Registration’
 common#:#udf_type_date#:#Date
 common#:#udf_type_datetime#:#Date and Time
@@ -5823,6 +5800,7 @@ common#:#usrimport_no_insert_ext_account_exists#:#Can't perform ‘Insert’ act
 common#:#usrimport_no_update_ext_account_exists#:#Can't perform ‘Update’ action. External account already exists.
 common#:#usrimport_with_specified_role_not_permitted#:#Import with specified role not permitted.
 common#:#usrimport_wrong_file_count#:#Too many files in import-folder. Please try again.
+common#:#usrimport_xml_anonymous_or_root_not_allowed#:#Neither the system-account nor the anonymous account can be changed through the import.
 common#:#usrimport_xml_attribute_missing#:#Attribute "%2$s" in element "%1$s" is missing.
 common#:#usrimport_xml_attribute_value_illegal#:#Value "%3$s" of attribute "%2$s" in element "%1$s" is illegal.
 common#:#usrimport_xml_attribute_value_inapplicable#:#Value "%3$s" of attribute "%2$s" in element "%1$s" is inapplicable for "%4$s" action.
@@ -7923,7 +7901,7 @@ dash#:#dash_enable_task#:#Tasks
 dash#:#dash_favourites#:#Favourites
 dash#:#dash_info_sure_remove_from_favs#:#Are you sure you want to remove the following objects from your Favourites?
 dash#:#dash_item_removed#:#Recommendation has been removed from the list.
-dash#:#dash_learningsequences#:#My Learning Sequences
+dash#:#dash_learning_sequences#:#My Learning Sequences
 dash#:#dash_list#:#List
 dash#:#dash_main_panel#:#Main Panel
 dash#:#dash_make_favourite#:#Add to Favourites
@@ -7938,12 +7916,13 @@ dash#:#dash_sort_by_location#:#Sort by Location
 dash#:#dash_sort_by_start_date#:#Sort by Period of Event
 dash#:#dash_sort_by_type#:#Sort by Type
 dash#:#dash_sortation#:#Sortation
-dash#:#dash_studyprogramme#:#My Study Programmes
+dash#:#dash_study_programmes#:#My Study Programmes
 dash#:#dash_tile#:#Tile
 dash#:#dash_view_courses_groups#:#Section ‘My Courses and Groups’
 dash#:#dash_view_favourites#:#Section ‘Favourites’
 dash#:#favourites_disabled_info#:#Add to favorites is deactivated. You may change this inside the repository settings.
 dash#:#memberships_disabled_info#:#Subscriptions are deactivated. You may change this inside the course settings.
+dash#:#topitem_block#:#Block
 dateplaner#:#Fr_long#:#Friday
 dateplaner#:#Fr_short#:#Fr
 dateplaner#:#Mo_long#:#Monday
@@ -8098,6 +8077,8 @@ dateplaner#:#cal_create#:#Create
 dateplaner#:#cal_created_appointment#:#Created new appointment.
 dateplaner#:#cal_created_milestone#:#Milestone added.
 dateplaner#:#cal_created_milestone_resp_q#:#Milestone added. Please select users that are responsible to meet the milestone.
+dateplaner#:#cal_cronjob_remote_description#:#If activated, appointments of the calendar type "Web calendar" are automatically synchronised after the specified time interval.
+dateplaner#:#cal_cronjob_remote_title#:#External Calendar Synchronisation
 dateplaner#:#cal_crs_info#:#Course Information
 dateplaner#:#cal_crs_new_notification_body#:#a new appointment has been created in course "%s".
 dateplaner#:#cal_crs_new_notification_sub#:#New Appointment in Course "%s"
@@ -8578,6 +8559,8 @@ dcl#:#dcl_std_field_not_importable#:# - Standard fields are not importable.
 dcl#:#dcl_std_filter#:#Default Filter
 dcl#:#dcl_supported_filetypes#:#Allowed file-extensions
 dcl#:#dcl_supported_filetypes_desc#:#You can set the allowed extensions comma seperated. For example: pdf, docx
+dcl#:#dcl_switch_table#:#Switch Table
+dcl#:#dcl_switch_view#:#Change View
 dcl#:#dcl_table#:#Table
 dcl#:#dcl_table_create#:#Create Table
 dcl#:#dcl_table_edit#:#Update Table
@@ -9342,7 +9325,6 @@ exc#:#exc_team_log_create_team#:#Team created.
 exc#:#exc_team_log_remove_file#:#Removed file %s.
 exc#:#exc_team_log_remove_member#:#Removed member %s.
 exc#:#exc_team_management_tutor#:#Team Management by Tutors
-exc#:#exc_team_management_tutor_info#:#If activated participants cannot organize teams themselves.
 exc#:#exc_team_max_small_than_members#:#Maximal Number of Participants can not be set as %s because some teams need to be set with %s participants.
 exc#:#exc_team_member_add#:#Add Team Member (Search)
 exc#:#exc_team_member_container_add#:#Add Team Member from Course/Group
@@ -9808,6 +9790,8 @@ glo#:#glo_box_last_presented#:#Box Last Presented
 glo#:#glo_boxes#:#Boxes
 glo#:#glo_boxes_really_reset#:#Do you really want to reset all boxes? All flashcards will be moved to the first box.
 glo#:#glo_boxes_reset#:#The boxes have been reset successfully.
+glo#:#glo_bulk_confirmation#:#Please check if all terms and definitions are listed correctly.
+glo#:#glo_bulk_creation#:#Bulk Creation
 glo#:#glo_change_to_collection_unavailable_info#:#To change the type of content assembly to "Collection Glossary", you first have to delete all existing terms within this glossary in tab "Content".
 glo#:#glo_change_to_standard_unavailable_info#:#To change the type of content assembly to "Standard Glossary", you first have to remove the selected glossaries in tab "Content".
 glo#:#glo_col_ordering_info#:#Order the titles of the metadata fields. They are presented as column headers in the table presentation of the glossary.
@@ -9817,6 +9801,7 @@ glo#:#glo_collection_info#:#The glossary automatically collects all terms from t
 glo#:#glo_content_assembly#:#Content Assembly
 glo#:#glo_copy#:#Copy Glossary
 glo#:#glo_copy_terms#:#Copy Terms
+glo#:#glo_create_term_definition_pairs#:#Create Term/Definition Pairs
 glo#:#glo_days_ago#:#%s days ago
 glo#:#glo_def_vs_term#:#Definition vs. Term
 glo#:#glo_def_vs_term_info#:#Show a definition first, the learner has to guess the term.
@@ -9847,9 +9832,13 @@ glo#:#glo_selected_terms_have_been_copied#:#The selected terms have been copied 
 glo#:#glo_show_definition#:#Show Definition
 glo#:#glo_show_term#:#Show Term
 glo#:#glo_term#:#Glossary Term
+glo#:#glo_term_definition_pairs#:#Term/Definition Pairs
+glo#:#glo_term_definition_pairs_info#:#Please enter a term and a definition pair in each line. Term and definition must be separated by a semicolon or a TAB character (usually provided by clipboard actions from spreadsheet applications).
+glo#:#glo_term_letter#:#Letter
 glo#:#glo_term_reference#:#Term Reference
 glo#:#glo_term_vs_def#:#Term vs. Definition
 glo#:#glo_term_vs_def_info#:#Show a term first, the learner has to guess the definition.
+glo#:#glo_terms_per_page#:#Terms per Page
 glo#:#glo_use_all_flashcards#:#Use All Flashcards (%s)
 glo#:#glo_use_remaining_flashcards#:#Use Remaining Flashcards (%s)
 grp#:#crs_add_grouping#:#Add Membership Limitation
@@ -10410,6 +10399,8 @@ link#:#link_wpages#:#Wiki Pages
 lm#:#lm_btn_lp_toggle_state_completed#:#Set Not Completed
 lm#:#lm_btn_lp_toggle_state_not_completed#:#Set Completed
 lm#:#lm_copy#:#Copy Learning Module
+lm#:#lm_edit_chapters#:#Edit Chapters
+lm#:#lm_edit_lm_settings#:#Edit Learning Module Settings
 lm#:#lm_est_reading_time#:#Estimated Reading Time
 lm#:#lm_est_reading_time_info#:#In Learning Modules in the repository the estimated reading time can be determined and displayed.
 lm#:#lm_page_type_lm#:#LM Page
@@ -10854,7 +10845,7 @@ mail#:#mail_absence_status#:#Enable Autoresponder
 mail#:#mail_absence_status_info#:#Activation of the automatic sending of an out of office message
 mail#:#mail_absent_from#:#Absent from
 mail#:#mail_absent_until#:#Absent until
-mail#:#mail_account_mail#:#Account Mail
+mail#:#mail_account_mail#:#Notify New Account Holders
 mail#:#mail_add_folder#:#Add New Sub-folder
 mail#:#mail_add_recipient#:#Please enter a recipient
 mail#:#mail_add_subfolder#:#Add Sub-folder
@@ -10961,6 +10952,8 @@ mail#:#mail_members_search_continue#:#Continue
 mail#:#mail_message_send#:#Message sent
 mail#:#mail_move_error#:#Error moving mail
 mail#:#mail_move_to#:#Move to:
+mail#:#mail_move_to_folder_btn_label#:#Move Mail
+mail#:#mail_move_to_folder_x#:#to "%s"
 mail#:#mail_moved#:#The mail has been moved
 mail#:#mail_moved_to_trash#:#Mail has been moved to trash
 mail#:#mail_multiple_role_recipients_found#:#%1$s (found multiple roles for recipient: %2$s)
@@ -11037,6 +11030,7 @@ mail#:#mail_smtp_status_info#:#If enabled, ILIAS will dispatch external e-mails 
 mail#:#mail_smtp_user#:#User
 mail#:#mail_subject_prefix#:#Mail Subject
 mail#:#mail_subject_prefix_info#:#Enter a text, which will be prepended to the subject line of outgoing auto generated e-mails. It is recommended the usage of a prefix for supporting message filtering by users.
+mail#:#mail_subject_too_long#:#The subject is too long.
 mail#:#mail_sure_delete#:#Are you sure you want to delete the marked mail(s)?
 mail#:#mail_sure_delete_entry#:#Are you sure you want to delete the following entries?
 mail#:#mail_sure_delete_file#:#Are you sure you want to delete the selected files?
@@ -11370,9 +11364,19 @@ meta#:#md_advanced#:#Custom Metadata
 meta#:#md_aria_language_selection#:#Language Selection
 meta#:#md_copyright#:#Copyright
 meta#:#md_copyright_add#:#Add New Copyright
+meta#:#md_copyright_alt_text#:#Text Representation
+meta#:#md_copyright_alt_text_info#:#Used for image ‘alt’ attribute
 meta#:#md_copyright_edit#:#Edit Copyright
 meta#:#md_copyright_enable_info#:#Add a copyright section to the LOM Metadata of Objects, including a selection of selectable predefined copyrights.
 meta#:#md_copyright_enabled#:#Enable Copyright Selection
+meta#:#md_copyright_full_name#:#Full Name
+meta#:#md_copyright_image#:#Image
+meta#:#md_copyright_image_file#:#File
+meta#:#md_copyright_image_is_file#:#Upload File
+meta#:#md_copyright_image_is_link#:#Enter URL
+meta#:#md_copyright_image_link#:#URL
+meta#:#md_copyright_link#:#URL
+meta#:#md_copyright_link_info#:#Link to the licence
 meta#:#md_copyright_preview#:#Copyright (Preview)
 meta#:#md_copyright_selection#:#Available Copyrights
 meta#:#md_copyright_settings#:#Copyright Settings
@@ -11391,14 +11395,27 @@ meta#:#md_record_list_table#:#Custom Metadata Sets
 meta#:#md_separated_by#:#Separated by %s
 meta#:#md_time#:#Time:
 meta#:#md_used#:#Current Number of Usages
+meta#:#meta_1#:#1
+meta#:#meta_2#:#2
+meta#:#meta_3#:#3
+meta#:#meta_4#:#4
 meta#:#meta_accessibility_restrictions#:#Accessibility Restrictions
 meta#:#meta_active#:#Active
 meta#:#meta_add#:#Add
+meta#:#meta_add_element#:#Add %s
+meta#:#meta_add_element_success#:#Element added successfully
+meta#:#meta_advmd_add_field#:#Add New Field
 meta#:#meta_advmd_select_options#:#Entries
+meta#:#meta_aggregation_level#:#Aggregation Level
+meta#:#meta_amaya#:#Amaya
 meta#:#meta_annotation#:#Annotation
+meta#:#meta_annotation_plural#:#Annotations
+meta#:#meta_any#:#Any
 meta#:#meta_atomic#:#Atomic
 meta#:#meta_author#:#Author
+meta#:#meta_authors#:#Authors
 meta#:#meta_browser#:#Browser
+meta#:#meta_button_to_full_editor_label#:#Edit the Full Learning Object Metadata
 meta#:#meta_c_AD#:#Andorra
 meta#:#meta_c_AE#:#United Arab Emirates
 meta#:#meta_c_AF#:#Afghanistan
@@ -11648,50 +11665,70 @@ meta#:#meta_c_ZM#:#Zambia
 meta#:#meta_c_ZW#:#Zimbabwe
 meta#:#meta_catalog#:#Catalogue
 meta#:#meta_classification#:#Classification
+meta#:#meta_classification_plural#:#Classifications
 meta#:#meta_collection#:#Collection
 meta#:#meta_competency#:#Competency
 meta#:#meta_contentprovider#:#Content Provider
 meta#:#meta_context#:#Context
+meta#:#meta_context_plural#:#Contexts
 meta#:#meta_contribute#:#Contribute
+meta#:#meta_contribute_plural#:#Contribute
 meta#:#meta_copyright#:#Copyright
 meta#:#meta_copyright_and_other_restrictions#:#Copyright and Other Restrictions
 meta#:#meta_copyright_change_info#:#You are about to change the copyright licence assigned to this content. This should only be done with the permission of the copyright holder. Please continue only if the new licence is not more restrictive than the one used before.
 meta#:#meta_copyright_change_warning_title#:#Changing a Copyright
 meta#:#meta_copyright_in_use#:#In use
 meta#:#meta_copyright_outdated#:#Outdated / No longer in use
+meta#:#meta_copyright_outdated_error#:#The chosen copyright is outdated and no longer in use.
 meta#:#meta_copyright_show_usages#:#Show Usages
 meta#:#meta_copyright_status#:#Status
 meta#:#meta_copyright_sub_items#:#Sub Items
 meta#:#meta_copyright_usage#:#Usage
 meta#:#meta_cost#:#Cost
 meta#:#meta_coverage#:#Coverage
+meta#:#meta_coverage_plural#:#Coverage
 meta#:#meta_cp_own#:#Own Copyright Information:
 meta#:#meta_creator#:#Creator
 meta#:#meta_current_value#:#Current value
 meta#:#meta_date#:#Date
+meta#:#meta_date_time#:#Date
 meta#:#meta_delete#:#Delete
+meta#:#meta_delete_confirm#:#Are you sure you want to delete this element and its content?
+meta#:#meta_delete_element#:#Delete %s
+meta#:#meta_delete_element_success#:#Element deleted successfully
+meta#:#meta_delete_this_element#:#Delete This Element
 meta#:#meta_description#:#Description
+meta#:#meta_description_plural#:#Descriptions
 meta#:#meta_diagramm#:#Diagram
 meta#:#meta_difficult#:#Difficult
 meta#:#meta_difficulty#:#Difficulty
+meta#:#meta_discipline#:#Discipline
 meta#:#meta_draft#:#Draft
 meta#:#meta_duration#:#Duration
 meta#:#meta_easy#:#Easy
+meta#:#meta_edit_element#:#Edit %s
+meta#:#meta_edit_element_success#:#Element edited successfully
 meta#:#meta_editor#:#Editor
 meta#:#meta_education#:#Education
 meta#:#meta_educational#:#Educational
 meta#:#meta_educational_level#:#Educational Level
 meta#:#meta_educational_objective#:#Educational Objective
+meta#:#meta_educational_plural#:#Educational
 meta#:#meta_educationalvalidator#:#Educational Validation
 meta#:#meta_entity#:#Entity
+meta#:#meta_entity_plural#:#Entities
 meta#:#meta_entry#:#Entry
+meta#:#meta_error_empty_input#:#Please make sure that at least one of the following input fields is not empty.
 meta#:#meta_exam#:#Exam
 meta#:#meta_exercise#:#Exercise
 meta#:#meta_experiment#:#Experiment
 meta#:#meta_expositive#:#Expository
 meta#:#meta_figure#:#Image / Illustration
 meta#:#meta_final#:#Final Version
+meta#:#meta_first_author#:#First Author
 meta#:#meta_format#:#Format
+meta#:#meta_format_plural#:#Formats
+meta#:#meta_full_editor_navigation_info#:#To navigate and edit this metadata set, use the ‘LOM’-tree in the ‘Tools’ entry of the main menu.
 meta#:#meta_general#:#General
 meta#:#meta_global#:#Global
 meta#:#meta_graph#:#Graph
@@ -11705,13 +11742,14 @@ meta#:#meta_higher_education#:#Higher Education
 meta#:#meta_id#:#ID
 meta#:#meta_idea#:#Idea
 meta#:#meta_identifier#:#Identifier
+meta#:#meta_identifier_plural#:#Identifiers
 meta#:#meta_index#:#Index
 meta#:#meta_info_only_repository_objects#:#Only repository objects are listed below (but not media objects or learning module pages).
-meta#:#meta_info_tlt_not_valid#:#The current value is not valid. Therefore it can not be used in other sections, such as learning progress statistics. Please insert a typical learning time in hours and/or minutes.
 meta#:#meta_initiator#:#Initiator
 meta#:#meta_installation_remarks#:#Installation Notes
 meta#:#meta_instructionaldesigner#:#Instructional Design
 meta#:#meta_intended_end_user_role#:#Intended End User Role
+meta#:#meta_intended_end_user_role_plural#:#Intended End User Roles
 meta#:#meta_interactivity_level#:#Interactivity Level
 meta#:#meta_interactivity_type#:#Interactivity Type
 meta#:#meta_is_based_on#:#Is based on …
@@ -11722,6 +11760,7 @@ meta#:#meta_is_referenced_by#:#Is referenced by
 meta#:#meta_is_required_by#:#Is required by
 meta#:#meta_is_version_of#:#Is version of
 meta#:#meta_keyword#:#Keyword
+meta#:#meta_keyword_plural#:#Keywords
 meta#:#meta_kind#:#Type
 meta#:#meta_l_aa#:#Afar
 meta#:#meta_l_ab#:#Abkhazian
@@ -11857,40 +11896,45 @@ meta#:#meta_l_vi#:#Vietnamese
 meta#:#meta_l_vo#:#Volapük
 meta#:#meta_l_wo#:#Wolof
 meta#:#meta_l_xh#:#Xhosa
+meta#:#meta_l_xx#:#none
 meta#:#meta_l_yi#:#Yiddish
 meta#:#meta_l_yo#:#Yoruba
 meta#:#meta_l_za#:#Zhuang
 meta#:#meta_l_zh#:#Chinese
 meta#:#meta_l_zu#:#Zulu
 meta#:#meta_language#:#Language
+meta#:#meta_language_plural#:#Languages
 meta#:#meta_learner#:#Learner
 meta#:#meta_learning_resource_type#:#Learning Resource Type
+meta#:#meta_learning_resource_type_plural#:#Learning Resource Types
 meta#:#meta_lecture#:#Lecture
 meta#:#meta_lifecycle#:#Lifecycle
 meta#:#meta_linear#:#Linear
 meta#:#meta_local#:#Local
 meta#:#meta_location#:#Location
+meta#:#meta_location_plural#:#Locations
+meta#:#meta_lom#:#Learning Object Metadata
+meta#:#meta_lom_short#:#LOM
 meta#:#meta_low#:#Low
+meta#:#meta_macos#:#MAC-OS
 meta#:#meta_manager#:#Manager
 meta#:#meta_maximum_version#:#Maximum Version
 meta#:#meta_medium#:#Medium
 meta#:#meta_meta_metadata#:#Meta-Metadata
-meta#:#meta_metadatascheme#:#Metadata Scheme
+meta#:#meta_metadatascheme#:#Metadata Schema
+meta#:#meta_metadatascheme_plural#:#Metadata Schemas
 meta#:#meta_minimum_version#:#Minimum Version
 meta#:#meta_mixed#:#Mixed
+meta#:#meta_ms-internet_explorer#:#MS-Internet Explorer
+meta#:#meta_ms-windows#:#MS-Windows
+meta#:#meta_multi-os#:#Multi-OS
 meta#:#meta_name#:#Name
 meta#:#meta_narrative_text#:#Narrative Text
+meta#:#meta_netscape_communicator#:#Netscape Communicator
 meta#:#meta_networked#:#Networked
 meta#:#meta_new_element#:#New Element
 meta#:#meta_no#:#No
-meta#:#meta_no_annotation#:#No metadata available for the Annotation section.
-meta#:#meta_no_classification#:#No metadata available for the Classification section.
-meta#:#meta_no_educational#:#No metadata available for the Educational section.
-meta#:#meta_no_lifecycle#:#No metadata available for the Lifecycle section.
-meta#:#meta_no_meta_metadata#:#No metadata available for the Meta-Metadata section.
-meta#:#meta_no_relation#:#No metadata available for the Relation section.
-meta#:#meta_no_rights#:#No metadata available for the Rights section.
-meta#:#meta_no_technical#:#No metadata available for the Technical section.
+meta#:#meta_none#:#None
 meta#:#meta_obj_type_active#:#Dataset offered
 meta#:#meta_obj_type_inactive#:#Data set not used
 meta#:#meta_obj_type_mandatory#:#Data set always offered
@@ -11902,23 +11946,25 @@ meta#:#meta_oer_copyright_selection_info#:#Only objects that have been published
 meta#:#meta_oer_harvester#:#OER Harvester
 meta#:#meta_oer_harvester_desc#:#Scans all File objects in the repository for their license. The OER Harvester adds all resources under selected CC licenses to the category defined in the cronjob settings. To get results from this cronjob it is necessary to activate and configurate the copyright selection in the administration of 'Metadata'.
 meta#:#meta_oer_target#:#Category for Release OER Content
+meta#:#meta_opera#:#Opera
 meta#:#meta_operating_system#:#Operating System
 meta#:#meta_or_composite#:#Or Composite
+meta#:#meta_or_composite_plural#:#Or Composites
 meta#:#meta_order#:#Order
 meta#:#meta_other#:#Other
 meta#:#meta_other_plattform_requirements#:#Other Platform Requirements
-meta#:#meta_pc_dos#:#PC-DOS
-meta#:#meta_please_select#:#Please select
+meta#:#meta_pc-dos#:#PC-DOS
 meta#:#meta_pointofcontact#:#Point(s) of Contact
 meta#:#meta_prerequisite#:#Prerequisite
 meta#:#meta_problem_statement#:#Problem Statement
 meta#:#meta_publisher#:#Publisher
 meta#:#meta_purpose#:#Purpose
 meta#:#meta_questionnaire#:#Questionnaire
-meta#:#meta_quickedit#:#Quick Edit
 meta#:#meta_references#:#References
 meta#:#meta_relation#:#Relation
+meta#:#meta_relation_plural#:#Relations
 meta#:#meta_requirement#:#Requirement
+meta#:#meta_requirement_plural#:#Requirements
 meta#:#meta_requires#:#Requires
 meta#:#meta_resource#:#Resource
 meta#:#meta_revised#:#Revised
@@ -11927,6 +11973,7 @@ meta#:#meta_role#:#Role
 meta#:#meta_save_order#:#Save Order
 meta#:#meta_school#:#School
 meta#:#meta_scriptwriter#:#Scriptwriter
+meta#:#meta_second_author#:#Second Author
 meta#:#meta_section#:#Section
 meta#:#meta_security_level#:#Security Level
 meta#:#meta_self_assessment#:#Self Assessment
@@ -11937,6 +11984,7 @@ meta#:#meta_skill_level#:#Competence Level
 meta#:#meta_slide#:#Slide
 meta#:#meta_source#:#Source
 meta#:#meta_status#:#Status
+meta#:#meta_string#:#Text
 meta#:#meta_structure#:#Structure
 meta#:#meta_subjectmatterexpert#:#Subject matter expert(s)
 meta#:#meta_tab_advmd#:#Custom Metadata
@@ -11945,17 +11993,22 @@ meta#:#meta_tab_lom#:#LOM
 meta#:#meta_table#:#Table
 meta#:#meta_taxon#:#Taxon
 meta#:#meta_taxon_path#:#Taxon Path
+meta#:#meta_taxon_path_plural#:#Taxon Paths
+meta#:#meta_taxon_plural#:#Taxons
 meta#:#meta_teacher#:#Teacher
 meta#:#meta_technical#:#Technical
 meta#:#meta_technicalimplementer#:#Technical implementer
 meta#:#meta_technicalvalidator#:#Technical validator
 meta#:#meta_terminator#:#Terminator
+meta#:#meta_third_author#:#Third Author
 meta#:#meta_title#:#Title
 meta#:#meta_training#:#Training
 meta#:#meta_type#:#Type
 meta#:#meta_typical_age_range#:#Typical Age Range
+meta#:#meta_typical_age_range_plural#:#Typical Age Ranges
 meta#:#meta_typical_learning_time#:#Typical Learning Time
 meta#:#meta_unavailable#:#Unavailable
+meta#:#meta_unix#:#Unix
 meta#:#meta_unknown#:#Unknown
 meta#:#meta_validator#:#Validator
 meta#:#meta_value#:#Value
@@ -11965,7 +12018,6 @@ meta#:#meta_very_easy#:#Very Easy
 meta#:#meta_very_high#:#Very High
 meta#:#meta_very_low#:#Very Low
 meta#:#meta_yes#:#Yes
-meta#:#sco_propagate#:#Propagate to all SCOs
 meta#:#udf_type_address#:#Address
 meta#:#udf_type_externallink#:#External Link
 meta#:#udf_type_float#:#Float
@@ -12339,7 +12391,9 @@ obj#:#obj_tool_setting_use_news_open_settings#:#Open Settings of News Block and 
 obj#:#obj_user_decides_notification#:#Members have to manually activate notifications
 obj#:#obj_user_not_disable_not#:#Member are not allowed to deactivate notifications
 obj#:#online_input_byline#:#The object has been published and can be accessed by anyone with read access. Other access prerequisites or time-based access restrictions may still apply. This settings applies to the object wherever it is used in the repository.
+obj#:#select_object_type#:#Select Object Type
 obj#:#svy_results#:#Results
+obj#:#user_owns_no_objects#:#No Repository Objects Available
 objref#:#objref_custom_title#:#Use Own Title
 objref#:#objref_edit_ref#:#Link Target
 objref#:#objref_edit_title#:#Title
@@ -12581,30 +12635,36 @@ poll#:#poll_answer#:#Answer
 poll#:#poll_answers#:#Possible Answers
 poll#:#poll_barchart#:#Bar Chart
 poll#:#poll_block_message_already_voted#:#You already voted in this poll.
-poll#:#poll_block_message_inactive#:#This poll will be available from %s.
 poll#:#poll_block_message_no_answers#:#This poll is incomplete.
-poll#:#poll_block_message_offline#:#This poll is offline.
-poll#:#poll_block_results_available_on#:#The results will be available on %s.
+poll#:#poll_block_results_available_on#:#The results will be available %s.
+poll#:#poll_cannot_set_online_no_answers#:#The status cannot be changed to &quot;online&quot; because this poll has no question!
 poll#:#poll_comments#:#Comments
 poll#:#poll_copy#:#Copy Poll
-poll#:#poll_delete_votes#:#Delete All Votes
-poll#:#poll_delete_votes_sure#:#Are you sure you want to delete all votes?
+poll#:#poll_delete_votes#:#Delete Votes of All Users
+poll#:#poll_delete_votes_sure#:#Are you sure you want to delete the votes of all users who took part in this poll?
 poll#:#poll_edit#:#Edit Poll
+poll#:#poll_edit_question#:#Edit Question
 poll#:#poll_image#:#Image
 poll#:#poll_import#:#Import Poll
-poll#:#poll_max_number_of_answers#:#Maximum Number Of Answers per Participant
+poll#:#poll_limit_not_below_answer_count#:#The answer limit must be below the number of possible answers.
+poll#:#poll_limit_number_of_answers#:#Limit Number of Answers per Participant
+poll#:#poll_max_number_of_answers#:#Max. Answers
+poll#:#poll_max_number_of_answers_info#:#You may choose up to %s answers.
 poll#:#poll_mode#:#Mode
-poll#:#poll_mode_anonymous#:#Anonymous
-poll#:#poll_mode_anonymous_info#:#Votes cannot be traced back to participants.
-poll#:#poll_mode_personal#:#Personal
-poll#:#poll_mode_personal_info#:#A list of participants with their respective votes is available when having sufficient permission.
+poll#:#poll_mode_anonymous#:#Without Names / Anonymous
+poll#:#poll_mode_anonymous_info#:#In the tab ‘Results’ the names of participants are omitted.
+poll#:#poll_mode_personal#:#With Names
+poll#:#poll_mode_personal_info#:#In the tab ‘Results’ the names of participants and their respective answers are listed. Users with access to this tab can inspect who has given which answer.
 poll#:#poll_new#:#Add New Poll
 poll#:#poll_non_anonymous_warning#:#Your name and vote are visible for administrators in the results.
+poll#:#poll_notification_activated#:#Notification Activated
+poll#:#poll_notification_deactivated#:#Notification Deactivated
 poll#:#poll_notification_subscribe#:#Activate Notification
 poll#:#poll_notification_unsubscribe#:#Deactivate Notification
 poll#:#poll_percentage#:#Current Percentage
 poll#:#poll_piechart#:#Pie Chart
 poll#:#poll_population#:#%s Participants
+poll#:#poll_population_singular#:#1 Participant
 poll#:#poll_question#:#Question
 poll#:#poll_result#:#Results
 poll#:#poll_result_answers#:#Votes
@@ -12622,6 +12682,7 @@ poll#:#poll_view_results_always#:#Always
 poll#:#poll_view_results_never#:#Never
 poll#:#poll_vote#:#Vote
 poll#:#poll_vote_error_multi#:#Please select no more than %s answers.
+poll#:#poll_vote_error_multi_no_answer#:#Please select at least 1 answer.
 poll#:#poll_vote_error_single#:#Please select 1 answer.
 poll#:#poll_vote_notification_body#:#the following poll has received a vote.
 poll#:#poll_vote_notification_link#:#Link to Poll
@@ -12629,8 +12690,9 @@ poll#:#poll_vote_notification_reason#:#You are receiving this e-mail because you
 poll#:#poll_vote_notification_subject#:#Poll "%s": new vote
 poll#:#poll_votes_no_edit#:#This poll already contains votes. You cannot edit the poll until you delete these votes.
 poll#:#poll_voting_period_and_results#:#Voting Period and Results
+poll#:#poll_voting_period_ended_info#:#The voting period ended %s.
 poll#:#poll_voting_period_full_info#:#Voting period from %s to %s
-poll#:#poll_voting_period_info#:#Deadline for Voting: %s
+poll#:#poll_voting_period_info#:#The deadline for voting is %s.
 poll#:#poll_voting_period_limited#:#Limited Voting Period
 prg#:#access_ctr_by_orgu_position#:#Access control according to Organisational Unit Positions
 prg#:#active_only#:#active users only
@@ -12693,7 +12755,7 @@ prg#:#msg_unmark_accredited#:#Unmarked %s users accredited.
 prg#:#msg_unmark_accredited_failed#:#Unmarking accredited not successful for:
 prg#:#msg_update_from_settings#:#Updated %s users from settings:
 prg#:#msg_update_from_settings_failed#:#Updated from settings failed:
-prg#:#msg_update_individual_plan#:#Successfully updated individual plan (%)
+prg#:#msg_update_individual_plan#:#Individual plan: %s successfully updated.
 prg#:#msg_update_individual_plan_failed#:#Update  of individual plan failed
 prg#:#no_srctype_or_id#:#Id and type may not be empty.
 prg#:#not_a_valid_cat_id#:#%s is not a valid ref-id of a category.
@@ -14079,10 +14141,6 @@ rbac#:#webr_edit_permission#:#User can change permission settings
 rbac#:#webr_read#:#User can read and use weblinks
 rbac#:#webr_visible#:#Weblink is visible
 rbac#:#webr_write#:#User can edit settings of weblinks
-rbac#:#wfe_edit_permission#:#User can change permission settings of Workflow Engine administration
-rbac#:#wfe_read#:#User has read access to administration of Workflow Engine
-rbac#:#wfe_visible#:#Administration of Workflow Engine is visible
-rbac#:#wfe_write#:#User can edit settings of Workflow Engine administration
 rbac#:#wiki_activate_wiki_protection#:#Set Wiki Pages to Read-Only
 rbac#:#wiki_copy#:#User can copy wiki
 rbac#:#wiki_delete#:#User can move or delete wiki
@@ -14991,6 +15049,10 @@ skmg#:#skmg_selected_skills#:#Selected Competences
 skmg#:#skmg_self_evaluation#:#Self-Evaluation
 skmg#:#skmg_self_evaluation_byline#:#The self-evaluation will be excluded from target achievement. It is used for your guidance.
 skmg#:#skmg_self_evaluations#:#Self-Evaluations
+skmg#:#skmg_set_as_lp_trigger#:#Set as Learning Progress Trigger
+skmg#:#skmg_set_as_no_lp_trigger#:#Unset as Learning Progress Trigger
+skmg#:#skmg_set_as_no_suggested#:#Unset as Learning Material
+skmg#:#skmg_set_as_suggested#:#Set as Learning Material
 skmg#:#skmg_settings#:#Competence Management Settings
 skmg#:#skmg_show_all#:#Show All
 skmg#:#skmg_show_latest_entries#:#Show Latest Entries
@@ -16668,6 +16730,13 @@ ui#:#datetime_required#:#Time/Date required
 ui#:#duration_default_label_end#:#end
 ui#:#duration_default_label_start#:#start
 ui#:#duration_end_must_not_be_earlier_than_start#:#Start must not be later than end.
+ui#:#label_fieldselection#:#Field Selection
+ui#:#label_fieldselection_refresh#:#Apply
+ui#:#label_pagination_limit#:#Pagination Number of Rows
+ui#:#label_pagination_offset#:#Pagination Offset
+ui#:#label_sortation#:#Sortation
+ui#:#presentaion_table_collapse#:#collapse all
+ui#:#presentaion_table_expand#:#expand all
 ui#:#ui_chars_max#:#Maximum:
 ui#:#ui_chars_min#:#Minimum:
 ui#:#ui_chars_remaining#:#Characters remaining:
@@ -16683,6 +16752,7 @@ ui#:#ui_link_url#:#URL
 ui#:#ui_md_input_edit#:#Edit
 ui#:#ui_md_input_view#:#View
 ui#:#ui_numeric_only#:#Please insert a whole number.
+ui#:#ui_table_no_records#:#No records
 ui#:#ui_tag_required#:#Please insert at least one tag.
 ui#:#ui_transcription#:#Transcript
 user#:#all_roles_has_starting_point#:#All the roles have starting points
@@ -16694,6 +16764,7 @@ user#:#clipboard_remove_btn#:#Remove from Clipboard
 user#:#clipboard_table_title#:#Clipboard (User Accounts)
 user#:#clipboard_user_added#:#Added selected users to clipboard.
 user#:#confirm_delete_starting_point#:#Are you sure you want to delete this rule?
+user#:#confirm_logout_for_email_change#:#You changed your email. To finalize this change, you will need to provide your password. The system is thus going to log you out and you will have 5 minutes to log in again. All other changes will be saved before logging you out.
 user#:#create_starting_point#:#Create Rule
 user#:#criteria#:#Criteria
 user#:#del_mail_body#:#Hello %1$s, %2$s You have not logged in to %3$s for a long time. Therefore, your ILIAS account is expected to be deleted on %4$s. In order to keep your ILIAS account, you must log in again before the aforementioned date.
@@ -16701,6 +16772,7 @@ user#:#del_mail_subject#:#Your ILIAS account will be deleted soon
 user#:#delete_inactive_user_accounts_frequency#:#Frequency
 user#:#delete_inactive_user_accounts_frequency_desc#:#Frequency, in which the deletion and e-mail distribution will be tested.
 user#:#editing_this_role#:#Role
+user#:#email_could_not_be_changed#:#The request to change your email could not be finalized.
 user#:#enable_local_user_administration#:#Enable Local User Administration
 user#:#enable_local_user_administration_info#:#Allow local user accounts to be administrated in categories and organisational units.
 user#:#feedhash#:#Newsfeedhash
@@ -16793,7 +16865,7 @@ user#:#user_profile_info_std#:#Default User Profile Info
 user#:#user_profile_info_text_info#:#This text is presented on top of the form for entering personal data.
 user#:#user_profile_portfolio#:#If you would like to use a portfolio as your profile, go to the portfolio section and select ‘Set As My Profile’ from the drop-down menu to the right of the portfolio you wish to use.
 user#:#user_profile_portfolio_selected#:#You are currently using a portfolio as your profile. Activation can be set there using the ‘Share’ tab.
-user#:#user_profile_preview#:#Preview
+user#:#user_profile_preview#:#Preview of Profile
 user#:#user_profile_prompt_text_info#:#This text will replace the default info text, if a user has been prompted to the profile.
 user#:#user_prompt_incomplete#:#Only if profile is incomplete
 user#:#user_prompt_incomplete_info#:#If the user has to enter required fields, the profile will be shown after login.
@@ -16866,37 +16938,6 @@ webr#:#webr_set_to_list#:#Set to Weblink List
 webr#:#webr_sort_manual#:#Sort Manually
 webr#:#webr_sort_title#:#Titles in Alphabetical Order
 webr#:#webr_sorting#:#Weblink Sorting
-wfe#:#context_by_id#:#Context By ID
-wfe#:#context_by_mask#:#Masked Context
-wfe#:#context_id#:#Context ID
-wfe#:#context_type#:#Context Type
-wfe#:#dashboard#:#Dashboard
-wfe#:#definition_deleted#:#Workflow-Definition deleted.
-wfe#:#definitions#:#Process Definitions
-wfe#:#delete_definition#:#Delete Definition
-wfe#:#input_static_variables_desc#:#The process requires the following data for its starts:
-wfe#:#input_variables_desc#:#The process requires the following data to start:
-wfe#:#input_variables_required#:#Input required
-wfe#:#instances#:#Process Instances
-wfe#:#obj_wfe_desc#:#Process Automation
-wfe#:#process_definition_file#:#Process Definition File
-wfe#:#process_definition_file_info#:#BPMN2-Models
-wfe#:#process_started#:#Process started
-wfe#:#start_event_form_header#:#Relevant Events for the Start of Workflows
-wfe#:#start_listening#:#Activate Listener
-wfe#:#start_process#:#Start Process
-wfe#:#static_input_form_header#:#Input Data for All Instances of the Workflow
-wfe#:#stop_listening#:#Deactivate Listener
-wfe#:#subject_by_id#:#Subject By ID
-wfe#:#subject_by_mask#:#Masked Subject
-wfe#:#subject_id#:#Subject ID
-wfe#:#subject_type#:#Subject Type
-wfe#:#upload_parse_success#:#Process Definition uploaded, parsed and stored.
-wfe#:#upload_process#:#Upload Process Definition
-wfe#:#wfe_request_missing_process_id#:#The process id is missing, cannot perform the desired action.
-wfe#:#wfe_started_listening#:#Process armed
-wfe#:#wfe_stopped_listening#:#Process disarmed
-wfe#:#wfe_sure_to_delete_process_def#:#Are you sure you want to delete the definition?
 wfld#:#wfld_add#:#Create Folder
 wfld#:#wfld_alphabetically_asc#:#Alphabetically, asc.
 wfld#:#wfld_alphabetically_desc#:#Alphabetically, desc.

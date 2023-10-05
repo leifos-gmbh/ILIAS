@@ -173,10 +173,10 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $solution = $this->object->getHtmlUserSolutionPurifier()->purify($solution);
         if ($this->renderPurposeSupportsFormHtml()) {
             $template->setCurrentBlock('essay_div');
-            $template->setVariable("DIV_ESSAY", $this->object->prepareTextareaOutput($solution, true));
+            $template->setVariable("DIV_ESSAY", ilLegacyFormElementsUtil::prepareTextareaOutput($solution, true));
         } else {
             $template->setCurrentBlock('essay_textarea');
-            $template->setVariable("TA_ESSAY", $this->object->prepareTextareaOutput($solution, true, true));
+            $template->setVariable("TA_ESSAY", ilLegacyFormElementsUtil::prepareTextareaOutput($solution, true, true));
         }
         $template->parseCurrentBlock();
 
@@ -218,7 +218,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             }
         }
         if ($show_question_text == true) {
-            $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
+            $template->setVariable("QUESTIONTEXT", ilLegacyFormElementsUtil::prepareTextareaOutput($questiontext, true));
         }
         $questionoutput = $template->get();
 
@@ -236,7 +236,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             );
 
             $solutiontemplate->setVariable("ILC_FB_CSS_CLASS", $cssClass);
-            $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput($feedback, true));
+            $solutiontemplate->setVariable("FEEDBACK", ilLegacyFormElementsUtil::prepareTextareaOutput($feedback, true));
         }
 
         $solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
@@ -289,10 +289,10 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $solution = $this->object->getHtmlUserSolutionPurifier()->purify($this->object->getLatestAutosaveContent($active_id));
         if ($this->renderPurposeSupportsFormHtml()) {
             $template->setCurrentBlock('essay_div');
-            $template->setVariable("DIV_ESSAY", $this->object->prepareTextareaOutput($solution, true));
+            $template->setVariable("DIV_ESSAY", ilLegacyFormElementsUtil::prepareTextareaOutput($solution, true));
         } else {
             $template->setCurrentBlock('essay_textarea');
-            $template->setVariable("TA_ESSAY", $this->object->prepareTextareaOutput($solution, true, true));
+            $template->setVariable("TA_ESSAY", ilLegacyFormElementsUtil::prepareTextareaOutput($solution, true, true));
         }
         $template->parseCurrentBlock();
 
@@ -320,7 +320,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             }
         }
         if ($show_question_text == true) {
-            $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
+            $template->setVariable("QUESTIONTEXT", ilLegacyFormElementsUtil::prepareTextareaOutput($questiontext, true));
         }
         $questionoutput = $template->get();
 
@@ -338,7 +338,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             );
 
             $solutiontemplate->setVariable("ILC_FB_CSS_CLASS", $cssClass);
-            $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput($feedback, true));
+            $solutiontemplate->setVariable("FEEDBACK", ilLegacyFormElementsUtil::prepareTextareaOutput($feedback, true));
         }
 
         $solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
@@ -377,7 +377,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
                 }
                 $keywordString .= ' ' . $this->lng->txt('for') . ' ';
             }
-            $keywordString .=  $answer->getAnswertext();
+            $keywordString .= $answer->getAnswertext();
 
             $tpl->setCurrentBlock('keyword');
             $tpl->setVariable('KEYWORD', $keywordString);
@@ -447,7 +447,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         }
 
         $questiontext = $this->object->getQuestion();
-        $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
+        $template->setVariable("QUESTIONTEXT", ilLegacyFormElementsUtil::prepareTextareaOutput($questiontext, true));
         $template->setVariable("QID", $this->object->getId());
 
         $questionoutput = $template->get();
@@ -470,9 +470,12 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             foreach ($solutions as $idx => $solution_value) {
                 $user_solution = $solution_value["value1"];
             }
-        }
-        if ($this->tiny_mce_enabled) {
-            $user_solution = htmlentities($user_solution);
+
+            if ($this->tiny_mce_enabled) {
+                $user_solution = htmlentities($user_solution);
+            }
+
+            $user_solution = str_replace(['{', '}', '\\'], ['&#123', '&#125', '&#92'], $user_solution);
         }
 
         $template = new ilTemplate("tpl.il_as_qpl_text_question_output.html", true, true, "Modules/TestQuestionPool");
@@ -501,7 +504,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $template->setVariable("QID", $this->object->getId());
         $template->setVariable("ESSAY", $user_solution);
         $questiontext = $this->object->getQuestion();
-        $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
+        $template->setVariable("QUESTIONTEXT", ilLegacyFormElementsUtil::prepareTextareaOutput($questiontext, true));
         $questionoutput = $template->get();
 
         $questionoutput .= $this->getJsCode();

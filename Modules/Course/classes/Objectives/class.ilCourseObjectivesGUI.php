@@ -630,8 +630,8 @@ class ilCourseObjectivesGUI
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('crs_no_objective_selected'), true);
             $this->ctrl->redirect($this, 'listObjectives');
         }
-
-        $this->__initQuestionObject($this->initObjectiveIdFromQuery());
+        $objective_id = $this->initObjectiveIdFromQuery();
+        $this->__initQuestionObject($objective_id);
 
         $limit = $this->http->wrapper()->post()->retrieve(
             'limit',
@@ -650,6 +650,7 @@ class ilCourseObjectivesGUI
             $this->objectives_qst_obj->setTestStatus(ilCourseObjectiveQuestion::TYPE_SELF_ASSESSMENT);
             $this->objectives_qst_obj->setTestSuggestedLimit($limit);
             $this->objectives_qst_obj->updateTest($test['test_objective_id']);
+            ilLOUserResults::updateResultLimit($objective_id, ilLOUserResults::TYPE_INITIAL, $limit);
         }
 
         $this->tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'), true);
@@ -973,7 +974,8 @@ class ilCourseObjectivesGUI
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('crs_no_objective_selected'), true);
             $this->ctrl->redirect($this, 'listObjectives');
         }
-        $this->__initQuestionObject($this->initObjectiveIdFromQuery());
+        $objective_id = $this->initObjectiveIdFromQuery();
+        $this->__initQuestionObject($objective_id);
 
         $limit = 0;
         if ($this->http->wrapper()->post()->has('limit')) {
@@ -993,6 +995,7 @@ class ilCourseObjectivesGUI
             $this->objectives_qst_obj->setTestStatus(ilCourseObjectiveQuestion::TYPE_FINAL_TEST);
             $this->objectives_qst_obj->setTestSuggestedLimit($limit);
             $this->objectives_qst_obj->updateTest($test['test_objective_id']);
+            ilLOUserResults::updateResultLimit($objective_id, ilLOUserResults::TYPE_QUALIFIED, $limit);
         }
 
         if (ilSession::get('objective_mode') != self::MODE_CREATE) {
@@ -1010,7 +1013,7 @@ class ilCourseObjectivesGUI
         }
         $this->form->setFormAction($this->ctrl->getFormAction($this));
         $this->form->setTableWidth('100%');
-        //$this->form->setTitleIcon(ilUtil::getImagePath('icon_lobj.svg'),$this->lng->txt('crs_objective'));
+        //$this->form->setTitleIcon(ilUtil::getImagePath('standard/icon_lobj.svg'),$this->lng->txt('crs_objective'));
 
         $tests = [];
         $max_points = 0;
@@ -1096,7 +1099,7 @@ class ilCourseObjectivesGUI
     {
         $this->form = new ilPropertyFormGUI();
         $this->form->setFormAction($this->ctrl->getFormAction($this));
-        //$this->form->setTitleIcon(ilUtil::getImagePath('icon_lobj.svg'),$this->lng->txt('crs_objective'));
+        //$this->form->setTitleIcon(ilUtil::getImagePath('standard/icon_lobj.svg'),$this->lng->txt('crs_objective'));
 
         switch ($a_mode) {
             case 'create':

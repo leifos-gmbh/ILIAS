@@ -95,8 +95,10 @@ class ilObjMediaCastGUI extends ilObjectGUI
         }
         asort($this->mimeTypes);
 
-        $this->mc_manager = $DIC->mediaCast()->internal()
-            ->domain()->mediaCast($this->object);
+        if ($this->object) {
+            $this->mc_manager = $DIC->mediaCast()->internal()
+                                    ->domain()->mediaCast($this->object);
+        }
         $this->gui = $DIC->mediaCast()->internal()->gui();
     }
 
@@ -1730,7 +1732,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
 
     protected function showCommentsObject() : void
     {
-        echo $this->getCommentGUI()->getListHTML();
+        echo $this->getCommentGUI()->getListHTML()."<script>ilNotes.init(null);</script>";
         exit;
     }
 }

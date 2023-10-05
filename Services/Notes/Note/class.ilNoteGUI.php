@@ -732,6 +732,9 @@ class ilNoteGUI
         $img_alt = "";
         $avatar = null;
         $title = $this->getItemTitle($note);
+        if ($note->getType() === Note::PUBLIC) {
+            $avatar = ilObjUser::_getAvatar($note->getAuthor());
+        }
         $this->addItemProperties($note, $properties);
 
         // last edited
@@ -762,7 +765,6 @@ class ilNoteGUI
     {
         $creation_date = ilDatePresentation::formatDate(new ilDate($note->getCreationDate()));
         if ($note->getType() === Note::PUBLIC) {
-            $avatar = ilObjUser::_getAvatar($note->getAuthor());
             $title = ilUserUtil::getNamePresentation($note->getAuthor(), false, false);
         } else {
             $title = $creation_date;
@@ -1309,6 +1311,106 @@ class ilNoteGUI
         return "";
     }
 
+    public function getGlyph(): string
+    {
+        $f = $this->ui->factory();
+        $r = $this->ui->renderer();
+        $lng = $this->lng;
+        $ctrl = $this->ctrl;
+        $ctrl->setParameter($this, "news_id", $this->news_id);
+        $hash = ilCommonActionDispatcherGUI::buildAjaxHash(
+            ilCommonActionDispatcherGUI::TYPE_REPOSITORY,
+            null,
+            ilObject::_lookupType($this->rep_obj_id),
+            $this->rep_obj_id,
+            $this->obj_type,
+            $this->obj_id,
+            $this->news_id
+        );
+
+        $context = $this->data->context(
+            $this->rep_obj_id,
+            $this->obj_id,
+            $this->obj_type,
+            $this->news_id
+        );
+
+        $cnt[$this->rep_obj_id][$this->note_type] = $this->manager->getNrOfNotesForContext($context, $this->note_type);
+        $cnt = $cnt[$this->rep_obj_id][$this->note_type] ?? 0;
+
+        $widget_el_id = "notew_" . str_replace(";", "_", $hash);
+        $ctrl->setParameter($this, "hash", $hash);
+        $update_url = $ctrl->getLinkTarget($this, "updateGlyph", "", true, false);
+        $query_url = $ctrl->getLinkTarget($this, "getListHtml", "", true, false);
+        $comps = array();
+        $c = $f->counter()->status((int) $cnt);
+        $comps[] = $f->symbol()->glyph()->comment()->withCounter($c)->withAdditionalOnLoadCode(function ($id) use ($hash, $query_url) {
+            $code = "$('#$id').attr('data-note-key','$hash');\n";
+            $code.= "$('#$id').attr('data-note-ui-type','trigger');\n";
+            $code.= "$('#$id').attr('data-note-query-url','" . $query_url . "');\n";
+            $code.= "$(\"#$id\").click(function(event) { ilNotes.clickTrigger(event)});";
+            return $code;
+        });
+        if ($this->ctrl->isAsynch()) {
+            $html = $r->renderAsync($comps);
+        } else {
+            $html = $r->render($comps);
+        }
+        $html = "<span id='" . $widget_el_id . "' data-note-key='$hash' data-note-ui-type='widget' data-note-update-url='$update_url'>" . $html . "</span>";
+        $ctrl->setParameter($this, "news_id", $this->requested_news_id);
+        return $html;
+    }
+
+    public function getNumber(): string
+    {
+        $f = $this->ui->factory();
+        $r = $this->ui->renderer();
+        $lng = $this->lng;
+        $ctrl = $this->ctrl;
+        $ctrl->setParameter($this, "news_id", $this->news_id);
+        $hash = ilCommonActionDispatcherGUI::buildAjaxHash(
+            ilCommonActionDispatcherGUI::TYPE_REPOSITORY,
+            null,
+            ilObject::_lookupType($this->rep_obj_id),
+            $this->rep_obj_id,
+            $this->obj_type,
+            $this->obj_id,
+            $this->news_id
+        );
+
+        $context = $this->data->context(
+            $this->rep_obj_id,
+            $this->obj_id,
+            $this->obj_type,
+            $this->news_id
+        );
+
+        $cnt[$this->rep_obj_id][$this->note_type] = $this->manager->getNrOfNotesForContext($context, $this->note_type);
+        $cnt = $cnt[$this->rep_obj_id][$this->note_type] ?? 0;
+
+        $widget_el_id = "notew_" . str_replace(";", "_", $hash);
+        $ctrl->setParameter($this, "hash", $hash);
+        $update_url = $ctrl->getLinkTarget($this, "updateNumber", "", true, false);
+        $query_url = $ctrl->getLinkTarget($this, "getListHtml", "", true, false);
+        $comps = array();
+        $comps[] = $f->button()->shy($cnt, "#")->withAdditionalOnLoadCode(function ($id) use ($hash, $query_url) {
+            $code = "$('#$id').attr('data-note-key','$hash');\n";
+            $code.= "$('#$id').attr('data-note-ui-type','trigger');\n";
+            $code.= "$('#$id').attr('data-note-query-url','" . $query_url . "');\n";
+            $code.= "$(\"#$id\").click(function(event) { ilNotes.clickTrigger(event)});";
+            return $code;
+        });
+        if ($this->ctrl->isAsynch()) {
+            $html = $r->renderAsync($comps);
+        } else {
+            $html = $r->render($comps);
+        }
+        //echo "<br>" . $widget_el_id . ":" . $update_url . "<br>";
+        $html = "<span id='" . $widget_el_id . "' data-note-key='$hash' data-note-ui-type='widget' data-note-update-url='$update_url'>" . $html . "</span>";
+        $ctrl->setParameter($this, "news_id", $this->requested_news_id);
+        return $html;
+    }
+
     public function getWidget(): string
     {
         $f = $this->ui->factory();
@@ -1382,6 +1484,18 @@ class ilNoteGUI
     protected function updateWidget(): void
     {
         echo $this->getWidget();
+        exit;
+    }
+
+    protected function updateGlyph(): void
+    {
+        echo $this->getGlyph();
+        exit;
+    }
+
+    protected function updateNumber(): void
+    {
+        echo $this->getNumber();
         exit;
     }
 

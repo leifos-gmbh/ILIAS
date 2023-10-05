@@ -1,284 +1,215 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Remove start: after metadata import changes in ilCourseXMLWriter -->
 <!DOCTYPE doc [
         <!ENTITY AdvancedMetaData SYSTEM "./ilias_advanced_meta_data_9_0.xsd">
         <!ENTITY MetaData SYSTEM "./ilias_md_4_1.xsd">
         ]>
+<!-- Remove end -->
 <xs:schema
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         targetNamespace = "http://www.ilias.de/Modules/Group/exp/9_0"
         elementFormDefault="qualified">
-    &MetaData;
-    &AdvancedMetaData;
 
     <xs:element name="group">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="title"/>
-                <xs:element ref="description"/>
-                <xs:element minOccurs="0" ref="owner"/>
-                <xs:element minOccurs="0" ref="information"/>
-                <xs:element minOccurs="0" ref="registration"/>
-                <xs:element minOccurs="0" ref="period"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="admin"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="member"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="file"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="folder"/>
-                <xs:element minOccurs="0" ref="Sort"/>
-                <xs:element minOccurs="0" ref="ViewMode"/>
-                <xs:element minOccurs="0" ref="SessionLimit"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="ContainerSetting"/>
-                <xs:element minOccurs="0" ref="GroupMap"/>
+                <!-- Remove start: after metadata import changes in ilCourseXMLWriter -->
+                &MetaData;
+                &AdvancedMetaData;
+                <!-- Remove end -->
+                <xs:element minOccurs="1" maxOccurs="1" name="title" type="xs:string"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="owner"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="information"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="registration"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="showMembers" type="xs:boolean"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="admissionNotification" type="binaryChoiceInt"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="viewMode" type="xs:integer"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="SessionLimit"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="GroupMap"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="period"/>
+                <!-- Soap compatibility start -->
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Admin" type="roleInfo"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Member" type="memberInfo"/>
+                <!-- Soap compatibility end -->
+                <xs:element minOccurs="1" maxOccurs="1" ref="Sort"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="ContainerSettings"/>
             </xs:sequence>
-            <xs:attribute name="exportVersion" use="required"/>
-            <xs:attribute name="id" use="required"/>
-            <xs:attribute name="type" use="required"/>
+            <xs:attribute name="exportVersion" type="xs:string" use="required"/>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="groupStatus" use="required"/>
         </xs:complexType>
     </xs:element>
 
-    <!-- type is 'open' or 'closed' -->
+    <!-- Soap compatibility start -->
+    <xs:complexType name="roleInfo">
+        <xs:attribute name="id" type="xs:string" use="required"/>
+        <xs:attribute name="notification" type="binaryChoiceString" use="required"/>
+        <xs:attribute name="passed" type="binaryChoiceString" use="required"/>
+        <xs:attribute name="contact" type="binaryChoiceString" use="required"/>
+    </xs:complexType>
 
-    <!-- TITLE -->
-    <xs:element name="title" type="xs:string" maxLength="255"/>
+    <xs:complexType name="memberInfo">
+        <xs:attribute name="id" type="xs:string" use="required"/>
+        <xs:attribute name="blocked" type="binaryChoiceString" use="required"/>
+        <xs:attribute name="passed" type="binaryChoiceString" use="required"/>
+    </xs:complexType>
+    <!-- Soap compatibility end -->
 
-    <!-- DESCRIPTION -->
-    <xs:element name="description" type="xs:string"/>
+    <xs:simpleType name="groupStatus">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="open"/>
+            <xs:enumeration value="closed"/>
+        </xs:restriction>
+    </xs:simpleType>
 
-    <!-- INFORMATION -->
-    <xs:element name="information" type="xs:string"/>
-
-    <!-- OWNER -->
     <xs:element name="owner">
         <xs:complexType>
-            <xs:attribute name="id" use="required"/>
+            <xs:attribute name="id" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
 
-    <!-- ADMIN -->
-    <xs:element name="admin">
-        <xs:complexType>
-            <xs:attribute name="id" use="required"/>
-            <xs:attribute name="action">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="Attach"/>
-                        <xs:enumeration value="Detach"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-            <xs:attribute name="notification">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="Yes"/>
-                        <xs:enumeration value="No"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-        </xs:complexType>
-    </xs:element>
-
-    <!-- MEMBER -->
-    <xs:element name="member">
-        <xs:complexType>
-            <xs:attribute name="id" use="required"/>
-            <xs:attribute name="action">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="Attach"/>
-                        <xs:enumeration value="Detach"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-        </xs:complexType>
-    </xs:element>
-
-    <!-- admissionNotification 1 | 0 -->
-    <xs:element name="admissionnotification" type="xs:string"/>
-
-    <!-- Registration settings -->
     <xs:element name="registration">
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="0" ref="password"/>
-                <xs:choice minOccurs="0">
-                    <xs:element ref="temporarilyAvailable"/>
-                    <xs:element ref="expiration"/>
-                </xs:choice>
-                <xs:element minOccurs="0" ref="maxMembers"/>
-                <xs:element minOccurs="0" ref="minMembers"/>
-                <xs:element minOccurs="0" ref="mailMembersType"/>
-                <xs:element minOccurs="0" ref="RegistrationAccessCode"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="password" type="xs:string"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="temporarilyAvailable"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="maxMembers"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="minMembers" type="xs:nonNegativeInteger"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="WaitingListAutoFill" type="binaryChoiceInt"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="CancellationEnd" type="xs:integer"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="mailMembersType" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="RegistrationAccessCode"/>
             </xs:sequence>
-            <xs:attribute name="type" use="required"/>
-            <xs:attribute name="waitingList"/>
+            <xs:attribute name="type" type="registrationTypes" use="required"/>
+            <xs:attribute name="waitingList" type="binaryChoiceString"/>
         </xs:complexType>
     </xs:element>
 
-    <!--
-        
-        'type':
-        	Use type = confirmation | direct | password | disabled
-        	'enabled' is deprecated
-        'waitingList':
-        	'Yes' | 'No'
-        
-    -->
-    <xs:element name="period">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="start"/>
-                <xs:element ref="end"/>
-            </xs:sequence>
-            <xs:attribute name="withTime"/>
-        </xs:complexType>
-    </xs:element>
+    <xs:simpleType name="registrationTypes">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="direct"/>
+            <xs:enumeration value="confirmation"/>
+            <xs:enumeration value="password"/>
+            <xs:enumeration value="disabled"/>
+        </xs:restriction>
+    </xs:simpleType>
 
-    <!-- group period begin,end -->
-    <xs:element name="temporarilyAvailable">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="start"/>
-                <xs:element ref="end"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="temporarilyAvailable" type="timeFrame"/>
 
-    <!-- Start time (unix time stamp) -->
-    <xs:element name="start" type="xs:string"/>
+    <xs:complexType name="timeFrame">
+        <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="start" type="xs:integer"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="end" type="xs:integer"/>
+        </xs:sequence>
+    </xs:complexType>
 
-    <!-- End time (unix time stamp) -->
-    <xs:element name="end" type="xs:string"/>
-
-    <!-- Password -->
-    <xs:element name="password" type="xs:string"/>
-
-    <!-- Deprecated: use temporarilyAvailable -->
-    <xs:element name="expiration" type="xs:string"/>
-
-    <!-- Number of user -->
-    <!-- maxMembers -->
     <xs:element name="maxMembers">
-        <xs:complexType mixed="true">
-            <xs:attribute name="enabled" use="required"/>
+        <xs:complexType>
+            <xs:attribute name="enabled" type="binaryChoiceString" use="required"/>
         </xs:complexType>
     </xs:element>
-
-    <xs:element name="minMembers" type="xs:string"/>
-
-    <xs:element name="mailMembersType" type="xs:string"/>
 
     <xs:element name="RegistrationAccessCode">
         <xs:complexType>
-            <xs:attribute name="enabled" use="required">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="0"/>
-                        <xs:enumeration value="1"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-            <xs:attribute name="code" use="required"/>
+            <xs:attribute name="enabled" type="binaryChoiceInt" use="required"/>
+            <xs:attribute name="code" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
 
-    <!-- FILE stored in objects directory with filename "id" -->
-    <xs:element name="file">
-        <xs:complexType>
-            <xs:attribute name="id" use="required"/>
-            <xs:attribute name="fileName" use="required"/>
-        </xs:complexType>
-    </xs:element>
+    <xs:simpleType name="binaryChoiceString">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="Yes"/>
+            <xs:enumeration value="No"/>
+        </xs:restriction>
+    </xs:simpleType>
 
-    <!-- FOLDER -->
-    <xs:element name="folder">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="folderTitle"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="file"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="folder"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    <!-- FOLDER TITLE -->
-    <xs:element name="folderTitle" type="xs:string"/>
-
-    <!-- Sort order of course items -->
-    <xs:element name="Sort">
-        <xs:complexType>
-            <xs:attribute name="type" use="required">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="Manual"/>
-                        <xs:enumeration value="Title"/>
-                        <xs:enumeration value="Inherit"/>
-                        <xs:enumeration value="Creation"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-            <xs:attribute name="direction">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="ASC"/>
-                        <xs:enumeration value="DESC"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-            <xs:attribute name="position">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="TOP"/>
-                        <xs:enumeration value="Bottom"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-            <xs:attribute name="order">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="Title"/>
-                        <xs:enumeration value="Creation"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-        </xs:complexType>
-    </xs:element>
-
-    <!-- Definition of sort order of course items -->
-    <xs:element name="ViewMode" type="xs:string"/>
+    <xs:simpleType name="binaryChoiceInt">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:element name="SessionLimit">
         <xs:complexType>
-            <xs:attribute name="active" use="required">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="0"/>
-                        <xs:enumeration value="1"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-            <xs:attribute name="previous" use="required"/>
-            <xs:attribute name="next" use="required"/>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:element name="ContainerSetting">
-        <xs:complexType mixed="true">
-            <xs:attribute name="id" use="required"/>
+            <xs:attribute name="active" type="binaryChoiceInt" use="required"/>
+            <xs:attribute name="previous" type="xs:integer" use="required"/>
+            <xs:attribute name="next" type="xs:integer" use="required"/>
         </xs:complexType>
     </xs:element>
 
     <xs:element name="GroupMap">
         <xs:complexType>
-            <xs:attribute name="enabled" use="required">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="0"/>
-                        <xs:enumeration value="1"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-            <xs:attribute name="latitude" use="required"/>
-            <xs:attribute name="longitude" use="required"/>
-            <xs:attribute name="location_zoom" use="required"/>
+            <xs:attribute name="enabled" type="binaryChoiceInt" use="required"/>
+            <xs:attribute name="latitude" type="xs:string" use="required"/>
+            <xs:attribute name="longitude" type="xs:string" use="required"/>
+            <xs:attribute name="location_zoom" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="period">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="timeFrame">
+                    <xs:attribute name="withTime" type="xs:boolean" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Sort">
+        <xs:complexType>
+            <xs:attribute name="direction" type="sortDirection" use="optional"/>
+            <xs:attribute name="position" type="sortPosition" use="optional"/>
+            <xs:attribute name="order" type="sortOrder" use="optional"/>
+            <xs:attribute name="type" type="sortTypes" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="sortDirection">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="ASC"/>
+            <xs:enumeration value="DESC"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="sortPosition">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="Bottom"/>
+            <xs:enumeration value="Top"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="sortOrder">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="Activation"/>
+            <xs:enumeration value="Creation"/>
+            <xs:enumeration value="Title"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="sortTypes">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="Manual"/>
+            <xs:enumeration value="Creation"/>
+            <xs:enumeration value="Title"/>
+            <xs:enumeration value="Activation"/>
+            <xs:enumeration value="Inherit"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="ContainerSettings">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="ContainerSetting"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ContainerSetting">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
 </xs:schema>

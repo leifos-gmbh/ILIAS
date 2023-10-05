@@ -98,6 +98,7 @@ class McstPodcastGUI
                 continue;
             }
 
+            $actions = [];
             $properties = [];
             $properties[$this->lng->txt("mcst_duration")] = $med_item["playtime"];
 
@@ -108,6 +109,7 @@ class McstPodcastGUI
                 );
                 //var_dump($med_item["id"]);
                 $properties[$this->lng->txt("comments")] = $renderer->render($f->legacy($comments_gui->getNumber()));
+                $actions[] = $comments_gui->getTriggerShyButton();
             }
 
             $item = $f->item()->standard($mob->getTitle())
@@ -125,10 +127,12 @@ class McstPodcastGUI
             if ($this->media_cast->getDownloadable()) {
                 $ctrl->setParameterByClass("ilobjmediacastgui", "purpose", "Standard");
                 $download = $ctrl->getLinkTargetByClass("ilobjmediacastgui", "downloadItem");
-                $actions = $f->dropdown()->standard(array(
-                    $f->button()->shy($lng->txt("download"), $download),
-                ));
-                $item = $item->withActions($actions);
+                $actions[] = $f->button()->shy($lng->txt("download"), $download);
+            }
+
+            if (count($actions) > 0) {
+                $dd = $f->dropdown()->standard($actions);
+                $item = $item->withActions($dd);
             }
 
             $items[] = $item;

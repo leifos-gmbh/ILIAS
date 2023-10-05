@@ -1411,6 +1411,44 @@ class ilNoteGUI
         return $html;
     }
 
+    public function getTriggerShyButton() : \ILIAS\UI\Component\Button\Shy
+    {
+        $f = $this->ui->factory();
+        $r = $this->ui->renderer();
+        $lng = $this->lng;
+        $ctrl = $this->ctrl;
+        $ctrl->setParameter($this, "news_id", $this->news_id);
+        $hash = ilCommonActionDispatcherGUI::buildAjaxHash(
+            ilCommonActionDispatcherGUI::TYPE_REPOSITORY,
+            null,
+            ilObject::_lookupType($this->rep_obj_id),
+            $this->rep_obj_id,
+            $this->obj_type,
+            $this->obj_id,
+            $this->news_id
+        );
+
+        $context = $this->data->context(
+            $this->rep_obj_id,
+            $this->obj_id,
+            $this->obj_type,
+            $this->news_id
+        );
+
+        $widget_el_id = "notew_" . str_replace(";", "_", $hash);
+        $ctrl->setParameter($this, "hash", $hash);
+        $update_url = $ctrl->getLinkTarget($this, "updateNumber", "", true, false);
+        $query_url = $ctrl->getLinkTarget($this, "getListHtml", "", true, false);
+        $but = $f->button()->shy($this->lng->txt("comments"), "#")->withAdditionalOnLoadCode(function ($id) use ($hash, $query_url) {
+            $code = "$('#$id').attr('data-note-key','$hash');\n";
+            $code.= "$('#$id').attr('data-note-ui-type','trigger');\n";
+            $code.= "$('#$id').attr('data-note-query-url','" . $query_url . "');\n";
+            $code.= "$(\"#$id\").click(function(event) { ilNotes.clickTrigger(event)});";
+            return $code;
+        });
+        return $but;
+    }
+
     public function getWidget(): string
     {
         $f = $this->ui->factory();

@@ -54,8 +54,8 @@ class InternalDomainService
         );
     }*/
 
-    public function mediaCast() : MediaCastManager
+    public function mediaCast(\ilObjMediaCast $media_cast) : MediaCastManager
     {
-        return new MediaCastManager();
+        return new MediaCastManager($media_cast);
     }
 }

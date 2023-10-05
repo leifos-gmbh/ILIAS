@@ -2,8 +2,8 @@
 
 <xs:schema
   xmlns:xs = 'http://www.w3.org/2001/XMLSchema'
-  targetNamespace = "http://www.ilias.de/Services/MetaData/md/4_1"
-  xmlns:t = 'http://www.ilias.de/Services/MetaData/md/4_1'>
+  targetNamespace = "http://www.ilias.de/Services/MetaData/meta/4_1"
+  xmlns:t = 'http://www.ilias.de/Services/MetaData/meta/4_1'>
 
 <!-- Type: LanguageCode -->
 <xs:simpleType name='LanguageCode'>

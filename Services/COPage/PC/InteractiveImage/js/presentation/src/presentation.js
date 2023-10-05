@@ -62,6 +62,9 @@ const presentation = (function () {
       let areaDataEl, areaId, triggerNr, markerEl, clickEl;
       let triggerType, triggerId, size;
       topContainer = tr.closest('.ilc_page_cont_PageContainer');
+      if (!topContainer) {
+        topContainer = tr.closest('#il_center_col');
+      }
       // get map area of trigger
       triggerNr = tr.getAttribute("data-copg-iim-nr");
       iimId = tr.getAttribute("data-copg-iim-id");  // image id

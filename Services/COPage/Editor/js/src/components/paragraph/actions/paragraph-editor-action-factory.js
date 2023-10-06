@@ -93,8 +93,35 @@ export default class ParagraphEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
+  listBulletStyle(format) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LIST_BULLET_STYLE, {
+      format: format
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
   listNumber() {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LIST_NUMBER);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  listNumberStyle(format) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LIST_NUMBER_STYLE, {
+      format: format
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  listItemStyle(format) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LIST_ITEM_STYLE, {
+      format: format
+    });
   }
 
   /**

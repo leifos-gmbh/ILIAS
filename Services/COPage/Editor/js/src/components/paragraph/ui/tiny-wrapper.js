@@ -990,6 +990,55 @@ export default class TinyWrapper {
     this.autoResize(ed);
   }
 
+  bulletListStyle(format) {
+    let ed = this.tiny;
+    ed.focus();
+    const currentRng = ed.selection.getRng();
+    if (currentRng.startContainer === currentRng.endContainer) {
+      const cont = currentRng.startContainer.parentNode;
+      const list = cont.closest("ul");
+      if (list) {
+        list.className = "";
+        list.classList.add("ilc_list_u_" + format);
+      }
+    }
+    this.getTinyDomTransform().fixListClasses();
+    this.autoResize(ed);
+  }
+
+  numberListStyle(format) {
+    let ed = this.tiny;
+    ed.focus();
+    const currentRng = ed.selection.getRng();
+    if (currentRng.startContainer === currentRng.endContainer) {
+      const cont = currentRng.startContainer.parentNode;
+      const list = cont.closest("ol");
+      if (list) {
+        list.className = "";
+        list.classList.add("ilc_list_o_" + format);
+      }
+    }
+    this.getTinyDomTransform().fixListClasses();
+    this.autoResize(ed);
+  }
+
+  itemListStyle(format) {
+    console.log("itemListStyle");
+    let ed = this.tiny;
+    ed.focus();
+    const currentRng = ed.selection.getRng();
+    if (currentRng.startContainer === currentRng.endContainer) {
+      const cont = currentRng.startContainer.parentNode;
+      const list = cont.closest("ol,ul");
+      list.querySelectorAll(":scope > li").forEach((item) => {
+        item.className = "";
+        item.classList.add("ilc_list_item_" + format);
+      });
+    }
+    this.getTinyDomTransform().fixListClasses();
+    this.autoResize(ed);
+  }
+
   numberedList() {
     let ed = this.tiny;
     ed.focus();

@@ -1892,7 +1892,7 @@ class ilPageObjectGUI
         // bullet lists
         $ulists = ilPCListGUI::_getListCharacteristics($a_style_id, "list_u");
         $olists = ilPCListGUI::_getListCharacteristics($a_style_id, "list_o");
-        $ilists = ilPCListGUI::_getListCharacteristics($a_style_id, "list_li");
+        $ilists = ilPCListGUI::_getListCharacteristics($a_style_id, "list_item");
         if (count($ulists) > 1) {
             $la = [];
             foreach ($ulists as $c) {

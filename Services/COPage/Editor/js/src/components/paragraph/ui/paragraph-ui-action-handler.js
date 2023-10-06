@@ -164,6 +164,18 @@ export default class ParagraphUIActionHandler {
           this.ui.cmdBList();
           break;
 
+        case ACTIONS.LIST_BULLET_STYLE:
+          this.ui.listBulletStyle(params.format);
+          break;
+
+        case ACTIONS.LIST_NUMBER_STYLE:
+          this.ui.listNumberStyle(params.format);
+          break;
+
+        case ACTIONS.LIST_ITEM_STYLE:
+          this.ui.listItemStyle(params.format);
+          break;
+
         case ACTIONS.LIST_NUMBER:
           this.ui.cmdNList();
           break;

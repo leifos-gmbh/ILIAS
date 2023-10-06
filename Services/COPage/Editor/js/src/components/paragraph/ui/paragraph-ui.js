@@ -361,11 +361,17 @@ export default class ParagraphUI {
     if (currentParent === 'ul') {
       this.enableListStyleDropdown(bulletDD, true);
       this.enableListStyleDropdown(itemDD, true);
-      this.hideListStyleDropdown(numberDD);
+      this.enableListStyleDropdown(numberDD, false);
+      if (bulletDD && numberDD) {
+        this.hideListStyleDropdown(numberDD);
+      }
     } else if (currentParent === 'ol') {
       this.enableListStyleDropdown(numberDD, true);
       this.enableListStyleDropdown(itemDD, true);
-      this.hideListStyleDropdown(bulletDD);
+      this.enableListStyleDropdown(bulletDD, false);
+      if (bulletDD && numberDD) {
+        this.hideListStyleDropdown(bulletDD);
+      }
     } else {
       this.enableListStyleDropdown(bulletDD, false);
       this.enableListStyleDropdown(numberDD, false);
@@ -470,6 +476,18 @@ export default class ParagraphUI {
 
   cmdBList() {
     this.tinyWrapper.bulletList();
+  }
+
+  listBulletStyle(format) {
+    this.tinyWrapper.bulletListStyle(format);
+  }
+
+  listNumberStyle(format) {
+    this.tinyWrapper.numberListStyle(format);
+  }
+
+  listItemStyle(format) {
+    this.tinyWrapper.itemListStyle(format);
   }
 
   cmdNList() {
@@ -946,12 +964,34 @@ export default class ParagraphUI {
 
     document.querySelectorAll("[data-copg-ed-type='par-action']").forEach(char_button => {
       const actionType = char_button.dataset.copgEdAction;
+      let format;
       switch (actionType) {
 
         case ACTIONS.SELECTION_FORMAT:
-          const format = char_button.dataset.copgEdParFormat;
+          format = char_button.dataset.copgEdParFormat;
           char_button.addEventListener("click", (event) => {
             dispatch.dispatch(action.paragraph().editor().selectionFormat(format));
+          });
+          break;
+
+        case ACTIONS.LIST_BULLET_STYLE:
+          format = char_button.dataset.copgEdParFormat;
+          char_button.addEventListener("click", (event) => {
+            dispatch.dispatch(action.paragraph().editor().listBulletStyle(format));
+          });
+          break;
+
+        case ACTIONS.LIST_NUMBER_STYLE:
+          format = char_button.dataset.copgEdParFormat;
+          char_button.addEventListener("click", (event) => {
+            dispatch.dispatch(action.paragraph().editor().listNumberStyle(format));
+          });
+          break;
+
+        case ACTIONS.LIST_ITEM_STYLE:
+          format = char_button.dataset.copgEdParFormat;
+          char_button.addEventListener("click", (event) => {
+            dispatch.dispatch(action.paragraph().editor().listItemStyle(format));
           });
           break;
 

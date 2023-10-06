@@ -267,7 +267,19 @@ class ilObjMediaCastGUI extends ilObjectGUI
 
         $new_table = $this->getManageTableGUI();
 
-        $tpl->setContent($this->gui->ui()->renderer()->render($new_table->get()));
+        $script = <<<EOT
+<script>
+    window.addEventListener('load', (event) => {
+        $(document).on('hidden.bs.modal', (e) => {
+            $('.modal-body').html('');
+        }); 
+        $(document).on('shown.bs.modal', (e) => {
+            window.dispatchEvent(new Event('resize'));
+        });
+    });
+</script>
+EOT;
+        $tpl->setContent($this->gui->ui()->renderer()->render($new_table->get()) . $script);
     }
 
     public function tableCommandObject() : void
@@ -924,7 +936,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $comp = $f->messageBox()->info($this->lng->txt("mcst_item_not_found"));
         }
         $this->gui->modal(
-            $this->lng->txt("mcst_item"),
+            $this->lng->txt("mcst_preview"),
             $this->lng->txt("close")
         )->content([$comp])->send();
     }

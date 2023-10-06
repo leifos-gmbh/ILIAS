@@ -159,6 +159,24 @@ class ilPCListGUI extends ilPageContentGUI
         $tpl->setContent($this->form->getHTML());
     }
 
+    public static function _getListCharacteristics(
+        int $a_style_id,
+        string $type
+    ): array {
+        $chars = [];
+
+        if ($a_style_id > 0 &&
+            ilObject::_lookupType($a_style_id) == "sty") {
+            $style = new ilObjStyleSheet($a_style_id);
+            $types = [$type];
+            foreach ($types as $t) {
+                $chars = array_merge($chars, $style->getCharacteristics($t, false, true));
+            }
+        }
+
+        return $chars;
+    }
+
     public function initListForm(
         string $a_mode = "edit"
     ): void {

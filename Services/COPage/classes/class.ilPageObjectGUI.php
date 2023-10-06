@@ -1778,6 +1778,7 @@ class ilPageObjectGUI
         global $DIC;
 
         $lng = $DIC->language();
+        $lng->loadLanguageModule("copg");
         $ctrl = $DIC->ctrl();
         $ui = $DIC->ui();
 
@@ -1887,6 +1888,32 @@ class ilPageObjectGUI
                 ["text" => $indent, "action" => "list.indent", "data" => []]
             ]
         ];
+
+        // bullet lists
+        $ulists = ilPCListGUI::_getListCharacteristics($a_style_id, "list_u");
+        $olists = ilPCListGUI::_getListCharacteristics($a_style_id, "list_o");
+        $ilists = ilPCListGUI::_getListCharacteristics($a_style_id, "list_li");
+        if (count($ulists) > 1) {
+            $la = [];
+            foreach ($ulists as $c) {
+                $la[] = ["action" => "list.bulletStyle", "text" => $c, "data" => ["format" => $c]];
+            }
+            $menu["copg_list_styles"][] = ["text" => $lng->txt("copg_list_style"), "action" => $la];
+        }
+        if (count($olists) > 1) {
+            $la = [];
+            foreach ($olists as $c) {
+                $la[] = ["action" => "list.numberStyle", "text" => $c, "data" => ["format" => $c]];
+            }
+            $menu["copg_list_styles"][] = ["text" => $lng->txt("copg_list_style"), "action" => $la];
+        }
+        if (count($ilists) > 1 ) {
+            $la = [];
+            foreach ($ilists as $c) {
+                $la[] = ["action" => "list.itemStyle", "text" => $c, "data" => ["format" => $c]];
+            }
+            $menu["copg_list_styles"][] = ["text" => $lng->txt("copg_list_item_style"), "action" => $la];
+        }
 
         // more...
 

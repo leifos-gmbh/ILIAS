@@ -7261,6 +7261,9 @@ copg#:#copg_error_occured_modal#:#An error occured while processing the page. Hi
 copg#:#copg_est_reading_time#:#Estimated Reading Time
 copg#:#copg_history_cleanup_cron#:#Page Editor History Cleanup
 copg#:#copg_history_cleanup_cron_info#:#Removes older entries from the page history.
+copg#:#copg_list_styles#:#List Formats
+copg#:#copg_list_style#:#List
+copg#:#copg_list_item_style#:#List Item
 copg#:#copg_page_element_not_found#:#Page element not found.
 copg#:#copg_page_type_stys#:#Layout Page
 copg#:#copg_questions_not_supported_here#:#Questions are not supported in this context.

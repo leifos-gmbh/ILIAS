@@ -321,6 +321,61 @@ export default class ParagraphUI {
     return ed.selection.getContent();
   }
 
+  getListStyleDropdown(action) {
+    let dd = document.querySelector("[data-copg-ed-action='" + action + "']");
+    if (dd) {
+      dd = dd.closest('div.dropdown');
+    }
+    return dd;
+  }
+
+  enableListStyleDropdown(dd, enable) {
+    if (dd) {
+      dd.querySelector('button').disabled = !enable;
+      dd.style.display = '';
+    }
+  }
+
+  hideListStyleDropdown(dd) {
+    if (dd) {
+      dd.style.display = 'none';
+    }
+  }
+
+  updateListStyleDropdowns() {
+    let ed = tinyMCE.get('tinytarget');
+    const currentRng = ed.selection.getRng();
+    const bulletDD = this.getListStyleDropdown('list.bulletStyle');
+    const numberDD = this.getListStyleDropdown('list.numberStyle');
+    const itemDD = this.getListStyleDropdown('list.itemStyle');
+
+    let currentParent = '';
+    if (currentRng.startContainer === currentRng.endContainer) {
+      const cont = currentRng.startContainer.parentNode;
+      const list = cont.closest("ol,ul");
+      if (list) {
+        currentParent = list.nodeName.toLowerCase();
+      }
+    }
+
+    if (currentParent === 'ul') {
+      this.enableListStyleDropdown(bulletDD, true);
+      this.enableListStyleDropdown(itemDD, true);
+      this.hideListStyleDropdown(numberDD);
+    } else if (currentParent === 'ol') {
+      this.enableListStyleDropdown(numberDD, true);
+      this.enableListStyleDropdown(itemDD, true);
+      this.hideListStyleDropdown(bulletDD);
+    } else {
+      this.enableListStyleDropdown(bulletDD, false);
+      this.enableListStyleDropdown(numberDD, false);
+      this.enableListStyleDropdown(itemDD, false);
+      if (bulletDD && numberDD) {
+        this.hideListStyleDropdown(numberDD);
+      }
+    }
+  }
+
   addBBCode(stag, etag, clearselection, content)
   {
     let ed = tinyMCE.get('tinytarget'), r, rcopy;
@@ -744,6 +799,11 @@ export default class ParagraphUI {
         parUI.autoSave.handleAutoSaveKeyPressed();
       }
     });
+    wrapper.addCallback(TINY_CB.NODE_CHANGE, () => {
+      if (pageModel.getCurrentPCName() === "Paragraph") {
+        parUI.updateListStyleDropdowns();
+      }
+    });
     wrapper.addCallback(TINY_CB.AFTER_INIT, () => {
       if (pageModel.getCurrentPCName() === "Paragraph") {
         let pcId;
@@ -874,8 +934,8 @@ export default class ParagraphUI {
     map[ACTIONS.SELECTION_TEX] = () => ef.selectionTex();
     map[ACTIONS.SELECTION_FN] = () => ef.selectionFn();
     map[ACTIONS.SELECTION_ANCHOR] = () => ef.selectionAnchor();
-    map[ACTIONS.LIST_BULLET] = () => ef.listBullet();
     map[ACTIONS.LIST_NUMBER] = () => ef.listNumber();
+    map[ACTIONS.LIST_BULLET] = () => ef.listBullet();
     map[ACTIONS.LIST_OUTDENT] = () => ef.listOutdent();
     map[ACTIONS.LIST_INDENT] = () => ef.listIndent();
     map[ACTIONS.LINK_WIKI] = () => ef.linkWiki();

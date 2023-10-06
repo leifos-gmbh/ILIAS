@@ -420,7 +420,6 @@ export default class TinyWrapper {
           dom.remove(sp[0]);
         }
       }
-
       wrapper.checkSplitOnReturn();
     });
 
@@ -510,7 +509,7 @@ export default class TinyWrapper {
       if (wrapper.pasting) {
         wrapper.pasting = false;
         wrapper.getTinyDomTransform().splitDivs();
-        wrapper.getTinyDomTransform().fixListClasses(false);
+        wrapper.getTinyDomTransform().fixListClasses();
         wrapper.getTinyDomTransform().splitSpans();
       }
 
@@ -527,6 +526,9 @@ export default class TinyWrapper {
           obut.disabled = true;
         }
       }
+      wrapper.getCallbacks(CB.NODE_CHANGE).forEach((cb) => {
+        cb(wrapper, false);
+      });
     });
 
     let width = wrapper.ghost_reg.width;
@@ -980,16 +982,22 @@ export default class TinyWrapper {
   bulletList() {
     let ed = this.tiny;
     ed.focus();
-    ed.execCommand('InsertUnorderedList', false);
-    this.getTinyDomTransform().fixListClasses(true);
+    ed.execCommand('InsertUnorderedList', false, {
+      'list-attributes': {class: 'ilc_list_u_BulletedList'},
+      'list-item-attributes': {class: 'ilc_list_item_StandardListItem'},
+    });
+    this.getTinyDomTransform().fixListClasses();
     this.autoResize(ed);
   }
 
   numberedList() {
     let ed = this.tiny;
     ed.focus();
-    ed.execCommand('InsertOrderedList', false);
-    this.getTinyDomTransform().fixListClasses(true);
+    ed.execCommand('InsertOrderedList', false, {
+      'list-attributes': {class: 'ilc_list_o_NumberedList'},
+      'list-item-attributes': {class: 'ilc_list_item_StandardListItem'},
+    });
+    this.getTinyDomTransform().fixListClasses();
     this.autoResize(ed);
   }
 
@@ -1014,7 +1022,7 @@ export default class TinyWrapper {
     }
 
     //tinyMCE.execCommand('mceCleanup', false, 'tinytarget');
-    this.getTinyDomTransform().fixListClasses(false);
+    this.getTinyDomTransform().fixListClasses();
     this.autoResize(ed);
   }
 
@@ -1023,7 +1031,7 @@ export default class TinyWrapper {
     let ed = this.tiny;
     ed.focus();
     ed.execCommand('Outdent', false);
-    this.getTinyDomTransform().fixListClasses(true);
+    this.getTinyDomTransform().fixListClasses();
     this.autoResize(ed);
   }
 

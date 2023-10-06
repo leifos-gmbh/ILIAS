@@ -65,93 +65,14 @@ export default class TinyDomTransform {
    * This one ensures that the standard ILIAS list style classes
    * are assigned to list elements
    */
-  fixListClasses(handle_inner_br)
+  fixListClasses()
   {
     let ed = this.tiny, par, r;
     const dom = ed.dom;
 
-    dom.removeClass(dom.select('ol'), 'ilc_list_u_BulletedList');
-    dom.removeClass(dom.select('ul'), 'ilc_list_o_NumberedList');
-    dom.addClass(dom.select('ol'), 'ilc_list_o_NumberedList');
-    dom.addClass(dom.select('ul'), 'ilc_list_u_BulletedList');
-    dom.addClass(dom.select('li'), 'ilc_list_item_StandardListItem');
-
-return;   // currently deactivated, hopefully not necessary anymore
-
-    if (handle_inner_br)
-    {
-      let rcopy = ed.selection.getRng(true);
-      let target_pos = false;
-
-      // get selection start p or li tag
-      let st_cont = rcopy.startContainer.nodeName.toLowerCase();
-      if (st_cont !== "p" && st_cont !== "li")
-      {
-        par = rcopy.startContainer.parentNode;
-        if (par.nodeName.toLowerCase() === "body")
-        {
-          // starting from something like a text node under body
-          // not really a parent anymore, but ok to get the previous sibling from
-          par = rcopy.startContainer;
-        }
-        else
-        {
-          // starting from a deeper node in text
-          while (par.parentNode &&
-          par.nodeName.toLowerCase() !== "li" &&
-          par.nodeName.toLowerCase() !== "p" &&
-          par.nodeName.toLowerCase() !== "body")
-          {
-            par = par.parentNode;
-            //console.log(par);
-          }
-        }
-      }
-      else
-      {
-        par = rcopy.startContainer;
-      }
-      //console.log(par);
-
-
-      // get previous sibling
-      var ps = par.previousSibling;
-      if (ps)
-      {
-        if (ps.nodeName.toLowerCase() === "p" ||
-          ps.nodeName.toLowerCase() === "li")
-        {
-          target_pos = ps;
-        }
-        if (ps.nodeName.toLowerCase() === "ul")
-        {
-          if (ps.lastChild)
-          {
-            target_pos = ps.lastChild;
-          }
-        }
-      }
-      else
-      {
-        //console.log("case d");
-        // set selection to beginning
-        r = ed.dom.getRoot();
-        target_pos = r.childNodes[0];
-      }
-      if (this.splitTopBr())
-      {
-        //console.log("setting range");
-
-        // set selection to start of first div
-        if (target_pos)
-        {
-          r =  ed.dom.createRng();
-          r.setStart(target_pos, 0);
-          r.setEnd(target_pos, 0);
-          ed.selection.setRng(r);
-        }
-      }
-    }
+    dom.addClass(dom.select("ol:not([class])"), 'ilc_list_o_NumberedList');
+    dom.addClass(dom.select("ul:not([class])"), 'ilc_list_u_BulletedList');
+    dom.addClass(dom.select("li:not([class])"), 'ilc_list_item_StandardListItem');
   }
 
 

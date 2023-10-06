@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\TestQuestionPool\QuestionInfoService;
+
 /**
 *
 * @author Helmut Schottmüller <ilias@aurealis.de>
@@ -28,6 +30,7 @@
 class ilQuestionBrowserTableGUI extends ilTable2GUI
 {
     private \ILIAS\TestQuestionPool\InternalRequestService $request;
+    private QuestionInfoService $questioninfo;
     protected \ILIAS\Notes\Service $notes;
     protected \ILIAS\UI\Factory $ui_factory;
     protected \ILIAS\UI\Renderer $renderer;
@@ -63,6 +66,7 @@ class ilQuestionBrowserTableGUI extends ilTable2GUI
         $this->request = $DIC->testQuestionPool()->internal()->request();
         $this->lng = $lng;
         $this->ctrl = $ilCtrl;
+        $this->questioninfo = $DIC->testQuestionPool()->questionInfo();
 
         $this->renderer = $DIC->ui()->renderer();
         $this->ui_factory = $DIC->ui()->factory();
@@ -368,7 +372,7 @@ class ilQuestionBrowserTableGUI extends ilTable2GUI
             $this->tpl->parseCurrentBlock();
 
             if ($a_set["complete"] == 0) {
-                $icon = $this->ui_factory->symbol()->icon()->custom(ilUtil::getImagePath("icon_alert.svg"), $this->lng->txt("warning_question_not_complete"));
+                $icon = $this->ui_factory->symbol()->icon()->custom(ilUtil::getImagePath("standard/icon_alert.svg"), $this->lng->txt("warning_question_not_complete"));
                 $this->tpl->setCurrentBlock("qpl_warning");
                 $this->tpl->setVariable("ICON_WARNING", $this->renderer->render($icon));
                 $this->tpl->parseCurrentBlock();
@@ -488,12 +492,12 @@ class ilQuestionBrowserTableGUI extends ilTable2GUI
         foreach ($this->getSelectedColumns() as $c) {
             if (strcmp($c, 'description') == 0) {
                 $this->tpl->setCurrentBlock('description');
-                $this->tpl->setVariable("QUESTION_COMMENT", (strlen($a_set["description"])) ? $a_set["description"] : "&nbsp;");
+                $this->tpl->setVariable("QUESTION_COMMENT", (isset($a_set["description"]) && $a_set["description"] !== '') ? $a_set["description"] : "&nbsp;");
                 $this->tpl->parseCurrentBlock();
             }
             if (strcmp($c, 'type') == 0) {
                 $this->tpl->setCurrentBlock('type');
-                $this->tpl->setVariable("QUESTION_TYPE", $this->questioninfo->getQuestionType($a_set["question_id"]));
+                $this->tpl->setVariable("QUESTION_TYPE", $this->questioninfo->getQuestionTypeName($a_set["question_id"]));
                 $this->tpl->parseCurrentBlock();
             }
         }
@@ -547,16 +551,20 @@ class ilQuestionBrowserTableGUI extends ilTable2GUI
             return '';
         }
 
-        $ajaxLink = $this->getCommentsAjaxLink($qData['question_id']);
+        $ajax_link = $this->getCommentsAjaxLink($qData['question_id']);
 
-        return "<a class='comment' href='#' onclick=\"return " . $ajaxLink . "\">
-                        <img src='" . ilUtil::getImagePath("comment_unlabeled.svg")
-            . "' alt='{$qData['comments']}'><span class='ilHActProp'>{$qData['comments']}</span></a>";
+        $comment_glyph = $this->ui_factory->symbol()->glyph()->comment()->withCounter(
+            $this->ui_factory->counter()->status($qData['comments'])
+        )->withAdditionalOnLoadCode(function ($id) use ($ajax_link): string {
+            return "document.getElementById('$id').onclick = function (event) { $ajax_link; };";
+        });
+        return $this->renderer->render($comment_glyph);
     }
 
     protected function getCommentsAjaxLink($questionId): string
     {
         $ajax_hash = ilCommonActionDispatcherGUI::buildAjaxHash(1, $this->request->getRefId(), 'quest', $this->parent_obj->object->getId(), 'quest', $questionId);
-        return ilNoteGUI::getListCommentsJSCall($ajax_hash, '');
+        $update_code = "il.UI.counter.getCounterObject($(\".ilTableOuter\")).incrementStatusCount(1);";
+        return ilNoteGUI::getListCommentsJSCall($ajax_hash, $update_code);
     }
 }

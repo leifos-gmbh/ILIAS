@@ -1809,23 +1809,23 @@ class ilObjectListGUI
                 $this->container_obj->getObject()->getRefId()
             );
         }
-        if ($this->getContainerObject() instanceof ilDashboardBlockGUI) {
+        if ($this->getContainerObject() instanceof ilDesktopItemHandling) {
             $this->ctrl->setParameter($this->container_obj, 'type', $type);
             $this->ctrl->setParameter($this->container_obj, 'item_ref_id', $this->getCommandId());
-        }
 
-        if (!$this->fav_manager->ifIsFavourite($this->user->getId(), $this->getCommandId())) {
-            // Pass type and object ID to ilAccess to improve performance
-            if ($this->checkCommandAccess('read', '', $this->ref_id, $this->type, $this->obj_id)) {
-                $cmd_link = $this->ctrl->getLinkTarget($this->container_obj, 'addToDesk');
-                $this->insertCommand($cmd_link, $this->lng->txt('rep_add_to_favourites'));
+            if (!$this->fav_manager->ifIsFavourite($this->user->getId(), $this->getCommandId())) {
+                // Pass type and object ID to ilAccess to improve performance
+                if ($this->checkCommandAccess('read', '', $this->ref_id, $this->type, $this->obj_id)) {
+                    $cmd_link = $this->ctrl->getLinkTarget($this->container_obj, 'addToDesk');
+                    $this->insertCommand($cmd_link, $this->lng->txt('rep_add_to_favourites'));
+                }
+            } else {
+                $cmd_link = $this->ctrl->getLinkTarget($this->container_obj, 'removeFromDesk');
+                $this->insertCommand($cmd_link, $this->lng->txt('rep_remove_from_favourites'));
             }
-        } else {
-            $cmd_link = $this->ctrl->getLinkTarget($this->container_obj, 'removeFromDesk');
-            $this->insertCommand($cmd_link, $this->lng->txt('rep_remove_from_favourites'));
-        }
 
-        $this->ctrl->clearParameters($this->container_obj);
+            $this->ctrl->clearParameters($this->container_obj);
+        }
     }
 
     public function insertInfoScreenCommand(): void
@@ -1837,7 +1837,7 @@ class ilObjectListGUI
             $this->getCommandLink('infoScreen'),
             $this->lng->txt('info_short'),
             $this->getCommandFrame('infoScreen'),
-            ilUtil::getImagePath('icon_info.svg')
+            ilUtil::getImagePath('standard/icon_info.svg')
         );
     }
 
@@ -2631,14 +2631,14 @@ class ilObjectListGUI
                 // 'view' added, see #19922
                 $this->tpl->setVariable('EXP_HREF', $this->ctrl->getLinkTarget($this->container_obj, 'view', $this->getUniqueItemId(true)));
                 $this->ctrl->clearParameters($this->container_obj);
-                $this->tpl->setVariable('EXP_IMG', ilUtil::getImagePath('tree_exp.svg'));
+                $this->tpl->setVariable('EXP_IMG', ilUtil::getImagePath('nav/tree_exp.svg'));
                 $this->tpl->setVariable('EXP_ALT', $this->lng->txt('collapse'));
             } else {
                 $this->ctrl->setParameter($this->container_obj, 'expand', $this->obj_id);
                 // 'view' added, see #19922
                 $this->tpl->setVariable('EXP_HREF', $this->ctrl->getLinkTarget($this->container_obj, 'view', $this->getUniqueItemId(true)));
                 $this->ctrl->clearParameters($this->container_obj);
-                $this->tpl->setVariable('EXP_IMG', ilUtil::getImagePath('tree_col.svg'));
+                $this->tpl->setVariable('EXP_IMG', ilUtil::getImagePath('nav/tree_col.svg'));
                 $this->tpl->setVariable('EXP_ALT', $this->lng->txt('expand'));
             }
 

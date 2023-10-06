@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Renderer as UIRenderer;
+use ILIAS\TestQuestionPool\QuestionInfoService;
 
 /**
 *
@@ -68,7 +69,7 @@ class ilTestQuestionsTableGUI extends ilTable2GUI
         private int $parent_ref_id,
         private UIFactory $ui_factory,
         private UIRenderer $ui_renderer,
-        private \ILIAS\TestQuestionPool\QuestionInfoService $questioninfo
+        private QuestionInfoService $questioninfo
     ) {
         parent::__construct($parent_obj, $parent_cmd);
 
@@ -203,7 +204,7 @@ class ilTestQuestionsTableGUI extends ilTable2GUI
             $this->tpl->setVariable("QUESTION_COMMENT", $a_set["description"] ? $a_set["description"] : '&nbsp;');
         }
 
-        $this->tpl->setVariable("QUESTION_TYPE", $this->questioninfo->getQuestionType($a_set['question_id']));
+        $this->tpl->setVariable("QUESTION_TYPE", $this->questioninfo->getQuestionTypeName($a_set['question_id']));
         $this->tpl->setVariable("QUESTION_POINTS", $a_set["points"]);
 
         if ($this->isColumnSelected('author')) {
@@ -274,11 +275,7 @@ class ilTestQuestionsTableGUI extends ilTable2GUI
         $removeUrl = $this->ctrl->getLinkTarget($this->getParentObject(), $this->getParentCmd());
         $this->ctrl->setParameter($this->getParentObject(), 'removeQid', '');
 
-        $button = ilLinkButton::getInstance();
-        $button->setCaption('remove_question');
-        $button->setUrl($removeUrl);
-
-        return $button->render();
+        return $this->ui_renderer->render($this->ui_factory->button()->standard($this->lng->txt('remove_question'), $removeUrl));
     }
 
     protected function buildQuestionTitleLink(array $rowData): string
@@ -376,7 +373,7 @@ class ilTestQuestionsTableGUI extends ilTable2GUI
         if ($rowData['obligatory'] && !$this->isQuestionManagingEnabled()) {
             return $this->ui_renderer->render(
                 $this->ui_factory->symbol()->icon()->custom(
-                    ilUtil::getImagePath('icon_alert.svg'),
+                    ilUtil::getImagePath('standard/icon_alert.svg'),
                     $this->lng->txt('question_obligatory')
                 )
             );

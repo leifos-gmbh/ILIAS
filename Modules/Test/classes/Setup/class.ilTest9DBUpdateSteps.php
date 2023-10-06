@@ -162,4 +162,30 @@ class ilTest9DBUpdateSteps implements ilDatabaseUpdateSteps
             $this->db->dropTable('tst_seq_qst_postponed');
         }
     }
+
+    public function step_8(): void
+    {
+        if ($this->db->tableColumnExists('tst_tests', 'redirection_url')) {
+            $this->db->modifyTableColumn(
+                'tst_tests',
+                'redirection_url',
+                [
+                    'type' => 'text',
+                    'length' => 4000,
+                    'notnull' => false,
+                    'default' => null
+                ]
+            );
+        }
+    }
+
+    public function step_9(): void
+    {
+        if ($this->db->tableColumnExists('tst_tests', 'sign_submission')) {
+            $this->db->dropTableColumn(
+                'tst_tests',
+                'sign_submission'
+            );
+        }
+    }
 }

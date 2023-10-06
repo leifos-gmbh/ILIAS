@@ -934,7 +934,14 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $items = [];
         $f = $this->gui->ui()->factory();
         $r = $this->gui->ui()->renderer();
-        foreach ($this->mc_request->getItemIds() as $id) {
+
+        $ids = $this->mc_request->getItemIds();
+        if (current($ids) === 'ALL_OBJECTS') {
+            $arr = $this->object->getSortedItemsArray();
+            $ids = array_keys($arr);
+        }
+
+        foreach ($ids as $id) {
             $item = new ilNewsItem($id);
             $items[] = $f->modal()->interruptiveItem()->keyValue($id, "", $item->getTitle());
         }

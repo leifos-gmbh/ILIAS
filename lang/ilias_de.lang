@@ -6607,6 +6607,7 @@ content#:#cont_linked_mobs#:#Verlinkte Medienobjekte
 content#:#cont_links#:#Links
 content#:#cont_list_files#:#Dateiverzeichnis
 content#:#cont_list_indent#:#Liste einrücken
+content#:#cont_list_item_style#:#Style Listeneintrag
 content#:#cont_list_outdent#:#Liste ausrücken
 content#:#cont_list_properties#:#Listen-Eigenschaften
 content#:#cont_lists#:#Listen
@@ -15254,6 +15255,8 @@ style#:#sty_lightness_header_text#:#Helligkeit Überschrift Text
 style#:#sty_line_height#:#Zeilenhöhe
 style#:#sty_link_char#:#Link
 style#:#sty_list_char#:#Liste
+style#:#sty_list_style_position#:#Listenstil/Position
+style#:#sty_list_style_type#:#Listenstil/Type
 style#:#sty_make_global_default#:#Standard-Style
 style#:#sty_make_global_fixed#:#Erzwungener Style für alle Objekte
 style#:#sty_margin#:#Außenrand
@@ -15274,6 +15277,7 @@ style#:#sty_odd_col_class#:#Ungerade Spalten
 style#:#sty_odd_row_class#:#Ungerade Zeilen
 style#:#sty_opacity#:#Deckkraft
 style#:#sty_opt_saved#:#Einstellungen gespeichert
+style#:#sty_ol#:#Geordnete Liste
 style#:#sty_order#:#Reihenfolge
 style#:#sty_outdated#:#Veraltet
 style#:#sty_overflow#:#Überlauf
@@ -15435,6 +15439,7 @@ style#:#sty_type_va_icont#:#Vert. Akkordeonelement Inhalt
 style#:#sty_type_va_ihcap#:#Vert. Akkordeonelement Überschrift
 style#:#sty_type_va_ihead#:#Vert. Akkordeonelement Kopf
 style#:#sty_type_va_iheada#:#Vert. Akkordeonelement Kopf (aktiv)
+style#:#sty_ul#:#Ungeordnete Liste
 style#:#sty_va_cntr_class#:#Vert. Akkordeon Container
 style#:#sty_va_icntr_class#:#Vert. Akkordeonelement Container
 style#:#sty_va_icont_class#:#Vert. Akkordeonelement Inhalt

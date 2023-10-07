@@ -6607,6 +6607,7 @@ content#:#cont_linked_mobs#:#Linked media objects
 content#:#cont_links#:#Links
 content#:#cont_list_files#:#List Files
 content#:#cont_list_indent#:#Indent List
+content#:#cont_list_item_style#:#List Item Style
 content#:#cont_list_outdent#:#Outdent List
 content#:#cont_list_properties#:#List Properties
 content#:#cont_lists#:#Lists
@@ -15253,6 +15254,8 @@ style#:#sty_lightness_header_text#:#Lightness Header Text
 style#:#sty_line_height#:#Line Height
 style#:#sty_link_char#:#Link
 style#:#sty_list_char#:#List
+style#:#sty_list_style_position#:#List Style Position
+style#:#sty_list_style_type#:#List Style Type
 style#:#sty_make_global_default#:#Set as default style
 style#:#sty_make_global_fixed#:#Force this style on all objects
 style#:#sty_margin#:#Margin
@@ -15273,6 +15276,7 @@ style#:#sty_odd_col_class#:#Odd Columns
 style#:#sty_odd_row_class#:#Odd Rows
 style#:#sty_opacity#:#Opacity
 style#:#sty_opt_saved#:#Options saved
+style#:#sty_ol#:#Ordered List
 style#:#sty_order#:#Order
 style#:#sty_outdated#:#Outdated
 style#:#sty_overflow#:#Overflow
@@ -15434,6 +15438,7 @@ style#:#sty_type_va_icont#:#Vert. Accordion Item Content
 style#:#sty_type_va_ihcap#:#Vert. Accordion Caption
 style#:#sty_type_va_ihead#:#Vert. Accordion Item Header
 style#:#sty_type_va_iheada#:#Vert. Accordion Header (active)
+style#:#sty_ul#:#Unordered List
 style#:#sty_va_cntr_class#:#Vert. Accordion Container
 style#:#sty_va_icntr_class#:#Vert. Accordion Item Container
 style#:#sty_va_icont_class#:#Vert. Accordion Item Content

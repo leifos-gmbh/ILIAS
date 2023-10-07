@@ -376,7 +376,7 @@ class ilObjStyleSheet extends ilObject
     public static array $pseudo_classes =
         [
             "a" => ["hover"],
-            "div" => ["hover"],
+            "div" => ["hover", "before"],
             "img" => ["hover"],
             "li" => ["before"]
         ];
@@ -1389,6 +1389,9 @@ class ilObjStyleSheet extends ilObject
             foreach ($style as $tag) {
                 if ($tag[0]["mq_id"] != $mq["id"]) {
                     continue;
+                }
+                if (is_int(strpos($tag[0]["class"], "before")) && !is_int(strpos($tag[0]["class"], "::before"))) {
+                    $tag[0]["class"] = str_replace(":before", "::before", $tag[0]["class"]);
                 }
                 fwrite($css_file, $tag[0]["tag"] . ".ilc_" . $tag[0]["type"] . "_" . $tag[0]["class"] . "\n");
                 //				echo "<br>";

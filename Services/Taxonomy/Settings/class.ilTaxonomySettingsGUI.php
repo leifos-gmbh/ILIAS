@@ -34,6 +34,12 @@ class ilTaxonomySettingsGUI
     protected \ILIAS\Taxonomy\InternalGUIService $gui;
     protected \ILIAS\Taxonomy\InternalDomainService $domain;
     protected int $rep_obj_id;
+    protected bool $assigned_item_sorting = false;
+    protected ilTaxAssignedItemInfo $assigned_item_info_obj;
+    protected string $assigned_item_comp_id = "";
+    protected int $assigned_item_obj_id = 0;
+    protected string $assigned_item_type = "";
+
 
     public function __construct(
         \ILIAS\Taxonomy\InternalDomainService $domain,
@@ -61,6 +67,21 @@ class ilTaxonomySettingsGUI
 
     }
 
+    public function withAssignedItemSorting(
+        ilTaxAssignedItemInfo $a_item_info_obj,
+        string $a_component_id,
+        int $a_obj_id,
+        string $a_item_type
+    ): self {
+        $new = clone $this;
+        $new->assigned_item_sorting = true;
+        $new->assigned_item_info_obj = $a_item_info_obj;
+        $new->assigned_item_comp_id = $a_component_id;
+        $new->assigned_item_obj_id = $a_obj_id;
+        $new->assigned_item_type = $a_item_type;
+        return $new;
+    }
+
     public function executeCommand() : void
     {
         $ctrl = $this->gui->ctrl();
@@ -75,6 +96,14 @@ class ilTaxonomySettingsGUI
             case strtolower(ilObjTaxonomyGUI::class):
                 $ctrl->setReturn($this, "");
                 $tax_gui = $this->gui->getObjTaxonomyGUI($this->rep_obj_id);
+                if ($this->assigned_item_sorting) {
+                    $tax_gui->activateAssignedItemSorting(
+                        $this->assigned_item_info_obj,
+                        $this->assigned_item_comp_id,
+                        $this->assigned_item_obj_id,
+                        $this->assigned_item_type
+                    );
+                }
                 $this->ctrl->forwardCommand($tax_gui);
                 break;
 

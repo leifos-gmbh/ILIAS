@@ -33,7 +33,7 @@ use ILIAS\Refinery\Random\Group as RandomGroup;
  * @ilCtrl_Calls ilObjQuestionPoolGUI: assOrderingQuestionGUI, assImagemapQuestionGUI
  * @ilCtrl_Calls ilObjQuestionPoolGUI: assNumericGUI, assTextSubsetGUI, assSingleChoiceGUI, ilPropertyFormGUI
  * @ilCtrl_Calls ilObjQuestionPoolGUI: assTextQuestionGUI, ilObjectMetaDataGUI, ilPermissionGUI, ilObjectCopyGUI
- * @ilCtrl_Calls ilObjQuestionPoolGUI: ilQuestionPoolExportGUI, ilInfoScreenGUI, ilObjTaxonomyGUI, ilCommonActionDispatcherGUI
+ * @ilCtrl_Calls ilObjQuestionPoolGUI: ilQuestionPoolExportGUI, ilInfoScreenGUI, ilTaxonomySettingsGUI, ilCommonActionDispatcherGUI
  * @ilCtrl_Calls ilObjQuestionPoolGUI: ilAssQuestionHintsGUI, ilAssQuestionFeedbackEditingGUI, ilLocalUnitConfigurationGUI
  * @ilCtrl_Calls ilObjQuestionPoolGUI: ilObjQuestionPoolSettingsGeneralGUI, assFormulaQuestionGUI
  * @ilCtrl_Calls ilObjQuestionPoolGUI: ilAssQuestionPreviewGUI
@@ -45,6 +45,7 @@ use ILIAS\Refinery\Random\Group as RandomGroup;
  */
 class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
 {
+    protected \ILIAS\Taxonomy\Service $taxonomy;
     public ?ilObject $object;
     protected ILIAS\TestQuestionPool\InternalRequestService $qplrequest;
 
@@ -72,6 +73,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
         $this->ctrl->saveParameterByClass('ilobjquestionpoolgui', 'calling_consumer');
         $this->ctrl->saveParameterByClass('ilobjquestionpoolgui', 'consumer_context');
         $this->qplrequest = $DIC->testQuestionPool()->internal()->request();
+        $this->taxonomy = $DIC->taxonomy();
 
         parent::__construct("", $this->qplrequest->raw("ref_id"), true, false);
     }
@@ -383,7 +385,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                 $this->ctrl->forwardCommand($gui);
                 break;
 
-            case "ilobjtaxonomygui":
+            case strtolower(ilTaxonomySettingsGUI::class):
 
                 /** @var ilObjQuestionPool $obj */
                 $obj = $this->object;
@@ -393,7 +395,8 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                     $component_repository,
                     $ilCtrl,
                     $ilTabs,
-                    $lng
+                    $lng,
+                    $this->taxonomy
                 );
 
                 $forwarder->forward();
@@ -1508,7 +1511,6 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
     {
         global $DIC;
         $ilHelp = $DIC['ilHelp'];
-
         $currentUserHasWriteAccess = $this->access->checkAccess("write", "", $this->object->getRefId());
         $currentUserHasReadAccess = $this->access->checkAccess("read", "", $this->object->getRefId());
 
@@ -1523,7 +1525,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             case "ilquestionpoolskilladministrationgui":
                 break;
 
-            case 'ilobjtaxonomygui':
+            case strtolower(ilTaxonomySettingsGUI::class):
             case 'ilobjquestionpoolsettingsgeneralgui':
 
                 if ($currentUserHasWriteAccess) {
@@ -1678,12 +1680,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             'ilObjQuestionPoolSettingsGeneralGUI'
         );
 
-        $tabs->addSubTabTarget(
-            'qpl_settings_subtab_taxonomies',
-            $this->ctrl->getLinkTargetByClass('ilObjTaxonomyGUI', 'editAOTaxonomySettings'),
-            '',
-            'ilObjTaxonomyGUI'
-        );
+        $this->taxonomy->gui()->addSettingsSubTab($this->getObject()->getId());
     }
 
     /**

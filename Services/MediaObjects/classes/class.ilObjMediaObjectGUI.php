@@ -379,6 +379,8 @@ class ilObjMediaObjectGUI extends ilObjectGUI
             $this->form_gui->addItem($ta);
         }
 
+        $this->video_gui->addPreviewInput($this->form_gui, $this->object->getId());
+
         // standard parameters
         if ($a_mode == "edit" &&
             $this->media_type->usesParameterProperty($std_item->getFormat())) {
@@ -873,6 +875,14 @@ class ilObjMediaObjectGUI extends ilObjectGUI
         $tpl->setContent($this->form_gui->getHTML());
     }
 
+    public function extractPreviewImageObject(): void
+    {
+        $ilCtrl = $this->ctrl;
+        $this->video_gui->handleExtractionRequest(
+            $this->object->getId()
+        );
+        $ilCtrl->redirect($this, "edit");
+    }
 
     /**
      * resize images to specified size
@@ -1044,6 +1054,8 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 
             // text representation
             $std_item->setTextRepresentation($form->getInput("text_representation"));
+
+            $this->video_gui->savePreviewInput($form, $this->object->getId());
 
             // set parameters
             if ($this->media_type->usesParameterProperty($std_item->getFormat())) {

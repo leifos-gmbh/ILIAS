@@ -36,6 +36,8 @@ class GUIService
         $this->gui_service = $gui_service;
         $this->domain_service = $domain_service;
         $this->tpl = $gui_service->ui()->mainTemplate();
+        $lng = $this->domain_service->lng();
+        $lng->loadLanguageModule("mob");
     }
 
     public function addPreviewExtractionToToolbar(
@@ -58,13 +60,13 @@ class GUIService
             if (is_object($med)) {
                 if (\ilFFmpeg::supportsImageExtraction($med->getFormat())) {
                     // second
-                    $ni = new \ilTextInputGUI($lng->txt("mcst_second"), "sec");
+                    $ni = new \ilTextInputGUI($lng->txt("mob_second"), "sec");
                     $ni->setMaxLength(4);
                     $ni->setSize(4);
                     $ni->setValue(1);
                     $toolbar->addInputItem($ni, true);
 
-                    $toolbar->addFormButton($lng->txt("mcst_extract_preview_image"), "extractPreviewImage");
+                    $toolbar->addFormButton($lng->txt("mob_extract_preview_image"), "extractPreviewImage");
                     $toolbar->setFormAction($ctrl->getFormActionByClass($gui_class));
                 }
             }
@@ -86,9 +88,9 @@ class GUIService
 
             $mob->generatePreviewPic(320, 240, $sec);
             if ($mob->getVideoPreviewPic() !== "") {
-                $this->tpl->setOnScreenMessage('info', $lng->txt("mcst_image_extracted"), true);
+                $this->tpl->setOnScreenMessage('info', $lng->txt("mob_image_extracted"), true);
             } else {
-                $this->tpl->setOnScreenMessage('failure', $lng->txt("mcst_no_extraction_possible"), true);
+                $this->tpl->setOnScreenMessage('failure', $lng->txt("mob_no_extraction_possible"), true);
             }
         } catch (\ilException $e) {
             if (DEVMODE === 1) {
@@ -99,5 +101,38 @@ class GUIService
             }
             $this->tpl->setOnScreenMessage('failure', $e->getMessage() . $add, true);
         }
+    }
+
+    public function addPreviewInput(\ilPropertyFormGUI $form, int $mob_id = 0) : void
+    {
+        $lng = $this->domain_service->lng();
+        $pp = new \ilImageFileInputGUI($lng->txt("mob_preview_picture"), "preview_pic");
+        $pp->setSuffixes(array("png", "jpeg", "jpg"));
+        $form->addItem($pp);
+
+        if ($mob_id > 0) {
+            $mob = new \ilObjMediaObject($mob_id);
+            // preview
+            $ppic = $mob->getVideoPreviewPic();
+            if ($ppic !== "") {
+                $pp->setImage($ppic . "?rand=" . rand(0,1000));
+            }
+        }
+    }
+
+    public function savePreviewInput(\ilPropertyFormGUI $form, int $mob_id) : void
+    {
+        $prevpic = $form->getInput("preview_pic");
+        if ($prevpic["size"] > 0) {
+            $mob = new \ilObjMediaObject($mob_id);
+            $mob->uploadVideoPreviewPic($prevpic);
+        } else {
+            $prevpici = $form->getItemByPostVar("preview_pic");
+            if ($prevpici->getDeletionFlag()) {
+                $mob = new \ilObjMediaObject($mob_id);
+                $mob->removeAdditionalFile($mob->getVideoPreviewPic(true));
+            }
+        }
+
     }
 }

@@ -649,6 +649,10 @@ class ilObjMediaObject extends ilObject
                                 "\" Language=\"" . $srt["language"] . "\" " . $def . "/>";
                         }
                     }
+                    if ($this->getVideoPreviewPic(true)) {
+                        $xml .= "<PreviewPic File=\"" . $this->getVideoPreviewPic(true) .
+                            "\" />";
+                    }
                     $xml .= "</MediaItem>";
                 }
                 break;

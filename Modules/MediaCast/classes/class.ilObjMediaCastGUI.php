@@ -512,10 +512,12 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 $this->form_gui->addItem($mimeTypeSelection);*/
 
                 // preview picure
-                $pp = new ilImageFileInputGUI($lng->txt("mcst_preview_picture"), "preview_pic");
-                $pp->setSuffixes(array("png", "jpeg", "jpg"));
-                $pp->setInfo($lng->txt("mcst_preview_picture_info") . " mp4, mp3, png, jp(e)g, gif");
-                $this->form_gui->addItem($pp);
+                $mob_id = 0;
+                if ($a_mode !== "create") {
+                    $mcst_item = new ilNewsItem($this->mc_request->getItemId());
+                    $mob_id = $mcst_item->getMobId();
+                }
+                $this->video_gui->addPreviewInput($this->form_gui, $mob_id);
             }
         }
 
@@ -543,14 +545,6 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $this->mc_request->getItemId()
         );
         $mob = new ilObjMediaObject($this->mcst_item->getMobId());
-
-        // preview
-        $ppic = $mob->getVideoPreviewPic();
-        if ($ppic != "") {
-            $i = $this->form_gui->getItemByPostVar("preview_pic");
-            $i->setImage($ppic);
-        }
-
 
         $values = array();
         $mediaItems = $this->getMediaItems(
@@ -615,10 +609,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $mob->setDescription($description);
 
             // save preview pic
-            $prevpic = $this->form_gui->getInput("preview_pic");
-            if ($prevpic["size"] > 0) {
-                $mob->uploadVideoPreviewPic($prevpic);
-            }
+            $this->video_gui->savePreviewInput($this->form_gui, $mob->getId());
 
             // determine duration for standard purpose
             $duration = $this->getDuration($file);
@@ -834,15 +825,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
                     $mob->setTitle($title);
                     $mob->setDescription($description);
 
-                    $prevpic = $this->form_gui->getInput("preview_pic");
-                    if ($prevpic["size"] > 0) {
-                        $mob->uploadVideoPreviewPic($prevpic);
-                    } else {
-                        $prevpici = $this->form_gui->getItemByPostVar("preview_pic");
-                        if ($prevpici->getDeletionFlag()) {
-                            $mob->removeAdditionalFile($mob->getVideoPreviewPic(true));
-                        }
-                    }
+                    $this->video_gui->savePreviewInput($this->form_gui, $mob->getId());
                 }
             }
 

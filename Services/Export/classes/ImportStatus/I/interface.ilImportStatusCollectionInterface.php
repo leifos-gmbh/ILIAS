@@ -10,7 +10,7 @@ interface ilImportStatusCollectionInterface extends Iterator, Countable, Arrayab
 {
     public function hasStatusType(StatusType $type): bool;
 
-    public function withStatus(ilImportStatusInterface $import_status): ilImportStatusCollectionInterface;
+    public function withAddedStatus(ilImportStatusInterface $import_status): ilImportStatusCollectionInterface;
 
     public function getCollectionOfAllByType(StatusType $type): ilImportStatusCollectionInterface;
 

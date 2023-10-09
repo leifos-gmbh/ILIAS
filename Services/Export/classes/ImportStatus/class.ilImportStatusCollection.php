@@ -42,7 +42,7 @@ class ilImportStatusCollection implements ilImportStatusCollectionInterface
         return count($this->getArrayOfElementsWithType($type)) > 0;
     }
 
-    public function withStatus(ilImportStatusInterface $import_status): ilImportStatusCollectionInterface
+    public function withAddedStatus(ilImportStatusInterface $import_status): ilImportStatusCollectionInterface
     {
         $clone = clone $this;
         $clone->status_collection[] = $import_status;

@@ -9353,6 +9353,8 @@ exc#:#exc_select_portfolio_change#:#Anderes Portfolio benutzen
 exc#:#exc_select_portfolio_info#:#Bitte wählen Sie eines Ihrer Portfolios, um es in dieser Übungseinheit zu benutzen.
 exc#:#exc_select_portfolio_unlink#:#Portfolio entfernen
 exc#:#exc_send_assignment#:#Übungseinheit per Mail verschicken
+exc#:#exc_set_failed#:#Auf 'nicht bestanden' setzen
+exc#:#exc_set_passed#:#Auf 'bestanden' setzen
 exc#:#exc_settings_feedback#:#Rückmeldung
 exc#:#exc_settings_feedback_file#:#Datei
 exc#:#exc_settings_feedback_file_info#:#Tutoren laden ihre Datei hoch. Der jeweilige Teilnehmer erhält eine Benachrichtigung und die Datei wird ihm in der Übungseinheiten-Übersicht angezeigt.

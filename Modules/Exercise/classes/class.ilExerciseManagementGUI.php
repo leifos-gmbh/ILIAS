@@ -2344,4 +2344,45 @@ class ilExerciseManagementGUI
 
         return $data;
     }
+
+    protected function setFailedObject() : void
+    {
+        $members = $this->getMultiActionUserIds();
+        $done = false;
+        if ($this->assignment !== null) {
+            foreach (array_keys($members) as $mem) {
+                $done = true;
+                $this->setSingleStatus($this->assignment->getId(), $mem, "failed");
+            }
+            if ($done) {
+                $this->tpl->setOnScreenMessage("success", $this->lng->txt("msg_obj_modified"), true);
+            }
+        }
+        $this->ctrl->redirect($this, "members");
+    }
+
+    protected function setPassedObject() : void
+    {
+        $members = $this->getMultiActionUserIds();
+        $done = false;
+        if ($this->assignment !== null) {
+            foreach (array_keys($members) as $mem) {
+                $done = true;
+                $this->setSingleStatus($this->assignment->getId(), $mem, "passed");
+            }
+            if ($done) {
+                $this->tpl->setOnScreenMessage("success", $this->lng->txt("msg_obj_modified"), true);
+            }
+        }
+        $this->ctrl->redirect($this, "members");
+    }
+
+    protected function setSingleStatus($ass_id, $part_id, $status) : void
+    {
+        $ass = new ilExAssignment($ass_id);
+        $submission = new ilExSubmission($ass, $part_id);
+        $member_status = $ass->getMemberStatus($part_id);
+        $member_status->setStatus($status);
+        $member_status->update();
+    }
 }

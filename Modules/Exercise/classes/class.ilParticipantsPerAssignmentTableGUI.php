@@ -44,6 +44,8 @@ class ilParticipantsPerAssignmentTableGUI extends ilExerciseSubmissionTableGUI
 
         $this->setFormAction($ctrl->getFormAction($a_parent_obj, "saveStatusAll"));
 
+        $this->addMultiCommand("setPassed", $this->lng->txt("exc_set_passed"));
+        $this->addMultiCommand("setFailed", $this->lng->txt("exc_set_failed"));
         $this->addMultiCommand("downloadSelected", $this->lng->txt("exc_download_selected"));
     }
 

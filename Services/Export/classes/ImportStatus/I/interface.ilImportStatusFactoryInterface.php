@@ -2,7 +2,7 @@
 
 namespace ImportStatus\I;
 
-interface ImportStatusFactoryInterface
+interface ilImportStatusFactoryInterface
 {
     public function createImportStatus(): ilImportStatusInterface;
     public function createImportStatusCollection(): ilImportStatusCollectionInterface;

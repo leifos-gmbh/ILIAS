@@ -13,8 +13,9 @@ class ilImportStatusContentCollectionDummy implements ilImportStatusCollectionIn
         return $type === StatusType::DUMMY;
     }
 
-    public function add(ilImportStatusInterface $import_status): void
+    public function withStatus(ilImportStatusInterface $import_status): ilImportStatusCollectionInterface
     {
+        return new ilImportStatusContentCollectionDummy();
     }
 
     public function getCollectionOfAllByType(StatusType $type): ilImportStatusCollectionInterface

@@ -189,6 +189,16 @@ class PermanentLinkManager
         return $append;
     }
 
+    public function getPermanentLink(int $ref_id, int $ass_id): string
+    {
+        $append = ($ass_id > 0)
+            ? $this->getDefaultAppend($ass_id)
+            : "";
+        return \ilLink::_getLink($ref_id, "exc", [], $append);
+    }
+
+
+
     public function getDownloadSubmissionAppend(int $ass_id, int $user_id) : string
     {
         return "_" . $ass_id . "_" . $user_id . "_setdownload";

@@ -557,11 +557,6 @@ class ilObjExerciseGUI extends ilObjectGUI
             $lng->txt("view"),
             $ilCtrl->getLinkTarget($this, "showOverview")
         );
-        $ilTabs->addSubTab(
-            "list",
-            $lng->txt("view"). " (" . $lng->txt("new") . ")",
-            $ilCtrl->getLinkTarget($this, "showOverviewNew")
-        );
         if ($this->checkPermissionBool("write")) {
             $ilTabs->addSubTab(
                 "list_assignments",
@@ -886,93 +881,6 @@ class ilObjExerciseGUI extends ilObjectGUI
      */
     public function showOverviewObject(): void
     {
-        $tpl = $this->tpl;
-        $ilTabs = $this->tabs;
-        $ilUser = $this->user;
-        $ilToolbar = $this->toolbar;
-        /** @var ilObjExercise $exc */
-        $exc = $this->object;
-
-        $this->checkPermission("read");
-
-        $ilTabs->activateTab("content");
-        $this->addContentSubTabs("content");
-
-        if ($this->handleRandomAssignmentEntryPage()) {
-            return;
-        }
-
-        $tpl->addJavaScript("./Modules/Exercise/js/ilExcPresentation.js");
-
-        ilLearningProgress::_tracProgress(
-            $ilUser->getId(),
-            $this->object->getId(),
-            $this->object->getRefId(),
-            'exc'
-        );
-
-        if ($this->certificateDownloadValidator->isCertificateDownloadable(
-            $ilUser->getId(),
-            $this->object->getId()
-        )) {
-            $ilToolbar->addButton(
-                $this->lng->txt("certificate"),
-                $this->ctrl->getLinkTarget($this, "outCertificate")
-            );
-        }
-
-        $ass_gui = new ilExAssignmentGUI($exc, $this->getService());
-
-        $acc = new ilAccordionGUI();
-        $acc->setId("exc_ow_" . $this->object->getId());
-
-        $ass_data = ilExAssignment::getInstancesByExercise($this->object->getId());
-        $random_manager = $this->service->domain()->assignment()->randomAssignments($exc);
-        foreach ($ass_data as $ass) {
-            if (!$random_manager->isAssignmentVisible($ass->getId(), $this->user->getId())) {
-                continue;
-            }
-
-            // incoming assignment deeplink
-            $force_open = false;
-            if ($this->requested_ass_id_goto === $ass->getId()) {
-                $force_open = true;
-            }
-
-            $acc->addItem(
-                $ass_gui->getOverviewHeader($ass),
-                $ass_gui->getOverviewBody($ass),
-                $force_open
-            );
-        }
-
-        if (count($ass_data) < 2) {
-            $acc->setBehaviour("FirstOpen");
-        } else {
-            $acc->setUseSessionStorage(true);
-        }
-
-        $mtpl = new ilTemplate("tpl.exc_ass_overview.html", true, true, "Modules/Exercise");
-        $mtpl->setVariable("CONTENT", $acc->getHTML());
-
-        $html = "";
-        $html.= $mtpl->get();
-
-        $tpl->setContent(
-            $html
-        );
-    }
-
-    /**
-     * @throws ilObjectNotFoundException
-     * @throws ilCtrlException
-     * @throws ilDatabaseException
-     * @throws ilObjectException
-     * @throws ilExcUnknownAssignmentTypeException
-     * @throws ilDateTimeException
-     */
-    public function showOverviewNewObject(): void
-    {
         $user = $this->service->domain()->user();
         $toolbar = $this->service->gui()->toolbar();
         $tabs = $this->service->gui()->tabs();
@@ -1069,7 +977,7 @@ class ilObjExerciseGUI extends ilObjectGUI
     protected function getModeLink(string $mode) : string
     {
         $this->ctrl->setParameterByClass(self::class, "mode", $mode);
-        $link = $this->ctrl->getLinkTargetByClass(self::class, "showOverviewNew");
+        $link = $this->ctrl->getLinkTargetByClass(self::class, "showOverview");
         $this->ctrl->setParameterByClass(self::class, "mode", null);
         return $link;
     }

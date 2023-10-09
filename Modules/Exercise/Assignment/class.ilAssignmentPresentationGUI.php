@@ -102,7 +102,7 @@ class ilAssignmentPresentationGUI
     {
         $this->tabs->setBackTarget(
             $this->lng->txt("back"),
-            $this->ctrl->getLinkTargetByClass(ilObjExerciseGUI::class, "showOverviewNew")
+            $this->ctrl->getLinkTargetByClass(ilObjExerciseGUI::class, "showOverview")
         );
         $ass = $this->ass_manager->get($this->ass_id);
         foreach ($this->panel_builder->getPanelViews($ass, $this->user->getId()) as $view) {

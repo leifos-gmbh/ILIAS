@@ -18,6 +18,17 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+use ILIAS\Filesystem\Filesystems;
+use ILIAS\Filesystem\Stream\Streams;
+use ILIAS\Filesystem\Util\Archive\Archives;
+use ILIAS\Filesystem\Util\Archive\Unzip;
+use ILIAS\Filesystem\Util\Archive\UnzipOptions;
+use ImportStatus\I\ilImportStatusCollectionInterface;
+use ImportStatus\ilImportStatus;
+use ImportStatus\ilImportStatusCollection;
+use ImportStatus\ilImportStatusContentBuilderString;
+use ImportStatus\StatusType;
+
 /**
  * Import class
  * @author Alex Killing <alex.killing@gmx.de>
@@ -40,6 +51,8 @@ class ilImport
     protected array $skip_entity = array();
     protected array $configs = array();
     protected array $skip_importer = [];
+    private Archives $archives;
+    private Filesystems $filesystem;
 
     public function __construct(int $a_target_id = 0)
     {
@@ -49,6 +62,8 @@ class ilImport
         $this->mapping = new ilImportMapping();
         $this->mapping->setTargetId($a_target_id);
         $this->log = $DIC->logger()->exp();
+        $this->archives = $DIC->archives();
+        $this->filesystem = $DIC->filesystem();
     }
 
     /**
@@ -111,6 +126,48 @@ class ilImport
         return $this->importObject(null, $a_tmp_file, $a_filename, $a_entity, $a_component, $a_copy_file);
     }
 
+    protected function unzipFile(
+        string $zip_file_name,
+        string $path_to_tmp_upload,
+        bool $file_is_on_server
+    ): ilImportStatusCollectionInterface {
+        $import_status_collection = new ilImportStatusCollection();
+        $tmp_dir_info = new SplFileInfo(ilFileUtils::ilTempnam());
+        $this->filesystem->temp()->createDir($tmp_dir_info->getFilename());
+        $target_file_path_str = $tmp_dir_info->getRealPath() . "/" . $zip_file_name;
+        $target_dir_path_str = substr($target_file_path_str, 0, -4);
+
+        // Copy uploaded file.
+        // File is not uploaded with the ilias storage system, therefore the php copy functions are used.
+        if ($file_is_on_server) {
+            copy($path_to_tmp_upload, $target_file_path_str);
+        } else {
+            ilFileUtils::moveUploadedFile($path_to_tmp_upload, $zip_file_name, $target_file_path_str);
+        }
+
+        /** @var Unzip $unzip **/
+        $unzip = $this->archives->unzip(
+            Streams::ofResource(fopen($target_file_path_str, 'rb')),
+            (new UnzipOptions())
+                ->withZipOutputPath($tmp_dir_info->getRealPath())
+                ->withOverwrite(false)
+                ->withFlat(false)
+                ->withEnsureTopDirectoy(true)
+        );
+
+        return $unzip->extract()
+            ? $import_status_collection->withAddedStatus(
+                (new ilImportStatus())
+                    ->withType(StatusType::ZIP_SUCCESS)
+                    ->withContentBuilder(new ilImportStatusContentBuilderString($target_dir_path_str))
+            )
+            : $import_status_collection->withAddedStatus(
+                (new ilImportStatus())
+                    ->withType(StatusType::FAILED)
+                    ->withContentBuilder(new ilImportStatusContentBuilderString('Unzip failed.'))
+            );
+    }
+
     final public function importObject(
         ?object $a_new_obj,
         string $a_tmp_file,
@@ -119,27 +176,34 @@ class ilImport
         string $a_comp = "",
         bool $a_copy_file = false
     ): ?int {
-        // create temporary directory
-        $tmpdir = ilFileUtils::ilTempnam();
-        ilFileUtils::makeDir($tmpdir);
-        if ($a_copy_file) {
-            copy($a_tmp_file, $tmpdir . "/" . $a_filename);
-        } else {
-            ilFileUtils::moveUploadedFile($a_tmp_file, $a_filename, $tmpdir . "/" . $a_filename);
+        // Unzip
+        $import_status_collection = $this->unzipFile(
+            $a_filename,
+            $a_tmp_file,
+            $a_copy_file
+        );
+        if ($import_status_collection->hasStatusType(StatusType::FAILED)) {
+            $msg = '';
+            foreach ($import_status_collection->getCollectionOfAllByType(StatusType::FAILED) as $failure) {
+                $msg .= "\n" . $failure->getContentBuilder()->contentToString();
+            }
+            throw new ilImportException($msg);
         }
+        $success_status = $import_status_collection->getCollectionOfAllByType(StatusType::ZIP_SUCCESS)->current();
+        $target_dir_info = new SplFileInfo($success_status->getContentBuilder()->contentToString());
+        $delete_dir_info = new SplFileInfo($target_dir_info->getPath());
 
-        $this->log->debug("unzip: " . $tmpdir . "/" . $a_filename);
-        ilFileUtils::unzip($tmpdir . "/" . $a_filename);
-        $dir = $tmpdir . "/" . substr($a_filename, 0, strlen($a_filename) - 4);
-        $this->setTemporaryImportDir($dir);
-        $this->log->debug("dir: " . $dir);
-        $ret = $this->doImportObject($dir, $a_type, $a_comp, $tmpdir);
+        // Import
+        $this->setTemporaryImportDir($target_dir_info->getRealPath());
+        $ret = $this->doImportObject($target_dir_info->getRealPath(), $a_type, $a_comp, $target_dir_info->getPath());
         $new_id = null;
         if (is_array($ret) && array_key_exists('new_id', $ret)) {
             $new_id = $ret['new_id'];
         }
-        // delete temporary directory
-        ilFileUtils::delDir($tmpdir);
+
+        // Delete tmp files
+        $this->filesystem->temp()->deleteDir($delete_dir_info->getFilename());
+
         return $new_id;
     }
 

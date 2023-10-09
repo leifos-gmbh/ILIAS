@@ -26,6 +26,7 @@ use ILIAS\MediaObjects\SubTitles\SubtitlesGUIRequest;
  */
 class ilObjMediaObjectGUI extends ilObjectGUI
 {
+    protected \ILIAS\MediaObjects\Video\GUIService $video_gui;
     protected ilFileServicesSettings $file_service_settings;
     protected SubtitlesGUIRequest $sub_title_request;
     protected ilPropertyFormGUI $form_gui;
@@ -85,6 +86,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 
         $lng->loadLanguageModule("mob");
         $this->file_service_settings = $DIC->fileServiceSettings();
+        $this->video_gui = $DIC->mediaObjects()->internal()->gui()->video();
     }
 
     /**
@@ -862,7 +864,10 @@ class ilObjMediaObjectGUI extends ilObjectGUI
         $tpl = $this->tpl;
 
         $this->setPropertiesSubTabs("general");
-
+        $this->video_gui->addPreviewExtractionToToolbar(
+            $this->object->getId(),
+            self::class
+        );
         $this->initForm("edit");
         $this->getValues();
         $tpl->setContent($this->form_gui->getHTML());

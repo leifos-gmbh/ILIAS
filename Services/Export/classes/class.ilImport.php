@@ -137,7 +137,7 @@ class ilImport
         $target_file_path_str = $tmp_dir_info->getRealPath() . "/" . $zip_file_name;
         $target_dir_path_str = substr($target_file_path_str, 0, -4);
 
-        // Copy uploaded file.
+        // Copy/move zip to tmp out directory
         // File is not uploaded with the ilias storage system, therefore the php copy functions are used.
         if (
             (
@@ -181,7 +181,7 @@ class ilImport
     final public function importObject(
         ?object $a_new_obj,
         string $a_tmp_file,
-        string $a_filename,
+        string $a_filename, // Verwerfen (sollte zip sein)
         string $a_type,
         string $a_comp = "",
         bool $a_copy_file = false
@@ -203,6 +203,22 @@ class ilImport
         $target_dir_info = new SplFileInfo($success_status->getContentBuilder()->contentToString());
         $delete_dir_info = new SplFileInfo($target_dir_info->getPath());
 
+        // (*1)
+        // new Validator()
+        // validator->validate(SplFileInfo(xml), SplFileInfo(xsd)) returns ImportStatusCollection
+        // 1696593631__0__crs_309.zip
+        // Bei fehler abbruch, fehler weiterreichen
+
+
+        // Parser
+        // validators = parser->parse(manifest)
+
+        // for each validate_files as validator : (*1)
+        // erst nach validieren ALLER gefundenen xml-componenten-dateien fehler weiterreichen + abbruch (falls fehler auftreten)
+
+        // Parse
+        // for each validate_files: parse
+
         // Import
         $this->setTemporaryImportDir($target_dir_info->getRealPath());
         $ret = $this->doImportObject($target_dir_info->getRealPath(), $a_type, $a_comp, $target_dir_info->getPath());
@@ -212,7 +228,7 @@ class ilImport
         }
 
         // Delete tmp files
-        $this->filesystem->temp()->deleteDir($delete_dir_info->getFilename());
+        // $this->filesystem->temp()->deleteDir($delete_dir_info->getFilename());
 
         return $new_id;
     }

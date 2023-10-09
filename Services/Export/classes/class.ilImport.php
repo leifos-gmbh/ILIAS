@@ -139,10 +139,20 @@ class ilImport
 
         // Copy uploaded file.
         // File is not uploaded with the ilias storage system, therefore the php copy functions are used.
-        if ($file_is_on_server) {
-            copy($path_to_tmp_upload, $target_file_path_str);
-        } else {
-            ilFileUtils::moveUploadedFile($path_to_tmp_upload, $zip_file_name, $target_file_path_str);
+        if (
+            (
+                $file_is_on_server &&
+                !copy($path_to_tmp_upload, $target_file_path_str)
+            ) || (
+                !$file_is_on_server &&
+                !ilFileUtils::moveUploadedFile($path_to_tmp_upload, $zip_file_name, $target_file_path_str)
+            )
+        ) {
+            return $import_status_collection->withAddedStatus(
+                (new ilImportStatus())
+                    ->withType(StatusType::FAILED)
+                    ->withContentBuilder(new ilImportStatusContentBuilderString('Could not move file.'))
+            );
         }
 
         /** @var Unzip $unzip **/

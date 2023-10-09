@@ -379,7 +379,9 @@ class ilObjMediaObjectGUI extends ilObjectGUI
             $this->form_gui->addItem($ta);
         }
 
-        $this->video_gui->addPreviewInput($this->form_gui, $this->object->getId());
+        if ($this->object) {
+            $this->video_gui->addPreviewInput($this->form_gui, $this->object->getId());
+        }
 
         // standard parameters
         if ($a_mode == "edit" &&

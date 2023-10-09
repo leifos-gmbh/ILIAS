@@ -103,8 +103,26 @@ class GUIService
         }
     }
 
+    protected function checkPreviewPossible(int $mob_id) : bool
+    {
+        if ($mob_id === 0) {
+            return false;
+        }
+        $mob = new \ilObjMediaObject($mob_id);
+        $med = $mob->getMediaItem("Standard");
+        if (is_object($med)) {
+            if (\ilFFmpeg::supportsImageExtraction($med->getFormat())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function addPreviewInput(\ilPropertyFormGUI $form, int $mob_id = 0) : void
     {
+        if (!$this->checkPreviewPossible($mob_id)) {
+            return;
+        }
         $lng = $this->domain_service->lng();
         $pp = new \ilImageFileInputGUI($lng->txt("mob_preview_picture"), "preview_pic");
         $pp->setSuffixes(array("png", "jpeg", "jpg"));
@@ -122,6 +140,9 @@ class GUIService
 
     public function savePreviewInput(\ilPropertyFormGUI $form, int $mob_id) : void
     {
+        if (!$this->checkPreviewPossible($mob_id)) {
+            return;
+        }
         $prevpic = $form->getInput("preview_pic");
         if ($prevpic["size"] > 0) {
             $mob = new \ilObjMediaObject($mob_id);

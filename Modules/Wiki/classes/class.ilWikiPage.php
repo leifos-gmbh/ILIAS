@@ -217,6 +217,7 @@ class ilWikiPage extends ilPageObject
             ilWikiUtil::sendNotification("update", ilNotification::TYPE_WIKI_PAGE, $this->getWikiRefId(), $this->getId());
 
             $this->log->debug("update news");
+            ilObjectSearch::raiseContentChanged($this->getWikiId());
             $this->updateNews(true);
         } else {
             return $updated;

@@ -1364,6 +1364,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
             0,
             $l
         );
+        $p2->setWikiRefId($this->getWikiRefId());
         $p2->setTitle($form->getData("title"));
         $p2->update();
         $this->ctrl->setParameter($this, "transl", $l);

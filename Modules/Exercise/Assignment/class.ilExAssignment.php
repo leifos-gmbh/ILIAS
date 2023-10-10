@@ -722,9 +722,31 @@ class ilExAssignment
         $this->setRelativeDeadline((int) $a_set["relative_deadline"]);
         $this->setRelDeadlineLastSubmission((int) $a_set["rel_deadline_last_subm"]);
         $rcid = $a_set["if_rcid"] ?? null;
+        if ($rcid === "") { // get new id, if we have an empty string here, see migration and #38167
+            $rcid = $this->createInstructionFilesIrssId()->serialize();
+        }
         if ($rcid !== null) {
             $this->instruction_file_rcid = $this->irss->collection()->id($rcid);
         }
+    }
+
+    /**
+     * @return ResourceCollectionIdentification
+     * @throws Exception
+     */
+    protected function createInstructionFilesIrssId(): ResourceCollectionIdentification
+    {
+        $rcid = $this->irss->collection()->id();
+        $this->db->update(
+            "exc_assignment",
+            [
+            "if_rcid" => ["text", $rcid->serialize()]
+        ],
+            [    // where
+                "id" => ["integer", $this->getId()]
+            ]
+        );
+        return $rcid;
     }
 
     /**

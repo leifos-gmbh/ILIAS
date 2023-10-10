@@ -59,7 +59,7 @@ class ilExerciseInstructionFilesMigration implements Migration
     {
         $db = $this->helper->getDatabase();
         $r = $this->helper->getDatabase()->query(
-            "SELECT id, exc_id, owner FROM exc_assignment JOIN object_data ON exc_id = obj_id WHERE if_rcid IS NULL OR if_rcid = '' LIMIT 1;"
+            "SELECT id, exc_id, owner FROM exc_assignment JOIN object_data ON exc_id = obj_id WHERE if_rcid IS NULL LIMIT 1;"
         );
         $d = $this->helper->getDatabase()->fetchObject($r);
         $exec_id = (int)$d->exc_id;
@@ -73,7 +73,7 @@ class ilExerciseInstructionFilesMigration implements Migration
         $this->helper->getDatabase()->update(
             'exc_assignment',
             [
-                'if_rcid' => ['text', $collection_id]
+                'if_rcid' => ['text', (string) $collection_id]
             ],
             [
                 'id' => ['integer', $assignment_id],
@@ -85,7 +85,7 @@ class ilExerciseInstructionFilesMigration implements Migration
     public function getRemainingAmountOfSteps(): int
     {
         $r = $this->helper->getDatabase()->query(
-            "SELECT count(id) AS amount FROM exc_assignment WHERE if_rcid IS NULL OR if_rcid = ''"
+            "SELECT count(id) AS amount FROM exc_assignment WHERE if_rcid IS NULL "
         );
         $d = $this->helper->getDatabase()->fetchObject($r);
 

@@ -911,9 +911,11 @@ class ilExAssignmentEditorGUI
         }
 
         // Create Collection ID
-        $rcid = $this->irss->collection()->id();
-        $a_ass->setInstructionFileRCID($rcid);
-        $a_ass->update();
+        if ($is_create) {
+            $rcid = $this->irss->collection()->id();
+            $a_ass->setInstructionFileRCID($rcid);
+            $a_ass->update();
+        }
 
         // id needed for file handling
         if ($is_create) {

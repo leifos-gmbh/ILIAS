@@ -23,25 +23,22 @@
 package de.ilias.services.lucene.search;
 
 import de.ilias.services.lucene.index.IndexDirectoryFactory;
-import java.io.IOException;
-import java.util.HashMap;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.lucene.search.IndexSearcher;
-
 import de.ilias.services.lucene.index.IndexHolder;
 import de.ilias.services.settings.ClientSettings;
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.LocalSettings;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 
+import java.io.IOException;
+import java.util.HashMap;
+
 /**
- * 
- *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
  * @version $Id$
  */
@@ -56,13 +53,6 @@ public class SearchHolder {
 	private IndexSearcher searcher = null;
 
 	
-	/**
-	 * @param indexPath
-	 * @param indexType
-	 * @throws ConfigurationException 
-	 * @throws IOException 
-	 * @throws IOException 
-	 */
 	private SearchHolder() throws ConfigurationException, IOException {
 		
 		init();
@@ -98,14 +88,7 @@ public class SearchHolder {
 		searcher = new IndexSearcher(reader);
 	}
 
-	/**
-	 * 
-	 * @param clientKey
-	 * @return
-	 * @throws IOException
-	 * @throws ConfigurationException 
-	 */
-	public static synchronized SearchHolder getInstance(String clientKey) throws 
+	public static synchronized SearchHolder getInstance(String clientKey) throws
 		IOException, ConfigurationException { 
 		
 		String hash = clientKey;
@@ -117,22 +100,11 @@ public class SearchHolder {
 		return instances.get(hash);
 	}
 	
-	/**
-	 * 
-	 * @param indexType
-	 * @return
-	 * @throws IOException 
-	 * @throws IOException
-	 * @throws ConfigurationException 
-	 */
 	public static synchronized SearchHolder getInstance() throws IOException, ConfigurationException {
 		
 		return getInstance(LocalSettings.getClientKey());
 	}
 
-	/**
-	 * @return the searcher
-	 */
 	public IndexSearcher getSearcher() {
 		return searcher;
 	}

@@ -114,11 +114,7 @@ public class DocumentHolder {
 	}
 	
 	/**
-	 * @param String name
-	 * @param String value
-	 * @param Field.Store store
-	 * @param boolean index
-	 */
+     */
 	public void add(String name, String value,boolean isGlobal,Field.Store store, boolean indexed) {
 		
 		if(indexed) {

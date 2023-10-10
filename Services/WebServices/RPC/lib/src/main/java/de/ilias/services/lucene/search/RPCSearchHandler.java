@@ -22,36 +22,28 @@
 
 package de.ilias.services.lucene.search;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Vector;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.BooleanClause.Occur;
-
 import de.ilias.services.lucene.index.FieldInfo;
 import de.ilias.services.lucene.index.FieldInfoUser;
 import de.ilias.services.lucene.search.highlight.HitHighlighter;
+import de.ilias.services.lucene.settings.LuceneSettings;
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.LocalSettings;
-
-import de.ilias.services.lucene.settings.*;
-import java.sql.SQLException;
-import java.util.logging.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser.Operator;
-import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.Vector;
 
 /**
  * 
@@ -60,6 +52,8 @@ import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
  * @version $Id$
  */
 public class RPCSearchHandler {
+
+	private static final int topDocsCount = 1000;
 
 	Logger logger = LogManager.getLogger(RPCSearchHandler.class);
 	
@@ -73,11 +67,6 @@ public class RPCSearchHandler {
 	/**
 	 * Multi field searcher
 	 * Searches in all defined fields.
-	 * @todo allow configuration of searchable fields.
-	 * 
-	 * 
-	 * @param clientKey
-	 * @param query
 	 */
 	public String search(String clientKey, String queryString,int pageNumber) {
 
@@ -120,10 +109,10 @@ public class RPCSearchHandler {
 			else {
 				multiParser.setDefaultOperator(Operator.OR);
 			}
-				
-			BooleanQuery.setMaxClauseCount(10000);
+
+			IndexSearcher.setMaxClauseCount(10000);
 			BooleanQuery query = (BooleanQuery) multiParser.parse(rewrittenQuery);
-			logger.info("Max clauses allowed: " + BooleanQuery.getMaxClauseCount());
+			logger.info("Max clauses allowed: " + IndexSearcher.getMaxClauseCount());
 			
 			//BooleanQuery query = (BooleanQuery) MultiFieldQueryParser.parse(rewrittenQuery,
 			//		fieldInfo.getFieldsAsStringArray(),
@@ -131,10 +120,13 @@ public class RPCSearchHandler {
 			//		new StandardAnalyzer());
 
 			
-			for(Object f : fieldInfo.getFields()) {
-				logger.info(((String) f));
+			for(String f : fieldInfo.getFields()) {
+				logger.info(f);
 			}
-			TopScoreDocCollector collector = TopScoreDocCollector.create(1000);
+			TopScoreDocCollector collector = TopScoreDocCollector.create(
+					RPCSearchHandler.topDocsCount,
+					RPCSearchHandler.topDocsCount
+			);
 			long s_start = new java.util.Date().getTime();
 			searcher.search(query,collector);
 			long s_end = new java.util.Date().getTime();
@@ -171,12 +163,6 @@ public class RPCSearchHandler {
 	}
 	
 	
-	/**
-	 * Search for users
-	 * @param clientKey
-	 * @param queryString
-	 * @return 
-	 */
 	public String searchUsers(String clientKey, String queryString) {
 		
 		LuceneSettings luceneSettings;
@@ -218,12 +204,15 @@ public class RPCSearchHandler {
 				multiParser.setDefaultOperator(Operator.OR);
 			}
 				
-			BooleanQuery.setMaxClauseCount(10000);
+			IndexSearcher.setMaxClauseCount(10000);
 			BooleanQuery query = (BooleanQuery) multiParser.parse(rewrittenQuery);
-			logger.info("Max clauses allowed: " + BooleanQuery.getMaxClauseCount());
+			logger.info("Max clauses allowed: " + IndexSearcher.getMaxClauseCount());
 			
 			logger.info("Rewritten query is: " + query.toString());
-			TopScoreDocCollector collector = TopScoreDocCollector.create(1000);
+			TopScoreDocCollector collector = TopScoreDocCollector.create(
+					RPCSearchHandler.topDocsCount,
+					RPCSearchHandler.topDocsCount
+			);
 			searcher.search(query,collector);
 			ScoreDoc[] hits = collector.topDocs().scoreDocs;
  
@@ -237,42 +226,16 @@ public class RPCSearchHandler {
 			logger.info("Total time: " + (end - start));
 			return hh.toXML();
 		}
-		catch(IOException e) {
+		catch(IOException | ConfigurationException | ParseException | SQLException | InvalidTokenOffsetsException e) {
 			StringWriter writer = new StringWriter();
 			e.printStackTrace(new PrintWriter(writer));
 			logger.fatal(writer.toString());
 		}
-		catch(ConfigurationException e) {
-			StringWriter writer = new StringWriter();
-			e.printStackTrace(new PrintWriter(writer));
-			logger.fatal(writer.toString());
-		}
-		catch(ParseException  e) {
-			StringWriter writer = new StringWriter();
-			e.printStackTrace(new PrintWriter(writer));
-			logger.fatal(writer.toString());
-		}
-		catch(SQLException e) {
-			StringWriter writer = new StringWriter();
-			e.printStackTrace(new PrintWriter(writer));
-			logger.fatal(writer.toString());
-		} 
-		catch (InvalidTokenOffsetsException ex) {
-			StringWriter writer = new StringWriter();
-			ex.printStackTrace(new PrintWriter(writer));
-			logger.fatal(writer.toString());
-		}
-		
-		
-		return "";
+
+
+        return "";
 	}
 
-	/**
-	 * 
-	 * @param clientKey
-	 * @param objIds
-	 * @return
-	 */
 	public String highlight(String clientKey, Vector<Integer> objIds, String queryString) {
 
 		LuceneSettings luceneSettings;
@@ -319,7 +282,10 @@ public class RPCSearchHandler {
 			logger.info("What occurs" + occurs);
 			logger.info("Rewritten query is: " + query.toString());
 			
-			TopScoreDocCollector collector = TopScoreDocCollector.create(1000);
+			TopScoreDocCollector collector = TopScoreDocCollector.create(
+					RPCSearchHandler.topDocsCount,
+					RPCSearchHandler.topDocsCount
+			);
 			searcher.search(query,collector);
 			ScoreDoc[] hits = collector.topDocs().scoreDocs;
 			
@@ -356,14 +322,6 @@ public class RPCSearchHandler {
 		return "";
 	}
 	
-	/**
-	 * Search for mails
-	 * @param clientKey
-	 * @param userId
-	 * @param query
-	 * @param folderId
-	 * @return 
-	 */
 	public String searchMail(String clientKey, int userId, String queryString, int folderId) {
 		
 		LocalSettings.setClientKey(clientKey);
@@ -398,7 +356,10 @@ public class RPCSearchHandler {
 			);
 
 			logger.info("Rewritten query is: " + query.toString());
-			TopScoreDocCollector collector = TopScoreDocCollector.create(500);
+			TopScoreDocCollector collector = TopScoreDocCollector.create(
+					RPCSearchHandler.topDocsCount,
+					RPCSearchHandler.topDocsCount
+			);
 			
 			searcher.search(query,collector);
 			ScoreDoc[] hits = collector.topDocs().scoreDocs;

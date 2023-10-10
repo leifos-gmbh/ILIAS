@@ -142,8 +142,7 @@ public class FieldDefinition {
 
 
 	/**
-	 * @param index the index to set
-	 */
+     */
 	public void setIndexType(int type) {
 		this.indexType = type;
 	}
@@ -374,7 +373,6 @@ public class FieldDefinition {
 
 	
 	/**
-	 * @param string
 	 * @return
 	 */
 	private String callTransformers(String value) {

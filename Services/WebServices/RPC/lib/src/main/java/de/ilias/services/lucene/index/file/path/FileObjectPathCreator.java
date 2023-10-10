@@ -74,8 +74,7 @@ public class FileObjectPathCreator implements PathCreator {
 	
 	
 	/**
-	 * @see de.ilias.services.lucene.index.file.path.PathCreator#buildPath(de.ilias.services.lucene.index.CommandQueueElement, java.sql.ResultSet)
-	 */
+     */
 	public File buildFile(CommandQueueElement el, ResultSet res)
 			throws PathCreatorException {
 

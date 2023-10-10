@@ -79,12 +79,7 @@ public class CommandController {
 	private final IndexHolder holder;
 	
 	/**
-	 * @throws SQLException 
-	 * @throws ConfigurationException 
-	 * @throws IOException 
-	 * @throws LockObtainFailedException 
-	 * @throws CorruptIndexException 
-	 * 
+     *
 	 */
 	private CommandController(ObjectDefinitions objDefinitions) throws 
 		SQLException,
@@ -104,12 +99,7 @@ public class CommandController {
 	}
 	
 	/**
-	 * @throws ConfigurationException 
-	 * @throws IOException 
-	 * @throws SQLException 
-	 * @throws LockObtainFailedException 
-	 * @throws CorruptIndexException 
-	 * 
+     *
 	 */
 	public CommandController() 
 	throws CorruptIndexException, LockObtainFailedException, SQLException, IOException, ConfigurationException {
@@ -120,14 +110,8 @@ public class CommandController {
 	}
 
 	/**
-	 * 
-	 * @return
-	 * @throws CorruptIndexException
-	 * @throws LockObtainFailedException
-	 * @throws SQLException
-	 * @throws IOException
-	 * @throws ConfigurationException
-	 */
+	 *
+     */
 	public static CommandController getInstance() {
 		
 		try {
@@ -158,8 +142,7 @@ public class CommandController {
 	
 	/**
 	 * Init command queue for new index
-	 * @throws SQLException
-	 */
+     */
 	public void initCreate() throws SQLException {
 	
 		queue.deleteAll();
@@ -177,9 +160,7 @@ public class CommandController {
 
 	/**
 	 * Load queue elements from given obj ids list
-	 * @param objIds
-	 * @throws SQLException 
-	 */
+     */
 	public void initObjects(Vector<Integer> objIds)  throws SQLException {
 		
 		queue.loadFromObjectList(objIds);
@@ -269,8 +250,7 @@ public class CommandController {
 	}
 
 	/**
-	 * @param finished
-	 */
+     */
 	public synchronized boolean writeToIndex() {
 
 		try {
@@ -341,11 +321,7 @@ public class CommandController {
 	
 
 	/**
-	 * @param el
-	 * @throws CorruptIndexException 
-	 * @throws ObjectDefinitionException 
-	 * @throws DocumentHandlerException 
-	 */
+     */
 	private void addDocument(CommandQueueElement el) throws CorruptIndexException, ObjectDefinitionException {
 
 		ObjectDefinition definition;
@@ -364,10 +340,7 @@ public class CommandController {
 	}
 
 	/**
-	 * @param el
-	 * @throws IOException 
-	 * @throws CorruptIndexException 
-	 */
+     */
 	private void deleteDocument(CommandQueueElement el) throws CorruptIndexException, IOException {
 
 		logger.debug("Deleteing document with objId: " + el.getObjId());

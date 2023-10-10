@@ -113,9 +113,6 @@ public class DBFactory {
 	
 	/**
 	 * get singleton db connection for each url
-	 * @param url
-	 * @param user
-	 * @param pass
 	 * @return Connection
 	 * @throws SQLException 
 	 */

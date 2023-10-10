@@ -216,7 +216,6 @@ public class ObjectDefinitionParser {
 	}
 
 	/**
-	 * @param document
 	 * @return
 	 * @throws ObjectDefinitionException 
 	 */

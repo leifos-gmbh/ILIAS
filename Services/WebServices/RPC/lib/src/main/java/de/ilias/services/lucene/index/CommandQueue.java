@@ -43,7 +43,7 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
- * @todo make this class thread safe 
+ * {@code @todo} make this class thread safe
  *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
  * @version $Id$
@@ -57,8 +57,7 @@ public class CommandQueue {
 	private int currentIndex = 0;
 	
 	/**
-	 * @throws SQLException 
-	 * 
+     *
 	 */
 	public CommandQueue() throws SQLException {
 
@@ -68,8 +67,7 @@ public class CommandQueue {
 	
 	/**
 	 * 
-	 * @param el
-	 * @throws SQLException, IllegalArgumentException 
+	 * @throws SQLException, IllegalArgumentException
 	 */
 	public void setFinished(CommandQueueElement el) throws SQLException, IllegalArgumentException {
 		
@@ -93,10 +91,8 @@ public class CommandQueue {
 	}
 	
 	/**
-	 * 
-	 * @param objIds
-	 * @throws SQLException
-	 */
+	 *
+     */
 	public void setFinished(Vector<Integer> objIds) throws SQLException {
 		
 		if(objIds.size() == 0) {
@@ -114,8 +110,7 @@ public class CommandQueue {
 
 
 	/**
-	 * @throws SQLException 
-	 * 
+     *
 	 */
 	public synchronized void loadFromDb() throws SQLException {
 
@@ -160,9 +155,8 @@ public class CommandQueue {
 	
 	
 	/**
-	 * 
-	 * @param objIds 
-	 */
+	 *
+     */
 	public synchronized void loadFromObjectList(Vector<Integer> objIds) throws SQLException {
 		
 		
@@ -204,8 +198,7 @@ public class CommandQueue {
 
 
 	/**
-	 * @throws SQLException 
-	 * 
+     *
 	 */
 	private synchronized void substituteResetCommands() throws SQLException {
 
@@ -238,8 +231,7 @@ public class CommandQueue {
 	}
 
 	/**
-	 * @param string
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	private synchronized void deleteResetCommandByType(String objType) throws SQLException {
 
@@ -260,8 +252,7 @@ public class CommandQueue {
 	}
 
 	/**
-	 * @param string
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public synchronized void deleteCommandsByType(String objType) throws SQLException {
 
@@ -281,8 +272,7 @@ public class CommandQueue {
 	}
 
 	/**
-	 * @param string
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	private synchronized void addCommandsByType(String objType) throws SQLException {
 
@@ -385,8 +375,7 @@ public class CommandQueue {
 	/**
 	 * 
 	 * @param type
-	 * @throws SQLException 
-	 */
+     */
 	public synchronized void debug(String type) throws SQLException {
 		
 		PreparedStatement resetType = DBFactory.getPreparedStatement(
@@ -410,8 +399,7 @@ public class CommandQueue {
 
 	/**
 	 * Delete and add all types
-	 * @throws SQLException 
-	 */
+     */
 	public synchronized void addAll() throws SQLException {
 		
 		try {
@@ -461,8 +449,7 @@ public class CommandQueue {
 	
 	/**
 	 * Delete command queue
-	 * @throws SQLException
-	 */
+     */
 	public synchronized void deleteAll() throws SQLException {
 		
 		logger.info("Deleting search_command_queue");
@@ -481,9 +468,7 @@ public class CommandQueue {
 
 	/**
 	 * Delete non incremental search command queue elements
-	 * @throws java.sql.SQLException
-	 * @throws de.ilias.services.settings.ConfigurationException
-	 */
+     */
 	public synchronized void deleteNonIncremental()  throws SQLException, ConfigurationException {
 
 		try {
@@ -509,9 +494,7 @@ public class CommandQueue {
 
 	/**
 	 * Add non incremental search command queue elements
-	 * @throws java.sql.SQLException
-	 * @throws de.ilias.services.settings.ConfigurationException
-	 */
+     */
 	public synchronized void addNonIncremental() throws SQLException, ConfigurationException {
 
 		try {

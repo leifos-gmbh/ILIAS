@@ -22,13 +22,13 @@
 
 package de.ilias.services.settings;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * A singleton for each client configuration 
@@ -57,12 +57,6 @@ public class ClientSettings {
 	private String dbUser;
 	private String dbPass;
 	
-	
-
-	/**
-	 * @param string
-	 * @param string2
-	 */
 	public ClientSettings(String client, String nic) {
 		
 		this.client = client;
@@ -95,19 +89,11 @@ public class ClientSettings {
 		return instances.get(clientKey);
 	}
 	
-	/**
-	 * @param string
-	 * @return
-	 */
 	public static boolean exists(String clientKey) {
 
 		return instances.containsKey(clientKey);
 	}
 
-	/**
-	 * get all clients
-	 * @return
-	 */
 	public static ArrayList<String> getClients() {
 
 		ArrayList<String> clients = new ArrayList<String>();
@@ -167,8 +153,7 @@ public class ClientSettings {
 
 	/**
 	 * @param dataDirectory the dataDirectory to set
-	 * @throws ConfigurationException 
-	 */
+     */
 	public void setDataDirectory(String dataDirectory) throws ConfigurationException {
 
 		logger.debug("ILIAS data directory: " + dataDirectory);
@@ -188,8 +173,7 @@ public class ClientSettings {
 
 	/**
 	 * @param absolutePath the absolutePath to set
-	 * @throws ConfigurationException 
-	 */
+     */
 	public void setAbsolutePath(String absolutePath) throws ConfigurationException {
 		
 		logger.debug("ILIAS absolute path: " + absolutePath);
@@ -209,9 +193,7 @@ public class ClientSettings {
 	}
 
 	/**
-	 * @param the clientIniFile to set
-	 * @throws ConfigurationException 
-	 */
+     */
 	public void setClientIniFile(String clientIniPath) throws ConfigurationException {
 		
 		this.clientIniFile = new File(clientIniPath);
@@ -225,8 +207,7 @@ public class ClientSettings {
 
 	/**
 	 * @param iliasIniFile the iliasIniFile to set
-	 * @throws ConfigurationException 
-	 */
+     */
 	public void setIliasIniFile(String iliasIniFile) throws ConfigurationException {
 		
 		this.iliasIniFile = new File(iliasIniFile);
@@ -268,8 +249,7 @@ public class ClientSettings {
 
 	/**
 	 * get db url
-	 * @return
-	 */
+     */
 	public String getDbUrl() {
 
 		if(getDbType().equalsIgnoreCase("mysql") || getDbType().equalsIgnoreCase("innodb")) {
@@ -385,16 +365,14 @@ public class ClientSettings {
 
 	/**
 	 * set Db port
-	 * @param purgeString
-	 */
+     */
 	public void setDbPort(String purgeString) {
 		this.dbPort = purgeString;
 	}
 	
 	/**
 	 * get db port
-	 * @return
-	 */
+     */
 	public String getDbPort() {
 		return this.dbPort;
 	}

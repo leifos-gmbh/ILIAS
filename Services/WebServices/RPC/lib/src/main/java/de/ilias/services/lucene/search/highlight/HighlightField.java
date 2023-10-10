@@ -81,8 +81,7 @@ public class HighlightField implements ResultExport {
 
 	/**
 	 * Add xml
-	 * @see de.ilias.services.lucene.search.highlight.HighlightResultExport#addXML(org.jdom2.Element)
-	 */
+     */
 	public Element addXML() {
 
 		Element field = new Element("Field");

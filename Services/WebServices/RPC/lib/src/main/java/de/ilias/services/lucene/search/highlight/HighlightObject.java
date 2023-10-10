@@ -91,8 +91,7 @@ public class HighlightObject implements ResultExport, Comparator {
 
 	/**
 	 * Add xml
-	 * @see de.ilias.services.lucene.search.highlight.HighlightResultExport#addXML(org.jdom2.Element)
-	 */
+     */
 	public Element addXML() {
 
 		Element obj = new Element("Object");

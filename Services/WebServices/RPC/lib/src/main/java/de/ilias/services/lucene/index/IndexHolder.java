@@ -57,9 +57,7 @@ public class IndexHolder {
 	
 
 	/**
-	 * @param indexPath
-	 * @param indexType
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private IndexHolder(String clientKey) throws IOException {
 
@@ -92,7 +90,6 @@ public class IndexHolder {
 	
 	/**
 	 * 
-	 * @param indexType
 	 * @return
 	 * @throws IOException
 	 */

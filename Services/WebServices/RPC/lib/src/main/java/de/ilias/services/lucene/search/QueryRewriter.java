@@ -52,8 +52,7 @@ public class QueryRewriter {
 	
 	
 	/**
-	 * @param String query
-	 */
+     */
 	public QueryRewriter(int mode, String query) {
 
 		this.query = query;

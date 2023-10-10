@@ -62,8 +62,7 @@ public class ServerSettings {
 
 
 	/**
-	 * @param properties
-	 */
+     */
 	private ServerSettings() {
 
 	}

@@ -65,12 +65,12 @@ class WeekGridGUI
             $start = sprintf('%02d:00', $i);
             if ($this->day_start > 0 && $i === $this->day_start) {
                 $start = sprintf('%02d:00', 0);
-                $end = sprintf('%02d:00', $i);
+                $end = sprintf('%02d:00', $i + 1);
             } else {
                 $end = sprintf('%02d:00', $i + 1);
             }
             if ($this->day_end < 23 && $i === $this->day_end) {
-                $end = sprintf('%02d:00', 23);
+                $end = sprintf('%02d:00', 23 + 1);
             }
             switch ($this->time_format) {
                 case \ilCalendarSettings::TIME_FORMAT_12:

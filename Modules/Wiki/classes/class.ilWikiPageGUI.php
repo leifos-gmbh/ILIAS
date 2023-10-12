@@ -511,7 +511,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
             }
             $this->ctrl->setParameterByClass(self::class, "transl", $this->requested_transl);
             $this->ctrl->setParameterByClass(self::class, "totransl", null);
-            if (count($actions) > 1) {
+            if (count($actions) > 0) {
                 $dd = $f->dropdown()->standard($actions)
                     ->withLabel($this->getLanguageLabelForCode($this->getCurrentLanguage()));
                 $toolbar->addComponent($dd);

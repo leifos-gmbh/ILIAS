@@ -32,6 +32,8 @@ use ILIAS\Services\ResourceStorage\Collections\View\Mode;
  */
 class ilExAssignmentEditorGUI
 {
+    protected \ILIAS\Exercise\InternalDomainService $domain;
+    protected \ILIAS\Exercise\InstructionFile\InstructionFileManager $instruction_files;
     protected ?int $ref_id = null;
     protected ilAccessHandler $access;
     protected \ILIAS\Exercise\InternalGUIService $gui;
@@ -92,10 +94,10 @@ class ilExAssignmentEditorGUI
         $this->random_manager = $DIC->exercise()->internal()->domain()->assignment()->randomAssignments(
             $request->getExercise()
         );
+        $this->domain = $DIC->exercise()->internal()->domain();
         $this->requested_ass_ids = $request->getAssignmentIds();
         $this->requested_order = $request->getOrder();
         $this->irss = $DIC->resourceStorage();
-        $this->upload = $DIC->upload();
         $this->access = $DIC->access();
         $this->ref_id = $DIC->http()->wrapper()->query()->has('ref_id')
             ? $DIC->http()->wrapper()->query()->retrieve(
@@ -910,42 +912,13 @@ class ilExAssignmentEditorGUI
             $a_ass->setFeedbackDateCustom((int) $a_input["fb_date_custom"]);
         }
 
-        // Create Collection ID
-        $rcid = $this->irss->collection()->id();
-        $a_ass->setInstructionFileRCID($rcid);
-        $a_ass->update();
-
         // id needed for file handling
         if ($is_create) {
             $a_ass->save();
 
             // #15994 - assignment files
             if (is_array($a_input["files"])) {
-                if (!$this->upload->hasBeenProcessed()) {
-                    $this->upload->process();
-                }
-                $stakeholder = new ilExcInstructionFilesStakeholder();
-                $collection = $this->irss->collection()->get($rcid);
-
-                foreach ($this->upload->getResults() as $name => $result) {
-                    // we must check if these are files from this input
-                    if (!in_array($name, $a_input["files"]["tmp_name"] ?? [], true)) {
-                        continue;
-                    }
-                    // if the result is not OK, we skip it
-                    if (!$result->isOK()) {
-                        continue;
-                    }
-                    // we store the file in the IRSS
-                    $rid = $this->irss->manage()->upload(
-                        $result,
-                        $stakeholder
-                    );
-                    // and add its identification to the collection
-                    $collection->add($rid);
-                }
-                // we store the collection after all files have been added
-                $this->irss->collection()->store($collection);
+                $this->domain->assignment()->instructionFiles($a_ass->getId())->importFromLegacyUpload($a_input["files"]);
             }
         } else {
             // remove global feedback file?

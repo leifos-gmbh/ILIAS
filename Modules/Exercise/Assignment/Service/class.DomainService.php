@@ -22,6 +22,7 @@ namespace ILIAS\Exercise\Assignment;
 
 use ILIAS\Exercise\InternalRepoService;
 use ILIAS\Exercise\InternalDomainService;
+use ILIAS\Exercise\InstructionFile\InstructionFileManager;
 
 /**
  * Assignments domain service
@@ -73,5 +74,15 @@ class DomainService
                 new Mandatory\MandatoryAssignmentsManager($exercise, $this->randomAssignments($exercise));
         }
         return self::$managers[Mandatory\MandatoryAssignmentsManager::class][$exercise->getId()];
+    }
+
+    public function instructionFiles(int $ass_id): InstructionFileManager
+    {
+        $stakeholder = new \ilExcInstructionFilesStakeholder();
+        return new InstructionFileManager(
+            $ass_id,
+            $this->repo_service->instructionFiles(),
+            $stakeholder
+        );
     }
 }

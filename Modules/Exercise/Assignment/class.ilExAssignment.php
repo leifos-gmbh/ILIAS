@@ -122,6 +122,7 @@ class ilExAssignment
         $this->app_event_handler = $DIC["ilAppEventHandler"];
         $this->types = ilExAssignmentTypes::getInstance();
         $this->access = $DIC->access();
+        $this->domain = $DIC->exercise()->internal()->domain();
 
         $this->setType(self::TYPE_UPLOAD);
         $this->setFeedbackDate(self::FEEDBACK_DATE_DEADLINE);
@@ -775,12 +776,14 @@ class ilExAssignment
             "max_char_limit" => array("integer", $this->getMaxCharLimit()),
             "relative_deadline" => array("integer", $this->getRelativeDeadline()),
             "rel_deadline_last_subm" => array("integer", $this->getRelDeadlineLastSubmission()),
-            "deadline_mode" => array("integer", $this->getDeadlineMode()),
-            "if_rcid" => array("text", $this->instruction_file_rcid ? $this->instruction_file_rcid->serialize() : null)
+            "deadline_mode" => array("integer", $this->getDeadlineMode())
             ));
         $this->setId($next_id);
         $exc = new ilObjExercise($this->getExerciseId(), false);
         $exc->updateAllUsersStatus();
+
+        $this->domain->assignment()->instructionFiles($next_id)->createCollection();
+
         self::createNewAssignmentRecords($next_id, $exc);
 
         $this->handleCalendarEntries("create");
@@ -827,8 +830,7 @@ class ilExAssignment
             "max_char_limit" => array("integer", $this->getMaxCharLimit()),
             "deadline_mode" => array("integer", $this->getDeadlineMode()),
             "relative_deadline" => array("integer", $this->getRelativeDeadline()),
-            "rel_deadline_last_subm" => array("integer", $this->getRelDeadlineLastSubmission()),
-            "if_rcid" => array("text", $this->instruction_file_rcid ? $this->instruction_file_rcid->serialize() : null),
+            "rel_deadline_last_subm" => array("integer", $this->getRelDeadlineLastSubmission())
             ),
             array(
             "id" => array("integer", $this->getId()),

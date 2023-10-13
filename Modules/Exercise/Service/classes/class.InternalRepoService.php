@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\Exercise;
 
+use ILIAS\Exercise\IRSS\CollectionWrapper;
+use ILIAS\Exercise\InstructionFile\InstructionFileRepository;
+
 /**
  * Internal repo factory
  * @author Alexander Killing <killing@leifos.de>
@@ -35,6 +38,7 @@ class InternalRepoService
         $this->data = $data;
         $this->db = $db;
         $this->submission_repo = new Submission\SubmissionDBRepository($db);
+        $this->collection_wrapper = new CollectionWrapper();
     }
 
     public function assignment(): Assignment\RepoService
@@ -48,5 +52,13 @@ class InternalRepoService
     public function submission(): Submission\SubmissionRepositoryInterface
     {
         return $this->submission_repo;
+    }
+
+    public function instructionFiles(): InstructionFileRepository
+    {
+        return new InstructionFileRepository(
+            $this->collection_wrapper,
+            $this->db
+        );
     }
 }

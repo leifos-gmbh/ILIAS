@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace ILIAS\Exercise;
 
+use ILIAS\Exercise\InstructionFile\InstructionFileManager;
+
 /**
  * Exercise domain service (business logic)
  * @author Alexander Killing <killing@leifos.de>

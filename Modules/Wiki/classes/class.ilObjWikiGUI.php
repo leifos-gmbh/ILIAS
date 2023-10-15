@@ -1352,6 +1352,17 @@ class ilObjWikiGUI extends ilObjectGUI
             ilWikiUtil::makeDbTitle($page),
             $this->edit_request->getTranslation()))
         {
+            $this->tabs_gui->clearTargets();
+            $this->tabs_gui->setBackTarget(
+                $this->lng->txt("back"),
+                $this->pm->getPermaLink(
+                    $this->pm->getPageIdForTitle(
+                        $this->edit_request->getFromPage(),
+                        $this->edit_request->getTranslation()
+                    ),
+                    $this->edit_request->getTranslation()
+                )
+            );
             $form = $this->getNewTranslatedPageForm();
             $this->tpl->setContent($this->getRenderedTranslationInfo() . $form->render());
             return true;

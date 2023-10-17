@@ -112,6 +112,14 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
             $this->filter["obj_type"] = "prtf";
         }
 
+        // see #38253
+        if ((isset($this->filter["user"]) && $this->filter["user"] !== "") ||
+            (isset($this->filter["title"]) && $this->filter["title"] !== "") ||
+            (isset($this->filter["acl_type"]) && $this->filter["acl_type"] !== "") ||
+            (isset($this->filter["acl_date"]) && $this->filter["acl_date"] !== "")) {
+            $a_load_data = true;
+        }
+
         // incoming request:  check for validity
         if ($a_load_data) {
             /*
@@ -128,7 +136,7 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
             $this->importData();
             return;
         } else {
-            $main_tpl->setOnScreenMessage('info', $lng->txt("wsp_shared_mandatory_filter_info"));
+            //$main_tpl->setOnScreenMessage('info', $lng->txt("wsp_shared_mandatory_filter_info"));
         }
 
         // initial state: show filters only

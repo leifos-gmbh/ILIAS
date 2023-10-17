@@ -580,9 +580,7 @@ class ilPortfolioRepositoryGUI
     ): void {
         $tpl = $this->tpl;
         $ilTabs = $this->tabs;
-
         $ilTabs->activateTab("otpf");
-
         $tbl = new ilWorkspaceShareTableGUI($this, "showOther", $this->getWorkspaceAccess(), null, $a_load_data);
         $tpl->setContent($tbl->getHTML());
     }
@@ -602,7 +600,7 @@ class ilPortfolioRepositoryGUI
         $tbl->resetOffset();
         $tbl->resetFilter();
 
-        $this->showOther();
+        $this->showOther(false);
     }
 
     public function redirectSendMailToSharer(): void

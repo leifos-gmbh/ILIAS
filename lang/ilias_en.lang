@@ -12955,7 +12955,7 @@ prtf#:#prtf_pages_copied#:#The pages have been copied.
 prtf#:#prtf_permanent_link#:#Link to Portfolio:
 prtf#:#prtf_pdf#:#Export as PDF
 prtf#:#prtf_portfolio_created#:#Portfolio added
-prtf#:#prtf_portfolio_created_from_template#:#This is the preview of your new portfolio. To add pages and manage the content of the portfolio click on "Edit Portfolio" on top of this page.
+prtf#:#prtf_portfolio_created_from_template#:#This is the preview of your new portfolio. To add new pages, please click "Edit Portfolio". To edit this page, please click "Edit Page".
 prtf#:#prtf_portfolio_deleted#:#Portfolio deleted
 prtf#:#prtf_portfolio_page_deleted#:#Portfolio / blog page deleted.
 prtf#:#prtf_portfolios#:#Portfolios

@@ -249,11 +249,13 @@ class ilParticipantsPerAssignmentTableGUI extends ilExerciseSubmissionTableGUI
                     }
                 }
 
-                if (array_key_exists($item["usr_id"], $idl)) {
-                    $data[$idx]["idl"] = $idl[$item["usr_id"]];
-                }
+                if (isset($data[$idx])) {
+                    if (array_key_exists($item["usr_id"], $idl)) {
+                        $data[$idx]["idl"] = $idl[$item["usr_id"]];
+                    }
 
-                $data[$idx]["requested_idl"] = array_key_exists($item["usr_id"], $rdl);
+                    $data[$idx]["requested_idl"] = array_key_exists($item["usr_id"], $rdl);
+                }
 
                 if (isset($calc_deadline["user"][$item["usr_id"]])) {
                     $data[$idx]["calc_deadline"] = $calc_deadline["user"][$item["usr_id"]]["calculated_deadline"];

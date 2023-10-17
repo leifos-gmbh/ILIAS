@@ -10915,7 +10915,7 @@ mail#:#mail_maxsize_attachment_error#:#Die maximale Dateigröße beträgt:
 mail#:#mail_member_notification#:#Teilnehmerbenachrichtigung
 mail#:#mail_members_of_mailing_list#:#Mitglieder der Verteilerliste "%s"
 mail#:#mail_members_search_continue#:#Weiter
-mail#:#mail_message_send#:#Die Mail wurde versandt
+mail#:#mail_message_send#:#Die Mail wurde versandt.
 mail#:#mail_move_error#:#Fehler beim Mailversand
 mail#:#mail_move_to#:#Verschieben nach:
 mail#:#mail_moved#:#Ihre Mail(s) wurden verschoben

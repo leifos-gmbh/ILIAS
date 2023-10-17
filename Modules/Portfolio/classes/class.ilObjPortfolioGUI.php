@@ -523,7 +523,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
             }
         }
 
-        $form->setTitle($this->lng->txt("prtf_create_portfolio"));
+        $form->setTitle($this->lng->txt("prtf_add_portfolio_from_template"));
         $form->addCommandButton("saveFromTemplate", $this->lng->txt("create"));
         $form->addCommandButton("toRepository", $this->lng->txt("cancel"));
 

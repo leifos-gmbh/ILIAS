@@ -82,4 +82,21 @@ class ilExerciseDBUpdateSteps implements \ilDatabaseUpdateSteps
             );
         }
     }
+
+    public function step_7(): void
+    {
+        if (!$this->db->tableColumnExists('exc_assignment', 'solution_rid')) {
+            $this->db->addTableColumn(
+                'exc_assignment',
+                'solution_rid',
+                [
+                    'type' => 'text',
+                    'notnull' => false,
+                    'length' => 64,
+                    'default' => ''
+                ]
+            );
+        }
+    }
+
 }

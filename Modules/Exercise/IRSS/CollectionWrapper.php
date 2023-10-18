@@ -24,6 +24,7 @@ use \ILIAS\ResourceStorage\Identification\ResourceCollectionIdentification;
 use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Exercise\InternalDataService;
+use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 
 class CollectionWrapper
 {
@@ -102,6 +103,51 @@ class CollectionWrapper
             }
             // we store the collection after all files have been added
             $this->irss->collection()->store($collection);
+        }
+    }
+
+    protected function getResourceIdForIdString(string $rid) : ?ResourceIdentification
+    {
+        return $this->irss->manage()->find($rid);
+    }
+
+    public function importFileFromLegacyUpload(
+        array $file_input,
+        ResourceStakeholder $stakeholder
+    ) : string
+    {
+        $upload = $this->upload;
+
+        if (is_array($file_input)) {
+            if (!$upload->hasBeenProcessed()) {
+                $upload->process();
+            }
+            foreach ($upload->getResults() as $name => $result) {
+                // we must check if these are files from this input
+                if ($name !== ($file_input["tmp_name"] ?? "")) {
+                    continue;
+                }
+                // if the result is not OK, we skip it
+                if (!$result->isOK()) {
+                    continue;
+                }
+
+                // we store the file in the IRSS
+                $rid = $this->irss->manage()->upload(
+                    $result,
+                    $stakeholder
+                );
+                return $rid->serialize();
+            }
+        }
+        return "";
+    }
+
+    public function deliverFile(string $rid) : void
+    {
+        $id = $this->getResourceIdForIdString($rid);
+        if ($id) {
+            $this->irss->consume()->download($id)->run();
         }
     }
 

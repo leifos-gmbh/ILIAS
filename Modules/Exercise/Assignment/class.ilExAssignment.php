@@ -1759,15 +1759,19 @@ class ilExAssignment
     /**
      * @throws ilException
      */
-    public function handleGlobalFeedbackFileUpload(array $a_file): bool
+    public function handleGlobalFeedbackFileUpload(int $ass_id, array $a_file): bool
     {
+        $rcid = $this->domain->assignment()->sampleSolution($ass_id)->importFromLegacyUpload($a_file);
+        $this->setFeedbackFile($a_file["name"]);
+        return ($rcid !== "");
+        /*
         $path = $this->getGlobalFeedbackFileStoragePath();
         ilFileUtils::delDir($path, true);
         if (ilFileUtils::moveUploadedFile($a_file["tmp_name"], $a_file["name"], $path . "/" . $a_file["name"])) {
             $this->setFeedbackFile($a_file["name"]);
             return true;
         }
-        return false;
+        return false;*/
     }
 
     public function getGlobalFeedbackFilePath(): string

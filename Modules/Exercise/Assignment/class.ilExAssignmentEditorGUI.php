@@ -544,6 +544,7 @@ class ilExAssignmentEditorGUI
 
         $fb_date = new ilRadioGroupInputGUI($lng->txt("exc_global_feedback_file_date"), "fb_date");
         $fb_date->setRequired(true);
+        $fb_date->setValue(ilExAssignment::FEEDBACK_DATE_DEADLINE);
         $fb_date->addOption(new ilRadioOption($lng->txt("exc_global_feedback_file_date_deadline"), ilExAssignment::FEEDBACK_DATE_DEADLINE));
         $fb_date->addOption(new ilRadioOption($lng->txt("exc_global_feedback_file_date_upload"), ilExAssignment::FEEDBACK_DATE_SUBMISSION));
 
@@ -916,7 +917,7 @@ class ilExAssignmentEditorGUI
 
         // add global feedback file?
         if (isset($a_input["fb"], $a_input["fb_file"])) {
-            $a_ass->handleGlobalFeedbackFileUpload($a_input["fb_file"]);
+            $a_ass->handleGlobalFeedbackFileUpload($a_ass->getId(), $a_input["fb_file"]);
             $a_ass->update();
         }
         $this->importFormToAssignmentReminders($a_input, $a_ass->getId());
@@ -1328,7 +1329,7 @@ class ilExAssignmentEditorGUI
             !$this->assignment->getFeedbackFile()) {
             $ilCtrl->redirect($this, "returnToParent");
         }
-
+        $this->domain->assignment()->sampleSolution($this->assignment->getId())->deliver();
         ilFileDelivery::deliverFileLegacy($this->assignment->getGlobalFeedbackFilePath(), $this->assignment->getFeedbackFile());
     }
 

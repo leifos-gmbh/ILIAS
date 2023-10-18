@@ -22,6 +22,7 @@ namespace ILIAS\Exercise;
 
 use ILIAS\Exercise\IRSS\CollectionWrapper;
 use ILIAS\Exercise\InstructionFile\InstructionFileRepository;
+use ILIAS\Exercise\SampleSolution\SampleSolutionRepository;
 
 /**
  * Internal repo factory
@@ -57,6 +58,14 @@ class InternalRepoService
     public function instructionFiles(): InstructionFileRepository
     {
         return new InstructionFileRepository(
+            $this->collection_wrapper,
+            $this->db
+        );
+    }
+
+    public function sampleSolution(): SampleSolutionRepository
+    {
+        return new SampleSolutionRepository(
             $this->collection_wrapper,
             $this->db
         );

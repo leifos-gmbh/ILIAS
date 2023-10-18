@@ -23,6 +23,7 @@ namespace ILIAS\Exercise\Assignment;
 use ILIAS\Exercise\InternalRepoService;
 use ILIAS\Exercise\InternalDomainService;
 use ILIAS\Exercise\InstructionFile\InstructionFileManager;
+use ILIAS\Exercise\SampleSolution\SampleSolutionManager;
 
 /**
  * Assignments domain service
@@ -85,4 +86,24 @@ class DomainService
             $stakeholder
         );
     }
+
+    public function sampleSolution(int $ass_id): SampleSolutionManager
+    {
+        $stakeholder = new \ilExcSampleSolutionStakeholder();
+        return new SampleSolutionManager(
+            $ass_id,
+            $this->repo_service->sampleSolution(),
+            $stakeholder,
+            $this->domain_service
+        );
+    }
+
+    /**
+     * @throws \ilExcUnknownAssignmentTypeException
+     */
+    public function getAssignment(int $ass_id): \ilExAssignment
+    {
+        return new \ilExAssignment($ass_id);
+    }
+
 }

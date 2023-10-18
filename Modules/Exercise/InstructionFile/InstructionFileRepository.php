@@ -40,7 +40,7 @@ class InstructionFileRepository
 
     public function createCollection(int $ass_id) : void
     {
-        $new_id = $this->wrapper->getNewCollectionIdAsString();
+        $new_id = $this->wrapper->createEmptyCollection();
         $this->db->update("exc_assignment", [
             "if_rcid" => ["text", $new_id]
         ], [    // where
@@ -49,7 +49,7 @@ class InstructionFileRepository
         );
     }
 
-    public function getCollection(int $ass_id) : ?ResourceCollection
+    protected function getIdStringForAssId(int $ass_id) : string
     {
         $set = $this->db->queryF("SELECT if_rcid FROM exc_assignment " .
             " WHERE id = %s ",
@@ -57,7 +57,12 @@ class InstructionFileRepository
             [$ass_id]
         );
         $rec = $this->db->fetchAssoc($set);
-        $rcid = ($rec["if_rcid"] ?? "");
+        return ($rec["if_rcid"] ?? "");
+    }
+
+    public function getCollection(int $ass_id) : ?ResourceCollection
+    {
+        $rcid = $this->getIdStringForAssId($ass_id);
         if ($rcid !== "") {
             return $this->wrapper->getCollectionForIdString($rcid);
         }
@@ -78,6 +83,20 @@ class InstructionFileRepository
                 $stakeholder
             );
         }
+    }
+
+    public function deleteCollection(
+        int $ass_id,
+        ResourceStakeholder $stakeholder
+    ): void {
+        $rcid = $this->getIdStringForAssId($ass_id);
+        if ($rcid === "") {
+            return;
+        }
+        $this->wrapper->deleteCollectionForIdString(
+            $rcid,
+            $stakeholder
+        );
     }
 
 }

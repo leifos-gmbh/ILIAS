@@ -864,20 +864,8 @@ class ilExAssignment
         $reminder->deleteReminders($this->getId());
 
         // delete resource collections and resources
-        $this->deleteResourceCollection(
-            $this->getInstructionFileRCID(),
-            new ilExcInstructionFilesStakeholder()
-        );
-    }
-
-    private function deleteResourceCollection(
-        ?ResourceCollectionIdentification $rcid,
-        ResourceStakeholder $stakeholder
-    ): void {
-        if ($rcid === null) {
-            return;
-        }
-        $this->irss->collection()->remove($rcid, $stakeholder, true);
+        $this->domain->assignment()->instructionFiles($this->getId())
+            ->deleteCollection();
     }
 
 

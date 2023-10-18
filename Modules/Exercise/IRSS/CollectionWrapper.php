@@ -34,19 +34,36 @@ class CollectionWrapper
         $this->upload = $DIC->upload();
     }
 
-    public function getNewCollectionId() :ResourceCollectionIdentification
+    protected function getNewCollectionId() :ResourceCollectionIdentification
     {
         return $this->irss->collection()->id();
     }
 
-    public function getNewCollectionIdAsString() : string
+    protected function getNewCollectionIdAsString() : string
     {
         return $this->getNewCollectionId()->serialize();
+    }
+
+    public function createEmptyCollection() : string
+    {
+        $new_id = $this->getNewCollectionId();
+        $new_collection = $this->irss->collection()->get($new_id);
+        $this->irss->collection()->store($new_collection);
+        return $new_id->serialize();
     }
 
     public function getCollectionForIdString(string $rcid) : ResourceCollection
     {
         return $this->irss->collection()->get($this->irss->collection()->id($rcid));
+    }
+
+    public function deleteCollectionForIdString(
+        string $rcid,
+        ResourceStakeholder $stakeholder
+    ): void
+    {
+        $id = $this->irss->collection()->id($rcid);
+        $this->irss->collection()->remove($id, $this->stakeholder, true);
     }
 
     public function importFilesFromLegacyUploadToCollection(

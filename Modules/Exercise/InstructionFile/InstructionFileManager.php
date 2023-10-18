@@ -51,4 +51,12 @@ class InstructionFileManager
             $this->stakeholder
         );
     }
+
+    public function deleteCollection(): void {
+        $this->repo->deleteCollection(
+            $this->ass_id,
+            $this->stakeholder
+        );
+    }
+
 }

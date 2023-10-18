@@ -23,15 +23,19 @@ namespace ILIAS\Exercise\IRSS;
 use \ILIAS\ResourceStorage\Identification\ResourceCollectionIdentification;
 use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
+use ILIAS\Exercise\InternalDataService;
 
 class CollectionWrapper
 {
-    public function __construct()
+    public function __construct(
+        InternalDataService $data
+    )
     {
         global $DIC;
 
         $this->irss = $DIC->resourceStorage();
         $this->upload = $DIC->upload();
+        $this->data = $data;
     }
 
     protected function getNewCollectionId() :ResourceCollectionIdentification
@@ -101,5 +105,33 @@ class CollectionWrapper
         }
     }
 
+    public function getCollectionResourcesInfo(
+        ResourceCollection $collection
+    ) : \Generator
+    {
+        foreach ($collection->getResourceIdentifications() as $rid) {
+            $info = $this->irss->manage()->getResource($rid)
+                               ->getCurrentRevision()
+                               ->getInformation();
+            $src = $this->irss->consume()->src($rid)->getSrc();
+            yield $this->data->resourceInformation(
+                $info->getTitle(),
+                $info->getSize(),
+                $info->getCreationDate()->getTimestamp(),
+                $info->getMimeType(),
+                $src
+            );
+        }
+    }
 
+    public function clone(
+        string $from_rc_id
+    ) : string
+    {
+        if ($from_rc_id !== "") {
+            $cloned_rcid = $this->irss->collection()->clone($this->irss->collection()->id($from_rc_id));
+            return $cloned_rcid->serialize();
+        }
+        return "";
+    }
 }

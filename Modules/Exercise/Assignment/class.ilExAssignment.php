@@ -104,8 +104,6 @@ class ilExAssignment
     protected array $member_status = [];
     protected ilLogger $log;
     protected ?int $crit_cat = 0;
-    protected ?ResourceCollectionIdentification $instruction_file_rcid = null;
-    protected \ILIAS\ResourceStorage\Services $irss;
 
     /**
      * Constructor
@@ -116,7 +114,6 @@ class ilExAssignment
         global $DIC;
 
         $this->db = $DIC->database();
-        $this->irss = $DIC->resourceStorage();
         $this->lng = $DIC->language();
         $this->user = $DIC->user();
         $this->app_event_handler = $DIC["ilAppEventHandler"];
@@ -196,21 +193,6 @@ class ilExAssignment
             $order_id = (int) $row['id'];
         }
         return array($order_val, $order_id);
-    }
-
-    public function hasInstructionFileRCID(): bool
-    {
-        return $this->instruction_file_rcid instanceof ResourceCollectionIdentification;
-    }
-
-    public function getInstructionFileRCID(): ?ResourceCollectionIdentification
-    {
-        return $this->instruction_file_rcid;
-    }
-
-    public function setInstructionFileRCID(ResourceCollectionIdentification $rcid): void
-    {
-        $this->instruction_file_rcid = $rcid;
     }
 
     public function hasTeam(): bool
@@ -722,10 +704,6 @@ class ilExAssignment
         $this->setDeadlineMode((int) $a_set["deadline_mode"]);
         $this->setRelativeDeadline((int) $a_set["relative_deadline"]);
         $this->setRelDeadlineLastSubmission((int) $a_set["rel_deadline_last_subm"]);
-        $rcid = $a_set["if_rcid"] ?? null;
-        if ($rcid !== null) {
-            $this->instruction_file_rcid = $this->irss->collection()->id($rcid);
-        }
     }
 
     /**
@@ -926,6 +904,8 @@ class ilExAssignment
         array $a_crit_cat_map
     ): void {
         global $DIC;
+
+        $ass_domain = $DIC->exercise()->internal()->domain()->assignment();
         $ass_data = self::getInstancesByExercise($a_old_exc_id);
         foreach ($ass_data as $d) {
             // clone assignment
@@ -972,12 +952,7 @@ class ilExAssignment
             $new_ass->save();
 
             // clone assignment files
-            $current_rcid = $d->getInstructionFileRCID();
-            if ($current_rcid !== null) {
-                $cloned_rcid = $DIC->resourceStorage()->collection()->clone($current_rcid);
-                $new_ass->setInstructionFileRCID($cloned_rcid);
-                $new_ass->update();
-            }
+            $ass_domain->instructionFiles($d->getId())->cloneTo($new_ass->getId());
 
             // clone global feedback file
             $old_storage = new ilFSStorageExercise($a_old_exc_id, $d->getId());
@@ -1012,37 +987,7 @@ class ilExAssignment
 
     public function getFiles(): array
     {
-        if ($this->hasInstructionFileRCID()) {
-            $collection = $this->irss->collection()->get($this->getInstructionFileRCID());
-            return array_map(function (ResourceIdentification $rid): array {
-                // this return the same array as the ilFSWebStorageExercise implementation for compatibility
-                $info = $this->irss->manage()->getResource($rid)
-                    ->getCurrentRevision()
-                    ->getInformation();
-                // if possible we use a flavour (PreviewDefinition from the ilResourceCollectionGUI)
-                $flavour_definition = new PreviewDefinition();
-                if ($this->irss->flavours()->possible($rid, $flavour_definition)) {
-                    $flavour = $this->irss->flavours()->get($rid, $flavour_definition);
-                    $src = $this->irss->consume()->flavourUrls($flavour)->getURLsAsArray()[0] ?? '';
-                } else {
-                    $src = $this->irss->consume()->src($rid)->getSrc();
-                }
-
-
-                return [
-                    'name' => $info->getTitle(),
-                    'size' => $info->getSize(),
-                    'ctime' => $info->getCreationDate()->getTimestamp(),
-                    'fullpath' => $src,
-                    'mime' => $info->getMimeType(), // this is additional to still use the image delivery in class.ilExAssignmentGUI.php:306
-                    'order' => 0 // sorting is currently not supported
-                ];
-            }, $collection->getResourceIdentifications());
-        } else {
-            $this->log->debug("getting files from class.ilExAssignment using ilFSWebStorageExercise");
-            $storage = new ilFSWebStorageExercise($this->getExerciseId(), $this->getId());
-            return $storage->getFiles();
-        }
+        return $this->domain->assignment()->instructionFiles($this->getId())->getFiles();
     }
 
     public function getInstructionFilesOrder(): array

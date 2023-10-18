@@ -17,7 +17,6 @@
  *********************************************************************/
 
 use ILIAS\Exercise\Assignment\Mandatory;
-use ILIAS\Services\ResourceStorage\Collections\View\Configuration;
 use ILIAS\ResourceStorage\Identification\ResourceCollectionIdentification;
 use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\Services\ResourceStorage\Collections\View\Mode;
@@ -127,28 +126,13 @@ class ilExAssignmentEditorGUI
             case strtolower(ilResourceCollectionGUI::class):
                 $this->setAssignmentHeader();
                 $ilTabs->activateTab("ass_files");
-                if (!$this->assignment->hasInstructionFileRCID()) {
-                    throw new LogicException("No resource collection id found for assignment " . $this->assignment->getId());
-                }
-                $collection_id = $this->assignment->getInstructionFileRCID();
-                $collection = $this->irss->collection()->get($collection_id);
-
-                $write_permission = $this->access->checkAccess('write', '', $this->ref_id ?? -1);
-                $overview = new ilResourceCollectionGUI(
-                    new Configuration(
-                        $collection,
-                        new ilExcInstructionFilesStakeholder(),
-                        $this->lng->txt('exc_instruction_files'),
-                        Mode::DATA_TABLE,
-                        100,
-                        $write_permission,
-                        $write_permission
-                    )
+                $gui = $this->gui->assignment()->getInstructionFileResourceCollectionGUI(
+                    (int) $this->ref_id,
+                    $this->assignment->getId()
                 );
-
-                $this->ctrl->forwardCommand($overview);
-
+                $this->ctrl->forwardCommand($gui);
                 break;
+
                 // instruction files
             case "ilexassignmentfilesystemgui":
                 $this->setAssignmentHeader();

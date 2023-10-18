@@ -21,6 +21,7 @@ namespace ILIAS\Exercise;
 use ILIAS\Refinery;
 use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICGUIServices;
+use ILIAS\Exercise\Assignment;
 
 /**
  * Exercise UI frontend presentation service class
@@ -61,6 +62,14 @@ class InternalGUIService
         );
     }
 
+    public function assignment() : Assignment\GUIService
+    {
+        return new Assignment\GUIService(
+            $this->service->domain(),
+            $this->service->gui()
+        );
+    }
+
     /**
      * Get request wrapper. If dummy data is provided the usual http wrapper will
      * not be used.
@@ -82,19 +91,6 @@ class InternalGUIService
         return new \ilObjExerciseGUI([], $ref_id, true);
     }
 
-    public function getRandomAssignmentGUI(\ilObjExercise $exc = null): \ilExcRandomAssignmentGUI
-    {
-        if ($exc === null) {
-            $exc = $this->request->getExercise();
-        }
-        return new \ilExcRandomAssignmentGUI(
-            $this->ui(),
-            $this->toolbar(),
-            $this->lng,
-            $this->ctrl(),
-            $this->service->domain()->assignment()->randomAssignments($exc)
-        );
-    }
 
     public function getSubmissionGUI(
         \ilObjExercise $exc = null,

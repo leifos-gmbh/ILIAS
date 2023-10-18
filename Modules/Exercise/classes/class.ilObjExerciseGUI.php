@@ -229,7 +229,7 @@ class ilObjExerciseGUI extends ilObjectGUI
                     break; */
 
             case "ilexcrandomassignmentgui":
-                $gui = $this->exercise_ui->getRandomAssignmentGUI();
+                $gui = $this->exercise_ui->assignment()->getRandomAssignmentGUI();
                 $this->ctrl->forwardCommand($gui);
                 break;
 
@@ -1101,7 +1101,7 @@ class ilObjExerciseGUI extends ilObjectGUI
         $service = $this->getService();
         $random_manager = $service->domain()->assignment()->randomAssignments($exc);
         if ($random_manager->needsStart()) {
-            $gui = $this->exercise_ui->getRandomAssignmentGUI();
+            $gui = $this->exercise_ui->assignment()->getRandomAssignmentGUI();
             $gui->renderStartPage();
             return true;
         }

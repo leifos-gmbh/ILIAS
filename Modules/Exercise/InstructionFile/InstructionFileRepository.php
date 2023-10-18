@@ -49,7 +49,7 @@ class InstructionFileRepository
         );
     }
 
-    protected function getIdStringForAssId(int $ass_id) : string
+    public function getIdStringForAssId(int $ass_id) : string
     {
         $set = $this->db->queryF("SELECT if_rcid FROM exc_assignment " .
             " WHERE id = %s ",
@@ -58,6 +58,12 @@ class InstructionFileRepository
         );
         $rec = $this->db->fetchAssoc($set);
         return ($rec["if_rcid"] ?? "");
+    }
+
+    public function hasCollection(int $ass_id) : bool
+    {
+        $rcid = $this->getIdStringForAssId($ass_id);
+        return ($rcid !== "");
     }
 
     public function getCollection(int $ass_id) : ?ResourceCollection
@@ -85,6 +91,14 @@ class InstructionFileRepository
         }
     }
 
+    public function getCollectionResourcesInfo(
+        int $ass_id
+    ) : \Generator
+    {
+        $collection = $this->getCollection($ass_id);
+        return $this->wrapper->getCollectionResourcesInfo($collection);
+    }
+
     public function deleteCollection(
         int $ass_id,
         ResourceStakeholder $stakeholder
@@ -99,4 +113,20 @@ class InstructionFileRepository
         );
     }
 
+    public function clone(
+        int $from_ass_id,
+        int $to_ass_id
+    ) : void
+    {
+        $from_rcid = $this->getIdStringForAssId($ass_id);
+        $to_rcid = $this->wrapper->clone($from_rcid);
+        if ($to_rcid !== "") {
+            $this->db->update("exc_assignment", [
+                "if_rcid" => ["text", $to_rcid]
+            ], [    // where
+                    "id" => ["integer", $to_ass_id]
+                ]
+            );
+        }
+    }
 }

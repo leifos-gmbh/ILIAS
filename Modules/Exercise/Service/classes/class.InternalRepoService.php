@@ -38,7 +38,7 @@ class InternalRepoService
         $this->data = $data;
         $this->db = $db;
         $this->submission_repo = new Submission\SubmissionDBRepository($db);
-        $this->collection_wrapper = new CollectionWrapper();
+        $this->collection_wrapper = new CollectionWrapper($data);
     }
 
     public function assignment(): Assignment\RepoService

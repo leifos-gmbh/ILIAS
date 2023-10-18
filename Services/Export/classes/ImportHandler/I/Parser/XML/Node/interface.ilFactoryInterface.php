@@ -18,13 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\Parser\XML\Node;
 
-enum StatusType
+use ImportHandler\I\Parser\XML\Node\ilInfoCollectionInterface as ilParserXMLNodeInfoCollectionInterface;
+use ImportHandler\I\Parser\XML\Node\ilInfoInterface as ilParserXMLNodeInfoInterface;
+
+interface ilFactoryInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function info(): ilParserXMLNodeInfoInterface;
+
+    public function infoCollection(
+        ilParserXMLNodeInfoInterface ...$initial_elements
+    ): ilParserXMLNodeInfoCollectionInterface;
 }

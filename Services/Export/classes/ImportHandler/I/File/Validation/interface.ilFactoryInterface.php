@@ -18,13 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\File\Validation;
 
-enum StatusType
+use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandlerInterface;
+use ImportHandler\I\File\Validation\ilStreamHandlerInterface as ilFileStreamValidationHandlerInterface;
+
+interface ilFactoryInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function handler(): ilFileValidationHandlerInterface;
+    public function streamHandler(): ilFileValidationHandlerInterface;
 }

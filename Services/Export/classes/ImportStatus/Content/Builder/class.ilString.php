@@ -18,13 +18,28 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportStatus\Content\Builder;
 
-enum StatusType
+use ImportStatus\I\Content\Builder\ilStringInterface as ilImportStatusStringContentBuilderInterface;
+
+class ilString implements ilImportStatusStringContentBuilderInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    private string $content;
+
+    public function __construct()
+    {
+        $this->content = '';
+    }
+
+    public function toString(): string
+    {
+        return $this->content;
+    }
+
+    public function withString(string $content)
+    {
+        $clone = clone $this;
+        $clone->content = $content;
+        return $clone;
+    }
 }

@@ -18,13 +18,23 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\Parser\Path;
 
-enum StatusType
+use ImportHandler\I\Parser\Path\ilComparisonInterface;
+
+class ilComparison implements ilComparisonInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    protected ComparisonOperator $operator;
+    protected string $value;
+
+    public function __construct(ComparisonOperator $operator, string $value)
+    {
+        $this->operator = $operator;
+        $this->value = $value;
+    }
+
+    public function toString()
+    {
+        return ComparisonOperator::toString($this->operator) . $this->value;
+    }
 }

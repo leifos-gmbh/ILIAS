@@ -18,13 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I;
 
-enum StatusType
+use ImportHandler\I\File\ilFactoryInterface as ilFileFactoryInterface;
+use ImportHandler\I\Parser\ilFactoryInterface as ilParserFactoryInterface;
+
+interface ilFactoryInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function parser(): ilParserFactoryInterface;
+
+    public function file(): ilFileFactoryInterface;
 }

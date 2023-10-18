@@ -18,13 +18,24 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\Parser\Path;
 
-enum StatusType
+enum ComparisonOperator
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    case EQUAL;
+    case LOWER;
+    case GREATER;
+    case GREATER_EQUAL;
+    case LOWER_EQUAL;
+
+    public static function toString(ComparisonOperator $operator): string
+    {
+        return match ($operator) {
+            ComparisonOperator::EQUAL => '=',
+            ComparisonOperator::LOWER => '<',
+            ComparisonOperator::GREATER => '>',
+            ComparisonOperator::GREATER_EQUAL => '>=',
+            ComparisonOperator::LOWER_EQUAL => '<=',
+        };
+    }
 }

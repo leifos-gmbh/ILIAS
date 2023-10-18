@@ -18,13 +18,20 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\Parser\XML\Node;
 
-enum StatusType
+use DOMDocument;
+use DOMNode;
+
+interface ilInfoInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function withDOMNode(DOMNode $node): ilInfoInterface;
+
+    public function getXML(): string;
+
+    public function getNodeName(): string;
+
+    public function getValueOfAttribute(string $attribute_name): string;
+
+    public function getNode(): DOMNode;
 }

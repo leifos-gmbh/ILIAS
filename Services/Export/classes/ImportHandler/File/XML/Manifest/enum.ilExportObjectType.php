@@ -18,13 +18,20 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\File\XML\Manifest;
 
-enum StatusType
+enum ilExportObjectType
 {
+    case EXPORT_SET;
+    case EXPORT_FILE;
     case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+
+    public static function toString(ilExportObjectType $type): string
+    {
+        return match ($type) {
+            ilExportObjectType::EXPORT_FILE => 'ExportFile',
+            ilExportObjectType::EXPORT_SET => 'ExportSet',
+            ilExportObjectType::NONE => ''
+        };
+    }
 }

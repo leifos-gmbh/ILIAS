@@ -18,13 +18,9 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\Parser\Path\Node;
 
-enum StatusType
+interface ilSimpleInterface extends ilNodeInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function withName(string $node_name): ilNodeInterface;
 }

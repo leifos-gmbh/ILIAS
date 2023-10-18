@@ -18,13 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\Parser\Path\Node;
 
-enum StatusType
+use ImportHandler\I\Parser\Path\ilComparisonInterface;
+
+interface ilIndexableInterface extends ilSimpleInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function withIndex(int $index): ilIndexableInterface;
+
+    public function withComparison(ilComparisonInterface $comparison): ilIndexableInterface;
+
+    public function withIndexingFromEndEnabled(bool $enabled): ilIndexableInterface;
 }

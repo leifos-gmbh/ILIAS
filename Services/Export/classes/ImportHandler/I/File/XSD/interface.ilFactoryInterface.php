@@ -18,13 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\File\XSD;
 
-enum StatusType
+use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
+
+interface ilFactoryInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function handler(): ilXSDFileHandlerInterface;
 }

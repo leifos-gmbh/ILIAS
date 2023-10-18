@@ -1,0 +1,174 @@
+<?php
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
+declare(strict_types=1);
+
+namespace ImportHandler\File\Validation;
+
+use DOMDocument;
+use Exception;
+use ilLogger;
+use ImportHandler\I\File\ilHandlerInterface as ilFileHandlerInterface;
+use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandlerInterface;
+use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
+use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
+use ImportHandler\I\Parser\Path\ilHandlerInterface as ilParserPathHandlerInterface;
+use ImportHandler\I\Parser\XML\Node\ilInfoCollectionInterface as ilParserXMLNodeInfoCollectionInterface;
+use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportHandler\I\Parser\Path\ilFactoryInterface as ilParserPathFactoryInterface;
+use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
+use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
+use ImportStatus\StatusType;
+use LibXMLError;
+
+class ilHandler implements ilFileValidationHandlerInterface
+{
+    protected const TMP_DIR_NAME = 'temp';
+    protected const XML_DIR_NAME = 'xml';
+
+    protected ilLogger $logger;
+    protected ilImportStatusFactoryInterface $import_status;
+    protected ilParserHandlerInterface $parser_handler;
+    protected ilParserPathFactoryInterface $path;
+    protected ilImportStatusHandlerInterface $success_status;
+
+    public function __construct(
+        ilLogger $logger,
+        ilParserHandlerInterface $parser_handler,
+        ilImportStatusFactoryInterface $import_status,
+        ilParserPathFactoryInterface $path
+    ) {
+        $this->logger = $logger;
+        $this->import_status = $import_status;
+        $this->parser_handler = $parser_handler;
+        $this->path = $path;
+        $this->success_status = $import_status->handler()
+            ->withType(StatusType::SUCCESS)
+            ->withContent($import_status->content()->builder()->string()->withString('Validation SUCCESS'));
+    }
+
+    /**
+     * @param ilFileHandlerInterface $file_handlers
+     */
+    protected function checkIfFilesExist(array $file_handlers): ilImportStatusHandlerCollectionInterface
+    {
+        $status_collection = $this->import_status->handlerCollection()->withNumberingEnabled(true);
+        foreach ($file_handlers as $file_handler) {
+            if($file_handler->fileExists()) {
+                continue;
+            }
+            $status_collection->withAddedStatus($this->import_status->handler()
+                ->withType(StatusType::FAILED)
+                ->withContent($this->import_status->content()->builder()->string()
+                    ->withString('File does not exist: ' . $file_handler->getFilePath())));
+        }
+        return $status_collection;
+    }
+
+    /**
+     * @param LibXMLError[] $errors
+     */
+    protected function collectErrors(
+        ?ilXMLFileHandlerInterface $xml_file_handler = null,
+        ?ilXSDFileHandlerInterface $xsd_file_handler = null,
+        array $errors = []
+    ): ilImportStatusHandlerCollectionInterface {
+        $status_collection = $this->import_status->handlerCollection()->withNumberingEnabled(true);
+        $xml_str = is_null($xml_file_handler)
+            ? ''
+            : "<br>XML-File: " . $xml_file_handler->getSubPathToDirBeginningAtPathEnd(self::TMP_DIR_NAME);
+        $xsd_str = is_null($xsd_file_handler)
+            ? ''
+            : "<br>XSD-File: " . $xsd_file_handler->getSubPathToDirBeginningAtPathEnd(self::XML_DIR_NAME);
+        foreach ($errors as $error) {
+            $content = $this->import_status->content()->builder()->string()->withString(
+                "Validation FAILED"
+                . $xml_str
+                . $xsd_str
+                . "<br>ERROR Message: " . $error->message
+            );
+            $status_collection = $status_collection->withAddedStatus(
+                $this->import_status->handler()->withType(StatusType::FAILED)->withContent($content)
+            );
+        }
+        return $status_collection;
+    }
+
+    protected function validateXMLAtNodes(
+        ilXMLFileHandlerInterface $xml_file_handler,
+        ilXSDFileHandlerInterface $xsd_file_handler,
+        ilParserXMLNodeInfoCollectionInterface $nodes
+    ): ilImportStatusHandlerCollectionInterface {
+        $this->logger->debug(
+            "\n\nValidating:"
+            . "\nXML: " . $xml_file_handler->getFilePath()
+            . "\nXSD: " . $xsd_file_handler->getFilePath() . "\n"
+        );
+        // Check if files exist
+        $status_collection = $this->checkIfFilesExist([$xsd_file_handler]);
+        if($status_collection->hasStatusType(StatusType::FAILED)) {
+            return $status_collection;
+        }
+        // Enable manual error handling
+        $old_value_of_use_internal_errors = libxml_use_internal_errors(true);
+        // VALIDATE
+        $status_collection = $this->import_status->handlerCollection()->withNumberingEnabled(true);
+        foreach ($nodes as $node) {
+            $doc = new DOMDocument();
+            $doc->loadXML($node->getXML(), LIBXML_NOBLANKS);
+            $doc->normalizeDocument();
+            try {
+                if($doc->schemaValidate($xsd_file_handler->getFilePath())) {
+                    continue;
+                }
+            } catch (Exception $e) {
+                // Catches xsd file related exceptions to allow for manual error handling
+            }
+            $errors = libxml_get_errors();
+            libxml_clear_errors();
+            $status_collection = $status_collection->getMergedCollectionWith($this->collectErrors(
+                null,
+                $xsd_file_handler,
+                $errors
+            ));
+        }
+        // Restore old value of manual error handling
+        libxml_use_internal_errors($old_value_of_use_internal_errors);
+        return $status_collection->hasStatusType(StatusType::FAILED)
+            ? $status_collection
+            : $this->import_status->handlerCollection()->withAddedStatus($this->success_status);
+    }
+
+    public function validateXMLFile(
+        ilXMLFileHandlerInterface $xml_file_handler,
+        ilXSDFileHandlerInterface $xsd_file_handler
+    ): ilImportStatusHandlerCollectionInterface {
+        $path = $this->path->handler()->withNode($this->path->node()->anyElement())->withStartAtRoot(true);
+        return $this->validateXMLAtPath($xml_file_handler, $xsd_file_handler, $path);
+    }
+
+    public function validateXMLAtPath(
+        ilXMLFileHandlerInterface $xml_file_handler,
+        ilXSDFileHandlerInterface $xsd_file_handler,
+        ilParserPathHandlerInterface $path_handler
+    ): ilImportStatusHandlerCollectionInterface {
+        $nodes = $this->parser_handler->withFileHandler($xml_file_handler)->getNodeInfoAt($path_handler);
+        return $this->validateXMLAtNodes($xml_file_handler, $xsd_file_handler, $nodes);
+    }
+}

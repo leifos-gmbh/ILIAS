@@ -18,13 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\Parser\XML;
 
-enum StatusType
+use ImportHandler\I\Parser\XML\ilFactoryInterface as ilParserXMLFactoryInterface;
+use ImportHandler\I\Parser\XML\Node\ilFactoryInterface as ilParserXMLNodeFactoryInterface;
+use ImportHandler\Parser\XML\Node\ilFactory as ilParserXMLNodeFactory;
+
+class ilFactory implements ilParserXMLFactoryInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function node(): ilParserXMLNodeFactoryInterface
+    {
+        return new ilParserXMLNodeFactory();
+    }
 }

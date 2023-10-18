@@ -18,13 +18,9 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportStatus\I\Content;
 
-enum StatusType
+interface ilHandlerInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function toString(): string;
 }

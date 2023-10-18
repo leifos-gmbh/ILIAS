@@ -18,13 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\File\XML\Manifest;
 
-enum StatusType
+use ImportHandler\I\File\XML\Manifest\ilHandlerInterface as ilManifestXMLFileHandlerInterface;
+use ImportHandler\I\File\XML\Manifest\ilHandlerCollectionInterface as ilManifestXMLFileHandlerCollectionInterface;
+
+interface ilFactoryInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function handler(): ilManifestXMLFileHandlerInterface;
+
+    public function handlerCollection(): ilManifestXMLFileHandlerCollectionInterface;
 }

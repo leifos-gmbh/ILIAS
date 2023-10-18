@@ -18,13 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\Parser\Path\Node;
 
-enum StatusType
+use ImportHandler\I\Parser\Path\ilComparisonInterface;
+
+interface ilAttributableInterface extends ilSimpleInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function withAttribute(string $attribute): ilAttributableInterface;
+
+    public function withComparison(ilComparisonInterface $comparison): ilAttributableInterface;
+
+    public function withAnyAttributeEnabled(bool $enabled): ilAttributableInterface;
 }

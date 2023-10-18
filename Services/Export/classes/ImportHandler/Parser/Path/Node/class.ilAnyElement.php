@@ -18,13 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\Parser\Path\Node;
 
-enum StatusType
+use ImportHandler\I\Parser\Path\Node\ilAnyElementInterface;
+
+class ilAnyElement implements ilAnyElementInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function toString(): string
+    {
+        return '*';
+    }
 }

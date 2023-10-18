@@ -88,7 +88,7 @@ class ilXmlSchemaFactory
 
     protected function sortByVersion(ilXmlSchemaInfoCollection $collection): ilXmlSchemaInfoCollection
     {
-        $collection->uasort( function (ilXmlSchemaInfo $a, ilXmlSchemaInfo $b): int {
+        $collection->uasort(function (ilXmlSchemaInfo $a, ilXmlSchemaInfo $b): int {
             if ($a->getVersion()->equals($b->getVersion())) {
                 return 0;
             }
@@ -127,15 +127,16 @@ class ilXmlSchemaFactory
                 continue;
             }
             $matches = [];
-            if (preg_match('/ilias_([a-zA-Z]+)(_[a-zA-Z])?_([3-9])_?([0-9]+)?.xsd/', $file->getFilename(), $matches) === false) {
+            if (preg_match('/ilias_([a-zA-Z]+)(_([a-zA-Z]+))?_([3-9])_?([0-9]+)?.xsd/', $file->getFilename(), $matches) !== 1) {
                 $this->logger->debug('Ignoring file (match): ' . $file->getFilename());
                 $this->logger->dump($matches, \ilLogLevel::DEBUG);
+                continue;
             }
             $this->collection[] = new ilXmlSchemaInfo(
                 new SplFileInfo($file->getPathname()),
                 (string) $matches[1],
-                (string) $matches[2],
-                new Version((string) $matches[3] . (($matches[4] ?? '') ? '.' . $matches[4] : ''))
+                (string) $matches[3],
+                new Version((string) $matches[4] . (($matches[5] ?? '') ? '.' . $matches[5] : ''))
             );
             $this->logger->debug($file->getFilename() . ' matches');
         }

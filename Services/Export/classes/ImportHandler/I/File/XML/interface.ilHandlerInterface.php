@@ -18,13 +18,19 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\File\XML;
 
-enum StatusType
+use DOMDocument;
+use ImportHandler\I\File\ilHandlerInterface as ilFileHandlerInterface;
+use SplFileInfo;
+
+interface ilHandlerInterface extends ilFileHandlerInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function withFileInfo(SplFileInfo $file_info): ilHandlerInterface;
+
+    public function withOptions(int $options): ilHandlerInterface;
+
+    public function withDOMDocumentStrictErrorChecking(bool $enabled): ilHandlerInterface;
+
+    public function loadDomDocument(): DOMDocument;
 }

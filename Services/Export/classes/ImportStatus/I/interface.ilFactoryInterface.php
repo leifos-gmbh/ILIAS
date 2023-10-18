@@ -18,13 +18,17 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportStatus\I;
 
-enum StatusType
+use ImportStatus\I\Content\ilFactoryInterface as ilImportStatusContentFactoryInterface;
+use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
+use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
+
+interface ilFactoryInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function content(): ilImportStatusContentFactoryInterface;
+
+    public function handler(): ilImportStatusHandlerInterface;
+
+    public function handlerCollection(): ilImportStatusHandlerCollectionInterface;
 }

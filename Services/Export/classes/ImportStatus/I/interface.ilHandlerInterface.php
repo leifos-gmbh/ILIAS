@@ -18,13 +18,18 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportStatus\I;
 
-enum StatusType
+use ImportStatus\StatusType;
+use ImportStatus\I\Content\ilHandlerInterface as ilImportStatusContentInterface;
+
+interface ilHandlerInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function getType(): StatusType;
+
+    public function getContent(): ilImportStatusContentInterface;
+
+    public function withType(StatusType $type): ilHandlerInterface;
+
+    public function withContent(ilImportStatusContentInterface $content): ilHandlerInterface;
 }

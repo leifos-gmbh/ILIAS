@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xs:schema
-  xmlns:xs = 'http://www.w3.org/2001/XMLSchema'
-  targetNamespace = "http://www.ilias.de/Services/MetaData/meta/4_1"
-  xmlns:t = 'http://www.ilias.de/Services/MetaData/meta/4_1'>
+  xmlns:xs = 'http://www.w3.org/2001/XMLSchema'>
 
 <!-- Type: LanguageCode -->
 <xs:simpleType name='LanguageCode'>

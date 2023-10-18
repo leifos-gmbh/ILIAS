@@ -18,13 +18,23 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\File;
 
-enum StatusType
+use SplFileInfo;
+
+interface ilHandlerInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function withFileInfo(SplFileInfo $file_info): ilHandlerInterface;
+
+    public function getFileName(): string;
+
+    public function getFilePath(): string;
+
+    public function getPathToFileLocation(): string;
+
+    public function getSubPathToDirBeginningAtPathStart(string $dir_name): string;
+
+    public function getSubPathToDirBeginningAtPathEnd(string $dir_name): string;
+
+    public function fileExists(): bool;
 }

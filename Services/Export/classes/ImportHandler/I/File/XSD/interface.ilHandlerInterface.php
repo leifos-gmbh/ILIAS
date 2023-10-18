@@ -18,13 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus;
+namespace ImportHandler\I\File\XSD;
 
-enum StatusType
+use ImportHandler\I\File\ilHandlerInterface as ilFileHandlerInterface;
+use SplFileInfo;
+
+interface ilHandlerInterface extends ilFileHandlerInterface
 {
-    case NONE;
-    case DUMMY;
-    case DEBUG;
-    case SUCCESS;
-    case FAILED;
+    public function withFileInfo(SplFileInfo $file_info): ilHandlerInterface;
 }

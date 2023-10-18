@@ -118,7 +118,7 @@ class ilStreamHandler implements ilFileValidationHandlerInterface
         //$reader->setSchema($xsd_file_handler->getFilePath());
         $component_name = null;
 
-        $this->parser_handler->moveXMLReader($reader, $path_handler);
+        $this->moveXMLReader($reader, $path_handler);
         // TODO
         $reader->close();
         $errors = libxml_get_errors();
@@ -133,5 +133,29 @@ class ilStreamHandler implements ilFileValidationHandlerInterface
         return $status_collection->hasStatusType(StatusType::FAILED)
             ? $status_collection
             : $this->import_status->handlerCollection()->withAddedStatus($this->success_status);
+    }
+
+    protected function moveXMLReader(XMLReader $reader, ilParserPathHandlerInterface $path_handler): bool
+    {
+        $reached_path_end = false;
+        $reached_file_end = false;
+        while (!$reached_path_end && !$reached_file_end) {
+            $path_node = $path_handler->firstElement();
+            $path_handler = $path_handler->subPath(1);
+
+            $msg = "\n\n\nStream Reading:";
+            $msg .= "\n      path node: " . $path_node->toString();
+            while (!($reached_file_end = !$reader->read())) {
+                $msg .= "\n    reader name: " . $reader->name;
+                if ($reader->name === $path_node->toString()) {
+                    break;
+                }
+            }
+            $msg .= "\n\n";
+            $this->logger->debug($msg);
+
+            $reached_path_end = $path_handler->count() === 0;
+        }
+        return !$reached_file_end;
     }
 }

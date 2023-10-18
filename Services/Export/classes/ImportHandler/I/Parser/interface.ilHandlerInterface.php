@@ -30,6 +30,4 @@ interface ilHandlerInterface
     public function withFileHandler(ilXMLFileHandlerInterface $file_handler): ilHandlerInterface;
 
     public function getNodeInfoAt(ilParserPathHandlerInterface $path): ilInfoCollectionInterface;
-
-    public function moveXMLReader(XMLReader $reader, ilParserPathHandlerInterface $path_handler): bool;
 }

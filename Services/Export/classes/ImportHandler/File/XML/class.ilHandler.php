@@ -76,8 +76,8 @@ class ilHandler extends ilFileHandler implements ilXMLFileHandlerInterface
                 $this->status->handler()->withType(StatusType::FAILED)->withContent(
                     $this->status->content()->builder()->string()->withString(
                         "Error loading dom document:" .
-                        "<br>" . $this->getFilePath() .
-                        "<br>" . $error->message
+                        "<br>  XML: " . $this->getSubPathToDirBeginningAtPathEnd('temp') .
+                        "<br>ERROR: " . $error->message
                     )
                 )
             );

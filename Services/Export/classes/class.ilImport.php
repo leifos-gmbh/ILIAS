@@ -217,14 +217,19 @@ class ilImport
                 ->withFileHandler($export_file)
                 ->getNodeInfoAt($path_to_export)
                 ->current();
-            $entity_type = $export_node_info->getValueOfAttribute('Entity');
-            // type = one_two splitten
-            $latest_file_info = $schema_factory->getLatest($entity_type);
+            $types_str = $export_node_info->getValueOfAttribute('Entity');
+            $types = (str_contains($types_str, '_'))
+                ? explode('_', $types_str)
+                : [$types_str];
+            $latest_file_info = count($types) === 1
+                ? $schema_factory->getLatest($types[0])
+                : $schema_factory->getLatest($types[0], $types[1]);
+            $this->log->dump($types);
             if (is_null($latest_file_info)) {
                 $status_collection = $status_collection->withAddedStatus($this->import_status->handler()
                     ->withType(StatusType::DEBUG)
                     ->withContent($this->import_status->content()->builder()->string()->withString(
-                        'Missing schema xsd file for entity of type: ' . $entity_type
+                        'Missing schema xsd file for entity of type: ' . implode('_', $types)
                     )));
                 continue;
             }
@@ -250,7 +255,7 @@ class ilImport
         if ($import_status_collection->hasStatusType(StatusType::FAILED)) {
             throw new ilImportException($import_status_collection
                 ->withNumberingEnabled(true)
-                ->toString(StatusType::FAILED));
+                ->toString(StatusType::FAILED, StatusType::DEBUG));
         }
     }
 

@@ -217,10 +217,10 @@ class ilImport
                 ->withFileHandler($export_file)
                 ->getNodeInfoAt($path_to_export)
                 ->current();
-            $types_str = $export_node_info->getValueOfAttribute('Entity');
-            $types = (str_contains($types_str, '_'))
-                ? explode('_', $types_str)
-                : [$types_str];
+            $type_str = $export_node_info->getValueOfAttribute('Entity');
+            $types = (str_contains($type_str, '_'))
+                ? explode('_', $type_str)
+                : [$type_str];
             $latest_file_info = count($types) === 1
                 ? $schema_factory->getLatest($types[0])
                 : $schema_factory->getLatest($types[0], $types[1]);
@@ -255,7 +255,7 @@ class ilImport
         if ($import_status_collection->hasStatusType(StatusType::FAILED)) {
             throw new ilImportException($import_status_collection
                 ->withNumberingEnabled(true)
-                ->toString(StatusType::FAILED, StatusType::DEBUG));
+                ->toString(StatusType::FAILED));
         }
     }
 

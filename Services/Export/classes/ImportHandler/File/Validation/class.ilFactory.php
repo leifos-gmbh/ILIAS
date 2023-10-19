@@ -26,6 +26,7 @@ use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandle
 use ImportHandler\File\Validation\ilHandler as ilFileValidationHandler;
 use ImportHandler\I\Parser\Path\ilFactoryInterface as ilParserPathFactoryInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportHandler\File\XML\Reader\ilFactory as ilXMLFileReaderFactory;
 use ImportStatus\ilFactory as ilImportStatusFactory;
 use ImportHandler\File\Validation\ilStreamHandler as ilFileStreamValidationHandler;
 
@@ -61,7 +62,10 @@ class ilFactory implements ilFileValidationFactoryInterface
             $this->logger,
             $this->parser_handler,
             new ilImportStatusFactory(),
-            $this->path
+            $this->path,
+            new ilXMLFileReaderFactory(
+                $this->logger
+            )
         );
     }
 }

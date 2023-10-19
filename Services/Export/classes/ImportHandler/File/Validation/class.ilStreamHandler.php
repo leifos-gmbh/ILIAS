@@ -8,10 +8,12 @@ use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandle
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportHandler\I\File\Validation\ilStreamHandlerInterface as ilXMLStreamFileValidationHandlerInterface;
 use ImportHandler\I\Parser\Path\ilFactoryInterface as ilParserPathFactoryInterface;
 use ImportHandler\I\Parser\Path\ilHandlerInterface as ilParserPathHandlerInterface;
 use ImportHandler\I\Parser\XML\Node\ilInfoCollectionInterface as ilParserXMLNodeInfoCollectionInterface;
 use ImportHandler\I\Parser\Path\Node\ilSimpleInterface as ilParserPathNodeSimpleInterface;
+use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
@@ -19,7 +21,7 @@ use ImportStatus\StatusType;
 use LibXMLError;
 use XMLReader;
 
-class ilStreamHandler implements ilFileValidationHandlerInterface
+class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
 {
     protected const TMP_DIR_NAME = 'temp';
     protected const XML_DIR_NAME = 'xml';
@@ -29,12 +31,14 @@ class ilStreamHandler implements ilFileValidationHandlerInterface
     protected ilParserHandlerInterface $parser_handler;
     protected ilParserPathFactoryInterface $path;
     protected ilImportStatusHandlerInterface $success_status;
+    protected ilXMLFileReaderFactoryInterface $reader;
 
     public function __construct(
         ilLogger $logger,
         ilParserHandlerInterface $parser_handler,
         ilImportStatusFactoryInterface $import_status,
-        ilParserPathFactoryInterface $path
+        ilParserPathFactoryInterface $path,
+        ilXMLFileReaderFactoryInterface $reader
     ) {
         $this->logger = $logger;
         $this->import_status = $import_status;
@@ -43,6 +47,7 @@ class ilStreamHandler implements ilFileValidationHandlerInterface
         $this->success_status = $import_status->handler()
             ->withType(StatusType::SUCCESS)
             ->withContent($import_status->content()->builder()->string()->withString('Validation SUCCESS'));
+        $this->reader = $reader;
     }
 
     /**
@@ -112,15 +117,19 @@ class ilStreamHandler implements ilFileValidationHandlerInterface
         );
         // Enable manual error handling
         $old_value_of_use_internal_errors = libxml_use_internal_errors(true);
-        // Open stream and collect errors
-        $reader = new XMLReader();
-        $reader->open($xml_file_handler->getFilePath());
-        //$reader->setSchema($xsd_file_handler->getFilePath());
         $component_name = null;
 
-        $this->moveXMLReader($reader, $path_handler);
-        // TODO
-        $reader->close();
+        $file_reader = $this->reader->handler()
+            ->withXMLFileHandler($xml_file_handler)
+        ;//->withXSDFileHandler($xsd_file_handler);
+
+        $file_reader->debug("Reader 1 Bevore:");
+
+        $file_reader_2 = $file_reader->moveAlongPath($path_handler);
+
+        $file_reader->debug("Reader 1 After:");
+        $file_reader_2->debug("Reader 2:");
+
         $errors = libxml_get_errors();
         libxml_clear_errors();
         $status_collection = $this->import_status->handlerCollection()->getMergedCollectionWith($this->collectErrors(
@@ -133,29 +142,5 @@ class ilStreamHandler implements ilFileValidationHandlerInterface
         return $status_collection->hasStatusType(StatusType::FAILED)
             ? $status_collection
             : $this->import_status->handlerCollection()->withAddedStatus($this->success_status);
-    }
-
-    protected function moveXMLReader(XMLReader $reader, ilParserPathHandlerInterface $path_handler): bool
-    {
-        $reached_path_end = false;
-        $reached_file_end = false;
-        while (!$reached_path_end && !$reached_file_end) {
-            $path_node = $path_handler->firstElement();
-            $path_handler = $path_handler->subPath(1);
-
-            $msg = "\n\n\nStream Reading:";
-            $msg .= "\n      path node: " . $path_node->toString();
-            while (!($reached_file_end = !$reader->read())) {
-                $msg .= "\n    reader name: " . $reader->name;
-                if ($reader->name === $path_node->toString()) {
-                    break;
-                }
-            }
-            $msg .= "\n\n";
-            $this->logger->debug($msg);
-
-            $reached_path_end = $path_handler->count() === 0;
-        }
-        return !$reached_file_end;
     }
 }

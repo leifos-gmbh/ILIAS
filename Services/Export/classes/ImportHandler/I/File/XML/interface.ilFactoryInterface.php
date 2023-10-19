@@ -23,6 +23,7 @@ namespace ImportHandler\I\File\XML;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHanlderInterface;
 use ImportHandler\I\File\XML\ilHandlerCollectionInterface as ilXMLFileHanlderCollectionInterface;
 use ImportHandler\I\File\XML\Manifest\ilFactoryInterface as ilManifestFileFactoryInterface;
+use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
 
 interface ilFactoryInterface
 {
@@ -31,4 +32,6 @@ interface ilFactoryInterface
     public function handlerCollection(): ilXMLFileHanlderCollectionInterface;
 
     public function manifest(): ilManifestFileFactoryInterface;
+
+    public function reader(): ilXMLFileReaderFactoryInterface;
 }

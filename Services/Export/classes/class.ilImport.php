@@ -263,7 +263,7 @@ class ilImport
         if ($import_status_collection->hasStatusType(StatusType::FAILED)) {
             throw new ilImportException($import_status_collection
                 ->withNumberingEnabled(true)
-                ->toString(StatusType::FAILED, StatusType::DEBUG));
+                ->toString(StatusType::FAILED));
         }
     }
 

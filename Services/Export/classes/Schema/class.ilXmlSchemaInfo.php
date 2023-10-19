@@ -31,7 +31,6 @@ class ilXmlSchemaInfo
 
     private string $sub_type;
 
-
     private SplFileInfo $file;
 
     public function __construct(SplFileInfo $file, string $component, string $sub_type, Version $version)
@@ -52,7 +51,7 @@ class ilXmlSchemaInfo
         return $this->component;
     }
 
-    public function getSubtype() : string
+    public function getSubtype(): string
     {
         return $this->sub_type;
     }
@@ -61,5 +60,4 @@ class ilXmlSchemaInfo
     {
         return $this->version;
     }
-
 }

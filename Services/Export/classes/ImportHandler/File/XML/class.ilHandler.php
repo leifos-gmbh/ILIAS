@@ -74,7 +74,11 @@ class ilHandler extends ilFileHandler implements ilXMLFileHandlerInterface
         foreach (libxml_get_errors() as $error) {
             $status_collection = $status_collection->withAddedStatus(
                 $this->status->handler()->withType(StatusType::FAILED)->withContent(
-                    $this->status->content()->builder()->string()->withString($error->message)
+                    $this->status->content()->builder()->string()->withString(
+                        "Error loading dom document:" .
+                        "<br>" . $this->getFilePath() .
+                        "<br>" . $error->message
+                    )
                 )
             );
         }

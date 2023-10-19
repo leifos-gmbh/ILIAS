@@ -30,8 +30,6 @@ class ilXmlSchemaFactory
 
     private \ilLogger $logger;
 
-
-
     public function __construct()
     {
         global $DIC;
@@ -73,7 +71,6 @@ class ilXmlSchemaFactory
         return $this->getLatest($type, $sub_type);
     }
 
-
     protected function getByType(string $component, string $sub_type = ''): ilXmlSchemaInfoCollection
     {
         $collection = new ilXmlSchemaInfoCollection();
@@ -104,7 +101,6 @@ class ilXmlSchemaFactory
         $this->logger->dump($sorted);
         return $sorted;
     }
-
 
     private function readSchemaFiles(): void
     {

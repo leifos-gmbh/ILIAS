@@ -139,13 +139,12 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
 
         $file_reader = $this->reader->handler()
             ->withXMLFileHandler($xml_file_handler)
-        ;//->withXSDFileHandler($xsd_file_handler);
-
-        $file_reader->debug("Reader 1 Bevore:");
-
+        //->withXSDFileHandler($xsd_file_handler);
+        ;
+        $path_handler = $path_handler->subPath(0, $path_handler->count() - 1);
         $file_reader_2 = $file_reader->moveAlongPath($path_handler);
 
-        $file_reader->debug("Reader 1 After:");
+        $file_reader->debug("Reader 1:");
         $file_reader_2->debug("Reader 2:");
 
         $errors = libxml_get_errors();

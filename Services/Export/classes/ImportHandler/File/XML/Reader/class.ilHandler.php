@@ -68,7 +68,7 @@ class ilHandler implements ilXMLFileReaderHandlerInterface
             $path_handler = $path_handler->subPath(1);
             $msg = "\n\n\nStream Reading:";
             $msg .= "\n      path node: " . $path_node->toString();
-            while (!($reached_file_end = !$clone->reader->read())) {
+            while (!($reached_file_end = !$this->reader->read())) {
                 $msg .= "\n    reader name: " . $clone->reader->name;
                 if ($clone->reader->name === $path_node->toString()) {
                     break;

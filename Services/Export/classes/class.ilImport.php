@@ -38,16 +38,12 @@ class ilImport
 {
     protected ilLogger $log;
     protected ilObjectDefinition $objDefinition;
-
-    private array $entity_types = [];
-    private ?ilXmlImporter $importer = null;
-    private string $comp = '';
-    private string $current_comp = '';
-    protected string $install_id = "";
-    protected string $install_url = "";
+    protected array $entity_types = [];
+    protected ?ilXmlImporter $importer = null;
+    protected string $comp = '';
+    protected string $current_comp = '';
     protected string $entities = "";
     protected string $tmp_import_dir = "";
-
     protected ?ilImportMapping $mapping = null;
     protected array $skip_entity = array();
     protected array $configs = array();
@@ -60,7 +56,6 @@ class ilImport
     public function __construct(int $a_target_id = 0)
     {
         global $DIC;
-
         $this->objDefinition = $DIC['objDefinition'];
         $this->mapping = new ilImportMapping();
         $this->mapping->setTargetId($a_target_id);
@@ -80,13 +75,11 @@ class ilImport
         if (isset($this->configs[$a_comp])) {
             return $this->configs[$a_comp];
         }
-
         // create instance of export config object
         $comp_arr = explode("/", $a_comp);
         $a_class = "il" . $comp_arr[1] . "ImportConfig";
         $imp_config = new $a_class();
         $this->configs[$a_comp] = $imp_config;
-
         return $imp_config;
     }
 
@@ -141,7 +134,6 @@ class ilImport
         $this->filesystem->temp()->createDir($tmp_dir_info->getFilename());
         $target_file_path_str = $tmp_dir_info->getRealPath() . DIRECTORY_SEPARATOR . $zip_file_name;
         $target_dir_path_str = substr($target_file_path_str, 0, -4);
-
         // Copy/move zip to tmp out directory
         // File is not uploaded with the ilias storage system, therefore the php copy functions are used.
         if (
@@ -161,7 +153,6 @@ class ilImport
                 ))
             );
         }
-
         /** @var Unzip $unzip **/
         $unzip = $this->archives->unzip(
             Streams::ofResource(fopen($target_file_path_str, 'rb')),
@@ -171,7 +162,6 @@ class ilImport
                 ->withFlat(false)
                 ->withEnsureTopDirectoy(true)
         );
-
         return $unzip->extract()
             ? $import_status_collection->withAddedStatus(
                 $this->import_status->handler()->withType(StatusType::SUCCESS)
@@ -199,7 +189,6 @@ class ilImport
         if($status_collection->hasStatusType(StatusType::FAILED)) {
             return $status_collection;
         }
-
         // If export set look for the export file manifests + VALIDATE
         if ($manifest_handlers->containsExportObjectType(ilExportObjectType::EXPORT_SET)) {
             $manifest_handlers = $manifest_handlers->findNextFiles();
@@ -208,14 +197,12 @@ class ilImport
         if($status_collection->hasStatusType(StatusType::FAILED)) {
             return $status_collection;
         }
-
         // If export file look for the export xmls
         if ($manifest_handlers->containsExportObjectType(ilExportObjectType::EXPORT_FILE)) {
             foreach ($manifest_handlers as $manfiest_file_handler) {
                 $export_files = $export_files->withMerged($manfiest_file_handler->findXMLFileHandlers());
             }
         }
-
         // VALIDATE export xmls
         $path_to_export_item = $this->import->parser()->path()->handler()
             ->withStartAtRoot(true)
@@ -286,7 +273,6 @@ class ilImport
         $target_dir_info = new SplFileInfo($success_status->getContent()->toString());
         $delete_dir_info = new SplFileInfo($target_dir_info->getPath());
         $manifest_spl = new SplFileInfo($target_dir_info->getRealPath() . DIRECTORY_SEPARATOR . 'manifest.xml');
-
         // Validate manifest files
         try {
             $status_collection = $this->validateXMLFiles($manifest_spl);
@@ -295,7 +281,6 @@ class ilImport
             $this->filesystem->temp()->deleteDir($delete_dir_info->getFilename());
             throw $e;
         }
-
         // Import
         try {
             $this->setTemporaryImportDir($target_dir_info->getRealPath());
@@ -308,7 +293,6 @@ class ilImport
             $this->filesystem->temp()->deleteDir($delete_dir_info->getFilename());
             throw $e;
         }
-
         // Delete tmp files
         $this->filesystem->temp()->deleteDir($delete_dir_info->getFilename());
         return $new_id;

@@ -2,7 +2,7 @@
 <!-- Remove start: after metadata import changes in ilCourseXMLWriter -->
 <!DOCTYPE doc [
         <!ENTITY AdvancedMetaData SYSTEM "./ilias_advanced_meta_data_9_0.xsd">
-        <!ENTITY MetaData SYSTEM "./ilias_md_4_1.xsd">
+        <!ENTITY MetaData SYSTEM "./ilias_meta_4_1.xsd">
         ]>
 <!-- Remove end -->
 <xs:schema

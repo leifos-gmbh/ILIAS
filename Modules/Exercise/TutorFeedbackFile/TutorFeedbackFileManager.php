@@ -18,23 +18,21 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Exercise\SampleSolution;
+namespace ILIAS\Exercise\TutorFeedback;
 
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Exercise\IRSS\ResourceInformation;
-use ILIAS\Exercise\InternalDomainService;
+use ILIAS\Exercise\InstructionFile\ilFSWebStorageExercise;
+use ILIAS\Exercise\InstructionFile\InstructionFileRepository;
 
-class SampleSolutionManager
+class TutorFeedbackFileManager
 {
-    protected InternalDomainService $domain;
-    protected SampleSolutionRepository $repo;
+    protected TutorFeedbackFileRepository $repo;
 
     public function __construct(
         int $ass_id,
-        SampleSolutionRepository $repo,
-        \ilExcSampleSolutionStakeholder $stakeholder,
-        InternalDomainService $domain
-    )
+        TutorFeedbackFileRepository $repo,
+        \ilExcTutorFeedbackFileStakeholder $stakeholder)
     {
         global $DIC;
 
@@ -43,7 +41,6 @@ class SampleSolutionManager
         $this->repo = $repo;
         $this->ass_id = $ass_id;
         $this->stakeholder = $stakeholder;
-        $this->domain = $domain;
     }
 
     public function getStakeholder() : ResourceStakeholder
@@ -51,31 +48,25 @@ class SampleSolutionManager
         return $this->stakeholder;
     }
 
-
-    public function importFromLegacyUpload(array $file_input) : string
+    public function getCollectionIdString() : string
     {
-        if (!isset($file_input["tmp_name"])) {
-            return "";
-        }
-        return $this->repo->importFromLegacyUpload(
+        return $this->repo->getIdStringForAssId($this->ass_id);
+    }
+
+    public function createCollection() : void
+    {
+        $this->repo->createCollection($this->ass_id);
+    }
+
+    public function importFromLegacyUpload(array $file_input) : void
+    {
+        $this->repo->importFromLegacyUpload(
             $this->ass_id,
             $file_input,
             $this->stakeholder
         );
     }
 
-    public function deliver() : void
-    {
-        if ($this->repo->hasFile($this->ass_id)) {
-            $this->repo->deliverFile($this->ass_id);
-        } else {
-            $ass = $this->domain->assignment()->getAssignment($this->ass_id);
-            \ilFileDelivery::deliverFileLegacy($ass->getGlobalFeedbackFilePath(),
-                $ass->getFeedbackFile());
-        }
-    }
-
-/*
     public function deleteCollection(): void {
         $this->repo->deleteCollection(
             $this->ass_id,
@@ -98,29 +89,15 @@ class SampleSolutionManager
             }, iterator_to_array($this->repo->getCollectionResourcesInfo($this->ass_id)));
         } else {
             $this->log->debug("getting files from class.ilExAssignment using ilFSWebStorageExercise");
-            $storage = new \ILIAS\Exercise\InstructionFile\ilFSWebStorageExercise($this->getExerciseId(), $this->ass_id);
+            $storage = new ilFSWebStorageExercise($this->getExerciseId(), $this->ass_id);
             return $storage->getFiles();
         }
-    }*/
+    }
 
     public function cloneTo(
         int $to_ass_id
     ) : void
     {
-        // IRSS
-        if ($this->repo->hasFile($this->ass_id)) {
-            $this->repo->clone($this->ass_id, $to_ass_id);
-        } else { // NO IRSS
-            $old_exc_id = \ilExAssignment::lookupExerciseId($this->ass_id);
-            $new_exc_id = \ilExAssignment::lookupExerciseId($to_ass_id);
-
-            $old_storage = new \ilFSStorageExercise($old_exc_id, $this->ass_id);
-            $new_storage = new \ilFSStorageExercise($new_exc_id, $to_ass_id);
-            $new_storage->create();
-            if (is_dir($old_storage->getGlobalFeedbackPath())) {
-                \ilFileUtils::rCopy($old_storage->getGlobalFeedbackPath(), $new_storage->getGlobalFeedbackPath());
-            }
-        }
+        $this->repo->clone($this->ass_id, $to_ass_id);
     }
-
 }

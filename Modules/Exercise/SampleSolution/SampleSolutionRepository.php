@@ -126,22 +126,22 @@ class SampleSolutionRepository
             $rcid,
             $stakeholder
         );
-    }
+    }*/
 
     public function clone(
         int $from_ass_id,
         int $to_ass_id
     ) : void
     {
-        $from_rcid = $this->getIdStringForAssId($ass_id);
-        $to_rcid = $this->wrapper->clone($from_rcid);
-        if ($to_rcid !== "") {
+        $from_rid = $this->getIdStringForAssId($from_ass_id);
+        $to_rid = $this->wrapper->cloneResource($from_rid);
+        if ($to_rid !== "") {
             $this->db->update("exc_assignment", [
-                "if_rcid" => ["text", $to_rcid]
+                "solution_rid" => ["text", $to_rid]
             ], [    // where
                     "id" => ["integer", $to_ass_id]
                 ]
             );
         }
-    }*/
+    }
 }

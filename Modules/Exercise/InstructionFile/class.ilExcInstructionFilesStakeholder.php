@@ -25,7 +25,7 @@ use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 /**
  * @author Fabian Schmid <fabian@sr.solutions>
  */
-class ilExcInstructionFilesStakeholder extends AbstractResourceStakeholder implements ResourceStakeholder
+class ilExcInstructionFilesStakeholder extends AbstractResourceStakeholder
 {
     protected int $owner = 6;
     private int $current_user;

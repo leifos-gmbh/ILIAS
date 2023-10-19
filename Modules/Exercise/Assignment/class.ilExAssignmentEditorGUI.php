@@ -1330,7 +1330,6 @@ class ilExAssignmentEditorGUI
             $ilCtrl->redirect($this, "returnToParent");
         }
         $this->domain->assignment()->sampleSolution($this->assignment->getId())->deliver();
-        ilFileDelivery::deliverFileLegacy($this->assignment->getGlobalFeedbackFilePath(), $this->assignment->getFeedbackFile());
     }
 
 

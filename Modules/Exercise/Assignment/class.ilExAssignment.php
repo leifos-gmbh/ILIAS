@@ -955,12 +955,7 @@ class ilExAssignment
             $ass_domain->instructionFiles($d->getId())->cloneTo($new_ass->getId());
 
             // clone global feedback file
-            $old_storage = new ilFSStorageExercise($a_old_exc_id, $d->getId());
-            $new_storage = new ilFSStorageExercise($a_new_exc_id, $new_ass->getId());
-            $new_storage->create();
-            if (is_dir($old_storage->getGlobalFeedbackPath())) {
-                ilFileUtils::rCopy($old_storage->getGlobalFeedbackPath(), $new_storage->getGlobalFeedbackPath());
-            }
+            $ass_domain->sampleSolution($d->getId())->cloneTo($new_ass->getId());
 
             // clone reminders
             foreach ([ilExAssignmentReminder::SUBMIT_REMINDER,

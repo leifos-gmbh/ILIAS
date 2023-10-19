@@ -180,4 +180,16 @@ class CollectionWrapper
         }
         return "";
     }
+
+    public function cloneResource(
+        string $from_rid
+    ) : string
+    {
+        if ($from_rid !== "") {
+            $cloned_rid = $this->irss->manage()->clone($this->getResourceIdForIdString($from_rid));
+            return $cloned_rid->serialize();
+        }
+        return "";
+    }
+
 }

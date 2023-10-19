@@ -30,6 +30,7 @@ use ILIAS\Exercise\GUIRequest;
 class ilExSubmissionGUI
 {
     public const MODE_OVERVIEW_CONTENT = 1;
+    protected \ILIAS\Exercise\InternalDomainService $domain;
 
     protected ilCtrl $ctrl;
     protected ilTabsGUI $tabs_gui;
@@ -87,6 +88,7 @@ class ilExSubmissionGUI
         $this->lng = $lng;
         $this->tpl = $tpl;
         $this->request = $DIC->exercise()->internal()->gui()->request();
+        $this->domain = $DIC->exercise()->internal()->domain();
     }
 
     /**
@@ -293,11 +295,13 @@ class ilExSubmissionGUI
         }
 
         // this is due to temporary bug in handleGlobalFeedbackFileUpload that missed the last "/"
+        /*
         $file = (is_file($this->assignment->getGlobalFeedbackFilePath()))
             ? $this->assignment->getGlobalFeedbackFilePath()
             : $this->assignment->getGlobalFeedbackFileStoragePath() . $this->assignment->getFeedbackFile();
 
-        ilFileDelivery::deliverFileLegacy($file, $this->assignment->getFeedbackFile());
+        ilFileDelivery::deliverFileLegacy($file, $this->assignment->getFeedbackFile());*/
+        $this->domain->assignment()->sampleSolution($this->assignment->getId())->deliver();
     }
 
     public function downloadFileObject(): bool

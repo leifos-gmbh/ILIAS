@@ -99,4 +99,20 @@ class ilExerciseDBUpdateSteps implements \ilDatabaseUpdateSteps
         }
     }
 
+    public function step_8(): void
+    {
+        if (!$this->db->tableColumnExists('exc_mem_ass_status', 'feedback_rcid')) {
+            $this->db->addTableColumn(
+                'exc_mem_ass_status',
+                'feedback_rcid',
+                [
+                    'type' => 'text',
+                    'notnull' => false,
+                    'length' => 64,
+                    'default' => ''
+                ]
+            );
+        }
+    }
+
 }

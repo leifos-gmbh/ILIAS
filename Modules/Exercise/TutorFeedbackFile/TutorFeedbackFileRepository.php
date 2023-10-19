@@ -18,13 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Exercise\InstructionFile;
+namespace ILIAS\Exercise\TutorFeedback;
 
 use ILIAS\Exercise\IRSS\CollectionWrapper;
 use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 
-class InstructionFileRepository
+class TutorFeedbackFileRepository
 {
     protected CollectionWrapper $collection;
     protected \ilDBInterface $db;
@@ -38,43 +38,45 @@ class InstructionFileRepository
         $this->wrapper = $wrapper;
     }
 
-    public function createCollection(int $ass_id) : void
+    public function createCollection(int $ass_id, int $user_id) : void
     {
         $new_id = $this->wrapper->createEmptyCollection();
-        $this->db->update("exc_assignment", [
-            "if_rcid" => ["text", $new_id]
+        $this->db->update("exc_mem_ass_status", [
+            "feedback_rcid" => ["text", $new_id]
         ], [    // where
-                "id" => ["integer", $ass_id]
+                "ass_id" => ["integer", $ass_id],
+                "usr_id" => ["integer", $user_id]
             ]
         );
     }
 
-    public function getIdStringForAssId(int $ass_id) : string
+    public function getIdStringForAssIdAndUserId(int $ass_id, int $user_id) : string
     {
-        $set = $this->db->queryF("SELECT if_rcid FROM exc_assignment " .
-            " WHERE id = %s ",
-            ["integer"],
-            [$ass_id]
+        $set = $this->db->queryF("SELECT feedback_rcid FROM exc_mem_ass_status " .
+            " WHERE ass_id = %s AND usr_id = %s",
+            ["integer", "integer"],
+            [$ass_id, $user_id]
         );
         $rec = $this->db->fetchAssoc($set);
         return ($rec["if_rcid"] ?? "");
     }
 
-    public function hasCollection(int $ass_id) : bool
+    public function hasCollection(int $ass_id, int $user_id) : bool
     {
-        $rcid = $this->getIdStringForAssId($ass_id);
+        $rcid = $this->getIdStringForAssIdAndUserId($ass_id, $user_id);
         return ($rcid !== "");
     }
 
-    public function getCollection(int $ass_id) : ?ResourceCollection
+    public function getCollection(int $ass_id, int $user_id) : ?ResourceCollection
     {
-        $rcid = $this->getIdStringForAssId($ass_id);
+        $rcid = $this->getIdStringForAssIdAndUserId($ass_id, $user_id);
         if ($rcid !== "") {
             return $this->wrapper->getCollectionForIdString($rcid);
         }
         return null;
     }
 
+    /*
     public function importFromLegacyUpload(
         int $ass_id,
         array $file_input,
@@ -89,21 +91,23 @@ class InstructionFileRepository
                 $stakeholder
             );
         }
-    }
+    }*/
 
     public function getCollectionResourcesInfo(
-        int $ass_id
+        int $ass_id,
+        int $user_id
     ) : \Generator
     {
-        $collection = $this->getCollection($ass_id);
+        $collection = $this->getCollection($ass_id, $user_id);
         return $this->wrapper->getCollectionResourcesInfo($collection);
     }
 
     public function deleteCollection(
         int $ass_id,
+        int $user_id,
         ResourceStakeholder $stakeholder
     ): void {
-        $rcid = $this->getIdStringForAssId($ass_id);
+        $rcid = $this->getIdStringForAssIdAndUserId($ass_id, $user_id);
         if ($rcid === "") {
             return;
         }
@@ -111,22 +115,5 @@ class InstructionFileRepository
             $rcid,
             $stakeholder
         );
-    }
-
-    public function clone(
-        int $from_ass_id,
-        int $to_ass_id
-    ) : void
-    {
-        $from_rcid = $this->getIdStringForAssId($from_ass_id);
-        $to_rcid = $this->wrapper->clone($from_rcid);
-        if ($to_rcid !== "") {
-            $this->db->update("exc_assignment", [
-                "if_rcid" => ["text", $to_rcid]
-            ], [    // where
-                    "id" => ["integer", $to_ass_id]
-                ]
-            );
-        }
     }
 }

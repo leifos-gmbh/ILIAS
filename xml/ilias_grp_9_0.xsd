@@ -1,30 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Remove start: after metadata import changes in ilCourseXMLWriter -->
-<!DOCTYPE doc [
-        <!ENTITY AdvancedMetaData SYSTEM "./ilias_advanced_meta_data_9_0.xsd">
-        <!ENTITY MetaData SYSTEM "./ilias_meta_4_1.xsd">
-        ]>
-<!-- Remove end -->
 <xs:schema
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        targetNamespace = "http://www.ilias.de/Modules/Group/exp/9_0"
         elementFormDefault="qualified">
 
     <xs:element name="group">
         <xs:complexType>
             <xs:sequence>
-                <!-- Remove start: after metadata import changes in ilCourseXMLWriter -->
-                &MetaData;
-                &AdvancedMetaData;
-                <!-- Remove end -->
                 <xs:element minOccurs="1" maxOccurs="1" name="title" type="xs:string"/>
                 <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="owner"/>
                 <xs:element minOccurs="1" maxOccurs="1" name="information"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="registration"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="showMembers" type="xs:boolean"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="showMembers" />
                 <xs:element minOccurs="1" maxOccurs="1" name="admissionNotification" type="binaryChoiceInt"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="viewMode" type="xs:integer"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="ViewMode" type="xs:integer"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="SessionLimit"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="GroupMap"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="period"/>
@@ -77,7 +66,7 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="maxMembers"/>
                 <xs:element minOccurs="1" maxOccurs="1" name="minMembers" type="xs:nonNegativeInteger"/>
                 <xs:element minOccurs="1" maxOccurs="1" name="WaitingListAutoFill" type="binaryChoiceInt"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="CancellationEnd" type="xs:integer"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="CancellationEnd" type="nullOrInteger"/>
                 <xs:element minOccurs="1" maxOccurs="1" name="mailMembersType" type="xs:string"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="RegistrationAccessCode"/>
             </xs:sequence>
@@ -85,6 +74,16 @@
             <xs:attribute name="waitingList" type="binaryChoiceString"/>
         </xs:complexType>
     </xs:element>
+
+    <xs:simpleType name="nullOrInteger">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d*|\s{0}" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="timestamp">
+        <xs:union memberTypes="xs:nonNegativeInteger"/>
+    </xs:simpleType>
 
     <xs:simpleType name="registrationTypes">
         <xs:restriction base="xs:token">
@@ -99,14 +98,18 @@
 
     <xs:complexType name="timeFrame">
         <xs:sequence>
-            <xs:element minOccurs="1" maxOccurs="1" name="start" type="xs:integer"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="end" type="xs:integer"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="start" type="nullOrInteger"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="end" type="nullOrInteger"/>
         </xs:sequence>
     </xs:complexType>
 
     <xs:element name="maxMembers">
         <xs:complexType>
-            <xs:attribute name="enabled" type="binaryChoiceString" use="required"/>
+            <xs:simpleContent>
+                <xs:extension base="xs:nonNegativeInteger">
+                    <xs:attribute name="enabled" type="binaryChoiceString" use="required"/>
+                </xs:extension>
+            </xs:simpleContent>
         </xs:complexType>
     </xs:element>
 
@@ -209,7 +212,11 @@
 
     <xs:element name="ContainerSetting">
         <xs:complexType>
-            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="id" type="xs:string" use="required"/>
+                </xs:extension>
+            </xs:simpleContent>
         </xs:complexType>
     </xs:element>
 </xs:schema>

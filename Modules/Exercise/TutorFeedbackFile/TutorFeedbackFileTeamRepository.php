@@ -23,9 +23,10 @@ namespace ILIAS\Exercise\TutorFeedbackFile;
 use ILIAS\Exercise\IRSS\CollectionWrapper;
 use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
+use _PHPStan_95cdbe577\Nette\Neon\Exception;
 use ILIAS\Exercise\IRSS\ResourceInformation;
 
-class TutorFeedbackFileRepository implements TutorFeedbackFileRepositoryInterface
+class TutorFeedbackFileTeamRepository implements TutorFeedbackFileRepositoryInterface
 {
     protected CollectionWrapper $collection;
     protected \ilDBInterface $db;
@@ -39,24 +40,38 @@ class TutorFeedbackFileRepository implements TutorFeedbackFileRepositoryInterfac
         $this->wrapper = $wrapper;
     }
 
+    protected function getTeamId(int $ass_id, int $user_id) : int
+    {
+        $set = $db->queryF("SELECT id FROM il_exc_team " .
+            " WHERE ass_id = %s AND user_id = %s",
+            ["integer", "integer"],
+            [$ass_id, $user_id]
+        );
+        if ($rec = $db->fetchAssoc($set)) {
+            return (int) $rec["id"];
+        }
+        throw new \ilExerciseException("Team not found for user $user_id in assignment $ass_id");
+    }
+
     public function createCollection(int $ass_id, int $user_id) : void
     {
+        $team_id = $this->getTeamId($ass_id, $user_id);
         $new_id = $this->wrapper->createEmptyCollection();
-        $this->db->update("exc_mem_ass_status", [
+        $this->db->update("exc_team_data", [
             "feedback_rcid" => ["text", $new_id]
         ], [    // where
-                "ass_id" => ["integer", $ass_id],
-                "usr_id" => ["integer", $user_id]
+                "id" => ["integer", $team_id]
             ]
         );
     }
 
     public function getIdStringForAssIdAndUserId(int $ass_id, int $user_id) : string
     {
-        $set = $this->db->queryF("SELECT feedback_rcid FROM exc_mem_ass_status " .
-            " WHERE ass_id = %s AND usr_id = %s",
-            ["integer", "integer"],
-            [$ass_id, $user_id]
+        $team_id = $this->getTeamId($ass_id, $user_id);
+        $set = $this->db->queryF("SELECT feedback_rcid FROM exc_team_data " .
+            " WHERE id = %s",
+            ["integer"],
+            [$team_id]
         );
         $rec = $this->db->fetchAssoc($set);
         return ($rec["if_rcid"] ?? "");
@@ -88,26 +103,6 @@ class TutorFeedbackFileRepository implements TutorFeedbackFileRepositoryInterfac
         throw new \ilExerciseException("Resource $file not found.");
     }
 
-    /*
-    public function importFromLegacyUpload(
-        int $ass_id,
-        array $file_input,
-        ResourceStakeholder $stakeholder
-    ) : void
-    {
-        $collection = $this->getCollection($ass_id);
-        if ($collection) {
-            $this->wrapper->importFilesFromLegacyUploadToCollection(
-                $collection,
-                $file_input,
-                $stakeholder
-            );
-        }
-    }*/
-
-    /**
-     * @return iterator<ResourceInformation>
-     */
     public function getCollectionResourcesInfo(
         int $ass_id,
         int $user_id
@@ -122,13 +117,6 @@ class TutorFeedbackFileRepository implements TutorFeedbackFileRepositoryInterfac
         int $user_id,
         ResourceStakeholder $stakeholder
     ): void {
-        $rcid = $this->getIdStringForAssIdAndUserId($ass_id, $user_id);
-        if ($rcid === "") {
-            return;
-        }
-        $this->wrapper->deleteCollectionForIdString(
-            $rcid,
-            $stakeholder
-        );
+        throw new \ilExerciseException("Collection cannot be deleted for user in team assignment $ass_id.");
     }
 }

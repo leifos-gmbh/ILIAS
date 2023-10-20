@@ -115,4 +115,27 @@ class ilExerciseDBUpdateSteps implements \ilDatabaseUpdateSteps
         }
     }
 
+    public function step_9(): void
+    {
+        if (!$this->db->tableExists('exc_team_data')) {
+            $this->db->createTable(
+                'exc_team_data',
+                [
+                    "id" => [
+                        'type' => 'integer',
+                        'notnull' => true,
+                        'length' => 4
+                    ],
+                    "feedback_rcid" => [
+                        'type' => 'text',
+                        'notnull' => false,
+                        'length' => 64,
+                        'default' => ''
+                    ]
+                ]
+            );
+        }
+        $this->db->addPrimaryKey('exc_team_data', ["id"]);
+    }
+
 }

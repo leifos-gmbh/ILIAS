@@ -22,6 +22,8 @@ use ILIAS\UI\Renderer;
 use ILIAS\UI\Component\Modal\RoundTrip;
 use ILIAS\Exercise\InternalService;
 use ILIAS\Exercise\GUIRequest;
+use ILIAS\Exercise\TutorFeedbackFile\TutorFeedbackFileManager;
+use ILIAS\Exercise\InternalGUIService;
 
 /**
  * Class ilExerciseManagementGUI
@@ -32,6 +34,7 @@ use ILIAS\Exercise\GUIRequest;
  * @ilCtrl_Calls ilExerciseManagementGUI: ilFileSystemGUI, ilRepositorySearchGUI
  * @ilCtrl_Calls ilExerciseManagementGUI: ilExSubmissionTeamGUI, ilExSubmissionFileGUI
  * @ilCtrl_Calls ilExerciseManagementGUI: ilExSubmissionTextGUI, ilExPeerReviewGUI
+ * @ilCtrl_Calls ilExAssignmentEditorGUI: ilResourceCollectionGUI
  */
 class ilExerciseManagementGUI
 {
@@ -45,7 +48,8 @@ class ilExerciseManagementGUI
     public const GRADE_NOT_GRADED = "notgraded";
     public const GRADE_PASSED = "passed";
     public const GRADE_FAILED = "failed";
-    protected \ILIAS\Exercise\InternalGUIService $gui;
+    protected TutorFeedbackFileManager $tutor_feedback_file;
+    protected InternalGUIService $gui;
     protected \ILIAS\HTTP\Services $http;
 
     protected ilCtrl $ctrl;
@@ -105,6 +109,8 @@ class ilExerciseManagementGUI
         $this->log = ilLoggerFactory::getLogger("exc");
         $this->access = $DIC->access();
 
+        $domain = $DIC->exercise()->internal()->domain();
+
         $this->ctrl = $DIC->ctrl();
         $this->tabs_gui = $DIC->tabs();
         $this->lng = $DIC->language();
@@ -147,6 +153,9 @@ class ilExerciseManagementGUI
         $this->gui = $DIC->exercise()
             ->internal()
             ->gui();
+        if ($this->ass_id > 0) {
+            $this->tutor_feedback_file = $domain->assignment()->tutorFeedbackFile($this->ass_id);
+        }
     }
 
     /**
@@ -163,6 +172,23 @@ class ilExerciseManagementGUI
         //$cmd = $ilCtrl->getCmd("listPublicSubmissions");
 
         switch ($class) {
+            // feedback files IRSS
+            case strtolower(ilResourceCollectionGUI::class):
+                $ilTabs->clearTargets();
+                $ilTabs->setBackTarget(
+                    $lng->txt("back"),
+                    $ilCtrl->getLinkTarget($this, $this->getViewBack())
+                );
+                $this->tpl->setOnScreenMessage('info', $lng->txt("exc_fb_tutor_info"));
+                $gui = $this->gui->assignment()->getTutorFeedbackFileResourceCollectionGUI(
+                    $this->exercise->getRefId(),
+                    $this->assignment->getId(),
+                    $this->requested_member_id
+                );
+                $this->ctrl->forwardCommand($gui);
+                break;
+
+            // feedback files LEGACY
             case "ilfilesystemgui":
                 $ilTabs->clearTargets();
                 $ilTabs->setBackTarget(

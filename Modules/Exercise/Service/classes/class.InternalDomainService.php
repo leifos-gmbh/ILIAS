@@ -23,7 +23,7 @@ namespace ILIAS\Exercise;
 use ILIAS\Exercise\InstructionFile\InstructionFileManager;
 use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICDomainServices;
-
+use ILIAS\Exercise\Team\TeamManager;
 
 class InternalDomainService
 {
@@ -51,4 +51,13 @@ class InternalDomainService
     {
         return $this->assignment_service;
     }
+
+    public function team(): TeamManager
+    {
+        return new TeamManager(
+            $this->data,
+            $this->repo
+        );
+    }
+
 }

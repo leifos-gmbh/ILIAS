@@ -161,6 +161,7 @@ class CollectionWrapper
                                ->getInformation();
             $src = $this->irss->consume()->src($rid)->getSrc();
             yield $this->data->resourceInformation(
+                $rid,
                 $info->getTitle(),
                 $info->getSize(),
                 $info->getCreationDate()->getTimestamp(),

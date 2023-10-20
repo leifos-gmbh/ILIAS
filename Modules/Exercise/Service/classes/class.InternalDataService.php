@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\Exercise;
 
 use ILIAS\Exercise\IRSS\ResourceInformation;
+use ILIAS\Exercise\Team\TeamMember;
 
 /**
  * Internal factory for data objects
@@ -32,6 +33,7 @@ class InternalDataService
     }
 
     public function resourceInformation(
+        string $rid,
         string $title,
         int $size,
         int $creation_timestamp,
@@ -40,6 +42,7 @@ class InternalDataService
     ) : ResourceInformation
     {
         return new ResourceInformation(
+            $rid,
             $title,
             $size,
             $creation_timestamp,
@@ -47,4 +50,18 @@ class InternalDataService
             $src
         );
     }
+
+    public function teamMember(
+        int $team_id,
+        int $assignment_id,
+        int $user_id
+    ) : TeamMember
+    {
+        return new TeamMember(
+            $team_id,
+            $assignment_id,
+            $user_id
+        );
+    }
+
 }

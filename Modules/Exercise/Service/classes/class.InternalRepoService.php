@@ -23,6 +23,10 @@ namespace ILIAS\Exercise;
 use ILIAS\Exercise\IRSS\CollectionWrapper;
 use ILIAS\Exercise\InstructionFile\InstructionFileRepository;
 use ILIAS\Exercise\SampleSolution\SampleSolutionRepository;
+use ILIAS\Exercise\Team\TeamDBRepository;
+use ILIAS\Exercise\TutorFeedbackFile\TutorFeedbackFileRepositoryInterface;
+use ILIAS\Exercise\TutorFeedbackFile\TutorFeedbackFileRepository;
+use ILIAS\Exercise\TutorFeedbackFile\TutorFeedbackFileTeamRepository;
 
 /**
  * Internal repo factory
@@ -70,4 +74,29 @@ class InternalRepoService
             $this->db
         );
     }
+
+    public function tutorFeedbackFile() : TutorFeedbackFileRepository
+    {
+        return new TutorFeedbackFileRepository(
+            $this->collection_wrapper,
+            $this->db
+        );
+    }
+
+    public function tutorFeedbackFileTeam() : TutorFeedbackFileTeamRepository
+    {
+        return new TutorFeedbackFileTeamRepository(
+            $this->collection_wrapper,
+            $this->db
+        );
+    }
+
+    public function team(): TeamDBRepository
+    {
+        return new TeamDBRepository(
+            $this->db,
+            $this->data
+        );
+    }
+
 }

@@ -72,4 +72,25 @@ class GUIService
             $write
         );
     }
+
+    public function getTutorFeedbackFileResourceCollectionGUI(
+        int $ref_id,
+        int $ass_id,
+        int $participant_id
+    ) : \ilResourceCollectionGUI
+    {
+        $feedback_file_manager = $this->domain->assignment()->tutorFeedbackFile($ass_id);
+        $lng = $this->domain->lng();
+        $lng->loadLanguageModule("exc");
+
+        $write = $this->domain->access()->checkAccess('write', '', $ref_id);
+
+        return $this->irss_wrapper_gui->getResourceCollectionGUI(
+            $feedback_file_manager->getStakeholder(),
+            $feedback_file_manager->getCollectionIdString($participant_id),
+            $lng->txt('exc_instruction_files'),
+            $write
+        );
+    }
+
 }

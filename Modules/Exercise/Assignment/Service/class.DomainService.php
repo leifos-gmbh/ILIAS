@@ -24,6 +24,7 @@ use ILIAS\Exercise\InternalRepoService;
 use ILIAS\Exercise\InternalDomainService;
 use ILIAS\Exercise\InstructionFile\InstructionFileManager;
 use ILIAS\Exercise\SampleSolution\SampleSolutionManager;
+use ILIAS\Exercise\TutorFeedbackFile\TutorFeedbackFileManager;
 
 /**
  * Assignments domain service
@@ -95,6 +96,16 @@ class DomainService
             $this->repo_service->sampleSolution(),
             $stakeholder,
             $this->domain_service
+        );
+    }
+
+    public function tutorFeedbackFile(int $ass_id) : TutorFeedbackFileManager
+    {
+        $stakeholder = new \ilExcTutorFeedbackFileStakeholder();
+        return new TutorFeedbackFileManager(
+            $ass_id,
+            $this->repo_service,
+            $stakeholder
         );
     }
 

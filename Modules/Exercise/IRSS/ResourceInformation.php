@@ -22,6 +22,7 @@ namespace ILIAS\Exercise\IRSS;
 
 class ResourceInformation
 {
+    protected string $rid;
     protected string $src;
     protected string $mime_type;
     protected int $creation_timestamp;
@@ -29,6 +30,7 @@ class ResourceInformation
     protected string $title;
 
     public function __construct(
+        string $rid,
         string $title,
         int $size,
         int $creation_timestamp,
@@ -36,11 +38,17 @@ class ResourceInformation
         string $src
     )
     {
+        $this->rid = $rid;
         $this->title = $title;
         $this->size = $size;
         $this->creation_timestamp = $creation_timestamp;
         $this->mime_type = $mime_type;
         $this->src = $src;
+    }
+
+    public function getRid() : string
+    {
+        return $this->rid;
     }
 
     public function getTitle() : string

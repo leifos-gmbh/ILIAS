@@ -59,7 +59,7 @@ class TutorFeedbackFileRepository implements TutorFeedbackFileRepositoryInterfac
             [$ass_id, $user_id]
         );
         $rec = $this->db->fetchAssoc($set);
-        return ($rec["if_rcid"] ?? "");
+        return ($rec["feedback_rcid"] ?? "");
     }
 
     public function hasCollection(int $ass_id, int $user_id) : bool
@@ -72,9 +72,18 @@ class TutorFeedbackFileRepository implements TutorFeedbackFileRepositoryInterfac
     {
         $rcid = $this->getIdStringForAssIdAndUserId($ass_id, $user_id);
         if ($rcid !== "") {
+            // 93fd5322-6a06-464d-b233-1f20da4b596f
             return $this->wrapper->getCollectionForIdString($rcid);
         }
         return null;
+    }
+
+    public function count(int $ass_id, int $user_id) : int
+    {
+        if (!is_null($collection = $this->getCollection($ass_id, $user_id))) {
+            return $collection->count();
+        }
+        return 0;
     }
 
     public function deliverFile($ass_id, $participant_id, $file) : void
@@ -87,23 +96,6 @@ class TutorFeedbackFileRepository implements TutorFeedbackFileRepositoryInterfac
         }
         throw new \ilExerciseException("Resource $file not found.");
     }
-
-    /*
-    public function importFromLegacyUpload(
-        int $ass_id,
-        array $file_input,
-        ResourceStakeholder $stakeholder
-    ) : void
-    {
-        $collection = $this->getCollection($ass_id);
-        if ($collection) {
-            $this->wrapper->importFilesFromLegacyUploadToCollection(
-                $collection,
-                $file_input,
-                $stakeholder
-            );
-        }
-    }*/
 
     /**
      * @return iterator<ResourceInformation>

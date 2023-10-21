@@ -32,8 +32,7 @@ class TeamManager
     public function __construct(
         InternalRepoService $repo,
         InternalDomainService $domain
-    )
-    {
+    ) {
         $this->repo = $repo->team();
         $this->domain = $domain;
     }
@@ -41,11 +40,15 @@ class TeamManager
     public function create(
         int $ass_id,
         int $first_user
-    ) : int
-    {
+    ) : int {
         $id = $this->repo->create();
         $this->repo->addUser($id, $ass_id, $first_user);
         $this->domain->assignment()->tutorFeedbackFile($ass_id)->createCollection($first_user);
         return $id;
+    }
+
+    public function getTeamForMember(int $ass_id, int $user_id) : ?int
+    {
+        return $this->repo->getTeamForMember($ass_id, $user_id);
     }
 }

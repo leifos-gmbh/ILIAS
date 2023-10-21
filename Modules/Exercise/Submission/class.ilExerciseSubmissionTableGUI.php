@@ -525,6 +525,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
                 $tutor_feedback_manager = $this->ass_domain->tutorFeedbackFile($a_ass->getId());
                 if ($tutor_feedback_manager->hasCollection($a_user_id)) {
                     // IRSS
+                    $counter = $tutor_feedback_manager->count($a_user_id);
                     $counter = $counter
                         ? " (" . $counter . ")"
                         : "";

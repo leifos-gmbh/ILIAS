@@ -86,8 +86,6 @@ class ilCourseXMLWriter extends ilXmlWriter
             $this->__buildFooter();
         } elseif ($this->getMode() == self::MODE_EXPORT) {
             $this->__buildCourseStart();
-            $this->__buildMetaData();
-            $this->__buildAdvancedMetaData();
             $this->__buildSetting();
             ilContainerSortingSettings::_exportContainerSortingSettings($this, $this->course_obj->getId());
             ilContainer::_exportContainerSettings($this, $this->course_obj->getId());

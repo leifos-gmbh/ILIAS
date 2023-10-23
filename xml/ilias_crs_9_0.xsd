@@ -2,10 +2,6 @@
 <xs:schema
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         elementFormDefault="qualified">
-    <!-- Remove start: after metadata import changes in ilCourseXMLWriter -->
-    <!-- Remove end -->
-    <!--<xs:include schemaLocation="ilias_meta_4_1.xsd" id="Metadata"/>
-    <xs:include schemaLocation="ilias_advanced_meta_data_9_0.xsd" id="AdvancedMetadata"/>-->
     <xs:element name="Course">
         <xs:complexType>
             <xs:sequence>

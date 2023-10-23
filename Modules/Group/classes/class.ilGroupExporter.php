@@ -67,8 +67,8 @@ class ilGroupExporter extends ilXmlExporter
         }
 
         $md_ids = [];
-        foreach ($a_ids as $exc_id) {
-            $md_ids[] = $exc_id . ":0:grp";
+        foreach ($a_ids as $grp_id) {
+            $md_ids[] = $grp_id . ":0:grp";
         }
         if ($md_ids !== []) {
             $deps[] =
@@ -129,26 +129,28 @@ class ilGroupExporter extends ilXmlExporter
      */
     public function getValidSchemaVersions(string $a_entity): array
     {
-        return array(
-            "9.0.0" => [
-                "namespace" => "http://www.ilias.de/Modules/Group/grp/9",
-                "xsd_file" => "ilias_grp_9_0.xsd",
+        return [
+            "9.0" => [
+                "namespace" => 'http://www.ilias.de/Modules/Group/grp/9',
+                "xsd_file" => 'ilias_grp_9_0.xsd',
                 "uses_dataset" => false,
                 "min" => "9.0",
                 "max" => "9.99"
             ],
-            "4.1.0" => array(
+            "4.1.0" => [
                 "namespace" => "http://www.ilias.de/Modules/Group/grp/4_1",
                 "xsd_file" => "ilias_grp_4_1.xsd",
                 "uses_dataset" => false,
                 "min" => "4.1.0",
-                "max" => "4.4.999"),
-            "5.0.0" => array(
+                "max" => "4.4.999"
+            ],
+            "5.0.0" => [
                 "namespace" => "http://www.ilias.de/Modules/Group/grp/5_0",
                 "xsd_file" => "ilias_grp_5_0.xsd",
                 "uses_dataset" => false,
                 "min" => "5.0.0",
-                "max" => "")
-        );
+                "max" => ""
+            ]
+        ];
     }
 }

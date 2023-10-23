@@ -44,7 +44,7 @@
 
     <xs:simpleType name="nameString">
         <xs:restriction base="xs:string">
-            <xs:pattern value="([A-Z]|[a-z]|\s)+"/>
+            <!-- <xs:pattern value="([A-Z]|[a-z]|\s)+"/> -->
         </xs:restriction>
     </xs:simpleType>
 

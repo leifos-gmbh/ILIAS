@@ -23,11 +23,8 @@ namespace ImportHandler\Parser;
 use ilLogger;
 use ImportHandler\I\Parser\ilFactoryInterface as ilParserFactoryInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
-use ImportHandler\I\Parser\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\XML\ilFactoryInterface as ilParserXMLFactoryInterface;
 use ImportHandler\Parser\ilHandler as ilParserHandler;
-use ImportHandler\Parser\Path\ilFactory as ilParserPathFactory;
-use ImportHandler\Parser\XML\ilFactory as ilParserXMLFactory;
+use ImportHandler\File\XML\Node\Info\ilFactory as ilXMLFileNodeInfoFactory;
 
 class ilFactory implements ilParserFactoryInterface
 {
@@ -42,17 +39,7 @@ class ilFactory implements ilParserFactoryInterface
     {
         return new ilParserHandler(
             $this->logger,
-            $this->xml()->node()
+            new ilXMLFileNodeInfoFactory()
         );
-    }
-
-    public function path(): ilParserPathFactoryInterface
-    {
-        return new ilParserPathFactory();
-    }
-
-    public function xml(): ilParserXMLFactoryInterface
-    {
-        return new ilParserXMLFactory();
     }
 }

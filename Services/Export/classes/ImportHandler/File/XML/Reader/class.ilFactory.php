@@ -24,6 +24,8 @@ use ilLogger;
 use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
 use ImportHandler\I\File\XML\Reader\ilHandlerInterface as ilXMLFileReaderHandlerInterface;
 use ImportHandler\File\XML\Reader\ilHandler as ilXMLFileReaderHandler;
+use ImportHandler\I\File\XML\Reader\Path\ilFactoryInterface as ilXMLFileReaderPathFactoryInterface;
+use ImportHandler\File\XML\Reader\Path\ilFactory as ilXMLFileReaderPathFactory;
 use ImportStatus\ilFactory as ilImportStatusFactory;
 
 class ilFactory implements ilXMLFileReaderFactoryInterface
@@ -40,7 +42,13 @@ class ilFactory implements ilXMLFileReaderFactoryInterface
     {
         return new ilXMLFileReaderHandler(
             $this->logger,
-            new ilImportStatusFactory()
+            new ilImportStatusFactory(),
+            new ilXMLFileReaderPathFactory()
         );
+    }
+
+    public function path(): ilXMLFileReaderPathFactoryInterface
+    {
+        return new ilXMLFileReaderPathFactory();
     }
 }

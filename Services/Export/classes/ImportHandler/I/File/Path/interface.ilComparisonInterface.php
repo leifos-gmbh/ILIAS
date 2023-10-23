@@ -18,12 +18,9 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportHandler\I\File\Path;
 
-use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
-
-interface ilFactoryInterface
+interface ilComparisonInterface
 {
-    public function handler(): ilParserHandlerInterface;
+    public function toString();
 }

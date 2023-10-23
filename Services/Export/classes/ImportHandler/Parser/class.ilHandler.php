@@ -26,27 +26,22 @@ use DOMNode;
 use DOMXPath;
 use ilImportException;
 use ilLogger;
-use ImportHandler\File\XML\ilHandler as ilXMLFileHandler;
-use ImportHandler\I\File\ilHandlerInterface as ilFileHandlerInterface;
+use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoFactoryInterface;
+use ImportHandler\I\File\XML\Node\Info\ilHandlerCollection as ilXMLFileNodeInfoCollectionInterface;
+use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParseHandlerInterface;
-use ImportHandler\I\Parser\Path\ilHandlerInterface as ilParserPathHandlerInterface;
-use ImportHandler\I\Parser\XML\Node\ilInfoCollectionInterface as ilParserXMLNodeInfoCollectionInterface;
-use ImportHandler\I\Parser\XML\Node\ilFactoryInterface as ilParserXMLNodeFactory;
-use ImportHandler\I\File\ilFactoryInterface as ilFileFactory;
-use SplFileInfo;
-use XMLReader;
 
 class ilHandler implements ilParseHandlerInterface
 {
     protected ilXMLFileHandlerInterface $xml_file_handler;
-    protected ilParserXMLNodeFactory $xml_node;
+    protected ilXMLFileNodeInfoFactoryInterface $xml_node;
     protected ilLogger $logger;
     protected DOMDocument $dom_doc;
 
     public function __construct(
         ilLogger $logger,
-        ilParserXMLNodeFactory $xml_node_factory,
+        ilXMLFileNodeInfoFactoryInterface $xml_node_factory,
     ) {
         $this->logger = $logger;
         $this->xml_node = $xml_node_factory;
@@ -67,14 +62,14 @@ class ilHandler implements ilParseHandlerInterface
         return $clone;
     }
 
-    public function getNodeInfoAt(ilParserPathHandlerInterface $path): ilParserXMLNodeInfoCollectionInterface
+    public function getNodeInfoAt(ilParserPathHandlerInterface $path): ilXMLFileNodeInfoCollectionInterface
     {
         $log_msg = "\n\n\nGetting node info at path: " . $path->toString();
         $log_msg .= "\nFrom file: " . $this->xml_file_handler->getFilePath();
         $this->checkIfFileHandlerIsSet();
         $dom_xpath = new DOMXPath($this->dom_doc);
         $nodes = $dom_xpath->query($path->toString());
-        $node_info_collection = $this->xml_node->infoCollection();
+        $node_info_collection = $this->xml_node->handlerCollection();
         /** @var DOMNode $node **/
         foreach ($nodes as $node) {
             $log_msg .= "\nFound Node: " . $node->nodeName;
@@ -82,7 +77,7 @@ class ilHandler implements ilParseHandlerInterface
             foreach ($node->attributes as $attribute) {
                 $log_msg .= "\nWith Attribute: " . $attribute->name . " = " . $attribute->value;
             }
-            $node_info = $this->xml_node->info()->withDOMNode($node);
+            $node_info = $this->xml_node->handler()->withDOMNode($node);
             $node_info_collection = $node_info_collection->withElement($node_info);
         }
         $log_msg .= "\n\n";

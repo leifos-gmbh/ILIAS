@@ -21,12 +21,14 @@ declare(strict_types=1);
 namespace ImportHandler\File\XML\Reader;
 
 use ilLogger;
+use ImportHandler\File\Path\ilHandler as ilParserPathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\File\XML\Reader\ilHandlerInterface as ilXMLFileReaderHandlerInterface;
+use ImportHandler\I\File\XML\Reader\Path\ilFactoryInterface as ilXMLFileReaderPathFactoryInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
-use ImportHandler\Parser\Path\ilHandler as ilParserPathHandlerInterface;
-use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
+use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportStatus\StatusType;
 use XMLReader;
 
 class ilHandler implements ilXMLFileReaderHandlerInterface
@@ -34,10 +36,13 @@ class ilHandler implements ilXMLFileReaderHandlerInterface
     protected ilLogger $logger;
     protected ilImportStatusFactoryInterface $status;
     protected XMLReader $reader;
+    protected ilXSDFileHandlerInterface $xsd_file_handler;
+    protected ilXMLFileHandlerInterface $xml_file_handler;
+    protected string $element_name;
 
     public function __construct(
         ilLogger $logger,
-        ilImportStatusFactoryInterface $status
+        ilImportStatusFactoryInterface $status,
     ) {
         $this->logger = $logger;
         $this->status = $status;
@@ -47,51 +52,80 @@ class ilHandler implements ilXMLFileReaderHandlerInterface
     public function withXSDFileHandler(ilXSDFileHandlerInterface $xsd_file): ilXMLFileReaderHandlerInterface
     {
         $clone = clone $this;
-        $clone->reader->setSchema($xsd_file->getFilePath());
+        $clone->xsd_file_handler = $xsd_file;
         return $clone;
     }
 
     public function withXMLFileHandler(ilXMLFileHandlerInterface $xml_file): ilXMLFileReaderHandlerInterface
     {
         $clone = clone $this;
-        $clone->reader->open($xml_file->getFilePath());
+        $clone->xml_file_handler = $xml_file;
         return $clone;
     }
 
-    public function moveAlongPath(ilParserPathHandlerInterface $path_handler): ilXMLFileReaderHandlerInterface
+    public function withTargetElement(string $element_name): ilXMLFileReaderHandlerInterface
     {
         $clone = clone $this;
-        $reached_path_end = false;
-        $reached_file_end = false;
-        while (!$reached_path_end && !$reached_file_end) {
-            $path_node = $path_handler->firstElement();
-            $path_handler = $path_handler->subPath(1);
-            $msg = "\n\n\nStream Reading:";
-            $msg .= "\n      path node: " . $path_node->toString();
-            while (!($reached_file_end = !$this->reader->read())) {
-                $msg .= "\n    reader name: " . $clone->reader->name;
-                if ($clone->reader->name === $path_node->toString()) {
-                    break;
-                }
-            }
-            $msg .= "\n\n";
-            $clone->logger->debug($msg);
-            $reached_path_end = $path_handler->count() === 0;
-        }
+        $clone->element_name = $element_name;
         return $clone;
     }
 
-    public function debug(string $msg)
+    protected function handleErrors(): ilImportStatusHandlerCollectionInterface
     {
-        $content = "";
-        while (!($reached_file_end = !$this->reader->read())) {
-            $content .= "\n    >>>: " . $this->reader->name;
+        $status_collection = $this->status->handlerCollection();
+        foreach (libxml_get_errors() as $error) {
+            $status_collection->withAddedStatus(
+                $this->status->handler()
+                    ->withType(StatusType::FAILED)
+                    ->withContent($this->status->content()->builder()->string()
+                        ->withString("ERROR: " . $error->message))
+            );
         }
-        $this->logger->debug(
-            "\n\n\n"
-            . $msg
-            . $content
-            . "\n\n"
-        );
+        libxml_clear_errors();
+        return $status_collection;
+    }
+
+    public function validate(): ilImportStatusHandlerCollectionInterface
+    {
+        $old_val = libxml_use_internal_errors(true);
+        $this->reader->open($this->xml_file_handler->getFilePath());
+        $status_collection = $this->handleErrors();
+        if ($status_collection->hasStatusType(StatusType::FAILED)) {
+            return $status_collection;
+        }
+        if (isset($this->element_name) && !$this->moveToElement()) {
+            libxml_use_internal_errors($old_val);
+            return $status_collection->withAddedStatus(
+                $this->status->handler()
+                    ->withType(StatusType::FAILED)
+                    ->withContent($this->status->content()->builder()->string()
+                        ->withString("Element not found in file: " . $this->element_name))
+            );
+        }
+        $this->reader->setSchema($this->xsd_file_handler->getFilePath());
+        while ($this->reader->read()) {
+            if (isset($this->element_name)) {
+
+            }
+        }
+        $status_collection = $this->handleErrors();
+        if ($status_collection->hasStatusType(StatusType::FAILED)) {
+            return $status_collection;
+        }
+        libxml_use_internal_errors($old_val);
+        return $status_collection;
+    }
+
+    protected function moveToElement(): bool
+    {
+        while ($this->reader->read()) {
+            if(
+                $this->reader->nodeType === XMLReader::ELEMENT &&
+                $this->reader->name === $this->element_name
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 }

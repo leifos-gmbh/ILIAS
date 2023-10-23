@@ -18,12 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportHandler\I\File\Path\Node;
 
-use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportHandler\I\File\Path\Node\ilNodeInterface as ilFilePathNodeInterface;
 
-interface ilFactoryInterface
+interface ilAnyNodeInterface extends ilFilePathNodeInterface
 {
-    public function handler(): ilParserHandlerInterface;
 }

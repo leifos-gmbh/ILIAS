@@ -18,12 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportHandler\File\XML\Node;
 
-use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportHandler\I\File\XML\Node\ilFactoryInterface as ilXMLFileNodeFactoryInterface;
+use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoInterface;
+use ImportHandler\File\XML\Node\Info\ilFactory as ilXMLFileNodeInfo;
 
-interface ilFactoryInterface
+class ilFactory implements ilXMLFileNodeFactoryInterface
 {
-    public function handler(): ilParserHandlerInterface;
+    public function info(): ilXMLFileNodeInfoInterface
+    {
+        return new ilXMLFileNodeInfo();
+    }
 }

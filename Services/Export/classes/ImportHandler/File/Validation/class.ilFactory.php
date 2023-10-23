@@ -21,25 +21,25 @@ declare(strict_types=1);
 namespace ImportHandler\File\Validation;
 
 use ilLogger;
+use ImportHandler\File\Validation\ilHandler as ilFileValidationHandler;
+use ImportHandler\File\Validation\ilStreamHandler as ilFileStreamValidationHandler;
+use ImportHandler\File\XML\Reader\ilFactory as ilXMLFileReaderFactory;
+use ImportHandler\I\File\Path\ilFactoryInterface as ilFilePathFactoryInterface;
 use ImportHandler\I\File\Validation\ilFactoryInterface as ilFileValidationFactoryInterface;
 use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandlerInterface;
-use ImportHandler\File\Validation\ilHandler as ilFileValidationHandler;
-use ImportHandler\I\Parser\Path\ilFactoryInterface as ilParserPathFactoryInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
-use ImportHandler\File\XML\Reader\ilFactory as ilXMLFileReaderFactory;
 use ImportStatus\ilFactory as ilImportStatusFactory;
-use ImportHandler\File\Validation\ilStreamHandler as ilFileStreamValidationHandler;
 
 class ilFactory implements ilFileValidationFactoryInterface
 {
     protected ilLogger $logger;
     protected ilParserHandlerInterface $parser_handler;
-    protected ilParserPathFactoryInterface $path;
+    protected ilFilePathFactoryInterface $path;
 
     public function __construct(
         ilLogger $logger,
         ilParserHandlerInterface $parser_handler,
-        ilParserPathFactoryInterface $path
+        ilFilePathFactoryInterface $path
     ) {
         $this->logger = $logger;
         $this->parser_handler = $parser_handler;

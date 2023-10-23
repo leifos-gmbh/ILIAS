@@ -204,14 +204,14 @@ class ilImport
             }
         }
         // VALIDATE export xmls
-        $path_to_export_item = $this->import->parser()->path()->handler()
+        $path_to_export_item = $this->import->file()->path()->handler()
             ->withStartAtRoot(true)
-            ->withNode($this->import->parser()->path()->node()->simple()->withName('exp:Export'))
-            ->withNode($this->import->parser()->path()->node()->simple()->withName('exp:ExportItem'))
-            ->withNode($this->import->parser()->path()->node()->anyNode());
-        $path_to_export = $this->import->parser()->path()->handler()
+            ->withNode($this->import->file()->path()->node()->simple()->withName('exp:Export'))
+            ->withNode($this->import->file()->path()->node()->simple()->withName('exp:ExportItem'))
+            ->withNode($this->import->file()->path()->node()->anyNode());
+        $path_to_export = $this->import->file()->path()->handler()
             ->withStartAtRoot(true)
-            ->withNode($this->import->parser()->path()->node()->simple()->withName('exp:Export'));
+            ->withNode($this->import->file()->path()->node()->simple()->withName('exp:Export'));
         foreach ($export_files as $export_file) {
             $export_node_info = $this->import->parser()->handler()
                 ->withFileHandler($export_file)

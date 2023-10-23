@@ -18,12 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportHandler\I\File\Path\Node;
 
-use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportHandler\I\File\Path\ilComparisonInterface as ilFilePathComparisonInterface;
+use ImportHandler\I\File\Path\Node\ilSimpleInterface as ilSimpleFilePathNodeInterface;
 
-interface ilFactoryInterface
+interface ilIndexableInterface extends ilSimpleFilePathNodeInterface
 {
-    public function handler(): ilParserHandlerInterface;
+    public function withIndex(int $index): ilIndexableInterface;
+
+    public function withComparison(ilFilePathComparisonInterface $comparison): ilIndexableInterface;
+
+    public function withIndexingFromEndEnabled(bool $enabled): ilIndexableInterface;
 }

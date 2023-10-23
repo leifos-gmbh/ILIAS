@@ -18,12 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportHandler\I\File\XML\Reader\Path;
 
-use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
+use XMLReader;
 
-interface ilFactoryInterface
+interface ilHandlerInterface
 {
-    public function handler(): ilParserHandlerInterface;
+    public function continueAlongPath(XMLReader $reader): bool;
+
+    public function withPath(ilParserPathHandlerInterface $path_handler): ilHandlerInterface;
+
+    public function finished(): bool;
 }

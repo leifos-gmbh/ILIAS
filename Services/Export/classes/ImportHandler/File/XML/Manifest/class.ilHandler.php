@@ -28,7 +28,6 @@ use ImportHandler\I\File\XML\ilHandlerCollectionInterface as ilXMLFileHandlerCol
 use ImportHandler\I\File\XML\Manifest\ilHandlerCollectionInterface as ilManifestXMLFileHandlerCollectionInterface;
 use ImportHandler\I\File\XML\Manifest\ilHandlerInterface as ilManifestHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
-use ImportHandler\I\Parser\XML\Node\ilInfoCollectionInterface as ilNodeInfoCollection;
 use ImportHandler\Parser\ilFactory as ilParserFactory;
 use ImportHandler\Parser\ilHandler as ilParserHandler;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
@@ -94,12 +93,12 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
 
     public function getExportObjectType(): ilExportObjectType
     {
-        $exp_file_file_path = $this->parser->path()->handler()
-            ->withNode($this->parser->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
-            ->withNode($this->parser->path()->node()->simple()->withName(self::EXPORT_FILE_NODE_NAME));
-        $exp_set_file_path = $this->parser->path()->handler()
-            ->withNode($this->parser->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
-            ->withNode($this->parser->path()->node()->simple()->withName(self::EXPORT_SET_NODE_NAME));
+        $exp_file_file_path = $this->file->path()->handler()
+            ->withNode($this->file->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
+            ->withNode($this->file->path()->node()->simple()->withName(self::EXPORT_FILE_NODE_NAME));
+        $exp_set_file_path = $this->file->path()->handler()
+            ->withNode($this->file->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
+            ->withNode($this->file->path()->node()->simple()->withName(self::EXPORT_SET_NODE_NAME));
         $export_file_node_info = $this->parser_handler->getNodeInfoAt($exp_file_file_path);
         $export_set_node_info = $this->parser_handler->getNodeInfoAt($exp_set_file_path);
         if (
@@ -133,10 +132,10 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
     public function findXMLFileHandlers(): ilXMLFileHandlerCollectionInterface
     {
         $type_name = ilExportObjectType::toString($this->getExportObjectType());
-        $path = $this->parser->path()->handler()
+        $path = $this->file->path()->handler()
             ->withStartAtRoot(true)
-            ->withNode($this->parser->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
-            ->withNode($this->parser->path()->node()->simple()->withName($type_name));
+            ->withNode($this->file->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
+            ->withNode($this->file->path()->node()->simple()->withName($type_name));
         $xml_file_infos = $this->file->xml()->handlerCollection();
         foreach ($this->parser_handler->getNodeInfoAt($path) as $node_info) {
             $file_name = $node_info->getNodeName() === ilExportObjectType::toString(ilExportObjectType::EXPORT_SET)
@@ -160,10 +159,10 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
             . ilExportObjectType::toString($this->getExportObjectType()) . "\n\n"
         );
         $type_name = ilExportObjectType::toString($this->getExportObjectType());
-        $path = $this->parser->path()->handler()
+        $path = $this->file->path()->handler()
             ->withStartAtRoot(true)
-            ->withNode($this->parser->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
-            ->withNode($this->parser->path()->node()->simple()->withName($type_name));
+            ->withNode($this->file->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
+            ->withNode($this->file->path()->node()->simple()->withName($type_name));
         $xml_file_infos = $this->file->xml()->manifest()->handlerCollection();
         foreach ($this->parser_handler->getNodeInfoAt($path) as $node_info) {
             $file_name = $node_info->getNodeName() === ilExportObjectType::toString(ilExportObjectType::EXPORT_SET)

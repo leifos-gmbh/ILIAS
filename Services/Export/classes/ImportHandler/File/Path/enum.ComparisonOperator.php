@@ -18,12 +18,24 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportHandler\File\Path;
 
-use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
-
-interface ilFactoryInterface
+enum ComparisonOperator
 {
-    public function handler(): ilParserHandlerInterface;
+    case EQUAL;
+    case LOWER;
+    case GREATER;
+    case GREATER_EQUAL;
+    case LOWER_EQUAL;
+
+    public static function toString(ComparisonOperator $operator): string
+    {
+        return match ($operator) {
+            ComparisonOperator::EQUAL => '=',
+            ComparisonOperator::LOWER => '<',
+            ComparisonOperator::GREATER => '>',
+            ComparisonOperator::GREATER_EQUAL => '>=',
+            ComparisonOperator::LOWER_EQUAL => '<=',
+        };
+    }
 }

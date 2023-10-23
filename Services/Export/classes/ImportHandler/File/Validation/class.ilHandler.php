@@ -23,14 +23,14 @@ namespace ImportHandler\File\Validation;
 use DOMDocument;
 use Exception;
 use ilLogger;
+use ImportHandler\I\File\XML\Node\Info\ilHandlerCollection as ilXMLFileNodeInfoCollection;
 use ImportHandler\I\File\ilHandlerInterface as ilFileHandlerInterface;
+use ImportHandler\I\File\Path\ilFactoryInterface as ilFilePathFactoryInterface;
+use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
 use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
-use ImportHandler\I\Parser\Path\ilHandlerInterface as ilParserPathHandlerInterface;
-use ImportHandler\I\Parser\XML\Node\ilInfoCollectionInterface as ilParserXMLNodeInfoCollectionInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
-use ImportHandler\I\Parser\Path\ilFactoryInterface as ilParserPathFactoryInterface;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
@@ -45,14 +45,14 @@ class ilHandler implements ilFileValidationHandlerInterface
     protected ilLogger $logger;
     protected ilImportStatusFactoryInterface $import_status;
     protected ilParserHandlerInterface $parser_handler;
-    protected ilParserPathFactoryInterface $path;
+    protected ilFilePathFactoryInterface $path;
     protected ilImportStatusHandlerInterface $success_status;
 
     public function __construct(
         ilLogger $logger,
         ilParserHandlerInterface $parser_handler,
         ilImportStatusFactoryInterface $import_status,
-        ilParserPathFactoryInterface $path
+        ilFilePathFactoryInterface $path
     ) {
         $this->logger = $logger;
         $this->import_status = $import_status;
@@ -113,7 +113,7 @@ class ilHandler implements ilFileValidationHandlerInterface
     protected function validateXMLAtNodes(
         ilXMLFileHandlerInterface $xml_file_handler,
         ilXSDFileHandlerInterface $xsd_file_handler,
-        ilParserXMLNodeInfoCollectionInterface $nodes
+        ilXMLFileNodeInfoCollection $nodes
     ): ilImportStatusHandlerCollectionInterface {
         $this->logger->debug(
             "\n\nValidating:"
@@ -133,6 +133,11 @@ class ilHandler implements ilFileValidationHandlerInterface
             $doc = new DOMDocument();
             $doc->loadXML($node->getXML(), LIBXML_NOBLANKS);
             $doc->normalizeDocument();
+
+            $this->logger->debug(
+                "\n\n\n" . $doc->saveXML() . "\n\n"
+            );
+
             try {
                 if($doc->schemaValidate($xsd_file_handler->getFilePath())) {
                     continue;
@@ -166,7 +171,7 @@ class ilHandler implements ilFileValidationHandlerInterface
     public function validateXMLAtPath(
         ilXMLFileHandlerInterface $xml_file_handler,
         ilXSDFileHandlerInterface $xsd_file_handler,
-        ilParserPathHandlerInterface $path_handler
+        ilFilePathHandlerInterface $path_handler
     ): ilImportStatusHandlerCollectionInterface {
         $nodes = $this->parser_handler->withFileHandler($xml_file_handler)->getNodeInfoAt($path_handler);
         return $this->validateXMLAtNodes($xml_file_handler, $xsd_file_handler, $nodes);

@@ -18,12 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportHandler\I\File\Path\Node;
 
-use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use XMLReader;
 
-interface ilFactoryInterface
+interface ilNodeInterface
 {
-    public function handler(): ilParserHandlerInterface;
+    public function toString(): string;
+
+    public function moveReader(XMLReader $reader): bool;
 }

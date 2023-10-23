@@ -20,10 +20,9 @@ declare(strict_types=1);
 
 namespace ImportHandler\I\File\Validation;
 
+use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
-use ImportHandler\I\Parser\XML\Node\ilInfoCollectionInterface as ilParserXMLNodeInfoCollectionInterface;
-use ImportHandler\I\Parser\Path\ilHandlerInterface as ilParserPathHandlerInterface;
 use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
 
 interface ilHandlerInterface

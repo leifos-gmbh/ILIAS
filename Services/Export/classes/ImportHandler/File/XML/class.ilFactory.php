@@ -29,10 +29,12 @@ use ImportHandler\File\XML\ilHandler as ilXMLFileHanlder;
 use ImportHandler\File\XML\ilHandlerCollection as ilXMLFileHanlderCollection;
 use ImportHandler\I\File\XML\Manifest\ilFactoryInterface as ilManifestFileFactoryInterface;
 use ImportHandler\I\File\ilFactoryInterface as ilFileFactoryInterface;
+use ImportHandler\I\File\XML\Node\ilFactoryInterface as ilXMLFileNodeFactoryInterface;
 use ImportHandler\I\Parser\ilFactoryInterface as ilParserFactoryInterface;
 use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
 use ImportHandler\File\XML\Reader\ilFactory as ilXMLFileReaderFactory;
 use ImportStatus\ilFactory as ilStatusFactory;
+use ImportHandler\File\XML\Node\ilFactory as ilXMLFileNodeFactory;
 
 class ilFactory implements ilXMLFileFactoryInterface
 {
@@ -76,5 +78,10 @@ class ilFactory implements ilXMLFileFactoryInterface
         return new ilXMLFileReaderFactory(
             $this->logger
         );
+    }
+
+    public function node(): ilXMLFileNodeFactoryInterface
+    {
+        return new ilXMLFileNodeFactory();
     }
 }

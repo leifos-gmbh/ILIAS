@@ -22,22 +22,18 @@ namespace ImportHandler\File\Validation;
 
 use ilLogger;
 use ImportHandler\I\File\ilHandlerInterface as ilFileHandlerInterface;
-use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandlerInterface;
+use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
+use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
+use ImportHandler\I\File\Validation\ilStreamHandlerInterface as ilXMLStreamFileValidationHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
+use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
-use ImportHandler\I\File\Validation\ilStreamHandlerInterface as ilXMLStreamFileValidationHandlerInterface;
-use ImportHandler\I\Parser\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\Path\ilHandlerInterface as ilParserPathHandlerInterface;
-use ImportHandler\I\Parser\XML\Node\ilInfoCollectionInterface as ilParserXMLNodeInfoCollectionInterface;
-use ImportHandler\I\Parser\Path\Node\ilSimpleInterface as ilParserPathNodeSimpleInterface;
-use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
 use ImportStatus\StatusType;
 use LibXMLError;
-use XMLReader;
 
 class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
 {
@@ -139,13 +135,10 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
 
         $file_reader = $this->reader->handler()
             ->withXMLFileHandler($xml_file_handler)
+            ->moveAlongPath($path_handler);
         //->withXSDFileHandler($xsd_file_handler);
-        ;
-        $path_handler = $path_handler->subPath(0, $path_handler->count() - 1);
-        $file_reader_2 = $file_reader->moveAlongPath($path_handler);
 
-        $file_reader->debug("Reader 1:");
-        $file_reader_2->debug("Reader 2:");
+
 
         $errors = libxml_get_errors();
         libxml_clear_errors();

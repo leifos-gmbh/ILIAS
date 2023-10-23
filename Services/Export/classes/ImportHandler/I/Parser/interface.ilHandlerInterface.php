@@ -20,14 +20,13 @@ declare(strict_types=1);
 
 namespace ImportHandler\I\Parser;
 
+use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
-use ImportHandler\I\Parser\Path\ilHandlerInterface as ilParserPathHandlerInterface;
-use ImportHandler\I\Parser\XML\Node\ilInfoCollectionInterface;
-use XMLReader;
+use ImportHandler\I\File\XML\Node\Info\ilHandlerCollection as ilXMLFileNodeInfoCollectionInterface;
 
 interface ilHandlerInterface
 {
     public function withFileHandler(ilXMLFileHandlerInterface $file_handler): ilHandlerInterface;
 
-    public function getNodeInfoAt(ilParserPathHandlerInterface $path): ilInfoCollectionInterface;
+    public function getNodeInfoAt(ilParserPathHandlerInterface $path): ilXMLFileNodeInfoCollectionInterface;
 }

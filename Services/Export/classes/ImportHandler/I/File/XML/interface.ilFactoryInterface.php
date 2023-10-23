@@ -24,6 +24,7 @@ use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHanlderInterface;
 use ImportHandler\I\File\XML\ilHandlerCollectionInterface as ilXMLFileHanlderCollectionInterface;
 use ImportHandler\I\File\XML\Manifest\ilFactoryInterface as ilManifestFileFactoryInterface;
 use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
+use ImportHandler\I\File\XML\Node\ilFactoryInterface as ilXMLFileNodeFactoryInterface;
 
 interface ilFactoryInterface
 {
@@ -34,4 +35,6 @@ interface ilFactoryInterface
     public function manifest(): ilManifestFileFactoryInterface;
 
     public function reader(): ilXMLFileReaderFactoryInterface;
+
+    public function node(): ilXMLFileNodeFactoryInterface;
 }

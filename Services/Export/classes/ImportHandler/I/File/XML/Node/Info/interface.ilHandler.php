@@ -18,12 +18,19 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportHandler\I\File\XML\Node\Info;
 
-use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use DOMNode;
 
-interface ilFactoryInterface
+interface ilHandler
 {
-    public function handler(): ilParserHandlerInterface;
+    public function withDOMNode(DOMNode $node): ilHandler;
+
+    public function getXML(): string;
+
+    public function getNodeName(): string;
+
+    public function getValueOfAttribute(string $attribute_name): string;
+
+    public function getNode(): DOMNode;
 }

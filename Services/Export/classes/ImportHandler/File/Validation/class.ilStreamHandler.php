@@ -26,7 +26,7 @@ use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface
 use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
 use ImportHandler\I\File\Validation\ilStreamHandlerInterface as ilXMLStreamFileValidationHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
-use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
+use ImportHandler\I\File\XML\Reader\Path\ilFactoryInterface as ilXMLFileReaderPathFactoryInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
@@ -34,6 +34,7 @@ use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollecti
 use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
 use ImportStatus\StatusType;
 use LibXMLError;
+use XMLReader;
 
 class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
 {
@@ -45,14 +46,14 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
     protected ilParserHandlerInterface $parser_handler;
     protected ilParserPathFactoryInterface $path;
     protected ilImportStatusHandlerInterface $success_status;
-    protected ilXMLFileReaderFactoryInterface $reader;
+    protected ilXMLFileReaderPathFactoryInterface $reader_path;
 
     public function __construct(
         ilLogger $logger,
         ilParserHandlerInterface $parser_handler,
         ilImportStatusFactoryInterface $import_status,
         ilParserPathFactoryInterface $path,
-        ilXMLFileReaderFactoryInterface $reader
+        ilXMLFileReaderPathFactoryInterface $reader_path
     ) {
         $this->logger = $logger;
         $this->import_status = $import_status;
@@ -61,7 +62,7 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
         $this->success_status = $import_status->handler()
             ->withType(StatusType::SUCCESS)
             ->withContent($import_status->content()->builder()->string()->withString('Validation SUCCESS'));
-        $this->reader = $reader;
+        $this->reader_path = $reader_path;
     }
 
     /**
@@ -90,24 +91,36 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
         ?ilXSDFileHandlerInterface $xsd_file_handler = null,
         array $errors = []
     ): ilImportStatusHandlerCollectionInterface {
-        $status_collection = $this->import_status->handlerCollection()->withNumberingEnabled(true);
+        $status_collection = $this->import_status->handlerCollection();
+        foreach ($errors as $error) {
+            $status_collection = $status_collection->getMergedCollectionWith(
+                $this->createErrorMessage($error->message, $xml_file_handler, $xsd_file_handler)
+            );
+        }
+        return $status_collection;
+    }
+
+    protected function createErrorMessage(
+        string $msg,
+        ?ilXMLFileHandlerInterface $xml_file_handler = null,
+        ?ilXSDFileHandlerInterface $xsd_file_handler = null
+    ): ilImportStatusHandlerCollectionInterface {
+        $status_collection = $this->import_status->handlerCollection();
         $xml_str = is_null($xml_file_handler)
             ? ''
             : "<br>XML-File: " . $xml_file_handler->getSubPathToDirBeginningAtPathEnd(self::TMP_DIR_NAME);
         $xsd_str = is_null($xsd_file_handler)
             ? ''
             : "<br>XSD-File: " . $xsd_file_handler->getSubPathToDirBeginningAtPathEnd(self::XML_DIR_NAME);
-        foreach ($errors as $error) {
-            $content = $this->import_status->content()->builder()->string()->withString(
-                "Validation FAILED"
-                . $xml_str
-                . $xsd_str
-                . "<br>ERROR Message: " . $error->message
-            );
-            $status_collection = $status_collection->withAddedStatus(
-                $this->import_status->handler()->withType(StatusType::FAILED)->withContent($content)
-            );
-        }
+        $content = $this->import_status->content()->builder()->string()->withString(
+            "Validation FAILED"
+            . $xml_str
+            . $xsd_str
+            . "<br>ERROR Message: " . $msg
+        );
+        $status_collection = $status_collection->withAddedStatus(
+            $this->import_status->handler()->withType(StatusType::FAILED)->withContent($content)
+        );
         return $status_collection;
     }
 
@@ -130,15 +143,30 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
             . "\nXSD: " . $xsd_file_handler->getFilePath() . "\n"
         );
         // Enable manual error handling
-        $old_value_of_use_internal_errors = libxml_use_internal_errors(true);
-        $component_name = null;
-
-        $file_reader = $this->reader->handler()
-            ->withXMLFileHandler($xml_file_handler)
-            ->moveAlongPath($path_handler);
-        //->withXSDFileHandler($xsd_file_handler);
-
-
+        $old_val = libxml_use_internal_errors(true);
+        $reader = new XMLReader();
+        $reader->open($xml_file_handler->getFilePath());
+        // Handle errors, on initialization
+        $errors = libxml_get_errors();
+        $status_collection = $this->collectErrors($xml_file_handler, $xsd_file_handler, $errors);
+        libxml_clear_errors();
+        if ($status_collection->hasStatusType(StatusType::FAILED)) {
+            libxml_use_internal_errors($old_val);
+            return $status_collection;
+        }
+        // Move reader
+        $reader_path_handler = $this->reader_path->handler()->withPath($path_handler);
+        while ($reader_path_handler->continueAlongPath($reader));
+        if(!$reader_path_handler->finished()) {
+            return $this->createErrorMessage(
+                'Path not found in xml: ' . $path_handler->toString(),
+                $xml_file_handler,
+                $xsd_file_handler
+            );
+        }
+        // Validate
+        $reader->setSchema($xsd_file_handler->getFilePath());
+        while ($reader->read());
 
         $errors = libxml_get_errors();
         libxml_clear_errors();
@@ -148,7 +176,7 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
             $errors
         ));
         // Restore old value of manual error handling
-        libxml_use_internal_errors($old_value_of_use_internal_errors);
+        libxml_use_internal_errors($old_val);
         return $status_collection->hasStatusType(StatusType::FAILED)
             ? $status_collection
             : $this->import_status->handlerCollection()->withAddedStatus($this->success_status);

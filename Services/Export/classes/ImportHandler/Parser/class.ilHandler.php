@@ -28,7 +28,7 @@ use ilImportException;
 use ilLogger;
 use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoFactoryInterface;
 use ImportHandler\I\File\XML\Node\Info\ilHandlerCollection as ilXMLFileNodeInfoCollectionInterface;
-use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
+use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParseHandlerInterface;
 
@@ -62,7 +62,7 @@ class ilHandler implements ilParseHandlerInterface
         return $clone;
     }
 
-    public function getNodeInfoAt(ilParserPathHandlerInterface $path): ilXMLFileNodeInfoCollectionInterface
+    public function getNodeInfoAt(ilFilePathHandlerInterface $path): ilXMLFileNodeInfoCollectionInterface
     {
         $log_msg = "\n\n\nGetting node info at path: " . $path->toString();
         $log_msg .= "\nFrom file: " . $this->xml_file_handler->getFilePath();

@@ -127,10 +127,12 @@ class ilHandlerCollection implements ilHandlerCollectionInterface
     public function toString(StatusType ...$types): string
     {
         $collection = new ilHandlerCollection();
+        $msg = "<br>Listing status messages (of type(s)";
         foreach ($types as $type) {
+            $msg .= " " . $type->name;
             $collection = $collection->getMergedCollectionWith($this->getCollectionOfAllByType($type));
         }
-        $msg = "<br>One or more errors occured while reading the manifest files:<br>";
+        $msg .= "):<br>";
         $elements = $collection->toArray();
         for($i = 0; $i < count($elements); $i++) {
             $faied_status = $elements[$i];

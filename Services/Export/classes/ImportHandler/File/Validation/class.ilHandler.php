@@ -148,7 +148,7 @@ class ilHandler implements ilFileValidationHandlerInterface
             $errors = libxml_get_errors();
             libxml_clear_errors();
             $status_collection = $status_collection->getMergedCollectionWith($this->collectErrors(
-                null,
+                $xml_file_handler,
                 $xsd_file_handler,
                 $errors
             ));

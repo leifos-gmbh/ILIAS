@@ -20,12 +20,9 @@ declare(strict_types=1);
 
 namespace ImportHandler\I\File\XML\Reader;
 
-use ImportHandler\I\File\XML\Reader\ilHandlerInterface as ilXMLFileReaderHandlerInterface;
 use ImportHandler\I\File\XML\Reader\Path\ilFactoryInterface as ilXMLFileReaderPathFactoryInterface;
 
 interface ilFactoryInterface
 {
-    public function handler(): ilXMLFileReaderHandlerInterface;
-
     public function path(): ilXMLFileReaderPathFactoryInterface;
 }

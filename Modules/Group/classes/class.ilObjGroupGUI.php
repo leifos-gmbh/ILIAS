@@ -454,6 +454,9 @@ class ilObjGroupGUI extends ilContainerGUI
 
         $this->tabs_gui->setTabActive('view_content');
         $this->renderObject();
+
+
+        SidsMdWs42
     }
 
     public function renderObject(): void

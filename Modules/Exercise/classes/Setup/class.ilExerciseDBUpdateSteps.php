@@ -138,4 +138,17 @@ class ilExerciseDBUpdateSteps implements \ilDatabaseUpdateSteps
         $this->db->addPrimaryKey('exc_team_data', ["id"]);
     }
 
+    public function step_10(): void
+    {
+        $set = $this->db->queryF("SELECT DISTINCT il_exc_team.id FROM il_exc_team LEFT JOIN exc_team_data ON il_exc_team.id = exc_team_data.id WHERE exc_team_data.id IS NULL",
+            [],
+            []
+        );
+        while ($rec = $this->db->fetchAssoc($set)) {
+            $this->db->insert("exc_team_data", [
+                "id" => ["integer", (int) $rec["id"]],
+            ]);
+        }
+    }
+
 }

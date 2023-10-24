@@ -1302,15 +1302,21 @@ class ilExAssignment
         global $DIC;
 
         $ilDB = $DIC->database();
+        $ass_domain = $DIC->exercise()->internal()->domain()->assignment();
 
         $exmem = new ilExerciseMembers($a_exc);
         $mems = $exmem->getMembers();
 
         foreach ($mems as $mem) {
-            self::createNewUserRecords(
-                $mem,
-                $a_exc->getId()
-            );
+            $ilDB->replace("exc_mem_ass_status", array(
+                "ass_id" => array("integer", $a_ass_id),
+                "usr_id" => array("integer", $mem)
+            ), array(
+                "status" => array("text", "notgraded")
+            ));
+            if (!$ass_domain->tutorFeedbackFile($a_ass_id)->hasCollection($mem)) {
+                $ass_domain->tutorFeedbackFile($a_ass_id)->createCollection($mem);
+            }
         }
     }
 

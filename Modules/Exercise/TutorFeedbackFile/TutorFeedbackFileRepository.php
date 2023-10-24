@@ -41,6 +41,11 @@ class TutorFeedbackFileRepository implements TutorFeedbackFileRepositoryInterfac
 
     public function createCollection(int $ass_id, int $user_id) : void
     {
+        /*
+        if ($ass_id === 12) {
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+            exit;
+        }*/
         $new_id = $this->wrapper->createEmptyCollection();
         $this->db->update("exc_mem_ass_status", [
             "feedback_rcid" => ["text", $new_id]

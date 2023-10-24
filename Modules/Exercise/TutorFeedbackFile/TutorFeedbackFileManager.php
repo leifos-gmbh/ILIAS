@@ -32,12 +32,14 @@ class TutorFeedbackFileManager
     protected \ilExAssignmentTypeInterface $type;
     protected InternalDomainService $domain;
     protected TutorFeedbackFileRepository $repo;
+    protected ResourceStakeholder $stakeholder;
 
     public function __construct(
         int $ass_id,
         InternalRepoService $repo,
         InternalDomainService $domain,
-        \ilExcTutorFeedbackFileStakeholder $stakeholder)
+        \ilExcTutorFeedbackFileStakeholder $stakeholder,
+        \ilExcTutorTeamFeedbackFileStakeholder $team_stakeholder)
     {
         global $DIC;
 
@@ -47,14 +49,13 @@ class TutorFeedbackFileManager
         $this->type = $types->getById(\ilExAssignment::lookupType($ass_id));
         if ($this->type->usesTeams()) {
             $this->repo = $repo->tutorFeedbackFileTeam();
+            $this->stakeholder = $team_stakeholder;
         } else {
             $this->repo = $repo->tutorFeedbackFile();
+            $this->stakeholder = $stakeholder;
         }
         $this->domain = $domain;
-
         $this->ass_id = $ass_id;
-
-        $this->stakeholder = $stakeholder;
     }
 
     public function getStakeholder() : ResourceStakeholder

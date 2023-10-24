@@ -309,6 +309,7 @@ class ilResourceStorageMigrationHelper
         string $absolute_base_path,
         string $pattern = '.*'
     ): RecursiveRegexIterator {
+        echo "\n\n$absolute_base_path\n";
         return new RecursiveRegexIterator(
             new RecursiveDirectoryIterator($absolute_base_path),
             $pattern,

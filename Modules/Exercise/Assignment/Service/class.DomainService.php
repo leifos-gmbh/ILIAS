@@ -102,11 +102,13 @@ class DomainService
     public function tutorFeedbackFile(int $ass_id) : TutorFeedbackFileManager
     {
         $stakeholder = new \ilExcTutorFeedbackFileStakeholder();
+        $team_stakeholder = new \ilExcTutorTeamFeedbackFileStakeholder();
         return new TutorFeedbackFileManager(
             $ass_id,
             $this->repo_service,
             $this->domain_service,
-            $stakeholder
+            $stakeholder,
+            $team_stakeholder
         );
     }
 

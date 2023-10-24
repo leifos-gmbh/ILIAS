@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ImportStatus\Content\Builder;
 
 use ImportStatus\I\Content\Builder\ilStringInterface as ilImportStatusStringContentBuilderInterface;
+use ImportStatus\I\Content\ilHandlerInterface;
 
 class ilString implements ilImportStatusStringContentBuilderInterface
 {
@@ -40,6 +41,13 @@ class ilString implements ilImportStatusStringContentBuilderInterface
     {
         $clone = clone $this;
         $clone->content = $content;
+        return $clone;
+    }
+
+    public function mergeWith(ilHandlerInterface $other): ilHandlerInterface
+    {
+        $clone = clone $this;
+        $clone->content .= $other->toString();
         return $clone;
     }
 }

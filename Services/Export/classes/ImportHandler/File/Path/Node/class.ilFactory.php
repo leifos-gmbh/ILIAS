@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\Path\Node;
 
+use ilLogger;
 use ImportHandler\I\File\Path\Node\ilAnyElementInterface as ilAnyElementFilePathNodeInterface;
 use ImportHandler\I\File\Path\Node\ilAnyNodeInterface as ilAnyNodeFilePathNodeInterface;
 use ImportHandler\I\File\Path\Node\ilAttributableInterface as ilAttributableFilePathNodeInterface;
@@ -35,6 +36,13 @@ use ImportHandler\File\Path\Node\ilSimple as ilSimpleFilePathNode;
 
 class ilFactory implements ilFilePathNodeFactoryInterface
 {
+    protected ilLogger $logger;
+
+    public function __construct(ilLogger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function anyElement(): ilAnyElementFilePathNodeInterface
     {
         return new ilAnyElementFilePathNode();
@@ -57,6 +65,6 @@ class ilFactory implements ilFilePathNodeFactoryInterface
 
     public function simple(): ilSimpleFilePathNodeInterface
     {
-        return new ilSimpleFilePathNode();
+        return new ilSimpleFilePathNode($this->logger);
     }
 }

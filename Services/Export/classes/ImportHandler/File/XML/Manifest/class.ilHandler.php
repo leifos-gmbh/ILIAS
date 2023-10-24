@@ -24,14 +24,14 @@ use ilImportException;
 use ilLogger;
 use ImportHandler\File\ilFactory as ilFileFactory;
 use ImportHandler\File\XML\ilHandler as ilXMLFileHandler;
-use ImportHandler\I\File\XML\ilHandlerCollectionInterface as ilXMLFileHandlerCollectionInterface;
+use ImportHandler\I\File\XML\ilCollectionInterface as ilXMLFileHandlerCollectionInterface;
 use ImportHandler\I\File\XML\Manifest\ilHandlerCollectionInterface as ilManifestXMLFileHandlerCollectionInterface;
 use ImportHandler\I\File\XML\Manifest\ilHandlerInterface as ilManifestHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
 use ImportHandler\Parser\ilFactory as ilParserFactory;
 use ImportHandler\Parser\ilHandler as ilParserHandler;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
-use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\StatusType;
 use Schema\ilXmlSchemaFactory;
 use SplFileInfo;
@@ -105,11 +105,11 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
             $export_file_node_info->count() > 0 &&
             $export_set_node_info->count() > 0
         ) {
-            $this->checkStatusCollection($this->status->handlerCollection()->withAddedStatus(
+            $this->checkStatusCollection($this->status->collection()->withAddedStatus(
                 $this->status->handler()->withType(StatusType::FAILED)->withContent(
                     $this->status->content()->builder()->string()->withString(
                         "XML:"
-                        . $this->getSubPathToDirBeginningAtPathEnd('temp')
+                        . $this->getSubPathToDirBeginningAtPathEnd('temp')->getFilePath()
                         . "\nFound export and set elements in manifest xml."
                     )
                 )
@@ -136,7 +136,7 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
             ->withStartAtRoot(true)
             ->withNode($this->file->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
             ->withNode($this->file->path()->node()->simple()->withName($type_name));
-        $xml_file_infos = $this->file->xml()->handlerCollection();
+        $xml_file_infos = $this->file->xml()->collection();
         foreach ($this->parser_handler->getNodeInfoAt($path) as $node_info) {
             $file_name = $node_info->getNodeName() === ilExportObjectType::toString(ilExportObjectType::EXPORT_SET)
                 ? DIRECTORY_SEPARATOR . self::MANIFEST_FILE_NAME

@@ -18,19 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\XML\Node\Info;
+namespace ImportHandler\I\File\XML\Node\Info\Attribute;
 
-use DOMNode;
-
-interface ilHandler
+interface ilPairInterface
 {
-    public function withDOMNode(DOMNode $node): ilHandler;
+    public function withValue(string $value): ilPairInterface;
 
-    public function getXML(): string;
+    public function withKey(string $key): ilPairInterface;
 
-    public function getNodeName(): string;
+    public function getKey(): string;
 
-    public function getValueOfAttribute(string $attribute_name): string;
-
-    public function getNode(): DOMNode;
+    public function getValue(): string;
 }

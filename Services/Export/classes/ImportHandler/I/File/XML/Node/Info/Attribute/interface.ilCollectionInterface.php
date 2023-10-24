@@ -18,17 +18,29 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\XML\Node\Info;
+namespace ImportHandler\I\File\XML\Node\Info\Attribute;
 
+use Iterator;
+use Countable;
+use ImportHandler\I\File\XML\Node\Info\Attribute\ilPairInterface as ilXMLFileNodeInfoAttributePairInterface;
 use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoInterface;
-use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
-use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
 
-interface ilFactoryInterface
+interface ilCollectionInterface extends Iterator, Countable
 {
-    public function handler(): ilXMLFileNodeInfoInterface;
+    public function matches(ilXMLFileNodeInfoInterface $node_info): bool;
 
-    public function collection(): ilXMLFileNodeInfoCollectionInterface;
+    /**
+     * @return ilXMLFileNodeInfoAttributePairInterface[]
+     */
+    public function toArray(): array;
 
-    public function tree(): ilXMLFileNodeInfoTreeInterface;
+    public function current(): ilXMLFileNodeInfoAttributePairInterface;
+
+    public function next(): void;
+
+    public function key(): int;
+
+    public function valid(): bool;
+
+    public function rewind(): void;
 }

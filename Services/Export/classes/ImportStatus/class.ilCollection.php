@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace ImportStatus;
 
-use ImportStatus\I\ilHandlerCollectionInterface;
+use ImportStatus\I\ilCollectionInterface;
 use ImportStatus\I\ilHandlerInterface;
 
-class ilHandlerCollection implements ilHandlerCollectionInterface
+class ilCollection implements ilCollectionInterface
 {
     /**
      * @var ilHandlerInterface[]
@@ -62,21 +62,21 @@ class ilHandlerCollection implements ilHandlerCollectionInterface
         return count($this->getArrayOfElementsWithType($type)) > 0;
     }
 
-    public function withAddedStatus(ilHandlerInterface $import_status): ilHandlerCollection
+    public function withAddedStatus(ilHandlerInterface $import_status): ilCollection
     {
         $clone = clone $this;
         $clone->status_collection[] = $import_status;
         return $clone;
     }
 
-    public function getCollectionOfAllByType(StatusType $type): ilHandlerCollectionInterface
+    public function getCollectionOfAllByType(StatusType $type): ilCollectionInterface
     {
-        return new ilHandlerCollection($this->getArrayOfElementsWithType($type));
+        return new ilCollection($this->getArrayOfElementsWithType($type));
     }
 
-    public function getMergedCollectionWith(ilHandlerCollectionInterface $other): ilHandlerCollectionInterface
+    public function getMergedCollectionWith(ilCollectionInterface $other): ilCollectionInterface
     {
-        return new ilHandlerCollection(array_merge($this->toArray(), $other->toArray()));
+        return new ilCollection(array_merge($this->toArray(), $other->toArray()));
     }
 
     public function current(): ilHandlerInterface
@@ -117,7 +117,7 @@ class ilHandlerCollection implements ilHandlerCollectionInterface
         return $this->status_collection;
     }
 
-    public function withNumberingEnabled(bool $enabled): ilHandlerCollectionInterface
+    public function withNumberingEnabled(bool $enabled): ilCollectionInterface
     {
         $clone = clone $this;
         $clone->is_numbering_enabled = $enabled;
@@ -126,7 +126,7 @@ class ilHandlerCollection implements ilHandlerCollectionInterface
 
     public function toString(StatusType ...$types): string
     {
-        $collection = new ilHandlerCollection();
+        $collection = new ilCollection();
         $msg = "<br>Listing status messages (of type(s)";
         foreach ($types as $type) {
             $msg .= " " . $type->name;

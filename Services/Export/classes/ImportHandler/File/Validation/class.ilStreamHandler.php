@@ -30,7 +30,7 @@ use ImportHandler\I\File\XML\Reader\Path\ilFactoryInterface as ilXMLFileReaderPa
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
-use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
 use ImportStatus\StatusType;
 use LibXMLError;
@@ -70,7 +70,7 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
      */
     protected function checkIfFilesExist(array $file_handlers): ilImportStatusHandlerCollectionInterface
     {
-        $status_collection = $this->import_status->handlerCollection()->withNumberingEnabled(true);
+        $status_collection = $this->import_status->collection()->withNumberingEnabled(true);
         foreach ($file_handlers as $file_handler) {
             if($file_handler->fileExists()) {
                 continue;
@@ -91,7 +91,7 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
         ?ilXSDFileHandlerInterface $xsd_file_handler = null,
         array $errors = []
     ): ilImportStatusHandlerCollectionInterface {
-        $status_collection = $this->import_status->handlerCollection();
+        $status_collection = $this->import_status->collection();
         foreach ($errors as $error) {
             $status_collection = $status_collection->getMergedCollectionWith(
                 $this->createErrorMessage($error->message, $xml_file_handler, $xsd_file_handler)
@@ -105,13 +105,13 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
         ?ilXMLFileHandlerInterface $xml_file_handler = null,
         ?ilXSDFileHandlerInterface $xsd_file_handler = null
     ): ilImportStatusHandlerCollectionInterface {
-        $status_collection = $this->import_status->handlerCollection();
+        $status_collection = $this->import_status->collection();
         $xml_str = is_null($xml_file_handler)
             ? ''
-            : "<br>XML-File: " . $xml_file_handler->getSubPathToDirBeginningAtPathEnd(self::TMP_DIR_NAME);
+            : "<br>XML-File: " . $xml_file_handler->getSubPathToDirBeginningAtPathEnd(self::TMP_DIR_NAME)->getFilePath();
         $xsd_str = is_null($xsd_file_handler)
             ? ''
-            : "<br>XSD-File: " . $xsd_file_handler->getSubPathToDirBeginningAtPathEnd(self::XML_DIR_NAME);
+            : "<br>XSD-File: " . $xsd_file_handler->getSubPathToDirBeginningAtPathEnd(self::XML_DIR_NAME)->getFilePath();
         $content = $this->import_status->content()->builder()->string()->withString(
             "Validation FAILED"
             . $xml_str
@@ -170,7 +170,7 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
 
         $errors = libxml_get_errors();
         libxml_clear_errors();
-        $status_collection = $this->import_status->handlerCollection()->getMergedCollectionWith($this->collectErrors(
+        $status_collection = $this->import_status->collection()->getMergedCollectionWith($this->collectErrors(
             $xml_file_handler,
             $xsd_file_handler,
             $errors
@@ -179,6 +179,6 @@ class ilStreamHandler implements ilXMLStreamFileValidationHandlerInterface
         libxml_use_internal_errors($old_val);
         return $status_collection->hasStatusType(StatusType::FAILED)
             ? $status_collection
-            : $this->import_status->handlerCollection()->withAddedStatus($this->success_status);
+            : $this->import_status->collection()->withAddedStatus($this->success_status);
     }
 }

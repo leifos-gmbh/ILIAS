@@ -56,7 +56,7 @@ class ilHandler implements ilFileHandlerInterface
             : $this->xml_file_info->getPath() . DIRECTORY_SEPARATOR . $this->xml_file_info->getFilename();
     }
 
-    public function getSubPathToDirBeginningAtPathEnd(string $dir_name): string
+    public function getSubPathToDirBeginningAtPathEnd(string $dir_name): ilFileHandlerInterface
     {
         $this->checkIfFileInfoIsSet();
         $parts = explode(DIRECTORY_SEPARATOR, $this->getFilePath());
@@ -69,10 +69,12 @@ class ilHandler implements ilFileHandlerInterface
                 break;
             }
         }
-        return $trimmed_str;
+        $clone = clone $this;
+        $clone->xml_file_info = new SplFileInfo($trimmed_str);
+        return $clone;
     }
 
-    public function getSubPathToDirBeginningAtPathStart(string $dir_name): string
+    public function getSubPathToDirBeginningAtPathStart(string $dir_name): ilFileHandlerInterface
     {
         $this->checkIfFileInfoIsSet();
         $parts = explode(DIRECTORY_SEPARATOR, $this->getFilePath());
@@ -85,7 +87,9 @@ class ilHandler implements ilFileHandlerInterface
                 break;
             }
         }
-        return $trimmed_str;
+        $clone = clone $this;
+        $clone->xml_file_info = new SplFileInfo($trimmed_str);
+        return $clone;
     }
 
     public function getPathToFileLocation(): string
@@ -98,5 +102,14 @@ class ilHandler implements ilFileHandlerInterface
     {
         $this->checkIfFileInfoIsSet();
         return $this->xml_file_info->getRealPath() !== false;
+    }
+
+    public function pathContainsFolderName(string $folder_name): bool
+    {
+        $path_parts = explode(DIRECTORY_SEPARATOR, $this->getFilePath());
+        if (in_array($folder_name, $path_parts, true)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -27,7 +27,7 @@ use DOMXPath;
 use ilImportException;
 use ilLogger;
 use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoFactoryInterface;
-use ImportHandler\I\File\XML\Node\Info\ilHandlerCollection as ilXMLFileNodeInfoCollectionInterface;
+use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
 use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParseHandlerInterface;
@@ -69,7 +69,7 @@ class ilHandler implements ilParseHandlerInterface
         $this->checkIfFileHandlerIsSet();
         $dom_xpath = new DOMXPath($this->dom_doc);
         $nodes = $dom_xpath->query($path->toString());
-        $node_info_collection = $this->xml_node->handlerCollection();
+        $node_info_collection = $this->xml_node->collection();
         /** @var DOMNode $node **/
         foreach ($nodes as $node) {
             $log_msg .= "\nFound Node: " . $node->nodeName;

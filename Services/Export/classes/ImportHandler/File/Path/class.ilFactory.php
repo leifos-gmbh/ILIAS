@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\Path;
 
+use ilLogger;
 use ImportHandler\File\Path\ComparisonOperator as ilFilePathComparisonOperator;
 use ImportHandler\File\Path\ilComparison as ilFilePathComparison;
 use ImportHandler\File\Path\ilHandler as ilFilePathHandler;
@@ -31,6 +32,13 @@ use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
 
 class ilFactory implements ilFilePathFactoryInterface
 {
+    protected ilLogger $logger;
+
+    public function __construct(ilLogger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function handler(): ilFilePathHandlerInterface
     {
         return new ilFilePathHandler();
@@ -38,7 +46,7 @@ class ilFactory implements ilFilePathFactoryInterface
 
     public function node(): ilFilePathNodeFactoryInterface
     {
-        return new ilFilePathNodeFactory();
+        return new ilFilePathNodeFactory($this->logger);
     }
 
     public function comparison(ilFilePathComparisonOperator $operator, string $value): ilFilePathComparisonInterface

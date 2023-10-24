@@ -20,15 +20,24 @@ declare(strict_types=1);
 
 namespace ImportHandler\I\File\XML\Node\Info;
 
-use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoInterface;
+use DOMNode;
 use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
-use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
 
-interface ilFactoryInterface
+interface ilHandlerInterface
 {
-    public function handler(): ilXMLFileNodeInfoInterface;
+    public function withDOMNode(DOMNode $node): ilHandlerInterface;
 
-    public function collection(): ilXMLFileNodeInfoCollectionInterface;
+    public function getXML(): string;
 
-    public function tree(): ilXMLFileNodeInfoTreeInterface;
+    public function getNodeName(): string;
+
+    public function getValueOfAttribute(string $attribute_name): string;
+
+    public function getAttributePath(string $attribute_name, string $path_separator): string;
+
+    public function getChildren(): ilXMLFileNodeInfoCollectionInterface;
+
+    public function getParent(): ilHandlerInterface|null;
+
+    public function hasAttribute(string $attribute_name): bool;
 }

@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\XML\Node\Info;
 
-use ImportHandler\I\File\XML\Node\Info\ilHandlerCollection as ilXMLFileNodeInfoCollectionInterface;
-use ImportHandler\I\File\XML\Node\Info\ilHandler as ilXMLFileNodeInfoInterface;
+use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
+use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoInterface;
 
-class ilInfoCollection implements ilXMLFileNodeInfoCollectionInterface
+class ilCollection implements ilXMLFileNodeInfoCollectionInterface
 {
     /**
      * @var ilXMLFileNodeInfoInterface[]
@@ -34,10 +34,23 @@ class ilInfoCollection implements ilXMLFileNodeInfoCollectionInterface
     /**
      * @param ilXMLFileNodeInfoInterface[] $initial_elements
      */
-    public function __construct(array $initial_elements = [])
+    public function __construct()
     {
-        $this->elements = $initial_elements;
+        $this->elements = [];
         $this->index = 0;
+    }
+
+    public function getFirst(): ilXMLFileNodeInfoInterface
+    {
+        return $this->elements[0];
+    }
+
+    public function removeFirst(): ilXMLFileNodeInfoCollectionInterface
+    {
+        $clone = clone $this;
+        $clone->index = $this->index;
+        $clone->elements = array_slice($this->elements, 1);
+        return $clone;
     }
 
     public function count(): int

@@ -32,9 +32,11 @@ interface ilHandlerInterface
 
     public function getPathToFileLocation(): string;
 
-    public function getSubPathToDirBeginningAtPathStart(string $dir_name): string;
+    public function getSubPathToDirBeginningAtPathStart(string $dir_name): ilHandlerInterface;
 
-    public function getSubPathToDirBeginningAtPathEnd(string $dir_name): string;
+    public function getSubPathToDirBeginningAtPathEnd(string $dir_name): ilHandlerInterface;
 
     public function fileExists(): bool;
+
+    public function pathContainsFolderName(string $folder_name): bool;
 }

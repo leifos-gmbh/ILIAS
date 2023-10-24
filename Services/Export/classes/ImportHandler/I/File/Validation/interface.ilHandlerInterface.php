@@ -23,7 +23,7 @@ namespace ImportHandler\I\File\Validation;
 use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
-use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 
 interface ilHandlerInterface
 {
@@ -31,13 +31,6 @@ interface ilHandlerInterface
         ilXMLFileHandlerInterface $xml_file_handler,
         ilXSDFileHandlerInterface $xsd_file_handler
     ): ilImportStatusHandlerCollectionInterface;
-
-    /*
-    public function validateXMLAtNodes(
-        ilXSDFileHandlerInterface $xsd_file_handler,
-        ilParserXMLNodeInfoCollectionInterface $nodes
-    ): ilImportStatusHandlerCollectionInterface;
-    */
 
     public function validateXMLAtPath(
         ilXMLFileHandlerInterface $xml_file_handler,

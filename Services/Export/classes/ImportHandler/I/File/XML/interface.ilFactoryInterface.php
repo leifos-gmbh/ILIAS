@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace ImportHandler\I\File\XML;
 
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHanlderInterface;
-use ImportHandler\I\File\XML\ilHandlerCollectionInterface as ilXMLFileHanlderCollectionInterface;
+use ImportHandler\I\File\XML\ilCollectionInterface as ilXMLFileHanlderCollectionInterface;
 use ImportHandler\I\File\XML\Manifest\ilFactoryInterface as ilManifestFileFactoryInterface;
 use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
 use ImportHandler\I\File\XML\Node\ilFactoryInterface as ilXMLFileNodeFactoryInterface;
@@ -30,7 +30,7 @@ interface ilFactoryInterface
 {
     public function handler(): ilXMLFileHanlderInterface;
 
-    public function handlerCollection(): ilXMLFileHanlderCollectionInterface;
+    public function collection(): ilXMLFileHanlderCollectionInterface;
 
     public function manifest(): ilManifestFileFactoryInterface;
 

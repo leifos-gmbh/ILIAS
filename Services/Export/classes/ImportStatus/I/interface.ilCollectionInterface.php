@@ -26,17 +26,17 @@ use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
 use ImportStatus\StatusType;
 use Iterator;
 
-interface ilHandlerCollectionInterface extends Iterator, Countable
+interface ilCollectionInterface extends Iterator, Countable
 {
     public function hasStatusType(StatusType $type): bool;
 
-    public function withAddedStatus(ilImportStatusHandlerInterface $import_status): ilHandlerCollectionInterface;
+    public function withAddedStatus(ilImportStatusHandlerInterface $import_status): ilCollectionInterface;
 
-    public function getCollectionOfAllByType(StatusType $type): ilHandlerCollectionInterface;
+    public function getCollectionOfAllByType(StatusType $type): ilCollectionInterface;
 
-    public function getMergedCollectionWith(ilHandlerCollectionInterface $other): ilHandlerCollectionInterface;
+    public function getMergedCollectionWith(ilCollectionInterface $other): ilCollectionInterface;
 
-    public function withNumberingEnabled(bool $enabled): ilHandlerCollectionInterface;
+    public function withNumberingEnabled(bool $enabled): ilCollectionInterface;
 
     public function toString(StatusType ...$types): string;
 

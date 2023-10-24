@@ -20,14 +20,23 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\XML\Node;
 
+use ilLogger;
 use ImportHandler\I\File\XML\Node\ilFactoryInterface as ilXMLFileNodeFactoryInterface;
 use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoInterface;
 use ImportHandler\File\XML\Node\Info\ilFactory as ilXMLFileNodeInfo;
 
 class ilFactory implements ilXMLFileNodeFactoryInterface
 {
+    protected ilLogger $logger;
+
+    public function __construct(
+        ilLogger $logger
+    ) {
+        $this->logger = $logger;
+    }
+
     public function info(): ilXMLFileNodeInfoInterface
     {
-        return new ilXMLFileNodeInfo();
+        return new ilXMLFileNodeInfo($this->logger);
     }
 }

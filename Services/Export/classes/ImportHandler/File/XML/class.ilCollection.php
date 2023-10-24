@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\XML;
 
-use ImportHandler\I\File\XML\ilHandlerCollectionInterface as ilXMLFileHandlerCollectionInterface;
+use ImportHandler\I\File\XML\ilCollectionInterface as ilXMLFileHandlerCollectionInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 
-class ilHandlerCollection implements ilXMLFileHandlerCollectionInterface
+class ilCollection implements ilXMLFileHandlerCollectionInterface
 {
     /**
      * @var ilXMLFileHandlerInterface[];

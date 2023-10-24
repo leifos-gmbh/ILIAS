@@ -39,7 +39,7 @@ class ilFactory implements ilParserFactoryInterface
     {
         return new ilParserHandler(
             $this->logger,
-            new ilXMLFileNodeInfoFactory()
+            new ilXMLFileNodeInfoFactory($this->logger)
         );
     }
 }

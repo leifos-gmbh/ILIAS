@@ -18,17 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus\I;
+namespace ImportHandler\I\File\XML\Node\Info\Attribute;
 
-use ImportStatus\I\Content\ilFactoryInterface as ilImportStatusContentFactoryInterface;
-use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
-use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportHandler\I\File\XML\Node\Info\Attribute\ilPairInterface as ilXMLFileNodeInfoAttributePairInterface;
+use ImportHandler\I\File\XML\Node\Info\Attribute\ilCollectionInterface as ilXMLFileNodeInfoAttributeCollectionInterface;
 
 interface ilFactoryInterface
 {
-    public function content(): ilImportStatusContentFactoryInterface;
+    public function pair(): ilXMLFileNodeInfoAttributePairInterface;
 
-    public function handler(): ilImportStatusHandlerInterface;
-
-    public function collection(): ilImportStatusHandlerCollectionInterface;
+    public function collection(): ilXMLFileNodeInfoAttributeCollectionInterface;
 }

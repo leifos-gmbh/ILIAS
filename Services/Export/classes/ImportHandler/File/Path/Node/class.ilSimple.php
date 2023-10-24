@@ -20,15 +20,18 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\Path\Node;
 
+use ilLogger;
 use ImportHandler\I\File\Path\Node\ilSimpleInterface as ilSimpleFilePathNodeInterface;
 use XMLReader;
 
 class ilSimple implements ilSimpleFilePathNodeInterface
 {
+    protected ilLogger $logger;
     protected string $node_name;
 
-    public function __construct()
+    public function __construct(ilLogger $logger)
     {
+        $this->logger = $logger;
         $this->node_name = '';
     }
 
@@ -46,15 +49,19 @@ class ilSimple implements ilSimpleFilePathNodeInterface
 
     public function moveReader(XMLReader $reader): bool
     {
-        $reader_finished = false;
-        while (!($reader_finished = !$reader->read())) {
+        $found = false;
+        $msg = "\n\n\nSIMPLE NODE START";
+        while ($reader->read()) {
+            $msg .= "\n" . $reader->name;
             if (
                 $reader->nodeType === XMLReader::ELEMENT &&
                 $reader->name === $this->node_name
             ) {
+                $found = true;
                 break;
             }
         }
-        return $reader_finished;
+        $this->logger->debug($msg . "\nSIMPLENODE END\n\n");
+        return $found;
     }
 }

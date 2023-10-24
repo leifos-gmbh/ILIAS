@@ -22,7 +22,7 @@ namespace ImportHandler\File\XML\Manifest;
 
 use ImportHandler\I\File\XML\Manifest\ilHandlerInterface as ilManifestXMLFileHandlerInterface;
 use ImportHandler\I\File\XML\Manifest\ilHandlerCollectionInterface as ilManifestXMLFileHandlerCollectionInterface;
-use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 
 class ilHandlerCollection implements ilManifestXMLFileHandlerCollectionInterface
@@ -103,7 +103,7 @@ class ilHandlerCollection implements ilManifestXMLFileHandlerCollectionInterface
 
     public function validateElements(): ilImportStatusHandlerCollectionInterface
     {
-        $status_collection = $this->import_status->handlerCollection()->withNumberingEnabled(true);
+        $status_collection = $this->import_status->collection()->withNumberingEnabled(true);
         foreach ($this as $manfiest_file_handler) {
             $status_collection = $status_collection->getMergedCollectionWith(
                 $manfiest_file_handler->validateManifestXML()

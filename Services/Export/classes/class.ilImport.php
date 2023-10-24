@@ -26,7 +26,7 @@ use ILIAS\Filesystem\Util\Archive\UnzipOptions;
 use ImportHandler\File\XML\Manifest\ilExportObjectType;
 use ImportHandler\ilFactory as ilImportFactory;
 use ImportStatus\ilFactory as ilImportStatusFactory;
-use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\StatusType;
 use Schema\ilXmlSchemaFactory;
 
@@ -129,7 +129,7 @@ class ilImport
         string $path_to_tmp_upload,
         bool $file_is_on_server
     ): ilImportStatusHandlerCollectionInterface {
-        $import_status_collection = $this->import_status->handlerCollection()->withNumberingEnabled(true);
+        $import_status_collection = $this->import_status->collection()->withNumberingEnabled(true);
         $tmp_dir_info = new SplFileInfo(ilFileUtils::ilTempnam());
         $this->filesystem->temp()->createDir($tmp_dir_info->getFilename());
         $target_file_path_str = $tmp_dir_info->getRealPath() . DIRECTORY_SEPARATOR . $zip_file_name;
@@ -175,7 +175,7 @@ class ilImport
 
     protected function validateXMLFiles(SplFileInfo $manifest_spl): ilImportStatusHandlerCollectionInterface
     {
-        $export_files = $this->import->file()->xml()->handlerCollection();
+        $export_files = $this->import->file()->xml()->collection();
         $schema_factory = new ilXmlSchemaFactory();
         $manifest_handlers = $this->import->file()->xml()->manifest()->handlerCollection()
             ->withElement($this->import->file()->xml()->manifest()->handler()->withFileInfo($manifest_spl));
@@ -204,7 +204,7 @@ class ilImport
             }
         }
         // VALIDATE export xmls
-        $path_to_export_item = $this->import->file()->path()->handler()
+        $path_to_export_item_child = $this->import->file()->path()->handler()
             ->withStartAtRoot(true)
             ->withNode($this->import->file()->path()->node()->simple()->withName('exp:Export'))
             ->withNode($this->import->file()->path()->node()->simple()->withName('exp:ExportItem'))
@@ -212,6 +212,26 @@ class ilImport
         $path_to_export = $this->import->file()->path()->handler()
             ->withStartAtRoot(true)
             ->withNode($this->import->file()->path()->node()->simple()->withName('exp:Export'));
+        // component tree used in case of validation errors to generate an error message
+        $component_tree = $this->import->file()->xml()->node()->info()->tree();
+        foreach ($export_files as $export_file) {
+            if (!$export_file
+                ->getSubPathToDirBeginningAtPathEnd('temp')
+                ->pathContainsFolderName('Container')
+            ) {
+                continue;
+            }
+            $component_tree = $component_tree->withRootInFile(
+                $export_file,
+                $path_to_export_item_child
+            );
+        }
+        $this->log->debug(
+            "\n\n\n"
+            . "COMP PATH: " . $component_tree->getFirstNodeWith('Id', '623')
+                ->getAttributePath('Title', DIRECTORY_SEPARATOR)
+            . "\n\n"
+        );
         foreach ($export_files as $export_file) {
             $export_node_info = $this->import->parser()->handler()
                 ->withFileHandler($export_file)
@@ -243,7 +263,7 @@ class ilImport
                 $this->import->file()->validation()->handler()->validateXMLAtPath(
                     $export_file,
                     $xsd_file,
-                    $path_to_export_item
+                    $path_to_export_item_child
                 )
             );
         }

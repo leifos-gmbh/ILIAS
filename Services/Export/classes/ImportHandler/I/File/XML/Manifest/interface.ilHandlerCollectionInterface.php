@@ -22,8 +22,8 @@ namespace ImportHandler\I\File\XML\Manifest;
 
 use ImportHandler\File\XML\Manifest\ilExportObjectType;
 use ImportHandler\I\File\XML\Manifest\ilHandlerInterface as ilManifestXMLFileHandlerInterface;
-use ImportStatus\I\ilHandlerCollectionInterface as ilImportStatusHandlerCollectionInterface;
-use ImportHandler\I\File\XML\ilHandlerCollectionInterface as ilXMLFileHandlerCollectionInterface;
+use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportHandler\I\File\XML\ilCollectionInterface as ilXMLFileHandlerCollectionInterface;
 use Iterator;
 use Countable;
 

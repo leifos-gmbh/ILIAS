@@ -23,10 +23,10 @@ namespace ImportHandler\File\XML;
 use ilLogger;
 use ImportHandler\File\XML\Manifest\ilFactory as ilManifestFileFactory;
 use ImportHandler\I\File\XML\ilFactoryInterface as ilXMLFileFactoryInterface;
-use ImportHandler\I\File\XML\ilHandlerCollectionInterface as ilXMLFileHanlderCollectionInterface;
+use ImportHandler\I\File\XML\ilCollectionInterface as ilXMLFileHanlderCollectionInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHanlderInterface;
 use ImportHandler\File\XML\ilHandler as ilXMLFileHanlder;
-use ImportHandler\File\XML\ilHandlerCollection as ilXMLFileHanlderCollection;
+use ImportHandler\File\XML\ilCollection as ilXMLFileHanlderCollection;
 use ImportHandler\I\File\XML\Manifest\ilFactoryInterface as ilManifestFileFactoryInterface;
 use ImportHandler\I\File\ilFactoryInterface as ilFileFactoryInterface;
 use ImportHandler\I\File\XML\Node\ilFactoryInterface as ilXMLFileNodeFactoryInterface;
@@ -59,7 +59,7 @@ class ilFactory implements ilXMLFileFactoryInterface
         );
     }
 
-    public function handlerCollection(): ilXMLFileHanlderCollectionInterface
+    public function collection(): ilXMLFileHanlderCollectionInterface
     {
         return new ilXMLFileHanlderCollection();
     }
@@ -82,6 +82,6 @@ class ilFactory implements ilXMLFileFactoryInterface
 
     public function node(): ilXMLFileNodeFactoryInterface
     {
-        return new ilXMLFileNodeFactory();
+        return new ilXMLFileNodeFactory($this->logger);
     }
 }

@@ -20,22 +20,43 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\XML\Node\Info;
 
+use ilLogger;
 use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoFactoryInterface;
-use ImportHandler\I\File\XML\Node\Info\ilHandlerCollection as ilXMLFileNodeInfoCollectionInterface;
-use ImportHandler\I\File\XML\Node\Info\ilHandler as ilXMLFileNodeInfoHandlerInterface;
-use ImportHandler\File\XML\Node\Info\ilInfo as ilXMLFileNodeInfo;
-use ImportHandler\File\XML\Node\Info\ilInfoCollection as ilFileNodeInfoCollection;
+use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
+use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoHandlerInterface;
+use ImportHandler\File\XML\Node\Info\ilHandler as ilXMLFileNodeInfo;
+use ImportHandler\File\XML\Node\Info\ilCollection as ilFileNodeInfoCollection;
+use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
+use ImportHandler\File\XML\Node\Info\ilTree as ilXMLFileNodeInfoTree;
+use ImportHandler\Parser\ilFactory as ilParserFactory;
 
 class ilFactory implements ilXMLFileNodeInfoFactoryInterface
 {
-    public function handler(): ilXMLFileNodeInfoHandlerInterface
-    {
-        return new ilXMLFileNodeInfo();
+    protected ilLogger $logger;
+
+    public function __construct(
+        ilLogger $logger
+    ) {
+        $this->logger = $logger;
     }
 
-    public function handlerCollection(
-        ilXMLFileNodeInfoHandlerInterface ...$initial_elements
-    ): ilXMLFileNodeInfoCollectionInterface {
-        return new ilFileNodeInfoCollection($initial_elements);
+    public function handler(): ilXMLFileNodeInfoHandlerInterface
+    {
+        return new ilXMLFileNodeInfo(
+            new ilFactory($this->logger)
+        );
+    }
+
+    public function collection(): ilXMLFileNodeInfoCollectionInterface
+    {
+        return new ilFileNodeInfoCollection();
+    }
+
+    public function tree(): ilXMLFileNodeInfoTreeInterface
+    {
+        return new ilXMLFileNodeInfoTree(
+            new ilFactory($this->logger),
+            new ilParserFactory($this->logger)
+        );
     }
 }

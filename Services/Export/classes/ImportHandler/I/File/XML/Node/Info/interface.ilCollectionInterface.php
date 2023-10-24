@@ -18,23 +18,28 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\XML;
+namespace ImportHandler\I\File\XML\Node\Info;
 
-use Countable;
 use Iterator;
+use Countable;
+use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoInterface;
 
-interface ilHandlerCollectionInterface extends Iterator, Countable
+interface ilCollectionInterface extends Iterator, Countable
 {
-    public function withMerged(ilHandlerCollectionInterface $other): ilHandlerCollectionInterface;
+    public function withMerged(ilCollectionInterface $other): ilCollectionInterface;
 
-    public function withElement(ilHandlerInterface $element): ilHandlerCollectionInterface;
+    public function withElement(ilXMLFileNodeInfoInterface $element): ilCollectionInterface;
+
+    public function getFirst(): ilXMLFileNodeInfoInterface;
+
+    public function removeFirst(): ilCollectionInterface;
 
     /**
-     * @return ilHandlerInterface[]
+     * @return ilXMLFileNodeInfoInterface[]
      */
     public function toArray(): array;
 
-    public function current(): ilHandlerInterface;
+    public function current(): ilXMLFileNodeInfoInterface;
 
     public function next(): void;
 

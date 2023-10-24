@@ -23,4 +23,6 @@ namespace ImportStatus\I\Content;
 interface ilHandlerInterface
 {
     public function toString(): string;
+
+    public function mergeWith(ilHandlerInterface $other): ilHandlerInterface;
 }

@@ -43,7 +43,7 @@
             <xs:attribute name="position">
                 <xs:simpleType>
                     <xs:restriction base="xs:token">
-                        <xs:enumeration value="TOP"/>
+                        <xs:enumeration value="Top"/>
                         <xs:enumeration value="Bottom"/>
                     </xs:restriction>
                 </xs:simpleType>

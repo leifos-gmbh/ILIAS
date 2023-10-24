@@ -25,14 +25,18 @@ use ILIAS\Exercise\IRSS\ResourceInformation;
 use ILIAS\Exercise\InstructionFile\ilFSWebStorageExercise;
 use ILIAS\Exercise\InstructionFile\InstructionFileRepository;
 use ILIAS\Exercise\InternalRepoService;
+use ILIAS\Exercise\InternalDomainService;
 
 class TutorFeedbackFileManager
 {
+    protected \ilExAssignmentTypeInterface $type;
+    protected InternalDomainService $domain;
     protected TutorFeedbackFileRepository $repo;
 
     public function __construct(
         int $ass_id,
         InternalRepoService $repo,
+        InternalDomainService $domain,
         \ilExcTutorFeedbackFileStakeholder $stakeholder)
     {
         global $DIC;
@@ -40,12 +44,13 @@ class TutorFeedbackFileManager
         $this->upload = $DIC->upload();
 
         $types = \ilExAssignmentTypes::getInstance();
-        $type = $types->getById(\ilExAssignment::lookupType($ass_id));
-        if ($type->usesTeams()) {
+        $this->type = $types->getById(\ilExAssignment::lookupType($ass_id));
+        if ($this->type->usesTeams()) {
             $this->repo = $repo->tutorFeedbackFileTeam();
         } else {
             $this->repo = $repo->tutorFeedbackFile();
         }
+        $this->domain = $domain;
 
         $this->ass_id = $ass_id;
 
@@ -62,6 +67,42 @@ class TutorFeedbackFileManager
         return ($this->getCollectionIdString($participant_id) !== "");
     }
 
+    protected function getLegacyFeedbackId(int $participant_id) : string
+    {
+        if ($this->type->usesTeams()) {
+            $team_id = $this->domain->team()->getTeamForMember($this->ass_id, $participant_id);
+            if (is_null($team_id)) {
+                throw new \ilExerciseException("Team for user " . $participant_id . " in assignment " . $this->ass_id . " not found.");
+            }
+            return "t" . $team_id;
+        } else {
+            return (string) $participant_id;
+        }
+    }
+
+    public function count(int $participant_id) : int
+    {
+        if ($this->hasCollection($participant_id)){
+            // IRSS
+            return $this->repo->count($this->ass_id, $participant_id);
+        }
+        // LEGACY
+        $exc_id = \ilExAssignment::lookupExerciseId($this->ass_id);
+        $storage = new \ilFSStorageExercise($exc_id, $this->ass_id);
+        return $storage->countFeedbackFiles($this->getLegacyFeedbackId($participant_id));
+    }
+
+    public function getFeedbackTitle(int $participant_id) : string
+    {
+        $title = $this->domain->lng()->txt('exc_fb_files');
+        if ($this->type->usesTeams()) {
+
+        } else {
+            $name = \ilObjUser::_lookupName($participant_id);
+            return $title. ": " . $name["lastname"] . ", " . $name["firstname"];
+        }
+    }
+
     public function getCollectionIdString(int $participant_id) : string
     {
         return $this->repo->getIdStringForAssIdAndUserId($this->ass_id, $participant_id);
@@ -72,15 +113,6 @@ class TutorFeedbackFileManager
         $this->repo->createCollection($this->ass_id, $participant_id);
     }
 
-    /*
-    public function importFromLegacyUpload(array $file_input) : void
-    {
-        $this->repo->importFromLegacyUpload(
-            $this->ass_id,
-            $file_input,
-            $this->stakeholder
-        );
-    }*/
 
     public function deleteCollection(int $participant_id): void {
         $this->repo->deleteCollection(
@@ -92,40 +124,37 @@ class TutorFeedbackFileManager
 
     public function getFiles(int $participant_id): array
     {
+        $files = [];
         if ($this->repo->hasCollection($this->ass_id, $participant_id)) {
-            return array_map(function (ResourceInformation $info): array {
-                return [
-                    'name' => $info->getTitle(),
-                    'size' => $info->getSize(),
-                    'ctime' => $info->getCreationTimestamp(),
-                    'fullpath' => $info->getSrc(),
-                    'mime' => $info->getMimeType(),
-                    'order' => 0 // sorting is currently not supported
-                ];
+            $files = array_map(function(ResourceInformation $info): string {
+                return $info->getTitle();
             }, iterator_to_array($this->repo->getCollectionResourcesInfo($this->ass_id, $participant_id)));
         } else {
-            $this->log->debug("getting files from class.ilExAssignment using ilFSWebStorageExercise");
-            /*
-            $storage = new ilFSWebStorageExercise($this->getExerciseId(), $this->ass_id);
-            return $storage->getFiles();*/
+            $exc_id = \ilExAssignment::lookupExerciseId($this->ass_id);
+            $storage = new \ilFSStorageExercise($exc_id, $this->ass_id);
+            $files = $storage->getFeedbackFiles($this->getLegacyFeedbackId($participant_id));
         }
+        return $files;
     }
 
     public function deliver(int $participant_id, string $file) : void
     {
+        $assignment = $this->domain->assignment()->getAssignment($this->ass_id);
+        if ($assignment->notStartedYet()) {
+            return;
+        }
+
         if ($this->repo->hasCollection($this->ass_id, $participant_id)) {
             // IRSS
             $this->repo->deliverFile($this->ass_id, $participant_id, $file);
         } else {
             // LEGACY
-            $assignment = new \ilExAssignment($this->ass_id);
-            $submission = new \ilExSubmission($assignment, $participant_id);
             $exc_id = \ilExAssignment::lookupExerciseId($this->ass_id);
             $storage = new \ilFSStorageExercise($exc_id, $this->ass_id);
-            $files = $storage->getFeedbackFiles($submission->getFeedbackId());
+            $files = $storage->getFeedbackFiles($this->getLegacyFeedbackId($participant_id));
             $file_exist = false;
             foreach ($files as $fb_file) {
-                if ($fb_file == $file) {
+                if ($fb_file === $file) {
                     $file_exist = true;
                     break;
                 }
@@ -133,12 +162,9 @@ class TutorFeedbackFileManager
             if (!$file_exist) {
                 return;
             }
-            // check whether assignment has already started
-            if (!$this->assignment->notStartedYet()) {
-                // deliver file
-                $p = $storage->getFeedbackFilePath($submission->getFeedbackId(), $file);
-                \ilFileDelivery::deliverFileLegacy($p, $file);
-            }
+            // deliver file
+            $p = $storage->getFeedbackFilePath($this->getLegacyFeedbackId($participant_id), $file);
+            \ilFileDelivery::deliverFileLegacy($p, $file);
         }
     }
 

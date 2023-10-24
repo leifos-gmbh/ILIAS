@@ -105,6 +105,7 @@ class DomainService
         return new TutorFeedbackFileManager(
             $ass_id,
             $this->repo_service,
+            $this->domain_service,
             $stakeholder
         );
     }

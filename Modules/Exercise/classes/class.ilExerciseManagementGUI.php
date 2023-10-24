@@ -34,7 +34,7 @@ use ILIAS\Exercise\InternalGUIService;
  * @ilCtrl_Calls ilExerciseManagementGUI: ilFileSystemGUI, ilRepositorySearchGUI
  * @ilCtrl_Calls ilExerciseManagementGUI: ilExSubmissionTeamGUI, ilExSubmissionFileGUI
  * @ilCtrl_Calls ilExerciseManagementGUI: ilExSubmissionTextGUI, ilExPeerReviewGUI
- * @ilCtrl_Calls ilExAssignmentEditorGUI: ilResourceCollectionGUI
+ * @ilCtrl_Calls ilExerciseManagementGUI: ilResourceCollectionGUI
  */
 class ilExerciseManagementGUI
 {

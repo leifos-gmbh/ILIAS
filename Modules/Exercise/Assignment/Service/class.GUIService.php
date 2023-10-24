@@ -88,7 +88,7 @@ class GUIService
         return $this->irss_wrapper_gui->getResourceCollectionGUI(
             $feedback_file_manager->getStakeholder(),
             $feedback_file_manager->getCollectionIdString($participant_id),
-            $lng->txt('exc_instruction_files'),
+            $feedback_file_manager->getFeedbackTitle($participant_id),
             $write
         );
     }

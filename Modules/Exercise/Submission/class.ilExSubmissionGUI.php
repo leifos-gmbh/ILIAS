@@ -257,28 +257,8 @@ class ilExSubmissionGUI
             $this->ctrl->redirect($this, "view");
         }
 
-        // check, whether file belongs to assignment
-        $storage = new ilFSStorageExercise($this->exercise->getId(), $this->assignment->getId());
-        $files = $storage->getFeedbackFiles($this->submission->getFeedbackId());
-        $file_exist = false;
-        foreach ($files as $fb_file) {
-            if ($fb_file == $file) {
-                $file_exist = true;
-                break;
-            }
-        }
-
-        if (!$file_exist) {
-            return false;
-        }
-
-        // check whether assignment has already started
-        if (!$this->assignment->notStartedYet()) {
-            // deliver file
-            $p = $storage->getFeedbackFilePath($this->submission->getFeedbackId(), $file);
-            ilFileDelivery::deliverFileLegacy($p, $file);
-        }
-
+        $this->domain->assignment()->tutorFeedbackFile($this->assignment->getId())
+            ->deliver($this->user_id, $file);
         return true;
     }
 

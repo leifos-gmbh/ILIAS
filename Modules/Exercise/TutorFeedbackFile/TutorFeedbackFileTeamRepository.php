@@ -92,6 +92,14 @@ class TutorFeedbackFileTeamRepository implements TutorFeedbackFileRepositoryInte
         return null;
     }
 
+    public function count(int $ass_id, int $user_id) : int
+    {
+        if (!is_null($collection = $this->getCollection($ass_id, $user_id))) {
+            return $collection->count();
+        }
+        return 0;
+    }
+
     public function deliverFile($ass_id, $participant_id, $file) : void
     {
         /** @var ResourceInformation $info */

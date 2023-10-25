@@ -20,28 +20,30 @@ declare(strict_types=1);
 
 namespace ImportStatus;
 
+use ImportStatus\I\Content\ilHandlerInterface as ilImportStatusContentHandlerInterface;
 use ImportStatus\I\ilCollectionInterface;
 use ImportStatus\I\ilHandlerInterface;
+use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 
 class ilCollection implements ilCollectionInterface
 {
+    protected ilImportStatusFactoryInterface $status;
     /**
      * @var ilHandlerInterface[]
      */
-    protected array $status_collection;
+    protected array $elements;
     protected int $index;
     protected int $minIndex;
     protected bool $is_numbering_enabled;
 
-    /**
-     * @param ilHandlerInterface[] $initial_values
-     */
-    public function __construct(array $initial_values = [])
-    {
-        $this->status_collection = $initial_values;
+    public function __construct(
+        ilImportStatusFactoryInterface $status,
+    ) {
+        $this->elements = [];
         $this->minIndex = 0;
         $this->index = $this->minIndex;
         $this->is_numbering_enabled = false;
+        $this->status = $status;
     }
 
     /**
@@ -65,23 +67,27 @@ class ilCollection implements ilCollectionInterface
     public function withAddedStatus(ilHandlerInterface $import_status): ilCollection
     {
         $clone = clone $this;
-        $clone->status_collection[] = $import_status;
+        $clone->elements[] = $import_status;
         return $clone;
     }
 
     public function getCollectionOfAllByType(StatusType $type): ilCollectionInterface
     {
-        return new ilCollection($this->getArrayOfElementsWithType($type));
+        $clone = clone $this;
+        $clone->elements = $this->getArrayOfElementsWithType($type);
+        return $clone;
     }
 
     public function getMergedCollectionWith(ilCollectionInterface $other): ilCollectionInterface
     {
-        return new ilCollection(array_merge($this->toArray(), $other->toArray()));
+        $clone = clone $this;
+        $clone->elements = array_merge($this->toArray(), $other->toArray());
+        return $clone;
     }
 
     public function current(): ilHandlerInterface
     {
-        return $this->status_collection[$this->index];
+        return $this->elements[$this->index];
     }
 
     public function next(): void
@@ -106,7 +112,7 @@ class ilCollection implements ilCollectionInterface
 
     public function count(): int
     {
-        return count($this->status_collection);
+        return count($this->elements);
     }
 
     /**
@@ -114,7 +120,7 @@ class ilCollection implements ilCollectionInterface
      */
     public function toArray(): array
     {
-        return $this->status_collection;
+        return $this->elements;
     }
 
     public function withNumberingEnabled(bool $enabled): ilCollectionInterface
@@ -126,7 +132,7 @@ class ilCollection implements ilCollectionInterface
 
     public function toString(StatusType ...$types): string
     {
-        $collection = new ilCollection();
+        $collection = $this->status->collection();
         $msg = "<br>Listing status messages (of type(s)";
         foreach ($types as $type) {
             $msg .= " " . $type->name;
@@ -143,5 +149,24 @@ class ilCollection implements ilCollectionInterface
             $msg .= $faied_status->getContent()->toString();
         }
         return $msg;
+    }
+
+    public function mergeContentToElements(
+        ilImportStatusContentHandlerInterface $content,
+        bool $at_front = true
+    ): ilCollectionInterface {
+        $clone = clone $this;
+        $new_elements = [];
+        foreach ($clone->toArray() as $element) {
+            $new_elements[] = $at_front
+                ? $this->status->handler()
+                    ->withType($element->getType())
+                    ->withContent($content->mergeWith($element->getContent()))
+                : $this->status->handler()
+                    ->withType($element->getType())
+                    ->withContent($element->getContent()->mergeWith($content));
+        }
+        $clone->elements = $new_elements;
+        return $clone;
     }
 }

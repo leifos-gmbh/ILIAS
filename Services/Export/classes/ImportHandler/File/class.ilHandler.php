@@ -35,22 +35,13 @@ class ilHandler implements ilFileHandlerInterface
         return $clone;
     }
 
-    protected function checkIfFileInfoIsSet(): void
-    {
-        if(!isset($this->xml_file_info)) {
-            throw new ilImportException("Missing file info.");
-        }
-    }
-
     public function getFileName(): string
     {
-        $this->checkIfFileInfoIsSet();
         return $this->xml_file_info->getFilename();
     }
 
     public function getFilePath(): string
     {
-        $this->checkIfFileInfoIsSet();
         return $this->fileExists()
             ? $this->xml_file_info->getRealPath()
             : $this->xml_file_info->getPath() . DIRECTORY_SEPARATOR . $this->xml_file_info->getFilename();
@@ -58,7 +49,6 @@ class ilHandler implements ilFileHandlerInterface
 
     public function getSubPathToDirBeginningAtPathEnd(string $dir_name): ilFileHandlerInterface
     {
-        $this->checkIfFileInfoIsSet();
         $parts = explode(DIRECTORY_SEPARATOR, $this->getFilePath());
         $trimmed_str = '';
         for ($i = count($parts) - 1; $i >= 0; $i--) {
@@ -76,7 +66,6 @@ class ilHandler implements ilFileHandlerInterface
 
     public function getSubPathToDirBeginningAtPathStart(string $dir_name): ilFileHandlerInterface
     {
-        $this->checkIfFileInfoIsSet();
         $parts = explode(DIRECTORY_SEPARATOR, $this->getFilePath());
         $trimmed_str = '';
         for ($i = 0; $i < count($parts); $i++) {
@@ -94,19 +83,16 @@ class ilHandler implements ilFileHandlerInterface
 
     public function getPathToFileLocation(): string
     {
-        $this->checkIfFileInfoIsSet();
         return $this->xml_file_info->getPath();
     }
 
     public function fileExists(): bool
     {
-        $this->checkIfFileInfoIsSet();
         return $this->xml_file_info->getRealPath() !== false;
     }
 
     public function getPathPart(string $pattern): string|null
     {
-        $this->checkIfFileInfoIsSet();
         $path_parts = explode(DIRECTORY_SEPARATOR, $this->getFilePath());
         foreach ($path_parts as $path_part) {
             if (preg_match($pattern, $path_part) === 1) {
@@ -118,7 +104,6 @@ class ilHandler implements ilFileHandlerInterface
 
     public function pathContainsFolderName(string $folder_name): bool
     {
-        $this->checkIfFileInfoIsSet();
         $path_parts = explode(DIRECTORY_SEPARATOR, $this->getFilePath());
         if (in_array($folder_name, $path_parts, true)) {
             return true;

@@ -105,18 +105,7 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
             $export_file_node_info->count() > 0 &&
             $export_set_node_info->count() > 0
         ) {
-            $statuses = $this->status->collection()->withAddedStatus(
-                $this->status->handler()->withType(StatusType::FAILED)->withContent(
-                    $this->status->content()->builder()->string()->withString(
-                        "XML:"
-                        . $this->getSubPathToDirBeginningAtPathEnd('temp')->getFilePath()
-                        . "\nFound export and set elements in manifest xml."
-                    )
-                )
-            );
-            $exception = $this->status->exception($statuses->toString(StatusType::FAILED));
-            $exception->setStatuses($statuses);
-            throw $exception;
+            return ilExportObjectType::MIXED;
         }
         if ($export_file_node_info->count() > 0) {
             return ilExportObjectType::EXPORT_FILE;

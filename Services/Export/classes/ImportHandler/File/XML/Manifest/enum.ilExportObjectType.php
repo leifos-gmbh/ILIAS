@@ -22,6 +22,7 @@ namespace ImportHandler\File\XML\Manifest;
 
 enum ilExportObjectType
 {
+    case MIXED;
     case EXPORT_SET;
     case EXPORT_FILE;
     case NONE;

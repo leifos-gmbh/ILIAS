@@ -29,7 +29,6 @@ use ImportStatus\ilFactory as ilImportStatusFactory;
 use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\StatusType;
 use ImportStatus\Exception\ilException as ilImportStatusException;
-use Schema\ilXmlSchemaFactory;
 
 /**
  * Import class
@@ -177,9 +176,9 @@ class ilImport
     protected function validateXMLFiles(SplFileInfo $manifest_spl): ilImportStatusHandlerCollectionInterface
     {
         $export_files = $this->import->file()->xml()->export()->collection();
-        $schema_factory = new ilXmlSchemaFactory();
         $manifest_handlers = $this->import->file()->xml()->manifest()->handlerCollection();
         $statuses = $this->import_status->collection();
+        // Find export xmls
         try {
             $manifest_handlers = $manifest_handlers->withElement(
                 $this->import->file()->xml()->manifest()->handler()->withFileInfo($manifest_spl)
@@ -214,42 +213,44 @@ class ilImport
             ->withNode($this->import->file()->path()->node()->anyNode());
         $component_tree = $this->import->file()->xml()->node()->info()->tree();
         foreach ($export_files as $export_file) {
-            if (!$export_file
-                ->getSubPathToDirBeginningAtPathEnd('temp')
-                ->pathContainsFolderName('Container')
-            ) {
-                continue;
+            if ($export_file->isContainerExportXML()) {
+                $component_tree = $component_tree->withRootInFile($export_file, $path_to_export_item_child);
+                break;
             }
-            $component_tree = $component_tree->withRootInFile(
-                $export_file,
-                $path_to_export_item_child
-            );
-            break;
         }
         foreach ($export_files as $export_file) {
-            $found_statuses = $this->import_status->collection();
-            try {
-                $found_statuses = $this->import->file()->validation()->handler()->validateXMLAtPath(
-                    $export_file,
-                    $export_file->getXSDFileHandler(),
-                    $path_to_export_item_child
-                );
-            } catch (ilImportStatusException $e) {
-                $found_statuses = $e->getStatuses();
+            $found_statuses = $export_file->loadExportInfo();
+            $xsd_file = $found_statuses->hasStatusType(StatusType::FAILED)
+                ? null
+                : $export_file->getXSDFileHandler();
+            if (!$found_statuses->hasStatusType(StatusType::FAILED) && is_null($xsd_file)) {
+                $found_statuses = $found_statuses->withAddedStatus($this->import_status->handler()
+                    ->withType(StatusType::DEBUG)
+                    ->withContent($this->import_status->content()->builder()->string()->withString(
+                        'Missing schema xsd file for entity of type: '
+                        . $export_file->getType()
+                        . ($export_file->getSubType() === '' ? '' : '_' . $export_file->getSubType())
+                    )));
+            }
+            if(!$found_statuses->hasStatusType(StatusType::FAILED) && !is_null($xsd_file)) {
+                try {
+                    $found_statuses = $this->import->file()->validation()->handler()->validateXMLAtPath(
+                        $export_file,
+                        $xsd_file,
+                        $path_to_export_item_child
+                    );
+                } catch (ilImportStatusException $e) {
+                    $found_statuses = $e->getStatuses();
+                }
             }
             if (!$found_statuses->hasStatusType(StatusType::FAILED)) {
                 continue;
             }
-            // Append location
-            $ilias_path = $export_file->getILIASPath($component_tree);
-            $info_str = "<br> Location: " . $ilias_path . "<br>";
-            foreach ($found_statuses as $status) {
-                $extra_content = $this->import_status->content()->builder()->string()->withString($info_str);
-                $old_content = $status->getContent();
-                $new_content = $extra_content->mergeWith($old_content);
-                $new_status = $this->import_status->handler()->withType($status->getType())->withContent($new_content);
-                $statuses = $statuses->withAddedStatus($new_status);
-            }
+            $info_str = "<br> Location: " . $export_file->getILIASPath($component_tree) . "<br>";
+            $found_statuses = $found_statuses->mergeContentToElements(
+                $this->import_status->content()->builder()->string()->withString($info_str)
+            );
+            $statuses = $statuses->getMergedCollectionWith($found_statuses);
         }
         return $statuses;
     }

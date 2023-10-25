@@ -44,7 +44,7 @@ class ilFactory implements ilImportStatusFactoryInterface
 
     public function collection(): ilImportStatusHandlerCollectionInterface
     {
-        return new ilImportStatusHandlerCollection();
+        return new ilImportStatusHandlerCollection($this);
     }
 
     public function exception(string $msg): ilImportStatusExceptionInterface

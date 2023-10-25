@@ -40,6 +40,11 @@ interface ilCollectionInterface extends Iterator, Countable
 
     public function toString(StatusType ...$types): string;
 
+    public function mergeContentToElements(
+        ilImportStatusContentHandlerInterface $content,
+        bool $at_front = true
+    ): ilCollectionInterface;
+
     /**
      * @return ilImportStatusHandlerInterface[]
      */

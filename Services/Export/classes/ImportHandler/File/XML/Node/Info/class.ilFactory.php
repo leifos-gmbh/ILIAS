@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ImportHandler\File\XML\Node\Info;
 
 use ilLogger;
+use ImportHandler\I\File\XML\Node\Info\Attribute\ilFactoryInterface as ilXMLFileNodeInfoAttributeFactoryInterface;
 use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoFactoryInterface;
 use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
 use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoHandlerInterface;
@@ -29,6 +30,7 @@ use ImportHandler\File\XML\Node\Info\ilCollection as ilFileNodeInfoCollection;
 use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
 use ImportHandler\File\XML\Node\Info\ilTree as ilXMLFileNodeInfoTree;
 use ImportHandler\Parser\ilFactory as ilParserFactory;
+use ImportHandler\File\XML\Node\Info\Attribute\ilFactory as ilXMLFileNodeInfoAttributeFactory;
 
 class ilFactory implements ilXMLFileNodeInfoFactoryInterface
 {
@@ -56,7 +58,13 @@ class ilFactory implements ilXMLFileNodeInfoFactoryInterface
     {
         return new ilXMLFileNodeInfoTree(
             new ilFactory($this->logger),
-            new ilParserFactory($this->logger)
+            new ilParserFactory($this->logger),
+            $this->logger
         );
+    }
+
+    public function attribute(): ilXMLFileNodeInfoAttributeFactoryInterface
+    {
+        return new ilXMLFileNodeInfoAttributeFactory($this->logger);
     }
 }

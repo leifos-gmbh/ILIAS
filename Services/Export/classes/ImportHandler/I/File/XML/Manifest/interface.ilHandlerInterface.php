@@ -22,7 +22,7 @@ namespace ImportHandler\I\File\XML\Manifest;
 
 use ImportHandler\File\XML\Manifest\ilExportObjectType;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
-use ImportHandler\I\File\XML\ilCollectionInterface as ilXMLFileHandlerCollectionInterface;
+use ImportHandler\I\File\XML\Export\ilCollectionInterface as ilXMLExportFileCollectionInterface;
 use ImportHandler\I\File\XML\Manifest\ilHandlerCollectionInterface as ilManifestXMLFileHandlerCollectionInterface;
 use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use SplFileInfo;
@@ -35,7 +35,7 @@ interface ilHandlerInterface extends ilXMLFileHandlerInterface
 
     public function validateManifestXML(): ilImportStatusHandlerCollectionInterface;
 
-    public function findXMLFileHandlers(): ilXMLFileHandlerCollectionInterface;
+    public function findXMLFileHandlers(): ilXMLExportFileCollectionInterface;
 
     public function findManifestXMLFileHandlers(): ilManifestXMLFileHandlerCollectionInterface;
 }

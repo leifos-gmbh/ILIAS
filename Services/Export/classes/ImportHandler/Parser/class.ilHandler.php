@@ -31,6 +31,7 @@ use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInf
 use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParseHandlerInterface;
+use ImportStatus\Exception\ilException as ilImportStatusException;
 
 class ilHandler implements ilParseHandlerInterface
 {
@@ -47,13 +48,9 @@ class ilHandler implements ilParseHandlerInterface
         $this->xml_node = $xml_node_factory;
     }
 
-    protected function checkIfFileHandlerIsSet(): void
-    {
-        if(!isset($this->xml_file_handler)) {
-            throw new ilImportException('XMLFileHandler not set.');
-        }
-    }
-
+    /**
+     * @throws ilImportStatusException
+     */
     public function withFileHandler(ilXMLFileHandlerInterface $file_handler): ilParseHandlerInterface
     {
         $clone = clone $this;
@@ -66,7 +63,6 @@ class ilHandler implements ilParseHandlerInterface
     {
         $log_msg = "\n\n\nGetting node info at path: " . $path->toString();
         $log_msg .= "\nFrom file: " . $this->xml_file_handler->getFilePath();
-        $this->checkIfFileHandlerIsSet();
         $dom_xpath = new DOMXPath($this->dom_doc);
         $nodes = $dom_xpath->query($path->toString());
         $node_info_collection = $this->xml_node->collection();

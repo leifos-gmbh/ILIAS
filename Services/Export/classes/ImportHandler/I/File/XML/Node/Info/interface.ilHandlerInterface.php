@@ -33,11 +33,17 @@ interface ilHandlerInterface
 
     public function getValueOfAttribute(string $attribute_name): string;
 
-    public function getAttributePath(string $attribute_name, string $path_separator): string;
+    public function getAttributePath(
+        string $attribute_name,
+        string $path_separator,
+        bool $skip_nodes_without_attribute = true
+    ): string;
 
     public function getChildren(): ilXMLFileNodeInfoCollectionInterface;
 
     public function getParent(): ilHandlerInterface|null;
 
     public function hasAttribute(string $attribute_name): bool;
+
+    public function toString(): string;
 }

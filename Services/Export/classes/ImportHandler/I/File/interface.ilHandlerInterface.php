@@ -38,5 +38,7 @@ interface ilHandlerInterface
 
     public function fileExists(): bool;
 
+    public function getPathPart(string $pattern): string|null;
+
     public function pathContainsFolderName(string $folder_name): bool;
 }

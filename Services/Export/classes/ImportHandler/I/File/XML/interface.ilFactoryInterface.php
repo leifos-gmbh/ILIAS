@@ -25,6 +25,7 @@ use ImportHandler\I\File\XML\ilCollectionInterface as ilXMLFileHanlderCollection
 use ImportHandler\I\File\XML\Manifest\ilFactoryInterface as ilManifestFileFactoryInterface;
 use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
 use ImportHandler\I\File\XML\Node\ilFactoryInterface as ilXMLFileNodeFactoryInterface;
+use ImportHandler\I\File\XML\Export\ilFactoryInterface as ilXMLExportFileFactoryInterface;
 
 interface ilFactoryInterface
 {
@@ -37,4 +38,6 @@ interface ilFactoryInterface
     public function reader(): ilXMLFileReaderFactoryInterface;
 
     public function node(): ilXMLFileNodeFactoryInterface;
+
+    public function export(): ilXMLExportFileFactoryInterface;
 }

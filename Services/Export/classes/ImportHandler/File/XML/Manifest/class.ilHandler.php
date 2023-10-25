@@ -24,7 +24,7 @@ use ilImportException;
 use ilLogger;
 use ImportHandler\File\ilFactory as ilFileFactory;
 use ImportHandler\File\XML\ilHandler as ilXMLFileHandler;
-use ImportHandler\I\File\XML\ilCollectionInterface as ilXMLFileHandlerCollectionInterface;
+use ImportHandler\I\File\XML\Export\ilCollectionInterface as ilXMLExportFileCollectionInterface;
 use ImportHandler\I\File\XML\Manifest\ilHandlerCollectionInterface as ilManifestXMLFileHandlerCollectionInterface;
 use ImportHandler\I\File\XML\Manifest\ilHandlerInterface as ilManifestHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
@@ -32,6 +32,7 @@ use ImportHandler\Parser\ilFactory as ilParserFactory;
 use ImportHandler\Parser\ilHandler as ilParserHandler;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use ImportStatus\Exception\ilException as ilImportStatusException;
 use ImportStatus\StatusType;
 use Schema\ilXmlSchemaFactory;
 use SplFileInfo;
@@ -76,6 +77,9 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
         $this->schema = $schema;
     }
 
+    /**
+     * @throws ilImportStatusException
+     */
     public function withFileInfo(SplFileInfo $file_info): ilHandler
     {
         $clone = clone $this;
@@ -84,13 +88,9 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
         return $clone;
     }
 
-    protected function checkStatusCollection(ilImportStatusHandlerCollectionInterface $import_status_collection)
-    {
-        if($import_status_collection->hasStatusType(StatusType::FAILED)) {
-            throw new ilImportException($import_status_collection->toString(StatusType::FAILED));
-        }
-    }
-
+    /**
+     * @throws ilImportStatusException
+     */
     public function getExportObjectType(): ilExportObjectType
     {
         $exp_file_file_path = $this->file->path()->handler()
@@ -105,7 +105,7 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
             $export_file_node_info->count() > 0 &&
             $export_set_node_info->count() > 0
         ) {
-            $this->checkStatusCollection($this->status->collection()->withAddedStatus(
+            $statuses = $this->status->collection()->withAddedStatus(
                 $this->status->handler()->withType(StatusType::FAILED)->withContent(
                     $this->status->content()->builder()->string()->withString(
                         "XML:"
@@ -113,7 +113,10 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
                         . "\nFound export and set elements in manifest xml."
                     )
                 )
-            )->withNumberingEnabled(true));
+            );
+            $exception = $this->status->exception($statuses->toString(StatusType::FAILED));
+            $exception->setStatuses($statuses);
+            throw $exception;
         }
         if ($export_file_node_info->count() > 0) {
             return ilExportObjectType::EXPORT_FILE;
@@ -129,19 +132,22 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
         return $this->file->validation()->handler()->validateXMLFile($this, $this->manifest_xsd_handler);
     }
 
-    public function findXMLFileHandlers(): ilXMLFileHandlerCollectionInterface
+    /**
+     * @throws ilImportStatusException
+     */
+    public function findXMLFileHandlers(): ilXMLExportFileCollectionInterface
     {
         $type_name = ilExportObjectType::toString($this->getExportObjectType());
         $path = $this->file->path()->handler()
             ->withStartAtRoot(true)
             ->withNode($this->file->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))
             ->withNode($this->file->path()->node()->simple()->withName($type_name));
-        $xml_file_infos = $this->file->xml()->collection();
+        $file_handlers = $this->file->xml()->export()->collection();
         foreach ($this->parser_handler->getNodeInfoAt($path) as $node_info) {
             $file_name = $node_info->getNodeName() === ilExportObjectType::toString(ilExportObjectType::EXPORT_SET)
                 ? DIRECTORY_SEPARATOR . self::MANIFEST_FILE_NAME
                 : '';
-            $xml_file_infos = $xml_file_infos->withElement($this->file->xml()->handler()
+            $file_handlers = $file_handlers->withElement($this->file->xml()->export()->handler()
                 ->withFileInfo(new SplFileInfo(
                     $this->getPathToFileLocation()
                     . DIRECTORY_SEPARATOR
@@ -149,16 +155,20 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
                     . $file_name
                 )));
         }
-        return $xml_file_infos;
+        return $file_handlers;
     }
 
+    /**
+     * @throws ilImportStatusException
+     */
     public function findManifestXMLFileHandlers(): ilManifestXMLFileHandlerCollectionInterface
     {
+        $export_obj_type = $this->getExportObjectType();
         $this->logger->debug(
             "\n\n\nFinding Manifest File Handlers\nType: "
-            . ilExportObjectType::toString($this->getExportObjectType()) . "\n\n"
+            . ilExportObjectType::toString($export_obj_type) . "\n\n"
         );
-        $type_name = ilExportObjectType::toString($this->getExportObjectType());
+        $type_name = ilExportObjectType::toString($export_obj_type);
         $path = $this->file->path()->handler()
             ->withStartAtRoot(true)
             ->withNode($this->file->path()->node()->simple()->withName(self::MANIFEST_NODE_NAME))

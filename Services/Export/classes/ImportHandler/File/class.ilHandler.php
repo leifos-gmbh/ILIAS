@@ -104,8 +104,21 @@ class ilHandler implements ilFileHandlerInterface
         return $this->xml_file_info->getRealPath() !== false;
     }
 
+    public function getPathPart(string $pattern): string|null
+    {
+        $this->checkIfFileInfoIsSet();
+        $path_parts = explode(DIRECTORY_SEPARATOR, $this->getFilePath());
+        foreach ($path_parts as $path_part) {
+            if (preg_match($pattern, $path_part) === 1) {
+                return $path_part;
+            }
+        }
+        return null;
+    }
+
     public function pathContainsFolderName(string $folder_name): bool
     {
+        $this->checkIfFileInfoIsSet();
         $path_parts = explode(DIRECTORY_SEPARATOR, $this->getFilePath());
         if (in_array($folder_name, $path_parts, true)) {
             return true;

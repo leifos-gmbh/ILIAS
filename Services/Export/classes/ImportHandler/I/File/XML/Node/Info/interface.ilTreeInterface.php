@@ -25,6 +25,7 @@ use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\File\XML\Node\Info\Attribute\ilPairInterface as ilXMLFileNodeInfoAttributePairInterface;
 use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
 use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoInterface;
+use ImportHandler\I\File\XML\Node\Info\Attribute\ilCollectionInterface as ilXMLFileNodeInfoAttributePairCollectionInterface;
 
 interface ilTreeInterface
 {
@@ -36,10 +37,10 @@ interface ilTreeInterface
     ): ilTreeInterface;
 
     public function getNodesWith(
-        ilXMLFileNodeInfoAttributePairInterface ...$attribute_pairs
+        ilXMLFileNodeInfoAttributePairCollectionInterface $attribute_pairs
     ): ilXMLFileNodeInfoCollectionInterface;
 
     public function getFirstNodeWith(
-        ilXMLFileNodeInfoAttributePairInterface ...$attribute_pairs
+        ilXMLFileNodeInfoAttributePairCollectionInterface $attribute_pairs
     ): ilXMLFileNodeInfoInterface|null;
 }

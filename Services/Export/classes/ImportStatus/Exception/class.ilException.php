@@ -18,20 +18,23 @@
 
 declare(strict_types=1);
 
-namespace ImportStatus\I;
+namespace ImportStatus\Exception;
 
-use ImportStatus\I\Content\ilFactoryInterface as ilImportStatusContentFactoryInterface;
-use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
-use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
+use Exception;
 use ImportStatus\I\Exception\ilExceptionInterface as ilImportStatusExceptionInterface;
+use ImportStatus\I\ilCollectionInterface as ilImportStatusCollectionInterface;
 
-interface ilFactoryInterface
+class ilException extends Exception implements ilImportStatusExceptionInterface
 {
-    public function content(): ilImportStatusContentFactoryInterface;
+    protected ilImportStatusCollectionInterface $statuses;
 
-    public function handler(): ilImportStatusHandlerInterface;
+    public function setStatuses(ilImportStatusCollectionInterface $statuses): void
+    {
+        $this->statuses = $statuses;
+    }
 
-    public function collection(): ilImportStatusHandlerCollectionInterface;
-
-    public function exception(string $msg): ilImportStatusExceptionInterface;
+    public function getStatuses(): ilImportStatusCollectionInterface
+    {
+        return $this->statuses;
+    }
 }

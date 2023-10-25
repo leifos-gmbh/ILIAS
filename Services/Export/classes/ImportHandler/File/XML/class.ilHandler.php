@@ -25,21 +25,19 @@ use ILIAS\DI\Exceptions\Exception;
 use ilImportException;
 use ImportHandler\File\ilHandler as ilFileHandler;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
-use ImportStatus\I\ilFactoryInterface as ilImportStatusFactory;
+use ImportStatus\Exception\ilException as ilImportStatusException;
+use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
+use ImportStatus\I\ilCollectionInterface as ilImportStatusCollectioninterface;
 use ImportStatus\StatusType;
 use SplFileInfo;
 
 class ilHandler extends ilFileHandler implements ilXMLFileHandlerInterface
 {
-    protected ilImportStatusFactory $status;
-    protected bool $strict_dom_doc_error_checking_enabled;
-    protected int $options;
+    protected ilImportStatusFactoryInterface $status;
 
     public function __construct(
-        ilImportStatusFactory $status
+        ilImportStatusFactoryInterface $status
     ) {
-        $this->strict_dom_doc_error_checking_enabled = false;
-        $this->options = 0;
         $this->status = $status;
     }
 
@@ -50,28 +48,18 @@ class ilHandler extends ilFileHandler implements ilXMLFileHandlerInterface
         return $clone;
     }
 
-    public function withDOMDocumentStrictErrorChecking(bool $enabled): ilXMLFileHandlerInterface
-    {
-        $clone = clone $this;
-        $clone->strict_dom_doc_error_checking_enabled = $enabled;
-        return $clone;
-    }
-
-    public function withOptions(int $options): ilXMLFileHandlerInterface
-    {
-        $clone = clone $this;
-        $clone->options = $options;
-        return $clone;
-    }
-
+    /**
+     * @throws ilImportStatusException
+     */
     public function loadDomDocument(): DOMDocument
     {
         $old_val = libxml_use_internal_errors(true);
         $doc = new DOMDocument();
-        $doc->strictErrorChecking = $this->strict_dom_doc_error_checking_enabled;
         $doc->load($this->getFilePath());
         $status_collection = $this->status->collection();
-        foreach (libxml_get_errors() as $error) {
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+        foreach ($errors as $error) {
             $status_collection = $status_collection->withAddedStatus(
                 $this->status->handler()->withType(StatusType::FAILED)->withContent(
                     $this->status->content()->builder()->string()->withString(
@@ -83,11 +71,10 @@ class ilHandler extends ilFileHandler implements ilXMLFileHandlerInterface
             );
         }
         if ($status_collection->hasStatusType(StatusType::FAILED)) {
-            throw new ilImportException($status_collection
-                ->withNumberingEnabled(true)
-                ->toString(StatusType::FAILED));
+            $exception = $this->status->exception($status_collection->toString(StatusType::FAILED));
+            $exception->setStatuses($status_collection);
+            throw $exception;
         }
-        libxml_clear_errors();
         libxml_use_internal_errors($old_val);
         return $doc;
     }

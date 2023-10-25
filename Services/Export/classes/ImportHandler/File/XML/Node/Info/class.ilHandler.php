@@ -43,23 +43,11 @@ class ilHandler implements ilXMLFileNodeInfoInterface
         $this->info = $info;
     }
 
-    protected function checkIfNodeIsSet(): void
-    {
-        if (!isset($this->node)) {
-            throw new ilImportException('DOMNode of NodeInfo not set.');
-        }
-    }
-
-    protected function checkIfAttributeExists(string $attribute_name): void
-    {
-        if (!$this->hasAttribute($attribute_name)) {
-            throw new ilImportException('Node info does not contain attribute with name: ' . $attribute_name);
-        }
-    }
-
     protected function initAttributes()
     {
-        $this->checkIfNodeIsSet();
+        if(is_null($this->node->attributes)) {
+            return;
+        }
         /** @var DOMAttr $attribute **/
         foreach ($this->node->attributes as $attribute) {
             $this->attributes[$attribute->name] = $attribute->value;
@@ -76,13 +64,11 @@ class ilHandler implements ilXMLFileNodeInfoInterface
 
     public function getXML(): string
     {
-        $this->checkIfNodeIsSet();
         return $this->node->ownerDocument->saveXML($this->node);
     }
 
     public function getNodeName(): string
     {
-        $this->checkIfNodeIsSet();
         return $this->node->nodeName;
     }
 
@@ -91,17 +77,24 @@ class ilHandler implements ilXMLFileNodeInfoInterface
      */
     public function getValueOfAttribute(string $attribute_name): string
     {
-        $this->checkIfNodeIsSet();
-        $this->checkIfAttributeExists($attribute_name);
         return $this->attributes[$attribute_name];
     }
 
-    public function getAttributePath(string $attribute_name, string $path_separator): string
-    {
-        $path_str = $this->getValueOfAttribute($attribute_name);
+    public function getAttributePath(
+        string $attribute_name,
+        string $path_separator,
+        bool $skip_nodes_without_attribute = true
+    ): string {
+        $path_str = '';
         $current_node = $this;
-        while (!is_null($current_node = $current_node->getParent())) {
-            $path_str = $current_node->getValueOfAttribute($attribute_name) . $path_separator . $path_str;
+        while (!is_null($current_node)) {
+            if($skip_nodes_without_attribute && !$current_node->hasAttribute($attribute_name)) {
+                break;
+            }
+            $path_str = $current_node->hasAttribute($attribute_name)
+                ? $path_separator . $current_node->getValueOfAttribute($attribute_name) . $path_str
+                : $path_separator . '..' . $path_str;
+            $current_node = $current_node->getParent();
         }
         return $path_str;
     }
@@ -109,10 +102,9 @@ class ilHandler implements ilXMLFileNodeInfoInterface
     public function getChildren(): ilXMLFileNodeInfoCollectionInterface
     {
         $collection = $this->info->collection();
-        $child = $this->node->firstChild;
-        while (!is_null($child)) {
+        $children = $this->node->childNodes;
+        foreach ($children as $child) {
             $collection = $collection->withElement($this->info->handler()->withDOMNode($child));
-            $child = $child->nextSibling;
         }
         return $collection;
     }
@@ -128,5 +120,14 @@ class ilHandler implements ilXMLFileNodeInfoInterface
     public function hasAttribute(string $attribute_name): bool
     {
         return array_key_exists($attribute_name, $this->attributes);
+    }
+
+    public function toString(): string
+    {
+        $msg = $this->getNodeName();
+        foreach ($this->attributes as $attribute) {
+            $msg .= "\n" . $attribute;
+        }
+        return $msg;
     }
 }

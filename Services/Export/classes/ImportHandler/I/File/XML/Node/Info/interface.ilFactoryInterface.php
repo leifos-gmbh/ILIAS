@@ -23,6 +23,7 @@ namespace ImportHandler\I\File\XML\Node\Info;
 use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoInterface;
 use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
 use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
+use ImportHandler\I\File\XML\Node\Info\Attribute\ilFactoryInterface as ilXMLFileNodeInfoAttributeFactoryInterface;
 
 interface ilFactoryInterface
 {
@@ -31,4 +32,6 @@ interface ilFactoryInterface
     public function collection(): ilXMLFileNodeInfoCollectionInterface;
 
     public function tree(): ilXMLFileNodeInfoTreeInterface;
+
+    public function attribute(): ilXMLFileNodeInfoAttributeFactoryInterface;
 }

@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\XML\Node\Info\Attribute;
 
+use ilLogger;
 use ImportHandler\I\File\XML\Node\Info\Attribute\ilCollectionInterface as ilXMLFileNodeInfoAttributeCollectionInterface;
 use ImportHandler\I\File\XML\Node\Info\Attribute\ilFactoryInterface as ilXMLFileNodeInfoAttributeFactoryInterface;
 use ImportHandler\I\File\XML\Node\Info\Attribute\ilPairInterface as ilXMLFileNodeInfoAttributePairInterface;
@@ -28,6 +29,13 @@ use ImportHandler\File\XML\Node\Info\Attribute\ilCollection as ilXMLFileNodeInfo
 
 class ilFactory implements ilXMLFileNodeInfoAttributeFactoryInterface
 {
+    protected ilLogger $logger;
+
+    public function __construct(ilLogger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function pair(): ilXMLFileNodeInfoAttributePairInterface
     {
         return new ilXMLFileNodeInfoAttributePair();
@@ -35,6 +43,6 @@ class ilFactory implements ilXMLFileNodeInfoAttributeFactoryInterface
 
     public function collection(): ilXMLFileNodeInfoAttributeCollectionInterface
     {
-        return new ilXMLFileNodeInfoAttribureCollection();
+        return new ilXMLFileNodeInfoAttribureCollection($this->logger);
     }
 }

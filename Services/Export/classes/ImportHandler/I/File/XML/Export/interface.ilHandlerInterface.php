@@ -18,16 +18,18 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportHandler\I\File\XML\Export;
 
-use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
-use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
-use ImportStatus\I\ilCollectionInterface as ilImportStatusCollectionInterface;
+use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
+use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
+use SplFileInfo;
 
-interface ilHandlerInterface
+interface ilHandlerInterface extends ilXMLFileHandlerInterface
 {
-    public function withFileHandler(ilXMLFileHandlerInterface $file_handler): ilHandlerInterface;
+    public function getXSDFileHandler(): ilXSDFileHandlerInterface;
 
-    public function getNodeInfoAt(ilParserPathHandlerInterface $path): ilXMLFileNodeInfoCollectionInterface;
+    public function withFileInfo(SplFileInfo $file_info): ilHandlerInterface;
+
+    public function getILIASPath(ilXMLFileNodeInfoTreeInterface $component_tree): string;
 }

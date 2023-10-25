@@ -18,16 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\Parser;
+namespace ImportStatus\I\Exception;
 
-use ImportHandler\I\File\Path\ilHandlerInterface as ilParserPathHandlerInterface;
-use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
-use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
 use ImportStatus\I\ilCollectionInterface as ilImportStatusCollectionInterface;
 
-interface ilHandlerInterface
+interface ilExceptionInterface
 {
-    public function withFileHandler(ilXMLFileHandlerInterface $file_handler): ilHandlerInterface;
+    public function setStatuses(ilImportStatusCollectionInterface $statuses): void;
 
-    public function getNodeInfoAt(ilParserPathHandlerInterface $path): ilXMLFileNodeInfoCollectionInterface;
+    public function getStatuses(): ilImportStatusCollectionInterface;
 }

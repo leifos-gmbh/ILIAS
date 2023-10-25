@@ -28,6 +28,7 @@ use ImportHandler\ilFactory as ilImportFactory;
 use ImportStatus\ilFactory as ilImportStatusFactory;
 use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\StatusType;
+use ImportStatus\Exception\ilException as ilImportStatusException;
 use Schema\ilXmlSchemaFactory;
 
 /**
@@ -175,33 +176,35 @@ class ilImport
 
     protected function validateXMLFiles(SplFileInfo $manifest_spl): ilImportStatusHandlerCollectionInterface
     {
-        $export_files = $this->import->file()->xml()->collection();
+        $export_files = $this->import->file()->xml()->export()->collection();
         $schema_factory = new ilXmlSchemaFactory();
-        $manifest_handlers = $this->import->file()->xml()->manifest()->handlerCollection()
-            ->withElement($this->import->file()->xml()->manifest()->handler()->withFileInfo($manifest_spl));
-        $this->log->debug(
-            "\n\n\npath: " . $manifest_spl->getPath()
-            . "\nFilename: " . $manifest_spl->getFilename()
-            . "\nRealpath: " . $manifest_spl->getRealPath()
-        );
-        // VALIDATE 1st manifest file, can be either export-set or export-file
-        $status_collection = $manifest_handlers->validateElements();
-        if($status_collection->hasStatusType(StatusType::FAILED)) {
-            return $status_collection;
-        }
-        // If export set look for the export file manifests + VALIDATE
-        if ($manifest_handlers->containsExportObjectType(ilExportObjectType::EXPORT_SET)) {
-            $manifest_handlers = $manifest_handlers->findNextFiles();
-            $status_collection = $manifest_handlers->validateElements();
-        }
-        if($status_collection->hasStatusType(StatusType::FAILED)) {
-            return $status_collection;
-        }
-        // If export file look for the export xmls
-        if ($manifest_handlers->containsExportObjectType(ilExportObjectType::EXPORT_FILE)) {
-            foreach ($manifest_handlers as $manfiest_file_handler) {
-                $export_files = $export_files->withMerged($manfiest_file_handler->findXMLFileHandlers());
+        $manifest_handlers = $this->import->file()->xml()->manifest()->handlerCollection();
+        $statuses = $this->import_status->collection();
+        try {
+            $manifest_handlers = $manifest_handlers->withElement(
+                $this->import->file()->xml()->manifest()->handler()->withFileInfo($manifest_spl)
+            );
+            // VALIDATE 1st manifest file, can be either export-set or export-file
+            $statuses = $manifest_handlers->validateElements();
+            if($statuses->hasStatusType(StatusType::FAILED)) {
+                return $statuses;
             }
+            // If export set look for the export file manifests + VALIDATE
+            if ($manifest_handlers->containsExportObjectType(ilExportObjectType::EXPORT_SET)) {
+                $manifest_handlers = $manifest_handlers->findNextFiles();
+                $statuses = $manifest_handlers->validateElements();
+            }
+            if($statuses->hasStatusType(StatusType::FAILED)) {
+                return $statuses;
+            }
+            // If export file look for the export xmls
+            if ($manifest_handlers->containsExportObjectType(ilExportObjectType::EXPORT_FILE)) {
+                foreach ($manifest_handlers as $manfiest_file_handler) {
+                    $export_files = $export_files->withMerged($manfiest_file_handler->findXMLFileHandlers());
+                }
+            }
+        } catch (ilImportStatusException $e) {
+            $this->checkStatuses($e->getStatuses());
         }
         // VALIDATE export xmls
         $path_to_export_item_child = $this->import->file()->path()->handler()
@@ -209,10 +212,6 @@ class ilImport
             ->withNode($this->import->file()->path()->node()->simple()->withName('exp:Export'))
             ->withNode($this->import->file()->path()->node()->simple()->withName('exp:ExportItem'))
             ->withNode($this->import->file()->path()->node()->anyNode());
-        $path_to_export = $this->import->file()->path()->handler()
-            ->withStartAtRoot(true)
-            ->withNode($this->import->file()->path()->node()->simple()->withName('exp:Export'));
-        // component tree used in case of validation errors to generate an error message
         $component_tree = $this->import->file()->xml()->node()->info()->tree();
         foreach ($export_files as $export_file) {
             if (!$export_file
@@ -225,52 +224,37 @@ class ilImport
                 $export_file,
                 $path_to_export_item_child
             );
+            break;
         }
-        $this->log->debug(
-            "\n\n\n"
-            . "COMP PATH: " . $component_tree->getFirstNodeWith('Id', '623')
-                ->getAttributePath('Title', DIRECTORY_SEPARATOR)
-            . "\n\n"
-        );
         foreach ($export_files as $export_file) {
-            $export_node_info = $this->import->parser()->handler()
-                ->withFileHandler($export_file)
-                ->getNodeInfoAt($path_to_export)
-                ->current();
-            $type_str = $export_node_info->getValueOfAttribute('Entity');
-            $types = (str_contains($type_str, '_'))
-                ? explode('_', $type_str)
-                : [$type_str];
-            $latest_file_info = count($types) === 1
-                ? $schema_factory->getLatest($types[0])
-                : $schema_factory->getLatest($types[0], $types[1]);
-            $this->log->dump($types);
-            if (is_null($latest_file_info)) {
-                $status_collection = $status_collection->withAddedStatus($this->import_status->handler()
-                    ->withType(StatusType::DEBUG)
-                    ->withContent($this->import_status->content()->builder()->string()->withString(
-                        'Missing schema xsd file for entity of type: ' . implode('_', $types)
-                    )));
+            $found_statuses = $this->import_status->collection();
+            try {
+                $found_statuses = $this->import->file()->validation()->handler()->validateXMLAtPath(
+                    $export_file,
+                    $export_file->getXSDFileHandler(),
+                    $path_to_export_item_child
+                );
+            } catch (ilImportStatusException $e) {
+                $found_statuses = $e->getStatuses();
+            }
+            if (!$found_statuses->hasStatusType(StatusType::FAILED)) {
                 continue;
             }
-            $xsd_file = $this->import->file()->xsd()->handler()->withFileInfo($latest_file_info);
-            $status_collection = $status_collection->getMergedCollectionWith(
-                /*$this->import->file()->validation()->streamHandler()->validateXMLAtPath(
-                    $export_file,
-                    $xsd_file,
-                    $path_to_export_item
-                )*/
-                $this->import->file()->validation()->handler()->validateXMLAtPath(
-                    $export_file,
-                    $xsd_file,
-                    $path_to_export_item_child
-                )
-            );
+            // Append location
+            $ilias_path = $export_file->getILIASPath($component_tree);
+            $info_str = "<br> Location: " . $ilias_path . "<br>";
+            foreach ($found_statuses as $status) {
+                $extra_content = $this->import_status->content()->builder()->string()->withString($info_str);
+                $old_content = $status->getContent();
+                $new_content = $extra_content->mergeWith($old_content);
+                $new_status = $this->import_status->handler()->withType($status->getType())->withContent($new_content);
+                $statuses = $statuses->withAddedStatus($new_status);
+            }
         }
-        return $status_collection;
+        return $statuses;
     }
 
-    protected function checkStatus(ilImportStatusHandlerCollectionInterface $import_status_collection): void
+    protected function checkStatuses(ilImportStatusHandlerCollectionInterface $import_status_collection): void
     {
         if ($import_status_collection->hasStatusType(StatusType::FAILED)) {
             throw new ilImportException($import_status_collection
@@ -293,7 +277,7 @@ class ilImport
             $a_tmp_file,
             $a_copy_file
         );
-        $this->checkStatus($status_collection);
+        $this->checkStatuses($status_collection);
         $success_status = $status_collection->getCollectionOfAllByType(StatusType::SUCCESS)->current();
         $target_dir_info = new SplFileInfo($success_status->getContent()->toString());
         $delete_dir_info = new SplFileInfo($target_dir_info->getPath());
@@ -301,7 +285,7 @@ class ilImport
         // Validate manifest files
         try {
             $status_collection = $this->validateXMLFiles($manifest_spl);
-            $this->checkStatus($status_collection);
+            $this->checkStatuses($status_collection);
         } catch (Exception $e) {
             $this->filesystem->temp()->deleteDir($delete_dir_info->getFilename());
             throw $e;

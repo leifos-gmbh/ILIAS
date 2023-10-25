@@ -18,16 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\XML;
+namespace ImportHandler\I\File\XML\Export;
 
-use DOMDocument;
-use ImportHandler\I\File\ilHandlerInterface as ilFileHandlerInterface;
-use ImportStatus\Exception\ilException as ilImportStatusException;
-use SplFileInfo;
+use ImportHandler\I\File\XML\Export\ilHandlerInterface as ilXMLExportFileHandlerInterface;
+use ImportHandler\I\File\XML\Export\ilCollectionInterface as ilXMLExportFileCollectionInterface;
 
-interface ilHandlerInterface extends ilFileHandlerInterface
+interface ilFactoryInterface
 {
-    public function withFileInfo(SplFileInfo $file_info): ilHandlerInterface;
+    public function handler(): ilXMLExportFileHandlerInterface;
 
-    public function loadDomDocument(): DOMDocument;
+    public function collection(): ilXMLExportFileCollectionInterface;
 }

@@ -22,6 +22,7 @@ namespace ImportHandler\File\XML\Manifest;
 
 use ImportHandler\I\File\XML\Manifest\ilHandlerInterface as ilManifestXMLFileHandlerInterface;
 use ImportHandler\I\File\XML\Manifest\ilHandlerCollectionInterface as ilManifestXMLFileHandlerCollectionInterface;
+use ImportStatus\Exception\ilException as ilImportStatusException;
 use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 
@@ -112,6 +113,9 @@ class ilHandlerCollection implements ilManifestXMLFileHandlerCollectionInterface
         return $status_collection;
     }
 
+    /**
+     * @throws ilImportStatusException
+     */
     public function findNextFiles(): ilManifestXMLFileHandlerCollectionInterface
     {
         $collection = clone $this;

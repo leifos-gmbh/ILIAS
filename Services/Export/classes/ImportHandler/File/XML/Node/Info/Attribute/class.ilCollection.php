@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\XML\Node\Info\Attribute;
 
+use ilLogger;
 use ImportHandler\I\File\XML\Node\Info\Attribute\ilCollectionInterface as ilXMLFileNodeInfoAttributeCollectionInterface;
 use ImportHandler\I\File\XML\Node\Info\Attribute\ilPairInterface as ilXMLFileNodeInfoAttributePairInterface;
 use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoInterface;
@@ -31,11 +32,14 @@ class ilCollection implements ilXMLFileNodeInfoAttributeCollectionInterface
      */
     protected array $elements;
     protected int $index;
+    protected ilLogger $logger;
 
-    public function __construct()
-    {
+    public function __construct(
+        ilLogger $logger
+    ) {
         $this->elements = [];
         $this->index = 0;
+        $this->logger = $logger;
     }
 
     public function matches(ilXMLFileNodeInfoInterface $node_info): bool
@@ -50,6 +54,14 @@ class ilCollection implements ilXMLFileNodeInfoAttributeCollectionInterface
             return false;
         }
         return true;
+    }
+
+    public function withElement(
+        ilXMLFileNodeInfoAttributePairInterface $element
+    ): ilXMLFileNodeInfoAttributeCollectionInterface {
+        $clone = clone $this;
+        $clone->elements[] = $element;
+        return $clone;
     }
 
     public function toArray(): array

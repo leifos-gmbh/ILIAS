@@ -31,6 +31,7 @@ use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandle
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportStatus\Exception\ilException as ilImportStatusException;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\I\ilHandlerInterface as ilImportStatusHandlerInterface;
@@ -177,6 +178,9 @@ class ilHandler implements ilFileValidationHandlerInterface
         return $this->validateXMLAtPath($xml_file_handler, $xsd_file_handler, $path);
     }
 
+    /**
+     * @throws ilImportStatusException
+     */
     public function validateXMLAtPath(
         ilXMLFileHandlerInterface $xml_file_handler,
         ilXSDFileHandlerInterface $xsd_file_handler,

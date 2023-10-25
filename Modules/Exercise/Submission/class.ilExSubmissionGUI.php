@@ -301,9 +301,7 @@ class ilExSubmissionGUI
             $file_exist = false;
             foreach ($files as $lfile) {
                 if ($lfile["name"] == $file) {
-                    // deliver file
-                    ilFileDelivery::deliverFileLegacy($lfile["fullpath"], $file);
-                    exit();
+                    $this->domain->assignment()->instructionFiles($this->assignment->getId())->deliver($lfile["fullpath"], $file);
                 }
             }
             if (!$file_exist) {

@@ -2227,6 +2227,9 @@ th {
   margin-right: 0;
 }
 
+/*
+* Elements
+*/
 * {
   box-sizing: border-box;
 }
@@ -10758,6 +10761,12 @@ tbody.collapse.in {
   position: absolute;
   clip: rect(0, 0, 0, 0);
   pointer-events: none;
+}
+
+.img-responsive {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 .carousel {

@@ -23,6 +23,7 @@ namespace ILIAS\Exercise\InstructionFile;
 use ILIAS\Exercise\IRSS\CollectionWrapper;
 use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
+use ILIAS\Exercise\IRSS\ResourceInformation;
 
 class InstructionFileRepository
 {
@@ -89,6 +90,17 @@ class InstructionFileRepository
                 $stakeholder
             );
         }
+    }
+
+    public function deliverFile($ass_id, $file) : void
+    {
+        /** @var ResourceInformation $info */
+        foreach ($this->getCollectionResourcesInfo($ass_id) as $info) {
+            if ($file === $info->getTitle()) {
+                $this->wrapper->deliverFile($info->getRid());
+            }
+        }
+        throw new \ilExerciseException("Resource $file not found.");
     }
 
     public function getCollectionResourcesInfo(

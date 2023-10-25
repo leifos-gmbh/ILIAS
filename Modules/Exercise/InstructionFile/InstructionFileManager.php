@@ -92,6 +92,17 @@ class InstructionFileManager
         }
     }
 
+    public function deliver(string $full_path, string $file) : void
+    {
+        if ($this->repo->hasCollection($this->ass_id)) {
+            $this->repo->deliverFile($this->ass_id, $file);
+        } else {
+            // deliver file
+            ilFileDelivery::deliverFileLegacy($full_path, $file);
+            exit();
+        }
+    }
+
     public function cloneTo(
         int $to_ass_id
     ) : void

@@ -183,7 +183,7 @@ class ilCourseExporter extends ilXmlExporter
                 "xsd_file" => 'ilias_crs_9_0.xsd',
                 "uses_dataset" => false,
                 "min" => "9.0",
-                "max" => "9.99"
+                "max" => ""
             ],
             "4.1.0" => [
                 "namespace" => "http://www.ilias.de/Modules/Course/crs/4_1",

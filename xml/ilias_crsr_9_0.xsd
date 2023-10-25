@@ -1,6 +1,5 @@
 <xs:schema
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        targetNamespace = "http://www.ilias.de/Modules/CourseReference/exp/9_0"
         elementFormDefault="qualified">
 
     <!--################################################################################################################
@@ -11,7 +10,7 @@
         <xs:complexType>
             <xs:all>
                 <xs:element ref="Target"/>
-                <xs:element ref="Title"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="Title" type="Title"/>
                 <xs:element ref="MemberUpdate"/>
             </xs:all>
         </xs:complexType>
@@ -23,25 +22,27 @@
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="Title">
-        <xs:complexType>
-            <xs:attribute name="type" default="Reuse">
-                <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                        <xs:enumeration value="Reuse"/>
-                        <xs:enumeration value="Custom"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:attribute>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="Title">
+        <xs:simpleContent>
+            <xs:extension base="xs:token">
+                <xs:attribute name="type" default="1">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                            <xs:enumeration value="1"/>
+                            <xs:enumeration value="2"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
 
     <xs:element name="MemberUpdate" default="0">
-        <xs:simpleType>
+        <xs:simpleContent>
             <xs:restriction xml:base="xs:token">
                 <xs:enumeration value="0"/>
                 <xs:enumeration value="1"/>
             </xs:restriction>
-        </xs:simpleType>
+        </xs:simpleContent>
     </xs:element>
 </xs:schema>

@@ -2511,6 +2511,8 @@ book#:#book_hours#:#Hours
 book#:#book_is_used#:#Is Used
 book#:#book_limit_objects_available#:#You can not assign %s participants to "%s" because it has only %s items available.
 book#:#book_log#:#Reservations
+book#:#book_mail_permanent_link#:#Link to Booking Pool
+book#:#book_mail_to_booker#:#Mail to User
 book#:#book_new#:#New Booking Pool
 book#:#book_no_bookings_for_you#:#No reservations have been performed for you.
 book#:#book_no_objects#:#No Assignment

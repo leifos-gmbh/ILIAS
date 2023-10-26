@@ -53,7 +53,7 @@ class ilHandler implements ilFileValidationHandlerInterface
         ilLogger $logger,
         ilParserHandlerInterface $parser_handler,
         ilImportStatusFactoryInterface $import_status,
-        ilFilePathFactoryInterface $path
+        ilFilePathFactoryInterface $path,
     ) {
         $this->logger = $logger;
         $this->import_status = $import_status;
@@ -139,15 +139,15 @@ class ilHandler implements ilFileValidationHandlerInterface
         if($status_collection->hasStatusType(StatusType::FAILED)) {
             return $status_collection;
         }
-        // Enable manual error handling
-        $old_value_of_use_internal_errors = libxml_use_internal_errors(true);
-        // VALIDATE
+        if(count($nodes) === 0) {
+            return $this->validateEmptyXML($xml_file_handler, $xsd_file_handler);
+        }
+        $old_value = libxml_use_internal_errors(true);
         $status_collection = $this->import_status->collection()->withNumberingEnabled(true);
         foreach ($nodes as $node) {
             $doc = new DOMDocument();
             $doc->loadXML($node->getXML(), LIBXML_NOBLANKS);
             $doc->normalizeDocument();
-            $this->logger->debug("\n\n\n" . $doc->saveXML() . "\n\n");
             try {
                 if($doc->schemaValidate($xsd_file_handler->getFilePath())) {
                     continue;
@@ -163,19 +163,39 @@ class ilHandler implements ilFileValidationHandlerInterface
                 $errors
             ));
         }
-        // Restore old value of manual error handling
-        libxml_use_internal_errors($old_value_of_use_internal_errors);
+        libxml_use_internal_errors($old_value);
         return $status_collection->hasStatusType(StatusType::FAILED)
             ? $status_collection
             : $this->import_status->collection()->withAddedStatus($this->success_status);
+    }
+
+    protected function validateEmptyXML(
+        ilXMLFileHandlerInterface $xml_file_handler,
+        ilXSDFileHandlerInterface $xsd_file_handler
+    ): ilImportStatusHandlerCollectionInterface {
+        $old_value = libxml_use_internal_errors(true);
+        $status_collection = $this->import_status->collection()->withNumberingEnabled(true);
+        $doc = new DOMDocument();
+        $doc->schemaValidate($xsd_file_handler->getFilePath());
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+        libxml_use_internal_errors($old_value);
+        return $status_collection->getMergedCollectionWith($this->collectErrors(
+            $xml_file_handler,
+            $xsd_file_handler,
+            $errors
+        ));
     }
 
     public function validateXMLFile(
         ilXMLFileHandlerInterface $xml_file_handler,
         ilXSDFileHandlerInterface $xsd_file_handler
     ): ilImportStatusHandlerCollectionInterface {
-        $path = $this->path->handler()->withNode($this->path->node()->anyElement())->withStartAtRoot(true);
-        return $this->validateXMLAtPath($xml_file_handler, $xsd_file_handler, $path);
+        return $this->validateXMLAtPath(
+            $xml_file_handler,
+            $xsd_file_handler,
+            $this->path->handler()->withNode($this->path->node()->anyElement())->withStartAtRoot(true)
+        );
     }
 
     /**
@@ -186,15 +206,10 @@ class ilHandler implements ilFileValidationHandlerInterface
         ilXSDFileHandlerInterface $xsd_file_handler,
         ilFilePathHandlerInterface $path_handler
     ): ilImportStatusHandlerCollectionInterface {
-        $nodes = $this->parser_handler->withFileHandler($xml_file_handler)->getNodeInfoAt($path_handler);
-        // Check if nodes exist
-        if (count($nodes) === 0) {
-            return $this->createErrorMessage(
-                'Path not found in xml: ' . $path_handler->toString(),
-                $xml_file_handler,
-                $xsd_file_handler
-            );
-        }
-        return $this->validateXMLAtNodes($xml_file_handler, $xsd_file_handler, $nodes);
+        return $this->validateXMLAtNodes(
+            $xml_file_handler,
+            $xsd_file_handler,
+            $this->parser_handler->withFileHandler($xml_file_handler)->getNodeInfoAt($path_handler)
+        );
     }
 }

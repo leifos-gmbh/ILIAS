@@ -29,15 +29,4 @@ class ilAnyNode implements ilAnyNodeFilePathNodeInterface
     {
         return 'node()';
     }
-
-    public function moveReader(XMLReader $reader): bool
-    {
-        $reader_finished = false;
-        while (!($reader_finished = !$reader->read())) {
-            if ($reader->nodeType !== XMLReader::ELEMENT) {
-                break;
-            }
-        }
-        return $reader_finished;
-    }
 }

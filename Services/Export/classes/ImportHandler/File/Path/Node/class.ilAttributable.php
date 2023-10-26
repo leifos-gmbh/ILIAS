@@ -78,29 +78,4 @@ class ilAttributable implements ilAttributableFilePathNodeInterface
             ? $this->node_name
             : $this->node_name . '[' . $attribute . ']';
     }
-
-    public function moveReader(XMLReader $reader): bool
-    {
-        $reader_finished = false;
-        $found_node_name = false;
-        $found_attribute = false;
-        while (!($reader_finished = !$reader->read())) {
-            if (!$found_node_name &&
-                $reader->nodeType === XMLReader::ELEMENT &&
-                $reader->name === $this->node_name
-            ) {
-                $found_attribute = true;
-            }
-            if (!$found_attribute &&
-                $reader->nodeType === XMLReader::ATTRIBUTE &&
-                $reader->name === $this->attribute
-            ) {
-                $found_attribute = true;
-            }
-            if($found_node_name && $found_attribute) {
-                break;
-            }
-        }
-        return $reader_finished;
-    }
 }

@@ -35,8 +35,6 @@ interface ilFactoryInterface
 
     public function manifest(): ilManifestFileFactoryInterface;
 
-    public function reader(): ilXMLFileReaderFactoryInterface;
-
     public function node(): ilXMLFileNodeFactoryInterface;
 
     public function export(): ilXMLExportFileFactoryInterface;

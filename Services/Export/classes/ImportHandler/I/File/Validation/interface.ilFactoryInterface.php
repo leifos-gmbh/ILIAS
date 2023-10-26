@@ -26,5 +26,4 @@ use ImportHandler\I\File\Validation\ilStreamHandlerInterface as ilFileStreamVali
 interface ilFactoryInterface
 {
     public function handler(): ilFileValidationHandlerInterface;
-    public function streamHandler(): ilFileValidationHandlerInterface;
 }

@@ -30,6 +30,7 @@ enum ilExportObjectType
     public static function toString(ilExportObjectType $type): string
     {
         return match ($type) {
+            ilExportObjectType::MIXED => 'Mixed',
             ilExportObjectType::EXPORT_FILE => 'ExportFile',
             ilExportObjectType::EXPORT_SET => 'ExportSet',
             ilExportObjectType::NONE => ''

@@ -25,6 +25,4 @@ use XMLReader;
 interface ilNodeInterface
 {
     public function toString(): string;
-
-    public function moveReader(XMLReader $reader): bool;
 }

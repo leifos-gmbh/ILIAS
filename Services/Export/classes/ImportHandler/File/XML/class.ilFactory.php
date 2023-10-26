@@ -33,7 +33,6 @@ use ImportHandler\I\File\ilFactoryInterface as ilFileFactoryInterface;
 use ImportHandler\I\File\XML\Node\ilFactoryInterface as ilXMLFileNodeFactoryInterface;
 use ImportHandler\I\Parser\ilFactoryInterface as ilParserFactoryInterface;
 use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
-use ImportHandler\File\XML\Reader\ilFactory as ilXMLFileReaderFactory;
 use ImportStatus\ilFactory as ilStatusFactory;
 use ImportHandler\File\XML\Node\ilFactory as ilXMLFileNodeFactory;
 use ImportHandler\File\XML\Export\ilFactory as ilXMLExportFileFactory;
@@ -71,13 +70,6 @@ class ilFactory implements ilXMLFileFactoryInterface
         return new ilManifestFileFactory(
             $this->file,
             $this->parser,
-            $this->logger
-        );
-    }
-
-    public function reader(): ilXMLFileReaderFactoryInterface
-    {
-        return new ilXMLFileReaderFactory(
             $this->logger
         );
     }

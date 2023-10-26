@@ -82,22 +82,4 @@ class ilIndexable implements ilIndexableFilePathNodeInterface
 
         return $this->node_name . '[' . $indexing . ']';
     }
-
-    public function moveReader(XMLReader $reader): bool
-    {
-        $reader_finished = false;
-        $curr_index = 0;
-        while (
-            $curr_index < $this->index &&
-            !($reader_finished = !$reader->read())
-        ) {
-            if (
-                $reader->nodeType === XMLReader::ELEMENT &&
-                $reader->name === $this->node_name
-            ) {
-                $curr_index++;
-            }
-        }
-        return $reader_finished;
-    }
 }

@@ -46,22 +46,4 @@ class ilSimple implements ilSimpleFilePathNodeInterface
     {
         return $this->node_name;
     }
-
-    public function moveReader(XMLReader $reader): bool
-    {
-        $found = false;
-        $msg = "\n\n\nSIMPLE NODE START";
-        while ($reader->read()) {
-            $msg .= "\n" . $reader->name;
-            if (
-                $reader->nodeType === XMLReader::ELEMENT &&
-                $reader->name === $this->node_name
-            ) {
-                $found = true;
-                break;
-            }
-        }
-        $this->logger->debug($msg . "\nSIMPLENODE END\n\n");
-        return $found;
-    }
 }

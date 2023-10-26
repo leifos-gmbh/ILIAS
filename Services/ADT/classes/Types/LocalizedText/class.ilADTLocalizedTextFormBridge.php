@@ -24,8 +24,13 @@ class ilADTLocalizedTextFormBridge extends ilADTTextFormBridge
     public function addToForm(): void
     {
         $active_languages = $this->getADT()->getCopyOfDefinition()->getActiveLanguages();
+        $multilingual_value_support = $this->getADT()->getCopyOfDefinition()->getMultilingualValueSupport();
 
-        if (!count($active_languages)) {
+        if (
+            !count($active_languages) ||
+            !$multilingual_value_support
+        ) {
+            // end-patch ovb-md-value-support
             $this->addElementToForm(
                 $this->getTitle(),
                 (string) $this->getElementId(),
@@ -66,7 +71,11 @@ class ilADTLocalizedTextFormBridge extends ilADTTextFormBridge
      */
     public function importFromPost(): void
     {
-        if (!$this->getADT()->getCopyOfDefinition()->supportsTranslations()) {
+        $multilingual_value_support = $this->getADT()->getCopyOfDefinition()->getMultilingualValueSupport();
+        if (
+            !$this->getADT()->getCopyOfDefinition()->supportsTranslations() ||
+            !$multilingual_value_support
+        ) {
             parent::importFromPost();
             return;
         }

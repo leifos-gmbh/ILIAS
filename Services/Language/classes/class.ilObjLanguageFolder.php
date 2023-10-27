@@ -110,7 +110,7 @@ class ilObjLanguageFolder extends ilObject
         while ($entry = $d->read()) {
             if (is_file($entry) && (preg_match("~(^ilias_.{2}\.lang$)~", $entry))) {
                 $lang_key = substr($entry, 6, 2);
-                $languages[$lang_key] = ""; // long names will be set in class Out
+				$languages[$lang_key] = array(); // long names will be set in class Out
             }
         }
 

@@ -134,4 +134,48 @@ class ilUIHookPluginGUI
     {
         return array('target' => false);
     }
+
+    // cdpatch start
+
+    /**
+     * Execute command
+     */
+    function executeCommand()
+    {
+        global $ilCtrl;
+
+        $cmd = $ilCtrl->getCmd();
+
+        if (($ret = $ilCtrl->forwardToPlugin()) !== false) {
+
+        } else {
+            switch ($cmd) {
+                case "setCmdClass":
+                    $this->$cmd();
+            }
+        }
+    }
+
+    /**
+     * Set cmd class
+     * @return
+     */
+    function setCmdClass()
+    {
+        global $ilCtrl;
+
+        $ilCtrl->setCmdClass($_GET["cmdClass"]);
+        return $this->executeCommand();
+    }
+
+    /**
+     * Forward to class
+     */
+    function forwardTo()
+    {
+        global $ilCtrl;
+
+        $ilCtrl->redirectByClass(ilUtil::stripSlashes($_GET["class"]));;
+    }
+    // cdpatch end
 }

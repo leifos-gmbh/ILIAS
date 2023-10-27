@@ -30,11 +30,13 @@ class ilADTLocalizedTextFormBridge extends ilADTTextFormBridge
             !count($active_languages) ||
             !$multilingual_value_support
         ) {
-            // end-patch ovb-md-value-support
+
+            $languages = $this->getADT()->getTranslations();
+            $text = $languages[$this->getADT()->getCopyOfDefinition()->getDefaultLanguage()] ?? '';
             $this->addElementToForm(
                 $this->getTitle(),
-                (string) $this->getElementId(),
-                (string) $this->getADT()->getText(),
+                $this->getElementId() . '_' . $this->getADT()->getCopyOfDefinition()->getDefaultLanguage(),
+                $text,
                 false,
                 ''
             );
@@ -76,7 +78,14 @@ class ilADTLocalizedTextFormBridge extends ilADTTextFormBridge
             !$this->getADT()->getCopyOfDefinition()->supportsTranslations() ||
             !$multilingual_value_support
         ) {
-            parent::importFromPost();
+            $language = $this->getADT()->getCopyOfDefinition()->getDefaultLanguage();
+            $this->getADT()->setTranslation(
+                $language,
+                $this->getForm()->getInput($this->getElementId() . '_' . $language)
+            );
+            $this->getADT()->setText($this->getForm()->getInput($this->getElementId() . '_' . $language));
+            $input_item = $this->getForm()->getItemByPostVar($this->getElementId() . '_' . $language);
+            $input_item->setValue($this->getADT()->getTextForLanguage($language));
             return;
         }
         $active_languages = $this->getADT()->getCopyOfDefinition()->getActiveLanguages();

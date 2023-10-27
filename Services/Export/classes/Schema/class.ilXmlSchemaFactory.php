@@ -26,6 +26,8 @@ use ILIAS\Data\Version;
 
 class ilXmlSchemaFactory
 {
+    private const SCHEMA_DEFINITION_LOCATION = './xml/SchemaValidation';
+
     private ilXmlSchemaInfoCollection $collection;
 
     private \ilLogger $logger;
@@ -98,13 +100,12 @@ class ilXmlSchemaFactory
         foreach ($collection as $schema_info) {
             $sorted[] = $schema_info;
         }
-        $this->logger->dump($sorted);
         return $sorted;
     }
 
     private function readSchemaFiles(): void
     {
-        foreach (new \DirectoryIterator('./xml') as $file) {
+        foreach (new \DirectoryIterator(self::SCHEMA_DEFINITION_LOCATION) as $file) {
             if ($file->isDot()) {
                 $this->logger->debug('Ignoring file (dot file): ' . $file->getFilename());
                 continue;

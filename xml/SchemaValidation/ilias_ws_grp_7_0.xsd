@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Remove start: after metadata import changes in ilCourseXMLWriter -->
 <!DOCTYPE doc [
-        <!ENTITY AdvancedMetaData SYSTEM "./ilias_advanced_meta_data_9_0.xsd">
+        <!ENTITY AdvancedMetaData SYSTEM "../ilias_advanced_meta_data_9_0.xsd">
         <!ENTITY MetaData SYSTEM "./ilias_md_4_1.xsd">
         ]>
 <!-- Remove end -->

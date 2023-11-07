@@ -226,6 +226,7 @@ class ilImport
                 );
             }
             if (!$found_statuses->hasStatusType(StatusType::FAILED)) {
+                $statuses = $statuses->getMergedCollectionWith($found_statuses);
                 continue;
             }
             $info_str = "<br> Location: " . $export_file->getILIASPath($component_tree) . "<br>";
@@ -242,7 +243,7 @@ class ilImport
         if ($import_status_collection->hasStatusType(StatusType::FAILED)) {
             throw new ilImportException($import_status_collection
                 ->withNumberingEnabled(true)
-                ->toString(StatusType::FAILED, StatusType::DEBUG));
+                ->toString(StatusType::FAILED));
         }
     }
 

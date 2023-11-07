@@ -52,9 +52,6 @@ abstract class ilHandler extends ilXMLFileHandler implements ilXMLExportFileHand
     protected ilXMlFileInfoNodeAttributeFactoryInterface $attribute;
     protected ilFileValidationSetFactoryInterface $set;
     protected ilLogger $logger;
-    // protected Version $version;
-    // protected string $type;
-    // protected string $subtype;
 
     public function __construct(
         ilFileNamespaceHandlerInterface $namespace,
@@ -84,67 +81,8 @@ abstract class ilHandler extends ilXMLFileHandler implements ilXMLExportFileHand
     {
         $clone = clone $this;
         $clone->xml_file_info = $file_info;
-        // $clone->loadExportInfo();
         return $clone;
     }
-
-    /**
-     * @throws ilImportStatusException
-     */
-    /*
-    public function loadExportInfo(): void
-    {
-        $node_info = null;
-        $node_info = $this->parser->handler()
-            ->withFileHandler($this)
-            ->getNodeInfoAt($this->getPathToExportNode())
-            ->current();
-        $type_str = $node_info->getValueOfAttribute('Entity');
-        $types = str_contains($type_str, '_')
-            ? explode('_', $type_str)
-            : [$type_str, ''];
-        $version_str = $node_info->getValueOfAttribute('SchemaVersion');
-        $this->type = $types[0];
-        $this->subtype = $types[1];
-        $this->version = new Version($version_str);
-    }
-    */
-    /*
-    public function getVersion(): Version
-    {
-        return $this->version;
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function getSubType(): string
-    {
-        return $this->subtype;
-    }
-
-    public function getPathToExportNode(): ilFilePathHandlerInterface
-    {
-        return $this->path->handler()
-            ->withStartAtRoot(true)
-            ->withNode($this->path->node()->simple()->withName('exp:Export'));
-    }
-    */
-
-    /**
-     * @throws ilImportStatusException
-     */
-    /*
-    public function getXSDFileHandler(): ilXSDFileHandlerInterface|null
-    {
-        $latest_file_info = $this->schema->getByVersionOrLatest($this->version, $this->type, $this->subtype);
-        return is_null($latest_file_info)
-            ? null
-            : $this->xsd_file->handler()->withFileInfo($latest_file_info);
-    }
-    */
 
     public function getILIASPath(ilXMLFileNodeInfoTreeInterface $component_tree): string
     {

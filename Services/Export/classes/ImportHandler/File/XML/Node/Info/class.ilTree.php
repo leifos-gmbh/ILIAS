@@ -82,23 +82,16 @@ class ilTree implements ilXMLFileNodeInfoTreeInterface
         if(!isset($this->root)) {
             return $this->info->collection();
         }
-        $msg = "\n\n\n";
-        $msg .= "ROOT: " . $this->root->getNodeName();
-        $msg .= "XML: " . $this->xml->getFilePath();
         $nodes = $this->info->collection()->withMerged($this->root->getChildren());
-
         $found = $this->info->collection();
         while (count($nodes) > 0) {
-            $msg .= "\nNodeCount: " . count($nodes);
             $current_node = $nodes->getFirst();
             $nodes = $nodes->removeFirst();
             $nodes = $nodes->withMerged($current_node->getChildren());
-            $msg .= "\nNode: " . $current_node->toString();
             if ($attribute_pairs->matches($current_node)) {
                 $found = $found->withElement($current_node);
             }
         }
-        $this->logger->debug($msg . "\n\n");
         return $found;
     }
 

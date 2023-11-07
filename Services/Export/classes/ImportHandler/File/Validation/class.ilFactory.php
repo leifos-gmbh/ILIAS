@@ -25,8 +25,10 @@ use ImportHandler\File\Validation\ilHandler as ilFileValidationHandler;
 use ImportHandler\I\File\Path\ilFactoryInterface as ilFilePathFactoryInterface;
 use ImportHandler\I\File\Validation\ilFactoryInterface as ilFileValidationFactoryInterface;
 use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandlerInterface;
+use ImportHandler\I\File\Validation\Set\ilFactoryInterface as ilFileValidationSetFactoryInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
 use ImportStatus\ilFactory as ilImportStatusFactory;
+use ImportHandler\File\Validation\Set\ilFactory as ilFileValidationSetFactory;
 
 class ilFactory implements ilFileValidationFactoryInterface
 {
@@ -52,5 +54,10 @@ class ilFactory implements ilFileValidationFactoryInterface
             new ilImportStatusFactory(),
             $this->path
         );
+    }
+
+    public function set(): ilFileValidationSetFactoryInterface
+    {
+        return new ilFileValidationSetFactory();
     }
 }

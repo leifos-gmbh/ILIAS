@@ -36,6 +36,7 @@ use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactory
 use ImportStatus\ilFactory as ilStatusFactory;
 use ImportHandler\File\XML\Node\ilFactory as ilXMLFileNodeFactory;
 use ImportHandler\File\XML\Export\ilFactory as ilXMLExportFileFactory;
+use ImportHandler\File\Namespace\ilFactory as ilFileNamespaceFactory;
 
 class ilFactory implements ilXMLFileFactoryInterface
 {
@@ -56,6 +57,7 @@ class ilFactory implements ilXMLFileFactoryInterface
     public function handler(): ilXMLFileHanlderInterface
     {
         return new ilXMLFileHanlder(
+            new ilFileNamespaceFactory(),
             new ilStatusFactory()
         );
     }

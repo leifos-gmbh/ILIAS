@@ -22,10 +22,20 @@ namespace ImportHandler\I\File\XML\Export;
 
 use ImportHandler\I\File\XML\Export\ilHandlerInterface as ilXMLExportFileHandlerInterface;
 use ImportHandler\I\File\XML\Export\ilCollectionInterface as ilXMLExportFileCollectionInterface;
+use ImportHandler\I\File\XML\Export\Component\ilFactoryInterface as ilComponentXMLExportFileHandlerFactoryInterface;
+use ImportHandler\I\File\XML\Export\DataSet\ilFactoryInterface as ilDataSetXMLExportFileHandlerFactoryInterface;
+use ImportHandler\I\File\XML\Export\Items\ilFactoryInterface as ilItemsXMLExportFileHandlerFactoryInterface;
+use SplFileInfo;
 
 interface ilFactoryInterface
 {
-    public function handler(): ilXMLExportFileHandlerInterface;
+    public function withFileInfo(SplFileInfo $file_info): ilXMLExportFileHandlerInterface;
 
     public function collection(): ilXMLExportFileCollectionInterface;
+
+    public function component(): ilComponentXMLExportFileHandlerFactoryInterface;
+
+    public function dataSet(): ilDataSetXMLExportFileHandlerFactoryInterface;
+
+    public function items(): ilItemsXMLExportFileHandlerFactoryInterface;
 }

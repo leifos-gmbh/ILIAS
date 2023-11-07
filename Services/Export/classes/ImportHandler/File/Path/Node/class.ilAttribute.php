@@ -20,48 +20,39 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\Path\Node;
 
-use ImportHandler\I\File\Path\Node\ilAttributableInterface as ilAttributableFilePathNodeInterface;
+use ImportHandler\I\File\Path\Node\ilAttributeInterface as ilAttributeFilePathNodeInterface;
 use ImportHandler\File\Path\ilComparisonDummy;
 use ImportHandler\I\File\Path\ilComparisonInterface;
 use XMLReader;
 
-class ilAttributable implements ilAttributableFilePathNodeInterface
+class ilAttribute implements ilAttributeFilePathNodeInterface
 {
     protected ilComparisonInterface $comparison;
-    protected string $node_name;
     protected string $attribute;
     protected bool $any_attribute_enabled;
 
     public function __construct()
     {
-        $this->node_name = '';
         $this->attribute = '';
         $this->comparison = new ilComparisonDummy();
         $this->any_attribute_enabled = false;
     }
 
-    public function withName(string $node_name): ilAttributableFilePathNodeInterface
-    {
-        $clone = clone $this;
-        $clone->node_name = $node_name;
-        return $clone;
-    }
-
-    public function withAttribute(string $attribute): ilAttributableFilePathNodeInterface
+    public function withAttribute(string $attribute): ilAttributeFilePathNodeInterface
     {
         $clone = clone $this;
         $clone->attribute = $attribute;
         return $clone;
     }
 
-    public function withComparison(ilComparisonInterface $comparison): ilAttributableFilePathNodeInterface
+    public function withComparison(ilComparisonInterface $comparison): ilAttributeFilePathNodeInterface
     {
         $clone = clone $this;
         $clone->comparison = $comparison;
         return $clone;
     }
 
-    public function withAnyAttributeEnabled(bool $enabled): ilAttributableFilePathNodeInterface
+    public function withAnyAttributeEnabled(bool $enabled): ilAttributeFilePathNodeInterface
     {
         $clone = clone $this;
         $clone->any_attribute_enabled = $enabled;
@@ -73,9 +64,11 @@ class ilAttributable implements ilAttributableFilePathNodeInterface
         $attribute = $this->any_attribute_enabled
             ? '@*'
             : '@' . $this->attribute . $this->comparison->toString();
+        return '[' . $attribute . ']';
+    }
 
-        return $attribute === ''
-            ? $this->node_name
-            : $this->node_name . '[' . $attribute . ']';
+    public function requiresPathSeparator(): bool
+    {
+        return true;
     }
 }

@@ -20,14 +20,8 @@ declare(strict_types=1);
 
 namespace ImportHandler\I\File\Path\Node;
 
-use ImportHandler\I\File\Path\ilComparisonInterface as ilFilePathComparisonInterface;
-use ImportHandler\I\File\Path\Node\ilSimpleInterface as ilSimpleFilePathNodeInterface;
+use ImportHandler\I\File\Path\Node\ilNodeInterface as ilFilePathNodeInterface;
 
-interface ilAttributableInterface extends ilSimpleFilePathNodeInterface
+interface ilCloseRoundBrackedInterface extends ilFilePathNodeInterface
 {
-    public function withAttribute(string $attribute): ilAttributableInterface;
-
-    public function withComparison(ilFilePathComparisonInterface $comparison): ilAttributableInterface;
-
-    public function withAnyAttributeEnabled(bool $enabled): ilAttributableInterface;
 }

@@ -21,10 +21,13 @@ declare(strict_types=1);
 namespace ImportHandler\File\XML\Export;
 
 use ilLogger;
+use ImportHandler\I\File\XML\Export\Component\ilFactoryInterface as ilComponentXMLExportFileHandlerFactoryInterface;
+use ImportHandler\I\File\XML\Export\DataSet\ilFactoryInterface as ilDataSetXMLExportFileHandlerFactoryInterface;
 use ImportHandler\I\File\XML\Export\ilCollectionInterface as ilXMLExportFileCollectionInterface;
 use ImportHandler\I\File\XML\Export\ilFactoryInterface as ilXMLExportFileFactoryInterface;
 use ImportHandler\I\File\XML\Export\ilHandlerInterface as ilXMLExportFileHandlerInterface;
 use ImportHandler\File\XML\Export\ilHandler as ilXMLExportFileHanlder;
+use ImportHandler\I\File\XML\Export\Items\ilFactoryInterface as ilItemsXMLExportFileHandlerFactoryInterface;
 use ImportStatus\ilFactory as ilImportStatusFactory;
 use ImportHandler\File\Path\ilFactory as ilFilePathFactory;
 use ImportHandler\Parser\ilFactory as ilParserFactory;
@@ -32,6 +35,11 @@ use ImportHandler\File\XSD\ilFactory as ilXSDFileFactory;
 use ImportHandler\File\XML\Export\ilCollection as ilXMLExportFileHandlerCollection;
 use Schema\ilXmlSchemaFactory;
 use ImportHandler\File\XML\Node\Info\Attribute\ilFactory as ilXMLNodeInfoAttributeFactory;
+use ImportHandler\File\Namespace\ilFactory as ilFileNamespaceFactory;
+use SplFileInfo;
+use ImportHandler\File\XML\Export\Component\ilFactory as ilComponentXMLExportFileFactory;
+use ImportHandler\File\XML\Export\DataSet\ilFactory as ilDataSetXMLExportFileFactory;
+use ImportHandler\File\XML\Export\Items\ilFactory as ilItemsXMLExportFileFactory;
 
 class ilFactory implements ilXMLExportFileFactoryInterface
 {
@@ -42,21 +50,53 @@ class ilFactory implements ilXMLExportFileFactoryInterface
         $this->logger = $logger;
     }
 
-    public function handler(): ilXMLExportFileHandlerInterface
+    /*
+public function handler(): ilXMLExportFileHandlerInterface
+{
+    return new ilXMLExportFileHanlder(
+        new ilFileNamespaceFactory(),
+        new ilImportStatusFactory(),
+        new ilXmlSchemaFactory(),
+        new ilParserFactory($this->logger),
+        new ilXSDFileFactory(),
+        new ilFilePathFactory($this->logger),
+        $this->logger,
+        new ilXMLNodeInfoAttributeFactory($this->logger)
+    );
+    }
+    */
+
+    public function withFileInfo(SplFileInfo $file_info): ilXMLExportFileHandlerInterface
     {
-        return new ilXMLExportFileHanlder(
-            new ilImportStatusFactory(),
-            new ilXmlSchemaFactory(),
-            new ilParserFactory($this->logger),
-            new ilXSDFileFactory(),
-            new ilFilePathFactory($this->logger),
-            $this->logger,
-            new ilXMLNodeInfoAttributeFactory($this->logger)
-        );
+        $comp_handler = $this->component()->handler()->withFileInfo($file_info);
+        $dataset_handler = $this->dataSet()->handler()->withFileInfo($file_info);
+        $items_handler = $this->items()->handler()->withFileInfo($file_info);
+        if ($items_handler->hasComponentRootNode()) {
+            return $items_handler;
+        }
+        if ($dataset_handler->hasComponentRootNode()) {
+            return $dataset_handler;
+        }
+        return $comp_handler;
     }
 
     public function collection(): ilXMLExportFileCollectionInterface
     {
         return new ilXMLExportFileHandlerCollection();
+    }
+
+    public function component(): ilComponentXMLExportFileHandlerFactoryInterface
+    {
+        return new ilComponentXMLExportFileFactory($this->logger);
+    }
+
+    public function dataSet(): ilDataSetXMLExportFileHandlerFactoryInterface
+    {
+        return new ilDataSetXMLExportFileFactory($this->logger);
+    }
+
+    public function items(): ilItemsXMLExportFileHandlerFactoryInterface
+    {
+        return new ilItemsXMLExportFileFactory($this->logger);
     }
 }

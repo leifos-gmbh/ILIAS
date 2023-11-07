@@ -21,10 +21,10 @@ declare(strict_types=1);
 namespace ImportHandler\Parser;
 
 use ilLogger;
+use ImportHandler\File\XML\Node\Info\ilFactory as ilXMLFileNodeInfoFactory;
 use ImportHandler\I\Parser\ilFactoryInterface as ilParserFactoryInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
 use ImportHandler\Parser\ilHandler as ilParserHandler;
-use ImportHandler\File\XML\Node\Info\ilFactory as ilXMLFileNodeInfoFactory;
 
 class ilFactory implements ilParserFactoryInterface
 {

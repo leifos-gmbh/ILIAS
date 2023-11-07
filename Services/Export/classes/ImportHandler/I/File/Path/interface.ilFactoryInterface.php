@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace ImportHandler\I\File\Path;
 
-use ImportHandler\I\File\Path\ilComparisonInterface as ilFilePathComparisonInterface;
-use ImportHandler\I\File\Path\Node\ilFactoryInterface as ilFilePathNodeFactoryInterface;
-use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
 use ImportHandler\File\Path\ComparisonOperator as ilFilePathComparisonOperator;
+use ImportHandler\I\File\Path\ilComparisonInterface as ilFilePathComparisonInterface;
+use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
+use ImportHandler\I\File\Path\Node\ilFactoryInterface as ilFilePathNodeFactoryInterface;
 
 interface ilFactoryInterface
 {

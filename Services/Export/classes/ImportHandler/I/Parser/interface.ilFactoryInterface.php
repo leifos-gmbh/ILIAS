@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace ImportHandler\I\Parser;
 
-use ImportHandler\I\File\Path\ilFactoryInterface as ilParserPathFactoryInterface;
 use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
 
 interface ilFactoryInterface

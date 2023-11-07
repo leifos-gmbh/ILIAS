@@ -46,4 +46,9 @@ class ilSimple implements ilSimpleFilePathNodeInterface
     {
         return $this->node_name;
     }
+
+    public function requiresPathSeparator(): bool
+    {
+        return true;
+    }
 }

@@ -18,16 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\Path\Node;
+namespace ImportHandler\I\File\XML\Export\DataSet;
 
-use ImportHandler\I\File\Path\ilComparisonInterface as ilFilePathComparisonInterface;
-use ImportHandler\I\File\Path\Node\ilSimpleInterface as ilSimpleFilePathNodeInterface;
+use ImportHandler\I\File\XML\Export\DataSet\ilHandlerInterface as ilDatasetXMLExportFileHandlerInterface;
 
-interface ilIndexableInterface extends ilSimpleFilePathNodeInterface
+interface ilFactoryInterface
 {
-    public function withIndex(int $index): ilIndexableInterface;
-
-    public function withComparison(ilFilePathComparisonInterface $comparison): ilIndexableInterface;
-
-    public function withIndexingFromEndEnabled(bool $enabled): ilIndexableInterface;
+    public function handler(): ilDatasetXMLExportFileHandlerInterface;
 }

@@ -23,6 +23,7 @@ namespace ImportHandler\File\Validation;
 use DOMDocument;
 use Exception;
 use ilLogger;
+use ImportHandler\I\File\Validation\Set\ilCollectionInterface as ilFileValidationSetCollectionInterface;
 use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollection;
 use ImportHandler\I\File\ilHandlerInterface as ilFileHandlerInterface;
 use ImportHandler\I\File\Path\ilFactoryInterface as ilFilePathFactoryInterface;
@@ -129,11 +130,6 @@ class ilHandler implements ilFileValidationHandlerInterface
         ilXSDFileHandlerInterface $xsd_file_handler,
         ilXMLFileNodeInfoCollection $nodes
     ): ilImportStatusHandlerCollectionInterface {
-        $this->logger->debug(
-            "\n\nValidating:"
-            . "\nXML: " . $xml_file_handler->getFilePath()
-            . "\nXSD: " . $xsd_file_handler->getFilePath() . "\n"
-        );
         // Check if files exist
         $status_collection = $this->checkIfFilesExist([$xsd_file_handler]);
         if($status_collection->hasStatusType(StatusType::FAILED)) {
@@ -148,6 +144,9 @@ class ilHandler implements ilFileValidationHandlerInterface
             $doc = new DOMDocument();
             $doc->loadXML($node->getXML(), LIBXML_NOBLANKS);
             $doc->normalizeDocument();
+            foreach ($xml_file_handler->getNamespaces() as $namespace) {
+                $doc->createAttributeNS($namespace->getNamespace(), $namespace->getPrefix());
+            }
             try {
                 if($doc->schemaValidate($xsd_file_handler->getFilePath())) {
                     continue;
@@ -211,5 +210,22 @@ class ilHandler implements ilFileValidationHandlerInterface
             $xsd_file_handler,
             $this->parser_handler->withFileHandler($xml_file_handler)->getNodeInfoAt($path_handler)
         );
+    }
+
+    /**
+     * @throws ilImportStatusException
+     */
+    public function validateSets(
+        ilFileValidationSetCollectionInterface $sets
+    ): ilImportStatusHandlerCollectionInterface {
+        $status_collection = $this->import_status->collection();
+        foreach ($sets as $set) {
+            $status_collection = $status_collection->getMergedCollectionWith($this->validateXMLAtPath(
+                $set->getXMLFileHandler(),
+                $set->getXSDFileHandler(),
+                $set->getFilePathHandler()
+            ));
+        }
+        return $status_collection;
     }
 }

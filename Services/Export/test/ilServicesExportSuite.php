@@ -38,7 +38,6 @@ class ilServicesExportSuite extends TestSuite
     {
         $base_path = __DIR__ . DIRECTORY_SEPARATOR . "ImportHandler";
         $dir_infos = [[array_diff(scandir($base_path), array('.', '..')), $base_path]];
-
         while (count($dir_infos) > 0) {
             $current_dir_info = array_shift($dir_infos);
             $dir_files = $current_dir_info[0];
@@ -52,10 +51,25 @@ class ilServicesExportSuite extends TestSuite
                 }
                 if (str_ends_with($file_path, '.php')) {
                     include_once($file_path);
-                    $class_name = substr($dir_file, 0, strlen($dir_file) - 4);
-                    $suite->addTestSuite($class_name);
+                    // $class_name = substr($dir_file, 0, strlen($dir_file) - 4);
+                    // $suite->addTestSuite($class_name);
                 }
             }
         }
+        $suite->addTestSuite(\Test\ImportHandler\File\Namespace\ilCollectionTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Namespace\ilHandlerTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Path\Comparison\ilHandlerTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Path\Node\ilAnyElementTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Path\Node\ilAnyNodeTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Path\Node\ilAttributeTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Path\Node\ilCloseRoundBrackedTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Path\Node\ilIndexTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Path\Node\ilOpenRoundBrackedTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Path\Node\ilSimpleTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\Path\ilHandlerTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\XML\Node\Info\Attribute\ilCollectionTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\XML\Node\Info\Attribute\ilPairTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\XML\Node\Info\ilCollectionTest::class);
+        $suite->addTestSuite(\Test\ImportHandler\File\ilHandlerTest::class);
     }
 }

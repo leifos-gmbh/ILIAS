@@ -36,12 +36,7 @@ class ilServicesExportSuite extends TestSuite
 
     public static function addImportHandlerTests(ilServicesExportSuite $suite): void
     {
-        $base_path =
-            "." . DIRECTORY_SEPARATOR
-            . "Services" . DIRECTORY_SEPARATOR
-            . "Export" . DIRECTORY_SEPARATOR
-            . "test" . DIRECTORY_SEPARATOR
-            . "ImportHandler";
+        $base_path = __DIR__ . DIRECTORY_SEPARATOR . "ImportHandler";
         $dir_infos = [[array_diff(scandir($base_path), array('.', '..')), $base_path]];
 
         while (count($dir_infos) > 0) {

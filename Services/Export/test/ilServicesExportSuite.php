@@ -51,7 +51,7 @@ class ilServicesExportSuite extends TestSuite
                     continue;
                 }
                 if (str_ends_with($dir_file, '.php')) {
-                    include_once($dir_path);
+                    include_once($dir_file);
                     $class_name = substr($dir_file, 0, count($dir_file) - 4);
                     $suite->addTestSuite($dir_file::class);
                 }

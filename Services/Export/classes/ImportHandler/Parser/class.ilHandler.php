@@ -68,7 +68,7 @@ class ilHandler implements ilParseHandlerInterface
         $node_info_collection = $this->xml_node->collection();
         /** @var DOMNode $node **/
         foreach ($nodes as $node) {
-            $node_info = $this->xml_node->handler()->withDOMNode($node);
+            $node_info = $this->xml_node->withDOMNode($node);
             $node_info_collection = $node_info_collection->withElement($node_info);
         }
         return $node_info_collection;

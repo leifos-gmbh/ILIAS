@@ -68,11 +68,10 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
     ) {
         parent::__construct($namespace, $status);
         $this->status = $status;
-        $this->manifest_xsd_handler = $file->xsd()->handler()
-            ->withFileInfo($schema->getLatest(
-                self::XSD_TYPE,
-                self::XSD_SUB_TYPE
-            ));
+        $this->manifest_xsd_handler = $file->xsd()->withFileInfo($schema->getLatest(
+            self::XSD_TYPE,
+            self::XSD_SUB_TYPE
+        ));
         $this->logger = $logger;
         $this->parser = $parser;
         $this->file = $file;

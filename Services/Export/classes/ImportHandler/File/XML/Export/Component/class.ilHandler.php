@@ -87,7 +87,7 @@ class ilHandler extends ilXMLExportFileHandler implements ilComponentXMLExportFi
             $file_info = $this->schema->getLatest('exp', 'comp');
             $structure_xsd = is_null($file_info)
                 ? null
-                : $this->xsd_file->handler()->withFileInfo($file_info);
+                : $this->xsd_file->withFileInfo($file_info);
             if (!is_null($structure_xsd)) {
                 // uncomment as soon as all export files use the exp:Export/exp:ExportItem/Component structure
                 /*$sets = $sets->withElement(
@@ -119,7 +119,7 @@ class ilHandler extends ilXMLExportFileHandler implements ilComponentXMLExportFi
             $latest_file_info = $this->schema->getByVersionOrLatest($version, $types[0], $types[1]);
             $component_xsd = is_null($latest_file_info)
                 ? null
-                : $this->xsd_file->handler()->withFileInfo($latest_file_info);
+                : $this->xsd_file->withFileInfo($latest_file_info);
             $path_to_component = $this->path->handler()
                 ->withStartAtRoot(true)
                 ->withNode($this->path->node()->simple()->withName('exp:Export'))

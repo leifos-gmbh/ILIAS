@@ -97,7 +97,7 @@ class ilHandler extends ilXMLExportFileHandler implements ilDataSetXMLExportFile
             $structure_spl = $this->schema->getLatest('exp', 'dataset');
             $structure_xsd = is_null($structure_spl)
                 ? null
-                : $this->xsd_file->handler()->withFileInfo($structure_spl);
+                : $this->xsd_file->withFileInfo($structure_spl);
             if (!is_null($structure_xsd)) {
                 $sets = $sets->withElement(
                     $this->set->handler()
@@ -144,7 +144,7 @@ class ilHandler extends ilXMLExportFileHandler implements ilDataSetXMLExportFile
                         )));
                     continue;
                 }
-                $xsd_handler = $this->xsd_file->handler()->withFileInfo($xsd_schema_spl);
+                $xsd_handler = $this->xsd_file->withFileInfo($xsd_schema_spl);
                 $path_to_rec = $this->path->handler()
                     ->withStartAtRoot(true)
                     ->withNode($this->path->node()->openRoundBracked())

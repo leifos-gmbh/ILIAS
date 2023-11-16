@@ -18,16 +18,24 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\Path\Node;
+namespace ImportHandler\File\Path\Comparison;
 
-use ImportHandler\I\File\Path\Comparison\ilHandlerInterface as ilFilePathComparisonInterface;
-use ImportHandler\I\File\Path\Node\ilNodeInterface as ilFilePathNodeInterface;
-
-interface ilAttributeInterface extends ilFilePathNodeInterface
+enum Operator
 {
-    public function withAttribute(string $attribute): ilAttributeInterface;
+    case EQUAL;
+    case LOWER;
+    case GREATER;
+    case GREATER_EQUAL;
+    case LOWER_EQUAL;
 
-    public function withComparison(ilFilePathComparisonInterface $comparison): ilAttributeInterface;
-
-    public function withAnyAttributeEnabled(bool $enabled): ilAttributeInterface;
+    public static function toString(Operator $operator): string
+    {
+        return match ($operator) {
+            Operator::EQUAL => '=',
+            Operator::LOWER => '<',
+            Operator::GREATER => '>',
+            Operator::GREATER_EQUAL => '>=',
+            Operator::LOWER_EQUAL => '<=',
+        };
+    }
 }

@@ -93,7 +93,7 @@ class ilHandler extends ilXMLExportFileHandler implements ilItemsXMLExportFileHa
             $file_info = $this->schema->getLatest('exp', 'items');
             $structure_xsd = is_null($file_info)
                 ? null
-                : $this->xsd_file->handler()->withFileInfo($file_info);
+                : $this->xsd_file->withFileInfo($file_info);
             if (!is_null($structure_xsd)) {
                 $sets = $sets->withElement(
                     $this->set->handler()

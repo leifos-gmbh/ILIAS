@@ -31,25 +31,10 @@ use SplFileInfo;
 
 interface ilHandlerInterface extends ilXMLFileHandlerInterface
 {
-    /*
-    public function getSkeletonXSDFileHandler(): ilXSDFileHandlerInterface|null;
-
-    public function getXSDFileHandler(): ilXSDFileHandlerInterface|null;
-    */
-
     public function getValidationSets(): ilFileValidationSetCollectionInterface;
 
     public function buildValidationSets(): ilImportStatusCollectionInterface;
 
-    /*
-    public function getVersion(): Version;
-
-    public function getType(): string;
-
-    public function getSubType(): string;
-
-    public function getPathToExportNode(): ilFilePathHandlerInterface;
-    */
     public function getPathToComponentRootNodes(): ilFilePathHandlerInterface;
 
     public function getILIASPath(ilXMLFileNodeInfoTreeInterface $component_tree): string;

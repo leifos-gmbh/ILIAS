@@ -18,16 +18,17 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\Path\Node;
+namespace ImportHandler\I\File\XML\Node\Info;
 
-use ImportHandler\I\File\Path\Comparison\ilHandlerInterface as ilFilePathComparisonInterface;
-use ImportHandler\I\File\Path\Node\ilNodeInterface as ilFilePathNodeInterface;
+use DOMNode;
+use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
+use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoHandlerInterface;
 
-interface ilAttributeInterface extends ilFilePathNodeInterface
+interface ilDOMNodeHandlerInterface extends ilXMLFileNodeInfoHandlerInterface
 {
-    public function withAttribute(string $attribute): ilAttributeInterface;
+    public function withDOMNode(DOMNode $node): ilDOMNodeHandlerInterface;
 
-    public function withComparison(ilFilePathComparisonInterface $comparison): ilAttributeInterface;
+    public function getParent(): ilDOMNodeHandlerInterface|null;
 
-    public function withAnyAttributeEnabled(bool $enabled): ilAttributeInterface;
+    public function getChildren(): ilXMLFileNodeInfoCollectionInterface;
 }

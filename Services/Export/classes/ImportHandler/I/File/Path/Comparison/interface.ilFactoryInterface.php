@@ -18,24 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\File\Path;
+namespace ImportHandler\I\File\Path\Comparison;
 
-enum ComparisonOperator
+use ImportHandler\File\Path\Comparison\Operator as ilFilePathComparisonOperator;
+use ImportHandler\I\File\Path\Comparison\ilHandlerInterface as ilFilePathComparisonHandlerInterface;
+
+interface ilFactoryInterface
 {
-    case EQUAL;
-    case LOWER;
-    case GREATER;
-    case GREATER_EQUAL;
-    case LOWER_EQUAL;
-
-    public static function toString(ComparisonOperator $operator): string
-    {
-        return match ($operator) {
-            ComparisonOperator::EQUAL => '=',
-            ComparisonOperator::LOWER => '<',
-            ComparisonOperator::GREATER => '>',
-            ComparisonOperator::GREATER_EQUAL => '>=',
-            ComparisonOperator::LOWER_EQUAL => '<=',
-        };
-    }
+    public function handler(
+        ilFilePathComparisonOperator $operator,
+        string $content
+    ): ilFilePathComparisonHandlerInterface;
 }

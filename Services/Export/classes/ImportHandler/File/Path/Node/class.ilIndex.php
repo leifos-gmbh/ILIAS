@@ -20,20 +20,19 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\Path\Node;
 
+use ImportHandler\File\Path\Comparison\ilHandlerDummy;
+use ImportHandler\I\File\Path\Comparison\ilHandlerInterface;
 use ImportHandler\I\File\Path\Node\ilIndexInterface as ilIndexFilePathNodeInterface;
-use ImportHandler\File\Path\ilComparisonDummy;
-use ImportHandler\I\File\Path\ilComparisonInterface;
-use XMLReader;
 
 class ilIndex implements ilIndexFilePathNodeInterface
 {
-    protected ilComparisonInterface $comparison;
+    protected ilHandlerInterface $comparison;
     protected int $index;
     protected bool $indexing_from_end_enabled;
 
     public function __construct()
     {
-        $this->comparison = new ilComparisonDummy();
+        $this->comparison = new ilHandlerDummy();
         $this->index = 0;
         $this->indexing_from_end_enabled = false;
     }
@@ -45,7 +44,7 @@ class ilIndex implements ilIndexFilePathNodeInterface
         return $clone;
     }
 
-    public function withComparison(ilComparisonInterface $comparison): ilIndexFilePathNodeInterface
+    public function withComparison(ilHandlerInterface $comparison): ilIndexFilePathNodeInterface
     {
         $clone = clone $this;
         $clone->comparison = $comparison;
@@ -63,7 +62,7 @@ class ilIndex implements ilIndexFilePathNodeInterface
     {
         $indexing = '';
 
-        if ($this->comparison instanceof ilComparisonDummy) {
+        if ($this->comparison instanceof ilHandlerDummy) {
             $indexing = $this->indexing_from_end_enabled
                 ? '(last)-' . $this->index
                 : $this->index;

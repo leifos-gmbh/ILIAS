@@ -26,10 +26,11 @@ use ImportHandler\I\File\XML\Manifest\ilFactoryInterface as ilManifestFileFactor
 use ImportHandler\I\File\XML\Reader\ilFactoryInterface as ilXMLFileReaderFactoryInterface;
 use ImportHandler\I\File\XML\Node\ilFactoryInterface as ilXMLFileNodeFactoryInterface;
 use ImportHandler\I\File\XML\Export\ilFactoryInterface as ilXMLExportFileFactoryInterface;
+use SplFileInfo;
 
 interface ilFactoryInterface
 {
-    public function handler(): ilXMLFileHanlderInterface;
+    public function withFileInfo(SplFileInfo $file_info): ilXMLFileHanlderInterface;
 
     public function collection(): ilXMLFileHanlderCollectionInterface;
 

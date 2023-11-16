@@ -18,16 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\File\Path;
+namespace ImportHandler\File\Path\Comparison;
 
-use ImportHandler\I\File\Path\ilComparisonInterface;
+use ImportHandler\I\File\Path\Comparison\ilHandlerInterface;
 
-class ilComparison implements ilComparisonInterface
+class ilHandler implements ilHandlerInterface
 {
-    protected ComparisonOperator $operator;
+    protected Operator $operator;
     protected string $value;
 
-    public function __construct(ComparisonOperator $operator, string $value)
+    public function __construct(Operator $operator, string $value)
     {
         $this->operator = $operator;
         $this->value = $value;
@@ -35,6 +35,6 @@ class ilComparison implements ilComparisonInterface
 
     public function toString()
     {
-        return ComparisonOperator::toString($this->operator) . $this->value;
+        return Operator::toString($this->operator) . $this->value;
     }
 }

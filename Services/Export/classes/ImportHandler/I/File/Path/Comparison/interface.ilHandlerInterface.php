@@ -18,14 +18,9 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\File\Path;
+namespace ImportHandler\I\File\Path\Comparison;
 
-use ImportHandler\I\File\Path\ilComparisonInterface;
-
-class ilComparisonDummy implements ilComparisonInterface
+interface ilHandlerInterface
 {
-    public function toString()
-    {
-        return '';
-    }
+    public function toString();
 }

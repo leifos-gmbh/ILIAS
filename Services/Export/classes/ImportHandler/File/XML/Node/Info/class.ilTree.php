@@ -101,4 +101,24 @@ class ilTree implements ilXMLFileNodeInfoTreeInterface
         $nodes = $this->getNodesWith($attribute_pairs);
         return count($nodes) === 0 ? null : $nodes->getFirst();
     }
+
+    public function getAttributePath(
+        ilXMLFileNodeInfoInterface $startNode,
+        string $attribute_name,
+        string $path_separator,
+        bool $skip_nodes_without_attribute = true
+    ): string {
+        $path_str = '';
+        $current_node = $startNode;
+        while (!is_null($current_node)) {
+            if($skip_nodes_without_attribute && !$current_node->hasAttribute($attribute_name)) {
+                break;
+            }
+            $path_str = $current_node->hasAttribute($attribute_name)
+                ? $path_separator . $current_node->getValueOfAttribute($attribute_name) . $path_str
+                : $path_separator . '..' . $path_str;
+            $current_node = $current_node->getParent();
+        }
+        return $path_str;
+    }
 }

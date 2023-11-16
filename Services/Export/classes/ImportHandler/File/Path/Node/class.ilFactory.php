@@ -69,7 +69,7 @@ class ilFactory implements ilFilePathNodeFactoryInterface
 
     public function simple(): ilSimpleFilePathNodeInterface
     {
-        return new ilSimpleFilePathNode($this->logger);
+        return new ilSimpleFilePathNode();
     }
 
     public function openRoundBracked(): ilOpenRoundBrackedFilePathNodeInterface

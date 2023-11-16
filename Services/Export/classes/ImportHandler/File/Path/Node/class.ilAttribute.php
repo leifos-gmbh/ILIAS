@@ -20,21 +20,20 @@ declare(strict_types=1);
 
 namespace ImportHandler\File\Path\Node;
 
+use ImportHandler\File\Path\Comparison\ilHandlerDummy;
+use ImportHandler\I\File\Path\Comparison\ilHandlerInterface;
 use ImportHandler\I\File\Path\Node\ilAttributeInterface as ilAttributeFilePathNodeInterface;
-use ImportHandler\File\Path\ilComparisonDummy;
-use ImportHandler\I\File\Path\ilComparisonInterface;
-use XMLReader;
 
 class ilAttribute implements ilAttributeFilePathNodeInterface
 {
-    protected ilComparisonInterface $comparison;
+    protected ilHandlerInterface $comparison;
     protected string $attribute;
     protected bool $any_attribute_enabled;
 
     public function __construct()
     {
         $this->attribute = '';
-        $this->comparison = new ilComparisonDummy();
+        $this->comparison = new ilHandlerDummy();
         $this->any_attribute_enabled = false;
     }
 
@@ -45,7 +44,7 @@ class ilAttribute implements ilAttributeFilePathNodeInterface
         return $clone;
     }
 
-    public function withComparison(ilComparisonInterface $comparison): ilAttributeFilePathNodeInterface
+    public function withComparison(ilHandlerInterface $comparison): ilAttributeFilePathNodeInterface
     {
         $clone = clone $this;
         $clone->comparison = $comparison;

@@ -97,7 +97,7 @@ abstract class ilHandler extends ilXMLFileHandler implements ilXMLExportFileHand
         );
         return is_null($node)
             ? ''
-            : $node->getAttributePath('Title', DIRECTORY_SEPARATOR);
+            : $component_tree->getAttributePath($node, 'Title', DIRECTORY_SEPARATOR);
     }
 
     public function isContainerExportXML(): bool

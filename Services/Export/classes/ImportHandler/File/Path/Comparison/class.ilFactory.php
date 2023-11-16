@@ -18,21 +18,19 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\Path;
+namespace ImportHandler\File\Path\Comparison;
 
+use ImportHandler\I\File\Path\Comparison\ilFactoryInterface as ilFilePathComparisonFactoryInterface;
+use ImportHandler\I\File\Path\Comparison\ilHandlerInterface as ilFilePathComparisonHandlerInterface;
+use ImportHandler\File\Path\Comparison\ilHandler as ilFilePathComparisonHandler;
 use ImportHandler\File\Path\Comparison\Operator as ilFilePathComparisonOperator;
-use ImportHandler\I\File\Path\Comparison\ilHandlerInterface as ilFilePathComparisonInterface;
-use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
-use ImportHandler\I\File\Path\Node\ilFactoryInterface as ilFilePathNodeFactoryInterface;
 
-interface ilFactoryInterface
+class ilFactory implements ilFilePathComparisonFactoryInterface
 {
-    public function handler(): ilFilePathHandlerInterface;
-
-    public function node(): ilFilePathNodeFactoryInterface;
-
-    public function comparison(
+    public function handler(
         ilFilePathComparisonOperator $operator,
-        string $value
-    ): ilFilePathComparisonInterface;
+        string $content
+    ): ilFilePathComparisonHandlerInterface {
+        return new ilFilePathComparisonHandler($operator, $content);
+    }
 }

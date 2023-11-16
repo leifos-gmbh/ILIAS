@@ -31,6 +31,7 @@ use ImportHandler\I\Parser\ilFactoryInterface as ilParserFactoryInterface;
 use ImportHandler\File\Namespace\ilFactory as ilFileNamespaceFactory;
 use ImportStatus\ilFactory as ilImportStatusFactory;
 use Schema\ilXmlSchemaFactory;
+use SplFileInfo;
 
 class ilFactory implements ilManifestFileFactoryInterface
 {
@@ -58,6 +59,18 @@ class ilFactory implements ilManifestFileFactoryInterface
             $this->parser,
             $this->logger,
         );
+    }
+
+    public function withFileInfo(SplFileInfo $file_info): ilManifestXMLFileHandlerInterface
+    {
+        return (new ilManifestXMLFileHandler(
+            new ilFileNamespaceFactory(),
+            new ilXmlSchemaFactory(),
+            new ilImportStatusFactory(),
+            $this->file,
+            $this->parser,
+            $this->logger,
+        ))->withFileInfo($file_info);
     }
 
     public function handlerCollection(): ilManifestXMLFileHandlerCollectionInterface

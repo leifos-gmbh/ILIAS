@@ -38,8 +38,8 @@ class ilFactory implements ilXMLFileDOMNodeInfoFactoryInterface
 
     public function withDOMNode(DOMNode $node): ilXMLFileNodeInfoDOMNodeHandlerInterface
     {
-        return new ilXMLFileDOMNodeInfoHandler(
+        return (new ilXMLFileDOMNodeInfoHandler(
             $this->info
-        );
+        ))->withDOMNode($node);
     }
 }

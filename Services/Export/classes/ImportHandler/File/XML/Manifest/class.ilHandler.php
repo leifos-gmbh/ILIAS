@@ -29,7 +29,7 @@ use ImportHandler\I\File\XML\Manifest\ilHandlerCollectionInterface as ilManifest
 use ImportHandler\I\File\XML\Manifest\ilHandlerInterface as ilManifestHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
 use ImportHandler\Parser\ilFactory as ilParserFactory;
-use ImportHandler\Parser\ilHandler as ilParserHandler;
+use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandler;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
 use ImportStatus\Exception\ilException as ilImportStatusException;
@@ -85,7 +85,7 @@ class ilHandler extends ilXMLFileHandler implements ilManifestHandlerInterface
     {
         $clone = clone $this;
         $clone->xml_file_info = $file_info;
-        $clone->parser_handler = $clone->parser->handler()->withFileHandler($clone);
+        $clone->parser_handler = $clone->parser->DOM()->withFileHandler($clone);
         return $clone;
     }
 

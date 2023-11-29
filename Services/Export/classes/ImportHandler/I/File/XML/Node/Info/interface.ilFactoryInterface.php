@@ -20,12 +20,10 @@ declare(strict_types=1);
 
 namespace ImportHandler\I\File\XML\Node\Info;
 
-use DOMNode;
-use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
-use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoInterface;
-use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
 use ImportHandler\I\File\XML\Node\Info\Attribute\ilFactoryInterface as ilXMLFileNodeInfoAttributeFactoryInterface;
-use ImportHandler\I\File\XML\Node\Info\ilDOMNodeHandlerInterface as ilXMLFileNodeInfoDOMNodeHandlerInterface;
+use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
+use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
+use ImportHandler\I\File\XML\Node\Info\DOM\ilFactoryInterface as ilXMLFileDOMNodeInfoFactoryInterface;
 
 interface ilFactoryInterface
 {
@@ -35,5 +33,5 @@ interface ilFactoryInterface
 
     public function attribute(): ilXMLFileNodeInfoAttributeFactoryInterface;
 
-    public function withDOMNode(DOMNode $node): ilXMLFileNodeInfoDOMNodeHandlerInterface;
+    public function DOM(): ilXMLFileDOMNodeInfoFactoryInterface;
 }

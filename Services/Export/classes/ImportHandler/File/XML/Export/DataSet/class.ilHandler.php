@@ -115,8 +115,7 @@ class ilHandler extends ilXMLExportFileHandler implements ilDataSetXMLExportFile
             }
             // Content validation set
             $node_info = null;
-            $node_info = $this->parser->handler()
-                ->withFileHandler($this)
+            $node_info = $this->parser->DOM()->withFileHandler($this)
                 ->getNodeInfoAt($path_to_export_node)
                 ->current();
             $type_str = $node_info->getValueOfAttribute('Entity');
@@ -125,8 +124,7 @@ class ilHandler extends ilXMLExportFileHandler implements ilDataSetXMLExportFile
                 : [$type_str, ''];
             $version_str = $node_info->getValueOfAttribute('SchemaVersion');
             $version = new Version($version_str);
-            $nodes = $this->parser->handler()
-                ->withFileHandler($this)
+            $nodes = $this->parser->DOM()->withFileHandler($this)
                 ->getNodeInfoAt($path_to_dataset_child_nodes);
 
             for ($i = 0; $i < $nodes->count(); $i++) {

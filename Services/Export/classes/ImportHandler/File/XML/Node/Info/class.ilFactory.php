@@ -22,17 +22,16 @@ namespace ImportHandler\File\XML\Node\Info;
 
 use DOMNode;
 use ilLogger;
-use ImportHandler\I\File\XML\Node\Info\Attribute\ilFactoryInterface as ilXMLFileNodeInfoAttributeFactoryInterface;
-use ImportHandler\I\File\XML\Node\Info\ilDOMNodeHandlerInterface as ilXMLFileNodeInfoDOMNodeHandlerInterface;
-use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoFactoryInterface;
-use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
-use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoHandlerInterface;
-use ImportHandler\File\XML\Node\Info\ilCollection as ilFileNodeInfoCollection;
-use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
-use ImportHandler\File\XML\Node\Info\ilTree as ilXMLFileNodeInfoTree;
-use ImportHandler\Parser\ilFactory as ilParserFactory;
 use ImportHandler\File\XML\Node\Info\Attribute\ilFactory as ilXMLFileNodeInfoAttributeFactory;
-use ImportHandler\File\XML\Node\Info\ilDOMNodeHandler as ilXMLFileNodeInfoDOMNodeHandler;
+use ImportHandler\File\XML\Node\Info\ilCollection as ilFileNodeInfoCollection;
+use ImportHandler\File\XML\Node\Info\ilTree as ilXMLFileNodeInfoTree;
+use ImportHandler\I\File\XML\Node\Info\Attribute\ilFactoryInterface as ilXMLFileNodeInfoAttributeFactoryInterface;
+use ImportHandler\I\File\XML\Node\Info\DOM\ilFactoryInterface as ilXMLFileDOMNodeInfoFactoryInterface;
+use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
+use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoFactoryInterface;
+use ImportHandler\I\File\XML\Node\Info\ilTreeInterface as ilXMLFileNodeInfoTreeInterface;
+use ImportHandler\Parser\ilFactory as ilParserFactory;
+use ImportHandler\File\XML\Node\Info\DOM\ilFactory as ilXMLFileDOMNodeInfoFactory;
 
 class ilFactory implements ilXMLFileNodeInfoFactoryInterface
 {
@@ -63,8 +62,8 @@ class ilFactory implements ilXMLFileNodeInfoFactoryInterface
         return new ilXMLFileNodeInfoAttributeFactory($this->logger);
     }
 
-    public function withDOMNode(DOMNode $node): ilXMLFileNodeInfoDOMNodeHandlerInterface
+    public function DOM(): ilXMLFileDOMNodeInfoFactoryInterface
     {
-        return (new ilXMLFileNodeInfoDOMNodeHandler(new ilFactory($this->logger)))->withDOMNode($node);
+        return new ilXMLFileDOMNodeInfoFactory($this);
     }
 }

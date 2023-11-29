@@ -20,17 +20,17 @@ declare(strict_types=1);
 
 namespace Test\ImportHandler\File\XML\Node\Info;
 
-use PHPUnit\Framework\TestCase;
+use ImportHandler\File\XML\Node\Info\DOM\ilHandler;
 use ImportHandler\File\XML\Node\Info\ilCollection;
-use ImportHandler\File\XML\Node\Info\ilDOMNodeHandler;
+use PHPUnit\Framework\TestCase;
 
 class ilCollectionTest extends TestCase
 {
     public function testNodeInfoCollection(): void
     {
-        $node1 = $this->createMock(ilDOMNodeHandler::class);
-        $node2 = $this->createMock(ilDOMNodeHandler::class);
-        $node3 = $this->createMock(ilDOMNodeHandler::class);
+        $node1 = $this->createMock(ilHandler::class);
+        $node2 = $this->createMock(ilHandler::class);
+        $node3 = $this->createMock(ilHandler::class);
 
         $collection = new ilCollection();
         $collection = $collection->withElement($node1);

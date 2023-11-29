@@ -31,7 +31,7 @@ use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
 use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\File\XSD\ilHandlerInterface as ilXSDFileHandlerInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportHandler\I\Parser\ilFactoryInterface as ilParserFactoryInterface;
 use ImportStatus\Exception\ilException as ilImportStatusException;
 use ImportStatus\I\ilFactoryInterface as ilImportStatusFactoryInterface;
 use ImportStatus\I\ilCollectionInterface as ilImportStatusHandlerCollectionInterface;
@@ -46,19 +46,19 @@ class ilHandler implements ilFileValidationHandlerInterface
 
     protected ilLogger $logger;
     protected ilImportStatusFactoryInterface $import_status;
-    protected ilParserHandlerInterface $parser_handler;
+    protected ilParserFactoryInterface $parser;
     protected ilFilePathFactoryInterface $path;
     protected ilImportStatusHandlerInterface $success_status;
 
     public function __construct(
         ilLogger $logger,
-        ilParserHandlerInterface $parser_handler,
+        ilParserFactoryInterface $parser,
         ilImportStatusFactoryInterface $import_status,
         ilFilePathFactoryInterface $path,
     ) {
         $this->logger = $logger;
         $this->import_status = $import_status;
-        $this->parser_handler = $parser_handler;
+        $this->parser = $parser;
         $this->path = $path;
         $this->success_status = $import_status->handler()
             ->withType(StatusType::SUCCESS)
@@ -208,7 +208,7 @@ class ilHandler implements ilFileValidationHandlerInterface
         return $this->validateXMLAtNodes(
             $xml_file_handler,
             $xsd_file_handler,
-            $this->parser_handler->withFileHandler($xml_file_handler)->getNodeInfoAt($path_handler)
+            $this->parser->DOM()->withFileHandler($xml_file_handler)->getNodeInfoAt($path_handler)
         );
     }
 

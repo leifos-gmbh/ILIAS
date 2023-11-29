@@ -108,9 +108,7 @@ abstract class ilHandler extends ilXMLFileHandler implements ilXMLExportFileHand
     public function hasComponentRootNode(): bool
     {
         try {
-            $nodes = $this->parser->handler()
-                ->withFileHandler($this)
-                ->getNodeInfoAt($this->getPathToComponentRootNodes());
+            $nodes = $this->parser->DOM()->withFileHandler($this)->getNodeInfoAt($this->getPathToComponentRootNodes());
         } catch (ilImportStatusException $e) {
             return false;
         }

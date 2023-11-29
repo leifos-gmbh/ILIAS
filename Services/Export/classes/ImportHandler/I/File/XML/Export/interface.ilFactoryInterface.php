@@ -24,7 +24,6 @@ use ImportHandler\I\File\XML\Export\ilHandlerInterface as ilXMLExportFileHandler
 use ImportHandler\I\File\XML\Export\ilCollectionInterface as ilXMLExportFileCollectionInterface;
 use ImportHandler\I\File\XML\Export\Component\ilFactoryInterface as ilComponentXMLExportFileHandlerFactoryInterface;
 use ImportHandler\I\File\XML\Export\DataSet\ilFactoryInterface as ilDataSetXMLExportFileHandlerFactoryInterface;
-use ImportHandler\I\File\XML\Export\Items\ilFactoryInterface as ilItemsXMLExportFileHandlerFactoryInterface;
 use SplFileInfo;
 
 interface ilFactoryInterface
@@ -36,6 +35,4 @@ interface ilFactoryInterface
     public function component(): ilComponentXMLExportFileHandlerFactoryInterface;
 
     public function dataSet(): ilDataSetXMLExportFileHandlerFactoryInterface;
-
-    public function items(): ilItemsXMLExportFileHandlerFactoryInterface;
 }

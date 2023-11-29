@@ -18,10 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\Validation;
+namespace ImportHandler\I\Parser\DOM;
 
-use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandlerInterface;
+use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
+use ImportHandler\I\Parser\DOM\ilHandlerInterface as ilDOMParserHandlerInterface;
 
-interface ilStreamHandlerInterface extends ilFileValidationHandlerInterface
+interface ilFactoryInterface
 {
+    public function withFileHandler(ilXMLFileHandlerInterface $file_handler): ilDOMParserHandlerInterface;
 }

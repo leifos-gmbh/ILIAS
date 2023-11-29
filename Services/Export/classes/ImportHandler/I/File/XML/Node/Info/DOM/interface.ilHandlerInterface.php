@@ -18,11 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\I\File\XML\Reader;
+namespace ImportHandler\I\File\XML\Node\Info\DOM;
 
-use ImportHandler\I\File\XML\Reader\Path\ilFactoryInterface as ilXMLFileReaderPathFactoryInterface;
+use DOMNode;
+use ImportHandler\I\File\XML\Node\Info\ilHandlerInterface as ilXMLFileNodeInfoHandlerInterface;
 
-interface ilFactoryInterface
+interface ilHandlerInterface extends ilXMLFileNodeInfoHandlerInterface
 {
-    public function path(): ilXMLFileReaderPathFactoryInterface;
+    public function withDOMNode(DOMNode $node): ilHandlerInterface;
+
+    public function getParent(): ilHandlerInterface|null;
 }

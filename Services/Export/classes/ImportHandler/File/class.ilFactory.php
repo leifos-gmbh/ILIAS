@@ -68,7 +68,7 @@ class ilFactory implements ilFileFactory
     {
         return new ilFileValidationFactory(
             $this->logger,
-            $this->parser->handler(),
+            $this->parser,
             new ilFilePathFactory($this->logger)
         );
     }

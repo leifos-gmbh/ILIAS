@@ -79,6 +79,7 @@ $xsd_file_spl = $schema->getByVersion($version, $type, '');
 $xsd_file_spl = $schema->getLatest($type, $subtype);
 ```
 ## Parser <a name="parser"></a>
+
 ```php
 // Get xml file SplFileInfo
 $xml_file_spl = new \Hoa\File\SplFileInfo('path to my xml file')
@@ -102,7 +103,7 @@ $xml_file_handler = $xml_file_handler->withAdditionalNamespace(
         ->withPrefix('namespace')
 )
 
-$parser = $import->parser()->handler()->withFileHandler($xml_file_handler);
+$parser = $import->parser()->DOM()->withFileHandler($xml_file_handler);
 /** @var \ImportHandler\File\XML\Node\Info\ilDOMNodeCollection $node_infos */
 $node_infos = $parser->getNodeInfoAt($path);
 

@@ -66,7 +66,7 @@ class ilTree implements ilXMLFileNodeInfoTreeInterface
     ): ilXMLFileNodeInfoTreeInterface {
         $clone = clone $this;
         $clone->xml = $xml_handler;
-        $items = $this->parser->handler()->withFileHandler($xml_handler)->getNodeInfoAt($path_handler);
+        $items = $this->parser->DOM()->withFileHandler($xml_handler)->getNodeInfoAt($path_handler);
         if ($items->count() === 0) {
             unset($clone->root);
         }

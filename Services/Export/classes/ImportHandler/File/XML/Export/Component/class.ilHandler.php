@@ -106,8 +106,7 @@ class ilHandler extends ilXMLExportFileHandler implements ilComponentXMLExportFi
             }
             // Content validation set
             $export_node_info = null;
-            $export_node_info = $this->parser->handler()
-                ->withFileHandler($this)
+            $export_node_info = $this->parser->DOM()->withFileHandler($this)
                 ->getNodeInfoAt($path_to_export_node)
                 ->current();
             $type_str = $export_node_info->getValueOfAttribute('Entity');

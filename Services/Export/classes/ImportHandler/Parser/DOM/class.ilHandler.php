@@ -18,9 +18,8 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\Parser;
+namespace ImportHandler\Parser\DOM;
 
-use DOMAttr;
 use DOMDocument;
 use DOMNode;
 use DOMXPath;
@@ -29,28 +28,28 @@ use ImportHandler\I\File\Path\ilHandlerInterface as ilFilePathHandlerInterface;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
 use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParseHandlerInterface;
+use ImportHandler\I\Parser\DOM\ilHandlerInterface as ilDOMParserHandlerInterface;
 use ImportStatus\Exception\ilException as ilImportStatusException;
 
-class ilHandler implements ilParseHandlerInterface
+class ilHandler implements ilDOMParserHandlerInterface
 {
     protected ilXMLFileHandlerInterface $xml_file_handler;
-    protected ilXMLFileNodeInfoFactoryInterface $xml_node;
+    protected ilXMLFileNodeInfoFactoryInterface $info;
     protected ilLogger $logger;
     protected DOMDocument $dom_doc;
 
     public function __construct(
         ilLogger $logger,
-        ilXMLFileNodeInfoFactoryInterface $xml_node_factory,
+        ilXMLFileNodeInfoFactoryInterface $info,
     ) {
         $this->logger = $logger;
-        $this->xml_node = $xml_node_factory;
+        $this->info = $info;
     }
 
     /**
      * @throws ilImportStatusException
      */
-    public function withFileHandler(ilXMLFileHandlerInterface $file_handler): ilParseHandlerInterface
+    public function withFileHandler(ilXMLFileHandlerInterface $file_handler): ilDOMParserHandlerInterface
     {
         $clone = clone $this;
         $clone->xml_file_handler = $file_handler;
@@ -65,10 +64,10 @@ class ilHandler implements ilParseHandlerInterface
             $dom_xpath->registerNamespace($namespace->getPrefix(), $namespace->getNamespace());
         }
         $nodes = $dom_xpath->query($path->toString());
-        $node_info_collection = $this->xml_node->collection();
+        $node_info_collection = $this->info->collection();
         /** @var DOMNode $node **/
         foreach ($nodes as $node) {
-            $node_info = $this->xml_node->withDOMNode($node);
+            $node_info = $this->info->DOM()->withDOMNode($node);
             $node_info_collection = $node_info_collection->withElement($node_info);
         }
         return $node_info_collection;

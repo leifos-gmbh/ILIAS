@@ -20,13 +20,11 @@ declare(strict_types=1);
 
 namespace Test\ImportHandler\File\XML\Node\Info\Attribute;
 
-use PHPUnit\Framework\TestCase;
-use ImportHandler\File\XML\Node\Info\Attribute\ilCollection as ilXMLFileNodeInfoAttributeCollection;
-use ImportHandler\File\XML\Node\Info\ilDOMNodeHandler as ilXMLFileNodeInfoDOMNodeHandler;
-use ImportHandler\File\XML\Node\Info\Attribute\ilPair as ilXMLFileNodeInfoAttributePair;
-use ImportHandler\File\XML\Node\Info\ilFactory as ilXMLFileNodeFactory;
-
 use ilLogger;
+use ImportHandler\File\XML\Node\Info\Attribute\ilCollection as ilXMLFileNodeInfoAttributeCollection;
+use ImportHandler\File\XML\Node\Info\Attribute\ilPair as ilXMLFileNodeInfoAttributePair;
+use ImportHandler\File\XML\Node\Info\DOM\ilHandler as ilXMLFileNodeInfoDOMNodeHandler;
+use PHPUnit\Framework\TestCase;
 
 class ilCollectionTest extends TestCase
 {

@@ -26,23 +26,23 @@ use ImportHandler\I\File\Path\ilFactoryInterface as ilFilePathFactoryInterface;
 use ImportHandler\I\File\Validation\ilFactoryInterface as ilFileValidationFactoryInterface;
 use ImportHandler\I\File\Validation\ilHandlerInterface as ilFileValidationHandlerInterface;
 use ImportHandler\I\File\Validation\Set\ilFactoryInterface as ilFileValidationSetFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
+use ImportHandler\I\Parser\ilFactoryInterface as ilParserFactoryInterface;
 use ImportStatus\ilFactory as ilImportStatusFactory;
 use ImportHandler\File\Validation\Set\ilFactory as ilFileValidationSetFactory;
 
 class ilFactory implements ilFileValidationFactoryInterface
 {
     protected ilLogger $logger;
-    protected ilParserHandlerInterface $parser_handler;
+    protected ilParserFactoryInterface $parser;
     protected ilFilePathFactoryInterface $path;
 
     public function __construct(
         ilLogger $logger,
-        ilParserHandlerInterface $parser_handler,
+        ilParserFactoryInterface $parser,
         ilFilePathFactoryInterface $path
     ) {
         $this->logger = $logger;
-        $this->parser_handler = $parser_handler;
+        $this->parser = $parser;
         $this->path = $path;
     }
 
@@ -50,7 +50,7 @@ class ilFactory implements ilFileValidationFactoryInterface
     {
         return new ilFileValidationHandler(
             $this->logger,
-            $this->parser_handler,
+            $this->parser,
             new ilImportStatusFactory(),
             $this->path
         );

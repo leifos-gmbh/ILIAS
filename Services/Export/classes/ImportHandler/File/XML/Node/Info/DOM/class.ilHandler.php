@@ -18,16 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\File\XML\Node\Info;
+namespace ImportHandler\File\XML\Node\Info\DOM;
 
 use DOMAttr;
 use DOMNode;
 use ilImportException;
+use ImportHandler\I\File\XML\Node\Info\DOM\ilHandlerInterface as ilXMLFileNodeInfoilDOMNodeHandlerInterface;
 use ImportHandler\I\File\XML\Node\Info\ilCollectionInterface as ilXMLFileNodeInfoCollectionInterface;
 use ImportHandler\I\File\XML\Node\Info\ilFactoryInterface as ilXMLFileNodeInfoFactoryInterface;
-use ImportHandler\I\File\XML\Node\Info\ilDOMNodeHandlerInterface as ilXMLFileNodeInfoilDOMNodeHandlerInterface;
 
-class ilDOMNodeHandler implements ilXMLFileNodeInfoilDOMNodeHandlerInterface
+class ilHandler implements ilXMLFileNodeInfoilDOMNodeHandlerInterface
 {
     /**
      * @var array<string, string>
@@ -54,7 +54,7 @@ class ilDOMNodeHandler implements ilXMLFileNodeInfoilDOMNodeHandlerInterface
         }
     }
 
-    public function withDOMNode(DOMNode $node): ilDOMNodeHandler
+    public function withDOMNode(DOMNode $node): ilHandler
     {
         $clone = clone $this;
         $clone->node = $node;
@@ -85,15 +85,15 @@ class ilDOMNodeHandler implements ilXMLFileNodeInfoilDOMNodeHandlerInterface
         $collection = $this->info->collection();
         $children = $this->node->childNodes;
         foreach ($children as $child) {
-            $collection = $collection->withElement($this->info->withDOMNode($child));
+            $collection = $collection->withElement($this->info->DOM()->withDOMNode($child));
         }
         return $collection;
     }
 
-    public function getParent(): ilDOMNodeHandler|null
+    public function getParent(): ilHandler|null
     {
         if(!is_null($this->node->parentNode)) {
-            return $this->info->withDOMNode($this->node->parentNode);
+            return $this->info->DOM()->withDOMNode($this->node->parentNode);
         }
         return null;
     }

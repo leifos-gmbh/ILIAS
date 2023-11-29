@@ -20,18 +20,7 @@ declare(strict_types=1);
 
 namespace Test\ImportHandler\File\XML\Node\Info;
 
-use MongoDB\BSON\Iterator;
 use PHPUnit\Framework\TestCase;
-use ImportHandler\File\XML\Node\Info\ilDOMNodeHandler as ilFileXMLNodeInfoDOMNodeHandler;
-use ImportHandler\File\XML\Node\Info\ilFactory as ilFileXMLNodeInfoFactory;
-use DOMDocument;
-use DOMNode;
-use DOMNamedNodeMap;
-use DOMNodeList;
-use DOMAttr;
-
-use function PHPUnit\Framework\exactly;
-use function PHPUnit\Framework\returnValueMap;
 
 class ilDOMNodeHandlerTest extends TestCase
 {

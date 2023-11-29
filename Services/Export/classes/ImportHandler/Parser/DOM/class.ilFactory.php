@@ -18,27 +18,31 @@
 
 declare(strict_types=1);
 
-namespace ImportHandler\Parser;
+namespace ImportHandler\Parser\DOM;
 
 use ilLogger;
-use ImportHandler\File\XML\Node\Info\ilFactory as ilXMLFileNodeInfoFactory;
 use ImportHandler\I\File\XML\ilHandlerInterface as ilXMLFileHandlerInterface;
 use ImportHandler\I\Parser\DOM\ilFactoryInterface as ilDOMParserFactoryInterface;
-use ImportHandler\I\Parser\ilFactoryInterface as ilParserFactoryInterface;
-use ImportHandler\I\Parser\ilHandlerInterface as ilParserHandlerInterface;
-use ImportHandler\Parser\DOM\ilFactory as ilDOMParserFactory;
+use ImportHandler\I\Parser\DOM\ilHandlerInterface as ilDOMParserHandlerInterface;
+use ImportHandler\Parser\DOM\ilHandler as ilDOMParser;
+use ImportHandler\Parser\DOM\ilHandler as ilDOMParserHandler;
+use ImportHandler\File\XML\Node\Info\ilFactory as ilXMLFileNodeInfoFactory;
 
-class ilFactory implements ilParserFactoryInterface
+class ilFactory implements ilDOMParserFactoryInterface
 {
     protected ilLogger $logger;
 
-    public function __construct(ilLogger $logger)
-    {
+    public function __construct(
+        ilLogger $logger
+    ) {
         $this->logger = $logger;
     }
 
-    public function DOM(): ilDOMParserFactoryInterface
+    public function withFileHandler(ilXMLFileHandlerInterface $file_handler): ilDOMParserHandlerInterface
     {
-        return new ilDOMParserFactory($this->logger);
+        return (new ilDOMParser(
+            $this->logger,
+            new ilXMLFileNodeInfoFactory($this->logger)
+        ))->withFileHandler($file_handler);
     }
 }

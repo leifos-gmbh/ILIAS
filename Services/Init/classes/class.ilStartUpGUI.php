@@ -249,6 +249,10 @@ class ilStartUpGUI
         // Instantiate login template
         $tpl = self::initStartUpTemplate("tpl.login.html");
 
+        // begin-patch sso
+        $tpl->setVariable('TARGET', isset($_GET['target']) ? ('?target=' . $_GET['target']) : '');
+        // end-patch sso
+
         $this->mainTemplate->addCss(ilObjStyleSheet::getContentStylePath(0));
         $this->mainTemplate->addCss(ilObjStyleSheet::getSyntaxStylePath());
 

@@ -569,8 +569,19 @@ class ilObjTestGUI extends ilObjectGUI
                 }
                 $this->prepareOutput();
                 $this->addHeaderAction();
-                require_once 'Modules/Test/classes/tables/class.ilTestQuestionBrowserTableGUI.php';
-                $gui = new ilTestQuestionBrowserTableGUI($this->ctrl, $this->tpl, $ilTabs, $this->lng, $tree, $ilDB, $ilPluginAdmin, $this->object, $ilAccess);
+                $gui = new ilTestQuestionBrowserTableGUI(
+                    $this->ctrl,
+                    $this->tpl,
+                    $ilTabs,
+                    $this->lng,
+                    $tree,
+                    $ilDB,
+                    $ilPluginAdmin,
+                    $this->object,
+                    $ilAccess,
+                    $DIC['ui.factory'],
+                    $DIC['ui.renderer']
+                );
                 $gui->setWriteAccess($ilAccess->checkAccess("write", "", $this->ref_id));
                 $gui->init();
                 $this->ctrl->forwardCommand($gui);
@@ -2462,7 +2473,7 @@ class ilObjTestGUI extends ilObjectGUI
         $table_gui = new ilTestHistoryTableGUI($this, 'history');
         $table_gui->setTestObject($this->object);
         include_once "./Modules/Test/classes/class.ilObjAssessmentFolder.php";
-        $log = &ilObjAssessmentFolder::_getLog(0, time(), $this->object->getId(), true);
+        $log = ilObjAssessmentFolder::_getLog(0, time(), $this->object->getId(), true);
         $table_gui->setData($log);
         $this->tpl->setVariable('ADM_CONTENT', $table_gui->getHTML());
     }

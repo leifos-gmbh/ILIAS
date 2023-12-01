@@ -169,7 +169,11 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 
         $list = $this->object->getOrderingElementList()->withElements($elements);
         $this->object->setOrderingElementList($list);
-        $this->buildEditFormAfterTypeChange($this->request->getParsedBody());
+
+        $this->writeQuestionGenericPostData();
+        $this->writeQuestionSpecificPostData($form);
+
+        $this->editQuestion();
     }
 
     public function writeQuestionSpecificPostData(ilPropertyFormGUI $form)
@@ -178,7 +182,9 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
         $thumb_geometry = (int) ($post["thumb_geometry"] ?? $this->object->getThumbGeometry());
         $this->object->setThumbGeometry($thumb_geometry);
 
-        $this->object->setPoints((int) $post["points"]);
+        $points = (float) str_replace(',', '.', $post['points']);
+
+        $this->object->setPoints($points);
 
         $use_nested = $post[self::F_USE_NESTED] === "1";
 
@@ -451,7 +457,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
         $template = new ilTemplate("tpl.il_as_qpl_nested_ordering_output_solution.html", true, true, "Modules/TestQuestionPool");
         $template->setVariable('SOLUTION_OUTPUT', $solution_html);
         if ($show_question_text == true) {
-            $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($this->object->getQuestion(), true));
+            $template->setVariable("QUESTIONTEXT", $this->object->getQuestionForHTMLOutput());
         }
         $questionoutput = $template->get();
 
@@ -512,7 +518,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
         $template->setVariable('NESTED_ORDERING', $answers->getHTML());
         $template->parseCurrentBlock();
 
-        $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($this->object->getQuestion(), true));
+        $template->setVariable("QUESTIONTEXT", $this->object->getQuestionForHTMLOutput());
 
         if ($show_question_only) {
             return $template->get();
@@ -561,7 +567,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
         $template->setVariable('NESTED_ORDERING', $orderingGUI->getHTML());
         $template->parseCurrentBlock();
 
-        $template->setVariable('QUESTIONTEXT', $this->object->prepareTextareaOutput($this->object->getQuestion(), true));
+        $template->setVariable('QUESTIONTEXT', $this->object->getQuestionForHTMLOutput());
 
         $pageoutput = $this->outQuestionPage('', $isPostponed, $activeId, $template->get());
 

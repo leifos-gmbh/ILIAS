@@ -257,9 +257,10 @@ Here 'type_string' is 'grp_reference' with type 'crs' and subtype 'objectives'.
 
 #### Updating Schema File Versions
 During development xml file specifications may change, wich in consequence requires a new xsd.
-The first step is to create a new xsd and add it to the 'xml/SchemaValidation'-folder. After that an entry with the correct version string needs to be added to the components ilExporter [getValidSchemaVersions()](#getvalidschemaversions)-function.
+The first step is to create a new xsd and add it to the 'xml/SchemaValidation'-folder.
+After that an entry with the correct version string needs to be added to the components ilExporter [getValidSchemaVersions()](#getvalidschemaversions)-function.
 If the import of older xml files should no longer be possible, the old xsd-file needs to be removed from the 'xml/SchemaValdiation'-folder
-and he components ilExporter [getValidSchemaVersions()](#getvalidschemaversions)-function should be adjusted accoirdingly.
+and the components ilExporter [getValidSchemaVersions()](#getvalidschemaversions)-function should be adjusted accoirdingly.
 
 #### Enable Import Validation
 Add the schema file to the 'xml/SchemaValidation'-folder.

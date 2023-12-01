@@ -252,7 +252,7 @@ If the xml-export file contains a dataset, the 'entity' attribute of the 'ds:Rec
 If the Version numbers do not match, the schema file with the highest version number is used.
 
 For example take a look at 'ilias_crs_objectives_9_0.xsd'.
-Here 'type_string' is 'grp_reference' with type 'crs' and subtype 'objectives'.
+Here 'type_string' is 'crs_objectives' with type 'crs' and subtype 'objectives'.
 'version_string' is '9_0' with 'major_version_number' 9 and a 'minor_version_number' 0.
 
 #### Updating Schema File Versions

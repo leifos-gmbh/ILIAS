@@ -196,8 +196,6 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         }
         $template->parseCurrentBlock();
 
-        $questiontext = $this->object->getQuestion();
-
         if (!$show_correct_solution) {
             $max_no_of_chars = $this->object->getMaxNumOfChars();
 
@@ -243,7 +241,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             }
         }
         if ($show_question_text == true) {
-            $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
+            $template->setVariable("QUESTIONTEXT", $this->object->getQuestionForHTMLOutput());
         }
         $questionoutput = $template->get();
 
@@ -280,7 +278,6 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         return $solutionoutput;
     }
 
-
     private function getBestAnswer($asHtml)
     {
         $answers = $this->object->getAnswers();
@@ -300,14 +297,14 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             $keywordString = '';
             if (in_array($this->object->getKeywordRelation(), assTextQuestion::getScoringModesWithPointsByKeyword())) {
                 $keywordString .= $answer->getPoints() . ' ';
-                if ($answer->getPoints() == '1' || $answer->getPoints() == '-1'){
+                if ($answer->getPoints() == '1' || $answer->getPoints() == '-1') {
                     $keywordString .= $this->lng->txt('point');
                 } else {
                     $keywordString .= $this->lng->txt('points');
                 }
                 $keywordString .= ' ' . $this->lng->txt('for') . ' ';
             }
-            $keywordString .=  $answer->getAnswertext();
+            $keywordString .= $answer->getAnswertext();
 
             $tpl->setCurrentBlock('keyword');
             $tpl->setVariable('KEYWORD', $keywordString);
@@ -375,8 +372,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             ));
         }
 
-        $questiontext = $this->object->getQuestion();
-        $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
+        $template->setVariable("QUESTIONTEXT", $this->object->getQuestionForHTMLOutput());
         $template->setVariable("QID", $this->object->getId());
 
         $questionoutput = $template->get();
@@ -396,20 +392,17 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $user_solution = "";
         if ($active_id) {
             $solutions = null;
-            // hey: prevPassSolutions - obsolete due to central check
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
-            // hey.
+
             $solutions = $this->object->getUserSolutionPreferingIntermediate($active_id, $pass);
             foreach ($solutions as $idx => $solution_value) {
                 $user_solution = $solution_value["value1"];
             }
-        }
-        if ($this->tiny_mce_enabled) {
-            $user_solution = htmlentities($user_solution);
+
+            if ($this->tiny_mce_enabled) {
+                $user_solution = htmlentities($user_solution);
+            }
+
+            $user_solution = str_replace(['{', '}', '\\'], ['&#123', '&#125', '&#92'], $user_solution);
         }
 
         // generate the question output
@@ -439,8 +432,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
         $template->setVariable("QID", $this->object->getId());
         $template->setVariable("ESSAY", $user_solution);
-        $questiontext = $this->object->getQuestion();
-        $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
+        $template->setVariable("QUESTIONTEXT", $this->object->getQuestionForHTMLOutput());
         $questionoutput = $template->get();
 
         $questionoutput .= $this->getJsCode();

@@ -184,36 +184,6 @@ class ilObjUserFolderGUI extends ilObjectGUI
         return true;
     }
 
-    /**
-     * @param string $a_permission
-     */
-    protected function checkAccess($a_permission)
-    {
-        global $DIC;
-
-        $ilErr = $DIC['ilErr'];
-
-        if (!$this->checkAccessBool($a_permission)) {
-            $ilErr->raiseError(
-                $this->lng->txt('msg_no_perm_read'),
-                $ilErr->WARNING
-            );
-        }
-    }
-
-    /**
-     * @param string $a_permission
-     * @return bool
-     */
-    protected function checkAccessBool($a_permission)
-    {
-        return $this->access->checkAccess(
-            $a_permission,
-            '',
-            $this->ref_id
-        );
-    }
-
     public function learningProgressObject()
     {
         global $DIC;
@@ -1338,16 +1308,16 @@ class ilObjUserFolderGUI extends ilObjectGUI
             //importParser needs the full path to xml file
             $xml_file_full_path = ilUtil::getDataDir() . '/' . $xml_file;
 
-            $form = $this->initUserRoleAssignmentForm($xml_file_full_path);
+            list($form, $message) = $this->initUserRoleAssignmentForm($xml_file_full_path);
 
-            $tpl->setContent($renderer->render($form));
+            $tpl->setContent($message . $renderer->render($form));
         } else {
             $this->form->setValuesByPost();
             $tpl->setContent($this->form->getHtml());
         }
     }
 
-    private function initUserRoleAssignmentForm($xml_file_full_path)
+    private function initUserRoleAssignmentForm($xml_file_full_path) : array
     {
         global $DIC;
 
@@ -1362,7 +1332,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
         );
         $importParser->startParsing();
 
-        $this->verifyXmlData($importParser);
+        $message = $this->verifyXmlData($importParser);
 
         $xml_file_name = explode(
             "/",
@@ -1718,10 +1688,10 @@ class ilObjUserFolderGUI extends ilObjectGUI
             $form_elements["send_mail"] = $mail_section;
         }
 
-        return $ui->input()->container()->form()->standard(
+        return [$ui->input()->container()->form()->standard(
             $form_action,
             $form_elements
-        );
+        ), $message];
     }
 
     /**
@@ -1821,7 +1791,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
         return $xml_file;
     }
 
-    public function verifyXmlData($importParser)
+    public function verifyXmlData($importParser) : string
     {
         global $DIC;
 
@@ -1830,13 +1800,9 @@ class ilObjUserFolderGUI extends ilObjectGUI
         $import_dir = $this->getImportDir();
         switch ($importParser->getErrorLevel()) {
             case IL_IMPORT_SUCCESS:
-                break;
+                return '';
             case IL_IMPORT_WARNING:
-                $this->tpl->setVariable(
-                    "IMPORT_LOG",
-                    $importParser->getProtocolAsHTML($this->lng->txt("verification_warning_log"))
-                );
-                break;
+                return $importParser->getProtocolAsHTML($this->lng->txt("verification_warning_log"));
             case IL_IMPORT_FAILURE:
                 $filesystem->deleteDir($import_dir);
                 $this->ilias->raiseError(
@@ -1845,7 +1811,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
                     ),
                     $this->ilias->error_obj->MESSAGE
                 );
-                return;
+                return '';
         }
     }
 
@@ -1891,7 +1857,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
         $xml_path = ilUtil::getDataDir() . '/' . $xml_file;
 
         if ($request->getMethod() == "POST") {
-            $form = $this->initUserRoleAssignmentForm($xml_path)->withRequest($request);
+            $form = $this->initUserRoleAssignmentForm($xml_path)[0]->withRequest($request);
             $result = $form->getData();
         } else {
             $this->ilias->raiseError(
@@ -3766,6 +3732,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
         $ilAccess = $DIC['ilAccess'];
         $ilErr = $DIC['ilErr'];
         $lng = $DIC['lng'];
+        $ctrl = $DIC['ilCtrl'];
 
         $a_target = USER_FOLDER_ID;
 
@@ -3774,7 +3741,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
             "",
             $a_target
         )) {
-            ilUtil::redirect("ilias.php?baseClass=ilAdministrationGUI&ref_id=" . $a_target . "&jmpToUser=" . $a_user);
+            $ctrl->redirectToURL("ilias.php?baseClass=ilAdministrationGUI&ref_id=" . $a_target . "&jmpToUser=" . $a_user);
             exit;
         } else {
             if ($ilAccess->checkAccess(
@@ -3878,7 +3845,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
         $cmds = [];
         // see searchResultHandler()
         if ($a_search_form) {
-            if ($this->checkAccessBool('write')) {
+            if ($rbacsystem->checkAccess('write', $this->object->getRefId())) {
                 $cmds = [
                     'activate' => $this->lng->txt('activate'),
                     'deactivate' => $this->lng->txt('deactivate'),
@@ -3887,12 +3854,12 @@ class ilObjUserFolderGUI extends ilObjectGUI
                 ];
             }
 
-            if ($this->checkAccessBool('delete')) {
+            if ($rbacsystem->checkAccess('delete', $this->object->getRefId())) {
                 $cmds["delete"] = $this->lng->txt("delete");
             }
         } // show confirmation
         else {
-            if ($this->checkAccessBool('write')) {
+            if ($rbacsystem->checkAccess('write', $this->object->getRefId())) {
                 $cmds = [
                     'activateUsers' => $this->lng->txt('activate'),
                     'deactivateUsers' => $this->lng->txt('deactivate'),
@@ -3901,12 +3868,12 @@ class ilObjUserFolderGUI extends ilObjectGUI
                 ];
             }
 
-            if ($this->checkAccessBool('delete')) {
+            if ($rbacsystem->checkAccess('delete', $this->object->getRefId())) {
                 $cmds["deleteUsers"] = $this->lng->txt("delete");
             }
         }
 
-        if ($this->checkAccessBool('write')) {
+        if ($rbacsystem->checkAccess('write', $this->object->getRefId())) {
             $export_types = array("userfolder_export_excel_x86", "userfolder_export_csv", "userfolder_export_xml");
             foreach ($export_types as $type) {
                 $cmd = explode(

@@ -924,7 +924,7 @@ ilias.questions.showFeedback =function(a_id) {
 
 	jQuery('#feedback'+a_id).html(fbtext);
 	jQuery('#feedback'+a_id).slideToggle(400, 'swing', function(){
-		if (typeof MathJax != "undefined") {
+		if (typeof MathJax != "undefined" && typeof MathJax.Hub != "undefined") {
 			MathJax.Hub.Queue(["Typeset",MathJax.Hub, this]);
 		}
 	});
@@ -1027,7 +1027,6 @@ ilias.questions.determineSuccessStatus = function()
 ilias.questions.showCorrectAnswers =function(a_id) {
 
 	switch (questions[a_id].type) {
-
 		case 'assSingleChoice':
 			var max = 0; // #10772
 			for (var i=0;i<questions[a_id].answers.length;i++) {
@@ -1086,10 +1085,6 @@ ilias.questions.showCorrectAnswers =function(a_id) {
 		//end assKprimChoice
 
 		case 'assImagemapQuestion':
-			//reinit map
-			jQuery(function() {
-		  		jQuery('.cmap'+a_id).maphilight_mod({fade:true});
-			});
 			for (var i=0;i<questions[a_id].answers.length;i++) {
 				// display correct
 				if (questions[a_id].answers[i].points > 0) {

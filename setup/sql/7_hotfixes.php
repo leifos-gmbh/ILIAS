@@ -1787,4 +1787,54 @@ if ($ilDB->tableExists('adv_md_values_text') &&
     ");
 }
 ?>
+<#105>
+<?php
+    $ilDB->manipulate("DELETE FROM rbac_operations WHERE operation='create_dbk'");
+?>
+<#106>
+<?php
+    if (!$ilDB->tableExists('usr_change_email_token')) {
+        $ilDB->createTable(
+            'usr_change_email_token',
+            [
+                'token' => [
+                    'type' => 'text',
+                    'length' => 32
+                ],
+                'new_email' => [
+                    'type' => 'text',
+                    'length' => 256
+                ],
+                'valid_until' => [
+                    'type' => 'integer',
+                    'length' => 8
+                ]
+            ]
+        );
+    }
+?>
+<#107>
+<?php
+if (
+    $this->db->tableExists('il_cert_template')
+    && !$this->db->indexExistsByFields('il_cert_template', ['background_image_path', 'currently_active'])
+) {
+    $this->db->addIndex('il_cert_template', ['background_image_path', 'currently_active'], 'i5');
+}
 
+if (
+    $this->db->tableExists('il_cert_user_cert')
+    && !$this->db->indexExistsByFields('il_cert_user_cert', ['background_image_path', 'currently_active'])
+) {
+    $this->db->addIndex('il_cert_user_cert', ['background_image_path', 'currently_active'], 'i7');
+}
+?>
+<#108>
+<?php
+    if (!$this->db->indexExistsByFields('loc_settings', ['itest'])) {
+        $this->db->addIndex('loc_settings', ['itest'], 'i1');
+    }
+    if (!$this->db->indexExistsByFields('loc_settings', ['qtest'])) {
+        $this->db->addIndex('loc_settings', ['qtest'], 'i2');
+    }
+?>

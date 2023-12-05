@@ -70,7 +70,7 @@ acc#:#acc_tree_off#:#ツリー表示しない
 acc#:#acc_tree_on#:#ツリー表示する
 adm#:#adm_acc_ctrl_cpt_desc#:#有効にするとアクセッシビリティコントロールコンセプト用のリンクはフッタ－内に表示されます。
 adm#:#adm_acc_ctrl_cpt_enable#:#アクセッシビリティコントロールコンセプトを有効にする
-adm#:#adm_accessibility_contacts#:#コンタクトのAccessibility Point 
+adm#:#adm_accessibility_contacts#:#コンタクトのAccessibility Point
 adm#:#adm_accessibility_contacts_info#:#フッターリンクのaccessibility issue報告用コンタクト。ログインアカウントのコンマ区切りリスト
 adm#:#adm_awrn_support_contacts_info#:#全てのテクニカルサポートコンタクトが表示されます。ユーザは"全般設定" > "コンタクト情報" セクションのテクニカルサポートコンタクトとして定義されます。
 adm#:#adm_support_contacts#:#テクニカルサポート
@@ -623,9 +623,6 @@ assessment#:#cloze_text#:#穴埋め問題のテキスト
 assessment#:#cloze_textgap_case_insensitive#:#大文字・小文字を非区分
 assessment#:#cloze_textgap_case_sensitive#:#大文字・小文字を区分
 assessment#:#cloze_textgap_levenshtein_of#:#%sのレーベンシュタイン距離
-assessment#:#cloze_textgap_multiple_whitespace#:#複数の白スペース
-assessment#:#cloze_textgap_whitespace_after#:#値の後の白スペース
-assessment#:#cloze_textgap_whitespace_before#:#値の前の白スペース
 assessment#:#code#:#コード
 assessment#:#codebase#:#コードベース
 assessment#:#concatenation#:#結び付け
@@ -933,6 +930,7 @@ assessment#:#new_category#:#新ユニットカテゴリ
 assessment#:#new_unit#:#新ユニット
 assessment#:#next_question#:#次
 assessment#:#next_question_rows#:#問題 %dの%d - %d >>
+assessment#:#no_manual_feedback_export_info#:#Manual feedbacks will not be exported.###12 09 2023 new variable
 assessment#:#no_passed_mark#:#合格のマークを1つはセットしなけれなりません! 採点尺度が保存されませんでした。
 assessment#:#no_question_selected_for_move#:#移動する問題の最低一つにチェックしてください!
 assessment#:#no_questions_available#:#問題がありません!
@@ -1661,6 +1659,7 @@ assessment#:#tst_password_form#:#テストパスワードを入力
 assessment#:#tst_password_introduction#:#テストのパスワードがないとテストにはアクセスできません。テストを開始するためにテストのパスワードを入力してください。
 assessment#:#tst_percent_solved#:#正解率
 assessment#:#tst_player_answer_saved_and_locked#:#回答は保存されてロックされ変更できなくなります。
+assessment#:#tst_please_select_source_pool#:#Please select a question pool.###12 09 2023 new variable
 assessment#:#tst_please_select_target_for_pool_derives#:#目標のコンテナを選択してください。
 assessment#:#tst_position#:#問題 %s の%s
 assessment#:#tst_position_without_total#:#問題 %s
@@ -2051,7 +2050,7 @@ auth#:#auth_oidc_settings_discovery_error#:#ディスカバリーURL読込み失
 auth#:#auth_oidc_settings_discovery_url#:#プロバイダーのディスカバリーURL
 auth#:#auth_oidc_settings_img#:#Bild
 auth#:#auth_oidc_settings_img_file_info#:#ログインページに表示する写真をアップロードします。画像は自動的にOpenId コンテンツログインスクリプトにリンクします。
-auth#:#auth_oidc_settings_invalid_scopes#:#次の値には有効な範囲がありません: %s 
+auth#:#auth_oidc_settings_invalid_scopes#:#次の値には有効な範囲がありません: %s
 auth#:#auth_oidc_settings_le#:#プレゼンテーションログインページ
 auth#:#auth_oidc_settings_login_option_default#:#強制的にログオンしない
 auth#:#auth_oidc_settings_login_option_default_info#:#有効なセッションがすでに存在する場合は、OpenIdコンテンツサーバーにログインする必要はありません。
@@ -5504,7 +5503,7 @@ common#:#session_config#:#セッション設定
 common#:#session_config_maintenance_disabled#:#クライアントによるメンテナンスを禁止する
 common#:#session_mail_subject_deletion#:# セッション "%s"からユーザ "%s"の登録解除
 common#:#session_mail_subject_entered#:#セッション "%s"内ユーザ"%s" の参加
-common#:#session_mail_subject_registered#:#セッション "%s"のユーザ"%s"の登録 
+common#:#session_mail_subject_registered#:#セッション "%s"のユーザ"%s"の登録
 common#:#session_max_count#:#Maxアクティブセッション
 common#:#session_max_count_info#:#同時に確立可能な最大セッション数を定義します。"0"の場合この機能はOFFとなります。
 common#:#session_max_idle#:#Maxセッションアイドル(分単位)
@@ -5725,7 +5724,6 @@ common#:#udf_delete_sure#:#本当にこの欄と全ての割り当てユーザ�
 common#:#udf_duplicate_entries#:#値はユニークでなければなりません。
 common#:#udf_field_deleted#:#欄を削除しました。
 common#:#udf_name_already_exists#:#この欄の名称は既に使用されています。別の名前を使用してください。
-common#:#udf_required_and_visible_requires_changeable#:#フィールドが"必須"で"パーソナルデータ中に表示"の際は、'プロファイル内で表示可'にする必要があります。
 common#:#udf_required_requires_visib_reg#:#欄が"必須項目"に設定されていると、"登録中表示"に設定しなければなりません。
 common#:#udf_type_date#:#日付
 common#:#udf_type_datetime#:#日付と時間
@@ -5852,6 +5850,7 @@ common#:#usrimport_no_insert_ext_account_exists#:#挿入アクションを実行
 common#:#usrimport_no_update_ext_account_exists#:#更新アクションが実行できません。外部アカウントが既に存在します。
 common#:#usrimport_with_specified_role_not_permitted#:#指定した役割のインポートはアクセス許可されません。
 common#:#usrimport_wrong_file_count#:#インポートフォルダーにたくさんファイルがありすぎます。もう一度やり直してください。
+common#:#usrimport_xml_anonymous_or_root_not_allowed#:#Neither the system-account nor the anonymous account can be changed through the import.###12 09 2023 new variable
 common#:#usrimport_xml_attribute_missing#:#要素 "%1$s" の属性 "%2$s" がありません。
 common#:#usrimport_xml_attribute_value_illegal#:#要素 "%1$s" の属性 "%2$s" の値 "%3$s" がありません。
 common#:#usrimport_xml_attribute_value_inapplicable#:#要素"%1$s"の属性 "%2$s"の値"%3$s"はアクション"%4$s"には不適切です。
@@ -5944,7 +5943,7 @@ common#:#withdrawal_complete_redirect#:#完全に承諾を取り下げます。 
 common#:#withdrawal_mail_info#:#取り下げ確認後に以下のメールが管理者へ送られます。:[BR][BR]
 common#:#withdrawal_mail_subject#:#利用規約承諾の取り下げ
 common#:#withdrawal_mail_text#:#担当の方へ,[BR][BR]ILIASシステムの利用規約をここに取り下げます。適時アカウントの更新または削除をお願いします。[BR][BR]名前: %1$s[BR]Login: %2$s[BR]External Account: %3$s[BR][BR]早々[BR]%1$s
-common#:#withdrawal_sure_account#:#承諾を本当に取り下げますか? 
+common#:#withdrawal_sure_account#:#承諾を本当に取り下げますか?
 common#:#withdrawal_sure_account_deletion#:#承諾を本当に取り下げますか? アカウントは取り消し不可能で削除されます。
 common#:#withdrawal_sure_account_deletion_no_consent_yet#:#本当に使用許諾を承認しませんか? ユーザアカウントは取消不可で削除されます。
 common#:#withdrawal_sure_account_no_consent_yet#:#本当に使用許諾を承認しませんか?
@@ -6200,7 +6199,7 @@ content#:#cont_citation_selection_not_valid#:#選択は無効です
 content#:#cont_click_br_corner#:#希望範囲の右下の角をクリックしてください。
 content#:#cont_click_center#:#希望範囲の中央をクリックしてください。
 content#:#cont_click_circle#:#希望範囲の円のポイントをクリックしてください。
-content#:#cont_click_edit#:#プロパティを<b>編集</b>するには要素を<b>クリック</b> 
+content#:#cont_click_edit#:#プロパティを<b>編集</b>するには要素を<b>クリック</b>
 content#:#cont_click_multi_select#:#<b>要素を</b> 選択<b>クリック</b> または解除する。
 content#:#cont_click_next_or_save#:#多角形あるいは保存範囲の次のポイントをクリックしてください。(この多角形の開始点を再度クリックする必要はありません !)
 content#:#cont_click_next_point#:#多角形の次のポイントをクリックしてください。
@@ -6285,7 +6284,7 @@ content#:#cont_download_title#:#ダウンロード タイトル
 content#:#cont_downloads#:#ダウンロード
 content#:#cont_downloads_desc#:#ダウンロード用(オフライン利用やインポート等)に全ての公開エクスポートファイルを提供します。
 content#:#cont_downloads_public_desc#:#匿名ユーザに対してもダウンロードを許可する。(共用範囲に限る)
-content#:#cont_drag_and_drop_elements#:#<b>Drag and drop</b>でプレースフォルダのコンテンツ要素へ<b>移動</b> 
+content#:#cont_drag_and_drop_elements#:#<b>Drag and drop</b>でプレースフォルダのコンテンツ要素へ<b>移動</b>
 content#:#cont_drag_element_click_save#:#希望する位置に要素をドラッグアナドドロップする。その後"保存"する。
 content#:#cont_ed_align_center#:#整列：中央
 content#:#cont_ed_align_left#:#整列：左
@@ -10517,7 +10516,7 @@ lti#:#lti_consumer_set_active#:#Consumerを有効にしました
 lti#:#lti_consumer_set_inactive#:#Consumerを解除しました
 lti#:#lti_consumer_updated#:#Consumerを更新しました
 lti#:#lti_consuming_tab#:#LTI ConsumerとしてのILIAS
-lti#:#lti_copy#:#ConsumerをCopy 
+lti#:#lti_copy#:#ConsumerをCopy
 lti#:#lti_create_consumer#:#Consumerを作成
 lti#:#lti_create_lti_user_role#:#LTI ユーザ用の推奨グローバル役割を作成
 lti#:#lti_cron_title#:#LTI Outcome Service
@@ -14567,6 +14566,7 @@ skmg#:#skmg_confirm_user_removal#:#本当にこのプロファイルから次の
 skmg#:#skmg_cont_profiles_info#:#この表示では、現在開いているオブジェクト(コース/グループ)に関係する能力エントリーの能力プロファイルを選択できます。割当てられている全ての能力プロファイルと全ての能力エントリー付きでグローバル表示をするには、以下のリンクをクリックします。
 skmg#:#skmg_context_global#:#グローバル
 skmg#:#skmg_context_local#:#ローカル
+skmg#:#skmg_count_references#:#Number of referenced competences:###23 10 2023 new variable
 skmg#:#skmg_create_sctp#:#テンプレートカテゴリを作成
 skmg#:#skmg_create_skill_category#:#能力カテゴリを作成
 skmg#:#skmg_create_skill_template#:#能力テンプレートを作成
@@ -15878,7 +15878,7 @@ sysc#:#sysc_tree_list_failures#:#リポジトリツリーのダンプが作成�
 sysc#:#sysc_tree_missing_failures#:#ツリー構造内の欠損エントリーが見つかりました欠損エントリー数
 sysc#:#sysc_tree_structure_failures#:#ツリー構造(親-関係)内の不良数:
 tagging#:#no_tag_text_1#:#まだタグは未利用です。実行するには2つのステップを実行する必要があります。
-tagging#:#no_tag_text_2#:# '%s'をクリックして利用可能な提案から学習オブジェクト(例. 学習モジュールまたは掲示板)を選択 
+tagging#:#no_tag_text_2#:# '%s'をクリックして利用可能な提案から学習オブジェクト(例. 学習モジュールまたは掲示板)を選択
 tagging#:#no_tag_text_3#:#オブジェクトへタグを添付するには、アクションメニューから'タグ設定'を選択します。
 tagging#:#tag_remove_tags_of_obj_without_access#:#タグを削除
 tagging#:#tag_some_obj_tagged_without_access#:#タグされたオブジェクトにはアクセス権のないものがあります。これらのオブジェクト用のタグを削除しますか?
@@ -16282,6 +16282,7 @@ user#:#clipboard_remove_btn#:#クリップボードから削除
 user#:#clipboard_table_title#:#クリップボード(ユーザアカウント)
 user#:#clipboard_user_added#:#クリップボードへ選択のユーザを追加しました
 user#:#confirm_delete_starting_point#:#このルールを本当に消去しますか？
+user#:#confirm_logout_for_email_change#:#You changed your email. To finalize this change, you will need to provide your password. The system is thus going to log you out and you will have 5 minutes to log in again. All other changes will be saved before logging you out.###23 10 2023 new variable
 user#:#create_starting_point#:#ルールを作成
 user#:#criteria#:#判定基準
 user#:#del_mail_body#:#%1$sさん, %3$s時点で%2$sへあなたは長期間ログインしていません。そのためアカウントは%4$s日以内に削除されます。アカウント削除を回避するには再度ログインし直す必要があります。
@@ -16289,6 +16290,7 @@ user#:#del_mail_subject#:#(ILIAS) アカウントは削除されます。
 user#:#delete_inactive_user_accounts_frequency#:#間隔
 user#:#delete_inactive_user_accounts_frequency_desc#:#削除とメール配布間隔をテストします。
 user#:#editing_this_role#:#役割
+user#:#email_could_not_be_changed#:#The request to change your email could not be finalized.###23 10 2023 new variable
 user#:#enable_local_user_administration#:#ローカルユーザ管理を使用
 user#:#enable_local_user_administration_info#:#有効にするとローカルユーザアカウントはカテゴリ内で管理できます。
 user#:#feedhash#:#ニュースフィードハッシュ

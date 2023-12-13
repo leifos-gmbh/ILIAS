@@ -482,8 +482,8 @@ class cdCompanyGUI
 
         if (is_array($_POST["company_id"])) {
             foreach ($_POST["company_id"] as $i) {
-                ${entity_small} = new cdCompany($i);
-                ${entity_small}->delete();
+                $company = new cdCompany($i);
+                $company->delete();
             }
         }
         ilUtil::sendSuccess("msg_obj_modified");

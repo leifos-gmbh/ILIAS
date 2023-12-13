@@ -34,6 +34,10 @@ class cdCompanyTableGUI extends ilTable2GUI
         $this->setData($this->getCompanies($a_user_admin_centers));
         $this->setTitle($this->pl->txt("companies"));
 
+        if (cdUtil::isDAF()) {
+            $this->addColumn("", "", "1");
+        }
+
         $this->addColumn("", "", "1");
         //$this->addColumn($this->lng->txt("title"), "title");
         // Firmenname von heller eingepflegt!!! - 29.03.2011
@@ -53,7 +57,9 @@ class cdCompanyTableGUI extends ilTable2GUI
         $this->setDefaultOrderDirection("asc");
 
         // HELLER 10.09.2013 FIX - Firmen sollen nicht mehr gel�scht werden!!! - Wichtig da Daten verloren/falsch zugeordnet werden
-        //$this->addMultiCommand("confirmCompanyDeletion", $lng->txt("delete"));
+        if (cdUtil::isDAF()) {
+            $this->addMultiCommand("confirmCompanyDeletion", $lng->txt("delete"));
+        }
         //$this->addCommandButton("", $lng->txt(""));
     }
     
@@ -117,7 +123,12 @@ class cdCompanyTableGUI extends ilTable2GUI
     {
         global $lng, $ilCtrl;
 
-        
+        if (cdUtil::isDAF()) {
+            $this->tpl->setCurrentBlock("checkbox");
+            $this->tpl->setVariable("VAL_ID", $a_set["id"]);
+            $this->tpl->parseCurrentBlock();
+        }
+
         // parent company
         if ($a_set["parent_company"] > 0) {
             $this->tpl->setCurrentBlock("parent_company");

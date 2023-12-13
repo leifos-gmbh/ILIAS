@@ -42,6 +42,10 @@ class ilUserQuery
      */
     protected $udf_filter = array();
 
+    // cdpatch start
+    public $company_id = 0;
+    // cdpatch end
+
     private $default_fields = array(
         "usr_id",
         "login",
@@ -277,7 +281,6 @@ class ilUserQuery
 
         $ilDB = $DIC['ilDB'];
 
-
         $udf_fields = array();
 
         $join = "";
@@ -399,7 +402,7 @@ class ilUserQuery
                 $where = " AND";
             }
         }
-        if ($this->limited_access) {		// limited access
+        if ($this->limited_access) {        // limited access
             $add = $where . " usr_data.time_limit_unlimited= " . $ilDB->quote(0, "integer");
             $query .= $add;
             $count_query .= $add;
@@ -420,6 +423,15 @@ class ilUserQuery
                 $where = " AND";
             }
         }
+
+        // cdpatch start
+        if ($this->company_id > 0) {
+            $add = $where . " company_id = " . $ilDB->quote($this->company_id, "integer");
+            $query .= $add;
+            $count_query .= $add;
+            $where = " AND";
+        }
+        // cdpatch end
 
         if ($this->has_access) { //user is limited but has access
             $unlimited = "time_limit_unlimited = " . $ilDB->quote(1, 'integer');
@@ -578,6 +590,7 @@ class ilUserQuery
      * Get data for user administration list.
      * @deprecated
      */
+    // cdpatch: added company id
     public static function getUserListData(
         $a_order_field,
         $a_order_dir,
@@ -595,6 +608,7 @@ class ilUserQuery
         $a_user_filter = null,
         $a_first_letter = "",
         $a_authentication_filter = null
+        , $a_company_id = 0
     ) {
         $query = new ilUserQuery();
         $query->setOrderField($a_order_field);
@@ -612,7 +626,13 @@ class ilUserQuery
         $query->setAdditionalFields($a_additional_fields);
         $query->setUserFilter($a_user_filter);
         $query->setFirstLetterLastname($a_first_letter);
+
         $query->setAuthenticationFilter($a_authentication_filter);
+
+        // cdpatch start
+        $query->company_id = $a_company_id;
+        // cdpatch end
+
         return $query->query();
     }
 }

@@ -123,10 +123,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
             'Sabre\\Uri\\' => 10,
             'Sabre\\HTTP\\' => 11,
             'Sabre\\Event\\' => 12,
-            'Sabre\\DAV\\' => 10,
-            'Sabre\\DAVACL\\' => 13,
-            'Sabre\\CardDAV\\' => 14,
-            'Sabre\\CalDAV\\' => 13,
+            'Sabre\\' => 6,
             'SAML2\\' => 6,
         ),
         'R' => 
@@ -457,21 +454,9 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         array (
             0 => __DIR__ . '/..' . '/sabre/event/lib',
         ),
-        'Sabre\\DAV\\' => 
+        'Sabre\\' => 
         array (
-            0 => __DIR__ . '/..' . '/sabre/dav/lib/DAV',
-        ),
-        'Sabre\\DAVACL\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/sabre/dav/lib/DAVACL',
-        ),
-        'Sabre\\CardDAV\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/sabre/dav/lib/CardDAV',
-        ),
-        'Sabre\\CalDAV\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/sabre/dav/lib/CalDAV',
+            0 => __DIR__ . '/..' . '/sabre/dav/lib',
         ),
         'SAML2\\' => 
         array (
@@ -767,6 +752,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'Basho\\Riak\\Node\\Config' => __DIR__ . '/..' . '/phpfastcache/riak-client/src/Riak/Node/Config.php',
         'Basho\\Riak\\Search\\Doc' => __DIR__ . '/..' . '/phpfastcache/riak-client/src/Riak/Search/Doc.php',
         'Basho\\Riak\\TimeSeries\\Cell' => __DIR__ . '/..' . '/phpfastcache/riak-client/src/Riak/TimeSeries/Cell.php',
+        'CURLStringFile' => __DIR__ . '/..' . '/symfony/polyfill-php81/Resources/stubs/CURLStringFile.php',
         'CachedActiveRecord' => __DIR__ . '/../../../..' . '/Services/ActiveRecord/class.CachedActiveRecord.php',
         'Certificate\\API\\Data\\UserCertificateDto' => __DIR__ . '/../../../..' . '/Services/Certificate/classes/API/Data/UserCertificateDto.php',
         'Certificate\\API\\Filter\\UserDataFilter' => __DIR__ . '/../../../..' . '/Services/Certificate/classes/API/Filter/UserDataFilter.php',
@@ -1714,8 +1700,10 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ILIAS\\Modules\\OrgUnit\\ARHelper\\BaseForm' => __DIR__ . '/../../../..' . '/Modules/OrgUnit/classes/ARHelper/BaseForm.php',
         'ILIAS\\Modules\\OrgUnit\\ARHelper\\DIC' => __DIR__ . '/../../../..' . '/Modules/OrgUnit/classes/ARHelper/DIC.php',
         'ILIAS\\Modules\\Test\\AccessFileUploadAnswer' => __DIR__ . '/../../../..' . '/Modules/Test/classes/AccessFileUploadAnswer.php',
+        'ILIAS\\Modules\\Test\\AccessFileUploadPreview' => __DIR__ . '/../../../..' . '/Modules/Test/classes/AccessFileUploadPreview.php',
         'ILIAS\\Modules\\Test\\AccessQuestionImage' => __DIR__ . '/../../../..' . '/Modules/Test/classes/AccessQuestionImage.php',
         'ILIAS\\Modules\\Test\\Incident' => __DIR__ . '/../../../..' . '/Modules/Test/classes/Incident.php',
+        'ILIAS\\Modules\\Test\\QuestionPoolLinkedTitleBuilder' => __DIR__ . '/../../../..' . '/Modules/Test/traits/QuestionPoolLinkedTitleBuilder.php',
         'ILIAS\\Modules\\Test\\Readable' => __DIR__ . '/../../../..' . '/Modules/Test/classes/Readable.php',
         'ILIAS\\Modules\\Test\\SimpleAccess' => __DIR__ . '/../../../..' . '/Modules/Test/classes/SimpleAccess.php',
         'ILIAS\\MyStaff\\Courses\\ShowUser\\ilMStShowUserCourses' => __DIR__ . '/../../../..' . '/Services/MyStaff/classes/ShowUser/Courses/class.ilMStShowUserCourses.php',
@@ -2528,6 +2516,8 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ILIAS\\UI\\NotImplementedException' => __DIR__ . '/../../../..' . '/src/UI/NotImplementedException.php',
         'ILIAS\\UI\\Renderer' => __DIR__ . '/../../../..' . '/src/UI/Renderer.php',
         'ILIAS\\User\\Export\\UserHtmlExport' => __DIR__ . '/../../../..' . '/Services/User/Export/UserHtmlExport.php',
+        'ILIAS\\User\\Profile\\ProfileChangeMailTokenDBRepository' => __DIR__ . '/../../../..' . '/Services/User/Profile/classes/ProfileChangeMailTokenDBRepository.php',
+        'ILIAS\\User\\Profile\\ProfileChangeMailTokenRepository' => __DIR__ . '/../../../..' . '/Services/User/Profile/classes/ProfileChangeMailTokenRepository.php',
         'ILIAS\\User\\Provider\\UserMetaBarProvider' => __DIR__ . '/../../../..' . '/Services/User/classes/Provider/UserMetaBarProvider.php',
         'ILIAS\\WebAccessChecker\\HttpServiceAware' => __DIR__ . '/../../../..' . '/Services/WebAccessChecker/classes/HttpServiceAware.php',
         'ILIAS\\WebAccessChecker\\PathType' => __DIR__ . '/../../../..' . '/Services/WebAccessChecker/interfaces/PathType.php',
@@ -2790,6 +2780,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'PHPMailer\\PHPMailer\\PHPMailer' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/PHPMailer.php',
         'PHPMailer\\PHPMailer\\POP3' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/POP3.php',
         'PHPMailer\\PHPMailer\\SMTP' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/SMTP.php',
+        'PRGUpdateCRSRefLPSettingMigration' => __DIR__ . '/../../../..' . '/Modules/StudyProgramme/classes/Setup/class.PRGUpdateCRSRefLPSettingMigration.php',
         'ParagonIE\\ConstantTime\\Base32' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base32.php',
         'ParagonIE\\ConstantTime\\Base32Hex' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base32Hex.php',
         'ParagonIE\\ConstantTime\\Base64' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base64.php',
@@ -3728,6 +3719,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'Sabre\\DAV\\IMoveTarget' => __DIR__ . '/..' . '/sabre/dav/lib/DAV/IMoveTarget.php',
         'Sabre\\DAV\\IMultiGet' => __DIR__ . '/..' . '/sabre/dav/lib/DAV/IMultiGet.php',
         'Sabre\\DAV\\INode' => __DIR__ . '/..' . '/sabre/dav/lib/DAV/INode.php',
+        'Sabre\\DAV\\INodeByPath' => __DIR__ . '/..' . '/sabre/dav/lib/DAV/INodeByPath.php',
         'Sabre\\DAV\\IProperties' => __DIR__ . '/..' . '/sabre/dav/lib/DAV/IProperties.php',
         'Sabre\\DAV\\IQuota' => __DIR__ . '/..' . '/sabre/dav/lib/DAV/IQuota.php',
         'Sabre\\DAV\\Locks\\Backend\\AbstractBackend' => __DIR__ . '/..' . '/sabre/dav/lib/DAV/Locks/Backend/AbstractBackend.php',
@@ -5634,6 +5626,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'getID3_cached_mysql' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/extension.cache.mysql.php',
         'getID3_cached_mysqli' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/extension.cache.mysqli.php',
         'getID3_cached_sqlite3' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/extension.cache.sqlite3.php',
+        'getid3_7zip' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.archive.7zip.php',
         'getid3_aa' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.audio.aa.php',
         'getid3_aac' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.audio.aac.php',
         'getid3_ac3' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.audio.ac3.php',
@@ -6846,6 +6839,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ilConsultationHourGroupTableGUI' => __DIR__ . '/../../../..' . '/Services/Calendar/classes/ConsultationHours/class.ilConsultationHourGroupTableGUI.php',
         'ilConsultationHourGroups' => __DIR__ . '/../../../..' . '/Services/Calendar/classes/ConsultationHours/class.ilConsultationHourGroups.php',
         'ilConsultationHourUtils' => __DIR__ . '/../../../..' . '/Services/Calendar/classes/ConsultationHours/class.ilConsultationHourUtils.php',
+        'ilConsultationHoursCalendarBlockGUI' => __DIR__ . '/../../../..' . '/Services/Calendar/classes/class.ilConsultationHoursCalendarBlockGUI.php',
         'ilConsultationHoursGUI' => __DIR__ . '/../../../..' . '/Services/Calendar/classes/ConsultationHours/class.ilConsultationHoursGUI.php',
         'ilConsultationHoursTableGUI' => __DIR__ . '/../../../..' . '/Services/Calendar/classes/ConsultationHours/class.ilConsultationHoursTableGUI.php',
         'ilContObjLocatorGUI' => __DIR__ . '/../../../..' . '/Modules/LearningModule/classes/class.ilContObjLocatorGUI.php',
@@ -8437,6 +8431,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ilMailingListsGUI' => __DIR__ . '/../../../..' . '/Services/Contact/classes/class.ilMailingListsGUI.php',
         'ilMailingListsMembersTableGUI' => __DIR__ . '/../../../..' . '/Services/Contact/classes/class.ilMailingListsMembersTableGUI.php',
         'ilMailingListsTableGUI' => __DIR__ . '/../../../..' . '/Services/Contact/classes/class.ilMailingListsTableGUI.php',
+        'ilMainMenuAccess' => __DIR__ . '/../../../..' . '/Services/MainMenu/interfaces/interface.ilMainMenuAccess.php',
         'ilMainMenuGUI' => __DIR__ . '/../../../..' . '/Services/MainMenu/classes/class.ilMainMenuGUI.php',
         'ilMainMenuSearchGUI' => __DIR__ . '/../../../..' . '/Services/Search/classes/class.ilMainMenuSearchGUI.php',
         'ilMakeInstallationAccessibleObjective' => __DIR__ . '/../../../..' . '/setup/classes/class.ilMakeInstallationAccessibleObjective.php',
@@ -10076,6 +10071,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ilStudyProgrammeMembershipSourceReaderOrgu' => __DIR__ . '/../../../..' . '/Modules/StudyProgramme/classes/model/AutoMemberships/class.ilStudyProgrammeMembershipSourceReaderOrgu.php',
         'ilStudyProgrammeMembershipSourceReaderParticipants' => __DIR__ . '/../../../..' . '/Modules/StudyProgramme/classes/model/AutoMemberships/class.ilStudyProgrammeMembershipSourceReaderParticipants.php',
         'ilStudyProgrammeMembershipSourceReaderRole' => __DIR__ . '/../../../..' . '/Modules/StudyProgramme/classes/model/AutoMemberships/class.ilStudyProgrammeMembershipSourceReaderRole.php',
+        'ilStudyProgrammeMigrationAgent' => __DIR__ . '/../../../..' . '/Modules/StudyProgramme/classes/Setup/class.ilStudyProgrammeMigrationAgent.php',
         'ilStudyProgrammeNoProgressForAssignmentException' => __DIR__ . '/../../../..' . '/Modules/StudyProgramme/classes/exceptions/class.ilStudyProgrammeNoProgressForAssignmentException.php',
         'ilStudyProgrammePlaceholderDescription' => __DIR__ . '/../../../..' . '/Services/Certificate/classes/Placeholder/Description/class.ilStudyProgrammePlaceholderDescription.php',
         'ilStudyProgrammePlaceholderValues' => __DIR__ . '/../../../..' . '/Services/Certificate/classes/Placeholder/Values/class.ilStudyProgrammePlaceholderValues.php',
@@ -10668,7 +10664,6 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ilUserSearchOptions' => __DIR__ . '/../../../..' . '/Services/Search/classes/class.ilUserSearchOptions.php',
         'ilUserService' => __DIR__ . '/../../../..' . '/Services/User/classes/class.ilUserService.php',
         'ilUserSettingsConfig' => __DIR__ . '/../../../..' . '/Services/User/Settings/classes/class.ilUserSettingsConfig.php',
-        'ilUserSetupAgent' => __DIR__ . '/../../../..' . '/Services/User/classes/Setup/class.ilUserSetupAgent.php',
         'ilUserStartingPointGUI' => __DIR__ . '/../../../..' . '/Services/User/classes/class.ilUserStartingPointGUI.php',
         'ilUserTableGUI' => __DIR__ . '/../../../..' . '/Services/User/classes/class.ilUserTableGUI.php',
         'ilUserUserActionProvider' => __DIR__ . '/../../../..' . '/Services/User/Actions/classes/class.ilUserUserActionProvider.php',
@@ -10958,6 +10953,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'phpseclib3\\Crypt\\EC\\Formats\\Keys\\XML' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/EC/Formats/Keys/XML.php',
         'phpseclib3\\Crypt\\EC\\Formats\\Keys\\libsodium' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/EC/Formats/Keys/libsodium.php',
         'phpseclib3\\Crypt\\EC\\Formats\\Signature\\ASN1' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/EC/Formats/Signature/ASN1.php',
+        'phpseclib3\\Crypt\\EC\\Formats\\Signature\\IEEE' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/EC/Formats/Signature/IEEE.php',
         'phpseclib3\\Crypt\\EC\\Formats\\Signature\\Raw' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/EC/Formats/Signature/Raw.php',
         'phpseclib3\\Crypt\\EC\\Formats\\Signature\\SSH2' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/EC/Formats/Signature/SSH2.php',
         'phpseclib3\\Crypt\\EC\\Parameters' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/EC/Parameters.php',

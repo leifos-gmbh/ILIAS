@@ -15947,6 +15947,9 @@ $ilDB->addIndex("il_cert_template", $in_fields, "i3", false);
 $in_fields = array("obj_type");
 $ilDB->addIndex("il_cert_template", $in_fields, "i4", false);
 
+$in_fields = array("background_image_path","currently_active");
+$ilDB->addIndex("il_cert_template", $in_fields, "i5", false);
+
 $ilDB->createSequence("il_cert_template", 1);
 
 
@@ -16077,6 +16080,9 @@ $ilDB->addIndex("il_cert_user_cert", $in_fields, "i5", false);
 
 $in_fields = array("user_id","obj_id","currently_active");
 $ilDB->addIndex("il_cert_user_cert", $in_fields, "i6", false);
+
+$in_fields = array("background_image_path","currently_active");
+$ilDB->addIndex("il_cert_user_cert", $in_fields, "i7", false);
 
 $ilDB->createSequence("il_cert_user_cert", 1);
 
@@ -25515,6 +25521,12 @@ $ilDB->createTable("loc_settings", $fields);
 
 $pk_fields = array("obj_id");
 $ilDB->addPrimaryKey("loc_settings", $pk_fields);
+
+$in_fields = array("itest");
+$ilDB->addIndex("loc_settings", $in_fields, "i1", false);
+
+$in_fields = array("qtest");
+$ilDB->addIndex("loc_settings", $in_fields, "i2", false);
 
 
 //
@@ -35316,9 +35328,6 @@ $ilDB->insert("rbac_operations", array(
 
 $ilDB->insert("rbac_operations", array(
 'ops_id' => array('integer', '22'), 'operation' => array('text', 'create_glo'), 'description' => array('text', 'create new glossary'), 'class' => array('text', 'create'), 'op_order' => array('integer', '9999')));
-
-$ilDB->insert("rbac_operations", array(
-'ops_id' => array('integer', '23'), 'operation' => array('text', 'create_dbk'), 'description' => array('text', 'create new digibook'), 'class' => array('text', 'create'), 'op_order' => array('integer', '9999')));
 
 $ilDB->insert("rbac_operations", array(
 'ops_id' => array('integer', '24'), 'operation' => array('text', 'create_exc'), 'description' => array('text', 'create new exercise'), 'class' => array('text', 'create'), 'op_order' => array('integer', '9999')));
@@ -47349,7 +47358,7 @@ $ilDB->insert("settings", array(
 'module' => array('text', 'common'), 'keyword' => array('text', 'db_hotfixes_5_3'), 'value' => array('clob', '18')));
 
 $ilDB->insert("settings", array(
-'module' => array('text', 'common'), 'keyword' => array('text', 'db_hotfixes_7'), 'value' => array('clob', '104')));
+'module' => array('text', 'common'), 'keyword' => array('text', 'db_hotfixes_7'), 'value' => array('clob', '108')));
 
 $ilDB->insert("settings", array(
 'module' => array('text', 'common'), 'keyword' => array('text', 'db_update_running'), 'value' => array('clob', '0')));
@@ -56497,6 +56506,32 @@ $in_fields = array("code");
 $ilDB->addIndex("usr_account_codes", $in_fields, "i1", false);
 
 $ilDB->createSequence("usr_account_codes", 1);
+
+
+//
+// usr_change_email_token
+//
+$fields = array (
+	"token" => array (
+		"notnull" => false
+		,"length" => 32
+		,"fixed" => false
+		,"type" => "text"
+	)
+	,"new_email" => array (
+		"notnull" => false
+		,"length" => 256
+		,"fixed" => false
+		,"type" => "text"
+	)
+	,"valid_until" => array (
+		"notnull" => false
+		,"length" => 8
+		,"unsigned" => false
+		,"type" => "integer"
+	)
+);
+$ilDB->createTable("usr_change_email_token", $fields);
 
 
 //

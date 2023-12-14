@@ -6907,7 +6907,8 @@ CREATE TABLE `il_cert_template` (
   KEY `i1_idx` (`obj_id`),
   KEY `i2_idx` (`obj_id`,`deleted`),
   KEY `i3_idx` (`obj_id`,`currently_active`,`deleted`),
-  KEY `i4_idx` (`obj_type`)
+  KEY `i4_idx` (`obj_type`),
+  KEY `i5_idx` (`background_image_path`,`currently_active`)
 ) ;
 
 --
@@ -6956,7 +6957,8 @@ CREATE TABLE `il_cert_user_cert` (
   KEY `i3_idx` (`user_id`,`currently_active`,`acquired_timestamp`),
   KEY `i4_idx` (`user_id`,`obj_type`,`currently_active`),
   KEY `i5_idx` (`obj_id`,`currently_active`),
-  KEY `i6_idx` (`user_id`,`obj_id`,`currently_active`)
+  KEY `i6_idx` (`user_id`,`obj_id`,`currently_active`),
+  KEY `i7_idx` (`background_image_path`,`currently_active`)
 ) ;
 
 --
@@ -11275,7 +11277,9 @@ CREATE TABLE `loc_settings` (
   `it_start` tinyint(4) DEFAULT 1,
   `qt_start` tinyint(4) DEFAULT 1,
   `passed_obj_mode` tinyint(4) DEFAULT 1,
-  PRIMARY KEY (`obj_id`)
+  PRIMARY KEY (`obj_id`),
+  KEY `i1_idx` (`itest`),
+  KEY `i2_idx` (`qtest`)
 ) ;
 
 --
@@ -15636,7 +15640,6 @@ INSERT INTO `rbac_operations` VALUES (19,'create_crs','create new course','creat
 INSERT INTO `rbac_operations` VALUES (20,'create_lm','create new learning module','create',9999);
 INSERT INTO `rbac_operations` VALUES (21,'create_sahs','create new SCORM/AICC learning module','create',9999);
 INSERT INTO `rbac_operations` VALUES (22,'create_glo','create new glossary','create',9999);
-INSERT INTO `rbac_operations` VALUES (23,'create_dbk','create new digibook','create',9999);
 INSERT INTO `rbac_operations` VALUES (24,'create_exc','create new exercise','create',9999);
 INSERT INTO `rbac_operations` VALUES (25,'create_file','upload new file','create',9999);
 INSERT INTO `rbac_operations` VALUES (26,'create_fold','create new folder','create',9999);
@@ -19938,7 +19941,7 @@ INSERT INTO `settings` VALUES ('common','dbupwarn_tos_migr_54x','1');
 INSERT INTO `settings` VALUES ('common','dbupwarn_tstfixqstseq','1');
 INSERT INTO `settings` VALUES ('common','dbup_tst_skl_thres_mig_done','1');
 INSERT INTO `settings` VALUES ('common','db_hotfixes_5_3','18');
-INSERT INTO `settings` VALUES ('common','db_hotfixes_7','104');
+INSERT INTO `settings` VALUES ('common','db_hotfixes_7','108');
 INSERT INTO `settings` VALUES ('common','db_update_running','0');
 INSERT INTO `settings` VALUES ('common','db_version','5751');
 INSERT INTO `settings` VALUES ('common','default_repository_view','flat');
@@ -23791,6 +23794,21 @@ CREATE TABLE `usr_account_codes_seq` (
 
 
 --
+-- Table structure for table `usr_change_email_token`
+--
+
+CREATE TABLE `usr_change_email_token` (
+  `token` varchar(32) DEFAULT NULL,
+  `new_email` varchar(256) DEFAULT NULL,
+  `valid_until` bigint(20) DEFAULT NULL
+) ;
+
+--
+-- Dumping data for table `usr_change_email_token`
+--
+
+
+--
 -- Table structure for table `usr_cron_mail_reminder`
 --
 
@@ -25032,4 +25050,4 @@ CREATE TABLE `xmlvalue_seq` (
 
 
 
--- Dump completed on 2023-07-20 18:09:40
+-- Dump completed on 2023-12-12 18:09:02

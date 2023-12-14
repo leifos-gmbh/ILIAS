@@ -616,6 +616,7 @@ assessment#:#circle_click_center#:#Clique no centro da área desejada.
 assessment#:#circle_click_circle#:#Clique num ponto circular da área desejada.
 assessment#:#clientip#:#IP do cliente
 assessment#:#close_text_hint#:#Para adicionar um novo espaço coloque o cursor na posição que quiser e use a caixa de seleção ‘Espaço de texto’. Aparecem em baixo correspondentes secções de edição. Também pode editar espaços se clicar nos espaços dentro do texto de espaços.
+assessment#:#cloze_answer_text_info#:#Spaces preceding or following the answer text will be deleted when the form is saved.###12 12 2023 new variable
 assessment#:#cloze_fixed_textlength#:#Comprimento do campo de texto
 assessment#:#cloze_fixed_textlength_description#:#Se introduzir um novo valor, todos os campos de espaços do texto que não impõem uma limitação máxima própria de caracteres, assim como todos os campos de espaços numéricos, serão criados com um comprimento fixo deste valor, não sendo assim possível introduzir mais do que os caracteres permitidos. Repare que para os espaços numéricos, o separador decimal conta como um caracter regular.
 assessment#:#cloze_gap_size_info#:#Se introduzir um valor superior a 0, este campo de texto de espaços será criado com o comprimento fixo deste valor. Se não introduzir um valor, o campo de texto de espaços será criado com o valor do comprimento global fixo.
@@ -623,9 +624,6 @@ assessment#:#cloze_text#:#Fechar texto
 assessment#:#cloze_textgap_case_insensitive#:#Caso insensível
 assessment#:#cloze_textgap_case_sensitive#:#Caso sensível
 assessment#:#cloze_textgap_levenshtein_of#:#Levenshtein distância de %s
-assessment#:#cloze_textgap_multiple_whitespace#:#Múltiplos espaços em branco
-assessment#:#cloze_textgap_whitespace_after#:#Espaço branco depois do valor
-assessment#:#cloze_textgap_whitespace_before#:#Espaço branco antes do valor
 assessment#:#code#:#Código
 assessment#:#codebase#:#Base do código
 assessment#:#concatenation#:#Concatenação
@@ -933,6 +931,7 @@ assessment#:#new_category#:#Nova unidade de categoria
 assessment#:#new_unit#:#Nova unidade
 assessment#:#next_question#:#Próximo
 assessment#:#next_question_rows#:#Perguntas %d - %d de %d >>
+assessment#:#no_manual_feedback_export_info#:#Manual feedbacks will not be exported.###12 09 2023 new variable
 assessment#:#no_passed_mark#:#Tem de definir pelo menos uma marca para APROVADO! O esquema de anotações não foi guardado.
 assessment#:#no_question_selected_for_move#:#Selecione pelo menos uma pergunta para mover!
 assessment#:#no_questions_available#:#Não existem nenhumas perguntas disponíveis!
@@ -1661,6 +1660,7 @@ assessment#:#tst_password_form#:#Inserir palavra-passe de teste
 assessment#:#tst_password_introduction#:#Os participantes podem rever o processar apenas por um período de tempo especificado. O tempo começa a contar a partir do momento que um utilizador inicia o teste pela primeira vez. Suspender o teste não para o relógio. Se houver um número limitado de possíveis tentativas do teste, aparece uma função adicional para garantir tempo extra aos participantes no separador 'Participantes'.
 assessment#:#tst_percent_solved#:#Todas as perguntas, exceto as que forem respondidas corretamente
 assessment#:#tst_player_answer_saved_and_locked#:#Answer is saved and locked and can no longer be changed###21 12 2022 new variable
+assessment#:#tst_please_select_source_pool#:#Please select a question pool.###12 09 2023 new variable
 assessment#:#tst_please_select_target_for_pool_derives#:#Selecione um destinatário.
 assessment#:#tst_position#:#Pergunta %s de %s
 assessment#:#tst_position_without_total#:#Pergunta %s
@@ -5725,7 +5725,6 @@ common#:#udf_delete_sure#:#Tem a certeza que quer apagar este campo e todos os d
 common#:#udf_duplicate_entries#:#Os valores têm de ser únicos.
 common#:#udf_field_deleted#:#Campo apagado.
 common#:#udf_name_already_exists#:#Este nome de campo já existe. Escolha um nome diferente.
-common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data’, it must also be ‘Changeable in Profile’###01 02 2023 new variable
 common#:#udf_required_requires_visib_reg#:#Inserir texto
 common#:#udf_type_date#:#Inserir pergunta
 common#:#udf_type_datetime#:#Data e hora
@@ -5852,6 +5851,7 @@ common#:#usrimport_no_insert_ext_account_exists#:#Permite manter IDs extra para 
 common#:#usrimport_no_update_ext_account_exists#:#identifierref
 common#:#usrimport_with_specified_role_not_permitted#:#Não é permitido importar com função especificada.
 common#:#usrimport_wrong_file_count#:#Too many files in import-folder. Please try again.###30 04 2021 new variable
+common#:#usrimport_xml_anonymous_or_root_not_allowed#:#Neither the system-account nor the anonymous account can be changed through the import.###12 09 2023 new variable
 common#:#usrimport_xml_attribute_missing#:#Falta o atributo "%2$s" no elemento "%1$s".
 common#:#usrimport_xml_attribute_value_illegal#:#O valor "%3$s" do atributo "%2$s" no elemento "%1$s" é ilegal.
 common#:#usrimport_xml_attribute_value_inapplicable#:#O valor "%3$s" do atributo "%2$s" no elemento "%1$s" não é aplicável à ação "%4$s".
@@ -8191,6 +8191,7 @@ dateplaner#:#cal_grp_others#:#Outras
 dateplaner#:#cal_grp_personal#:#Pessoal
 dateplaner#:#cal_ical_infoscreen#:#Subscrever
 dateplaner#:#cal_ical_url#:#iCal-URL
+dateplaner#:#cal_ical_url_google#:#iCal-URL for Google Calendar###12 12 2023 new variable
 dateplaner#:#cal_import_appointments#:#Marcações importadas
 dateplaner#:#cal_import_file#:#Importar ficheiro
 dateplaner#:#cal_import_file_info#:#Escolha o ficheiro que contém as suas marcações de calendário.
@@ -11741,6 +11742,7 @@ mme#:#move_to_top_item#:#Move to Top Items###30 04 2021 new variable
 mme#:#msg_languages_added#:#Defina os limites de acesso a funções para novos utilizadores registados
 mme#:#msg_moved#:#Item successfully moved###30 04 2021 new variable
 mme#:#msg_not_moved#:#Item could not be moved, please select a valid parent.###30 04 2021 new variable
+mme#:#msg_ref_id_not_callable#:#This reference ID cannot be used by Main-Menu. Only targets in the magazine are supported.###12 12 2023 new variable
 mme#:#msg_restore_confirm#:#All Custom Items and Translations will be deleted, all Standard items will be reset to factory default. All customization will be lost.###07 02 2020 new variable
 mme#:#msg_restored#:#Main Menu completely reset###07 02 2020 new variable
 mme#:#msg_subitem_deleted#:#Atribuição de funções
@@ -14567,6 +14569,7 @@ skmg#:#skmg_confirm_user_removal#:#Quer remover os seguintes utilizadores do per
 skmg#:#skmg_cont_profiles_info#:#In this view, you can select the competence profiles with competence entries, which are related to the currently open object (course/group). To get to the global view with all competence profiles you are assigned to and all competence entries, click on the link below.###31 08 2022 new variable
 skmg#:#skmg_context_global#:#Global###30 04 2021 new variable
 skmg#:#skmg_context_local#:#Local###30 04 2021 new variable
+skmg#:#skmg_count_references#:#Number of referenced competences:###23 10 2023 new variable
 skmg#:#skmg_create_sctp#:#Criar categoria de modelo
 skmg#:#skmg_create_skill_category#:#Create Skill Category
 skmg#:#skmg_create_skill_template#:#Create Skill Template
@@ -16282,6 +16285,7 @@ user#:#clipboard_remove_btn#:#Remover da área de transferência
 user#:#clipboard_table_title#:#Área de transferência (contas de utilizador)
 user#:#clipboard_user_added#:#Utilizadores selecionados adicionados à área de transferência.
 user#:#confirm_delete_starting_point#:#Tem a certeza que quer apagar esta regra?
+user#:#confirm_logout_for_email_change#:#You changed your email. To finalize this change, you will need to provide your password. The system is thus going to log you out and you will have 5 minutes to log in again. All other changes will be saved before logging you out.###23 10 2023 new variable
 user#:#create_starting_point#:#Criar regra
 user#:#criteria#:#Critérios
 user#:#del_mail_body#:#Hello %1$s, %2$s you haven't logged in for a long period of time, on %3$s. So your account will be deleted in %4$s days. You have to login again to prevent the deletion of your account.
@@ -16289,6 +16293,7 @@ user#:#del_mail_subject#:#(ILIAS) – A sua conta foi apagada
 user#:#delete_inactive_user_accounts_frequency#:#Frequência
 user#:#delete_inactive_user_accounts_frequency_desc#:#Frequency, in which the deletion and email distibution will be tested.
 user#:#editing_this_role#:#Função
+user#:#email_could_not_be_changed#:#The request to change your email could not be finalized.###23 10 2023 new variable
 user#:#enable_local_user_administration#:#Habilitar administração local de usuário
 user#:#enable_local_user_administration_info#:#Se habiliatdo, contas locais de usuário podem ser administradas nas categorias.
 user#:#feedhash#:#Newsfeedhash

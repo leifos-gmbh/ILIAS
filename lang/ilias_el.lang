@@ -617,6 +617,7 @@ assessment#:#circle_click_center#:#Παρακαλώ κάντε κλικ στο �
 assessment#:#circle_click_circle#:#Παρακαλώ κάντε κλικ στο κυκλικό σημείο της επιθυμητής περιοχής
 assessment#:#clientip#:#IP Πελάτη
 assessment#:#close_text_hint#:#Μπορείτε να ορίσετε ένα κενό εισάγοντας [gap][/gap] στη θέση κειμένου της επιλογής σας. Πατήστε στο κουμπί 'Δημιουργία κενών' για να προσθέσετε μια επεξεργάσιμη φόρμα για κάθε κενό.
+assessment#:#cloze_answer_text_info#:#Spaces preceding or following the answer text will be deleted when the form is saved.###12 12 2023 new variable
 assessment#:#cloze_fixed_textlength#:#Text Field Length
 assessment#:#cloze_fixed_textlength_description#:#Εαν εισάγετε τιμή μεγαλύτερη του 0, όλα τα κείμενα και οι αριθμητικές τιμές θα δημιουργηθούν μέ αυτόν ώς μέγιστο αριθμό επιτρεπόμενο χαρακτήρων
 assessment#:#cloze_gap_size_info#:#If you enter a value greater than 0, this gap text field will be created with the fixed length of this value. If you do not enter a value the gap text fiel will be created with the value of the global fixed length.###26 09 2014 new variable
@@ -624,9 +625,6 @@ assessment#:#cloze_text#:#Κείμενο με κενά
 assessment#:#cloze_textgap_case_insensitive#:#Χωρίς ταίριασμα πεζών-κεφαλαίων
 assessment#:#cloze_textgap_case_sensitive#:#Με ταίριασμα πεζών-κεφαλαίων
 assessment#:#cloze_textgap_levenshtein_of#:#Levenshtein απόσταση του %s
-assessment#:#cloze_textgap_multiple_whitespace#:#Multiple Whitespaces###07 11 2014 new variable
-assessment#:#cloze_textgap_whitespace_after#:#Whitespace behind the value###07 11 2014 new variable
-assessment#:#cloze_textgap_whitespace_before#:#Whitespace before the value###07 11 2014 new variable
 assessment#:#code#:#Κώδικας
 assessment#:#codebase#:#Κωδικοσελίδα
 assessment#:#concatenation#:#Συγχώνευση
@@ -934,6 +932,7 @@ assessment#:#new_category#:#New Unit Category###24 10 2013 new variable
 assessment#:#new_unit#:#New Unit###24 10 2013 new variable
 assessment#:#next_question#:#Επόμενο
 assessment#:#next_question_rows#:#Ερωτήσεις %d - %d από %d >>
+assessment#:#no_manual_feedback_export_info#:#Manual feedbacks will not be exported.###12 09 2023 new variable
 assessment#:#no_passed_mark#:#Πρέπει να ορίσετε τουλάχιστο ένα βαθμό σε ΠΡΟΒΙΒΑΣΤΗΚΕ! Το βαθμολογικό σχήμα δεν αποθηκεύθηκε.
 assessment#:#no_question_selected_for_move#:#Παρακαλώ επιλέξτε τουλάχιστο μια ερώτηση για να την μετακινήσετε!
 assessment#:#no_questions_available#:#Δεν υπάρχουν διαθέσιμες ερωτήσεις!
@@ -1662,6 +1661,7 @@ assessment#:#tst_password_form#:#Enter Test Password###26 09 2014 new variable
 assessment#:#tst_password_introduction#:#Μπορείτε να προσπαλάσετε το διαγώνισμα μόνο αφού δώσετε το σωστό κωδικό. Παρακαλώ δώστε το κωδικό του διαγωνίσματος για να ξεκινήσετε το τεστ
 assessment#:#tst_percent_solved#:#Ποσοστό που επιλύθηκε
 assessment#:#tst_player_answer_saved_and_locked#:#Answer is saved and locked and can no longer be changed###21 12 2022 new variable
+assessment#:#tst_please_select_source_pool#:#Please select a question pool.###12 09 2023 new variable
 assessment#:#tst_please_select_target_for_pool_derives#:#Please select a target conatainer.###25 10 2016 new variable
 assessment#:#tst_position#:#Ερώτηση %s από %s
 assessment#:#tst_position_without_total#:#Question %s###23 12 2015 new variable
@@ -5726,7 +5726,6 @@ common#:#udf_delete_sure#:#Είστε σίγουροι ότι θέλετε να 
 common#:#udf_duplicate_entries#:#Οι τιμές πρέπει να είναι μοναδικές.
 common#:#udf_field_deleted#:#Το πεδίο διαγράφηκε.
 common#:#udf_name_already_exists#:#Το όνομα του πεδίου υπάρχει ήδη. Παρακαλώ επιλέξτε ένα διαφορετικό όνομα.
-common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data’, it must also be ‘Changeable in Profile’###01 02 2023 new variable
 common#:#udf_required_requires_visib_reg#:#When field is set to "required", it must be set to "visible in registration"###29 09 2009 new variable
 common#:#udf_type_date#:#Date Field
 common#:#udf_type_datetime#:#Date and Time
@@ -5853,6 +5852,7 @@ common#:#usrimport_no_insert_ext_account_exists#:#Can't perform "Insert" action.
 common#:#usrimport_no_update_ext_account_exists#:#Can't perform "Update" action. External account already exists.
 common#:#usrimport_with_specified_role_not_permitted#:#Δεν επιτρέπεται εισαγωγή από τον συγκεκριμένο ρόλο.
 common#:#usrimport_wrong_file_count#:#Too many files in import-folder. Please try again.###30 04 2021 new variable
+common#:#usrimport_xml_anonymous_or_root_not_allowed#:#Neither the system-account nor the anonymous account can be changed through the import.###12 09 2023 new variable
 common#:#usrimport_xml_attribute_missing#:#Η ιδιότητα "%2$s" στο στοιχείο "%1$s" λείπει.
 common#:#usrimport_xml_attribute_value_illegal#:#Η τιμή "%3$s" της ιδιότητας "%2$s" του στοιχείου "%1$s" είναι παράνομη.
 common#:#usrimport_xml_attribute_value_inapplicable#:#Η τιμή "%3$s" της ιδιότητας "%2$s" του στοιχείου "%1$s" είναι ακατάλληλη για την ενέργεια "%4$s".
@@ -8192,6 +8192,7 @@ dateplaner#:#cal_grp_others#:#Others###31 08 2017 new variable
 dateplaner#:#cal_grp_personal#:#Personal###31 08 2017 new variable
 dateplaner#:#cal_ical_infoscreen#:#Subscribe###28 08 2012 new variable
 dateplaner#:#cal_ical_url#:#iCal-URL###14 05 2014 new variable
+dateplaner#:#cal_ical_url_google#:#iCal-URL for Google Calendar###12 12 2023 new variable
 dateplaner#:#cal_import_appointments#:#Import Appointments###28 08 2012 new variable
 dateplaner#:#cal_import_file#:#Import File###28 08 2012 new variable
 dateplaner#:#cal_import_file_info#:#Choose the file, that contains your calendar appointments.###28 08 2012 new variable
@@ -11742,6 +11743,7 @@ mme#:#move_to_top_item#:#Move to Top Items###30 04 2021 new variable
 mme#:#msg_languages_added#:#Added languages###10 11 2018 new variable
 mme#:#msg_moved#:#Item successfully moved###30 04 2021 new variable
 mme#:#msg_not_moved#:#Item could not be moved, please select a valid parent.###30 04 2021 new variable
+mme#:#msg_ref_id_not_callable#:#This reference ID cannot be used by Main-Menu. Only targets in the magazine are supported.###12 12 2023 new variable
 mme#:#msg_restore_confirm#:#All Custom Items and Translations will be deleted, all Standard items will be reset to factory default. All customization will be lost.###07 02 2020 new variable
 mme#:#msg_restored#:#Main Menu completely reset###07 02 2020 new variable
 mme#:#msg_subitem_deleted#:#Item deleted.###10 11 2018 new variable
@@ -14568,6 +14570,7 @@ skmg#:#skmg_confirm_user_removal#:#Do you really want to remove the following us
 skmg#:#skmg_cont_profiles_info#:#In this view, you can select the competence profiles with competence entries, which are related to the currently open object (course/group). To get to the global view with all competence profiles you are assigned to and all competence entries, click on the link below.###31 08 2022 new variable
 skmg#:#skmg_context_global#:#Global###30 04 2021 new variable
 skmg#:#skmg_context_local#:#Local###30 04 2021 new variable
+skmg#:#skmg_count_references#:#Number of referenced competences:###23 10 2023 new variable
 skmg#:#skmg_create_sctp#:#Create Template Category###02 09 2011 new variable
 skmg#:#skmg_create_skill_category#:#Create Skill Category###02 09 2011 new variable
 skmg#:#skmg_create_skill_template#:#Create Skill Template###02 09 2011 new variable
@@ -16283,6 +16286,7 @@ user#:#clipboard_remove_btn#:#Remove from Clipboard###25 10 2016 new variable
 user#:#clipboard_table_title#:#Clipboard (User Accounts)###25 10 2016 new variable
 user#:#clipboard_user_added#:#Added selected users to clipboard.###25 10 2016 new variable
 user#:#confirm_delete_starting_point#:#Are you sure you want to delete this rule?###31 08 2017 new variable
+user#:#confirm_logout_for_email_change#:#You changed your email. To finalize this change, you will need to provide your password. The system is thus going to log you out and you will have 5 minutes to log in again. All other changes will be saved before logging you out.###23 10 2023 new variable
 user#:#create_starting_point#:#Create Rule###31 08 2017 new variable
 user#:#criteria#:#Criteria###31 08 2017 new variable
 user#:#del_mail_body#:#Hello %1$s, %2$s you haven't logged in for a long period of time, on %3$s. So your account will be deleted in %4$s days. You have to login again to prevent the deletion of your account.###26 09 2014 new variable
@@ -16290,6 +16294,7 @@ user#:#del_mail_subject#:#(ILIAS) – Your account will be deleted###26 09 2014 
 user#:#delete_inactive_user_accounts_frequency#:#Frequency###26 09 2014 new variable
 user#:#delete_inactive_user_accounts_frequency_desc#:#Frequency, in which the deletion and email distibution will be tested.###26 09 2014 new variable
 user#:#editing_this_role#:#Role###31 08 2017 new variable
+user#:#email_could_not_be_changed#:#The request to change your email could not be finalized.###23 10 2023 new variable
 user#:#enable_local_user_administration#:#Enable Local User Administration###16 07 2010 new variable
 user#:#enable_local_user_administration_info#:#If enabled, local user accounts can be administrated in categories.###16 07 2010 new variable
 user#:#feedhash#:#Newsfeedhash###08 10 2015 new variable

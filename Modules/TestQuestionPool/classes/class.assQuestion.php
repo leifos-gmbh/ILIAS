@@ -3786,9 +3786,25 @@ abstract class assQuestion
     public function setQuestion($question = "")
     {
         $this->question = $question;
-        if (!is_null($question) && $question !== '') {
-            $this->question = $this->getHtmlQuestionContentPurifier()->purify($question);
+    }
+
+    public function getQuestionForHTMLOutput() : string
+    {
+        return $this->purifyAndPrepareTextAreaOutput($this->question);
+    }
+
+    protected function purifyAndPrepareTextAreaOutput(string $content) : string
+    {
+        $purified_content = $this->getHtmlQuestionContentPurifier()->purify($content);
+        if ($this->isAdditionalContentEditingModePageObject()
+            || !(new ilSetting('advanced_editing'))->get('advanced_editing_javascript_editor') === 'tinymce') {
+            $purified_content = nl2br($purified_content);
         }
+        return $this->prepareTextareaOutput(
+            $purified_content,
+            true,
+            true
+        );
     }
 
     /**

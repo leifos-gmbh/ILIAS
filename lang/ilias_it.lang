@@ -630,6 +630,7 @@ assessment#:#circle_click_center#:#Fare clic sul centro dell'area desiderata.
 assessment#:#circle_click_circle#:#Fare clic su un punto circolare dell'area desiderata.
 assessment#:#clientip#:#IP cliente
 assessment#:#close_text_hint#:#Per aggiungere un nuovo spazio, imposta il cursore sulla posizione desiderata e utilizza il menu a discesa "Spazio vuoto". Le sezioni di modifica corrispondenti verranno visualizzate di seguito. Puoi anche modificare gli spazi facendo clic sugli spazi all'interno del testo degli spazi.
+assessment#:#cloze_answer_text_info#:#Spaces preceding or following the answer text will be deleted when the form is saved.###12 12 2023 new variable
 assessment#:#cloze_fixed_textlength#:#Lunghezza del campo di testo
 assessment#:#cloze_fixed_textlength_description#:#Se si inserisce un valore maggiore di 0 tutte le mancanze di testo e di numero avranno quella lunghezza.
 assessment#:#cloze_gap_size_info#:#Se si immette un valore maggiore di 0, questo campo di testo spazio verrà creato con la lunghezza fissa di questo valore. Se non si immette un valore, il campo di testo del gap verrà creato con il valore della lunghezza fissa globale.
@@ -637,9 +638,6 @@ assessment#:#cloze_text#:#Testo corrispondente
 assessment#:#cloze_textgap_case_insensitive#:#No Maiuscole/minuscole
 assessment#:#cloze_textgap_case_sensitive#:#Maiuscole/minuscole
 assessment#:#cloze_textgap_levenshtein_of#:#Distanza di Levenshtein del %s
-assessment#:#cloze_textgap_multiple_whitespace#:#Diversi spazi vuoti
-assessment#:#cloze_textgap_whitespace_after#:#Spazio vuoto dopo il valore
-assessment#:#cloze_textgap_whitespace_before#:#Spazio vuoto prima del valore
 assessment#:#code#:#Codice
 assessment#:#codebase#:#Base dei codici
 assessment#:#concatenation#:#Concatenazione
@@ -947,6 +945,7 @@ assessment#:#new_category#:#Nuova categoria di unità
 assessment#:#new_unit#:#Nuova unità
 assessment#:#next_question#:#Domanda successiva
 assessment#:#next_question_rows#:#Domande %d - %d di %d >>
+assessment#:#no_manual_feedback_export_info#:#Manual feedbacks will not be exported.###12 09 2023 new variable
 assessment#:#no_passed_mark#:#Devi scegliere almeno un voto come SUPERATO! Lo schema voti non e' stato salvato.
 assessment#:#no_question_selected_for_move#:#Per favore seleziona almeno una domanda da spostare!
 assessment#:#no_questions_available#:#Non ci sono domande disponibili!
@@ -1675,6 +1674,7 @@ assessment#:#tst_password_form#:#Password di accesso del test
 assessment#:#tst_password_introduction#:#Questo test può essere fatto solo dopo l'inserimento di una password. Inseriscila qui per favore.
 assessment#:#tst_percent_solved#:#Percentuale risolta
 assessment#:#tst_player_answer_saved_and_locked#:#Answer is saved and locked and can no longer be changed###21 12 2022 new variable
+assessment#:#tst_please_select_source_pool#:#Please select a question pool.###12 09 2023 new variable
 assessment#:#tst_please_select_target_for_pool_derives#:#Selezionare un contenitore di destinazione.
 assessment#:#tst_position#:#Domanda %s di %s
 assessment#:#tst_position_without_total#:#Domanda %s
@@ -5739,7 +5739,6 @@ common#:#udf_delete_sure#:#Sei sicuro di voler eliminare questo campo e con esso
 common#:#udf_duplicate_entries#:#I valori devono essere unici.
 common#:#udf_field_deleted#:#Campo eliminato.
 common#:#udf_name_already_exists#:#Questo nome di campo esiste già. Scegli un nome diverso.
-common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data’, it must also be ‘Changeable in Profile’###01 02 2023 new variable
 common#:#udf_required_requires_visib_reg#:#Quando il campo è impostato su "obbligatorio", deve essere impostato su "visibile in registrazione".
 common#:#udf_type_date#:#Campo Data
 common#:#udf_type_datetime#:#Data e Ora
@@ -5866,6 +5865,7 @@ common#:#usrimport_no_insert_ext_account_exists#:#Non e' possibile eseguire l'az
 common#:#usrimport_no_update_ext_account_exists#:#Non è possibile eseguire l'azione di "Update". Esistono già account esterni.
 common#:#usrimport_with_specified_role_not_permitted#:#Importazione con ruolo specificato non consentita.
 common#:#usrimport_wrong_file_count#:#La cartella import-folder contiene troppi elementi. Riprova.
+common#:#usrimport_xml_anonymous_or_root_not_allowed#:#Neither the system-account nor the anonymous account can be changed through the import.###12 09 2023 new variable
 common#:#usrimport_xml_attribute_missing#:#Attributo " %2$s" nell'elemento " %1$s" mancante.
 common#:#usrimport_xml_attribute_value_illegal#:#Il valore " %3$s" dell'attributo " %2$s" nell'elemento " %1$s" non è consentito.
 common#:#usrimport_xml_attribute_value_inapplicable#:#Il valore " %3$s" dell'attributo " %2$s" nell'elemento " %1$s" non è applicabile per l'azione " %4$s".
@@ -8205,6 +8205,7 @@ dateplaner#:#cal_grp_others#:#Altro
 dateplaner#:#cal_grp_personal#:#Personale
 dateplaner#:#cal_ical_infoscreen#:#Sottoscrivere
 dateplaner#:#cal_ical_url#:#iCal-URL
+dateplaner#:#cal_ical_url_google#:#iCal-URL for Google Calendar###12 12 2023 new variable
 dateplaner#:#cal_import_appointments#:#Importa appuntamenti
 dateplaner#:#cal_import_file#:#Importa file
 dateplaner#:#cal_import_file_info#:#Scegli il file che contiene i tuoi appuntamenti sul calendario.
@@ -11755,6 +11756,7 @@ mme#:#move_to_top_item#:#Sposta negli oggetti preferiti
 mme#:#msg_languages_added#:#Lingue aggiunte
 mme#:#msg_moved#:#Oggetto spostato correttamente
 mme#:#msg_not_moved#:#L'oggetto non può essere spostato, seleziona una cartella madre valida.
+mme#:#msg_ref_id_not_callable#:#This reference ID cannot be used by Main-Menu. Only targets in the magazine are supported.###12 12 2023 new variable
 mme#:#msg_restore_confirm#:#Tutti gli articoli personalizzati e le traduzioni verranno eliminati, tutti gli articoli standard verranno ripristinati alle impostazioni di fabbrica. Tutta la personalizzazione andrà persa.
 mme#:#msg_restored#:#Menu principale reimpostato
 mme#:#msg_subitem_deleted#:#Oggetto cancellato.
@@ -14581,6 +14583,7 @@ skmg#:#skmg_confirm_user_removal#:#Vuoi davvero rimuovere i seguenti utenti da q
 skmg#:#skmg_cont_profiles_info#:#In this view, you can select the competence profiles with competence entries, which are related to the currently open object (course/group). To get to the global view with all competence profiles you are assigned to and all competence entries, click on the link below.###31 08 2022 new variable
 skmg#:#skmg_context_global#:#Global
 skmg#:#skmg_context_local#:#Local
+skmg#:#skmg_count_references#:#Number of referenced competences:###23 10 2023 new variable
 skmg#:#skmg_create_sctp#:#Crea una Categoria di Template
 skmg#:#skmg_create_skill_category#:#Crea una Categoria di competenze
 skmg#:#skmg_create_skill_template#:#Crea Template di competenze
@@ -16296,6 +16299,7 @@ user#:#clipboard_remove_btn#:#Rimuovi da Appunti
 user#:#clipboard_table_title#:#Appunti (account utente)
 user#:#clipboard_user_added#:#Aggiunti gli utenti selezionati agli Appunti.
 user#:#confirm_delete_starting_point#:#Sei sicuro di voler eliminare questa regola?
+user#:#confirm_logout_for_email_change#:#You changed your email. To finalize this change, you will need to provide your password. The system is thus going to log you out and you will have 5 minutes to log in again. All other changes will be saved before logging you out.###23 10 2023 new variable
 user#:#create_starting_point#:#Crea ruolo
 user#:#criteria#:#Criteri
 user#:#del_mail_body#:#Ciao %1$s, %2$s non hai effettuato l'accesso per un lungo periodo di tempo, su %3$s. Quindi il tuo account verrà eliminato tra %4$ s giorni. Devi accedere di nuovo per impedire la cancellazione del tuo account.
@@ -16303,6 +16307,7 @@ user#:#del_mail_subject#:#[ILIAS] - Il tuo account verrà eliminato
 user#:#delete_inactive_user_accounts_frequency#:#Frequenza
 user#:#delete_inactive_user_accounts_frequency_desc#:#Frequenza, in cui verranno testati la cancellazione e la distribuzione della posta elettronica.
 user#:#editing_this_role#:#Ruolo
+user#:#email_could_not_be_changed#:#The request to change your email could not be finalized.###23 10 2023 new variable
 user#:#enable_local_user_administration#:#Abilita l'amministrazione di utenti locali
 user#:#enable_local_user_administration_info#:#Se abilitato, gli account degli utenti locali possono essere categorizzati.
 user#:#feedhash#:#News feed hash

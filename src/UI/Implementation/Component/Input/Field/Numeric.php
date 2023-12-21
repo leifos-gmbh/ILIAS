@@ -30,7 +30,7 @@ use ILIAS\Refinery\ConstraintViolationException;
 /**
  * This implements the numeric input.
  */
-class Numeric extends FilterInput implements C\Input\Field\Numeric
+class Numeric extends FormInput implements C\Input\Field\Numeric
 {
     public function __construct(
         DataFactory $data_factory,

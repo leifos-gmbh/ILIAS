@@ -379,11 +379,7 @@ class FilterContextRenderer extends AbstractComponentRenderer
         $this->applyValue($component, $tpl, $this->escapeSpecialChars());
         $id = $this->bindJSandApplyId($component, $tpl);
 
-        if ($component->isInPopoverView()) {
-            return $this->wrapInPopoverContext($component, $tpl->get(), $id);
-        } else {
-            return $this->wrapInFilterContext($component, $tpl->get(), $default_renderer, $id);
-        }
+        return $this->wrapInFilterContext($component, $tpl->get(), $default_renderer, $id);
     }
 
     protected function renderDurationField(F\Duration $component, RendererInterface $default_renderer): string
@@ -396,11 +392,11 @@ class FilterContextRenderer extends AbstractComponentRenderer
         $input_html = "";
         $inputs = $component->getInputs();
         $input = array_shift($inputs); //from
-        $input_html .= $default_renderer->render($input->withPopoverView(true));
+        $input_html .= $default_renderer->withAdditionalContext($input)->render($input);
         $input = array_shift($inputs)->withAdditionalPickerconfig([ //until
                                                                     "useCurrent" => false
         ]);
-        $input_html .= $default_renderer->render($input->withPopoverView(true));
+        $input_html .= $default_renderer->withAdditionalContext($input)->render($input);
         $tpl->setVariable("DURATION", $input_html);
 
         return $this->wrapInFilterContext($component, $tpl->get(), $default_renderer, $id);

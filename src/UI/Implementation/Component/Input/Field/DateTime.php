@@ -33,7 +33,7 @@ use Closure;
 /**
  * This implements the date input.
  */
-class DateTime extends FilterInput implements C\Input\Field\DateTime
+class DateTime extends FormInput implements C\Input\Field\DateTime
 {
     use ComponentHelper;
     use JavaScriptBindable;

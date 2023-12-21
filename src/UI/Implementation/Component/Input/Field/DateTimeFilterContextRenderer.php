@@ -23,25 +23,26 @@ namespace ILIAS\UI\Implementation\Component\Input\Field;
 use ILIAS\UI\Renderer as RendererInterface;
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
 use ILIAS\UI\Implementation\Render\Template;
-use ILIAS\UI\Component\Input\Container\Filter\FilterInput;
 
 /**
  * Class DateTimeContextRenderer
  * @package ILIAS\UI\Implementation\Component\Input
  */
-class DateTimeFilterContextRenderer extends FilterContextRenderer
+class DateTimeFilterContextRenderer extends AbstractRenderer
 {
-    protected function wrapInFilterContext(
-        FilterInput $component,
+    protected function wrapInContext(
+        FormInput $component,
         string $input_html,
         RendererInterface $default_renderer,
-        string $id_pointing_to_input = ""
+        string $id_pointing_to_input = '',
+        string $dependant_group_html = '',
+        bool $bind_label_with_for = true,
     ): string {
         $tpl = $this->getTemplate("tpl.context_form.html", true, true);
 
         $tpl->setVariable("INPUT", $input_html);
 
-        if ($id_pointing_to_input) {
+        if ($id_pointing_to_input && $bind_label_with_for) {
             $tpl->setCurrentBlock("for");
             $tpl->setVariable("ID", $id_pointing_to_input);
             $tpl->parseCurrentBlock();
@@ -51,5 +52,10 @@ class DateTimeFilterContextRenderer extends FilterContextRenderer
         $tpl->setVariable("LABEL", $label);
 
         return $tpl->get();
+    }
+
+    protected function maybeDisable(FormInput $component, Template $tpl): void
+    {
+        // Filter Inputs should not be deactivatable
     }
 }

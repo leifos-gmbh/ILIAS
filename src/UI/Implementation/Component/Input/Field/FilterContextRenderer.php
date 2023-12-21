@@ -20,45 +20,21 @@ declare(strict_types=1);
 
 namespace ILIAS\UI\Implementation\Component\Input\Field;
 
-use ILIAS\Data\DateFormat;
 use ILIAS\UI\Component;
 use ILIAS\UI\Implementation\Component\Input\Field as F;
-use ILIAS\UI\Implementation\Render\AbstractComponentRenderer;
-use ILIAS\UI\Implementation\Render\ResourceRegistry;
 use ILIAS\UI\Renderer as RendererInterface;
 use ILIAS\UI\Implementation\Render\Template;
 use ILIAS\UI\Implementation\Component\Input\Container\Filter\ProxyFilterField;
 use LogicException;
-use Closure;
+use ILIAS\UI\Component\Input\Container\Form\FormInput;
 use ILIAS\UI\Component\Input\Container\Filter\FilterInput;
 
 /**
  * Class FilterContextRenderer
  * @package ILIAS\UI\Implementation\Component\Input
  */
-class FilterContextRenderer extends AbstractComponentRenderer
+class FilterContextRenderer extends AbstractRenderer
 {
-    public const DATETIME_DATEPICKER_MINMAX_FORMAT = 'Y-m-d\Th:m';
-    public const DATE_DATEPICKER_MINMAX_FORMAT = 'Y-m-d';
-    public const TYPE_DATE = 'date';
-    public const TYPE_DATETIME = 'datetime-local';
-    public const TYPE_TIME = 'time';
-
-    public const DATEPICKER_FORMAT_MAPPING = [
-        'd' => 'DD',
-        'jS' => 'Do',
-        'l' => 'dddd',
-        'D' => 'dd',
-        'S' => 'o',
-        'i' => 'mm',
-        'W' => '',
-        'm' => 'MM',
-        'F' => 'MMMM',
-        'M' => 'MMM',
-        'Y' => 'YYYY',
-        'y' => 'YY'
-    ];
-
     /**
      * @inheritdoc
      */
@@ -139,11 +115,18 @@ class FilterContextRenderer extends AbstractComponentRenderer
         return $tpl->get();
     }
 
-    protected function wrapInFilterContext(
-        FilterInput $component,
+    protected function maybeDisable(FormInput $component, Template $tpl): void
+    {
+        // Filter Inputs should not be deactivatable
+    }
+
+    protected function wrapInContext(
+        FormInput $component,
         string $input_html,
         RendererInterface $default_renderer,
-        string $id_pointing_to_input = ""
+        string $id_pointing_to_input = '',
+        string $dependant_group_html = '',
+        bool $bind_label_with_for = true
     ): string {
         $f = $this->getUIFactory();
         $tpl = $this->getTemplate("tpl.context_filter.html", true, true);
@@ -158,8 +141,10 @@ class FilterContextRenderer extends AbstractComponentRenderer
 
         $tpl->setCurrentBlock("addon_left");
         $tpl->setVariable("LABEL", $component->getLabel());
-        if ($id_pointing_to_input) {
+        if ($id_pointing_to_input && $bind_label_with_for) {
+            $tpl->setCurrentBlock("for");
             $tpl->setVariable("ID", $id_pointing_to_input);
+            $tpl->parseCurrentBlock();
         }
         $tpl->parseCurrentBlock();
         $tpl->setCurrentBlock("filter_field");
@@ -172,27 +157,6 @@ class FilterContextRenderer extends AbstractComponentRenderer
         $tpl->setCurrentBlock("addon_right");
         $tpl->setVariable("DELETE", $default_renderer->render($remove_glyph));
         $tpl->parseCurrentBlock();
-
-        return $tpl->get();
-    }
-
-    protected function wrapInPopoverContext(
-        FilterInput $component,
-        string $input_html,
-        string $id_pointing_to_input = ""
-    ): string {
-        $tpl = $this->getTemplate("tpl.context_filter_popover.html", true, true);
-
-        $tpl->setVariable("FILTER_INPUT", $input_html);
-
-        if ($id_pointing_to_input) {
-            $tpl->setCurrentBlock("for");
-            $tpl->setVariable("ID", $id_pointing_to_input);
-            $tpl->parseCurrentBlock();
-        }
-
-        $label = $component->getLabel();
-        $tpl->setVariable("LABEL", $label);
 
         return $tpl->get();
     }
@@ -213,245 +177,6 @@ class FilterContextRenderer extends AbstractComponentRenderer
 
         $this->bindJSandApplyId($prox, $tpl);
         return $tpl->get();
-    }
-
-    protected function applyName(FilterInput $component, Template $tpl): ?string
-    {
-        $name = $component->getName();
-        $tpl->setVariable("NAME", $name);
-        return $name;
-    }
-
-    protected function bindJSandApplyId($component, Template $tpl): string
-    {
-        $id = $this->bindJavaScript($component) ?? $this->createId();
-        $tpl->setVariable("ID", $id);
-        return $id;
-    }
-
-    /**
-     * Escape values for rendering with a Callable "$escape"
-     * In order to prevent XSS-attacks, values need to be stripped of
-     * special chars (such as quotes or tags).
-     * Needs vary according to the type of component, i.e.the html generated
-     * for this specific component and the placement of {VALUE} in its template.
-     * Please note: this may not work for customized templates!
-     */
-    protected function applyValue(FilterInput $component, Template $tpl, callable $escape = null): void
-    {
-        $value = $component->getValue();
-        if (!is_null($escape)) {
-            $value = $escape($value);
-        }
-        if ($value) {
-            $tpl->setVariable("VALUE", $value);
-        }
-    }
-
-    protected function escapeSpecialChars(): Closure
-    {
-        return fn($v) => htmlspecialchars((string) $v, ENT_QUOTES);
-    }
-
-    protected function renderTextField(F\Text $component, RendererInterface $default_renderer): string
-    {
-        $tpl = $this->getTemplate("tpl.text.html", true, true);
-        $this->applyName($component, $tpl);
-
-        if ($component->getMaxLength()) {
-            $tpl->setVariable("MAX_LENGTH", $component->getMaxLength());
-        }
-
-        $this->applyValue($component, $tpl, $this->escapeSpecialChars());
-        $id = $this->bindJSandApplyId($component, $tpl);
-        return $this->wrapInFilterContext($component, $tpl->get(), $default_renderer, $id);
-    }
-
-    protected function renderNumericField(F\Numeric $component, RendererInterface $default_renderer): string
-    {
-        $tpl = $this->getTemplate("tpl.numeric.html", true, true);
-        $this->applyName($component, $tpl);
-        $this->applyValue($component, $tpl, $this->escapeSpecialChars());
-        $id = $this->bindJSandApplyId($component, $tpl);
-        return $this->wrapInFilterContext($component, $tpl->get(), $default_renderer, $id);
-    }
-
-    public function renderSelectField(F\Select $component, RendererInterface $default_renderer): string
-    {
-        $tpl = $this->getTemplate("tpl.select.html", true, true);
-        $this->applyName($component, $tpl);
-
-        $value = $component->getValue();
-        //disable first option if required.
-        $tpl->setCurrentBlock("options");
-        if (!$value) {
-            $tpl->setVariable("SELECTED", 'selected="selected"');
-        }
-        if ($component->isRequired()) {
-            $tpl->setVariable("DISABLED_OPTION", "disabled");
-            $tpl->setVariable("HIDDEN", "hidden");
-        }
-        $tpl->setVariable("VALUE", null);
-        $tpl->setVariable("VALUE_STR", "-");
-        $tpl->parseCurrentBlock();
-
-        foreach ($component->getOptions() as $option_key => $option_value) {
-            $tpl->setCurrentBlock("options");
-            if ($value == $option_key) {
-                $tpl->setVariable("SELECTED", 'selected="selected"');
-            }
-            $tpl->setVariable("VALUE", $option_key);
-            $tpl->setVariable("VALUE_STR", $option_value);
-            $tpl->parseCurrentBlock();
-        }
-
-        $id = $this->bindJSandApplyId($component, $tpl);
-
-        return $this->wrapInFilterContext($component, $tpl->get(), $default_renderer, $id);
-    }
-
-    protected function renderMultiSelectField(F\MultiSelect $component, RendererInterface $default_renderer): string
-    {
-        $tpl = $this->getTemplate("tpl.multiselect.html", true, true);
-        $name = $this->applyName($component, $tpl);
-
-        $value = $component->getValue();
-        $tpl->setVariable("VALUE", $value);
-
-        $id = $this->bindJSandApplyId($component, $tpl);
-        $tpl->setVariable("ID", $id);
-
-        foreach ($component->getOptions() as $opt_value => $opt_label) {
-            $tpl->setCurrentBlock("option");
-            $tpl->setVariable("NAME", $name);
-            $tpl->setVariable("VALUE", $opt_value);
-            $tpl->setVariable("LABEL", $opt_label);
-
-            if ($value && in_array($opt_value, $value)) {
-                $tpl->setVariable("CHECKED", 'checked="checked"');
-            }
-
-            $tpl->parseCurrentBlock();
-        }
-
-        return $this->wrapInFilterContext($component, $tpl->get(), $default_renderer);
-    }
-
-    protected function renderDateTimeField(F\DateTime $component, RendererInterface $default_renderer): string
-    {
-        $tpl = $this->getTemplate("tpl.datetime.html", true, true);
-        $this->applyName($component, $tpl);
-
-        if ($component->getTimeOnly() === true) {
-            $format = $component::TIME_FORMAT;
-            $dt_type = self::TYPE_TIME;
-        } else {
-            $dt_type = self::TYPE_DATE;
-            $format = $this->getTransformedDateFormat(
-                $component->getFormat(),
-                self::DATEPICKER_FORMAT_MAPPING
-            );
-
-            if ($component->getUseTime() === true) {
-                $format .= ' ' . $component::TIME_FORMAT;
-                $dt_type = self::TYPE_DATETIME;
-            }
-        }
-
-        $tpl->setVariable("DTTYPE", $dt_type);
-
-        $min_max_format = self::DATE_DATEPICKER_MINMAX_FORMAT;
-        if ($dt_type === self::TYPE_DATETIME) {
-            $min_max_format = self::DATETIME_DATEPICKER_MINMAX_FORMAT;
-        }
-
-        $min_date = $component->getMinValue();
-        if (!is_null($min_date)) {
-            $tpl->setVariable("MIN_DATE", date_format($min_date, $min_max_format));
-        }
-        $max_date = $component->getMaxValue();
-        if (!is_null($max_date)) {
-            $tpl->setVariable("MAX_DATE", date_format($max_date, $min_max_format));
-        }
-
-        $tpl->setVariable("PLACEHOLDER", $format);
-
-        $this->applyValue($component, $tpl, $this->escapeSpecialChars());
-        $id = $this->bindJSandApplyId($component, $tpl);
-
-        return $this->wrapInFilterContext($component, $tpl->get(), $default_renderer, $id);
-    }
-
-    protected function renderDurationField(F\Duration $component, RendererInterface $default_renderer): string
-    {
-        $tpl = $this->getTemplate("tpl.duration.html", true, true);
-        $this->applyName($component, $tpl);
-
-        $id = $this->bindJSandApplyId($component, $tpl);
-
-        $input_html = "";
-        $inputs = $component->getInputs();
-        $input = array_shift($inputs); //from
-        $input_html .= $default_renderer->withAdditionalContext($input)->render($input);
-        $input = array_shift($inputs)->withAdditionalPickerconfig([ //until
-                                                                    "useCurrent" => false
-        ]);
-        $input_html .= $default_renderer->withAdditionalContext($input)->render($input);
-        $tpl->setVariable("DURATION", $input_html);
-
-        return $this->wrapInFilterContext($component, $tpl->get(), $default_renderer, $id);
-    }
-
-    /**
-     * Return the datetime format in a form fit for the JS-component of this input.
-     * Currently, this means transforming the elements of DateFormat to momentjs.
-     * http://eonasdan.github.io/bootstrap-datetimepicker/Options/#format
-     * http://momentjs.com/docs/#/displaying/format/
-     */
-    protected function getTransformedDateFormat(
-        DateFormat\DateFormat $origin,
-        array $mapping
-    ): string {
-        $ret = '';
-        foreach ($origin->toArray() as $element) {
-            if (array_key_exists($element, $mapping)) {
-                $ret .= $mapping[$element];
-            } else {
-                $ret .= $element;
-            }
-        }
-        return $ret;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function registerResources(ResourceRegistry $registry): void
-    {
-        parent::registerResources($registry);
-        $registry->register('./src/UI/templates/js/Input/Container/dist/filter.js');
-        $registry->register('./src/UI/templates/js/Input/Field/input.js');
-        $registry->register('./src/UI/templates/js/Input/Field/groups.js');
-    }
-
-    protected function setSignals(FilterInput $input): FilterInput
-    {
-        $signals = null;
-        foreach ($input->getTriggeredSignals() as $s) {
-            $signals[] = [
-                "signal_id" => $s->getSignal()->getId(),
-                "event" => $s->getEvent(),
-                "options" => $s->getSignal()->getOptions()
-            ];
-        }
-        if ($signals !== null) {
-            $signals = json_encode($signals);
-
-            $input = $input->withAdditionalOnLoadCode(fn($id) => "il.UI.input.setSignalsForId('$id', $signals);");
-
-            $input = $input->withAdditionalOnLoadCode($input->getUpdateOnLoadCode());
-        }
-        return $input;
     }
 
     /**

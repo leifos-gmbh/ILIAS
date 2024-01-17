@@ -73,15 +73,34 @@ class ilPollResultsRenderer
         ilTemplate $tpl,
         ilPollResultsHandler $results
     ): void {
-        $tpl->setCurrentBlock("answer_result");
+        global $DIC;
+        $f = $DIC->ui()->factory();
+        $df = new \ILIAS\Data\Factory();
+        $r = $DIC->ui()->renderer();
+
+        $c_dimension = $df->dimension()->cardinal();
+        $dataset = $df->dataset(['Votes' => $c_dimension]);
         foreach ($results->getOrderedAnswerIds() as $id) {
-            $pbar = $this->getProgressBar();
-            $pbar->setCurrent(round($results->getAnswerPercentage($id)));
-            $pbar->setCaption('(' . $results->getAnswerTotal($id) . ')');
-            $tpl->setVariable("PERC_ANSWER_RESULT", $pbar->render());
-            $tpl->setVariable("TXT_ANSWER_RESULT", nl2br($results->getAnswerText($id)));
-            $tpl->parseCurrentBlock();
+            $total_votes = $results->getAnswerTotal($id);
+            $tooltip = $total_votes . ' (' . round($results->getAnswerPercentage($id)) . '%)';
+            $dataset = $dataset
+                ->withPoint(
+                    nl2br($results->getAnswerText($id)),
+                    ['Votes' => $total_votes]
+                )
+                ->withAlternativeInformation(
+                    nl2br($results->getAnswerText($id)),
+                    ['Votes' => $tooltip]
+                );
         }
+
+        $bar = new ILIAS\UI\Component\Chart\Bar\BarConfig();
+        $bar = $bar->withColor($df->color('#4c6586'))->withRelativeWidth(0.65);
+
+        $chart = $f->chart()->bar()->horizontal('', $dataset)->withTitleVisible(false)->withLegendVisible(false);
+        $chart = $chart->withBarConfigs(['Votes' => $bar]);
+
+        $tpl->setVariable("KS", $r->render($chart));
     }
 
     protected function getLegend(): ilChartLegend

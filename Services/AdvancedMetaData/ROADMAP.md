@@ -62,10 +62,10 @@ should be done in type-specific classes.
 The process for this could be as follows, e.g. when reading out
 a field definition: a central class reads out all universal properties
 of the definition, and compiles them as a dummy object. This dummy object
-is then passed according to one of a number of refinery-like classes
-according to the type of the definition, which read out type-specific
-properties. This class then takes the universal properties from the dummy
-object, the type-specific properties it reads out itself, and creates from
+is then passed to one of a number of refinery-like classes according to
+the type of the definition, which read out type-specific properties.
+This class then takes the universal properties from the dummy object,
+the type-specific properties it reads out itself, and creates from
 them the actual data object for the field definition.
 
 ## Long Term

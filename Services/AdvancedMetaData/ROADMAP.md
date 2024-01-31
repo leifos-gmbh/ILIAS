@@ -32,6 +32,9 @@ specific objects (see e.g. `ilAdvancedMDSettingsGUI`), and the latter for
 managing and displaying metadata values of objects (see e.g.
 `ilAdvancedMDRecordGUI`).
 
+Apart from that, the repository should also facilitate searching for
+objects that carry specific metadata values for specific fields.
+
 Auxiliary data like translations, record scopes, record selection of objects,
 etc. should not be understood as their own entities, but rather as properties
 of the main entities, and should be treated as such.
@@ -67,5 +70,16 @@ the type of the definition, which read out type-specific properties.
 This class then takes the universal properties from the dummy object,
 the type-specific properties it reads out itself, and creates from
 them the actual data object for the field definition.
+
+#### API
+
+Currently, AdvancedMetaData is used by consumers mainly via various
+different static methods, distributed across a few classes. A cleaner,
+centralized API should be offered, organized around concrete use cases
+for the metadata. A small part of this, for the use of custom metadata
+in KS data tables, has already been implemented.
+
+The API should in particular offer the option to search for objects with
+specific values for a given field.
 
 ## Long Term

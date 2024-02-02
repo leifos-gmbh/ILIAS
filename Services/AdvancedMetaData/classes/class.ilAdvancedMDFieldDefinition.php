@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 use ILIAS\Refinery\Factory as RefineryFactory;
 use ILIAS\HTTP\GlobalHttpState;
+use ILIAS\AdvancedMetaData\FieldDefinition\Type;
+use ILIAS\AdvancedMetaData\Repository\GenericData\Gateway as DBGateway;
+use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericData;
 
 /**
  * AMD field abstract base class
@@ -29,6 +32,21 @@ use ILIAS\HTTP\GlobalHttpState;
  */
 abstract class ilAdvancedMDFieldDefinition
 {
+    /**
+     * TODO: put this in before merging to 10
+     */
+    /*public const TYPE_SELECT = Type::SELECT->value;
+    public const TYPE_TEXT = Type::TEXT->value;
+    public const TYPE_DATE = Type::DATE->value;
+    public const TYPE_DATETIME = Type::DATETIME->value;
+    public const TYPE_INTEGER = Type::INTEGER->value;
+    public const TYPE_FLOAT = Type::FLOAT->value;
+    public const TYPE_LOCATION = Type::LOCATION->value;
+    public const TYPE_SELECT_MULTI = Type::SELECT_MULTI->value;
+    public const TYPE_ADDRESS = Type::ADDRESS->value;
+    public const TYPE_EXTERNAL_LINK = Type::EXTERNAL_LINK->value;
+    public const TYPE_INTERNAL_LINK = Type::INTERNAL_LINK->value;*/
+
     public const TYPE_SELECT = 1;
     public const TYPE_TEXT = 2;
     public const TYPE_DATE = 3;
@@ -41,20 +59,15 @@ abstract class ilAdvancedMDFieldDefinition
     public const TYPE_EXTERNAL_LINK = 9;
     public const TYPE_INTERNAL_LINK = 10;
 
-    protected ?int $field_id = null;
-    protected int $record_id = 0;
-    protected string $import_id = '';
-    protected int $position = 0;
-    protected string $title = '';
-    protected string $description = '';
-    protected bool $searchable = false;
-    protected bool $required = false;
+    protected GenericData $generic_data;
+
     protected ?ilADTDefinition $adt_def = null;
     protected ?ilADT $adt = null;
 
     protected string $language = '';
 
     protected ilDBInterface $db;
+    protected DBGateway $db_gateway;
     protected ilLanguage $lng;
     protected ilLogger $logger;
     protected GlobalHttpState $http;
@@ -279,24 +292,17 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public static function getValidTypes(): array
     {
-        return array(
-            self::TYPE_TEXT,
-            self::TYPE_DATE,
-            self::TYPE_DATETIME,
-            self::TYPE_SELECT,
-            self::TYPE_INTEGER,
-            self::TYPE_FLOAT,
-            self::TYPE_LOCATION,
-            self::TYPE_SELECT_MULTI,
-            self::TYPE_EXTERNAL_LINK,
-            self::TYPE_INTERNAL_LINK,
-            self::TYPE_ADDRESS
-        );
+        $types = Type::cases();
+        $values = [];
+        foreach ($types as $type) {
+            $values[] = $type->value;
+        }
+        return $values;
     }
 
     public static function isValidType(int $a_type): bool
     {
-        return in_array($a_type, self::getValidTypes());
+        return !is_null(Type::tryFrom($a_type));
     }
 
     /**
@@ -309,23 +315,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     protected static function getTypeString(int $a_type): string
     {
-        if (self::isValidType($a_type)) {
-            $map = array(
-                self::TYPE_TEXT => "Text",
-                self::TYPE_SELECT => "Select",
-                self::TYPE_DATE => "Date",
-                self::TYPE_DATETIME => "DateTime",
-                self::TYPE_FLOAT => "Float",
-                self::TYPE_LOCATION => "Location",
-                self::TYPE_INTEGER => "Integer",
-                self::TYPE_SELECT_MULTI => "SelectMulti",
-                self::TYPE_EXTERNAL_LINK => 'ExternalLink',
-                self::TYPE_INTERNAL_LINK => 'InternalLink',
-                self::TYPE_ADDRESS => "Address"
-            );
-            return $map[$a_type];
-        }
-        return '';
+        return (string) (Type::tryFrom($a_type)?->stringValue());
     }
 
     /**
@@ -336,7 +326,7 @@ abstract class ilAdvancedMDFieldDefinition
         if (!strlen($language)) {
             return true;
         }
-        $record = ilAdvancedMDRecord::_getInstanceByRecordId($this->record_id);
+        $record = ilAdvancedMDRecord::_getInstanceByRecordId($this->getRecordID());
         return strcmp($record->getDefaultLanguage(), $language) === 0;
     }
 
@@ -397,7 +387,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function getFieldId(): ?int
     {
-        return $this->field_id;
+        return $this->generic_data->id();
     }
 
     /**
@@ -405,7 +395,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function setRecordId(int $a_id): void
     {
-        $this->record_id = $a_id;
+        $this->generic_data->setRecordID($a_id);
     }
 
     /**
@@ -413,7 +403,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function getRecordId(): int
     {
-        return $this->record_id;
+        return $this->generic_data->getRecordID();
     }
 
     /**
@@ -421,10 +411,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function setImportId(string $a_id_string): void
     {
-        if ($a_id_string !== null) {
-            $a_id_string = trim($a_id_string);
-        }
-        $this->import_id = $a_id_string;
+        $this->generic_data->setImportID(trim($a_id_string));
     }
 
     /**
@@ -432,7 +419,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function getImportId(): string
     {
-        return $this->import_id;
+        return $this->generic_data->getImportID();
     }
 
     /**
@@ -440,7 +427,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function setPosition(int $a_pos): void
     {
-        $this->position = $a_pos;
+        $this->generic_data->setPosition($a_pos);
     }
 
     /**
@@ -448,7 +435,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function getPosition(): int
     {
-        return $this->position;
+        return $this->generic_data->getPosition();
     }
 
     /**
@@ -456,10 +443,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function setTitle(string $a_title): void
     {
-        if ($a_title !== null) {
-            $a_title = trim($a_title);
-        }
-        $this->title = $a_title;
+        $this->generic_data->setTitle(trim($a_title));
     }
 
     /**
@@ -467,7 +451,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function getTitle(): string
     {
-        return $this->title;
+        return $this->generic_data->getTitle();
     }
 
     /**
@@ -475,10 +459,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function setDescription(string $a_desc): void
     {
-        if ($a_desc !== null) {
-            $a_desc = trim($a_desc);
-        }
-        $this->description = $a_desc;
+        $this->generic_data->setDescription(trim($a_desc));
     }
 
     /**
@@ -486,7 +467,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function getDescription(): string
     {
-        return $this->description;
+        return $this->generic_data->getDescription();
     }
 
     /**
@@ -514,7 +495,7 @@ abstract class ilAdvancedMDFieldDefinition
         if (!$this->isSearchSupported()) {
             $a_status = false;
         }
-        $this->searchable = (bool) $a_status;
+        $this->generic_data->setSearchable($a_status);
     }
 
     /**
@@ -522,7 +503,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function isSearchable(): bool
     {
-        return $this->searchable;
+        return $this->generic_data->isSearchable();
     }
 
     /**
@@ -530,7 +511,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function setRequired(bool $a_status): void
     {
-        $this->required = $a_status;
+        $this->generic_data->setRequired($a_status);
     }
 
     /**
@@ -538,7 +519,7 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function isRequired(): bool
     {
-        return $this->required;
+        return $this->generic_data->isRequired();
     }
 
     /**
@@ -685,7 +666,7 @@ abstract class ilAdvancedMDFieldDefinition
         ilAdvancedMDPermissionHelper $a_permissions,
         string $active_language
     ): void {
-        $record = ilAdvancedMDRecord::_getInstanceByRecordId($this->record_id);
+        $record = ilAdvancedMDRecord::_getInstanceByRecordId($this->getRecordID());
         $is_translation = (($active_language !== '') && ($active_language != $record->getDefaultLanguage()));
         if (!$a_form->getItemByPostVar("title")->getDisabled() && !$is_translation) {
             $this->setTitle($a_form->getInput("title"));
@@ -828,24 +809,16 @@ abstract class ilAdvancedMDFieldDefinition
             return;
         }
 
-        $next_id = $this->db->nextId("adv_mdf_definition");
+        /**
+         * TODO figure out whether the new field id needs to be set here. If nothing further
+         *  is done with the object after saving, we can skip that.
+         */
 
-        // append
-        if (!$a_keep_pos) {
-            $this->setPosition($this->getLastPosition() + 1);
+        if ($a_keep_pos) {
+            $this->db_gateway->create($this->generic_data);
+        } else {
+            $this->db_gateway->createFromScratch($this->generic_data);
         }
-
-        // needs unique import id
-        if (!$this->getImportId()) {
-            $this->setImportId($this->generateImportId($next_id));
-        }
-
-        $fields = $this->getDBProperties();
-        $fields["field_id"] = array("integer", $next_id);
-
-        $this->db->insert("adv_mdf_definition", $fields);
-
-        $this->setFieldId($next_id);
     }
 
     /**
@@ -877,9 +850,7 @@ abstract class ilAdvancedMDFieldDefinition
         // delete all values
         ilAdvancedMDValues::_deleteByFieldId($this->getFieldId(), $this->getADT());
 
-        $query = "DELETE FROM adv_mdf_definition" .
-            " WHERE field_id = " . $this->db->quote($this->getFieldId(), "integer");
-        $this->db->manipulate($query);
+        $this->db_gateway->delete($this->getFieldId());
     }
 
     /**

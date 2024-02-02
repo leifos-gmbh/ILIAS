@@ -82,4 +82,18 @@ in KS data tables, has already been implemented.
 The API should in particular offer the option to search for objects with
 specific values for a given field.
 
+#### Redesign `ilAdvancedMDClaimingPlugin`
+
+The plugin slot `ilAdvancedMDClaimingPlugin` should be redesigned to
+fit with the new repository. It would probably be easiest to expose an
+abstraction of the repository via the API to accomodate programatically
+managing metadata sets.
+
+#### Bespoke Tables for Type-Specific Data
+
+Currently, most of the type-specific option of fields are persisted as 
+serialized arrays in the column `field_values` in the table `adv_mdf_definition`.
+Every type should instead store these options in their own tables. `field_values`
+should be removed.
+
 ## Long Term

@@ -168,7 +168,7 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
         bool $disabled,
         string $language = ''
     ): void {
-        $default_language = ilAdvancedMDRecord::_getInstanceByRecordId($this->record_id)->getDefaultLanguage();
+        $default_language = ilAdvancedMDRecord::_getInstanceByRecordId($this->getRecordId())->getDefaultLanguage();
 
         $translation = $this->getOptionTranslation($language);
 

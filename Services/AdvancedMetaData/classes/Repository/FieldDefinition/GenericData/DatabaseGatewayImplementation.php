@@ -93,22 +93,42 @@ class DatabaseGatewayImplementation implements Gateway
      */
     public function readByIDs(int ...$field_ids): \Generator
     {
+        if (empty($field_ids)) {
+            return;
+        }
+
         $query = 'SELECT * FROM adv_mdf_definition WHERE ' .
             $this->db->in('field_id', $field_ids, false, \ilDBConstants::T_INTEGER);
 
         $res = $this->db->query($query);
+        $data = [];
         while ($row = $this->db->fetchAssoc($res)) {
-            yield $this->dataFromRow($row);
+            $data[$row['field_id']] = $this->dataFromRow($row);
+        }
+
+        // Return data in the order the field IDs where passed.
+        foreach ($field_ids as $field_id) {
+            yield $data[$field_id];
         }
     }
 
     /**
      * @return GenericData[]
      */
-    public function readByRecords(int ...$record_ids): \Generator
+    public function readByRecords(bool $only_searchable, int ...$record_ids): \Generator
     {
+        if (empty($record_ids)) {
+            return;
+        }
+
         $query = 'SELECT * FROM adv_mdf_definition WHERE ' .
             $this->db->in('record_id', $record_ids, false, \ilDBConstants::T_INTEGER);
+
+        if ($only_searchable) {
+            $query .= ' AND searchable = 1';
+        }
+
+        $query .= ' ORDER BY position';
 
         $res = $this->db->query($query);
         while ($row = $this->db->fetchAssoc($res)) {
@@ -116,10 +136,10 @@ class DatabaseGatewayImplementation implements Gateway
         }
     }
 
-    public function readByImportID(int $import_id): ?GenericData
+    public function readByImportID(string $import_id): ?GenericData
     {
         $query = 'SELECT * FROM adv_mdf_definition WHERE import_id = ' .
-            $this->db->quote($import_id, \ilDBConstants::T_INTEGER);
+            $this->db->quote($import_id, \ilDBConstants::T_TEXT);
 
         $res = $this->db->query($query);
         if ($row = $this->db->fetchAssoc($res)) {
@@ -151,6 +171,10 @@ class DatabaseGatewayImplementation implements Gateway
 
     public function delete(int ...$field_ids): void
     {
+        if (empty($field_ids)) {
+            return;
+        }
+
         $query = 'DELETE FROM adv_mdf_definition WHERE ' .
             $this->db->in('field_id', $field_ids, false, \ilDBConstants::T_INTEGER);
     }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,11 +16,15 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 use ILIAS\Refinery\Factory as RefineryFactory;
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\AdvancedMetaData\FieldDefinition\Type;
 use ILIAS\AdvancedMetaData\Repository\GenericData\Gateway as DBGateway;
 use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericData;
+use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericDataImplementation;
+use ILIAS\AdvancedMetaData\Repository\GenericData\DatabaseGatewayImplementation;
 
 /**
  * AMD field abstract base class
@@ -73,7 +75,7 @@ abstract class ilAdvancedMDFieldDefinition
     protected GlobalHttpState $http;
     protected RefineryFactory $refinery;
 
-    public function __construct(?int $a_field_id = null, string $language = '')
+    public function __construct(GenericData $generic_data, string $language = '')
     {
         global $DIC;
 
@@ -89,9 +91,10 @@ abstract class ilAdvancedMDFieldDefinition
         /** @noinspection PhpUndefinedMethodInspection */
         $this->logger = $DIC->logger()->amet();
         $this->db = $DIC->database();
+        $this->db_gateway = new DatabaseGatewayImplementation($this->db);
 
-        $this->init();
-        $this->read($a_field_id);
+        $this->generic_data = $generic_data;
+        $this->importFieldDefinition($generic_data->getFieldValues());
     }
 
     public static function getInstance(
@@ -101,21 +104,38 @@ abstract class ilAdvancedMDFieldDefinition
     ): ilAdvancedMDFieldDefinition {
         global $DIC;
 
-        $db = $DIC->database();
+        $db_gateway = new DatabaseGatewayImplementation($DIC->database());
 
-        if (!$a_type) {
-            $set = $db->query("SELECT field_type" .
-                " FROM adv_mdf_definition" .
-                " WHERE field_id = " . $db->quote($a_field_id, "integer"));
-            $a_type = $db->fetchAssoc($set);
-            $a_type = (int) $a_type["field_type"];
+        if (self::isValidType((int) $a_type)) {
+            $generic_data = new GenericDataImplementation(
+                Type::from($a_type),
+                0,
+                '',
+                '',
+                '',
+                0,
+                false,
+                false,
+                []
+            );
         }
 
-        if (self::isValidType($a_type)) {
-            $class = "ilAdvancedMDFieldDefinition" . self::getTypeString($a_type);
-            return new $class($a_field_id, $language);
+        if ($a_field_id) {
+            $generic_data = $db_gateway->readByID($a_field_id);
+        }
+
+        if (isset($generic_data)) {
+            self::getInstanceWithData($generic_data);
         }
         throw new ilException("unknown type " . $a_type);
+    }
+
+    protected static function getInstanceWithData(
+        GenericData $generic_data,
+        string $language = ''
+    ): ilAdvancedMDFieldDefinition {
+        $class = "ilAdvancedMDFieldDefinition" . $generic_data->type()->stringValue();
+        return new $class($generic_data, $language);
     }
 
     public static function exists(int $a_field_id): bool
@@ -172,20 +192,11 @@ abstract class ilAdvancedMDFieldDefinition
     ): array {
         global $DIC;
 
-        $ilDB = $DIC['ilDB'];
+        $db_gateway = new DatabaseGatewayImplementation($DIC->database());
 
-        $query = "SELECT * FROM adv_mdf_definition" .
-            " WHERE record_id = " . $ilDB->quote($a_record_id, "integer");
-        if ($a_only_searchable) {
-            $query .= " AND searchable = " . $ilDB->quote(1, "integer");
-        }
-        $query .= " ORDER BY position";
-        $set = $ilDB->query($query);
         $defs = [];
-        while ($row = $ilDB->fetchAssoc($set)) {
-            $field = self::getInstance(null, (int) $row["field_type"], $language);
-            $field->import($row);
-            $defs[(int) $row["field_id"]] = $field;
+        foreach ($db_gateway->readByRecords($a_only_searchable, $a_record_id) as $data) {
+            $defs[$data->id()] = self::getInstanceWithData($data);
         }
         return $defs;
     }
@@ -199,7 +210,8 @@ abstract class ilAdvancedMDFieldDefinition
     {
         global $DIC;
 
-        $ilDB = $DIC['ilDB'];
+        $ilDB = $DIC->database();
+        $db_gateway = new DatabaseGatewayImplementation($ilDB);
 
         $query = "SELECT amf.* FROM adv_md_record_objs aro" .
             " JOIN adv_md_record amr ON aro.record_id = amr.record_id" .
@@ -209,13 +221,19 @@ abstract class ilAdvancedMDFieldDefinition
             $query .= " AND active = " . $ilDB->quote(1, "integer");
         }
         $query .= " ORDER BY aro.record_id,position";
+
         $res = $ilDB->query($query);
-        $defs = [];
+        $ids = [];
         while ($row = $ilDB->fetchAssoc($res)) {
-            $field = self::getInstance(null, (int) $row["field_type"]);
-            $field->import($row);
-            $defs[(int) $row["field_id"]] = $field;
+            $ids[] = (int) $row["field_id"];
         }
+        $data = $db_gateway->readByIDs(...$ids);
+
+        $defs = [];
+        foreach ($data as $datum) {
+            $defs[] = self::getInstanceWithData($datum);
+        }
+
         return $defs;
     }
 
@@ -223,16 +241,12 @@ abstract class ilAdvancedMDFieldDefinition
     {
         global $DIC;
 
-        $ilDB = $DIC['ilDB'];
+        $db_gateway = new DatabaseGatewayImplementation($DIC->database());
 
-        $query = "SELECT field_id, field_type FROM adv_mdf_definition" .
-            " WHERE import_id = " . $ilDB->quote($a_import_id, 'text');
-        $set = $ilDB->query($query);
-        if ($ilDB->numRows($set)) {
-            $row = $ilDB->fetchAssoc($set);
-            return self::getInstance((int) $row["field_id"], (int) $row["field_type"]);
+        if (is_null($data = $db_gateway->readByImportID($a_import_id))) {
+            return null;
         }
-        return null;
+        return self::getInstanceWithData($data);
     }
 
     /**
@@ -278,12 +292,6 @@ abstract class ilAdvancedMDFieldDefinition
             $a_defs[$element_id]->setADT($element);
         }
         return $group;
-    }
-
-    protected function init(): void
-    {
-        $this->setRequired(false);
-        $this->setSearchable(false);
     }
 
     /**
@@ -372,14 +380,6 @@ abstract class ilAdvancedMDFieldDefinition
         if (!$this->adt instanceof ilADT) {
             $this->adt = $a_adt;
         }
-    }
-
-    /**
-     * Set field_id
-     */
-    protected function setFieldId(int $a_id): void
-    {
-        $this->field_id = $a_id;
     }
 
     /**
@@ -714,89 +714,11 @@ abstract class ilAdvancedMDFieldDefinition
     }
 
     /**
-     * Get last position of record
-     */
-    protected function getLastPosition(): int
-    {
-        $sql = "SELECT max(position) pos" .
-            " FROM adv_mdf_definition" .
-            " WHERE record_id = " . $this->db->quote($this->getRecordId(), "integer");
-        $set = $this->db->query($sql);
-        if ($this->db->numRows($set)) {
-            $pos = $this->db->fetchAssoc($set);
-            return (int) $pos["pos"];
-        }
-        return 0;
-    }
-
-    /**
      * Generate unique record id
      */
     public function generateImportId(int $a_field_id): string
     {
         return 'il_' . IL_INST_ID . '_adv_md_field_' . $a_field_id;
-    }
-
-    /**
-     * Get all definition properties for DB
-     */
-    protected function getDBProperties(): array
-    {
-        $fields = array(
-            "field_type" => array("integer", $this->getType()),
-            "record_id" => array("integer", $this->getRecordId()),
-            "import_id" => array("text", $this->getImportId()),
-            "title" => array("text", $this->getTitle()),
-            "description" => array("text", $this->getDescription()),
-            "position" => array("integer", $this->getPosition()),
-            "searchable" => array("integer", $this->isSearchable()),
-            "required" => array("integer", $this->isRequired())
-        );
-
-        $def = $this->getFieldDefinition();
-        if (is_array($def)) {
-            $fields["field_values"] = array("text", serialize($def));
-        }
-        return $fields;
-    }
-
-    /**
-     * Import from DB
-     */
-    protected function import(array $a_data): void
-    {
-        $this->setFieldId((int) $a_data["field_id"]);
-        $this->setRecordId((int) $a_data["record_id"]);
-        $this->setImportId((string) $a_data["import_id"]);
-        $this->setTitle((string) $a_data["title"]);
-        $this->setDescription((string) $a_data["description"]);
-        $this->setPosition((int) $a_data["position"]);
-        $this->setSearchable((bool) $a_data["searchable"]);
-        $this->setRequired((bool) $a_data["required"]);
-        if (isset($a_data['field_values'])) {
-            $field_values = unserialize($a_data['field_values']);
-            if (is_array($field_values)) {
-                $this->importFieldDefinition($field_values);
-            }
-        }
-    }
-
-    /**
-     * Read field definition
-     */
-    protected function read(?int $a_field_id): void
-    {
-        if (!(int) $a_field_id) {
-            return;
-        }
-
-        $sql = "SELECT * FROM adv_mdf_definition" .
-            " WHERE field_id = " . $this->db->quote($a_field_id, "integer");
-        $set = $this->db->query($sql);
-        if ($this->db->numRows($set)) {
-            $row = $this->db->fetchAssoc($set);
-            $this->import($row);
-        }
     }
 
     /**
@@ -809,16 +731,24 @@ abstract class ilAdvancedMDFieldDefinition
             return;
         }
 
-        /**
-         * TODO figure out whether the new field id needs to be set here. If nothing further
-         *  is done with the object after saving, we can skip that.
-         */
-
         if ($a_keep_pos) {
-            $this->db_gateway->create($this->generic_data);
+            $field_id = $this->db_gateway->create($this->generic_data);
         } else {
-            $this->db_gateway->createFromScratch($this->generic_data);
+            $field_id = $this->db_gateway->createFromScratch($this->generic_data);
         }
+
+        $this->generic_data = new GenericDataImplementation(
+            $this->generic_data->type(),
+            $this->generic_data->getRecordID(),
+            $this->generic_data->getImportID(),
+            $this->generic_data->getTitle(),
+            $this->generic_data->getDescription(),
+            $this->generic_data->getPosition(),
+            $this->generic_data->isSearchable(),
+            $this->generic_data->isRequired(),
+            $this->generic_data->getFieldValues(),
+            $field_id
+        );
     }
 
     /**
@@ -831,11 +761,7 @@ abstract class ilAdvancedMDFieldDefinition
             return;
         }
 
-        $this->db->update(
-            "adv_mdf_definition",
-            $this->getDBProperties(),
-            array("field_id" => array("integer", $this->getFieldId()))
-        );
+        $this->db_gateway->update($this->generic_data);
     }
 
     /**

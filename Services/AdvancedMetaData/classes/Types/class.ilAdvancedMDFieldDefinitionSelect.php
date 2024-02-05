@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,10 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
+
+use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericData;
 
 /**
  * AMD field type select
@@ -35,10 +37,11 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
 
     protected array $option_translations = [];
     private \ilGlobalTemplateInterface $main_tpl;
-    public function __construct(?int $a_field_id = null, string $language = '')
+    public function __construct(GenericData $generic_data, string $language = '')
     {
-        parent::__construct($a_field_id, $language);
         global $DIC;
+
+        parent::__construct($generic_data, $language);
         $this->main_tpl = $DIC->ui()->mainTemplate();
     }
 

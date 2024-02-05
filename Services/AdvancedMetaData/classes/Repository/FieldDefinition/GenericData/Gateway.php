@@ -46,9 +46,9 @@ interface Gateway
     /**
      * @return GenericData[]
      */
-    public function readByRecords(int ...$record_ids): \Generator;
+    public function readByRecords(bool $only_searchable, int ...$record_ids): \Generator;
 
-    public function readByImportID(int $import_id): ?GenericData;
+    public function readByImportID(string $import_id): ?GenericData;
 
     public function update(GenericData $data): void;
 

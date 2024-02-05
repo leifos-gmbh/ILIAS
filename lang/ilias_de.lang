@@ -899,6 +899,8 @@ assessment#:#msg_number_of_terms_too_low#:#Die Anzahl der Terme muss größer od
 assessment#:#msg_poly_added#:#Polygon hinzugefügt
 assessment#:#msg_questions_moved#:#Fragen verschoben
 assessment#:#msg_rect_added#:#Rechteck hinzugefügt
+assessment#:#msg_score_settings_modified_and_recalc#:#Die Einstellungen wurden gespeichert und die Resultate neu berechnet.
+assessment#:#msg_score_settings_not_modified#:#Die Einstellungen wurden nicht gespeichert.
 assessment#:#msg_selected_for_move#:#Fragen zum Verschieben ausgewählt
 assessment#:#new_category#:#Neue Einheiten-Kategorie
 assessment#:#new_unit#:#Neue Einheit
@@ -1179,6 +1181,7 @@ assessment#:#search_results#:#Suchergebnisse
 assessment#:#search_roles#:#nach Rollen
 assessment#:#search_term#:#Suchbegriff
 assessment#:#search_users#:#nach Benutzern
+assessment#:#select_at_least_one_feedback_type_and_trigger#:#Bitte mindestens eine Art der Rückmeldung und einen Auslöser auswählen.
 assessment#:#select_gap#:#Auswahl-Lücke
 assessment#:#select_max_one_item#:#Bitte wählen Sie nur ein Objekt aus!
 assessment#:#select_one_user#:#Bitte wählen Sie mindestens einen Benutzer aus!
@@ -2256,7 +2259,7 @@ bgtask#:#bgtask_processing#:#Download erzeugen
 bgtask#:#bgtask_setting#:#„Herunterladen im Hintergrund“ aktivieren
 bgtask#:#bgtask_setting_info#:#Die Erstellung der ZIP-Datei erfolgt asynchron und kann jederzeit abgebrochen werden.
 bgtask#:#bgtask_setting_limit#:#Globales Limit
-bgtask#:#bgtask_setting_limit_info#:#Ein Download ist nur möglich, wenn die maximale Summe der Dateigrössen den Wert nicht überschreitet.
+bgtask#:#bgtask_setting_limit_info#:#Ein Download ist nur möglich, wenn die maximale Summe der Dateigrössen den Wert in MB nicht überschreitet.
 bgtask#:#bgtask_setting_threshold_count#:#Minimale Anzahl
 bgtask#:#bgtask_setting_threshold_count_info#:#Ab diesem Wert erfolgt der Download asynchron.
 bgtask#:#bgtask_setting_threshold_size#:#Minimale Grösse
@@ -3914,6 +3917,7 @@ common#:#downloading_settings#:#Einstellungen
 common#:#dpro_accept_usr_agreement#:#Datenschutzerklärung akzeptieren?
 common#:#dpro_accept_usr_agreement_intro#:#Es liegt eine neue Datenschutzerklärung vor. Sie müssen diese akzeptieren, bevor Sie mit der Nutzung von ILIAS fortfahren können. Lesen Sie das folgende Dokument sorgfältig durch und geben Sie unten auf der Seite Ihre Zustimmung oder Ablehnung.
 common#:#dpro_force_accept_usr_agreement#:#Sie müssen die Datenschutzerklärung akzeptieren!
+common#:#dpro_no_agreement_description#:#Aktuell wird in dieser Installation keine Datenschutzerklärung angeboten. Bitte kontaktieren Sie die <a href="%1$s">ILIAS-Administration</a>.
 common#:#dpro_refuse_acceptance#:#Wiederruf der Akzeptanz der Datenschutzerklärung
 common#:#dpro_usr_agreement#:#Datenschutzerklärung
 common#:#dpro_usr_agreement_footer_intro#:#Zu dieser Datenschutzerklärung haben Sie ihr Einverständnis erklärt.
@@ -4790,7 +4794,6 @@ common#:#no#:#Nein
 common#:#no_access_item#:#Sie besitzen keine ausreichende Berechtigung, um auf dieses Objekt zuzugreifen.
 common#:#no_access_item_public#:#Um dieses Objekt zu nutzen, müssen Sie angemeldet sein und entsprechende Zugriffsrechte besitzen.
 common#:#no_accessibility_control_concept_description#:#Aktuell wird in dieser Installation keine Info zur Barrierefreiheit angeboten. Bitte kontaktieren Sie die <a href="%1$s">Anlaufstelle für Barrierefreiheit</a> für weitere Informationen.
-common#:#no_agreement_description#:#Aktuell wird in dieser Installation keine Nutzungsvereinbarung angeboten. Bitte kontaktieren Sie die <a href="%1$s">ILIAS-Administration</a>.
 common#:#no_checkbox#:#Sie haben keine Auswahl getroffen.
 common#:#no_condition_selected#:#Sie haben keine Vorbedingung ausgewählt.
 common#:#no_date#:#Kein Datum
@@ -5736,6 +5739,7 @@ common#:#top_of_page#:#Seitenanfang
 common#:#tos_accept_usr_agreement#:#Nutzungsvereinbarung akzeptieren?
 common#:#tos_accept_usr_agreement_intro#:#Es liegen neue Nutzungsbedingungen vor. Sie müssen sie akzeptieren, bevor Sie mit der Nutzung von ILIAS fortfahren können. Lesen Sie das folgende Dokument sorgfältig durch und geben Sie unten auf der Seite Ihre Zustimmung oder Ablehnung.
 common#:#tos_force_accept_usr_agreement#:#Sie müssen die Nutzungsvereinbarung akzeptieren!
+common#:#tos_no_agreement_description#:#Aktuell wird in dieser Installation keine Nutzungsvereinbarung angeboten. Bitte kontaktieren Sie die <a href="%1$s">ILIAS-Administration</a>.
 common#:#tos_refuse_acceptance#:#Akzeptanz der Nutzungsvereinbarung ablehnen
 common#:#tos_usr_agreement#:#Nutzungsvereinbarung
 common#:#tos_usr_agreement_footer_intro#:#Zu dieser Nutzungsvereinbarung haben Sie ihr Einverständnis erklärt.
@@ -7323,6 +7327,7 @@ copa#:#copa_prop_reading_time#:#Lesezeit
 copa#:#copa_value_reading_time_f_p#:#%s Minuten
 copa#:#copa_value_reading_time_f_s#:#%s Minute
 copa#:#obj_copa_duplicate#:#Inhaltsseite duplizieren
+copg#:#copg_active_to_small#:#Dieses Datum muss größer als das "Aktiv ab" Datum sein.
 copg#:#copg_allow_html#:#HTML/Javascript erlauben
 copg#:#copg_allow_html_info#:#Benutzer können HTML oder Javascript in Seiteninhalten verwenden. Dies kann zu Sicherheitsproblemen führen. Sie sollten diese Funktion nur für Komponenten aktivieren, die von vertrauenswürdigen Benutzern verwendet werden. Die Möglichkeit, HTML in dieser Art einzubinden, wird möglicherweise in einer zukünftigen Version komplett entfallen.
 copg#:#copg_an_error_occured#:#Es ist leider ein Problem aufgetreten.
@@ -10434,7 +10439,7 @@ irss#:#by_title_asc#:#Titel (aufsteigend)
 irss#:#by_title_desc#:#Titel (absteigend)
 irss#:#creation_date#:#Erstellungsdatum (Diese Revision)
 irss#:#file_size#:#Dateigrösse (Diese Revision)
-irss#:#file_size_bigger_than#:#Dateigrösse grösser als (MB)
+irss#:#file_size_bigger_than#:#Dateigrösse > MB
 irss#:#full_size#:#Ressourcengrössse (Alle Revisionen)
 irss#:#max_revision#:#Max. Revision
 irss#:#msg_upload#:#Dateien zum Hinzufügen hier ablegen
@@ -10456,7 +10461,7 @@ irss#:#sorting_3#:#Dateigrösse (aufsteigend)
 irss#:#sorting_4#:#Dateigrösse (absteigend)
 irss#:#sorting_5#:#Erstellungsdatum (aufsteigend)
 irss#:#sorting_6#:#Erstellungsdatum (absteigend)
-irss#:#stakeholders#:#Stakeholders
+irss#:#stakeholders#:#Ursprung
 irss#:#storage_id#:#Storage ID
 irss#:#storage_info#:#Storage Information
 irss#:#type#:#Dateityp

@@ -32,6 +32,9 @@ $il-metabar-small-glyph-size: 1.25rem;
 	}
 
 	.glyphicon {
+		@media (prefers-contrast: more) {
+			filter: none;
+		}
 		filter: invert(50%);
 		font-family: 'il-icons';
 		font-size: $il-slate-bulky-glyph-size;
@@ -141,11 +144,6 @@ $il-metabar-small-glyph-size: 1.25rem;
 		.glyphicon {
 			color: $il-metabar-glyph-color;
 			font-size: $il-metabar-small-glyph-size;
-		}
-		.il-counter-status,
-		.il-counter-novelty {
-			margin-top: 0;
-			top: $il-margin-large-vertical
 		}
 
 		.il-counter-spacer {

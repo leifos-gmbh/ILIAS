@@ -899,6 +899,8 @@ assessment#:#msg_number_of_terms_too_low#:#The number of terms must be greater o
 assessment#:#msg_poly_added#:#Polygon added
 assessment#:#msg_questions_moved#:#Question(s) moved
 assessment#:#msg_rect_added#:#Rectangle added
+assessment#:#msg_score_settings_modified_and_recalc#:#Your changes were saved and the results recalculated correspondingly.
+assessment#:#msg_score_settings_not_modified#:#Your changes were not saved.
 assessment#:#msg_selected_for_move#:#Question(s) selected for moving
 assessment#:#new_category#:#New Unit Category
 assessment#:#new_unit#:#New Unit
@@ -1179,6 +1181,7 @@ assessment#:#search_results#:#Search Results
 assessment#:#search_roles#:#Search Roles
 assessment#:#search_term#:#Search Term
 assessment#:#search_users#:#Search Users
+assessment#:#select_at_least_one_feedback_type#:#Please Select at least one type of feedback and a trigger.
 assessment#:#select_gap#:#Select Gap
 assessment#:#select_max_one_item#:#Please select one item only
 assessment#:#select_one_user#:#Please select at least one user.
@@ -2256,7 +2259,7 @@ bgtask#:#bgtask_processing#:#Creating download
 bgtask#:#bgtask_setting#:#'Background Download' enabled
 bgtask#:#bgtask_setting_info#:#The creation of the ZIP archive is done asynchronously and can be cancelled anytime.
 bgtask#:#bgtask_setting_limit#:#Global Limit
-bgtask#:#bgtask_setting_limit_info#:#A download is only possible if the sum of the file sizes is below this value.
+bgtask#:#bgtask_setting_limit_info#:#A download is only possible if the sum of the file sizes is below this value in MB.
 bgtask#:#bgtask_setting_threshold_count#:#Minimum Number
 bgtask#:#bgtask_setting_threshold_count_info#:#If the number of files exceeds this value the download will be asynchronously.
 bgtask#:#bgtask_setting_threshold_size#:#Minimum Size
@@ -3914,6 +3917,7 @@ common#:#downloading_settings#:#Download Settings
 common#:#dpro_accept_usr_agreement#:#Accept Declaration of Data Protection?
 common#:#dpro_accept_usr_agreement_intro#:#There is a new Declaration of Data Protection. You need to accept it before proceeding with the use of ILIAS. Read the following document carefully and give your consent or dissent at the bottom of the page.
 common#:#dpro_force_accept_usr_agreement#:#You must accept the Declaration of Data Protection!
+common#:#dpro_no_agreement_description#:#There is currently no Declaration of Data Protection document available for this installation. Please contact the <a href="%1$s">system administrator</a>.
 common#:#dpro_refuse_acceptance#:#Refuse to Accept the Declaration of Data Protection
 common#:#dpro_usr_agreement#:#Declaration of Data Protection
 common#:#dpro_usr_agreement_footer_intro#:#You have declared your consent to this Declaration of Data Protection.
@@ -4790,7 +4794,6 @@ common#:#no#:#No
 common#:#no_access_item#:#You have no permission to access this item.
 common#:#no_access_item_public#:#To access this item you need to be logged in and to have appropriate permissions.
 common#:#no_accessibility_control_concept_description#:#There is currently no Accessibility document available for this installation. Please contact your <a href="%1$s">Contact Point for Accessibility Issues</a>.
-common#:#no_agreement_description#:#There is currently no Terms of Service document available for this installation. Please contact the <a href="%1$s">system administrator</a>.
 common#:#no_checkbox#:#You did not select any item.
 common#:#no_condition_selected#:#Please select one precondition.
 common#:#no_date#:#No date
@@ -5736,6 +5739,7 @@ common#:#top_of_page#:#Top of page
 common#:#tos_accept_usr_agreement#:#Accept Terms of Service?
 common#:#tos_accept_usr_agreement_intro#:#There are new terms of service. You need to accept them before proceeding with the use of ILIAS. Read the following document carefully and give your consent or dissent at the bottom of the page.
 common#:#tos_force_accept_usr_agreement#:#You must accept the Terms of Service!
+common#:#tos_no_agreement_description#:#There is currently no Terms of Service document available for this installation. Please contact the <a href="%1$s">system administrator</a>.
 common#:#tos_refuse_acceptance#:#Refuse to Accept Terms of Service
 common#:#tos_usr_agreement#:#Terms of Service
 common#:#tos_usr_agreement_footer_intro#:#You have declared your consent to these terms of service.
@@ -7323,6 +7327,7 @@ copa#:#copa_prop_reading_time#:#Reading Time
 copa#:#copa_value_reading_time_f_p#:#%s Minutes
 copa#:#copa_value_reading_time_f_s#:#%s Minute
 copa#:#obj_copa_duplicate#:#Duplicate Content Page
+copg#:#copg_active_to_small#:#This date must be higher than the starting date.
 copg#:#copg_allow_html#:#Enable HTML/Javascript
 copg#:#copg_allow_html_info#:#User may use HTML or Javascript page content. This may lead to security issues. Do not activate, if features can be used by users which you consider not being trustworthy. The support to add HTML content this way may be discontinued in a future version.
 copg#:#copg_an_error_occured#:#An error occured.
@@ -10434,7 +10439,7 @@ irss#:#by_title_asc#:#By Title (Ascending)
 irss#:#by_title_desc#:#By Title (Descending)
 irss#:#creation_date#:#Creation Date (This Revision)
 irss#:#file_size#:#File Size (This Revision)
-irss#:#file_size_bigger_than#:#File Size greater than (MB)
+irss#:#file_size_bigger_than#:#File Size > MB
 irss#:#full_size#:#Resource Size (All Revisions)
 irss#:#max_revision#:#Max. Revision
 irss#:#msg_upload#:#Drop Files to upload
@@ -10456,7 +10461,7 @@ irss#:#sorting_3#:#By File Size (Ascending)
 irss#:#sorting_4#:#By File Size (Descending)
 irss#:#sorting_5#:#By Creation Date (Ascending)
 irss#:#sorting_6#:#By Creation Date (Descending)
-irss#:#stakeholders#:#Stakeholders
+irss#:#stakeholders#:#Origin
 irss#:#storage_id#:#Storage ID
 irss#:#storage_info#:#Storage Information
 irss#:#type#:#File Type

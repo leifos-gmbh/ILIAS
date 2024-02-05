@@ -139,11 +139,6 @@ class ilTutorialSupportBlockGUI extends ilBlockGUI
         return $this->rbac_system->checkAccess('internal_mail', ilMailGlobalServices::getMailObjectRefId());
     }
 
-    protected function isUserPublicMailValid(ilObjUser $tutor): bool
-    {
-        return $tutor->getPref('public_email') && $tutor->getEmail() !== self::EMPTY_MAIL_URL_STRING;
-    }
-
     protected function isTutorCurrentUser(int $tutor_id)
     {
         return $tutor_id === $this->user->getId();
@@ -178,24 +173,21 @@ class ilTutorialSupportBlockGUI extends ilBlockGUI
 
     protected function getMailUrlOfUser(ilObjUser $tutor): string
     {
-        if ($this->isIliasInternalMailEnabled()) {
-            return ilMailFormCall::getLinkTarget(
-                $this->http->request()->getUri()->__toString(),
-                '',
-                [],
-                [
-                    'type' => 'new',
-                    'rcp_to' => $tutor->getLogin()
-                ]
-            );
-        }
         if (
-            $this->hasPublicProfile($tutor) &&
-            $this->isUserPublicMailValid($tutor)
+            $this->isTutorCurrentUser($tutor->getId()) ||
+            !$this->isIliasInternalMailEnabled()
         ) {
-            return 'mailto:' . $tutor->getEmail();
+            return (string) self::EMPTY_MAIL_URL_STRING;
         }
-        return (string) self::EMPTY_MAIL_URL_STRING;
+        return ilMailFormCall::getLinkTarget(
+            $this->http->request()->getUri()->__toString(),
+            '',
+            [],
+            [
+                'type' => 'new',
+                'rcp_to' => $tutor->getLogin()
+            ]
+        );
     }
 
     public function getData(): array

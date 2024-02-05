@@ -292,6 +292,12 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
                 $this->course_obj->setLocationZoom((int) $a_attribs['location_zoom'] ?? 0);
                 break;
 
+            case 'TutorialSupportBlock':
+                if (isset($a_attribs['active'])) {
+                    $this->course_obj->setTutorialSupportBlockSettingValue((int) $a_attribs['active']);
+                }
+                break;
+
             case 'SessionLimit':
                 if (isset($a_attribs['active'])) {
                     $this->course_obj->enableSessionLimit((bool) $a_attribs['active']);

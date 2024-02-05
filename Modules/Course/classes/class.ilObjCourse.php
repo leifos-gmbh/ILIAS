@@ -80,6 +80,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     private bool $auto_fill_from_waiting = false;
     private bool $member_export = false;
     private int $timing_mode = ilCourseConstants::IL_CRS_VIEW_TIMING_ABSOLUTE;
+    private int $tutorial_support_block_setting_value = 0;
     private bool $auto_notification = true;
     private ?string $target_group = null;
     private int $activation_start = 0;
@@ -100,6 +101,17 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $this->type = "crs";
         $this->course_logger = $DIC->logger()->crs();
         parent::__construct($a_id, $a_call_by_reference);
+    }
+
+    public static function lookupTutorialBlockSettingEabled(int $a_obj_id): bool
+    {
+        $query = 'SELECT tutorial_support_block FROM crs_settings'
+            . ' WHERE obj_id = ' . $GLOBALS['DIC']['ilDB']->quote($a_obj_id, 'integer');
+        $res = $GLOBALS['DIC']['ilDB']->query($query);
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            return (bool) $row->tutorial_support_block;
+        }
+        return false;
     }
 
     public static function lookupShowMembersEnabled(int $a_obj_id): bool
@@ -440,6 +452,16 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     public function getTimingMode(): int
     {
         return $this->timing_mode;
+    }
+
+    public function setTutorialSupportBlockSettingValue(int $value): void
+    {
+        $this->tutorial_support_block_setting_value = $value;
+    }
+
+    public function getTutorialSupportBlockSettingValue(): int
+    {
+        return $this->tutorial_support_block_setting_value;
     }
 
     public static function _lookupViewMode(int $a_id): int
@@ -955,6 +977,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         }
 
         $query = "UPDATE crs_settings SET " .
+            'tutorial_support_block = ' . $this->db->quote($this->getTutorialSupportBlockSettingValue(), 'integer') . ", " .
             "syllabus = " . $this->db->quote($this->getSyllabus(), 'text') . ", " .
             "contact_name = " . $this->db->quote($this->getContactName(), 'text') . ", " .
             "contact_responsibility = " . $this->db->quote($this->getContactResponsibility(), 'text') . ", " .
@@ -1031,6 +1054,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 
     public function cloneSettings(ilObject $new_obj): void
     {
+        $new_obj->setTutorialSupportBlockSettingValue($this->getTutorialSupportBlockSettingValue());
         $new_obj->setSyllabus($this->getSyllabus());
         $new_obj->setContactName($this->getContactName());
         $new_obj->setContactResponsibility($this->getContactResponsibility());
@@ -1093,7 +1117,8 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             "sub_limitation_type,sub_start,sub_end,sub_type,sub_password,sub_mem_limit," .
             "sub_max_members,sub_notify,view_mode,timing_mode,abo," .
             "latitude,longitude,location_zoom,enable_course_map,waiting_list,show_members,show_members_export, " .
-            "session_limit,session_prev,session_next, reg_ac_enabled, reg_ac, auto_notification, status_dt,mail_members_type) " .
+            "session_limit,session_prev,session_next, reg_ac_enabled, reg_ac, auto_notification, status_dt, " .
+            "mail_members_type, tutorial_support_block) " .
             "VALUES( " .
             $this->db->quote($this->getId(), 'integer') . ", " .
             $this->db->quote($this->getSyllabus(), 'text') . ", " .
@@ -1128,7 +1153,8 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             $this->db->quote($this->getRegistrationAccessCode(), 'text') . ', ' .
             $this->db->quote((int) $this->getAutoNotification(), 'integer') . ', ' .
             $this->db->quote($this->getStatusDetermination(), 'integer') . ', ' .
-            $this->db->quote($this->getMailToMembersType(), 'integer') . ' ' .
+            $this->db->quote($this->getMailToMembersType(), 'integer') . ', ' .
+            $this->db->quote($this->getTutorialSupportBlockSettingValue(), 'integer') . ' ' .
             ")";
 
         $res = $this->db->manipulate($query);
@@ -1144,6 +1170,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $query = "SELECT * FROM crs_settings WHERE obj_id = " . $this->db->quote($this->getId(), 'integer');
         $res = $this->db->query($query);
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            $this->setTutorialSupportBlockSettingValue((int) $row->tutorial_support_block);
             $this->setSyllabus((string) $row->syllabus);
             $this->setTargetGroup($row->target_group);
             $this->setContactName((string) $row->contact_name);

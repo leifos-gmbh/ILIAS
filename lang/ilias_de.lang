@@ -8042,6 +8042,11 @@ crs#:#timings_usr_edit#:#Persönliche Lernplanung
 crs#:#tutor_email#:#E-Mail
 crs#:#tutor_name#:#Name
 crs#:#tutor_phone#:#Telefon
+crs#:#tutorial_support_block_contact#:#Kontakt
+crs#:#tutorial_support_block_send_mail#:#E-Mail senden
+crs#:#tutorial_support_block_setting_desc#:#Der 'Kontaktperson' Block wird im 'Inhalt' Tab dargestellt.
+crs#:#tutorial_support_block_setting_title#:#Kontaktperson Block
+crs#:#tutorial_support_block_title#:#Kontaktperson
 crs#:#user_fields#:#Angaben des Persönlichen Profils
 crsv#:#crsv_create#:#Kurszertifikat erstellen
 crsv#:#crsv_create_info#:#Wählen Sie einen Kurs, für den Sie ein Zertifikat benötigen

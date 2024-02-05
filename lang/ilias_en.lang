@@ -8042,6 +8042,11 @@ crs#:#timings_usr_edit#:#Edit Timings
 crs#:#tutor_email#:#E-Mail
 crs#:#tutor_name#:#Name
 crs#:#tutor_phone#:#Phone
+crs#:#tutorial_support_block_contact#:#Contact
+crs#:#tutorial_support_block_send_mail#:#send email
+crs#:#tutorial_support_block_setting_desc#:#The 'Tutorial Support' block is displayed in the 'Contents' tab.
+crs#:#tutorial_support_block_setting_title#:#Tutorial Support Block
+crs#:#tutorial_support_block_title#:#Tutorial Support
 crs#:#user_fields#:#User Fields
 crsv#:#crsv_create#:#Create Course Certificate
 crsv#:#crsv_create_info#:#Select a completed course to generate a certificate for it

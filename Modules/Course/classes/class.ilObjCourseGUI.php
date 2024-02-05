@@ -854,6 +854,13 @@ class ilObjCourseGUI extends ilContainerGUI
         $this->object->setOrderType((int) $form->getInput('sorting'));
         $this->saveSortingSettings($form);
 
+        $this->log->debug(
+            "\n\n\nValue: " . (int) $form->getInput('tutorial_support_block_checkbox') . "\n\n\n"
+        );
+        $this->object->setTutorialSupportBlockSettingValue(
+            (int) $form->getInput('tutorial_support_block_checkbox')
+        );
+
         $this->object->setAboStatus((bool) $form->getInput('abo'));
         $this->object->setShowMembers((bool) $form->getInput('show_members'));
 
@@ -1351,6 +1358,15 @@ class ilObjCourseGUI extends ilContainerGUI
                 ilContainer::SORT_ACTIVATION
             )
         );
+
+        $tutorial_support_panel_checkbox = new ilCheckboxInputGUI(
+            $this->lng->txt('tutorial_support_block_setting_title'),
+            'tutorial_support_block_checkbox'
+        );
+        //$tutorial_support_panel_checkbox->setValue($this->object->getTutorialSupportBlockSettingValue());
+        $tutorial_support_panel_checkbox->setChecked((bool) $this->object->getTutorialSupportBlockSettingValue());
+        $tutorial_support_panel_checkbox->setInfo($this->lng->txt('tutorial_support_block_setting_desc'));
+        $form->addItem($tutorial_support_panel_checkbox);
 
         // lp vs. course status
         if (ilObjUserTracking::_enabledLearningProgress()) {

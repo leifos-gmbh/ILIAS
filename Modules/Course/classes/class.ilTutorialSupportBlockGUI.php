@@ -199,7 +199,10 @@ class ilTutorialSupportBlockGUI extends ilBlockGUI
         $tutor_ids = $this->getTutorIds();
         foreach ($tutor_ids as $tutor_id) {
             $tutor = new ilObjUser($tutor_id);
-            if (!$this->isUserValid($tutor)) {
+            if (
+                !$this->isUserValid($tutor) ||
+                $this->user->isAnonymous()
+            ) {
                 continue;
             }
             $data[] = $this->getTutorData($tutor);

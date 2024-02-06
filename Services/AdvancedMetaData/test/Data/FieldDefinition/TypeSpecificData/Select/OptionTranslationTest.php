@@ -18,13 +18,20 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\FieldDefinition\TypeSpecificData;
+namespace ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\Select;
 
-use ILIAS\AdvancedMetaData\FieldDefinition\Type;
+use PHPUnit\Framework\TestCase;
 
-interface TypeSpecificData
+class OptionTranslationTest extends TestCase
 {
-    public function type(): Type;
-
-    public function fieldID(): int;
+    public function testContainsChangesInValue(): void
+    {
+        $data = new OptionTranslationImplementation(
+            'lang',
+            'value',
+            true
+        );
+        $data->setValue('different value');
+        $this->assertTrue($data->containsChanges());
+    }
 }

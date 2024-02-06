@@ -18,15 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\FieldDefinition\GenericData;
+namespace ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData;
 
-use ILIAS\AdvancedMetaData\FieldDefinition\Type;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
+use ILIAS\AdvancedMetaData\Data\PersistenceTrackingDataImplementation;
 
-class GenericDataImplementation implements GenericData
+class GenericDataImplementation extends PersistenceTrackingDataImplementation implements GenericData
 {
     protected ?int $id;
-
-    protected bool $contains_changes;
 
     public function __construct(
         protected Type $type,
@@ -41,7 +40,6 @@ class GenericDataImplementation implements GenericData
         int $id = null
     ) {
         $this->id = $id;
-        $this->contains_changes = is_null($id);
     }
 
     public function id(): ?int
@@ -56,13 +54,14 @@ class GenericDataImplementation implements GenericData
 
     public function isPersisted(): bool
     {
-        return !is_null($this->id);
+        return !is_null($this->id());
     }
 
-    public function containsChanges(): bool
+    protected function getSubData(): \Generator
     {
-        return $this->contains_changes;
+        yield from [];
     }
+
 
     public function getRecordID(): int
     {
@@ -71,10 +70,11 @@ class GenericDataImplementation implements GenericData
 
     public function setRecordID(int $id): void
     {
-        if ($id !== $this->record_id) {
-            $this->record_id = $id;
-            $this->contains_changes = true;
+        if ($id === $this->record_id) {
+            return;
         }
+        $this->record_id = $id;
+        $this->markAsChanged();
     }
 
     public function getImportID(): string
@@ -84,10 +84,11 @@ class GenericDataImplementation implements GenericData
 
     public function setImportID(string $id): void
     {
-        if ($id !== $this->import_id) {
-            $this->import_id = $id;
-            $this->contains_changes = true;
+        if ($id === $this->import_id) {
+            return;
         }
+        $this->import_id = $id;
+        $this->markAsChanged();
     }
 
     public function getTitle(): string
@@ -97,10 +98,11 @@ class GenericDataImplementation implements GenericData
 
     public function setTitle(string $title): void
     {
-        if ($title !== $this->title) {
-            $this->title = $title;
-            $this->contains_changes = true;
+        if ($title === $this->title) {
+            return;
         }
+        $this->title = $title;
+        $this->markAsChanged();
     }
 
     public function getDescription(): string
@@ -110,10 +112,11 @@ class GenericDataImplementation implements GenericData
 
     public function setDescription(string $description): void
     {
-        if ($description !== $this->description) {
-            $this->description = $description;
-            $this->contains_changes = true;
+        if ($description === $this->description) {
+            return;
         }
+        $this->description = $description;
+        $this->markAsChanged();
     }
 
     public function getPosition(): int
@@ -123,10 +126,11 @@ class GenericDataImplementation implements GenericData
 
     public function setPosition(int $position): void
     {
-        if ($position !== $this->position) {
-            $this->position = $position;
-            $this->contains_changes = true;
+        if ($position === $this->position) {
+            return;
         }
+        $this->position = $position;
+        $this->markAsChanged();
     }
 
     public function isSearchable(): bool
@@ -136,10 +140,11 @@ class GenericDataImplementation implements GenericData
 
     public function setSearchable(bool $searchable): void
     {
-        if ($searchable !== $this->searchable) {
-            $this->searchable = $searchable;
-            $this->contains_changes = true;
+        if ($searchable === $this->searchable) {
+            return;
         }
+        $this->searchable = $searchable;
+        $this->markAsChanged();
     }
 
     public function isRequired(): bool
@@ -149,10 +154,11 @@ class GenericDataImplementation implements GenericData
 
     public function setRequired(bool $required): void
     {
-        if ($required !== $this->required) {
-            $this->required = $required;
-            $this->contains_changes = true;
+        if ($required === $this->required) {
+            return;
         }
+        $this->required = $required;
+        $this->markAsChanged();
     }
 
     public function getFieldValues(): array
@@ -162,9 +168,10 @@ class GenericDataImplementation implements GenericData
 
     public function setFieldValues(array $values): void
     {
-        if ($values !== $this->field_values) {
-            $this->field_values = $values;
-            $this->contains_changes = true;
+        if ($values === $this->field_values) {
+            return;
         }
+        $this->field_values = $values;
+        $this->markAsChanged();
     }
 }

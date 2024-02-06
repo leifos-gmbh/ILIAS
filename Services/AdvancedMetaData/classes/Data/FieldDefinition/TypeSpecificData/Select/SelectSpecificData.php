@@ -18,21 +18,23 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\Repository\TypeSpecificData;
+namespace ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\Select;
 
-use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\TypeSpecificData;
 
-interface Gateway
+interface SelectSpecificData extends TypeSpecificData
 {
-    public function create(TypeSpecificData $data): void;
+    /**
+     * @return Option[]
+     */
+    public function getOptions(): \Generator;
+
+    public function getOption(int $option_id): ?Option;
+
+    public function removeOption(int $option_id): void;
 
     /**
-     * @return TypeSpecificData[]
+     * Returns the new option such that it can be configured.
      */
-    public function read(int ...$field_ids): \Generator;
-
-    public function update(TypeSpecificData $data): void;
-
-    public function delete(int ...$field_ids): void;
+    public function addOption(): Option;
 }

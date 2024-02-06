@@ -18,21 +18,8 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\Repository\TypeSpecificData;
+namespace ILIAS\AdvancedMetaData\Data;
 
-use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
-use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\TypeSpecificData;
-
-interface Gateway
+class Exception extends \ilException
 {
-    public function create(TypeSpecificData $data): void;
-
-    /**
-     * @return TypeSpecificData[]
-     */
-    public function read(int ...$field_ids): \Generator;
-
-    public function update(TypeSpecificData $data): void;
-
-    public function delete(int ...$field_ids): void;
 }

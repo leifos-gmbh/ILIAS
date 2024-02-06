@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Repository\GenericData;
 
-use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericData;
-use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericDataImplementation;
-use ILIAS\AdvancedMetaData\FieldDefinition\Type;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericData;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericDataImplementation;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
 use ILIAS\AdvancedMetaData\Repository\Exception;
 
 class DatabaseGatewayImplementation implements Gateway
@@ -150,6 +150,10 @@ class DatabaseGatewayImplementation implements Gateway
 
     public function update(GenericData $data): void
     {
+        if (!$data->isPersisted() || !$data->containsChanges()) {
+            return;
+        }
+
         $this->db->update(
             'adv_mdf_definition',
             [
@@ -200,7 +204,7 @@ class DatabaseGatewayImplementation implements Gateway
     {
         if (!isset($row['field_type']) || is_null($type = Type::tryFrom((int) $row['field_type']))) {
             throw new Exception(
-                ($row['field_type'] ?? 'Null') . 'is invalid as field definition type'
+                ($row['field_type'] ?? 'Null') . ' is invalid as field definition type'
             );
         }
 

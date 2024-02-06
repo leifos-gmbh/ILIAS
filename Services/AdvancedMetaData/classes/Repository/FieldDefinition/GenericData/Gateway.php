@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Repository\GenericData;
 
-use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericData;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericData;
 
 interface Gateway
 {

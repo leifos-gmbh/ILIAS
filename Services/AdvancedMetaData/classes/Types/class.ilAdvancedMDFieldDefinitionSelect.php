@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericData;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericData;
 
 /**
  * AMD field type select
@@ -37,6 +37,7 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
 
     protected array $option_translations = [];
     private \ilGlobalTemplateInterface $main_tpl;
+
     public function __construct(GenericData $generic_data, string $language = '')
     {
         global $DIC;

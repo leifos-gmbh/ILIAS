@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 use ILIAS\Refinery\Factory as RefineryFactory;
 use ILIAS\HTTP\GlobalHttpState;
-use ILIAS\AdvancedMetaData\FieldDefinition\Type;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
 use ILIAS\AdvancedMetaData\Repository\GenericData\Gateway as DBGateway;
-use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericData;
-use ILIAS\AdvancedMetaData\FieldDefinition\GenericData\GenericDataImplementation;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericData;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericDataImplementation;
 use ILIAS\AdvancedMetaData\Repository\GenericData\DatabaseGatewayImplementation;
 
 /**
@@ -107,6 +107,9 @@ abstract class ilAdvancedMDFieldDefinition
         $db_gateway = new DatabaseGatewayImplementation($DIC->database());
 
         if (self::isValidType((int) $a_type)) {
+            /**
+             * TODO: In the future, this should probably be supplied by the repo.
+             */
             $generic_data = new GenericDataImplementation(
                 Type::from($a_type),
                 0,

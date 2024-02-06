@@ -18,14 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\FieldDefinition\GenericData;
+namespace ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData;
 
 use PHPUnit\Framework\TestCase;
-use ILIAS\AdvancedMetaData\FieldDefinition\Type;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
 
 class GenericDataTest extends TestCase
 {
-    protected function getGenericData(
+    protected function getData(
         int $id = null,
         string $title = 'title'
     ): GenericDataImplementation {
@@ -45,31 +45,25 @@ class GenericDataTest extends TestCase
 
     public function testIsPersistedTrue(): void
     {
-        $data = $this->getGenericData(7);
+        $data = $this->getData(7);
         $this->assertTrue($data->isPersisted());
     }
 
     public function testIsPersistedFalse(): void
     {
-        $data = $this->getGenericData();
+        $data = $this->getData();
         $this->assertFalse($data->isPersisted());
-    }
-
-    public function testContainsChangesTrueIfNotPersisted(): void
-    {
-        $data = $this->getGenericData();
-        $this->assertTrue($data->containsChanges());
     }
 
     public function testContainsChangesFalse(): void
     {
-        $data = $this->getGenericData(5);
+        $data = $this->getData(5);
         $this->assertFalse($data->containsChanges());
     }
 
     public function testContainsChangesTrue(): void
     {
-        $data = $this->getGenericData(8, 'something');
+        $data = $this->getData(8, 'something');
         $data->setTitle('something else');
 
         $this->assertTrue($data->containsChanges());

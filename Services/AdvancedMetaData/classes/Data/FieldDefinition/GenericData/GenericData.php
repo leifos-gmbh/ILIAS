@@ -18,26 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\FieldDefinition\GenericData;
+namespace ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData;
 
-use ILIAS\AdvancedMetaData\FieldDefinition\Type;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
 
 interface GenericData
 {
     public function id(): ?int;
 
     public function type(): Type;
-
-    /**
-     * Is this data is already persisted under an ID?
-     */
-    public function isPersisted(): bool;
-
-    /**
-     * Was the contained data altered with respect to what is persisted?
-     * Returns true if not persisted.
-     */
-    public function containsChanges(): bool;
 
     public function getRecordID(): int;
 

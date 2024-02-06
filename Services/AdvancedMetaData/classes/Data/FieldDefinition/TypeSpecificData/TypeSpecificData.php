@@ -18,21 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\Repository\TypeSpecificData;
+namespace ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData;
 
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
-use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\TypeSpecificData;
+use ILIAS\AdvancedMetaData\Data\PersistenceTrackingData;
 
-interface Gateway
+interface TypeSpecificData extends PersistenceTrackingData
 {
-    public function create(TypeSpecificData $data): void;
+    public function isTypeSupported(Type $type): bool;
 
-    /**
-     * @return TypeSpecificData[]
-     */
-    public function read(int ...$field_ids): \Generator;
-
-    public function update(TypeSpecificData $data): void;
-
-    public function delete(int ...$field_ids): void;
+    public function fieldID(): ?int;
 }

@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\FieldDefinition;
+namespace ILIAS\AdvancedMetaData\Data\FieldDefinition;
 
 use PHPUnit\Framework\TestCase;
 

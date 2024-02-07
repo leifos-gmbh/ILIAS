@@ -37,7 +37,7 @@ class ilAdvancedMDFieldDefinitionGroupTableGUI extends ilTable2GUI
     {
         $data = array();
 
-        foreach ($a_def->getOptions() as $option) {
+        foreach ($a_def->getOptionsInDefaultLanguageAsArray() as $option) {
             $item = array("option" => $option);
 
             $a_def->exportOptionToTableGUI($option, $item);

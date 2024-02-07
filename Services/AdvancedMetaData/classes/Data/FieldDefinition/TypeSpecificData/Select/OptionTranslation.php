@@ -26,6 +26,10 @@ interface OptionTranslation extends PersistenceTrackingData
 {
     public function language(): string;
 
+    public function getPosition(): int;
+
+    public function setPosition(int $position): void;
+
     public function getValue(): string;
 
     public function setValue(string $value): void;

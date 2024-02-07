@@ -18,21 +18,22 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\Repository\TypeSpecificData;
+namespace ILIAS\AdvancedMetaData\Repository\TypeSpecificData\Select;
 
-use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
-use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\TypeSpecificData;
+use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\Select\SelectSpecificData;
 
 interface Gateway
 {
-    public function create(TypeSpecificData $data): void;
+    public function create(int $field_id, SelectSpecificData $data): void;
+
+    public function readByID(int $field_id): ?SelectSpecificData;
 
     /**
-     * @return TypeSpecificData[]
+     * @return SelectSpecificData[]
      */
-    public function read(int ...$field_ids): \Generator;
+    public function readByIDs(int ...$field_ids): \Generator;
 
-    public function update(TypeSpecificData $data): void;
+    public function update(SelectSpecificData $data): void;
 
     public function delete(int ...$field_ids): void;
 }

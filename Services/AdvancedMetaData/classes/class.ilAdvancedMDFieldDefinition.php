@@ -69,7 +69,7 @@ abstract class ilAdvancedMDFieldDefinition
     protected string $language = '';
 
     protected ilDBInterface $db;
-    protected DBGateway $db_gateway;
+    private DBGateway $db_gateway;
     protected ilLanguage $lng;
     protected ilLogger $logger;
     protected GlobalHttpState $http;
@@ -94,7 +94,9 @@ abstract class ilAdvancedMDFieldDefinition
         $this->db_gateway = new DatabaseGatewayImplementation($this->db);
 
         $this->generic_data = $generic_data;
-        $this->importFieldDefinition($generic_data->getFieldValues());
+        if (!empty($generic_data->getFieldValues())) {
+            $this->importFieldDefinition($generic_data->getFieldValues());
+        }
     }
 
     public static function getInstance(
@@ -740,18 +742,7 @@ abstract class ilAdvancedMDFieldDefinition
             $field_id = $this->db_gateway->createFromScratch($this->generic_data);
         }
 
-        $this->generic_data = new GenericDataImplementation(
-            $this->generic_data->type(),
-            $this->generic_data->getRecordID(),
-            $this->generic_data->getImportID(),
-            $this->generic_data->getTitle(),
-            $this->generic_data->getDescription(),
-            $this->generic_data->getPosition(),
-            $this->generic_data->isSearchable(),
-            $this->generic_data->isRequired(),
-            $this->generic_data->getFieldValues(),
-            $field_id
-        );
+        $this->generic_data = $this->db_gateway->readByID($field_id);
     }
 
     /**

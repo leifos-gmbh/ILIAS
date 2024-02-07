@@ -33,7 +33,6 @@ class OptionImplementation extends PersistenceTrackingDataImplementation impleme
     protected array $translations;
 
     public function __construct(
-        protected int $position,
         int $option_id = null,
         OptionTranslation ...$translations
     ) {
@@ -54,20 +53,6 @@ class OptionImplementation extends PersistenceTrackingDataImplementation impleme
     protected function getSubData(): \Generator
     {
         yield from $this->getTranslations();
-    }
-
-    public function getPosition(): int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): void
-    {
-        if ($this->position === $position) {
-            return;
-        }
-        $this->position = $position;
-        $this->markAsChanged();
     }
 
     public function getTranslations(): \Generator
@@ -104,7 +89,7 @@ class OptionImplementation extends PersistenceTrackingDataImplementation impleme
             throw new Exception('Translation in language ' . $language . ' already exists.');
         }
 
-        $translation = new OptionTranslationImplementation($language, '');
+        $translation = new OptionTranslationImplementation($language, 0, '');
         $this->translations[] = $translation;
         return $translation;
     }

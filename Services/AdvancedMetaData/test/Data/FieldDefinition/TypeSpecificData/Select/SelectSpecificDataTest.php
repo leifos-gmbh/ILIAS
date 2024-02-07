@@ -26,7 +26,7 @@ class SelectSpecificDataTest extends TestCase
 {
     public function testGetOption(): void
     {
-        $option = new OptionImplementation(9, 13);
+        $option = new OptionImplementation(13);
         $data = new SelectSpecificDataImplementation(1, $option);
         $this->assertSame(
             $option,
@@ -46,7 +46,7 @@ class SelectSpecificDataTest extends TestCase
 
     public function testRemoveOption(): void
     {
-        $option = new OptionImplementation(9, 13);
+        $option = new OptionImplementation(13);
         $data = new SelectSpecificDataImplementation(1, $option);
         $data->removeOption(13);
         $this->assertNull($data->getOption(13));
@@ -54,7 +54,7 @@ class SelectSpecificDataTest extends TestCase
 
     public function testContainsChangesOptionRemoved(): void
     {
-        $option = new OptionImplementation(9, 13);
+        $option = new OptionImplementation(13);
         $data = new SelectSpecificDataImplementation(1, $option);
         $data->removeOption(13);
         $this->assertTrue($data->containsChanges());

@@ -76,7 +76,7 @@ class SelectSpecificDataImplementation extends TypeSpecificDataImplementation im
 
     public function addOption(): Option
     {
-        $option = new OptionImplementation(0);
+        $option = new OptionImplementation();
         $this->options[] = $option;
         return $option;
     }

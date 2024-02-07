@@ -181,6 +181,8 @@ class DatabaseGatewayImplementation implements Gateway
 
         $query = 'DELETE FROM adv_mdf_definition WHERE ' .
             $this->db->in('field_id', $field_ids, false, \ilDBConstants::T_INTEGER);
+
+        $this->db->manipulate($query);
     }
 
     protected function getNextPositionInRecord(int $record_id): int
@@ -190,7 +192,7 @@ class DatabaseGatewayImplementation implements Gateway
 
         $res = $this->db->query($query);
         if ($row = $this->db->fetchAssoc($res)) {
-            return (int) $row['max_pos'];
+            return $row['max_pos'] + 1;
         }
         return 0;
     }

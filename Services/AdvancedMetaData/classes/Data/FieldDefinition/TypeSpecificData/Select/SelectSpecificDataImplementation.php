@@ -35,6 +35,10 @@ class SelectSpecificDataImplementation extends TypeSpecificDataImplementation im
         Option ...$options
     ) {
         parent::__construct($field_id);
+
+        usort($options, function (Option $a, Option $b) {
+            return $a->getPosition() > $b->getPosition();
+        });
         $this->options = $options;
     }
 
@@ -76,7 +80,7 @@ class SelectSpecificDataImplementation extends TypeSpecificDataImplementation im
 
     public function addOption(): Option
     {
-        $option = new OptionImplementation();
+        $option = new OptionImplementation(0);
         $this->options[] = $option;
         return $option;
     }

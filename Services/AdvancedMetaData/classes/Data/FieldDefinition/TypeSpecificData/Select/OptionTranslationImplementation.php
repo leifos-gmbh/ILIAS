@@ -26,7 +26,6 @@ class OptionTranslationImplementation extends PersistenceTrackingDataImplementat
 {
     public function __construct(
         protected string $language,
-        protected int $position,
         protected string $value,
         protected bool $is_persisted = false
     ) {
@@ -45,20 +44,6 @@ class OptionTranslationImplementation extends PersistenceTrackingDataImplementat
     public function language(): string
     {
         return $this->language;
-    }
-
-    public function getPosition(): int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): void
-    {
-        if ($this->position === $position) {
-            return;
-        }
-        $this->position = $position;
-        $this->markAsChanged();
     }
 
     public function getValue(): string

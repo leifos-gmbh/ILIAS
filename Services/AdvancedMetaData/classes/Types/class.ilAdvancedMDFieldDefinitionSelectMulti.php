@@ -42,12 +42,7 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
         $def = ilADTFactory::getInstance()->getDefinitionInstanceByType("MultiEnum");
         $def->setNumeric(false);
 
-        $options = $this->getOptions();
-        $translated_options = [];
-        if (isset($this->getOptionTranslations()[$this->language])) {
-            $translated_options = $this->getOptionTranslations()[$this->language];
-        }
-        $def->setOptions(array_replace($options, $translated_options));
+        $def->setOptions($this->getOptionsInLanguageAsArray($this->language));
         return $def;
     }
 

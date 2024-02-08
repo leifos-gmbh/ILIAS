@@ -24,9 +24,33 @@ use PHPUnit\Framework\TestCase;
 
 class SelectSpecificDataTest extends TestCase
 {
+    public function testGetOptionsSortedByPosition(): void
+    {
+        $option_1 = new OptionImplementation(5, 13);
+        $option_2 = new OptionImplementation(0, 13);
+        $option_3 = new OptionImplementation(32, 13);
+        $data = new SelectSpecificDataImplementation(1, $option_1, $option_2, $option_3);
+
+        $options = $data->getOptions();
+        $this->assertSame(
+            $option_2,
+            $options->current()
+        );
+        $options->next();
+        $this->assertSame(
+            $option_1,
+            $options->current()
+        );
+        $options->next();
+        $this->assertSame(
+            $option_3,
+            $options->current()
+        );
+    }
+
     public function testGetOption(): void
     {
-        $option = new OptionImplementation(13);
+        $option = new OptionImplementation(5, 13);
         $data = new SelectSpecificDataImplementation(1, $option);
         $this->assertSame(
             $option,
@@ -46,7 +70,7 @@ class SelectSpecificDataTest extends TestCase
 
     public function testRemoveOption(): void
     {
-        $option = new OptionImplementation(13);
+        $option = new OptionImplementation(5, 13);
         $data = new SelectSpecificDataImplementation(1, $option);
         $data->removeOption(13);
         $this->assertNull($data->getOption(13));
@@ -54,7 +78,7 @@ class SelectSpecificDataTest extends TestCase
 
     public function testContainsChangesOptionRemoved(): void
     {
-        $option = new OptionImplementation(13);
+        $option = new OptionImplementation(5, 13);
         $data = new SelectSpecificDataImplementation(1, $option);
         $data->removeOption(13);
         $this->assertTrue($data->containsChanges());

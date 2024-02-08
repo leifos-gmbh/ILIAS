@@ -118,9 +118,10 @@ class DatabaseGatewayImplementation implements Gateway
         foreach ($option->getTranslations() as $translation) {
             $translation_langs[] = $translation->language();
 
-            if (!$translation->containsChanges()) {
-                continue;
-            }
+            /**
+             * containsChanges check must be skipped here, since an
+             * option's position is persisted redundantly for every translation.
+             */
 
             if ($translation->isPersisted()) {
                 $this->updateTranslation(
@@ -175,11 +176,14 @@ class DatabaseGatewayImplementation implements Gateway
 
     protected function dataFromRows(int $field_id, array $rows): ?SelectSpecificData
     {
+        if (empty($rows)) {
+            return null;
+        }
+
         $translations_by_option_id = [];
         foreach ($rows as $row) {
             $translations_by_option_id[(int) $row['option_id']][] = new OptionTranslationImplementation(
                 (string) $row['lang_code'],
-                (int) $row['idx'],
                 (string) $row['value'],
                 true
             );
@@ -188,6 +192,7 @@ class DatabaseGatewayImplementation implements Gateway
         $options = [];
         foreach ($translations_by_option_id as $option_id => $translations) {
             $options[] = new OptionImplementation(
+                (int) $rows[0]['idx'],
                 $option_id,
                 ...$translations
             );

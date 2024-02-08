@@ -37,7 +37,7 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
     protected array $confirm_objects_values = [];
     protected ?array $confirmed_objects = null;
 
-    protected ?SelectSpecificData $old_options = null;
+    protected ?array $old_options_array = null;
     protected SelectSpecificData $options;
 
     protected string $default_language;
@@ -155,22 +155,27 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
     ): void {
         $default_language = ilAdvancedMDRecord::_getInstanceByRecordId($this->getRecordId())->getDefaultLanguage();
 
-        $translation = $this->getOptionTranslation($language);
-
         $first = true;
-        foreach ($this->getOptions() as $index => $option) {
+        foreach ($this->options()->getOptions() as $option) {
             $title = '';
             if ($first) {
                 $title = $this->lng->txt("meta_advmd_select_options");
             }
             $text = new ilTextInputGUI(
                 $title,
-                'opts__' . $language . '__' . $index
+                'opts__' . $language . '__' . $option->optionID()
             );
-            if (isset($translation[$index])) {
-                $text->setValue($translation[$index]);
+
+            if ($option->hasTranslationInLanguage($language)) {
+                $text->setValue($option->getTranslationInLanguage($language)->getValue());
             }
-            $text->setInfo($default_language . ': ' . $option);
+
+            $default_value = '';
+            if ($option->hasTranslationInLanguage($default_language)) {
+                $default_value = $option->getTranslationInLanguage($default_language)->getValue();
+            }
+
+            $text->setInfo($default_language . ': ' . $default_value);
             $text->setMaxLength(255);
             $text->setRequired(true);
 
@@ -252,22 +257,56 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
         }
 
         if (!strlen($language)) {
-            $language = ilAdvancedMDRecord::_getInstanceByRecordId($this->getRecordId())->getDefaultLanguage();
+            $language = $this->default_language;
         }
 
-        $old = $this->getOptionTranslation($language);
-        $new = $a_form->getInput("opts");
+        $this->old_options_array = $this->getOptionsInLanguageAsArray($language);
 
-        $missing = array_diff_assoc($old, $new);
-        // keep track of the indices of entries persisting through the operation
-        $index_map = [];
-        foreach ($missing as $missing_idx => $missing_value) {
-            if (in_array($missing_value, $new)) {
-                $index_map[$missing_idx] = array_search($missing_value, $new);
+        $new = $a_form->getInput("opts");
+        $unmapped_new_values = $new;
+        $unmapped_old_options = [];
+        $removed_old_options = [];
+
+        // update position for unchanged values
+        foreach ($this->options()->getOptions() as $option) {
+            $old_value = $option->getTranslationInLanguage($language);
+
+            if (in_array($old_value, $unmapped_new_values)) {
+                $new_position = array_search($old_value, $unmapped_new_values);
+                $option->setPosition((int) $new_position);
+                unset($unmapped_new_values[$new_position]);
+                continue;
+            }
+
+            $unmapped_old_options[$option->getPosition()] = $option;
+        }
+
+        // if all leftover options have values in their old position, use those values
+        if (count(array_intersect_key($unmapped_old_options, $unmapped_new_values)) === count($unmapped_old_options)) {
+            foreach ($unmapped_old_options as $position => $option) {
+                $option->getTranslationInLanguage($language)->setValue(
+                    trim($unmapped_new_values[$position])
+                );
+                unset($unmapped_new_values[$position]);
+                unset($unmapped_old_options[$position]);
             }
         }
 
-        if (sizeof($missing)) {
+        // remove leftover options
+        foreach ($unmapped_old_options as $option) {
+            $this->options()->removeOption($option->optionID());
+            $removed_old_options[] = $option;
+        }
+
+        // create leftover values as new options
+        foreach ($unmapped_new_values as $position => $value) {
+            $new_option = $this->options()->addOption();
+            $new_option->setPosition((int) $position);
+            $new_translation = $new_option->addTranslation($language);
+            $new_translation->setValue(trim($value));
+        }
+
+        if (count($removed_old_options)) {
             $this->confirmed_objects = $this->buildConfirmedObjects($a_form);
             $already_confirmed = is_array($this->confirmed_objects);
 
@@ -276,42 +315,18 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
                 false,
                 $multi
             );
-            foreach ($missing as $missing_idx => $missing_value) {
-                $in_use = $this->findBySingleValue($search, $missing_idx);
+            foreach ($removed_old_options as $option) {
+                $in_use = $this->findBySingleValue($search, $option->optionID());
                 if (is_array($in_use)) {
                     foreach ($in_use as $item) {
-                        if (array_key_exists($missing_idx, $index_map)) {
-                            $complete_id = $item[0] . "_" . $item[1] . "_" . $item[2];
-                            $new_index = $index_map[$missing_idx];
-                            $this->confirmed_objects[$missing_idx][$complete_id] = $new_index;
-                            continue;
-                        }
                         if (!$already_confirmed) {
-                            $this->confirm_objects[$missing_idx][] = $item;
-                            $this->confirm_objects_values[$missing_idx] = $old[$missing_idx];
+                            $old_option_value = $option->getTranslationInLanguage($language)?->getValue() ?? '';
+                            $this->confirm_objects[$option->optionID()][] = $item;
+                            $this->confirm_objects_values[$option->optionID()] = $old_option_value;
                         }
                     }
                 }
             }
-        }
-        $this->old_options = $old;
-
-        // update the options along with their translations
-        $this->setOptionTranslationsForLanguage($new, $language);
-        foreach ($this->getOptionTranslations() as $current_lang => $options) {
-            $current_lang = (string) $current_lang;
-            if ($current_lang === $language) {
-                continue;
-            }
-            $updated_translations = [];
-            foreach ($options as $idx => $option) {
-                if (array_key_exists($idx, $index_map)) {
-                    $updated_translations[$index_map[$idx]] = $option;
-                    continue;
-                }
-                $updated_translations[$idx] = $option;
-            }
-            $this->setOptionTranslationsForLanguage($updated_translations, $current_lang);
         }
     }
 
@@ -343,14 +358,17 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
 
     protected function importTranslatedFormPostValues(ilPropertyFormGUI $form, string $language): void
     {
-        $translated_options = [];
-        foreach ($this->getOptions() as $idx => $value) {
-            $value = $form->getInput('opts__' . $language . '__' . $idx);
-            $translated_options[] = trim($value);
+        foreach ($this->options()->getOptions() as $option) {
+            $value = $form->getInput('opts__' . $language . '__' . $option->optionID());
+            $value = trim($value);
+
+            if ($option->hasTranslationInLanguage($language)) {
+                $option->getTranslationInLanguage($language)->setValue($value);
+                continue;
+            }
+            $new_translation = $option->addTranslation($language);
+            $new_translation->setValue($value);
         }
-        $translations = $this->getOptionTranslations();
-        $translations[$language] = $translated_options;
-        $this->setOptionTranslations($translations);
     }
 
     public function importDefinitionFormPostValuesNeedsConfirmation(): bool
@@ -517,7 +535,7 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
             // we need the "old" options for the search
             $def = $this->getADTDefinition();
             $def = clone($def);
-            $def->setOptions($this->old_options);
+            $def->setOptions($this->old_options_array);
             $search = ilADTFactory::getInstance()->getSearchBridgeForDefinitionInstance($def, false, true);
             ilADTFactory::initActiveRecordByType();
 
@@ -572,7 +590,6 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
                             if (is_numeric($new_option)) {
                                 ilADTActiveRecordByType::deleteByPrimary('adv_md_values', $index_new, 'MultiEnum');
                                 ilADTActiveRecordByType::create('adv_md_values', $index_new, 'MultiEnum');
-                            } else {
                             }
                         }
                     }
@@ -611,12 +628,32 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
         }
     }
 
+    /**
+     * Since the XML import only allows for a key-value pair, we also rely on
+     * the order of properties to sort translations into options.
+     */
     public function importXMLProperty(string $a_key, string $a_value): void
     {
-        /**
-         * TODO figure out how import works currently, and reproduce it as best as possible?
-         *  or expand export (option_id and idx), and make it backwards compatible as best
-         */
+        $language = $a_key;
+
+        $associated_option = null;
+        $max_position = -1;
+        foreach ($this->options()->getOptions() as $option) {
+            if (
+                !$option->hasTranslationInLanguage($a_key) &&
+                !isset($associated_option)
+            ) {
+                $associated_option = $option;
+            }
+            $max_position = max($max_position, $option->getPosition());
+        }
+        if (!isset($associated_option)) {
+            $associated_option = $this->options()->addOption();
+            $associated_option->setPosition($max_position + 1);
+        }
+
+        $new_translation = $associated_option->addTranslation($language);
+        $new_translation->setValue($a_value);
     }
 
     public function getValueForXML(ilADT $element): string

@@ -24,23 +24,10 @@ use PHPUnit\Framework\TestCase;
 
 class OptionTranslationTest extends TestCase
 {
-    public function testContainsChangesInPosition(): void
-    {
-        $translation = new OptionTranslationImplementation(
-            'lang',
-            5,
-            'value',
-            true
-        );
-        $translation->setPosition(103);
-        $this->assertTrue($translation->containsChanges());
-    }
-
     public function testContainsChangesInValue(): void
     {
         $translation = new OptionTranslationImplementation(
             'lang',
-            5,
             'value',
             true
         );

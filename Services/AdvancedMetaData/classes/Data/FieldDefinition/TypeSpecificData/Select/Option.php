@@ -27,6 +27,10 @@ interface Option extends PersistenceTrackingData
 {
     public function optionID(): ?int;
 
+    public function getPosition(): int;
+
+    public function setPosition(int $position): void;
+
     /**
      * @return OptionTranslation[]
      */

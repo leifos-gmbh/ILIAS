@@ -25,6 +25,7 @@ use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\TypeSpecificDat
 interface SelectSpecificData extends TypeSpecificData
 {
     /**
+     * Returns options in the order of their position.
      * @return Option[]
      */
     public function getOptions(): \Generator;

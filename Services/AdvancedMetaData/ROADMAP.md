@@ -6,11 +6,17 @@
 
 ### Improve Stability and Code Quality
 
-#### ID for Select Options
+#### Better UI for Select Options
 
-Enum entries (for select and multiselect fields) should get an actual ID.
-The current ID acts more like a ordering parameter, which makes mapping entries
-during editing of the fields unnecessarily tedious and error prone.
+The current form for options of (multi-)select fields allows the user to
+make too many manipulations at once to be able to determine user intent
+reliably: simultaneous changes in positions, values, as well as adding and
+deleting options can't be mapped uniquely to how the existing options should
+be changed individually.
+
+To really make use of the newly implemented IDs for options, the UI should
+be adapted accordingly, such that individual options can be identified
+during editing.
 
 #### Repository for Records, Field Definitions, and Values
 

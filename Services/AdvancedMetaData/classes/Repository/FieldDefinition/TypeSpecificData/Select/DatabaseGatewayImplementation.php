@@ -36,10 +36,15 @@ class DatabaseGatewayImplementation implements Gateway
 
     public function create(int $field_id, SelectSpecificData $data): void
     {
-        $option_id = 0;
+        $option_id = 1;
         foreach ($data->getOptions() as $option) {
             foreach ($option->getTranslations() as $translation) {
-                $this->createTranslation($field_id, $option_id, $translation);
+                $this->createTranslation(
+                    $field_id,
+                    $option_id,
+                    $option->getPosition(),
+                    $translation
+                );
             }
             $option_id++;
         }
@@ -49,7 +54,7 @@ class DatabaseGatewayImplementation implements Gateway
     {
         $query = 'SELECT * FROM adv_mdf_enum WHERE field_id = ' .
             $this->db->quote($field_id, \ilDBConstants::T_INTEGER) .
-            ' ORDER BY idx';
+            ' ORDER BY position';
 
         $res = $this->db->query($query);
         $rows = [];
@@ -74,7 +79,7 @@ class DatabaseGatewayImplementation implements Gateway
 
         $query = 'SELECT * FROM adv_mdf_enum WHERE ' .
             $this->db->in('field_id', $field_ids, false, \ilDBConstants::T_INTEGER) .
-            ' ORDER BY idx';
+            ' ORDER BY position';
 
         $res = $this->db->query($query);
         $rows_by_field_id = [];
@@ -95,24 +100,24 @@ class DatabaseGatewayImplementation implements Gateway
 
         $option_ids = [];
         foreach ($data->getOptions() as $option) {
-            $option_ids[] = $option->optionID();
-            $this->createOrUpdateOption(
+            $option_ids[] = $this->createOrUpdateOption(
                 $data->fieldID(),
                 $option
             );
         }
-        $this->deleteOptionsExcept(...$option_ids);
+
+        $this->deleteOptionsExcept($data->fieldID(), ...$option_ids);
     }
 
-    protected function createOrUpdateOption(int $field_id, Option $option): void
+    protected function createOrUpdateOption(int $field_id, Option $option): int
     {
-        if (!$option->containsChanges()) {
-            return;
-        }
-
         $option_id = $option->isPersisted() ?
             $option->optionID() :
             $this->getNextOptionIDInField($field_id);
+
+        if (!$option->containsChanges()) {
+            return $option_id;
+        }
 
         $translation_langs = [];
         foreach ($option->getTranslations() as $translation) {
@@ -127,36 +132,47 @@ class DatabaseGatewayImplementation implements Gateway
                 $this->updateTranslation(
                     $field_id,
                     $option_id,
+                    $option->getPosition(),
                     $translation
                 );
             } else {
                 $this->createTranslation(
                     $field_id,
                     $option_id,
+                    $option->getPosition(),
                     $translation
                 );
             }
         }
 
         if ($option->isPersisted()) {
-            $this->deleteTranslationsOfOptionExcept($option_id, ...$translation_langs);
+            $this->deleteTranslationsOfOptionExcept(
+                $field_id,
+                $option_id,
+                ...$translation_langs
+            );
         }
+
+        return $option_id;
     }
 
-    protected function deleteOptionsExcept(int ...$keep_option_ids): void
+    protected function deleteOptionsExcept(int $field_id, int ...$keep_option_ids): void
     {
-        $query = 'DELETE FROM adv_mdf_enum WHERE ' .
-            $this->db->in('option_id', $keep_option_ids, true, \ilDBConstants::T_INTEGER);
+        $query = 'DELETE FROM adv_mdf_enum WHERE field_id = ' .
+            $this->db->quote($field_id, \ilDBConstants::T_INTEGER) . ' AND ' .
+            $this->db->in('idx', $keep_option_ids, true, \ilDBConstants::T_INTEGER);
 
         $this->db->manipulate($query);
     }
 
     protected function deleteTranslationsOfOptionExcept(
+        int $field_id,
         int $option_id,
         string ...$keep_languages
     ): void {
-        $query = 'DELETE FROM adv_mdf_enum WHERE option_id = ' .
-            $this->db->quote($option_id, \ilDBConstants::T_INTEGER) . ' AND ' .
+        $query = 'DELETE FROM adv_mdf_enum WHERE idx = ' .
+            $this->db->quote($option_id, \ilDBConstants::T_INTEGER) . ' AND field_id = ' .
+            $this->db->quote($field_id, \ilDBConstants::T_INTEGER) . ' AND ' .
             $this->db->in('lang_code', $keep_languages, true, \ilDBConstants::T_TEXT);
 
         $this->db->manipulate($query);
@@ -182,7 +198,7 @@ class DatabaseGatewayImplementation implements Gateway
 
         $translations_by_option_id = [];
         foreach ($rows as $row) {
-            $translations_by_option_id[(int) $row['option_id']][] = new OptionTranslationImplementation(
+            $translations_by_option_id[(int) $row['idx']][] = new OptionTranslationImplementation(
                 (string) $row['lang_code'],
                 (string) $row['value'],
                 true
@@ -192,7 +208,7 @@ class DatabaseGatewayImplementation implements Gateway
         $options = [];
         foreach ($translations_by_option_id as $option_id => $translations) {
             $options[] = new OptionImplementation(
-                (int) $rows[0]['idx'],
+                (int) $rows[0]['position'],
                 $option_id,
                 ...$translations
             );
@@ -204,15 +220,16 @@ class DatabaseGatewayImplementation implements Gateway
     protected function createTranslation(
         int $field_id,
         int $option_id,
+        int $position,
         OptionTranslation $translation
     ): void {
         $this->db->insert(
             'adv_mdf_enum',
             [
                 'field_id' => [\ilDBConstants::T_INTEGER, $field_id],
-                'option_id' => [\ilDBConstants::T_INTEGER, $option_id],
+                'idx' => [\ilDBConstants::T_INTEGER, $option_id],
                 'lang_code' => [\ilDBConstants::T_TEXT, $translation->language()],
-                'idx' => [\ilDBConstants::T_INTEGER, $translation->getPosition()],
+                'position' => [\ilDBConstants::T_INTEGER, $position],
                 'value' => [\ilDBConstants::T_TEXT, trim($translation->getValue())]
             ]
         );
@@ -221,17 +238,18 @@ class DatabaseGatewayImplementation implements Gateway
     protected function updateTranslation(
         int $field_id,
         int $option_id,
+        int $position,
         OptionTranslation $translation
     ): void {
         $this->db->update(
             'adv_mdf_enum',
             [
-                'idx' => [\ilDBConstants::T_INTEGER, $translation->getPosition()],
+                'position' => [\ilDBConstants::T_INTEGER, $position],
                 'value' => [\ilDBConstants::T_TEXT, trim($translation->getValue())]
             ],
             [
                 'field_id' => [\ilDBConstants::T_INTEGER, $field_id],
-                'option_id' => [\ilDBConstants::T_INTEGER, $option_id],
+                'idx' => [\ilDBConstants::T_INTEGER, $option_id],
                 'lang_code' => [\ilDBConstants::T_TEXT, $translation->language()]
             ]
         );
@@ -239,7 +257,7 @@ class DatabaseGatewayImplementation implements Gateway
 
     protected function getNextOptionIDInField(int $field_id): int
     {
-        $query = 'SELECT MAX(option_id) max_id FROM adv_mdf_enum WHERE field_id = ' .
+        $query = 'SELECT MAX(idx) max_id FROM adv_mdf_enum WHERE field_id = ' .
             $this->db->quote($field_id, \ilDBConstants::T_INTEGER);
 
         $res = $this->db->query($query);

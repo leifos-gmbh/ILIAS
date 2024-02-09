@@ -543,7 +543,7 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
 
             foreach ($this->confirmed_objects as $old_option => $item_ids) {
                 // get complete old values
-                $old_values = array();
+                $old_values = [];
                 foreach ($this->findBySingleValue($search, $old_option) as $item) {
                     $old_values[$item[0] . "_" . $item[1] . "_" . $item[2]] = $item[3];
                 }
@@ -556,41 +556,32 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
 
                     // update existing value (with changed option)
                     if (isset($old_values[$item])) {
-                        $old_value = $old_values[$item];
-                        // find changed option in old value
-                        //$old_value = explode(ilADTMultiEnumDBBridge::SEPARATOR, $old_values[$item]);
-                        // remove separators
-                        //array_shift($old_value);
-                        //array_pop($old_value);
+                        $old_id = $old_values[$item];
 
-                        //$old_idx = array_keys($old_value, $old_option);
-                        $old_idx = $old_value;
-                        if (isset($old_idx)) {
-                            $primary = array(
-                                "obj_id" => array("integer", $obj_id),
-                                "sub_type" => array("text", $sub_type),
-                                "sub_id" => array("integer", $sub_id),
-                                "field_id" => array("integer", $this->getFieldId())
-                            );
+                        $primary = array(
+                            "obj_id" => array("integer", $obj_id),
+                            "sub_type" => array("text", $sub_type),
+                            "sub_id" => array("integer", $sub_id),
+                            "field_id" => array("integer", $this->getFieldId())
+                        );
 
-                            $index_old = array_merge(
-                                $primary,
-                                [
-                                    'value_index' => [ilDBConstants::T_INTEGER, $old_idx]
-                                ]
-                            );
-                            $index_new = array_merge(
-                                $primary,
-                                [
-                                    'value_index' => [ilDBConstants::T_INTEGER, $new_option]
-                                ]
-                            );
-                            ilADTActiveRecordByType::deleteByPrimary('adv_md_values', $index_old, 'MultiEnum');
+                        $id_old = array_merge(
+                            $primary,
+                            [
+                                'value_index' => [ilDBConstants::T_INTEGER, $old_id]
+                            ]
+                        );
+                        $id_new = array_merge(
+                            $primary,
+                            [
+                                'value_index' => [ilDBConstants::T_INTEGER, $new_option]
+                            ]
+                        );
+                        ilADTActiveRecordByType::deleteByPrimary('adv_md_values', $id_old, 'MultiEnum');
 
-                            if (is_numeric($new_option)) {
-                                ilADTActiveRecordByType::deleteByPrimary('adv_md_values', $index_new, 'MultiEnum');
-                                ilADTActiveRecordByType::create('adv_md_values', $index_new, 'MultiEnum');
-                            }
+                        if (is_numeric($new_option)) {
+                            ilADTActiveRecordByType::deleteByPrimary('adv_md_values', $id_new, 'MultiEnum');
+                            ilADTActiveRecordByType::create('adv_md_values', $id_new, 'MultiEnum');
                         }
                     }
 

@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\Repository\TypeSpecificData\Select;
+namespace ILIAS\AdvancedMetaData\Repository\FieldDefinition\TypeSpecificData\Select;
 
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\Select\SelectSpecificData;
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\Select\OptionTranslationImplementation;
@@ -54,7 +54,7 @@ class DatabaseGatewayImplementation implements Gateway
     {
         $query = 'SELECT * FROM adv_mdf_enum WHERE field_id = ' .
             $this->db->quote($field_id, \ilDBConstants::T_INTEGER) .
-            ' ORDER BY position';
+            ' ORDER BY COALESCE(position, idx)';
 
         $res = $this->db->query($query);
         $rows = [];
@@ -79,7 +79,7 @@ class DatabaseGatewayImplementation implements Gateway
 
         $query = 'SELECT * FROM adv_mdf_enum WHERE ' .
             $this->db->in('field_id', $field_ids, false, \ilDBConstants::T_INTEGER) .
-            ' ORDER BY position';
+            ' ORDER BY COALESCE(position, idx)';
 
         $res = $this->db->query($query);
         $rows_by_field_id = [];
@@ -197,8 +197,21 @@ class DatabaseGatewayImplementation implements Gateway
         }
 
         $translations_by_option_id = [];
+        $positions_by_option_id = [];
         foreach ($rows as $row) {
-            $translations_by_option_id[(int) $row['idx']][] = new OptionTranslationImplementation(
+            $option_id = (int) $row['idx'];
+            $position = $row['position'];
+
+            /**
+             * This is necessary to take care of translations that haven't been
+             * migrated yet.
+             */
+            if ($position === '' || is_null($position)) {
+                $position = $option_id;
+            }
+
+            $positions_by_option_id[$option_id][] = (int) $position;
+            $translations_by_option_id[$option_id][] = new OptionTranslationImplementation(
                 (string) $row['lang_code'],
                 (string) $row['value'],
                 true
@@ -208,7 +221,7 @@ class DatabaseGatewayImplementation implements Gateway
         $options = [];
         foreach ($translations_by_option_id as $option_id => $translations) {
             $options[] = new OptionImplementation(
-                (int) $rows[0]['position'],
+                $positions_by_option_id[$option_id],
                 $option_id,
                 ...$translations
             );

@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\Repository\GenericData;
+namespace ILIAS\AdvancedMetaData\Repository\FieldDefinition\GenericData;
 
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericData;
 

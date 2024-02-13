@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\AdvancedMetaData\Repository\TypeSpecificData\Select;
+namespace ILIAS\AdvancedMetaData\Repository\FieldDefinition\TypeSpecificData\Select;
 
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\Select\SelectSpecificData;
 

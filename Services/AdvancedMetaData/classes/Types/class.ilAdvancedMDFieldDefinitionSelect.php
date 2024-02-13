@@ -19,8 +19,8 @@
 declare(strict_types=1);
 
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericData;
-use ILIAS\AdvancedMetaData\Repository\TypeSpecificData\Select\Gateway;
-use ILIAS\AdvancedMetaData\Repository\TypeSpecificData\Select\DatabaseGatewayImplementation;
+use ILIAS\AdvancedMetaData\Repository\FieldDefinition\TypeSpecificData\Select\Gateway;
+use ILIAS\AdvancedMetaData\Repository\FieldDefinition\TypeSpecificData\Select\DatabaseGatewayImplementation;
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\Select\SelectSpecificData;
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\TypeSpecificData\Select\SelectSpecificDataImplementation;
 
@@ -262,14 +262,13 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
 
         $this->old_options_array = $this->getOptionsInLanguageAsArray($language);
 
-        $new = $a_form->getInput("opts");
-        $unmapped_new_values = $new;
+        $unmapped_new_values = $a_form->getInput('opts');
         $unmapped_old_options = [];
         $removed_old_options = [];
 
         // update position for unchanged values
         foreach ($this->options()->getOptions() as $option) {
-            $old_value = $option->getTranslationInLanguage($language);
+            $old_value = $option->getTranslationInLanguage($language)->getValue();
 
             if (in_array($old_value, $unmapped_new_values)) {
                 $new_position = array_search($old_value, $unmapped_new_values);

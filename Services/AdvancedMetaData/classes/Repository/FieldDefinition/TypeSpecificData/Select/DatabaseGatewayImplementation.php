@@ -210,7 +210,7 @@ class DatabaseGatewayImplementation implements Gateway
                 $position = $option_id;
             }
 
-            $positions_by_option_id[$option_id][] = (int) $position;
+            $positions_by_option_id[$option_id] = (int) $position;
             $translations_by_option_id[$option_id][] = new OptionTranslationImplementation(
                 (string) $row['lang_code'],
                 (string) $row['value'],

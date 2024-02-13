@@ -21,10 +21,10 @@ declare(strict_types=1);
 use ILIAS\Refinery\Factory as RefineryFactory;
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\Type;
-use ILIAS\AdvancedMetaData\Repository\GenericData\Gateway as DBGateway;
+use ILIAS\AdvancedMetaData\Repository\FieldDefinition\GenericData\Gateway as DBGateway;
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericData;
 use ILIAS\AdvancedMetaData\Data\FieldDefinition\GenericData\GenericDataImplementation;
-use ILIAS\AdvancedMetaData\Repository\GenericData\DatabaseGatewayImplementation;
+use ILIAS\AdvancedMetaData\Repository\FieldDefinition\GenericData\DatabaseGatewayImplementation;
 
 /**
  * AMD field abstract base class
@@ -130,7 +130,7 @@ abstract class ilAdvancedMDFieldDefinition
         }
 
         if (isset($generic_data)) {
-            self::getInstanceWithData($generic_data);
+            return self::getInstanceWithData($generic_data);
         }
         throw new ilException("unknown type " . $a_type);
     }

@@ -630,6 +630,7 @@ assessment#:#circle_click_center#:#Kliknite na sredino želenega območja.
 assessment#:#circle_click_circle#:#Kliknite na točko v okolici želenega območja.
 assessment#:#clientip#:#IP stranke
 assessment#:#close_text_hint#:#Če želite v besedilo vstaviti praznino, premaknite kurzor na želeni položaj in kliknite na gumb "praznina v besedilu". Spodaj bodo na voljo ustrezna področja za obdelavo. Prav tako lahko kliknete neposredno na praznine in jih obdelate v besedilu s prazninami.
+assessment#:#cloze_answer_text_info#:#Spaces preceding or following the answer text will be deleted when the form is saved.###12 12 2023 new variable
 assessment#:#cloze_fixed_textlength#:#Dolžina besedilnega polja
 assessment#:#cloze_fixed_textlength_description#:#Če tukaj vnesete vrednost, se v besedilu ustvarijo praznine, ki ne določajo lastne vrednosti za maksimalno dolžino, kot tudi praznine za številčni odgovor s to dolžino, zato ni mogoče vnesti več znakov, kot je dovoljeno. Pri prazninah za številčni odgovor je poleg tega treba upoštevati, da se pri štetju upoštevajo tudi decimalna ločila.
 assessment#:#cloze_gap_size_info#:#Če je vnesena vrednost večja od 0, se ta praznina ustvari z dolžino, ki je tukaj navedena. Če ni vnesena nobena vrednost, se ta praznina ustvari z globalno določeno dolžino besedilnega polja.
@@ -1461,6 +1462,7 @@ assessment#:#tst_form_dynamic_question_set_config#:#Zaporedni izbor vprašanj
 assessment#:#tst_gap_analysis#:#Analiza praznine
 assessment#:#tst_general_properties#:#Nastavitve testa
 assessment#:#tst_header_participant#:#Vaš odgovor:
+assessment#:#tst_header_participant_no_answer#:#Question - not answered###14 02 2024 new variable
 assessment#:#tst_header_solution#:#Najboljša možna rešitev:
 assessment#:#tst_heading_scoring#:#Ocena
 assessment#:#tst_hide_side_list#:#Seznam vprašanj iz
@@ -5290,7 +5292,7 @@ common#:#private_notes#:#Zasebne opombe
 common#:#pro#:#Pro
 common#:#proceed#:#Nadaljuj
 common#:#profile#:#Profile
-common#:#profile_changed#:#ILIAS eLearning - Vaši profilni podatki so bili spremenjeni
+common#:#profile_changed#:#Vaši profilni podatki so bili spremenjeni
 common#:#profile_incomplete#:#Vaš profil ni popoln. Vnesite vse zahtevane podatke
 common#:#profile_of#:#Profil od
 common#:#properties#:#Lastnosti
@@ -5349,8 +5351,8 @@ common#:#reg_mail_body_salutation#:#Pozdravljeni
 common#:#reg_mail_body_text1#:#Dobrodošli v eLearning platformi ILIAS!
 common#:#reg_mail_body_text2#:#Vaši dostopni podatki:
 common#:#reg_mail_body_text3#:#Nadaljnji osebni podatki:
-common#:#reg_mail_subject#:#ILIAS eLearning - Vaši dostopni podatki
-common#:#reg_mail_subject_confirmation#:#ILIAS eLearning - Vaša povezava za potrditev
+common#:#reg_mail_subject#:#Vaši dostopni podatki
+common#:#reg_mail_subject_confirmation#:#Vaša povezava za potrditev
 common#:#reg_passwd_via_mail#:#Geslo bo poslano na spodaj navedeni e-poštni naslov.
 common#:#register#:#Registriracija
 common#:#register_notification#:#"%s" has applied for session "%s".
@@ -8204,6 +8206,7 @@ dateplaner#:#cal_grp_others#:#Drugi
 dateplaner#:#cal_grp_personal#:#Osebno
 dateplaner#:#cal_ical_infoscreen#:#Naroči se
 dateplaner#:#cal_ical_url#:#iCal-URL
+dateplaner#:#cal_ical_url_google#:#iCal-URL for Google Calendar###12 12 2023 new variable
 dateplaner#:#cal_import_appointments#:#Uvozi termine
 dateplaner#:#cal_import_file#:#Datoteka za uvoz
 dateplaner#:#cal_import_file_info#:#Izberite datoteko, ki vsebuje vaše termine.
@@ -8333,6 +8336,7 @@ dateplaner#:#cal_weekly#:#Tedensko
 dateplaner#:#cal_where#:#Kraj
 dateplaner#:#cal_year_s#:#Leto/leta
 dateplaner#:#cal_yearly#:#Letno
+dateplaner#:#consultation_hours_block_title#:#Consultation Hours###14 02 2024 new variable
 dateplaner#:#created#:#ustvarjeno dne
 dateplaner#:#crs_cal_activation_end#:#Konec tečaja
 dateplaner#:#crs_cal_activation_start#:#Začetek tečaja
@@ -11754,6 +11758,7 @@ mme#:#move_to_top_item#:#Move to Top Items###19 08 2022 new variable
 mme#:#msg_languages_added#:#Jeziki so dodani
 mme#:#msg_moved#:#Item successfully moved###19 08 2022 new variable
 mme#:#msg_not_moved#:#Item could not be moved, please select a valid parent.###19 08 2022 new variable
+mme#:#msg_ref_id_not_callable#:#This reference ID cannot be used by Main-Menu. Only targets in the magazine are supported.###12 12 2023 new variable
 mme#:#msg_restore_confirm#:#All Custom Items and Translations will be deleted, all Standard items will be reset to factory default. All customization will be lost.
 mme#:#msg_restored#:#Main Menu completely reset
 mme#:#msg_subitem_deleted#:#Vnos je izbrisan.

@@ -120,6 +120,18 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
         return [];
     }
 
+    public function getFieldDefinitionForTableGUI(string $content_language): array
+    {
+        if (strlen($content_language)) {
+            $options = $this->getOptionsInLanguageAsArray($content_language);
+        } else {
+            $options = $this->getOptionsInDefaultLanguageAsArray();
+        }
+        return [
+            $this->lng->txt("meta_advmd_select_options") => implode(",", $options)
+        ];
+    }
+
     protected function addCustomFieldToDefinitionForm(
         ilPropertyFormGUI $a_form,
         bool $a_disabled = false,
@@ -256,6 +268,12 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
             return;
         }
 
+        $search = ilADTFactory::getInstance()->getSearchBridgeForDefinitionInstance(
+            $this->getADTDefinition(),
+            false,
+            $multi
+        );
+
         if (!strlen($language)) {
             $language = $this->default_language;
         }
@@ -309,11 +327,6 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
             $this->confirmed_objects = $this->buildConfirmedObjects($a_form);
             $already_confirmed = is_array($this->confirmed_objects);
 
-            $search = ilADTFactory::getInstance()->getSearchBridgeForDefinitionInstance(
-                $this->getADTDefinition(),
-                false,
-                $multi
-            );
             foreach ($removed_old_options as $option) {
                 $in_use = $this->findBySingleValue($search, $option->optionID());
                 if (is_array($in_use)) {
@@ -386,8 +399,6 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
 
         $a_form->getItemByPostVar("opts")->setDisabled(true);
         if (is_array($this->confirm_objects) && count($this->confirm_objects) > 0) {
-            $new_options = $a_form->getInput("opts");
-
             $sec = new ilFormSectionHeaderGUI();
             $sec->setTitle($lng->txt("md_adv_confirm_definition_select_section"));
             $a_form->addItem($sec);
@@ -419,8 +430,10 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
                     "" => $lng->txt("please_select"),
                     self::REMOVE_ACTION_ID => $lng->txt("md_adv_confirm_definition_select_option_remove")
                 );
-                foreach ($new_options as $new_option_index => $new_option) {
-                    $options['idx_' . $new_option_index] = $lng->txt("md_adv_confirm_definition_select_option_overwrite") . ': "' . $new_option . '"';
+                foreach ($this->options()->getOptions() as $new_option) {
+                    $new_id = $new_option->optionID();
+                    $new_value = $new_option->getTranslationInLanguage($this->default_language)->getValue();
+                    $options['idx_' . $new_id] = $lng->txt("md_adv_confirm_definition_select_option_overwrite") . ': "' . $new_value . '"';
                 }
                 $sel->setOptions($options);
                 $sum->addSubItem($sel);
@@ -478,8 +491,10 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
                         "" => $lng->txt("please_select"),
                         self::REMOVE_ACTION_ID => $lng->txt("md_adv_confirm_definition_select_option_remove")
                     );
-                    foreach ($new_options as $new_option_index => $new_option) {
-                        $options['idx_' . $new_option_index] = $lng->txt("md_adv_confirm_definition_select_option_overwrite") . ': "' . $new_option . '"';
+                    foreach ($this->options()->getOptions() as $new_option) {
+                        $new_id = $new_option->optionID();
+                        $new_value = $new_option->getTranslationInLanguage($this->default_language)->getValue();
+                        $options['idx_' . $new_id] = $lng->txt("md_adv_confirm_definition_select_option_overwrite") . ': "' . $new_value . '"';
                     }
                     $sel->setOptions($options);
 

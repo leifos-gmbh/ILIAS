@@ -34,4 +34,9 @@ class Agent extends Setup\Agent\NullAgent
             new \ilDatabaseUpdateStepsExecutedObjective(new DBUpdateSteps10())
         );
     }
+
+    public function getMigrations(): array
+    {
+        return [new SelectOptionsMigration()];
+    }
 }

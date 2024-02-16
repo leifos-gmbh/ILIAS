@@ -616,6 +616,7 @@ assessment#:#circle_click_center#:#Будь ласка клікнітьо на �
 assessment#:#circle_click_circle#:#Будь ласка клікніть на точку кола бажаної області.
 assessment#:#clientip#:#Клієнтt IP
 assessment#:#close_text_hint#:#Ви маєте визначити проміжок для введення <gap></gap> в позицію в тексті що ви вибрали. Натисніть кнопку 'Створити проміжки' для додавання форми що редагується для кожного проміжку.
+assessment#:#cloze_answer_text_info#:#Spaces preceding or following the answer text will be deleted when the form is saved.###12 12 2023 new variable
 assessment#:#cloze_fixed_textlength#:#Text Field Length###02 04 2007 new variable
 assessment#:#cloze_fixed_textlength_description#:#If you enter a value greater than 0, all text and numeric gap text fields will be created with the fixed length of this value.###02 04 2007 new variable
 assessment#:#cloze_gap_size_info#:#If you enter a value greater than 0, this gap text field will be created with the fixed length of this value. If you do not enter a value the gap text fiel will be created with the value of the global fixed length.###26 09 2014 new variable
@@ -1447,6 +1448,7 @@ assessment#:#tst_form_dynamic_question_set_config#:#Continues Question Selection
 assessment#:#tst_gap_analysis#:#Gap Analysis###26 09 2014 new variable
 assessment#:#tst_general_properties#:#Загальні властивості
 assessment#:#tst_header_participant#:#Result:###24 10 2013 new variable
+assessment#:#tst_header_participant_no_answer#:#Question - not answered###14 02 2024 new variable
 assessment#:#tst_header_solution#:#Correct solution:###24 10 2013 new variable
 assessment#:#tst_heading_scoring#:#Scoring###13 May 2005 new variable
 assessment#:#tst_hide_side_list#:#Hide question list###24 07 2009 new variable
@@ -5335,8 +5337,8 @@ common#:#reg_mail_body_salutation#:#Привіт
 common#:#reg_mail_body_text1#:#Ласково просимо до ILIAS eLearning!
 common#:#reg_mail_body_text2#:#Для доступу в ILIAs використовуйте наступні дані:
 common#:#reg_mail_body_text3#:#Подальша персональна інформація:
-common#:#reg_mail_subject#:#ILIAS eLearning - Ваші дані доступу
-common#:#reg_mail_subject_confirmation#:#ILIAS eLearning - Your Confirmationlink###24 07 2009 new variable
+common#:#reg_mail_subject#:#Ваші дані доступу
+common#:#reg_mail_subject_confirmation#:#Your Confirmationlink###24 07 2009 new variable
 common#:#reg_passwd_via_mail#:#Ваш пароль буде відсланий на вашу поштову адресу вказану нижче.
 common#:#register#:#Зареєструвати
 common#:#register_notification#:#"%s" has applied for session "%s".###07 02 2020 new variable
@@ -8190,6 +8192,7 @@ dateplaner#:#cal_grp_others#:#Others###31 08 2017 new variable
 dateplaner#:#cal_grp_personal#:#Personal###31 08 2017 new variable
 dateplaner#:#cal_ical_infoscreen#:#Subscribe###28 08 2012 new variable
 dateplaner#:#cal_ical_url#:#iCal-URL###14 05 2014 new variable
+dateplaner#:#cal_ical_url_google#:#iCal-URL for Google Calendar###12 12 2023 new variable
 dateplaner#:#cal_import_appointments#:#Import Appointments###28 08 2012 new variable
 dateplaner#:#cal_import_file#:#Import File###28 08 2012 new variable
 dateplaner#:#cal_import_file_info#:#Choose the file, that contains your calendar appointments.###28 08 2012 new variable
@@ -8319,6 +8322,7 @@ dateplaner#:#cal_weekly#:#Weekly###02 06 2008 new variable
 dateplaner#:#cal_where#:#Location###02 06 2008 new variable
 dateplaner#:#cal_year_s#:#Year(s)###02 06 2008 new variable
 dateplaner#:#cal_yearly#:#Yearly###02 06 2008 new variable
+dateplaner#:#consultation_hours_block_title#:#Consultation Hours###14 02 2024 new variable
 dateplaner#:#created#:#Створений
 dateplaner#:#crs_cal_activation_end#:#Course End###02 06 2008 new variable
 dateplaner#:#crs_cal_activation_start#:#Course Start###02 06 2008 new variable
@@ -11740,6 +11744,7 @@ mme#:#move_to_top_item#:#Move to Top Items###30 04 2021 new variable
 mme#:#msg_languages_added#:#Added languages###10 11 2018 new variable
 mme#:#msg_moved#:#Item successfully moved###30 04 2021 new variable
 mme#:#msg_not_moved#:#Item could not be moved, please select a valid parent.###30 04 2021 new variable
+mme#:#msg_ref_id_not_callable#:#This reference ID cannot be used by Main-Menu. Only targets in the magazine are supported.###12 12 2023 new variable
 mme#:#msg_restore_confirm#:#All Custom Items and Translations will be deleted, all Standard items will be reset to factory default. All customization will be lost.###07 02 2020 new variable
 mme#:#msg_restored#:#Main Menu completely reset###07 02 2020 new variable
 mme#:#msg_subitem_deleted#:#Item deleted.###10 11 2018 new variable

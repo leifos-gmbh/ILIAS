@@ -616,6 +616,7 @@ assessment#:#circle_click_center#:#Kliki soovitud ala keskele.
 assessment#:#circle_click_circle#:#Palun klikka soovitud ala ringjoonel.
 assessment#:#clientip#:#Kliendi IP
 assessment#:#close_text_hint#:#Lünga saad teha, sisestades  [gap][/gap] soovitud teksti kohale. Klikka nupul 'Koosta lünk', et lisada igale lüngale soovitud vorm.
+assessment#:#cloze_answer_text_info#:#Spaces preceding or following the answer text will be deleted when the form is saved.###12 12 2023 new variable
 assessment#:#cloze_fixed_textlength#:#Tekstivälja pikkus
 assessment#:#cloze_fixed_textlength_description#:#Kui sisestad nullist suurema väärtuse, luuakse kõik teksti- ja numbriväljad selles väärtuses fikseeritud pikkuses.
 assessment#:#cloze_gap_size_info#:#If you enter a value greater than 0, this gap text field will be created with the fixed length of this value. If you do not enter a value the gap text fiel will be created with the value of the global fixed length.
@@ -1447,6 +1448,7 @@ assessment#:#tst_form_dynamic_question_set_config#:#Continues Question Selection
 assessment#:#tst_gap_analysis#:#Gap Analysis
 assessment#:#tst_general_properties#:#Üldised seaded
 assessment#:#tst_header_participant#:#Result:
+assessment#:#tst_header_participant_no_answer#:#Question - not answered###14 02 2024 new variable
 assessment#:#tst_header_solution#:#Correct solution:
 assessment#:#tst_heading_scoring#:#Punktiarvestus
 assessment#:#tst_hide_side_list#:#Peida küsimuste nimestik
@@ -5336,7 +5338,7 @@ common#:#reg_mail_body_text1#:#teretulemast e-õppe keskkonda ILIAS!
 common#:#reg_mail_body_text2#:#ILIASesse sisenemiseks kasuta järgnevaid andmeid:
 common#:#reg_mail_body_text3#:#Muu isiklik info:
 common#:#reg_mail_subject#:#ILIAS - sinu salasõna
-common#:#reg_mail_subject_confirmation#:#ILIAS eLearning - Your Confirmation Link
+common#:#reg_mail_subject_confirmation#:#Your Confirmation Link
 common#:#reg_passwd_via_mail#:#Sinu salasõna saadetakse sinu e-posti aadressile - seetõttu peab e-posti aadress olema korrektselt sisestatud. NB! Hot.ee, hotmail.com, mail.ee, gmail.com jm e-posti rakendused võivad ILIASe süsteemi kirju spämmiks lugeda ja need kustutada. Palume võimalusel kasutada ametiaadressi.
 common#:#register#:#Registreeru
 common#:#register_notification#:#"%s" has applied for session "%s".###07 02 2020 new variable
@@ -8190,6 +8192,7 @@ dateplaner#:#cal_grp_others#:#Others###31 08 2017 new variable
 dateplaner#:#cal_grp_personal#:#Personal###31 08 2017 new variable
 dateplaner#:#cal_ical_infoscreen#:#Subscribe
 dateplaner#:#cal_ical_url#:#iCal-URL
+dateplaner#:#cal_ical_url_google#:#iCal-URL for Google Calendar###12 12 2023 new variable
 dateplaner#:#cal_import_appointments#:#Import Appointments
 dateplaner#:#cal_import_file#:#Import File
 dateplaner#:#cal_import_file_info#:#Choose the file, that contains your calendar appointments.
@@ -8319,6 +8322,7 @@ dateplaner#:#cal_weekly#:#Iga nädal
 dateplaner#:#cal_where#:#Koht
 dateplaner#:#cal_year_s#:#aasta
 dateplaner#:#cal_yearly#:#Iga aasta
+dateplaner#:#consultation_hours_block_title#:#Consultation Hours###14 02 2024 new variable
 dateplaner#:#created#:#Loodud
 dateplaner#:#crs_cal_activation_end#:#Kursuse lõpp
 dateplaner#:#crs_cal_activation_start#:#Kursuse algus
@@ -11740,6 +11744,7 @@ mme#:#move_to_top_item#:#Move to Top Items###30 04 2021 new variable
 mme#:#msg_languages_added#:#Added languages###10 11 2018 new variable
 mme#:#msg_moved#:#Item successfully moved###30 04 2021 new variable
 mme#:#msg_not_moved#:#Item could not be moved, please select a valid parent.###30 04 2021 new variable
+mme#:#msg_ref_id_not_callable#:#This reference ID cannot be used by Main-Menu. Only targets in the magazine are supported.###12 12 2023 new variable
 mme#:#msg_restore_confirm#:#All Custom Items and Translations will be deleted, all Standard items will be reset to factory default. All customization will be lost.###07 02 2020 new variable
 mme#:#msg_restored#:#Main Menu completely reset###07 02 2020 new variable
 mme#:#msg_subitem_deleted#:#Item deleted.###10 11 2018 new variable

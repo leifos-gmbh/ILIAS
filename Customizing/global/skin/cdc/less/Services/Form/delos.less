@@ -1,0 +1,254 @@
+/* Services/Form */
+
+/* forms */
+
+label, input[type=checkbox], input[type=radio], select {
+	cursor: pointer;
+}
+
+.form-control {
+	font-size: @ilFormInputFontSize;
+}
+
+.form-horizontal {
+	margin-bottom: 20px;
+	background-color: @ilFormBgColor;
+}
+
+form.form-inline {
+	margin-bottom: 20px;
+}
+
+.form-horizontal .form-group {
+	margin: 10px 0;
+}
+
+.form-control, .form-control:focus {
+	.box-shadow(none);
+}
+
+.form-horizontal input.form-control, .form-horizontal textarea.form-control,
+.form-horizontal select.form-control {
+	/* max-width: 80%; */
+}
+
+select.form-control {
+	width: auto;
+}
+
+.form-horizontal label {
+	color: darken(@ilFormColor, 20%);
+	font-size: 100%;
+}
+
+.form-horizontal .control-label {
+    //padding-top: 0;
+	&.col-sm-3.il_textarea {
+		text-align: left;
+		width: 100%;
+	}
+}
+
+[dir="rtl"] .form-horizontal .control-label {
+    text-align: left;
+}
+
+label {
+	font-weight: normal;
+}
+
+.form-horizontal .help-block {
+	color: lighten(@ilFormColor, 10%);
+	margin: 2px 0 4px;
+	padding: 0;
+	font-size: 90%;
+	clear: both;
+}
+
+td.form-inline > div.form-group {
+	display: block;
+	padding: 4px 0;
+}
+
+input[type="file"].form-control {
+	border: none;
+	height: auto;
+}
+
+.ilFormHeader {
+	padding: 15px 0 5px;
+	.ilFormCmds {
+		margin: 0;
+		float: right;
+	}
+	h3 {
+		margin: 0;
+	}
+}
+
+[dir="rtl"] .ilFormHeader .ilFormCmds {
+	float: left;
+}
+
+.ilFormHeader, .ilFormFooter {
+	color: darken(@ilFormColor, 20%);
+	/* background-color: lighten(@ilFormColor, 45%); */
+	background-color: @body-bg;
+}
+
+.ilSubForm {
+	background-color: darken(@ilFormBgColor, 2%);
+	padding: 3px 0;
+	.form-group {
+		margin: 0;
+	}
+	.col-sm-9.il_textarea {
+		width: 100%;
+	}
+}
+
+.ilFormFooter {
+	padding: 3px 0;
+}
+
+.ilFormFooter .ilFormCmds {
+	text-align: right;
+	padding: 0;
+}
+
+[dir="rtl"] .ilFormFooter .ilFormCmds {
+	text-align: left;
+}
+
+/* jQuery ui autocomplete menu */
+input.ilHFormHighlighted, .ui-state-focus {
+	background-color: #ff9;
+}
+
+div.ilFormExternalSetting {
+	margin-bottom: 10px;
+}
+
+div.ilFormExternalSetting ul {
+	margin: 2px 0;
+	padding-left: 25px;
+}
+
+[dir="rtl"] div.ilFormExternalSetting ul {
+	padding-left: 0;
+	padding-right: 25px;
+}
+
+div.ilFormExternalSetting span {
+	color: #c08030;
+	/* font-style: italic; */
+}
+
+div[id^="ilFormField"] {
+	margin-bottom: 10px;
+}
+
+/* Hierarchy Form */
+div.ilHFormHeader, div.ilHFormFooter {
+	color: darken(@ilFormColor, 20%);
+	background-color: @body-bg;
+	padding: 4px 0 4px 22px;
+}
+
+[dir="rtl"] div.ilHFormHeader, [dir="rtl"] div.ilHFormFooter {
+	padding: 4px 22px 4px 0;
+}
+
+div.ilHFormContent {
+	padding: 20px 0;
+}
+
+div.ilHFormItem {
+	margin-bottom: 5px;
+	display: table-row;
+}
+
+div.ilHFormHeader .ilFormCmds, div.ilHFormFooter .ilFormCmds {
+	float: right;
+}
+
+[dir="rtl"] div.ilHFormHeader .ilFormCmds, [dir="rtl"] div.ilHFormFooter .ilFormCmds {
+	float: left;
+}
+
+.ilHFormExpIcon, .ilHFormCheckbox, .ilHFormIcon, .ilHFormInput, .ilHFormItemCmd {
+}
+
+.ilHFormExpIcon, .ilHFormCheckbox, .ilHFormIcon {
+	min-width: 20px;
+	padding: 0;
+}
+
+.ilHFormItemCmd {
+	padding: 0 10px;
+}
+
+.ilHFormChilds {
+
+}
+
+.ilHFormExpIcon img, .ilHFormIcon img {
+	width: 19px;
+	height: 19px;
+}
+
+.ilHFormInput, .ilHFormInput input.form-control {
+	width: 100%;
+}
+
+.ilHFormDropArea {
+	margin: 6px 0;
+	width: auto;
+}
+
+/* deprecated */
+div.ilFormInfo {
+}
+
+
+/* experimental: bootstrap'ed file upload */
+.btn-file {
+	position: relative;
+	overflow: hidden;
+}
+.btn-file input[type=file] {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 100%;
+	min-height: 100%;
+	font-size: 100px;
+	text-align: right;
+	filter: alpha(opacity=0);
+	opacity: 0;
+	outline: none;
+	background: white;
+	cursor: inherit;
+	display: block;
+}
+
+.ilFormInnerCol {
+	padding: 0;
+}
+
+.ilFormInnerCol .form-group {
+	margin: 0;
+}
+
+input:invalid {
+	background-color: #ffebeb;
+	border-color: #d08080;
+}
+
+.il_non_editable_value {
+	padding-top: 4px;
+}
+
+.bootstrap-datetimepicker-widget {
+	z-index: 2000;
+}

@@ -16,6 +16,30 @@
 //var_dump ($_SESSION);
 //var_dump ($_COOKIE);
 
+
+// cdpatch start
+// goto.php?client_id=cd_dev&target=cdregtrain&center_id=1&firstname=a&lastname=b&email=c&gender=m&title=Dr
+// http://anderson.local/cd/5_2_cd/goto.php?client_id=cd52&target=cdregtrain&center_id=1&firstname=a&lastname=b&email=c&gender=m&title=Dr
+if ($_GET["target"] == 'cdregtrain')
+{
+	$_GET["cmd"] = "";
+	$_GET["baseClass"] = $_REQUEST["baseClass"] = "ilStartUpGUI";
+	$_GET["cmdClass"] = $_REQUEST["cmdClass"] = "ilaccountregistrationgui";
+	require_once("Services/Init/classes/class.ilInitialisation.php");
+	ilInitialisation::initILIAS();
+	$ilCtrl->setTargetScript("ilias.php");
+	$ilCtrl->getCallStructure(strtolower("ilStartUpGUI"));
+	$pars = array("firstname", "lastname", "email", "center_id", "title", "gender");
+	foreach ($pars as $p)
+	{
+		$ilCtrl->setParameterByClass("ilaccountregistrationgui", $p, $_GET[$p]);
+	}
+	$ilCtrl->setParameterByClass("ilaccountregistrationgui", "mode", "trainer");
+	$ilCtrl->redirectByClass(array("ilStartUpGUI", "ilaccountregistrationgui"));
+	exit;
+}
+// cdpatch end
+
 // this should bring us all session data of the desired
 // client
 require_once("Services/Init/classes/class.ilInitialisation.php");

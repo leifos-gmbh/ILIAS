@@ -291,6 +291,8 @@ class ilCourseParticipants extends ilParticipants
                 break;
 
             case $this->NOTIFY_DISMISS_MEMBER:
+                // cdpatch (do not send these emails)
+                return true;
                 $mail->setType(ilCourseMembershipMailNotification::TYPE_DISMISS_MEMBER);
                 $mail->setRefId($this->ref_id);
                 $mail->setRecipients(array($a_usr_id));
@@ -312,6 +314,8 @@ class ilCourseParticipants extends ilParticipants
                 break;
 
             case $this->NOTIFY_ACCEPT_USER:
+                // cdpatch (do not send these emails)
+                return true;
                 $mail->setType(ilCourseMembershipMailNotification::TYPE_ADMISSION_MEMBER);
                 $mail->setRefId($this->ref_id);
                 $mail->setRecipients(array($a_usr_id));

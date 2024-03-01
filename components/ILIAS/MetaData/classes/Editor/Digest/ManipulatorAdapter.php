@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Editor\Digest;
 
 use ILIAS\MetaData\Elements\SetInterface;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Editor\Manipulator\ManipulatorInterface;
@@ -54,7 +54,7 @@ class ManipulatorAdapter
 
     public function update(
         SetInterface $set,
-        RequestForFormInterface $request
+        RequestInterface $request
     ): bool {
         $form = null;
         foreach ($this->content_assembler->get($set, $request) as $type => $entity) {

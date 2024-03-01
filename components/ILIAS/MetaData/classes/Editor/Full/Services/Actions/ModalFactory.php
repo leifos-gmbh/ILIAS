@@ -34,7 +34,7 @@ use ILIAS\MetaData\Editor\Full\Services\FormFactory;
 use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as ConstraintDictionaryInterface;
 use ILIAS\MetaData\Repository\Validation\Dictionary\Restriction;
 use ILIAS\MetaData\Paths\FactoryInterface;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
 
 class ModalFactory
 {
@@ -111,14 +111,14 @@ class ModalFactory
     public function update(
         PathInterface $base_path,
         ElementInterface $to_be_updated,
-        ?RequestForFormInterface $request = null
+        RequestInterface $request
     ): FlexibleModal {
         $form = $this->form_factory->getUpdateForm(
             $base_path,
             $to_be_updated,
             false
         );
-        $modal =  $this->getRoundtripModal(
+        $modal = $this->getRoundtripModal(
             $to_be_updated,
             $form,
             Command::UPDATE_FULL,
@@ -131,7 +131,7 @@ class ModalFactory
     public function create(
         PathInterface $base_path,
         ElementInterface $to_be_created,
-        ?RequestForFormInterface $request = null
+        RequestInterface $request
     ): FlexibleModal {
         $form = $this->form_factory->getCreateForm(
             $base_path,
@@ -157,7 +157,7 @@ class ModalFactory
         ElementInterface $element,
         StandardForm $form,
         Command $action_cmd,
-        ?RequestForFormInterface $request
+        RequestInterface $request
     ): RoundtripModal {
         $modal = $this->factory->modal()->roundtrip(
             $this->getModalTitle($action_cmd, $element),
@@ -171,39 +171,36 @@ class ModalFactory
     protected function handleError(
         RoundtripModal $modal,
         ElementInterface $element,
-        ?RequestForFormInterface $request
+        RequestInterface $request
     ): RoundtripModal {
-        if (is_null($request)) {
+        if (!$request->shouldBeAppliedToForms()) {
             return $modal;
         }
         $action_path = $this->path_factory->toElement($element, true);
         if (strtolower($action_path->toString()) !== strtolower($request->path()?->toString() ?? '')) {
-            $request = null;
+            return $modal;
         }
         // For error handling, make the modal open on load and pass request
-        if ($request) {
+        $modal = $request->applyRequestToModal($modal);
+
+        /*
+         * Show error message in a box, since KS groups don't pass along
+         * errors on their own.
+         */
+        if (
+            ($group = $modal->getInputs()[0]) instanceof Group &&
+            $error = $group->getError()
+        ) {
+            $modal = $this->factory->modal()->roundtrip(
+                $modal->getTitle(),
+                [$this->factory->messageBox()->failure($error)],
+                $modal->getInputs(),
+                $modal->getPostURL()
+            );
             $modal = $request->applyRequestToModal($modal);
-
-            /*
-             * Show error message in a box, since KS groups don't pass along
-             * errors on their own.
-             */
-            if (
-                ($group = $modal->getInputs()[0]) instanceof Group &&
-                $error = $group->getError()
-            ) {
-                $modal = $this->factory->modal()->roundtrip(
-                    $modal->getTitle(),
-                    [$this->factory->messageBox()->failure($error)],
-                    $modal->getInputs(),
-                    $modal->getPostURL()
-                );
-                $modal = $request->applyRequestToModal($modal);
-            }
-
-            $modal = $modal->withOnLoad($modal->getShowSignal());
         }
-        return $modal;
+
+        return $modal->withOnLoad($modal->getShowSignal());
     }
 
     protected function getModalTitle(

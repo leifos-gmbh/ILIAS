@@ -20,27 +20,36 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Editor\Http;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ServerRequestInterface as HttpRequest;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
 use ILIAS\UI\Component\Modal\RoundTrip as RoundtripModal;
+use ILIAS\UI\Component\Table\Data as DataTable;
 
-class RequestForForm implements RequestForFormInterface
+class Request implements RequestInterface
 {
-    protected Request $request;
+    protected HttpRequest $request;
     protected ?PathInterface $path;
+    protected bool $apply_to_forms = false;
 
     public function __construct(
-        Request $request,
-        ?PathInterface $path = null
+        HttpRequest $request,
+        ?PathInterface $path,
+        bool $apply_to_forms
     ) {
         $this->request = $request;
         $this->path = $path;
+        $this->apply_to_forms = $apply_to_forms;
     }
 
     public function path(): ?PathInterface
     {
         return $this->path;
+    }
+
+    public function shouldBeAppliedToForms(): bool
+    {
+        return $this->apply_to_forms;
     }
 
     public function applyRequestToForm(StandardForm $form): StandardForm
@@ -51,5 +60,10 @@ class RequestForForm implements RequestForFormInterface
     public function applyRequestToModal(RoundtripModal $modal): RoundtripModal
     {
         return $modal->withRequest($this->request);
+    }
+
+    public function applyRequestToDataTable(DataTable $table): DataTable
+    {
+        return $table->withRequest($this->request);
     }
 }

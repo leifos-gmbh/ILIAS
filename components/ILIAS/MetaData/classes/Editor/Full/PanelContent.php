@@ -28,7 +28,7 @@ use ILIAS\UI\Component\Panel\Panel;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Implementation\Component\Listing\CharacteristicValue\Text as Listing;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
 
 class PanelContent
 {
@@ -53,7 +53,7 @@ class PanelContent
         PathInterface $base_path,
         ElementInterface $element,
         bool $is_subpanel,
-        ?RequestForFormInterface $request
+        RequestInterface $request
     ): \Generator {
         $buttons = [];
         $delete_modal = $this->services->actions()->getModal()->delete(

@@ -28,7 +28,7 @@ use ILIAS\UI\Component\Modal\Interruptive as InterruptiveModal;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
 use ILIAS\MetaData\Elements\SetInterface;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Editor\Http\LinkFactory;
 use ILIAS\MetaData\Editor\Http\Command;
@@ -88,7 +88,7 @@ class ContentAssembler
      */
     public function get(
         SetInterface $set,
-        ?RequestForFormInterface $request = null
+        RequestInterface $request
     ): \Generator {
         $sections = [
             self::GENERAL => $this->getGeneralSection($set),
@@ -107,7 +107,7 @@ class ContentAssembler
             $sections
         );
 
-        if (isset($request)) {
+        if ($request->shouldBeAppliedToForms()) {
             $form = $request->applyRequestToForm($form);
         }
         yield ContentType::FORM => $form;
@@ -401,7 +401,7 @@ class ContentAssembler
             $inputs
         )->withAdditionalTransformation(
             $this->refinery->custom()->transformation(function ($vs) use ($dh) {
-                $vs = array_map(fn ($v) => is_null($v) ? $v : (int) $v, $vs);
+                $vs = array_map(fn($v) => is_null($v) ? $v : (int) $v, $vs);
                 return $dh->durationFromIntegers(...$vs);
             })
         );

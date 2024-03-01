@@ -26,7 +26,7 @@ use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Editor\Full\Services\Services as FullEditorServices;
 use ILIAS\MetaData\Editor\Full\Services\Actions\FlexibleModal;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
 
 class FormContent
 {
@@ -44,7 +44,7 @@ class FormContent
     public function content(
         PathInterface $base_path,
         ElementInterface $element,
-        ?RequestForFormInterface $request
+        RequestInterface $request
     ): \Generator {
         $delete_modal = $this->services->actions()->getModal()->delete(
             $base_path,
@@ -64,7 +64,7 @@ class FormContent
             $base_path,
             $element
         );
-        if ($request) {
+        if ($request->shouldBeAppliedToForms()) {
             $form = $request->applyRequestToForm($form);
         }
         yield ContentType::MAIN => $form;

@@ -22,7 +22,7 @@ namespace ILIAS\MetaData\Editor\Digest;
 
 use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
 use ILIAS\MetaData\Elements\SetInterface;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
 use ILIAS\UI\Component\Modal\Interruptive as InterruptiveModal;
 
 class Digest
@@ -43,14 +43,14 @@ class Digest
      */
     public function getContent(
         SetInterface $set,
-        ?RequestForFormInterface $request = null
+        RequestInterface $request
     ): \Generator {
         yield from $this->content_assembler->get($set, $request);
     }
 
     public function updateMD(
         SetInterface $set,
-        RequestForFormInterface $request
+        RequestInterface $request
     ): bool {
         return $this->manipulator_adapter->update($set, $request);
     }

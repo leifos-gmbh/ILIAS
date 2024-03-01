@@ -170,10 +170,9 @@ class Services
         }
         return $this->table_factory = new TableFactory(
             $this->dic->ui()->factory(),
-            $this->dic->ui()->renderer(),
             $this->editor_services->presenter(),
-            $this->dataFinder(),
-            $this->actions()->getButton()
+            $this->data_helper_services->dataHelper(),
+            $this->dataFinder()
         );
     }
 

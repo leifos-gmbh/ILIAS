@@ -28,13 +28,12 @@ use ILIAS\MetaData\Repository\RepositoryInterface;
 use ILIAS\MetaData\Editor\Observers\ObserverHandler;
 use ILIAS\GlobalScreen\Services as GlobalScreen;
 use ILIAS\UI\Factory as UIFactory;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Editor\Full\FullEditor;
 use ILIAS\MetaData\Editor\Full\ContentType as FullContentType;
 use ILIAS\MetaData\Editor\Digest\ContentType as DigestContentType;
-use ILIAS\MetaData\Editor\Full\Services\Tables\Table;
 use ILIAS\MetaData\Editor\Digest\DigestInitiator;
 use ILIAS\MetaData\Editor\Digest\Digest;
 use ILIAS\MetaData\XML\Writer\WriterInterface as XMLWriter;
@@ -137,7 +136,8 @@ class ilMDEditorGUI
             $this->type
         );
 
-        $this->renderDigest($set, $digest);
+        $request = $this->request_parser->fetchRequest(false, false);
+        $this->renderDigest($set, $digest, $request);
     }
 
     public function updateQuickEdit(): void
@@ -151,7 +151,7 @@ class ilMDEditorGUI
             $this->type
         );
 
-        $request = $this->request_parser->fetchRequestForForm(false);
+        $request = $this->request_parser->fetchRequest(false, true);
         if (!$digest->updateMD($set, $request)) {
             $this->tpl->setOnScreenMessage(
                 'failure',
@@ -179,7 +179,7 @@ class ilMDEditorGUI
     protected function renderDigest(
         SetInterface $set,
         Digest $digest,
-        ?RequestForFormInterface $request = null
+        RequestInterface $request
     ): void {
         $content = $digest->getContent($set, $request);
         $template_content = [];
@@ -229,7 +229,7 @@ class ilMDEditorGUI
         $set = $editor->manipulateMD()->prepare($set, $base_path);
 
         // update or create
-        $request = $this->request_parser->fetchRequestForForm(true);
+        $request = $this->request_parser->fetchRequest(true, true);
         $success = $editor->manipulateMD()->createOrUpdate(
             $set,
             $base_path,
@@ -324,14 +324,15 @@ class ilMDEditorGUI
         $set = $editor->manipulateMD()->prepare($set, $base_path);
 
         // add content for element
-        $this->renderFullEditor($set, $base_path, $editor);
+        $request = $this->request_parser->fetchRequest(false, false);
+        $this->renderFullEditor($set, $base_path, $editor, $request);
     }
 
     protected function renderFullEditor(
         SetInterface $set,
         PathInterface $base_path,
         FullEditor $full_editor,
-        ?RequestForFormInterface $request = null
+        RequestInterface $request
     ): void {
         // add slate with tree
         $this->global_screen->tool()->context()->current()->addAdditionalData(
@@ -349,11 +350,6 @@ class ilMDEditorGUI
         foreach ($content as $type => $entity) {
             switch ($type) {
                 case FullContentType::MAIN:
-                    if ($entity instanceof Table) {
-                        $entity = $this->ui_factory->legacy(
-                            $entity->getHTML()
-                        );
-                    }
                     $template_content[] = $entity;
                     break;
 

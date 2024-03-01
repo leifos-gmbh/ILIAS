@@ -51,12 +51,14 @@ class RequestParser implements RequestParserInterface
         return $this->fetchPath(Parameter::ACTION_PATH, true);
     }
 
-    public function fetchRequestForForm(
-        bool $with_action_path
-    ): RequestForFormInterface {
-        return new RequestForForm(
+    public function fetchRequest(
+        bool $with_action_path,
+        bool $apply_to_forms
+    ): RequestInterface {
+        return new Request(
             $request = $this->http->request(),
-            $with_action_path ? $this->fetchActionPath() : null
+            $with_action_path ? $this->fetchActionPath() : null,
+            $apply_to_forms
         );
     }
 

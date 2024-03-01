@@ -25,7 +25,7 @@ use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
 
 class ManipulatorAdapter
 {
@@ -60,7 +60,7 @@ class ManipulatorAdapter
         SetInterface $set,
         PathInterface $base_path,
         PathInterface $action_path,
-        RequestForFormInterface $request
+        RequestInterface $request
     ): bool {
         $action_element = $this->navigator_factory->navigator($action_path, $set->getRoot())
                                                   ->lastElementAtFinalStep();

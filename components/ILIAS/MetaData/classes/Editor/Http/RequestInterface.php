@@ -23,12 +23,17 @@ namespace ILIAS\MetaData\Editor\Http;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
 use ILIAS\UI\Component\Modal\RoundTrip as RoundtripModal;
+use ILIAS\UI\Component\Table\Data as DataTable;
 
-interface RequestForFormInterface
+interface RequestInterface
 {
     public function path(): ?PathInterface;
+
+    public function shouldBeAppliedToForms(): bool;
 
     public function applyRequestToForm(StandardForm $form): StandardForm;
 
     public function applyRequestToModal(RoundtripModal $modal): RoundtripModal;
+
+    public function applyRequestToDataTable(DataTable $table): DataTable;
 }

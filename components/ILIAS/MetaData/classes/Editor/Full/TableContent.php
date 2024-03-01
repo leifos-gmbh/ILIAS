@@ -25,8 +25,8 @@ use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Editor\Full\Services\Services as FullEditorServices;
 use ILIAS\MetaData\Editor\Full\Services\Actions\FlexibleModal;
-use ILIAS\MetaData\Editor\Full\Services\Tables\Table;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
+use ILIAS\UI\Component\Table\Data as DataTable;
 
 class TableContent
 {
@@ -39,11 +39,11 @@ class TableContent
     }
 
     /**
-     * @return Table[]|FlexibleModal[]|Button[]
+     * @return DataTable[]|FlexibleModal[]|Button[]
      */
     public function content(
         PathInterface $base_path,
-        ?RequestForFormInterface $request,
+        RequestInterface $request,
         ElementInterface ...$elements
     ): \Generator {
         yield from $this->createModalAndButton(
@@ -51,7 +51,7 @@ class TableContent
             $request,
             ...$elements
         );
-        $builder =  $this->services->tableFactory()->table();
+        $builder = $this->services->tableFactory()->table();
         $delete_buttons = [];
         $update_buttons = [];
         foreach ($elements as $element) {
@@ -78,7 +78,7 @@ class TableContent
                 yield ContentType::MODAL => $delete_modal;
             }
         }
-        yield ContentType::MAIN => $builder->get();
+        yield ContentType::MAIN => $builder->get($request);
     }
 
     /**
@@ -86,7 +86,7 @@ class TableContent
      */
     protected function createModalAndButton(
         PathInterface $base_path,
-        ?RequestForFormInterface $request,
+        RequestInterface $request,
         ElementInterface ...$elements
     ): \Generator {
         foreach ($elements as $element) {

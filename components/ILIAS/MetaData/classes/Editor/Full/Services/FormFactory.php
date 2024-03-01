@@ -23,7 +23,6 @@ namespace ILIAS\MetaData\Editor\Full\Services;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
 use ILIAS\Data\URI;
-use ILIAS\MetaData\Editor\Full\Services\Actions\Actions;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Editor\Full\Services\Inputs\InputFactory;
@@ -108,8 +107,7 @@ class FormFactory
                 $element,
                 $context_element,
                 $with_title
-            )
-            ];
+            )];
         }
         return $this->ui_factory->input()->container()->form()->standard(
             (string) $link,

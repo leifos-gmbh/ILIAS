@@ -20,44 +20,39 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Editor\Full\Services\Tables;
 
-use ILIAS\UI\Renderer;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface as PresenterInterface;
 use ILIAS\MetaData\Editor\Full\Services\DataFinder;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
-use ILIAS\MetaData\Editor\Full\Services\Actions\ButtonFactory;
+use ILIAS\MetaData\DataHelper\DataHelperInterface;
 
 class TableFactory
 {
     protected UIFactory $ui_factory;
-    protected Renderer $renderer;
     protected PresenterInterface $presenter;
+    protected DataHelperInterface $data_helper;
     protected DataFinder $data_finder;
-    protected ButtonFactory $button_factory;
 
     public function __construct(
         UIFactory $ui_factory,
-        Renderer $renderer,
         PresenterInterface $presenter,
-        DataFinder $data_finder,
-        ButtonFactory $button_factory
+        DataHelperInterface $data_helper,
+        DataFinder $data_finder
     ) {
         $this->ui_factory = $ui_factory;
-        $this->renderer = $renderer;
         $this->presenter = $presenter;
+        $this->data_helper = $data_helper;
         $this->data_finder = $data_finder;
-        $this->button_factory = $button_factory;
     }
 
     public function table(): TableBuilder
     {
         return new TableBuilder(
             $this->ui_factory,
-            $this->renderer,
             $this->presenter,
-            $this->data_finder,
-            $this->button_factory
+            $this->data_helper,
+            $this->data_finder
         );
     }
 }

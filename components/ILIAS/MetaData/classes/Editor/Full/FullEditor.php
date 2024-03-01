@@ -31,9 +31,9 @@ use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Editor\Full\Services\Services as FullEditorServices;
 use ILIAS\MetaData\Editor\Full\Services\ManipulatorAdapter;
-use ILIAS\MetaData\Editor\Full\Services\Tables\Table;
 use ILIAS\MetaData\Editor\Full\Services\Actions\FlexibleModal;
-use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
+use ILIAS\UI\Component\Table\Data as DataTable;
 
 class FullEditor
 {
@@ -74,12 +74,12 @@ class FullEditor
     }
 
     /**
-     * @return Table[]|StandardForm[]|Panel[]|FlexibleModal[]|Button[]|StandardDropdown[]
+     * @return DataTable[]|StandardForm[]|Panel[]|FlexibleModal[]|Button[]|StandardDropdown[]
      */
     public function getContent(
         SetInterface $set,
         PathInterface $base_path,
-        ?RequestForFormInterface $request = null
+        RequestInterface $request
     ): \Generator {
         $elements = $this->getElements($set, $base_path);
         switch ($this->decideContentType(...$elements)) {

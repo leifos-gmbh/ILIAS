@@ -35,58 +35,29 @@ require_once('./Services/FileDelivery/classes/class.ilFileDelivery.php');
  */
 class ilWebAccessChecker
 {
-    const DISPOSITION = 'disposition';
-    const STATUS_CODE = 'status_code';
-    const REVALIDATE = 'revalidate';
-    const CM_FILE_TOKEN = 1;
-    const CM_FOLDER_TOKEN = 2;
-    const CM_CHECKINGINSTANCE = 3;
-    const CM_SECFOLDER = 4;
+    public const DISPOSITION = 'disposition';
+    public const STATUS_CODE = 'status_code';
+    public const REVALIDATE = 'revalidate';
+    public const CM_FILE_TOKEN = 1;
+    public const CM_FOLDER_TOKEN = 2;
+    public const CM_CHECKINGINSTANCE = 3;
+    public const CM_SECFOLDER = 4;
     /**
      * @var ilWACPath
      */
-    protected $path_object = null;
+    protected $applied_checking_methods = [];
     /**
-     * @var bool
-     */
-    protected $checked = false;
-    /**
-     * @var string
-     */
-    protected $disposition = ilFileDelivery::DISP_INLINE;
-    /**
-     * @var string
-     */
-    protected $override_mimetype = '';
-    /**
-     * @var bool
-     */
-    protected $send_status_code = false;
-    /**
-     * @var bool
-     */
-    protected $initialized = false;
-    /**
-     * @var bool
-     */
-    protected $revalidate_folder_tokens = true;
-    /**
-     * @var bool
-     */
-    protected static $use_seperate_logfile = false;
-    /**
-     * @var array
-     */
-    protected $applied_checking_methods = array();
-    /**
-     * @var \ILIAS\DI\HTTPServices $http
+     * @var \Services
      */
     private $http;
     /**
-     * @var CookieFactory $cookieFactory
+     * @var \ILIAS\HTTP\Cookies\CookieFactory
      */
     private $cookieFactory;
-
+    /**
+     * @var \ilWACException|null
+     */
+    private $ressource_not_found;
 
     /**
      * ilWebAccessChecker constructor.
@@ -96,7 +67,15 @@ class ilWebAccessChecker
      */
     public function __construct(GlobalHttpState $httpState, CookieFactory $cookieFactory)
     {
-        $this->setPathObject(new ilWACPath($httpState->request()->getRequestTarget()));
+        try {
+            $this->setPathObject(new ilWACPath($httpState->request()->getRequestTarget()));
+        } catch (ilWACException $e) {
+            if ($e->getCode() !== ilWACException::NOT_FOUND) {
+                throw $e;
+            }
+            $this->ressource_not_found = $e;
+        }
+
         $this->http = $httpState;
         $this->cookieFactory = $cookieFactory;
     }
@@ -108,7 +87,11 @@ class ilWebAccessChecker
      */
     public function check()
     {
-        if (!$this->getPathObject()) {
+        if ($this->getPathObject() === null) {
+            if ($this->ressource_not_found !== null) {
+                throw new ilWACException(ilWACException::NOT_FOUND, '', $this->ressource_not_found);
+            }
+
             throw new ilWACException(ilWACException::CODE_NO_PATH);
         }
 
@@ -146,7 +129,7 @@ class ilWebAccessChecker
             $clean_path = $this->getPathObject()->getCleanURLdecodedPath();
             $path = realpath($clean_path);
             $data_dir = realpath(CLIENT_WEB_DIR);
-            if (strpos($path, $data_dir) !== 0) {
+            if (strpos($path, (string) $data_dir) !== 0) {
                 return false;
             }
             if (dirname($path) === $data_dir && is_file($path)) {
@@ -259,7 +242,6 @@ class ilWebAccessChecker
     protected function checkPublicSection()
     {
         global $DIC;
-        $on_login_page = !$this->isRequestNotFromLoginPage();
         $is_anonymous = ((int) $DIC->user()->getId() === (int) ANONYMOUS_USER_ID);
         $is_null_user = ($DIC->user()->getId() === 0);
         $pub_section_activated = (bool) $DIC['ilSetting']->get('pub_section');
@@ -268,11 +250,6 @@ class ilWebAccessChecker
 
         if (!$isset || !$instanceof) {
             throw new ilWACException(ilWACException::ACCESS_DENIED_NO_PUB);
-        }
-
-        if ($on_login_page && ($is_null_user || $is_anonymous)) {
-            // Request is initiated from login page
-            return;
         }
 
         if ($pub_section_activated && ($is_null_user || $is_anonymous)) {
@@ -292,8 +269,7 @@ class ilWebAccessChecker
 
         $is_user = $DIC->user() instanceof ilObjUser;
         $user_id_is_zero = ((int) $DIC->user()->getId() === 0);
-        $not_on_login_page = $this->isRequestNotFromLoginPage();
-        if (!$is_user || ($user_id_is_zero && $not_on_login_page)) {
+        if (!$is_user || $user_id_is_zero) {
             throw new ilWACException(ilWACException::ACCESS_DENIED_NO_LOGIN);
         }
     }
@@ -514,33 +490,5 @@ class ilWebAccessChecker
         $ilAuthSession->setUserId($a_id);
         $ilAuthSession->setAuthenticated(false, $a_id);
         $DIC->user()->setId($a_id);
-    }
-
-
-    /**
-     * @return bool
-     */
-    protected function isRequestNotFromLoginPage()
-    {
-        $referrer = (string) ($_SERVER['HTTP_REFERER'] ?? '');
-        $not_on_login_page = (strpos($referrer, 'login.php') === false
-                              && strpos($referrer, '&baseClass=ilStartUpGUI') === false);
-
-        if ($not_on_login_page && $referrer !== '') {
-            // In some scenarios (observed for content styles on login page, the HTTP_REFERER does not contain a PHP script
-            $referrer_url_parts = parse_url($referrer);
-            $ilias_url_parts = parse_url(ilUtil::_getHttpPath());
-            if (
-                $ilias_url_parts['host'] === $referrer_url_parts['host'] &&
-                (
-                    !isset($referrer_url_parts['path']) ||
-                    strpos($referrer_url_parts['path'], '.php') === false
-                )
-            ) {
-                $not_on_login_page = false;
-            }
-        }
-
-        return $not_on_login_page;
     }
 }

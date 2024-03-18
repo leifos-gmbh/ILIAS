@@ -22,6 +22,7 @@ use ILIAS\Repository\Clipboard\ClipboardManager;
 use ILIAS\HTTP\Wrapper\RequestWrapper;
 use ILIAS\HTTP\Wrapper\ArrayBasedRequestWrapper;
 use ILIAS\Refinery\Factory as Refinery;
+use ILIAS\Refinery\ConstraintViolationException;
 use ILIAS\Style\Content\Container\ContainerDBRepository;
 use Psr\Http\Message\ServerRequestInterface;
 use ILIAS\UI\Factory as UIFactory;
@@ -455,8 +456,14 @@ class ilObjectCopyGUI
             return;
         }
 
+        try {
+            $targets = $this->retriever->getArrayOfInt('target');
+        } catch (ConstraintViolationException $e) {
+            $possible_target = $this->retriever->getMaybeInt('target');
+            $targets = $possible_target === null ? [] : [$possible_target];
+        }
 
-        if (($targets = $this->retriever->getArrayOfInt('target')) !== []) {
+        if ($targets !== []) {
             $this->setTargets($targets);
             $this->ctrl->setParameter($this, 'target_ids', implode('_', $this->getTargets()));
         } elseif (($target = $this->retriever->getMaybeInt('target')) !== null) {
@@ -717,6 +724,25 @@ class ilObjectCopyGUI
         return '';
     }
 
+    /**
+     * Save selected source from membership screen
+     */
+    protected function saveSourceMembership(): void
+    {
+        $source = $this->retriever->getMaybeInt('source');
+        if ($source === null) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
+            $this->ctrl->redirect($this, 'showSourceSelectionMembership');
+            return;
+        }
+
+        $this->setSource([$source]);
+        $this->setType(ilObject::_lookupType($this->getFirstSource(), true));
+        $this->ctrl->setParameter($this, 'source_id', $source);
+
+        $this->executeNextStepAfterSourceSelection();
+    }
+
     private function executeNextStepAfterSourceSelection(): void
     {
         if (!$this->obj_definition->isContainer($this->getType())) {
@@ -735,30 +761,6 @@ class ilObjectCopyGUI
         }
 
         $this->showItemSelection();
-    }
-
-    /**
-     * Save selected source from membership screen
-     */
-    protected function saveSourceMembership(): void
-    {
-        $source = $this->retriever->getMaybeInt('source');
-        if ($source === null) {
-            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
-            $this->ctrl->redirect($this, 'showSourceSelectionMembership');
-            return;
-        }
-
-        $this->setSource([$source]);
-        $this->setType(ilObject::_lookupType($this->getFirstSource(), true));
-        $this->ctrl->setParameter($this, 'source_id', $source);
-
-        if ($this->obj_definition->isContainer($this->getType())) {
-            $this->showItemSelection();
-            return;
-        }
-
-        $this->copySingleObject();
     }
 
     protected function showCopyPageSelection(): void
@@ -822,7 +824,7 @@ class ilObjectCopyGUI
     protected function copySingleObject(): void
     {
         // Source defined
-        if (!count($this->getSources())) {
+        if ($this->getSources() === []) {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'), true);
             $this->ctrl->returnToParent($this);
         }
@@ -973,7 +975,7 @@ class ilObjectCopyGUI
             $orig_page->copy($target_object->getId(), "cont", $target_object->getId());
         }
 
-        $style_id = $source_object->getStyleSheetId();
+        $style_id = ilObjStyleSheet::lookupObjectStyle($source_object->getId());
         if ($style_id > 0 && !ilObjStyleSheet::_lookupStandard($style_id)) {
             $style_obj = ilObjectFactory::getInstanceByObjId($style_id);
             $new_id = $style_obj->ilClone();

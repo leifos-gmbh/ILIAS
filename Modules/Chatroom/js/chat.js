@@ -604,7 +604,7 @@
 								|| lastHandledDate.scope.getDate() != messageDate.getDate()
 								|| lastHandledDate.scope.getMonth() != messageDate.getMonth()
 								|| lastHandledDate.scope.getFullYear() != messageDate.getFullYear()) {
-                container.append($(`<div class="messageLine chat dateline"><span class="chat content date">${il.Chatroom.formatISODate(message.timestamp)}</span><span class="chat content username"></span><span class="chat content message"></span></div>`));
+                container.append($(`<div class="messageLine chat dateline"><span class="chat content date">${il.Chatroom.formatISODate(message.timestamp)}</span></div>`));
               }
               lastHandledDate.scope = messageDate;
 
@@ -620,7 +620,7 @@
               }
 
               var messageSpan = $('<span class="chat content message"></span>');
-              messageSpan.text(messageSpan.text(content).text());
+              messageSpan.html(content);
               line.append($('<span class="chat content messageseparator">:</span>'))
                 .append(messageSpan);
 

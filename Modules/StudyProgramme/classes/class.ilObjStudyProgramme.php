@@ -302,6 +302,17 @@ class ilObjStudyProgramme extends ilContainer
         return !is_null($type) && count($this->type_repository->getAssignedAMDRecordIdsByType($type->getId(), true)) > 0;
     }
 
+    public function cloneObject(int $target_ref_id, int $copy_id = 0, bool $omit_tree = false): ?ilObject
+    {
+        $new_obj = parent::cloneObject($target_ref_id, $copy_id, $omit_tree);
+        $settings = $this->getSettings()->withObjId($new_obj->getId());
+        $settings = $settings->withAssessmentSettings(
+            $settings->getAssessmentSettings()->withStatus(ilStudyProgrammeSettings::STATUS_DRAFT)
+        );
+        $new_obj->updateSettings($settings);
+        return $new_obj;
+    }
+
     ////////////////////////////////////
     // GETTERS AND SETTERS
     ////////////////////////////////////
@@ -412,6 +423,18 @@ class ilObjStudyProgramme extends ilContainer
         }
 
         return null;
+    }
+
+    public function isCertificateActive(): bool
+    {
+        $global_settings = new ilSetting('certificate');
+        $global_active = (bool) $global_settings->get('active', '0');
+        if(!$global_active) {
+            return false;
+        }
+        $certificate_template_repository = new ilCertificateTemplateDatabaseRepository($this->db);
+        $certificate_template = $certificate_template_repository->fetchCurrentlyUsedCertificate($this->getId());
+        return $certificate_template->isCurrentlyActive();
     }
 
 
@@ -1495,14 +1518,6 @@ class ilObjStudyProgramme extends ilContainer
         // We only use courses via crs_refs
         $type = ilObject::_lookupType($obj_id);
         if ($type === "crsr") {
-            require_once("Services/ContainerReference/classes/class.ilContainerReference.php");
-            $crs_reference_obj_ids = ilContainerReference::_lookupSourceIds($obj_id);
-            foreach ($crs_reference_obj_ids as $crs_reference_obj_id) {
-                foreach (ilObject::_getAllReferences($crs_reference_obj_id) as $ref_id) {
-                    self::setProgressesCompletedIfParentIsProgrammeInLPCompletedMode($ref_id, $crs_reference_obj_id, $user_id);
-                }
-            }
-        } else {
             foreach (ilObject::_getAllReferences($obj_id) as $ref_id) {
                 self::setProgressesCompletedIfParentIsProgrammeInLPCompletedMode($ref_id, $obj_id, $user_id);
             }
@@ -1556,12 +1571,14 @@ class ilObjStudyProgramme extends ilContainer
         $customIcon = $this->custom_icon_factory->getByObjId($this->getId(), $this->getType());
         $subtype = $this->getSubType();
 
-        if ($subtype
-                && $this->webdir->has($subtype->getIconPath(true))
-                && $subtype->getIconPath(true) !== $subtype->getIconPath(false)
-        ) {
-            $icon = $subtype->getIconPath(true);
-            $customIcon->saveFromSourceFile($icon);
+        if ($subtype && $subtype->getIconIdentifier()) {
+            $src = $this->type_repository->getIconPathFS($subtype);
+
+            //This is a horrible hack to allow Flysystem/LocalFilesystem to read the file.
+            $tmp = 'ico_' . $this->getId();
+            copy($src, \ilFileUtils::getDataDir() . '/temp/' . $tmp);
+
+            $customIcon->saveFromTempFileName($tmp);
         } else {
             $customIcon->remove();
         }

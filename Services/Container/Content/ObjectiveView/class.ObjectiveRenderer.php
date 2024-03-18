@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 namespace ILIAS\Containter\Content;
 
@@ -439,7 +439,12 @@ class ObjectiveRenderer
 
         $sort_content = array();
 
+        $access = $this->domain->access();
         foreach ($items as $item) {
+
+            if (!$access->checkAccess('visible', '', $item["ref_id"])) {
+                continue;
+            }
             /*
             if ($this->getDetailsLevel($a_objective_id) < self::DETAILS_ALL) {
                 continue;
@@ -735,6 +740,9 @@ class ObjectiveRenderer
         if ($a_lo_result === null) {
             $a_lo_result["type"] = null;
         }
+        if (!isset($a_lo_result["type"])) {
+            $a_lo_result["type"] = null;
+        }
 
         $lng = $DIC->language();
         $lng->loadLanguageModule('crs');
@@ -746,8 +754,7 @@ class ObjectiveRenderer
                 $a_lo_result['type'] == \ilLOUserResults::TYPE_INITIAL &&
                 \ilLOSettings::getInstanceByObjId($a_lo_result['course_id'] ?? 0)->isInitialTestQualifying()
             );
-        $has_completed =
-            ($a_lo_result["status"] ?? 0 == \ilLOUserResults::STATUS_COMPLETED);
+        $has_completed = (int) ($a_lo_result["status"] ?? 0) === \ilLOUserResults::STATUS_COMPLETED;
 
         $next_step = $progress_txt = $bar_color = $test_url = $initial_sub = null;
 
@@ -923,7 +930,7 @@ class ObjectiveRenderer
                 $initial_lim = (int) $a_lo_result['initial']['limit_perc'];
             }
             if (
-                $a_lo_result['type'] == \ilLOUserResults::TYPE_INITIAL &&
+                ($a_lo_result['type'] ?? \ilLOUserResults::TYPE_UNDEFINED) == \ilLOUserResults::TYPE_INITIAL &&
                 isset($a_lo_result['result_perc'])
             ) {
                 $initial_res = (int) $a_lo_result['result_perc'];
@@ -966,7 +973,7 @@ class ObjectiveRenderer
         $qual_res = null;
         $qual_lim = null;
 
-        if ($a_lo_result['type'] == \ilLOUserResults::TYPE_QUALIFIED) {
+        if (($a_lo_result['type'] ?? \ilLOUserResults::TYPE_UNDEFINED) == \ilLOUserResults::TYPE_QUALIFIED) {
             $qual_res = (int) $a_lo_result['result_perc'];
             $qual_lim = (int) $a_lo_result['limit_perc'];
         }

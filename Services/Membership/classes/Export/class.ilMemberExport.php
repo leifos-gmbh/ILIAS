@@ -1,7 +1,4 @@
 <?php
-
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +14,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * Class for generation of member export files
@@ -286,7 +285,7 @@ class ilMemberExport
 
                 switch ($field) {
                     case 'role':
-                        switch ($this->user_course_data[$usr_id]['role']) {
+                        switch ($this->user_course_data[$usr_id]['role'] ?? '') {
                             case ilParticipants::IL_CRS_ADMIN:
                                 $this->addCol($this->lng->txt('crs_admin'), $row, $col++);
                                 break;
@@ -385,7 +384,7 @@ class ilMemberExport
                                 $this->agreement[$usr_id]['accepted'])
                         ) {
                             #$this->csv->addColumn($this->user_profile_data[$usr_id][$field]);
-                            $this->addCol($this->user_profile_data[$usr_id][$field], $row, $col++);
+                            $this->addCol($this->user_profile_data[$usr_id][$field] ?? '', $row, $col++);
                         } else {
                             #$this->csv->addColumn('');
                             $this->addCol('', $row, $col++);
@@ -464,11 +463,14 @@ class ilMemberExport
         if (strpos($a_field, 'cdf_') !== 0) {
             return false;
         }
-        if (!$this->privacy->courseConfirmationRequired() or $this->agreement[$a_usr_id]['accepted']) {
+        if (
+            !$this->privacy->courseConfirmationRequired() ||
+            ($this->agreement[$a_usr_id]['accepted'] ?? false)
+        ) {
             $field_info = explode('_', $a_field);
             $field_id = $field_info[1] ?? 0;
             $value = '';
-            if (isset($this->user_course_fields[$a_usr_id][$a_field])) {
+            if (isset($this->user_course_fields[$a_usr_id][$field_id])) {
                 $value = $this->user_course_fields[$a_usr_id][$field_id];
             }
             $this->addCol((string) $value, $row, $col);

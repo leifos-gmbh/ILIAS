@@ -386,11 +386,14 @@ class ilPersonalSettingsGUI
                 $options[$lang_key] = ilLanguage::_lookupEntry($lang_key, 'meta', 'meta_l_' . $lang_key);
             }
 
-            $si = new ilSelectInputGUI($this->lng->txt('language'), 'language');
-            $si->setOptions($options);
-            $si->setValue($this->user->getLanguage());
-            $si->setDisabled((bool) $this->settings->get('usr_settings_disable_language'));
-            $this->form->addItem($si);
+            $lang = new ilSelectInputGUI($this->lng->txt('language'), 'language');
+            $lang->setOptionsLangAttribute(fn($options, $key) => $key);
+            $lang->setOptions($options);
+            $lang->setValue($this->user->getLanguage());
+            if (count($options) <= 1 || $this->settings->get('usr_settings_disable_language') === '1') {
+                $lang->setDisabled(true);
+            }
+            $this->form->addItem($lang);
         }
 
         // skin/style
@@ -768,7 +771,7 @@ class ilPersonalSettingsGUI
         $admin_mail = $this->settings->get('user_delete_own_account_email');
 
         $mmail = new ilMimeMail();
-        $mmail->From($this->sender_factory->system());
+        $mmail->From($this->mail_sender_factory->system());
 
         if ($user_email !== '') {
             $mmail->To($user_email);
@@ -783,7 +786,7 @@ class ilPersonalSettingsGUI
             $mmail->Send();
         }
 
-        $this->log->root()->log('Account deleted: ' . $ilUser->getLogin() . ' (' . $ilUser->getId() . ')');
+        $this->log->root()->log('Account deleted: ' . $this->user->getLogin() . ' (' . $this->user->getId() . ')');
 
         $this->user->delete();
 

@@ -10,7 +10,13 @@
 <!-- BEGIN item -->
 <!-- BEGIN header -->
 <!-- BEGIN title_icon --><!-- <img src="{IMG_ICON}" alt="{IMG_ALT}" border="0"/> --><!-- END title_icon -->
-		<div class="ilFormHeader clearfix"><h2 class="ilHeader">{TXT_TITLE}</h2>
+		<div class="ilFormHeader clearfix">
+			<div class="col-sm-6 ilFormRequired--top">
+				<!-- BEGIN required_text_top -->
+				<span class="asterisk">*</span><span class="small"> {TXT_REQUIRED_TOP}</span>
+				<!-- END required_text_top -->
+				&nbsp;</div>
+			<h2 class="ilHeader">{TXT_TITLE}</h2>
 		<div class="ilFormCmds">
 				<!-- BEGIN commands2 -->
 				<!-- BEGIN cmd2 -->
@@ -25,7 +31,7 @@
 <!-- BEGIN std_prop_start -->
 <div class="form-group row" id="il_prop_cont_{LAB_ID}">
 	<label {FOR_ID} class="col-lg-2 col-md-3 col-sm-4 control-label">{PROPERTY_TITLE}<!-- BEGIN std_hid_title --> <span class="ilAccHeadingHidden">{PHID_TITLE}</span><!-- END std_hid_title --><!-- BEGIN required --> <span class="asterisk">*</span><!-- END required --></label>
-	<div class="col-lg-10 col-md-9 col-sm-8 row">
+	<div class="col-lg-10 col-md-9 col-sm-8">
 <!-- END std_prop_start -->
 <!-- BEGIN sub_prop_start -->
 <div class="form-group row" id="il_prop_cont_{LAB_ID}">
@@ -79,7 +85,7 @@
 		</div>
 <!-- END prop_color -->
 <!-- BEGIN description -->
-		<div class="help-block">{PROPERTY_DESCRIPTION}</div>
+		<div id="desc_{DESCRIPTION_FOR_ID}" class="help-block">{PROPERTY_DESCRIPTION}</div>
 <!-- END description -->
 <!-- BEGIN sub_form -->
 		<div class="ilSubForm" id="subform_{SFID}">{PROP_SUB_FORM}</div>

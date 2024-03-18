@@ -31,6 +31,7 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
     private array $results;
     private array $resultunits;
     private ilUnitConfigurationRepository $unitrepository;
+    protected PassPresentedVariablesRepo $pass_presented_variables_repo;
 
     public function __construct(
         string $title = "",
@@ -44,6 +45,7 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
         $this->results = array();
         $this->resultunits = array();
         $this->unitrepository = new ilUnitConfigurationRepository(0);
+        $this->pass_presented_variables_repo = new PassPresentedVariablesRepo($this->db);
     }
 
     public function clearVariables(): void
@@ -235,9 +237,28 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
         return true;
     }
 
-    /**
-     * @return array $initialVariableSolutionValues
-     */
+    public function getVariableSolutionValuesForPass(
+        int $active_id,
+        int $pass
+    ): array {
+        $question_id = $this->getId();
+        $values = $this->pass_presented_variables_repo->getFor(
+            $question_id,
+            $active_id,
+            $pass
+        );
+        if(is_null($values)) {
+            $values = $this->getInitialVariableSolutionValues();
+            $this->pass_presented_variables_repo->store(
+                $question_id,
+                $active_id,
+                $pass,
+                $values
+            );
+        }
+        return $values;
+    }
+
     public function getInitialVariableSolutionValues(): array
     {
         foreach ($this->fetchAllResults($this->getQuestion()) as $resObj) {
@@ -251,6 +272,20 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
         }
 
         return $variableSolutionValues;
+    }
+
+    public function saveCurrentSolution(int $active_id, int $pass, $value1, $value2, bool $authorized = true, $tstamp = 0): int
+    {
+        $init_solution_vars = $this->getVariableSolutionValuesForPass($active_id, $pass);
+        foreach ($init_solution_vars as $val1 => $val2) {
+            $this->db->manipulateF(
+                "DELETE FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s AND value1 = %s",
+                ['integer', 'integer','integer', 'text'],
+                [$active_id, $this->getId(), $pass, $val1]
+            );
+            parent::saveCurrentSolution($active_id, $pass, $val1, $val2, $authorized);
+        }
+        return parent::saveCurrentSolution($active_id, $pass, $value1, $value2, $authorized, $tstamp);
     }
 
     /**
@@ -299,10 +334,14 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
                 if (is_array($userdata) &&
                     isset($userdata[$result]) &&
                     isset($userdata[$result]["value"])) {
-                    $input = $this->generateResultInputHtml($result, $userdata[$result]["value"]);
+
+                    $input = $this->generateResultInputHTML($result, $userdata[$result]["value"], $forsolution);
                 } elseif ($forsolution) {
-                    $value = $resObj->calculateFormula($this->getVariables(), $this->getResults(), parent::getId());
-                    $value = sprintf("%." . $resObj->getPrecision() . "f", $value);
+                    $value = '';
+                    if (!is_array($userdata)) {
+                        $value = $resObj->calculateFormula($this->getVariables(), $this->getResults(), parent::getId());
+                        $value = sprintf("%." . $resObj->getPrecision() . "f", $value);
+                    }
 
                     if ($is_frac) {
                         $value = assFormulaQuestionResult::convertDecimalToCoprimeFraction($value);
@@ -310,14 +349,11 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
                             $frac_helper = $value[1];
                             $value = $value[0];
                         }
-                        $value = ' value="' . $value . '"';
                     }
 
-                    $input = '<span class="ilc_qinput_TextInput solutionbox">' . ilLegacyFormElementsUtil::prepareFormOutput(
-                        $value
-                    ) . '</span>';
+                    $input = $this->generateResultInputHTML($result, $value, true);
                 } else {
-                    $input = $this->generateResultInputHTML($result, '');
+                    $input = $this->generateResultInputHTML($result, '', false);
                 }
 
                 $units = "";
@@ -358,7 +394,7 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
                         $units .= ' ' . $this->lng->txt('expected_result_type') . ': ' . $this->lng->txt('result_dec');
                         break;
                     case assFormulaQuestionResult::RESULT_FRAC:
-                        if (strlen($frac_helper)) {
+                        if ($frac_helper !== '') {
                             $units .= ' &asymp; ' . $frac_helper . ', ';
                         } elseif (is_array($userdata) &&
                             array_key_exists($result, $userdata) &&
@@ -371,7 +407,7 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
                         $units .= ' ' . $this->lng->txt('expected_result_type') . ': ' . $this->lng->txt('result_frac');
                         break;
                     case assFormulaQuestionResult::RESULT_CO_FRAC:
-                        if (strlen($frac_helper)) {
+                        if ($frac_helper !== '') {
                             $units .= ' &asymp; ' . $frac_helper . ', ';
                         } elseif (is_array($userdata) && isset($userdata[$result]) && isset($userdata[$result]["frac_helper"]) && $userdata[$result]["frac_helper"] !== '') {
                             if (!preg_match('-/-', $value)) {
@@ -456,8 +492,13 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
         return $text;
     }
 
-    protected function generateResultInputHTML(string $result_key, string $result_value): string
+    protected function generateResultInputHTML(string $result_key, string $result_value, bool $forsolution): string
     {
+        if ($forsolution) {
+            return  '<span class="ilc_qinput_TextInput solutionbox">'
+                . ilLegacyFormElementsUtil::prepareFormOutput($result_value)
+                . '</span>';
+        }
         $input = '<input class="ilc_qinput_TextInput" type="text"';
         $input .= 'spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"';
         $input .= 'name="result_' . $result_key . '"';
@@ -519,8 +560,7 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
      */
     public function saveToDb($original_id = ""): void
     {
-        global $DIC;
-        $ilDB = $DIC['ilDB'];
+        $ilDB = $this->db;
 
         if ($original_id == "") {
             $this->saveQuestionDataToDb();
@@ -841,7 +881,7 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
      * @param integer $test_id The database Id of the test containing the question
      * @access public
      */
-    public function calculateReachedPoints($active_id, $pass = null, $authorizedSolution = true, $returndetails = false): int
+    public function calculateReachedPoints($active_id, $pass = null, $authorizedSolution = true, $returndetails = false): float
     {
         if (is_null($pass)) {
             $pass = $this->getSolutionMaxPass($active_id);
@@ -878,7 +918,7 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
             );
         }
 
-        return $points;
+        return (float)$points;
     }
 
     public function calculateReachedPointsFromPreviewSession(ilAssQuestionPreviewSession $previewSession)
@@ -1456,4 +1496,5 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition, ilAs
             return $this->getResults();
         }
     }
+
 }

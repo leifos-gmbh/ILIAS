@@ -777,7 +777,7 @@ class ilObjectListGUI
      */
     public function createDefaultCommand(array $command): array
     {
-        if ($this->static_link_enabled and !$this->default_command_params) {
+        if ($this->static_link_enabled && !$this->default_command_params) {
             if ($link = ilLink::_getStaticLink($this->ref_id, $this->type, false)) {
                 $command['link'] = $link;
                 $command['frame'] = '_top';
@@ -1089,10 +1089,9 @@ class ilObjectListGUI
             ];
         }
         // begin-patch lok
-        if (
-            !$this->default_command ||
-            (!$this->getCommandsStatus() && !$this->restrict_to_goto) ||
-            $this->title_link_disabled
+        if ($this->default_command === []
+            || !$this->getCommandsStatus() && !$this->restrict_to_goto
+            || $this->title_link_disabled
         ) {
             // end-patch lok
             $this->tpl->setCurrentBlock('item_title');
@@ -1100,7 +1099,7 @@ class ilObjectListGUI
         } else {
             $this->default_command['link'] = $this->modifyTitleLink($this->default_command['link']);
 
-            $this->default_command['link'] =
+            list($this->default_command['link'], $this->default_command['frame']) =
                 $this->modifySAHSlaunch($this->default_command['link'], $this->default_command['frame']);
 
             if ($this->default_command['frame'] != '') {
@@ -1987,6 +1986,16 @@ class ilObjectListGUI
         string $async_url = '',
         bool $header_actions = false
     ): string {
+        $commands = $this->getCommands();
+        if ($use_async && !$get_async_commands) {
+            foreach ($commands as $command) {
+                if ($command['default'] === true) {
+                    $this->default_command = $command['granted'] === true ? $this->createDefaultCommand($command) : [];
+                    break;
+                }
+            }
+        }
+
         if (!$this->getCommandsStatus() || $this->commandsNeedToBeHidden(
             $use_async,
             $get_async_commands,
@@ -2017,13 +2026,11 @@ class ilObjectListGUI
             'ilContainerListItemOuterHighlight'
         );
 
-        $this->ctrl->setParameterByClass($this->gui_class_name, 'ref_id', $this->ref_id);
-
-        // only standard command?
-        $only_default = false;
         if ($use_async && !$get_async_commands) {
-            $only_default = true;
+            return $this->current_selection_list->getHTML();
         }
+
+        $this->ctrl->setParameterByClass($this->gui_class_name, 'ref_id', $this->ref_id);
 
         $this->default_command = [];
         $this->prevent_duplicate_commands = [];
@@ -2031,116 +2038,112 @@ class ilObjectListGUI
         // we only allow the following commands inside the header actions
         $valid_header_commands = ['mount_webfolder'];
 
-        $commands = $this->getCommands();
+
         foreach ($commands as $command) {
-            if ($header_actions && !in_array($command['cmd'], $valid_header_commands)) {
+            if ($header_actions && !in_array($command['cmd'], $valid_header_commands)
+                || $command['granted'] === false) {
                 continue;
             }
 
-            if ($command['granted'] == true) {
-                if (!$command['default'] === true) {
-                    if (!$this->std_cmd_only && !$only_default) {
-                        // workaround for repository frameset
-                        $command['link'] =
-                            $this->appendRepositoryFrameParameter($command['link']);
-
-                        $cmd_link = $command['link'];
-                        $txt = ($command['lang_var'] == '')
-                            ? $command['txt']
-                            : $this->lng->txt($command['lang_var']);
-                        $this->insertCommand(
-                            $cmd_link,
-                            $txt,
-                            $command['frame'],
-                            $command['img'],
-                            $command['cmd']
-                        );
-                    }
-                } else {
-                    $this->default_command = $this->createDefaultCommand($command);
-                }
+            if ($command['default'] === true) {
+                $this->default_command = $this->createDefaultCommand($command);
+                continue;
             }
+
+            // workaround for repository frameset
+            $command['link'] =
+                $this->appendRepositoryFrameParameter($command['link']);
+
+            $cmd_link = $command['link'];
+            $txt = ($command['lang_var'] == '')
+                ? $command['txt']
+                : $this->lng->txt($command['lang_var']);
+            $this->insertCommand(
+                $cmd_link,
+                $txt,
+                $command['frame'],
+                $command['img'],
+                $command['cmd']
+            );
         }
 
-        if (!$only_default) {
-            // custom commands
-            if (is_array($this->cust_commands)) {
-                foreach ($this->cust_commands as $command) {
-                    if ($command instanceof Button) {
-                        $this->current_selection_list->addComponent($command);
-                        continue;
-                    }
-
-                    $this->insertCommand(
-                        $command['link'],
-                        $this->lng->txt($command['lang_var']),
-                        $command['frame'],
-                        '',
-                        $command['cmd'] ?? '',
-                        $command['onclick']
-                    );
+        // custom commands
+        if (is_array($this->cust_commands)) {
+            foreach ($this->cust_commands as $command) {
+                if ($command instanceof Button) {
+                    $this->current_selection_list->addComponent($command);
+                    continue;
                 }
+
+                $this->insertCommand(
+                    $command['link'],
+                    $this->lng->txt($command['lang_var']),
+                    $command['frame'],
+                    '',
+                    $command['cmd'] ?? '',
+                    $command['onclick']
+                );
             }
-            $this->insertLPSettingsCommand();
+        }
+        $this->insertLPSettingsCommand();
 
-            // info screen command
-            if ($this->getInfoScreenStatus()) {
-                $this->insertInfoScreenCommand();
+        // info screen command
+        if ($this->getInfoScreenStatus()) {
+            $this->insertInfoScreenCommand();
+        }
+
+        $this->insertLPCommand();
+
+        if (!$this->isMode(self::IL_LIST_AS_TRIGGER)) {
+            // delete
+            if ($this->delete_enabled) {
+                $this->insertDeleteCommand();
             }
 
-            $this->insertLPCommand();
-
-            if (!$this->isMode(self::IL_LIST_AS_TRIGGER)) {
-                // delete
-                if ($this->delete_enabled) {
-                    $this->insertDeleteCommand();
-                }
-
-                // link
-                if ($this->link_enabled) {
-                    $this->insertLinkCommand();
-                }
-
-                // cut
-                if ($this->cut_enabled) {
-                    $this->insertCutCommand();
-                }
-
-                // copy
-                if ($this->copy_enabled) {
-                    $this->insertCopyCommand();
-                }
-
-                // cut/copy from workspace to repository
-                if ($this->repository_transfer_enabled) {
-                    $this->insertCutCommand(true);
-                    $this->insertCopyCommand(true);
-                }
-
-                if ($this->timings_enabled) {
-                    $this->insertTimingsCommand();
-                }
-
-                // subscribe
-                if ($this->subscribe_enabled) {
-                    $this->insertSubscribeCommand();
-                }
-
-                // multi download
-                if ($this->multi_download_enabled && $header_actions) {
-                    $this->insertMultiDownloadCommand();
-                }
-
-                // BEGIN PATCH Lucene search
-                if ($this->cut_enabled or $this->link_enabled) {
-                    $this->insertPasteCommand();
-                }
-                // END PATCH Lucene Search
+            // link
+            if ($this->link_enabled) {
+                $this->insertLinkCommand();
             }
+
+            // cut
+            if ($this->cut_enabled) {
+                $this->insertCutCommand();
+            }
+
+            // copy
+            if ($this->copy_enabled) {
+                $this->insertCopyCommand();
+            }
+
+            // cut/copy from workspace to repository
+            if ($this->repository_transfer_enabled) {
+                $this->insertCutCommand(true);
+                $this->insertCopyCommand(true);
+            }
+
+            if ($this->timings_enabled) {
+                $this->insertTimingsCommand();
+            }
+
+            // subscribe
+            if ($this->subscribe_enabled) {
+                $this->insertSubscribeCommand();
+            }
+
+            // multi download
+            if ($this->multi_download_enabled && $header_actions) {
+                $this->insertMultiDownloadCommand();
+            }
+
+            // BEGIN PATCH Lucene search
+            if ($this->cut_enabled or $this->link_enabled) {
+                $this->insertPasteCommand();
+            }
+            // END PATCH Lucene Search
         }
 
         // common social commands (comment, notes, tags)
-        if (!$only_default && !$this->isMode(self::IL_LIST_AS_TRIGGER)) {
+        if (!$this->isMode(self::IL_LIST_AS_TRIGGER)) {
             $this->insertCommonSocialCommands($header_actions);
         }
 
@@ -2166,12 +2169,9 @@ class ilObjectListGUI
         bool $get_async_commands,
         bool $header_actions
     ): bool {
-        if ($use_async && !$get_async_commands && !$header_actions
+        return $use_async && !$get_async_commands && !$header_actions
             && $this->user->getId() === ANONYMOUS_USER_ID && $this->checkInfoPageOnAsynchronousRendering()
-            && $this->object_properties->getPropertyInfoTabVisibility()) {
-            return true;
-        }
-        return false;
+            && $this->object_properties->getPropertyInfoTabVisibility();
     }
 
     public function enableComments(bool $value, bool $enable_comments_settings = true): void
@@ -2577,34 +2577,38 @@ class ilObjectListGUI
     /**
     * workaround: SAHS in new javavasript-created window or iframe
     */
-    public function modifySAHSlaunch(string $link, string $wtarget): string
+    public function modifySAHSlaunch(string $link, string $target): array
     {
-        if (strstr($link, ilSAHSPresentationGUI::class)) {
-            $sahs_obj = new ilObjSAHSLearningModule($this->ref_id);
-            $om = $sahs_obj->getOpenMode();
-            $width = $sahs_obj->getWidth();
-            $height = $sahs_obj->getHeight();
-            if (($om == 5 || $om == 1) && $width > 0 && $height > 0) {
-                $om++;
-            }
-            if ($om != 0 && !$this->http->agent()->isMobile()) {
-                $this->default_command['frame'] = '';
-                $link =
-                    'javascript:void(0); onclick=startSAHS("' .
-                    $link .
-                    '","' .
-                    $wtarget .
-                    '",' .
-                    $om .
-                    ',' .
-                    $width .
-                    ',' .
-                    $height .
-                    ');'
-                ;
-            }
+        if (strstr($link, ilSAHSPresentationGUI::class) === false) {
+            return [$link, $target];
         }
-        return $link;
+
+        $sahs_obj = new ilObjSAHSLearningModule($this->ref_id);
+        $om = $sahs_obj->getOpenMode();
+        $width = $sahs_obj->getWidth();
+        $height = $sahs_obj->getHeight();
+        if (($om == 5 || $om == 1) && $width > 0 && $height > 0) {
+            $om++;
+        }
+        if ($om !== 0 && !$this->http->agent()->isMobile()) {
+            $this->default_command['frame'] = '';
+            $link =
+                'javascript:void(0); onclick=startSAHS(\'' .
+                $link .
+                '\',\'' .
+                $target .
+                '\',' .
+                $om .
+                ',' .
+                $width .
+                ',' .
+                $height .
+                ');'
+            ;
+        } else {
+            $target = "ilContObj" . $this->ref_id;
+        }
+        return [$link, $target];
     }
 
     public function insertPath(): void
@@ -3148,7 +3152,8 @@ class ilObjectListGUI
 
 
         if ($def_command['link'] ?? false) {
-            $def_command['link'] = $this->modifySAHSlaunch($def_command['link'], $def_command['frame']);
+            list($def_command['link'], $def_command['frame']) =
+                $this->modifySAHSlaunch($def_command['link'], $def_command['frame']);
             $new_viewport = !in_array($this->getDefaultCommand()['frame'], ['', '_top', '_self', '_parent'], true); // Cannot use $def_command['frame']. $this->default_command has been edited.
             $link = $this->ui->factory()
                              ->link()
@@ -3252,12 +3257,12 @@ class ilObjectListGUI
         $def_cmd_link = ($def_command['link'] ?? '');
 
         // workaround for scorm
-        $modified_link =
+        list($modified_link, $def_cmd_frame) =
             $this->modifySAHSlaunch($def_cmd_link, $def_cmd_frame);
 
         $image = $this->getTileImage();
         if ($def_cmd_link != '') {    // #24256
-            if ($def_cmd_frame != '' && ($modified_link == $def_cmd_link)) {
+            if ($def_cmd_frame !== '' && ($modified_link === $def_cmd_link)) {
                 $image = $image->withAdditionalOnLoadCode(function ($id) use (
                     $def_cmd_frame,
                     $def_cmd_link

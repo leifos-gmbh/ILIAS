@@ -700,16 +700,21 @@ assessment#:#examid_in_test_pass#:#Display Test ID
 assessment#:#examid_in_test_pass_desc#:#A Test ID is displayed in the test. A new, unique ID is generated for every test attempt.
 assessment#:#examid_in_test_res#:#Display ILIAS Test ID
 assessment#:#examid_in_test_res_desc#:#The ILIAS Test ID will be included in the test results.
-assessment#:#exp_all_test_runs#:#All test runs
-assessment#:#exp_best_pass#:#Scored test run
-assessment#:#exp_eval_data#:#Export evaluation data as
+assessment#:#exp_all_test_runs#:#All test attempts
+assessment#:#exp_eval_data#:#Export data
 assessment#:#exp_file_created#:#Export file created.
-assessment#:#exp_scored_test_run#:#Scored test run
+assessment#:#exp_grammar_as#:#as
+assessment#:#exp_scored_test_run#:#Scored test attempt
 assessment#:#exp_type_certificate#:#Certificate (PDF)
 assessment#:#exp_type_excel#:#Microsoft Excel
-assessment#:#exp_type_spss#:#Comma Separated Value (CSV)
+assessment#:#exp_type_spss#:#Comma Separated Values (CSV)
 assessment#:#expected_result_type#:#Expected result type
 assessment#:#export#:#Export
+assessment#:#export_cert_failed_for_users_p#:#No certificate file could be generated and added for the following %s accounts: %s. Please contact an administrator to check the log file.
+assessment#:#export_cert_failed_for_users_s#:#No certificate file could be generated and added to the archive for the following account: %s. Please contact an administrator to check the log file.
+assessment#:#export_cert_ignored_for_users_p#:#The following %s accounts did not achieve a certificate, or the certificate service is not enabled/activate: %s
+assessment#:#export_cert_ignored_for_users_s#:#The following account did not achieve a certificate, or the certificate service is not enabled/activate: %s
+assessment#:#export_cert_no_users#:#A certificate archive cannot be created due to missing test participants.
 assessment#:#export_essay_qst_with_html#:#Export Essay Question with HTML code
 assessment#:#export_essay_qst_with_html_desc#:#If activated it is possible to export Essay Question with HTML to Excel.
 assessment#:#extratime#:#Extra Time
@@ -894,6 +899,8 @@ assessment#:#msg_number_of_terms_too_low#:#The number of terms must be greater o
 assessment#:#msg_poly_added#:#Polygon added
 assessment#:#msg_questions_moved#:#Question(s) moved
 assessment#:#msg_rect_added#:#Rectangle added
+assessment#:#msg_score_settings_modified_and_recalc#:#Your changes were saved and the results recalculated correspondingly.
+assessment#:#msg_score_settings_not_modified#:#Your changes were not saved.
 assessment#:#msg_selected_for_move#:#Question(s) selected for moving
 assessment#:#new_category#:#New Unit Category
 assessment#:#new_unit#:#New Unit
@@ -952,7 +959,7 @@ assessment#:#parseQuestion#:#Parse Question
 assessment#:#part_received_a_of_b_points#:#The participant received %s of %s possible points
 assessment#:#participants#:#Participants
 assessment#:#participants_invitation#:#Select Participants Manually
-assessment#:#participants_invitation_description#:#This test can only be accessed by users you have manually added in the ‘Dashboard’ tab of the test.
+assessment#:#participants_invitation_description#:#This test can only be accessed by users you have manually added in the ‘Participants’ tab of the test.
 assessment#:#participants_results_subtab#:#All Participants
 assessment#:#pass#:#Pass
 assessment#:#pass_finished#:#%s pass
@@ -968,6 +975,7 @@ assessment#:#please_select#:#-- please select --
 assessment#:#point#:#Point
 assessment#:#points#:#Points
 assessment#:#points_checked#:#Points when Checked
+assessment#:#points_non_numeric_or_negative_msg#:#Inputs for points only accept positive numeric values.
 assessment#:#points_short#:#Pt.
 assessment#:#points_unchecked#:#Points when Unchecked
 assessment#:#points_wrong#:#Wrong Selections
@@ -1174,6 +1182,7 @@ assessment#:#search_results#:#Search Results
 assessment#:#search_roles#:#Search Roles
 assessment#:#search_term#:#Search Term
 assessment#:#search_users#:#Search Users
+assessment#:#select_at_least_one_feedback_type_and_trigger#:#Please Select at least one type of feedback and a trigger.
 assessment#:#select_gap#:#Select Gap
 assessment#:#select_max_one_item#:#Please select one item only
 assessment#:#select_one_user#:#Please select at least one user.
@@ -1427,7 +1436,8 @@ assessment#:#tst_finished#:#Finished
 assessment#:#tst_form_dynamic_question_set_config#:#Continues Question Selection
 assessment#:#tst_gap_analysis#:#Gap Analysis
 assessment#:#tst_general_properties#:#General Settings
-assessment#:#tst_header_participant#:#Your Answer:
+assessment#:#tst_header_participant#:#Question and your answer:
+assessment#:#tst_header_participant_no_answer#:#Question - not answered
 assessment#:#tst_header_solution#:#Best Solution:
 assessment#:#tst_heading_scoring#:#Scoring
 assessment#:#tst_hide_info_tab#:#Hide Info Tab
@@ -1616,7 +1626,7 @@ assessment#:#tst_participant#:#Participant
 assessment#:#tst_participant_fullname_pattern#:#%2$s, %1$s
 assessment#:#tst_participant_status#:#Participant Status
 assessment#:#tst_participating_users#:#Participating Users
-assessment#:#tst_pass_best_pass#:#Score the Best Pass
+assessment#:#tst_pass_best_pass#:#Score the Best Attempt
 assessment#:#tst_pass_best_pass_desc#:#The pass in which a participant performed best will be scored. This setting does only apply when more than one test attempt is possible.
 assessment#:#tst_pass_deletion#:#Previous Passes
 assessment#:#tst_pass_deletion_allowed#:#The deletion of non-scoring attempts is allowed.
@@ -1766,11 +1776,11 @@ assessment#:#tst_res_jump_to_participant_hint_opt#:#Jump to Participant
 assessment#:#tst_res_lo_objectives_header#:#Relevant Learning Objectives
 assessment#:#tst_res_lo_try_header#:#Attempt
 assessment#:#tst_res_lo_try_n#:#Attempt %s
-assessment#:#tst_res_tab_msg_res_after_date#:#You test results will be offered here on the following date: %s
-assessment#:#tst_res_tab_msg_res_after_date_no_res#:#When you take the test your results will be offered here on the following date: %s
-assessment#:#tst_res_tab_msg_res_after_finish_test#:#After finishing the test your results will be offered here.
-assessment#:#tst_res_tab_msg_res_after_taking_test#:#After taking the test your results will be offered here.
-assessment#:#tst_res_tab_msg_res_after_test_passed#:#After passing the test your results will be offered here.
+assessment#:#tst_res_tab_msg_res_after_date#:#Your test results will be shown here after: %s
+assessment#:#tst_res_tab_msg_res_after_date_no_res#:#Once you have taken the test your results will be shown here after: %s
+assessment#:#tst_res_tab_msg_res_after_finish_test#:#After finishing the test your results will be shown here.
+assessment#:#tst_res_tab_msg_res_after_taking_test#:#After taking the test your results will be shown here.
+assessment#:#tst_res_tab_msg_res_after_test_passed#:#After passing the test your results will be shown here.
 assessment#:#tst_reset_processing_time#:#Reset duration for every test attempt
 assessment#:#tst_reset_processing_time_desc#:#The duration will be reset to the defined maximum for every test attempt. This setting requires multiple test attempts to become effective.
 assessment#:#tst_result#:#Test Result
@@ -1942,7 +1952,7 @@ assessment#:#tst_type#:#Test Type
 assessment#:#tst_unchanged_answer_is_correct#:#The preset answer is correct###fau: testNav
 assessment#:#tst_unchanged_order_is_correct#:#The preset order is correct###fau: testNav
 assessment#:#tst_use_previous_answers#:#Use Previous Answers
-assessment#:#tst_use_previous_answers_description#:#Participants will be presented with their answers from previous test attempts. This option has to be activated by individual participants on the Info-tab before starting a test attempt.
+assessment#:#tst_use_previous_answers_description#:#Participants will be presented with their answers from previous test attempts. This option has to be activated by individual participants on a modal before starting a test attempt.
 assessment#:#tst_use_previous_answers_user#:#Use my previous answers as default values in future test attempts
 assessment#:#tst_user_finished_test#:#User finished test (%s)
 assessment#:#tst_view_competence_assign#:#View Assignment Properties
@@ -2251,7 +2261,7 @@ bgtask#:#bgtask_processing#:#Creating download
 bgtask#:#bgtask_setting#:#'Background Download' enabled
 bgtask#:#bgtask_setting_info#:#The creation of the ZIP archive is done asynchronously and can be cancelled anytime.
 bgtask#:#bgtask_setting_limit#:#Global Limit
-bgtask#:#bgtask_setting_limit_info#:#A download is only possible if the sum of the file sizes is below this value.
+bgtask#:#bgtask_setting_limit_info#:#A download is only possible if the sum of the file sizes is below this value in MB.
 bgtask#:#bgtask_setting_threshold_count#:#Minimum Number
 bgtask#:#bgtask_setting_threshold_count_info#:#If the number of files exceeds this value the download will be asynchronously.
 bgtask#:#bgtask_setting_threshold_size#:#Minimum Size
@@ -2315,6 +2325,7 @@ bibl#:#filter_type_3#:#Multi-Selectinput
 bibl#:#filter_type_info#:#Please choose a filter type for the field.
 bibl#:#identifier#:#Identifier
 bibl#:#msg_confirm_delete_filter#:#Do you like to delete the following filter?
+bibl#:#msg_filter_info#:#Create a filter here that can be used in the "Contents" tab to limit the display of entries.
 bibl#:#news_title_created#:#New bibliography list added
 bibl#:#news_title_updated#:#Bibliography list updated
 bibl#:#not_yet_migrated#:#This Object has not et been migrated. Please contact the administrators of the platform.
@@ -2574,7 +2585,7 @@ book#:#book_pref_book_cron_info#:#Automatically allocate bookings based on prefe
 book#:#book_pref_deadline#:#Deadline
 book#:#book_pref_deadline_info#:#Preferences can be stated up to this point.
 book#:#book_pref_overview#:#Overview
-book#:#book_preference_info#:#book#:#book_preference_info#:#Please select %1 preference(s) by %2. After this deadline, bookings will be allocated automatically, taking into consideration the preferences of all users.
+book#:#book_preference_info#:#Please select %1 preference(s) by %2. After this deadline, bookings will be allocated automatically, taking into consideration the preferences of all users.
 book#:#book_preferences#:#Preferences
 book#:#book_preferences_saved#:#Your preferences have been saved.
 book#:#book_public_log#:#Bookings Visible to All Participants
@@ -2583,9 +2594,9 @@ book#:#book_recurrence#:#Recurrence
 book#:#book_refresh#:#Refresh
 book#:#book_rem_intro#:#This is an overview of upcoming reservations:
 book#:#book_rem_reason#:#You have received this mail because you are subscribed to notifications for the booking pool mentioned in this mail.
-book#:#book_reminder_day#:#day(s) before time-slot of booking
+book#:#book_reminder_day#:#Send Reminder
 book#:#book_reminder_day_info#:#Send list of own bookings to users and full list of all upcoming bookings to admins. Please note: in order to receive reminders, users need to have activated notifications via the ‘Actions’ menu at the top right-hand corner of the booking pool.
-book#:#book_reminder_days#:#Day(s)
+book#:#book_reminder_days#:#day(s) before time-slot of booking
 book#:#book_reminder_setting#:#Reminder
 book#:#book_rerun_assignments#:#Run Allocation Process
 book#:#book_rerun_confirmation#:#Attention. The process of allocating bookings according to preferences has already taken place. You may restart the process if any errors have occurred, e.g. no bookings have been saved. To prevent multiple allocations, please delete all existing bookings before restarting the process.
@@ -2616,7 +2627,7 @@ book#:#book_schedule_type_none_info#:#This type can be used for seminar papers, 
 book#:#book_schedule_type_none_preference#:#No Schedule, Using Preferences
 book#:#book_schedule_type_none_preference_info#:#This booking mode is ideal for presentation topics, places in seminars or similar. Participants get to indicate their preferences in terms of which items they are most interested in. Items will then be allocated automatically after the preferences deadline has passed.
 book#:#book_schedule_updated#:#Booking schedule updated.
-book#:#book_schedule_warning_edit#:#Your booking pool currently does not have a schedule available. To use the booking pool you either need to create a schedule or select a ‘no schedule’ booking mode in the ‘Booking Mode’ section of the ‘Settings’ tab).
+book#:#book_schedule_warning_edit#:#Your booking pool currently does not have a schedule available. To use the booking pool you either need to create a schedule or select a ‘no schedule’ booking mode in the ‘Booking Mode’ section of the ‘Settings’ tab.
 book#:#book_schedules#:#Schedules
 book#:#book_select_pool#:#Select Pool
 book#:#book_set_cancel#:#Cancel Booking
@@ -2864,7 +2875,7 @@ chatroom#:#chat_deletion_interval_value#:#Value
 chatroom#:#chat_deletion_ival_max_val#:#The maximum value for the chose unit '%s' is: %s
 chatroom#:#chat_deletion_section_head#:#Deletion of old Messages
 chatroom#:#chat_enable_history#:#Enable History
-chatroom#:#chat_enable_history_info#:#Everybody can read and export past public chat messages in the tab „History“. Messages from within private rooms are only accessible by invited users.
+chatroom#:#chat_enable_history_info#:#Everybody can read and export past chat messages in the tab „History“.
 chatroom#:#chat_error_log_info#:#Please define an absolute server path to the chat server's error log file (e.g.: /var/www/ilias/data/chat_error.log). If you do not specify a path, the chat server will automatically create a file located in the chat server directory.
 chatroom#:#chat_functions#:#Chat Functions
 chatroom#:#chat_https_cert_info#:#Please define an absolute server path to the SSL certificate file (e.g.: /etc/ssl/certs/server.pem).
@@ -2958,8 +2969,6 @@ chatroom#:#client_chatserver_connection#:#Client to Server Connection
 chatroom#:#client_proxy_info#:#If the Server is not accessible with the default IP-Address and Port, it is possible to configure a custom URL for Client to Server connection.
 chatroom#:#connection_url_info#:#Please insert an URL for the Server connection.
 chatroom#:#custom_username#:#Custom Username
-chatroom#:#delete_private_room#:#Delete Private Room
-chatroom#:#delete_private_room_question#:#Confirm delete private room?
 chatroom#:#dhparam#:#Diffie-Hellman Parameter
 chatroom#:#display_past_msgs#:#Number of Past Messages
 chatroom#:#duration_from#:#From
@@ -2981,9 +2990,6 @@ chatroom#:#invite_username#:#Username
 chatroom#:#key#:#Key
 chatroom#:#kick_question#:#Do you really want to kick the user from chat?
 chatroom#:#kicked#:#You have been kicked from this chat room
-chatroom#:#kicked_from_private_room#:#You have been kicked from the private room <b>#title#</b>.
-chatroom#:#leave_private_room#:#Leave Private Room
-chatroom#:#left_private_room#:#Left private room
 chatroom#:#lost_connection#:#The connection to the chat server was interrupted.
 chatroom#:#main#:#Main Room
 chatroom#:#messages#:#Messages
@@ -3000,12 +3006,8 @@ chatroom#:#osc_noti_title#:#New Chat Message
 chatroom#:#period#:#Period
 chatroom#:#permissions#:#Permissions
 chatroom#:#preferred_chatname#:#Preferred Name
-chatroom#:#private_room_closed#:#The chat room <b>#title#</b> has been closed.
-chatroom#:#private_room_entered#:#Welcome to the private room <b>#title#</b>.
-chatroom#:#private_room_entered_user#:#The user <b>#username#</b> has entered the private room <b>#title#</b>.
-chatroom#:#private_room_left#:#The user <b>#user#</b> has left the private room <b>#title#</b>.
 chatroom#:#public_chat_created#:#The public chat room has been added to the repository.
-chatroom#:#scope#:#Room/Private Room
+chatroom#:#scope#:#Room
 chatroom#:#select_custom_username#:#Select Custom Username
 chatroom#:#server_further_information#:#You can find further information about the server configuration in the <a href="%1$s" target="_blank">readme file</a>.
 chatroom#:#session#:#Session
@@ -3118,6 +3120,13 @@ cmix#:#conf_bypass_proxy_enabled#:#CronJob to check Learning Record Store
 cmix#:#conf_bypass_proxy_info#:#In most cases it is recommended to use the xAPI-Proxy. Use the CronJob in case of Limitations regarding Resource or Server.
 cmix#:#conf_cronjob_neccessary#:#CronJob necessary for Learning Progress
 cmix#:#conf_cronjob_neccessary_info#:#By activating this option, xAPI-Objects using this LRS-Type could not use the xAPI-Proxy to get immediately data for Detection of Learning Progress. Use only the CronJob in case of limitations regarding resources or server.
+cmix#:#conf_delete_data#:#Delete Data in LRS
+cmix#:#conf_delete_data_info#:#Deletion is currently only possible with the Learning Record Store (LRS) LearningLocker. Only use the options for deleting the user identification if the data has been pseudonymized in the LRS.
+cmix#:#conf_delete_data_opt0#:#never
+cmix#:#conf_delete_data_opt1#:#never - but if users are deleted and if xAPI/cmi objects are moved to the trash or deleted, data will no longer be assignable for ILIAS by deleting the - user identification
+cmix#:#conf_delete_data_opt11#:#when users are deleted and when xAPI/cmi objects are moved to the trash or deleted
+cmix#:#conf_delete_data_opt12#:#additionally when users are removed from courses or groups
+cmix#:#conf_delete_data_opt2#:#never - but additionally when users are removed from courses or groups, data will no longer be assignable for ILIAS by deleting the user identification
 cmix#:#conf_description#:#Description
 cmix#:#conf_external_lrs#:#External LRS
 cmix#:#conf_keep_lp#:#Keep Learning Progress
@@ -3146,6 +3155,10 @@ cmix#:#conf_privacy_ident_il_uuid_login#:#ILIAS Login combined with a unique ILI
 cmix#:#conf_privacy_ident_il_uuid_login_info#:#Sends the login name. This is identical to each call, but may allow a direct conclusion about the ILIAS user.
 cmix#:#conf_privacy_ident_il_uuid_random#:#Random ID combined with a unique ILIAS platform ID formatted as an E-Mail address
 cmix#:#conf_privacy_ident_il_uuid_random_info#:#For each ILIAS object and ILIAS user a random ID is generated which remains identical for each call. Conclusions about a user are very limited because it is practically impossible to create user profiles across objects.
+cmix#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address
+cmix#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.
+cmix#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address
+cmix#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.
 cmix#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS user id combined with a unique ILIAS platform id formatted as an E-Mail address
 cmix#:#conf_privacy_ident_il_uuid_user_id_info#:#Sends the internal numeric user id. This is identical to each call, but may allow conclusions about the ILIAS user.
 cmix#:#conf_privacy_ident_info#:#Standard is frequently the E-Mail address. The unique ILIAS platform id is:
@@ -3261,7 +3274,7 @@ cmix#:#satisfied_info#:#Indicates that the authority or activity provider determ
 cmix#:#satisfied_label#:#Statements with the verb 'satisfied'
 cmix#:#sect_learning_progress_options#:#Options for Learning Progress
 cmix#:#show_debug#:#Display Learning Experiences
-cmix#:#show_debug_info#:#The Learning Experiences of other users could be displayed if the right 'View learning experiences of other users' is set.
+cmix#:#show_debug_info#:#Shows tab ‘Learning Experiences’ with information about own interaction with cmi5 module. Data of other users is displayed if permission ‘View learning experiences of other users’ is given.
 cmix#:#tab_export#:#Export
 cmix#:#tab_info#:#Info
 cmix#:#tab_lrs_types#:#LRS-Types
@@ -3717,6 +3730,7 @@ common#:#clientlist_public_access#:#Public Access
 common#:#clientlist_start_page#:#Start page
 common#:#clipboard#:#Clipboard
 common#:#close#:#Close
+common#:#cmix#:#Object xAPI/cmi5
 common#:#cnt_new#:#(%s New)
 common#:#collapse#:#Collapse
 common#:#collapse_all#:#Collapse All
@@ -3761,6 +3775,7 @@ common#:#context#:#Context
 common#:#continue#:#Continue
 common#:#continue_work#:#Continue
 common#:#contra#:#Contra
+common#:#copa#:#Content Page
 common#:#copy#:#Copy
 common#:#copyChapter#:#Copy
 common#:#copyPage#:#Copy
@@ -3770,6 +3785,8 @@ common#:#copy_of#:#Copy of
 common#:#copy_of_suffix#:#- Copy
 common#:#copy_selected_items#:#Copy
 common#:#count#:#Count
+common#:#counter_novelty#:#News
+common#:#counter_status#:#Status
 common#:#country#:#Country
 common#:#country_free_text#:#Country (Free Text Input)
 common#:#country_selection#:#Country (Drop Down Selection)
@@ -3780,7 +3797,7 @@ common#:#create_date#:#Created on
 common#:#create_export_file#:#Create export file
 common#:#create_stylesheet#:#Create Style
 common#:#created#:#Creation Date
-common#:#cron_forum_notification#:#Send Forum Notifications
+common#:#cron_forum_notification#:#Send Forum Notifications via Cron Job
 common#:#cron_forum_notification_crob_desc#:#If enabled, all users who have enabled notifications for certain forums or forum threads will daily receive a notification mail about all new  or changed posts but no immediate notification for each submitted posting.
 common#:#cron_forum_notification_desc#:#If enabled, all users, who want to be informed about new posts in specified forum threads, will get notifications by mail.
 common#:#cron_forum_notification_disabled#:#Can't be disabled when the Cron Job is active.
@@ -3911,21 +3928,20 @@ common#:#download_all_returned_files#:#Download all Submissions
 common#:#download_link#:#Download Link
 common#:#download_multiple_objects#:#Download Multiple Objects
 common#:#download_selected_items#:#Download
-common#:#download_with_uploaded_filename#:#Download With Uploaded Filename
-common#:#download_with_uploaded_filename_info#:#Select this option exclusively for backwards compatibility with ILIAS 3.9 and older versions: When this option is selected, the filename of a downloaded file will be the same as the original filename that was used when the file was uploaded to ILIAS. If this option is not selected, the filename of a downloaded file will be the same as the title of the file object in ILIAS. This option does not affect WebDAV. For WebDAV, the filename of a downloaded file is always the same as the title of the file object.
 common#:#downloading_settings#:#Download Settings
 common#:#dpro_accept_usr_agreement#:#Accept Declaration of Data Protection?
-common#:#dpro_accept_usr_agreement_intro#:#There is a new data protection. You need to accept it before proceeding with the use of ILIAS. Read the following document carefully and give your consent or dissent at the bottom of the page.
-common#:#dpro_force_accept_usr_agreement#:#You must accept the Data Protection!
-common#:#dpro_refuse_acceptance#:#Refuse to Accept Data Protection
-common#:#dpro_usr_agreement#:#Data Protection
+common#:#dpro_accept_usr_agreement_intro#:#There is a new Declaration of Data Protection. You need to accept it before proceeding with the use of ILIAS. Read the following document carefully and give your consent or dissent at the bottom of the page.
+common#:#dpro_force_accept_usr_agreement#:#You must accept the Declaration of Data Protection!
+common#:#dpro_no_agreement_description#:#There is currently no Declaration of Data Protection document available for this installation. Please contact the <a href="%1$s">system administrator</a>.
+common#:#dpro_refuse_acceptance#:#Refuse to Accept the Declaration of Data Protection
+common#:#dpro_usr_agreement#:#Declaration of Data Protection
 common#:#dpro_usr_agreement_footer_intro#:#You have declared your consent to this Declaration of Data Protection.
 common#:#dpro_withdraw_consent_description#:#Withdraw your consent to our Declaration of Data Protection here.
-common#:#dpro_withdraw_consent_description_external#:#Please return to your ILIAS installation and log in again to complete the process of withdrawing your consent to the Data Protection.
-common#:#dpro_withdraw_consent_description_internal#:#Please log in again to complete the process of withdrawing your consent to the Data Protection.
+common#:#dpro_withdraw_consent_description_external#:#Please return to your ILIAS installation and log in again to complete the process of withdrawing your consent to the Declaration of Data Protection.
+common#:#dpro_withdraw_consent_description_internal#:#Please log in again to complete the process of withdrawing your consent to the Declaration of Data Protection.
 common#:#dpro_withdraw_consent_header#:#Withdraw to Consent of Declaration of Data Protection
-common#:#dpro_withdraw_consent_info#:#Withdraw your consent to our Data Protection.
-common#:#dpro_withdraw_consent_info_external#:#Please contact the administrator of your authentication system and inform them of your intention to withdraw your consent to the Data Protection.
+common#:#dpro_withdraw_consent_info#:#Withdraw your consent to our Declaration of Data Protection.
+common#:#dpro_withdraw_consent_info_external#:#Please contact the administrator of your authentication system and inform them of your intention to withdraw your consent to the Declaration of Data Protection.
 common#:#drafts#:#Drafts
 common#:#drag_file_here#:#Drag-and-drop your file here
 common#:#drag_files_here#:#Drag-and-drop your files here
@@ -4087,9 +4103,9 @@ common#:#file_not_found_sec#:#This file cannot be found in ILIAS or has been blo
 common#:#file_not_valid#:#File not valid!
 common#:#file_notice#:#Maximum upload size:
 common#:#file_objects#:#File Objects
-common#:#file_rollback#:#Make this the current version
-common#:#file_rollback_done#:#File version %s is now the current version.
-common#:#file_rollback_select_exact_one#:#Only one file version can be selected to make it the current version.
+common#:#file_rollback#:#Publish this version
+common#:#file_rollback_done#:#File version %s is now the published version.
+common#:#file_rollback_select_exact_one#:#Only one file version can be selected to make it the published version.
 common#:#file_some_invalid_file_types_removed#:#Some file types are not allowed and have been removed.
 common#:#file_suffix_repl#:#File Upload Suffix Replacement
 common#:#file_suffix_repl_info#:#Enter file types with suffix (separated by comma) that shall be be renamed with a ‘.sec’ when uploaded into webspace to prevent execution of this file. This is done per default for these suffixes:
@@ -4100,7 +4116,9 @@ common#:#file_upload_pending#:#Pending file
 common#:#file_valid#:#File is valid!
 common#:#file_version#:#Version Provided in File
 common#:#file_version_create#:#Initial version
+common#:#file_version_intermediate_version#:#Intermediate Version
 common#:#file_version_new_version#:#New version
+common#:#file_version_published_version#:#Published Version
 common#:#file_version_replace#:#All versions replaced
 common#:#file_version_rollback#:#Rollback to version %s from %s
 common#:#file_versions_deleted#:#The selected file versions were successfully deleted.
@@ -4170,6 +4188,7 @@ common#:#frm_edit#:#Edit Forum
 common#:#frm_import#:#Import Forum
 common#:#frm_latest_postings#:#Latest Articles
 common#:#frm_new#:#New Forum
+common#:#frm_no_threads#:#There are no threads available at the moment.
 common#:#frm_statistics_ranking#:#Number of Public Postings
 common#:#from#:#From
 common#:#fullname#:#Full name
@@ -4757,6 +4776,7 @@ common#:#msg_perm_adopted_from_itself#:#You cannot adopt permission settings fro
 common#:#msg_removed#:#Object(s) removed from system.
 common#:#msg_role_reserved_prefix#:#The prefix ‘il_’ is reserved for automatically generated roles. Please choose another name
 common#:#msg_roleassignment_changed#:#Role assignment changed
+common#:#msg_security_svg_rejected#:#File upload removed due to security reasons. The SVG file contains possibily malicious code.
 common#:#msg_sysrole_not_deletable#:#The system role cannot be deleted
 common#:#msg_sysrole_not_editable#:#The permission settings of the system role may not be changed. The system role grants all assigned users unlimited access to all objects and functions.
 common#:#msg_to_many_files#:#Too many files selected, allowed amount of files:
@@ -4791,7 +4811,6 @@ common#:#no#:#No
 common#:#no_access_item#:#You have no permission to access this item.
 common#:#no_access_item_public#:#To access this item you need to be logged in and to have appropriate permissions.
 common#:#no_accessibility_control_concept_description#:#There is currently no Accessibility document available for this installation. Please contact your <a href="%1$s">Contact Point for Accessibility Issues</a>.
-common#:#no_agreement_description#:#There is currently no Terms of Service document available for this installation. Please contact the <a href="%1$s">system administrator</a>.
 common#:#no_checkbox#:#You did not select any item.
 common#:#no_condition_selected#:#Please select one precondition.
 common#:#no_date#:#No date
@@ -4884,8 +4903,8 @@ common#:#obj_crsv#:#Course Certificate
 common#:#obj_dbk#:#Digilib Book
 common#:#obj_dcl#:#Data Collection
 common#:#obj_dcl_duplicate#:#Copy Data Collection
-common#:#obj_dpro#:#Data Protection
-common#:#obj_dpro_desc#:#Data Protection Settings
+common#:#obj_dpro#:#Declaration of Data Protection
+common#:#obj_dpro_desc#:#Declaration of Data Protection Settings
 common#:#obj_dshs#:#Dashboard
 common#:#obj_dshs_desc#:#Dashboard settings
 common#:#obj_ecss#:#ECS
@@ -5737,6 +5756,7 @@ common#:#top_of_page#:#Top of page
 common#:#tos_accept_usr_agreement#:#Accept Terms of Service?
 common#:#tos_accept_usr_agreement_intro#:#There are new terms of service. You need to accept them before proceeding with the use of ILIAS. Read the following document carefully and give your consent or dissent at the bottom of the page.
 common#:#tos_force_accept_usr_agreement#:#You must accept the Terms of Service!
+common#:#tos_no_agreement_description#:#There is currently no Terms of Service document available for this installation. Please contact the <a href="%1$s">system administrator</a>.
 common#:#tos_refuse_acceptance#:#Refuse to Accept Terms of Service
 common#:#tos_usr_agreement#:#Terms of Service
 common#:#tos_usr_agreement_footer_intro#:#You have declared your consent to these terms of service.
@@ -6140,7 +6160,8 @@ content#:#cont_active_to#:#Activation End
 content#:#cont_add_area#:#Add Area
 content#:#cont_add_cell#:#Add Column
 content#:#cont_add_change_comment#:#Add change comment
-content#:#cont_add_elements#:#Click on a plus symbol to add a new element.
+content#:#cont_add_definition#:#Add Definition
+content#:#cont_add_elements#:#<b>Click</b> on a plus symbol to <b>add</b> a new element.
 content#:#cont_add_file#:#Add File
 content#:#cont_add_images#:#Add Images
 content#:#cont_add_popup#:#Add Popup
@@ -6248,8 +6269,8 @@ content#:#cont_citation_selection_not_valid#:#You're selection is not valid
 content#:#cont_click_br_corner#:#Please click on the bottom right corner of the desired area.
 content#:#cont_click_center#:#Please click on center of the desired area.
 content#:#cont_click_circle#:#Please click on a circle point of the desired area.
-content#:#cont_click_edit#:#<b>Click</b> on elements to <b>edit</b> its properties.
-content#:#cont_click_multi_select#:#<b>Click</b> on elements to <b>select</b> or deselect them.
+content#:#cont_click_edit#:#To <b>edit</b> a page element, <b>click</b> on it.
+content#:#cont_click_multi_select#:#<b>Click</b> on elements to <b>select</b> them.
 content#:#cont_click_next_or_save#:#Please click on the next point of the polygon or save the area. (It is not necessary to click again on the starting point of this polygon !)
 content#:#cont_click_next_point#:#Please click on the next point of the polygon.
 content#:#cont_click_starting_point#:#Please click on the starting point of the polygon.
@@ -6335,7 +6356,7 @@ content#:#cont_download_title#:#Download Title
 content#:#cont_downloads#:#Enable Download
 content#:#cont_downloads_desc#:#Offers all public export files for download (e.g. for offline use or import).
 content#:#cont_downloads_public_desc#:#Allow download even for anonymous users (in public area)
-content#:#cont_drag_and_drop_elements#:#To <b>move</b> an element, <b>Drag and drop</b> it to a placeholder.
+content#:#cont_drag_and_drop_elements#:#To <b>move</b> a page element, <b>drag</b> it with the mouse to the intended location and <b/>drop<b> it.
 content#:#cont_drag_element_click_save#:#Drag and drop the element to the desired position. Then hit ‘Save’.
 content#:#cont_ed_align_center#:#Align: Center
 content#:#cont_ed_align_left#:#Align: Left
@@ -7042,7 +7063,7 @@ content#:#cont_set_styles#:#Set Styles
 content#:#cont_set_tab_style_info#:#Activate checkboxes in table cells to set style.
 content#:#cont_settings#:#Settings for learning modules
 content#:#cont_shape#:#Shape
-content#:#cont_shift_click_to_select#:#<b>Shift-click</b> on an element to <b>select</b> it and switch to selection mode.
+content#:#cont_shift_click_to_select#:#To select page elements for <b>deleting, copying etc</b>, press <b>Shift</b> ⇧ and <b>click</b> on the respective page elements.
 content#:#cont_short_title#:#Short Title
 content#:#cont_short_title_info#:#Short titles are used in the left-hand tree presentation and for labels in the previous/next navigation.
 content#:#cont_short_titles#:#Short Titles
@@ -7124,15 +7145,15 @@ content#:#cont_text_acc#:#Accent:
 content#:#cont_text_code#:#Code:
 content#:#cont_text_com#:#Comment:
 content#:#cont_text_editing#:#Edit Text
-content#:#cont_text_emp#:#Emphatic Text:
+content#:#cont_text_emp#:#Emphasised
 content#:#cont_text_fn#:#Footnote:
 content#:#cont_text_iln_link#:#Internal Link
-content#:#cont_text_imp#:#Important:
+content#:#cont_text_imp#:#Important
 content#:#cont_text_keyword#:#Keyword
 content#:#cont_text_placeh#:#Click and edit to insert text
 content#:#cont_text_placehl#:#Text Placeholder
 content#:#cont_text_quot#:#Quotation
-content#:#cont_text_str#:#Strong Text
+content#:#cont_text_str#:#Strongly Emphasised
 content#:#cont_text_sub#:#Subscript
 content#:#cont_text_sup#:#Superscript
 content#:#cont_text_tex#:#LaTeX Code
@@ -7324,6 +7345,7 @@ copa#:#copa_prop_reading_time#:#Reading Time
 copa#:#copa_value_reading_time_f_p#:#%s Minutes
 copa#:#copa_value_reading_time_f_s#:#%s Minute
 copa#:#obj_copa_duplicate#:#Duplicate Content Page
+copg#:#copg_active_to_small#:#This date must be higher than the starting date.
 copg#:#copg_allow_html#:#Enable HTML/Javascript
 copg#:#copg_allow_html_info#:#User may use HTML or Javascript page content. This may lead to security issues. Do not activate, if features can be used by users which you consider not being trustworthy. The support to add HTML content this way may be discontinued in a future version.
 copg#:#copg_an_error_occured#:#An error occured.
@@ -7334,6 +7356,7 @@ copg#:#copg_cron_keep_entries#:#Keep Minimum
 copg#:#copg_cron_keep_entries_info#:#This number is the minimum of entries that will be kept, even if they are older than the deletion period.
 copg#:#copg_days#:#Days
 copg#:#copg_details#:#Details
+copg#:#copg_edit_iframe_title#:#Text Editing of Page Editor
 copg#:#copg_entries#:#Entries
 copg#:#copg_error#:#Error
 copg#:#copg_error_occured_modal#:#An error occured while processing the page. Hit "Reload Page" to return to the previously saved state.
@@ -7343,13 +7366,17 @@ copg#:#copg_history_cleanup_cron_info#:#Removes older entries from the page hist
 copg#:#copg_list_item_style#:#List Item
 copg#:#copg_list_style#:#List
 copg#:#copg_list_styles#:#List Formats
+copg#:#copg_more_character_formats#:#More Styles for Characters
 copg#:#copg_page_element_not_found#:#Page element not found.
 copg#:#copg_page_type_stys#:#Layout Page
+copg#:#copg_par_format_selection#:#Paragraph Format Selection
 copg#:#copg_pc_mob_does_not_exist#:#This media object does not exist.
 copg#:#copg_questions_not_supported_here#:#Questions are not supported in this context.
 copg#:#copg_reload_page#:#Reload Page
+copg#:#copg_remove_formats#:#Remove Formatting
 copg#:#copg_sec_link_info#:#Select a target for linking the block. Attention: In this case, the content of the block must not contain any further links itself!
 copg#:#copg_snippet_cannot_be_edited#:#This is a predefined content snippet and cannot be edited here.
+copg#:#copg_unsupported_media_type#:#This media object has an unsupported media type.
 copg#:#copg_x_minutes#:#%s minute(s)
 cpad#:#cpad_reading_time_status#:#Reading Time
 cpad#:#cpad_reading_time_status_desc#:#If enabled, the estimated reading time for content page objects will be determined and displayed.
@@ -7490,7 +7517,7 @@ crs#:#crs_edit_timings#:#Edit Timings
 crs#:#crs_enable_map#:#Enable Course Map
 crs#:#crs_end#:#End
 crs#:#crs_export#:#Course export
-crs#:#crs_file#:#File
+crs#:#crs_file#:#Title
 crs#:#crs_file_download#:#Files for Download
 crs#:#crs_file_name#:#File Name
 crs#:#crs_file_size_info#:#Filesize
@@ -7673,6 +7700,7 @@ crs#:#crs_members_groups#:#Memberships in Groups
 crs#:#crs_members_map#:#Course Members Map
 crs#:#crs_members_print_title#:#Course Members
 crs#:#crs_min_one_admin#:#There has to be at least one administrator assigned to this course.
+crs#:#crs_msg_no_self_registration_period_if_self_enrolment_disabled#:#The limited registration period can not be defined if the "No Self-enrolment" setting is active.
 crs#:#crs_my_courses_groups_enabled#:#My Courses and Groups
 crs#:#crs_my_courses_groups_enabled_info#:#If activated, the section 'My Courses and Groups' is visible.
 crs#:#crs_new_status#:#Your new status is:
@@ -7784,6 +7812,7 @@ crs#:#crs_reg_code_link#:#Link for Direct Admission
 crs#:#crs_reg_max_info#:#Set the maximum number of users that can join this course.
 crs#:#crs_reg_no_selfreg#:#No Self-Enrolment
 crs#:#crs_reg_password_info#:#Users need to type in this password in order to join the course.
+crs#:#crs_reg_selfreg#:#Self-Enrolment
 crs#:#crs_reg_subject#:#Message
 crs#:#crs_reg_until#:#Registration Period
 crs#:#crs_reg_user_already_subscribed#:#You have already requested membership for this course
@@ -7998,6 +8027,7 @@ crs#:#events#:#Sessions
 crs#:#export_members#:#Export Data of Participants
 crs#:#grouping_change_assignment#:#Change Assignment
 crs#:#grp_grp_already_assigned#:#You are already member of this grouping of groups.
+crs#:#grp_not_all_users_assigned_msg#:#%s user(s) assigned as group member(s), %s user(s) were already in the group.
 crs#:#mem_cron_min_members_intro#:#The following courses and groups do not meet the minimum number of members (yet).
 crs#:#mem_cron_min_members_reason#:#You receive this message because you have activated the notification in the members-tab.
 crs#:#mem_cron_min_members_subject#:#Course/Group: Minimum Members Check
@@ -8829,21 +8859,21 @@ didactic#:#grp_closed_info#:#Group is not visible for non-members.
 didactic#:#more_translations#:#More Translations
 didactic#:#sess_closed#:#Closed Session
 didactic#:#sess_closed_info#:#Session is not visible for non-participants.
-dpro#:#dpro_account_reg_not_possible#:#Self-registration is currently not possible because there is no Data Protection agreement available. Please contact your <a href="%1$s">system administrator</a> for further information.
-dpro#:#dpro_agree_date#:#Data Protection agreed on
-dpro#:#dpro_last_reset_date#:#The Data Protection were reset on %s. Only reset the Data Protection if changes have been made to the document(s) and you require all users to agree to the documents.
-dpro#:#dpro_mode#:#Mode
-dpro#:#dpro_mode_desc#:#Please configure when and how the Data Protection should be accepted.
+dpro#:#dpro_account_reg_not_possible#:#Self-registration is currently not possible because there is no Declaration of Data Protection agreement available. Please contact your <a href="%1$s">system administrator</a> for further information.
+dpro#:#dpro_agree_date#:#Declaration of Data Protection agreed on
+dpro#:#dpro_last_reset_date#:#The Declaration of Data Protection were reset on %s. Only reset the Declaration of Data Protection if changes have been made to the document(s) and you require all users to agree to the documents.
+dpro#:#dpro_mode#:#Agreement Mode
+dpro#:#dpro_mode_desc#:#Please configure when and how the Declaration of Data Protection should be accepted.
 dpro#:#dpro_no_acceptance#:#Never, only informative
 dpro#:#dpro_no_documents_exist#:#There are currently no Declaration of Data Protection documents available.
 dpro#:#dpro_no_documents_exist_cant_save#:#There are currently no Declaration of Data Protection documents available. Please add at least one document in order to activate this service.
 dpro#:#dpro_once#:#Accept once
-dpro#:#dpro_reset_for_all_users#:#Reset Data Protection
-dpro#:#dpro_status_enable#:#Enable Data Protection
-dpro#:#dpro_status_enable_desc#:#Display relevant language-based Data Protection documents at the end of the registration form for new users and, if applicable, upon the user’s first login. Users are required to accept the Data Protection before they can enter ILIAS.
-dpro#:#dpro_sure_reset_tos#:#Are you sure you want to reset the Data Protection for all users in the system? This also applies, for example, to those accounts that are used for the SOAP web services.
-dpro#:#dpro_withdrawal_usr_deletion#:#Account deletion upon Data Protection withdrawal
-dpro#:#dpro_withdrawal_usr_deletion_desc#:#If a user withdraws their acceptance from a previously accepted Data Protection document, this will result in the deletion of the user’s account.
+dpro#:#dpro_reset_for_all_users#:#Reset the Declaration of Data Protection
+dpro#:#dpro_status_enable#:#Enable the Declaration of Data Protection
+dpro#:#dpro_status_enable_desc#:#Display relevant language-based Declaration of Data Protection documents at the end of the registration form for new users and, if applicable, upon the user’s first login. Users are required to accept the Declaration of Data Protection before they can enter ILIAS.
+dpro#:#dpro_sure_reset_tos#:#Are you sure you want to reset the Declaration of Data Protection for all users in the system? This also applies, for example, to those accounts that are used for the SOAP web services.
+dpro#:#dpro_withdrawal_usr_deletion#:#Account deletion upon Declaration of Data Protection withdrawal
+dpro#:#dpro_withdrawal_usr_deletion_desc#:#If a user withdraws their acceptance from a previously accepted Declaration of Data Protection document, this will result in the deletion of the user’s account.
 ecs#:#cert_serial#:#Certificate Serial Number
 ecs#:#ecs_abr#:#Abbreviation
 ecs#:#ecs_account_duration#:#Activation Period Extension
@@ -9099,6 +9129,7 @@ etal#:#etal_add_new_item#:#Add new Talk
 etal#:#etal_create_invalid_template_ref#:#Invalid Talk Template ID
 etal#:#etal_date_appointment_edit#:#Date of Talk
 etal#:#etal_date_series_edit#:#Date of Talk Series
+etal#:#etal_delete_confirmation_msg#:#Are you sure that you want to delete the following talk?
 etal#:#etal_edit#:#General
 etal#:#etal_invalid_user#:#This user either does not exist or can't be invited.
 etal#:#etal_new#:#New Talk
@@ -9332,6 +9363,7 @@ exc#:#exc_notification#:#Personal Notification
 exc#:#exc_nr_random_mand#:#Number of Mandatory Assignments
 exc#:#exc_num_teams#:#Number
 exc#:#exc_ongoing#:#Ongoing
+exc#:#exc_optional#:#Optional
 exc#:#exc_order_by_deadline#:#Order by Deadline
 exc#:#exc_overview#:#Overview
 exc#:#exc_participant#:#Participant
@@ -9676,7 +9708,7 @@ file#:#file_new_version#:#Create New Version
 file#:#file_new_version_info#:#Create new file version. Previous versions will not be modified.
 file#:#file_publish#:#Publish Draft
 file#:#file_rollback_rollback_first#:#The version could not be reset because an unpublished draft exists.
-file#:#file_rollback_same_version#:#This is already the current version
+file#:#file_rollback_same_version#:#This is already the published version
 file#:#file_unpublish#:#Mark as Draft
 file#:#file_upload_info_file_with_critical_extension#:#At least one uploaded file contains a critical or unknown file ending. Whenever the file is downloaded, its ending will be changed to ‘.sec’. If necessary, contact your administrator. Filename(s): %s
 file#:#file_uploaded_by#:#Version Uploaded By
@@ -9686,6 +9718,7 @@ file#:#form_icon_creation#:#Create Icon
 file#:#form_icon_updating#:#Update Icon
 file#:#general_upload_error_occured#:#An unexpected error occurred during upload.
 file#:#important_info#:#Important Information
+file#:#important_info_byline#:#The information is displayed in the "Info" tab.
 file#:#input_active#:#Active
 file#:#input_desc_active#:#Activate this icon.
 file#:#input_desc_icon#:#Image to be used as the icon for files with the specified suffixes.
@@ -9718,6 +9751,8 @@ file#:#preview_persisting_info#:#Generated preview images will be stored by ILIA
 file#:#publish_before_delete#:#Version(s) could not be deleted because an unpublished draft exists.
 file#:#replace_file_info#:#All previous file versions will be deleted.
 file#:#resource_id#:#Resource ID
+file#:#service_settings#:#Additional Features
+file#:#service_settings_saved#:#Saved
 file#:#set_license_for_all_files#:#Set License for All Files
 file#:#show_amount_of_downloads#:#Show Number of Downloads
 file#:#show_amount_of_downloads_info#:#Display the number of times a file object has been downloaded on its 'Info' page.
@@ -9826,7 +9861,7 @@ forum#:#add_re_to_subject#:#Add ‘Re: ’ to subject on reply
 forum#:#adm_autosave_drafts#:#Automatically save drafts
 forum#:#adm_autosave_drafts_desc#:#If activated, drafts are saved automatically during editing.
 forum#:#adm_autosave_ival#:#Interval
-forum#:#adm_save_drafts#:#Save drafts
+forum#:#adm_save_drafts#:#Enable Drafts
 forum#:#adm_save_drafts_desc#:#If enabled, registered users are able to save forum postings as draft.
 forum#:#allow_file_upload_desc#:#If enabled, users are able to attach files to their postings.
 forum#:#ascending_order#:#Latest postings at the bottom
@@ -9911,6 +9946,10 @@ forum#:#frm_action_not_possible_parent_deleted#:#Action not possible, the parent
 forum#:#frm_action_not_possible_thr_closed#:#Action not possible, the thread has been closed.
 forum#:#frm_action_not_possible_thr_deleted#:#Action not possible, the thread has been deleted.
 forum#:#frm_activation_online_info#:#Set the forum online to make it visible and available to other users. If not, only administrators will have access to it.
+forum#:#frm_adm_sec_default_settings#:#Default Object Settings
+forum#:#frm_adm_sec_drafts#:#Drafts
+forum#:#frm_adm_sec_features#:#Forum Features
+forum#:#frm_adm_sec_notifications#:#Notifications
 forum#:#frm_all_threads#:#All Threads
 forum#:#frm_anonymous_posting#:#Posting with pseudonym
 forum#:#frm_anonymous_posting_desc#:#If enabled, registered users can post to this forum only by using a pseudonym or without name. If the option "Mark moderators posts" is also enabled, moderators can not use a pseudonym.
@@ -10419,7 +10458,7 @@ irss#:#by_title_asc#:#By Title (Ascending)
 irss#:#by_title_desc#:#By Title (Descending)
 irss#:#creation_date#:#Creation Date (This Revision)
 irss#:#file_size#:#File Size (This Revision)
-irss#:#file_size_bigger_than#:#File Size greater than (MB)
+irss#:#file_size_bigger_than#:#File Size > MB
 irss#:#full_size#:#Resource Size (All Revisions)
 irss#:#max_revision#:#Max. Revision
 irss#:#msg_upload#:#Drop Files to upload
@@ -10434,6 +10473,7 @@ irss#:#revisions#:#Available Revisions
 irss#:#rid_deleted#:#File removed
 irss#:#rids_appended#:#Resource(s) added
 irss#:#rids_deleted#:#Resource(s) deleted
+irss#:#rids_updated#:#Ressource(n) updated
 irss#:#sorting#:#Default Ordering
 irss#:#sorting_1#:#By Title (Ascending)
 irss#:#sorting_2#:#By Title (Descending)
@@ -10441,7 +10481,7 @@ irss#:#sorting_3#:#By File Size (Ascending)
 irss#:#sorting_4#:#By File Size (Descending)
 irss#:#sorting_5#:#By Creation Date (Ascending)
 irss#:#sorting_6#:#By Creation Date (Descending)
-irss#:#stakeholders#:#Stakeholders
+irss#:#stakeholders#:#Origin
 irss#:#storage_id#:#Storage ID
 irss#:#storage_info#:#Storage Information
 irss#:#type#:#File Type
@@ -10675,7 +10715,7 @@ ldoc#:#ldoc_doc_crit_changed#:#The criterion for displaying your document has be
 ldoc#:#ldoc_doc_crit_detached#:#The criterion has been removed.
 ldoc#:#ldoc_doc_delete#:#Delete Document
 ldoc#:#ldoc_doc_detach_crit_confirm_title#:#Remove Criterion
-ldoc#:#ldoc_doc_sure_detach_crit#:#Are you sure that you want to remove this as the criterion for displaying your Terms of Service document?
+ldoc#:#ldoc_doc_sure_detach_crit#:#Are you sure that you want to remove this as the criterion for displaying your document?
 ldoc#:#ldoc_document#:#Document
 ldoc#:#ldoc_enabled#:#Enabled
 ldoc#:#ldoc_form_attach_criterion_head#:#Select Criterion for Displaying your Document
@@ -10715,6 +10755,7 @@ ldoc#:#ldoc_tbl_hist_head_document#:#Document
 ldoc#:#ldoc_tbl_hist_head_firstname#:#First Name
 ldoc#:#ldoc_tbl_hist_head_lastname#:#Last Name
 ldoc#:#ldoc_tbl_hist_head_login#:#Username (Login)
+ldoc#:#ldoc_updated_document#:#Document uploaded
 lhist#:#cont_create_lhist#:#Create Learning History Element
 lhist#:#cont_update_lhist#:#Edit Learning History Element
 lhist#:#lhist_all#:#All
@@ -10752,6 +10793,7 @@ lng#:#language_detection#:#Language Detection
 lng#:#lng_disable_language_detection#:#Disable Language Detection
 lng#:#lng_download_deprecated#:#Download Deprecated List
 lng#:#lng_enable_language_detection#:#Enable Language Detection
+lng#:#lng_switch_language_detection#:#Switch Language Detection
 log#:#log_browser#:#Browser Console Log
 log#:#log_browser_users#:#Usernames Using Console Log
 log#:#log_cache_#:#Caching
@@ -11203,6 +11245,7 @@ mail#:#mail_add_subject#:#Please enter a subject.
 mail#:#mail_allow_external#:#External E-Mails
 mail#:#mail_allow_external_info#:#Allow the delivery of external e-mails (via-SMTP). Unchecking this box will prevent external mails being sent globally across this installation.
 mail#:#mail_assign_entry_to_mailing_list#:##Add One of Your Contacts to the Mailing List
+mail#:#mail_assign_to_mailing_list#:#Assign
 mail#:#mail_attachment_file_not_exist#:#At least one of the following attachments does not exist: %1$s
 mail#:#mail_attachments#:#Attachments
 mail#:#mail_auto_generated_info#:#This mail was automatically sent to you by the ILIAS installation %s, %s
@@ -11335,6 +11378,7 @@ mail#:#mail_notification_membership_section#:#Membership
 mail#:#mail_notification_subject#:#New mail in your inbox
 mail#:#mail_notify_orphaned#:#Notification Mail
 mail#:#mail_notify_orphaned_info#:#If you enter a value here that is larger than or equal to 1, ILIAS will send a notification e-mail to all affected accounts that many days before any internal mails are deleted. Please make sure that external e-mail reception is possible.
+mail#:#mail_operation_on_invalid_folder#:#The operation cannot be executed, the folder given in the server request is invalid. Please contact an administrator.
 mail#:#mail_options_saved#:#Options saved.
 mail#:#mail_orphaned_mails#:#Delete old or orphaned mails
 mail#:#mail_orphaned_mails_desc#:#Deletes orphaned mails and mails that are older than the configured threshold value (configurable via the ‘Edit’ link to the right of this cron job).
@@ -11354,8 +11398,8 @@ mail#:#mail_second_email#:#Second E-Mail Address
 mail#:#mail_sel_label#:#Send mail to
 mail#:#mail_sel_users#:#Selected users
 mail#:#mail_select_attachment#:#Please select an attachment to download.
-mail#:#mail_select_course#:#Please select at least one course.
-mail#:#mail_select_group#:#Please select at least one group.
+mail#:#mail_select_crs#:#Please select at least one course.
+mail#:#mail_select_grp#:#Please select at least one group.
 mail#:#mail_select_one_entry#:#You must select at least one entry.
 mail#:#mail_select_one_file#:#You must select at least one file.
 mail#:#mail_send_html#:#HTML Frame
@@ -11398,7 +11442,7 @@ mail#:#mail_system_usr_env_from_addr_info#:#If you leave this field empty, the s
 mail#:#mail_system_usr_from_addr#:#Sender E-Mail (From)
 mail#:#mail_system_usr_from_addr_info#:#Please enter the e-mail address to be put in the 'FROM' header. The 'FROM' header is used to display the sender in the recipient e-mail client and helps prevent mails being rejected as spam. When a user manually sends an e-mail via ILIAS, the e-mail address associated with that user’s account will be automatically put in the 'Reply-To' header.<br /><br />Examples: <span style="font-style: italic">info@institution.de</span> or <span style="font-style: italic">no-reply@institution.de</span>
 mail#:#mail_system_usr_from_name#:#Name of Sender (From)
-mail#:#mail_system_usr_from_name_info#:#The name of the sender is normally displayed in e-mail clients in the ‘From’ line. You can use the placeholders [FULLNAME], [FIRSTNAME] and [LASTNAME]. These will then be replaced by the relevant data of the user who manually sent the mail.
+mail#:#mail_system_usr_from_name_info#:#The name of the sender is normally displayed in e-mail clients in the ‘From’ line. You can use the placeholders &lbrace;&lbrace;FULLNAME&rbrace;&rbrace;, &lbrace;&lbrace;FIRSTNAME&rbrace;&rbrace; and &lbrace;&lbrace;LASTNAME&rbrace;&rbrace;. These will then be replaced by the relevant data of the user who manually sent the mail.
 mail#:#mail_tbl_head_attachments#:#Attachment
 mail#:#mail_template_client#:#Text Template
 mail#:#mail_template_client_info#:#Choose one of the available text templates and, if required, make use of its placeholders. Switching to a different text template will change the message content of your mail and lose any changes you may have made. The subject line of your mail will not change and needs to be altered manually.
@@ -11719,6 +11763,7 @@ meta#:#md_copyright#:#Copyright
 meta#:#md_copyright_add#:#Add New Copyright
 meta#:#md_copyright_alt_text#:#Text Representation
 meta#:#md_copyright_alt_text_info#:#Used for image ‘alt’ attribute
+meta#:#md_copyright_default#:#Default
 meta#:#md_copyright_edit#:#Edit Copyright
 meta#:#md_copyright_enable_info#:#Add a copyright section to the LOM Metadata of Objects, including a selection of selectable predefined copyrights.
 meta#:#md_copyright_enabled#:#Enable Copyright Selection
@@ -12695,7 +12740,7 @@ notifications_adm#:#osd_settings#:#On-Screen Notifications
 notifications_adm#:#osd_vanish#:#Presentation Time
 notifications_adm#:#osd_vanish_desc#:#Visible time of a notification on the screen in miliseconds.
 obj#:#activation_visible_when_disabled#:#Visibility
-obj#:#activation_visible_when_disabled_info#:#If chosen, the material is visible even outside of the given availability.
+obj#:#activation_visible_when_disabled_info#:#The item is visible outside of the selected availability period, but it cannot be opened.
 obj#:#availability_period_changed#:#The availability period for the selected objects has been changed successfully.
 obj#:#cont_filter_empty#:#Please use the filter to see any objects.
 obj#:#cont_skll_published#:#All assignments have been published.
@@ -12704,7 +12749,7 @@ obj#:#copy_container_page_no_label#:#Don't Copy Content Page
 obj#:#copy_container_page_yes_byline#:#The content page and corresponding style settings of the source object will be copied to this object. Pre-existing page elements will be overwritten.
 obj#:#copy_container_page_yes_label#:#Copy Content Page
 obj#:#custom_icon#:#Custom Icon
-obj#:#edit_availability_period#:#Edit Availability Period
+obj#:#edit_availability_period#:#Availability Period
 obj#:#edit_questions#:#Edit Questions
 obj#:#no_objects_selected#:#At least one object needs to be selected.
 obj#:#obj_activate_content_lang#:#Activate Translation for Page Editing
@@ -12943,6 +12988,7 @@ poll#:#poll_activation_online_info#:#Activate this setting to make the poll acce
 poll#:#poll_add#:#Add Poll
 poll#:#poll_anonymous_warning#:#Your name is not visible in the poll results.
 poll#:#poll_answer#:#Answer
+poll#:#poll_answer_selected_alt_text#:#Selected
 poll#:#poll_answers#:#Possible Answers
 poll#:#poll_barchart#:#Bar Chart
 poll#:#poll_block_message_already_voted#:#You already voted in this poll.
@@ -13032,12 +13078,13 @@ prg#:#edit_participants#:#Edit Members
 prg#:#error_updating_deadline#:#Error during updating deadline.
 prg#:#error_updating_expire_date#:#Error during updating expire date.
 prg#:#export_memberships#:#Export Assignments
+prg#:#foreign_assignment#:#not top node
 prg#:#form_msg_file_wrong_file_type#:#Wrong file type.
 prg#:#header_remove_certificate#:#Do you really want to remove the certificate for the selected Users?
 prg#:#header_update_certificate#:#Do you really want to update the certificate?
 prg#:#header_update_current_plan#:#Do you really want to reset all individual settings for the selected assignments?
 prg#:#inactive_only#:#inactive users only
-prg#:#info_to_re_assign_mail_body#:#%s %s,<br/><br/>The validity of your participation in the study programm '%' will soon expire. Please sign in again.
+prg#:#info_to_re_assign_mail_body#:#%s %s,<br/><br/>The validity of your participation in the study programm '%s' will soon expire. Please sign in again.
 prg#:#info_to_re_assign_mail_subject#:#Reminder of renewed participation in the study programm
 prg#:#invalidated#:#validity
 prg#:#label_crs#:#Course Name
@@ -13046,6 +13093,7 @@ prg#:#label_role#:#Role Name
 prg#:#last_edited#:#Last edited
 prg#:#last_edited_by#:#Last Editor
 prg#:#mail_assignments#:#Mail to assigned Users
+prg#:#mails_foreign_assignment_failed#:#Selected assignments are not in current context. Mails should be sent from Study Programme's top node.
 prg#:#manage_assignments#:#Manage Assignments
 prg#:#membership_source_id#:#Id
 prg#:#membership_source_id_byline_objid#:#Please use the <b>object-id</b>
@@ -13070,7 +13118,8 @@ prg#:#msg_mark_relevant_failed#:#Not marked marked relevant:
 prg#:#msg_points_must_be_positive#:#Only positive numbers are allowed.
 prg#:#msg_unmark_accredited#:#Unmarked %s users accredited.
 prg#:#msg_unmark_accredited_failed#:#Unmarking accredited not successful for:
-prg#:#msg_update_certificate#:#%s Certificate updated.
+prg#:#msg_update_certificate#:#%s Certificate(s) updated.
+prg#:#msg_update_certificate_failed#:#Certificate(s) not updated:
 prg#:#msg_update_from_settings#:#Updated %s users from settings:
 prg#:#msg_update_from_settings_failed#:#Updated from settings failed:
 prg#:#msg_update_individual_plan#:#Individual plan: %s successfully updated.
@@ -13129,13 +13178,13 @@ prg#:#prg_create_new_leaf#:#Create new leaf
 prg#:#prg_create_new_node#:#Create new node
 prg#:#prg_cron_job_configuration#:#Configuration automatic Mails
 prg#:#prg_custom_plan#:#Custom Plan
-prg#:#prg_dash_label_finish_until#:#Finish until:
-prg#:#prg_dash_label_gain#:#Current Completion:
-prg#:#prg_dash_label_minimum#:#Minimum Completion:
-prg#:#prg_dash_label_restart_from#:#Restart from:
-prg#:#prg_dash_label_status#:#Status:
+prg#:#prg_dash_label_finish_until#:#Finish until
+prg#:#prg_dash_label_gain#:#Current Completion
+prg#:#prg_dash_label_minimum#:#Minimum Completion
+prg#:#prg_dash_label_restart_from#:#Restart from
+prg#:#prg_dash_label_status#:#Status
 prg#:#prg_dash_label_unreachable#:#- cannot be achieved
-prg#:#prg_dash_label_valid#:#Valid:
+prg#:#prg_dash_label_valid#:#Valid
 prg#:#prg_deadline#:#Deadline
 prg#:#prg_deadline_date#:#Processing time expires at fixed date
 prg#:#prg_deadline_date_desc#:#the programme must be finished until a given date.
@@ -13177,11 +13226,11 @@ prg#:#prg_multi_change_expire_date#:#Change expire date
 prg#:#prg_multi_mail_user#:#Send Mail
 prg#:#prg_multi_mark_accredited#:#Accredited
 prg#:#prg_multi_mark_relevant#:#Mark Relevant
-prg#:#prg_multi_remove_certificate#:#Remove Certificate
+prg#:#prg_multi_remove_certificate#:#Remove Certificates
 prg#:#prg_multi_remove_user#:#Remove User
 prg#:#prg_multi_unmark_accredited#:#Unmark Accredited
 prg#:#prg_multi_unmark_relevant#:#Unmark Relevant
-prg#:#prg_multi_update_certificate#:#Update Certificate
+prg#:#prg_multi_update_certificate#:#Update Certificates
 prg#:#prg_multi_update_from_current_plan#:#Update From Current Plan
 prg#:#prg_new#:#New Study Programme
 prg#:#prg_no_deadline#:#No fixed processing time
@@ -13210,6 +13259,7 @@ prg#:#prg_progress_status#:# %1$d of %2$d Points
 prg#:#prg_progress_status_with_child_sp#:# %1$d of possible %2$d Points
 prg#:#prg_quali_not_valid#:#Qualification not valid
 prg#:#prg_quali_still_valid#:#Qualification still valid
+prg#:#prg_remove_certificate#:#Remove Certificate
 prg#:#prg_remove_user#:#Remove Assignment
 prg#:#prg_remove_user_success#:#Assignment removed successfully.
 prg#:#prg_remove_users_not_possible#:#Remove Selected Users Not Possible
@@ -13248,7 +13298,6 @@ prg#:#prg_still_valid#:#valid
 prg#:#prg_subtype_add#:#Add new subtype
 prg#:#prg_subtypes#:#Subtypes
 prg#:#prg_successfully_removed_certificate#:#Successfully removed certificate of selected Users
-prg#:#prg_successfully_updated_certificate#:#Successfully updated certificate of selected Users
 prg#:#prg_title#:#Title
 prg#:#prg_type#:#Study Programme Type
 prg#:#prg_type_add#:#Study Programme Type
@@ -13267,6 +13316,7 @@ prg#:#prg_unmark_accredited#:#Unmark Accredited
 prg#:#prg_unmark_accredited_multi_success#:#Unmark Selected Users As Accredited
 prg#:#prg_unmark_accredited_success#:#Unaccredited Program Node for User successfully.
 prg#:#prg_unmark_relevant#:#Unmark Relevant
+prg#:#prg_update_certificate#:#Update Certificate
 prg#:#prg_update_from_current_plan#:#Update from current Plan
 prg#:#prg_update_from_current_plan_not_possible#:#Update From Current Plan Not Possible
 prg#:#prg_update_from_current_plan_partitial_success#:#Update From Current Plan Partically
@@ -13296,6 +13346,7 @@ prg#:#restart_period_info#:#Days before qualification expiration to restart qual
 prg#:#restart_period_label#:#Days before expiry
 prg#:#restart_recheck_desc#:#For assignments made via an automatism, the system rechecks whether criteria for the assignment still exist.
 prg#:#restart_recheck_label#:#Check prerequisites again
+prg#:#restarted#:#restarted
 prg#:#risky_to_fail_mail_body#:#%s %s,<br/><br/>the deadline for completing the study program '%s' will soon be reached.
 prg#:#risky_to_fail_mail_subject#:#Reminder, that the deadline for the study program will soon be reached
 prg#:#rol#:#Role
@@ -13341,6 +13392,7 @@ prg#:#will_not_modify_irrelevant_progress#:#No change because not relevant
 prg#:#will_not_modify_relevant_progress#:#already relevant
 prg#:#will_not_modify_validity_on_non_successful_progress#:#Can change only when successful
 prg#:#will_not_set_top_progress_to_irrelevant#:#Cannot change top node to irrelevant.
+prg#:#will_not_update_cert_for_unsuccessful_progress#:#No certificate for unsuccessful programme
 prtf#:#pdf_export#:#PDF Export
 prtf#:#prtf_add_assignment#:#Add Assignment
 prtf#:#prtf_add_blog#:#Add Blog
@@ -13580,6 +13632,8 @@ pwsp#:#pwsp_enable_personal_resources#:#Enable personal resources
 pwsp#:#pwsp_enable_wsp_blogs#:#Enable Blogs
 pwsp#:#pwsp_enable_wsp_files#:#Enable Files
 pwsp#:#pwsp_enable_wsp_links#:#Enable Links
+qpl#:#qpl_filter_commented_exclude#:#Questions without comments
+qpl#:#qpl_filter_commented_only#:#Questions with comments
 qpl#:#qpl_page_type_qfbg#:#General Feedback
 qpl#:#qpl_page_type_qfbs#:#Special Feedback
 qpl#:#qpl_page_type_qht#:#Hint
@@ -14053,6 +14107,7 @@ rbac#:#mobs_visible#:#Media Objects/Pools administration is visible
 rbac#:#mobs_write#:#User can edit settings in Media Objects/Pools administration
 rbac#:#moderate#:#Moderate
 rbac#:#moderate_frm#:#Moderate
+rbac#:#msg_anonymous_cannot_be_assigned#:#Anonymous cannot be assigned to a role.
 rbac#:#msg_no_roles_of_type#:#No Roles available with selected filter setting
 rbac#:#news_add_news#:#Add News
 rbac#:#nots_edit_permissions#:#User can change permission settings of Notes administration.
@@ -14284,7 +14339,7 @@ rbac#:#rbac_repository_permissions#:#Repository Permissions
 rbac#:#rbac_role_delete_qst#:#Are you sure you want to delete the following role?<br />All permissions granted by this role will be deleted permanently.
 rbac#:#rbac_role_delete_self#:#<strong>Attention:</strong> You are assigned to this role. If you continue this delete operation, you may loose access to some ILIAS materials.
 rbac#:#rbac_role_exists_alert#:#A role with the same name already exists in this context. Please choose another name.
-rbac#:#rbac_role_imported#:#The role has been imported.
+rbac#:#rbac_role_imported#:#The role has been successfully imported and the permissions set have been transferred to the new role's permissions settings. Now specify below which permissions the imported role should have for this object.
 rbac#:#rbac_role_rights_copy#:#Copy Permissions
 rbac#:#rbac_role_rights_copy_change_existing#:#Change Existing Objects
 rbac#:#rbac_role_rights_copy_empty#:#None
@@ -14622,8 +14677,8 @@ rep#:#btn_undelete_origin_location#:#Restore (same location)
 rep#:#rep_activation_access#:#Access
 rep#:#rep_activation_access_ref_info#:#This setting only affects this and no other reference in the repository.
 rep#:#rep_activation_availability#:#Availability
-rep#:#rep_activation_limited_end#:#Finish Time
-rep#:#rep_activation_limited_start#:#Start Time
+rep#:#rep_activation_limited_end#:#End
+rep#:#rep_activation_limited_start#:#Start
 rep#:#rep_activation_limited_visibility#:#Always Visible
 rep#:#rep_activation_online#:#Online
 rep#:#rep_activation_online_object_info#:#This setting affects all references in the repository.
@@ -14647,6 +14702,7 @@ rep#:#rep_configure#:#Configure
 rep#:#rep_crs_default_shortened#:#Default: Breadcrumbs Shortened
 rep#:#rep_custom_icons#:#Custom Icons
 rep#:#rep_default#:#Default
+rep#:#rep_deleted_account#:#Deleted Account
 rep#:#rep_dependencies#:#Dependencies
 rep#:#rep_dependency#:#Dependency
 rep#:#rep_dependent_object#:#Resource with dependence
@@ -14695,6 +14751,8 @@ rep#:#rep_remove_rec_content#:#Are you sure you want to remove the following rec
 rep#:#rep_removed_from_favourites#:#The item has been removed from your favourites.
 rep#:#rep_target_location#:#Target Location
 rep#:#rep_target_location_info#:#Bitte wählen Sie nun das Ziel aus, an dem die ausgewählten Objekte wiederhergestellt werden sollen.
+rep#:#rep_time_based_availability#:#Limited Availability Period
+rep#:#rep_time_based_availability_info#:#The selected items will only be visible between the start and end date.
 rep#:#rep_time_period#:#Period
 rep#:#rep_trash_deleted_by_unknown#:#Unknown
 rep#:#rep_trash_table_col_deleted_by#:#Deleted by
@@ -14705,7 +14763,6 @@ rep#:#rep_tree_limit#:#Limit Items in Tree
 rep#:#rep_tree_limit_info#:#The number of objects in the repository tree will be limited to enhance performance.
 rep#:#rep_tree_limit_number#:#Maximum Number
 rep#:#rep_tree_limit_number_info#:#Maximum Number of children elements that are initially shown for an expanded node. If more children elements are present, a search input field is shown to filter the children elements by title.
-rep#:#rep_visibility_until#:#Limited Availability Period
 rfil#:#rfil_call#:#Call ECS File
 rfil#:#rfil_version_tstamp#:#Upload Date
 rglo#:#rglo_call#:#Call ECS Glossary
@@ -15183,6 +15240,7 @@ sess#:#sess_material_assigned#:#Assigned
 sess#:#sess_material_not_assigned#:#Not Assigned
 sess#:#sess_max_members_needed#:#A maximum number of members is needed for the waiting list feature.
 sess#:#sess_mem_contacts#:#Tutorial Support
+sess#:#sess_mem_send_mail#:#Send Mail
 sess#:#sess_mem_tbl_header#:#Session Participants
 sess#:#sess_member_administration#:#Edit Participants
 sess#:#sess_members#:#Participants
@@ -15488,8 +15546,11 @@ style#:#color_changed_to#:#to:
 style#:#color_reset#:#The colors of the icons have been reset. Important: Note that caching might prevent your changes from being shown. You might need to clear your browsers cache.
 style#:#color_update#:#The colors of the icons have been updated. Important: Note that caching might prevent your changes from being shown. You might need to clear your browsers cache.
 style#:#default_style_set_to#:#The default system style has been set to:
+style#:#dir_changed_to#:#The directory has been moved to:
 style#:#dir_copied_from#:#The directory has been copied to from:
+style#:#dir_created#:#The following directory has been created:
 style#:#dir_deleted#:#The following directory has been deleted:
+style#:#dir_preserved_backup#:#Preserved Backup folder:
 style#:#dir_preserved_linked#:#Preserved Link:
 style#:#directory_created#:#Directory created:
 style#:#documentation#:#Documentation
@@ -15499,7 +15560,7 @@ style#:#enable_system_styles_management_no_write_perm#:#System styles management
 style#:#entries_reloaded#:#All entries have been reloaded
 style#:#file_deleted#:#Following file has been deleted:
 style#:#font_dir#:#Font Directory
-style#:#font_dir_description#:#Folder to store fonts of the skin into. This directory can be shared with other styles and sub styles of this skin.
+style#:#font_dir_description#:#Folder to store fonts of the skin into. This directory can be shared with other styles and sub styles of this skin. Beware, if this folder is adapted, the SCSS variable il-web-font-path needs to be manually adapted as well.
 style#:#from_skin#:#of skin:
 style#:#green_color#:#Green Color
 style#:#green_colors#:#Green Colors
@@ -15515,6 +15576,7 @@ style#:#in_main_scss_file#:#is not imported inside the system styles main scss f
 style#:#invalid_scss_path#:#The provided sass/scss path is not valid or the webserver does not have the proper permission to read and execute sass/scss. Sass/scss (or the file linked to by the file pointed to by the scss path) has to be readabele and executable by your webserver.
 style#:#ks_documentation_of_style#:#Kitchen Sink documentation of style:
 style#:#ks_documentation_of_substyle#:#Kitchen Sink documentation of sub style:
+style#:#main_scss_created#:#Main SCSS has been created:
 style#:#manage_system_styles#:#Manage System Styles
 style#:#msg_sub_style_created#:#The sub style has been created.
 style#:#msg_sys_style_created#:#The new system style has successfully been created.
@@ -15541,6 +15603,8 @@ style#:#scss_can_not_be_modified#:#Scss cannot be modified
 style#:#scss_compile_failed#:#Something in the compilation of the scss file went wrong. Is scss installed and the path set correctly in ILIAS setup? Original error:
 style#:#scss_file_reset#:#The scss variables have been reset. Important: Note that caching might prevent your changes from being shown. You might need to clear your browsers cache.
 style#:#scss_file_updated#:#The scss variables have been updated. Important: Note that caching might prevent your changes from being shown. You might need to clear your browsers cache.
+style#:#scss_folder_reset#:#Scss folder reset
+style#:#scss_folder_updated#:#Scss folder has been updated
 style#:#scss_scss_installation_detected#:#Scss/sass installation detected at:
 style#:#scss_variable_empty#:#This variable was empty. The default from your settings files has been set. Please check if this is correct before compiling.
 style#:#scss_variables_empty_might_have_changed#:#There are empty variables in your form. You might have changed your settings files since loading this form. The defaults from the settings files have been set for the empty fields. Please check those marked empty fields before compiling and saving the values to your settings files.
@@ -15781,6 +15845,7 @@ style#:#sty_type_ca_icont#:#Carousel Item Content
 style#:#sty_type_ca_ihead#:#Carousel Item Header
 style#:#sty_type_code_block#:#Code (Block)
 style#:#sty_type_code_inline#:#Code (Inline)
+style#:#sty_type_em#:#Emphasised
 style#:#sty_type_flist#:#File List
 style#:#sty_type_flist_a#:#File List Item Link
 style#:#sty_type_flist_cont#:#File List Container
@@ -15852,6 +15917,7 @@ style#:#sty_type_sco_keyw#:#SCO Keywords
 style#:#sty_type_sco_obj#:#SCO Objective
 style#:#sty_type_sco_title#:#SCO Title
 style#:#sty_type_section#:#Section
+style#:#sty_type_strong#:#Strong
 style#:#sty_type_sub#:#Subscript
 style#:#sty_type_sup#:#Superscript
 style#:#sty_type_table#:#Table
@@ -16385,7 +16451,7 @@ survey#:#survey_not_available#:#n/a
 survey#:#survey_notification_finished_introduction#:#A participant has finished the survey.
 survey#:#survey_notification_finished_reason#:#You are receiving this e-mail because you activated notifications for the survey mentioned above.
 survey#:#survey_notification_target_group#:#Target Group
-survey#:#survey_notification_target_group_invited#:#All users who got the survey put on their Personal Desktop
+survey#:#survey_notification_target_group_invited#:#All users who got the survey put on their Dashboard as tasks (invitation)
 survey#:#survey_notification_target_group_invited_info#:#Number of current recipients: %s
 survey#:#survey_notification_target_group_parent_course#:#All members of parent course/group
 survey#:#survey_notification_target_group_parent_course_inactive#:#No parent course/group given - no reminders will be sent!
@@ -16619,6 +16685,7 @@ svy#:#svy_finish_survey#:#Finish survey '%1'
 svy#:#svy_invite_participants#:#Invite Participants
 svy#:#svy_link_to_svy#:#Link to Survey
 svy#:#svy_part_overview#:#Overview
+svy#:#svy_placeholders_label#:#Verfügbare Platzhalter
 svy#:#svy_print_selection#:#Print View Selection
 svy#:#svy_remove_all_participants#:#Delete all Participant Data
 svy#:#svy_remove_participants#:#Remove Participants
@@ -16826,6 +16893,8 @@ trac#:#trac_filter_hidden#:#Hidden
 trac#:#trac_first_access#:#First Access
 trac#:#trac_first_and_last_access#:#First and Last Access
 trac#:#trac_frm_contribution_num_postings#:#Minimum number of Postings
+trac#:#trac_frm_contribution_num_postings_info_p#:#%s: %s Postings
+trac#:#trac_frm_contribution_num_postings_info_s#:#%s: %s Posting
 trac#:#trac_group_materials#:#Create Grouping with Optional Materials
 trac#:#trac_group_materials_save#:#Save Number of Compulsory Materials
 trac#:#trac_grouped_material_obligatory_err#:#The number materials which must be passed has to be greater than 0 and smaller than the number of materials of the grouping.
@@ -17036,6 +17105,15 @@ ui#:#label_fieldselection_refresh#:#Apply
 ui#:#label_pagination_limit#:#Pagination Number of Rows
 ui#:#label_pagination_offset#:#Pagination Offset
 ui#:#label_sortation#:#Sortation
+ui#:#order_option_alphabetical_ascending#:#A to Z
+ui#:#order_option_alphabetical_descending#:#Z to A
+ui#:#order_option_chronological_ascending#:#Earliest first
+ui#:#order_option_chronological_descending#:#Most Recent first
+ui#:#order_option_first#:#first
+ui#:#order_option_generic_ascending#:#ascending
+ui#:#order_option_generic_descending#:#descending
+ui#:#order_option_numerical_ascending#:#0 to 9
+ui#:#order_option_numerical_descending#:#9 to 0
 ui#:#presentation_table_collapse#:#collapse all
 ui#:#presentation_table_expand#:#expand all
 ui#:#ui_chars_max#:#Maximum:
@@ -17052,9 +17130,7 @@ ui#:#ui_link_label#:#Label
 ui#:#ui_link_url#:#URL
 ui#:#ui_md_input_edit#:#Edit
 ui#:#ui_md_input_view#:#View
-ui#:#ui_numeric_only#:#Please insert a whole number.
 ui#:#ui_table_no_records#:#No records
-ui#:#ui_tag_required#:#Please insert at least one tag.
 ui#:#ui_transcription#:#Transcript
 user#:#all_roles_has_starting_point#:#All the roles have starting points
 user#:#back_to_starting_points_list#:#Back to Starting Points
@@ -17088,8 +17164,8 @@ user#:#ldoc_not_accepted_yet#:#Not accepted yet
 user#:#msg_spoint_not_modified#:#Starting point not modified
 user#:#no_deactivate_yourself#:#You cannot deactivate your own user account.
 user#:#obj_ref_id_not_exist#:#The entered Reference-Id does not exist
-user#:#restrict_user_access#:#Restricted Access to User Accounts
-user#:#restrict_user_access_info#:#Access to local and global user accounts is restricted to roles that have the permission ‘Read Access to User Accounts’.
+user#:#restrict_user_access#:#Restricted Search in User Accounts
+user#:#restrict_user_access_info#:#ILIAS-accounts will only be autocompleted in search for roles with ‘Read Access to User Accounts’.
 user#:#roles_without_starting_point#:#Roles without defined starting point:
 user#:#save_order#:#Save Order
 user#:#send_mail_reminder_window_too_small#:#Your Frequency setting is too large for this reminder value.
@@ -17214,6 +17290,8 @@ validation#:#not_max_length#:#The entered text has a length more than '%s'.
 validation#:#not_min_length#:#Your input has a length of %d and falls below the minimum length %d.
 validation#:#not_numeric#:#'%s' is not numeric.
 validation#:#not_numeric_empty_string#:#Your input is not numeric.
+validation#:#numeric_only#:#Please insert a whole number.
+validation#:#tag_required#:#Please insert at least one tag.
 violation#:#not_a_string#:#Given value is not a String
 webr#:#invalid_links_tbl#:#Invalid Links
 webr#:#webr_active#:#Active
@@ -17443,6 +17521,8 @@ wiki#:#wiki_wiki_search#:#Wiki Search
 wiki#:#wiki_wpg#:#Wiki Page
 wopi#:#activate_wopi#:#Activate WOPI
 wopi#:#close_wopi_editor#:#Close Editor
+wopi#:#close_wopi_editor_info#:#It can take up to several minutes for the external editor to transfer the changes to ILIAS. Visit this page again at a later time if the changes you have made are not yet visible.
+wopi#:#currently_supported#:#Currently supported Suffixes: %s
 wopi#:#msg_error_wopi_invalid_discorvery_url#:#The Discovery URL entered is invalid or cannot be accessed.
 wopi#:#msg_wopi_settings_modified#:#Settings stored
 wopi#:#open_external_editor#:#Open in external Editor
@@ -17453,7 +17533,7 @@ wopi#:#wopi_crawler_cronjob_success#:#WOPI information updated successfully.
 wopi#:#wopi_crawler_cronjob_title#:#Update WOPI Discovery
 wopi#:#wopi_settings#:#WOPI
 wopi#:#wopi_url#:#WOPI Discovery URL
-wopi#:#wopi_url_byline#:#Complete URL of the WOPI-Discovery, this must be accessible through the ILIAS server. The XML data of the Discover is read in and stored by ILIAS, the information is regularly updated by the cronjob "Update WOPI Discovery".
+wopi#:#wopi_url_byline#:#Complete URL of the WOPI-Discovery, this must be accessible through the ILIAS server. The XML data of the Discover is read in and stored by ILIAS, the information is regularly updated by the cronjob "Update WOPI Discovery". Example: https://example.org/hosting/discovery
 wsp#:#element_already_shared#:#This object is already shared with this user.
 wsp#:#element_shared#:#Object shared.
 wsp#:#error_creating_certificate_pdf#:#The certificate could not be created. Please contact the administrator to check the certificate server.

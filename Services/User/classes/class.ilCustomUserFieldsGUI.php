@@ -298,7 +298,7 @@ class ilCustomUserFieldsGUI
                     break;
 
                 default:
-                    $plugin = ilCustomUserFieldsHelper::getInstance()->getPluginForType($udf_type);
+                    $plugin = ilCustomUserFieldsHelper::getInstance()->getPluginForType((string) $udf_type);
                     if ($plugin instanceof ilUDFDefinitionPlugin) {
                         $plugin->addDefinitionTypeOptionsToRadioOption($op, $this->field_id);
                     }
@@ -593,7 +593,7 @@ class ilCustomUserFieldsGUI
             }
 
             $user_field_definitions->enableVisible($access['visible']);
-            $user_field_definitions->enableVisibleRegistration((int) $access['visib_reg']);
+            $user_field_definitions->enableVisibleRegistration($access['visib_reg']);
             $user_field_definitions->enableVisibleLocalUserAdministration($access['visib_lua']);
             $user_field_definitions->enableCourseExport($access['course_export']);
             $user_field_definitions->enableGroupExport($access['group_export']);

@@ -307,7 +307,7 @@ class assTextSubsetGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
 
     public function writeQuestionSpecificPostData(ilPropertyFormGUI $form): void
     {
-        $this->object->setCorrectAnswers($_POST["correctanswers"]);
+        $this->object->setCorrectAnswers((int) $_POST["correctanswers"]);
         $this->object->setTextRating($_POST["text_rating"]);
     }
 
@@ -316,7 +316,8 @@ class assTextSubsetGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
         // Delete all existing answers and create new answers from the form data
         $this->object->flushAnswers();
         foreach ($this->answers_from_post as $index => $answertext) {
-            $this->object->addAnswer(htmlentities(trim($answertext)), $_POST['answers']['points'][$index], $index);
+            $answertext = assQuestion::extendedTrim($answertext);
+            $this->object->addAnswer(htmlentities($answertext), $_POST['answers']['points'][$index], $index);
         }
     }
 

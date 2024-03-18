@@ -281,8 +281,8 @@ class ilGlossaryDataSet extends ilDataSet
                 $newObj->setSnippetLength($a_rec["SnippetLength"]);
                 $newObj->setActiveGlossaryMenu($a_rec["GloMenuActive"]);
                 $newObj->setShowTaxonomy($a_rec["ShowTax"]);
-                $newObj->setActiveFlashcards($a_rec["FlashActive"]);
-                $newObj->setFlashcardsMode($a_rec["FlashMode"]);
+                $newObj->setActiveFlashcards((bool) ($a_rec["FlashActive"] ?? false));
+                $newObj->setFlashcardsMode($a_rec["FlashMode"] ?? "");
                 if ($this->getCurrentInstallationId() > 0) {
                     $newObj->setImportId("il_" . $this->getCurrentInstallationId() . "_glo_" . $a_rec["Id"]);
                 }
@@ -301,6 +301,29 @@ class ilGlossaryDataSet extends ilDataSet
                 $a_mapping->addMapping("Services/AdvancedMetaData", "parent", $a_rec["Id"], $newObj->getId());
                 break;
 
+            case "glo_definition":
+
+                // note: this must be kept for older glossaries <= 8
+
+                $term_id = (int) $a_mapping->getMapping("Modules/Glossary", "term", $a_rec["TermId"]);
+                if ($term_id == 0) {
+                    $this->log->debug("ERROR: Did not find glossary term glo_term id '" . $a_rec["TermId"] . "' for definition id '" . $a_rec["Id"] . "'.");
+                } else {
+                    $a_mapping->addMapping(
+                        "Services/COPage",
+                        "pg",
+                        "gdf:" . $a_rec["Id"],
+                        "term:" . $term_id
+                    );
+                    $a_mapping->addMapping(
+                        "Services/MetaData",
+                        "md",
+                        $this->old_glo_id . ":" . $a_rec["Id"] . ":gdf",
+                        $this->current_obj->getId() . ":" . $term_id . ":term"
+                    );
+                }
+                break;
+
             case "glo_term":
 
                 // id, glo_id, term, language, import_id, short_text, short_text_dirty
@@ -310,8 +333,8 @@ class ilGlossaryDataSet extends ilDataSet
                 $term->setGlossaryId($glo_id);
                 $term->setTerm($a_rec["Term"]);
                 $term->setLanguage($a_rec["Language"]);
-                $term->setShortText($a_rec["ShortText"]);
-                $term->setShortTextDirty($a_rec["ShortTextDirty"]);
+                $term->setShortText($a_rec["ShortText"] ?? "");
+                $term->setShortTextDirty($a_rec["ShortTextDirty"] ?? true);
                 if ($this->getCurrentInstallationId() > 0) {
                     $term->setImportId("il_" . $this->getCurrentInstallationId() . "_git_" . $a_rec["Id"]);
                 }

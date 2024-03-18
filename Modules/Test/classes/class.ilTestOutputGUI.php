@@ -526,6 +526,8 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
             $this->testSequence->getQuestionForSequence($currentSequenceElement)
         );
 
+        $currentQuestionOBJ->setTestId($this->getObject()->getId());
+
         $currentQuestionOBJ->resetUsersAnswer(
             $this->test_session->getActiveId(),
             $this->test_session->getPass()
@@ -924,8 +926,7 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
     protected function handleTearsAndAngerNoObjectiveOrientedQuestion()
     {
         $this->tpl->setOnScreenMessage('failure', sprintf($this->lng->txt('tst_objective_oriented_test_pass_without_questions'), $this->object->getTitle()), true);
-
-        $this->backToInfoScreenCmd();
+        $this->ctrl->redirectByClass(ilObjTestGUI::class);
     }
 
     protected function handlePrimaryButton(ilTestNavigationToolbarGUI $navigationToolbarGUI, int $currentQuestionId): bool

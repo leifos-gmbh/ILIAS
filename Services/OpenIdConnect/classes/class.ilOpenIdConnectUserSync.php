@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
@@ -184,8 +184,13 @@ class ilOpenIdConnectUserSync
         $this->logger->dump($this->settings->getRoleMappings(), ilLogLevel::DEBUG);
 
         foreach ($this->settings->getRoleMappings() as $role_id => $role_info) {
-            $this->logger->dump($role_id);
-            $this->logger->dump($role_info);
+            $this->logger->dump($role_id, ilLogLevel::DEBUG);
+            $this->logger->dump($role_info, ilLogLevel::DEBUG);
+
+            if ($role_info['value'] === '') {
+                $this->logger->debug('No role mapping for role: ' . $role_id);
+                continue;
+            }
 
             [$role_attribute, $role_value] = explode('::', $role_info['value']);
 
@@ -247,6 +252,7 @@ class ilOpenIdConnectUserSync
                 null
             );
         }
+
         return $roles_assignable;
     }
 
@@ -260,6 +266,6 @@ class ilOpenIdConnectUserSync
             return '';
         }
 
-        return $this->user_info->{$connect_name};
+        return (string) $this->user_info->{$connect_name};
     }
 }

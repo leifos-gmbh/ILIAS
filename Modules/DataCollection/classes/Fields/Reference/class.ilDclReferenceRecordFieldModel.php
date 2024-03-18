@@ -44,7 +44,7 @@ class ilDclReferenceRecordFieldModel extends ilDclBaseRecordFieldModel
                 }
                 foreach ($value as $val) {
                     if ($val) {
-                        $ref_rec = ilDclCache::getRecordCache($val);
+                        $ref_rec = ilDclCache::getRecordCache((int)$val);
                         $ref_record_field = $ref_rec->getRecordField($this->getField()->getProperty(ilDclBaseFieldModel::PROP_REFERENCE));
                         $exp_value = $ref_record_field->getExportValue();
                         $names[] = is_array($exp_value) ? array_shift($exp_value) : $exp_value;
@@ -121,7 +121,7 @@ class ilDclReferenceRecordFieldModel extends ilDclBaseRecordFieldModel
 
     public function getReferenceFromValue($value): int
     {
-        $field = ilDclCache::getFieldCache($this->getField()->getProperty(ilDclBaseFieldModel::PROP_REFERENCE));
+        $field = ilDclCache::getFieldCache((int) $this->getField()->getProperty(ilDclBaseFieldModel::PROP_REFERENCE));
         $table = ilDclCache::getTableCache($field->getTableId());
         $record_id = 0;
         foreach ($table->getRecords() as $record) {

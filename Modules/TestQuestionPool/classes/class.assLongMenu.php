@@ -20,7 +20,7 @@ require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
 class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable, ilAssQuestionLMExportable, ilAssQuestionAutosaveable
 {
-    private $answerType;
+    private ?array $answerType = null;
     private $long_menu_text;
     private $json_structure;
     private $ilDB;
@@ -57,18 +57,12 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable,
         $this->identical_scoring = 1;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAnswerType()
+    public function getAnswerType(): ?array
     {
         return $this->answerType;
     }
 
-    /**
-     * @param mixed $answerType
-     */
-    public function setAnswerType($answerType): void
+    public function setAnswerType(array $answerType): void
     {
         $this->answerType = $answerType;
     }
@@ -177,9 +171,9 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable,
         return false;
     }
 
-    public function saveToDb(): void
+    public function saveToDb(int $original_id = -1): void
     {
-        $this->saveQuestionDataToDb(-1);
+        $this->saveQuestionDataToDb($original_id);
         $this->saveAdditionalQuestionDataToDb();
         $this->saveAnswerSpecificDataToDb();
         parent::saveToDb();
@@ -604,7 +598,7 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable,
      * @throws ilTestException
      * @return integer/array $points/$details (array $details is deprecated !!)
      */
-    public function calculateReachedPoints($active_id, $pass = null, $authorizedSolution = true, $returndetails = false)
+    public function calculateReachedPoints($active_id, $pass = null, $authorizedSolution = true, $returndetails = false): float
     {
         if ($returndetails) {
             throw new ilTestException('return details not implemented for ' . __METHOD__);
@@ -622,7 +616,7 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable,
         return $this->calculateReachedPointsForSolution($found_values, $active_id);
     }
 
-    protected function calculateReachedPointsForSolution($found_values, $active_id = 0)
+    protected function calculateReachedPointsForSolution($found_values, $active_id = 0): float
     {
         if ($found_values == null) {
             $found_values = [];

@@ -88,7 +88,7 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
 
         $qst_id = (int) $table->getFilterItemByPostVar('question')->getValue();
         $passNr = $table->getFilterItemByPostVar('pass')->getValue();
-        $finalized_filter = $table->getFilterItemByPostVar('finalize_evaluation')->getValue();
+        $finalized_filter = (int)$table->getFilterItemByPostVar('finalize_evaluation')->getValue();
         $answered_filter = $table->getFilterItemByPostVar('only_answered')->getChecked();
         $table_data = [];
         $selected_questionData = null;
@@ -123,8 +123,8 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
                     }
 
                     $check_filter =
-                        ($finalized_filter != self::ONLY_FINALIZED || $finalized_evaluation) &&
-                        ($finalized_filter != self::EXCEPT_FINALIZED || !$finalized_evaluation);
+                        ($finalized_filter !== self::ONLY_FINALIZED || $finalized_evaluation) &&
+                        ($finalized_filter !== self::EXCEPT_FINALIZED || !$finalized_evaluation);
 
                     $check_answered = $answered_filter == false || $is_answered;
 
@@ -218,7 +218,9 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
             $update_participant = false;
             $qst_id = null;
 
-            foreach ($questions as $qst_id => $reached_points) {
+            foreach ($questions as $qst_id => $reached_points_string) {
+                $reached_points = $this->refinery->kindlyTo()->float()
+                    ->transform($reached_points_string);
                 if (!isset($manPointsPost[$pass])) {
                     $manPointsPost[$pass] = [];
                 }
@@ -241,7 +243,7 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
                 }
 
                 $maxPointsByQuestionId[$qst_id] = $this->questioninfo->getMaximumPoints($qst_id);
-                $manPointsPost[$pass][$active_id][$qst_id] = (float) $reached_points;
+                $manPointsPost[$pass][$active_id][$qst_id] = $reached_points;
                 if ($reached_points > $maxPointsByQuestionId[$qst_id]) {
                     $this->tpl->setOnScreenMessage('failure', sprintf($this->lng->txt('tst_save_manscoring_failed'), $pass + 1), false);
                     $this->showManScoringByQuestionParticipantsTable($manPointsPost);
@@ -256,7 +258,7 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
                     $update_participant = assQuestion::_setReachedPoints(
                         $active_id,
                         $qst_id,
-                        (float) $reached_points,
+                        $reached_points,
                         $maxPointsByQuestionId[$qst_id],
                         $pass,
                         true,
@@ -325,6 +327,7 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
                 $correction_feedback['finalized_evaluation'] = $this->lng->txt('yes');
             } else {
                 $correction_feedback['finalized_evaluation'] = $this->lng->txt('no');
+                $correction_feedback['finalized_by'] = '';
             }
 
             echo json_encode([ 'feedback' => $correction_feedback, 'points' => $correction_points, "translation" => ['yes' => $this->lng->txt('yes'), 'no' => $this->lng->txt('no')]]);
@@ -379,7 +382,8 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
                 false,
                 $this->object->getShowSolutionFeedback(),
                 false,
-                true
+                true,
+                false
             );
             $tmp_tpl->setVariable('TEXT_ASOLUTION_OUTPUT', $this->lng->txt('autosavecontent'));
             $tmp_tpl->setVariable('ASOLUTION_OUTPUT', $aresult_output);

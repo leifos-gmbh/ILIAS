@@ -536,9 +536,20 @@ class ilPropertyFormGUI extends ilFormGUI
             }
 
             $this->tpl->setCurrentBlock("header");
+            // required top
+            $this->tpl->setCurrentBlock("required_text_top");
+            $this->tpl->setVariable("TXT_REQUIRED_TOP", $lng->txt("required_field"));
+            $this->tpl->parseCurrentBlock();
+
             $this->tpl->setVariable("TXT_TITLE", $this->getTitle());
             //$this->tpl->setVariable("LABEL", $this->getTopAnchor());
             $this->tpl->setVariable("TXT_DESCRIPTION", $this->getDescription());
+            $this->tpl->parseCurrentBlock();
+        } elseif (!$this->required_text && $this->getMode() == "std") {
+            $this->tpl->setCurrentBlock("header");
+            // required top
+            $this->tpl->setCurrentBlock("required_text_top");
+            $this->tpl->setVariable("TXT_REQUIRED_TOP", $lng->txt("required_field"));
             $this->tpl->parseCurrentBlock();
         }
         $this->tpl->touchBlock("item");
@@ -667,6 +678,10 @@ class ilPropertyFormGUI extends ilFormGUI
                 $this->tpl->setVariable(
                     "PROPERTY_DESCRIPTION",
                     $item->getInfo()
+                );
+                $this->tpl->setVariable(
+                    "DESCRIPTION_FOR_ID",
+                    $item->getFieldId()
                 );
                 $this->tpl->parseCurrentBlock();
             }

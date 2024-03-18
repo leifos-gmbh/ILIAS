@@ -47,6 +47,11 @@ const classForSingleSlate = 'il-maincontrols-slate';
 /**
  * @type {string}
  */
+const classForSingleSlateContent = 'il-maincontrols-slate-content';
+
+/**
+ * @type {string}
+ */
 const classForSlateEngaged = 'engaged';
 
 /**
@@ -73,6 +78,23 @@ function disengageButton(btn) {
  */
 function isEngaged(btn) {
   return btn.hasClass(classForBtnEngaged);
+}
+
+/**
+ * @param {HTMLDivElement} child from which to search for a specific parent.
+ * @param {string} className of the parent that we expect to contain the child.
+ * @return {HTMLDivElement|null} parent with className containing the child or null if there is no such parent
+ */
+function findSpecificParent(child, className) {
+  let parent = child.parentElement; // starting with the current parent
+  // keep traversing to next parent, if it's not className
+  while (parent && !parent.classList.contains(className)) {
+    parent = parent.parentElement;
+  }
+  if (!parent) { // parent may be null if className name was never met in while loop.
+    console.warn(`No parent element with class "${className}" found.`);
+  }
+  return parent;
 }
 
 export default class Metabar {
@@ -188,11 +210,14 @@ export default class Metabar {
     if (isEngaged(btn)) {
       disengageButton(btn);
     } else {
-      this.disengageAllSlates();
-      this.disengageAllButtons();
-      if (btn.parents(`.${classForMoreSlate}`).length === 0) {
-        engageButton(btn);
-      }
+      this.disengageAll();
+      engageButton(btn);
+
+      // unfortunately, we need to wait until the corresponding slate is engaged
+      setTimeout(() => {
+        const btnAsJsElement = btn[0]; // from here on we use a default JS element instead of a jQuery object
+        this.focusInEngagedSlate(btnAsJsElement);
+      }, 10);
     }
   }
 
@@ -207,14 +232,18 @@ export default class Metabar {
   /**
    * @return {void}
    */
+
   disengageAllButtons() {
-    this.#jquery(`#${this.#id}.${classForEntries}`)
-      .children('li').children(`.btn.${classForBtnEngaged}`)
-      .each(
-        (i, btn) => {
-          disengageButton(this.#jquery(btn));
-        },
-      );
+    // disengage all buttons in desktop metabar
+    const desktEntries = document.querySelectorAll(`#${this.#id}.${classForEntries} > li > .btn.${classForBtnEngaged}`);
+    desktEntries.forEach((btn) => {
+      disengageButton($(btn));
+    });
+    // disengage all buttons in mobile metabar (nested in "more" slate)
+    const mobEntries = document.querySelectorAll(`#${this.#id}.${classForEntries} > li > .${classForSlates} > .${classForMoreSlate} > .${classForSingleSlateContent} > .btn.${classForBtnEngaged}`);
+    mobEntries.forEach((btn) => {
+      disengageButton($(btn));
+    });
   }
 
   /**
@@ -239,6 +268,29 @@ export default class Metabar {
   getEngagedSlates() {
     const search = `#${this.#id} .${classForSingleSlate}.${classForSlateEngaged}`;
     return this.#jquery(search);
+  }
+
+  /**
+   * @param {HTMLDivElement} childDiv from which to find the nearest engaged slate to set keyboard focus in
+   * @return {void}
+   */
+  focusInEngagedSlate(childDiv) {
+    // Find the common parent of the button and slate
+    const parent = findSpecificParent(childDiv, classForEntries);
+
+    if (parent) {
+      // Find the engaged slate within that parent
+      const engagedSlate = parent.querySelector(`.${classForSingleSlate}.${classForSlateEngaged}`);
+
+      if (engagedSlate) {
+        // Find the first focusable element inside the engaged slate
+        const firstFocusableElement = engagedSlate.querySelector('input, button');
+
+        if (firstFocusableElement) {
+          firstFocusableElement.focus();
+        }
+      }
+    }
   }
 
   /**

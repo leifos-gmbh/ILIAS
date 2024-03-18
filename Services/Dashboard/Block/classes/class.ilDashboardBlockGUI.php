@@ -121,6 +121,8 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
             $data->getDescription()
         );
 
+        $list_item = $list_item->withProperties($list_item->getProperties() + $data->getAdditionalData());
+
         return $list_item;
     }
 
@@ -208,7 +210,7 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
         $this->addCommandActions();
         $this->setData($this->getItemGroups());
 
-        return parent::getHTML();
+        return parent::getHTMLNew();
     }
 
     /**
@@ -534,7 +536,7 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
                     $this->getRemoveMultipleActionText(),
                     $this->ui->factory()->legacy($this->manage($replace_signal ?? null))
                 );
-                $modal = $modal->withAdditionalOnLoadCode(function ($id) {
+                $content = $modal->withAdditionalOnLoadCode(function ($id) {
                     return "
                     $('#$id').attr('data-modal-name', 'remove_modal_view_" . $this->viewSettings->getCurrentView() . "');
                     ";
@@ -542,9 +544,17 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
                 break;
             case 'confirm':
             default:
-                $modal = $this->ui->factory()->legacy($this->confirmRemoveObject());
+                if ($this->viewSettings->isSelectedItemsViewActive()) {
+                    $question = $this->lng->txt('dash_info_sure_remove_from_favs');
+                } else {
+                    $question = $this->lng->txt('mmbr_info_delete_sure_unsubscribe');
+                }
+                $content = [
+                    $this->ui->factory()->messageBox()->confirmation($question),
+                    $this->ui->factory()->legacy($this->confirmRemoveObject())
+                ];
         }
-        $responseStream = Streams::ofString($this->ui->renderer()->renderAsync($modal));
+        $responseStream = Streams::ofString($this->ui->renderer()->renderAsync($content));
         $this->http->saveResponse(
             $this->http->response()
                        ->withBody($responseStream)
@@ -646,7 +656,11 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
             return $this->ui->renderer()->render($message_box);
         }
 
-        $question = $this->lng->txt('dash_info_sure_remove_from_favs');
+        if ($this->viewSettings->isSelectedItemsViewActive()) {
+            $question = $this->lng->txt('dash_info_sure_remove_from_favs');
+        } else {
+            $question = $this->lng->txt('mmbr_info_delete_sure_unsubscribe');
+        }
 
         $cgui = new ilConfirmationGUI();
         $cgui->setHeaderText($question);

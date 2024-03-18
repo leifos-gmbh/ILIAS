@@ -93,12 +93,12 @@ class ilFileVersionsTableGUI extends ilTable2GUI
         // Columns
         $this->addColumn("", "", "1", true);
         $this->addColumn($this->dic->language()->txt("version"), "", "auto");
+        $this->addColumn($this->dic->language()->txt("filename"));
         $this->addColumn($this->dic->language()->txt("date"));
         $this->addColumn($this->dic->language()->txt("file_uploaded_by"));
-        $this->addColumn($this->dic->language()->txt("filename"));
         $this->addColumn($this->dic->language()->txt("versionname"));
         $this->addColumn($this->dic->language()->txt("filesize"), "", "", false);
-        $this->addColumn($this->dic->language()->txt("type"));
+        $this->addColumn($this->dic->language()->txt("status"));
         $this->addColumn($this->dic->language()->txt("action"));
         $this->addColumn("", "", "1");
 
@@ -164,28 +164,46 @@ class ilFileVersionsTableGUI extends ilTable2GUI
         );
 
         $this->modals[] = $pseudo_modal;
-        if(!$this->current_version_is_draft) {
-            $action_entries['delete'] = $this->dic->ui()->factory()->button()->shy(
-                $this->dic->language()->txt("delete"),
-                ''
-            )->withOnClick(
-                $pseudo_modal->getShowSignal()
-            );
+        $buttons = $this->dic->ui()->factory()->button();
+
+
+        if (!$this->current_version_is_draft) {
+            $action_entries['delete'] = $buttons
+                ->shy(
+                    $this->dic->language()->txt("delete"),
+                    ''
+                )
+                ->withOnClick(
+                    $pseudo_modal->getShowSignal()
+                );
+
+
             if ($this->current_version !== (int) $version) {
-                $action_entries['file_rollback'] = $this->dic->ui()->factory()->button()->shy(
-                    $this->dic->language()->txt("file_rollback"),
-                    $this->dic->ctrl()->getLinkTarget($this->parent_obj, ilFileVersionsGUI::CMD_ROLLBACK_VERSION)
-                );
-            } elseif($this->amount_of_versions > 1) {
-                $action_entries['unpublish'] = $this->dic->ui()->factory()->button()->shy(
-                    $this->dic->language()->txt("file_unpublish"),
-                    $this->dic->ctrl()->getLinkTarget($this->parent_obj, ilFileVersionsGUI::CMD_UNPUBLISH)
-                );
+                $action_entries['file_rollback'] = $buttons
+                    ->shy(
+                        $this->dic->language()->txt("file_rollback"),
+                        $this->dic->ctrl()->getLinkTarget($this->parent_obj, ilFileVersionsGUI::CMD_ROLLBACK_VERSION)
+                    );
+            } elseif ($this->amount_of_versions > 1) {
+                $action_entries['unpublish'] = $buttons
+                    ->shy(
+                        $this->dic->language()->txt("file_unpublish"),
+                        $this->dic->ctrl()->getLinkTarget($this->parent_obj, ilFileVersionsGUI::CMD_UNPUBLISH)
+                    );
             }
+        } elseif ($this->current_version === (int) $version) {
+            $action_entries['publish'] = $buttons
+                ->shy(
+                    $this->dic->language()->txt("file_publish"),
+                    $this->dic->ctrl()->getLinkTarget($this->parent_obj, ilFileVersionsGUI::CMD_PUBLISH)
+                );
         }
 
+
         $actions = $this->dic->ui()->renderer()->render(
-            $this->dic->ui()->factory()->dropdown()->standard($action_entries)->withLabel("Actions")
+            $this->dic->ui()->factory()->dropdown()
+                      ->standard($action_entries)
+                      ->withLabel($this->lng->txt('actions'))
         );
 
         // reset history parameter

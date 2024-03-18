@@ -31,11 +31,25 @@ abstract class Options
         '__MACOSX',
     ];
 
+    protected ZipDirectoryHandling $top_directory_handling = ZipDirectoryHandling::KEEP_STRUCTURE;
+
     /**
      * @description like __MACOSX, will filter out all paths which contain one of those snippets
      */
     public function getIgnoredPathSnippets(): array
     {
         return $this->ignore;
+    }
+
+    public function withDirectoryHandling(ZipDirectoryHandling $top_dir_handling): self
+    {
+        $clone = clone $this;
+        $clone->top_directory_handling = $top_dir_handling;
+        return $clone;
+    }
+
+    public function getDirectoryHandling(): ZipDirectoryHandling
+    {
+        return $this->top_directory_handling;
     }
 }

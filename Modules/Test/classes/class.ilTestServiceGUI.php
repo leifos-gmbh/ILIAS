@@ -409,7 +409,13 @@ class ilTestServiceGUI
 
                         if ($show_best_solution) {
                             $compare_template = new ilTemplate('tpl.il_as_tst_answers_compare.html', true, true, 'Modules/Test');
-                            $compare_template->setVariable("HEADER_PARTICIPANT", $this->lng->txt('tst_header_participant'));
+                            $test_session = $this->testSessionFactory->getSession($active_id);
+                            if ($pass <= $test_session->getLastFinishedPass()) {
+                                $compare_template->setVariable("HEADER_PARTICIPANT", $this->lng->txt('tst_header_participant'));
+                            } else {
+                                $compare_template->setVariable("HEADER_PARTICIPANT", $this->lng->txt('tst_header_participant_no_answer'));
+                            }
+
                             $compare_template->setVariable("HEADER_SOLUTION", $this->lng->txt('tst_header_solution'));
                             $result_output = $question_gui->getSolutionOutput($active_id, $pass, $show_graphical_output, false, $show_question_only, $show_feedback);
                             $best_output = $question_gui->getSolutionOutput($active_id, $pass, false, false, $show_question_only, false, true);
@@ -1015,7 +1021,7 @@ class ilTestServiceGUI
 
         $table_gui = $this->buildPassDetailsOverviewTableGUI($this, 'outUserPassDetails');
 
-        $questionList = new ilAssQuestionList($ilDB, $this->lng, $component_repository);
+        $questionList = new ilAssQuestionList($ilDB, $this->lng, $this->refinery, $component_repository);
 
         $questionList->setParentObjIdsFilter([$this->object->getId()]);
         $questionList->setQuestionInstanceTypeFilter(ilAssQuestionList::QUESTION_INSTANCE_TYPE_DUPLICATES);

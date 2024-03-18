@@ -18,6 +18,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+use ILIAS\Style\Content\InternalDomainService;
+
 /**
  * Class ilObjStyleSheet
  *
@@ -25,6 +27,7 @@ declare(strict_types=1);
  */
 class ilObjStyleSheet extends ilObject
 {
+    protected InternalDomainService $domain;
     protected bool $is_3_10_skin = false;
     protected string $export_sub_dir = "";
     protected array $chars_by_type = [];
@@ -262,12 +265,12 @@ class ilObjStyleSheet extends ilObject
     // displayed with matching tag (group -> tags)
     public static array $filtered_groups =
             array("ol" => array("ol"), "ul" => array("ul"),
-                "table" => array("table"), "positioning" => array("h1", "h2", "h3", "div", "img", "table", "a", "figure", "li"));
+                "table" => array("table"), "positioning" => array("h1", "h2", "h3", "div", "img", "table", "a", "figure", "li", "p"));
 
     // style types and their super type
     public static array $style_super_types = array(
         "text_block" => array("text_block", "heading1", "heading2", "heading3", "code_block"),
-        "text_inline" => array("text_inline", "sub", "sup", "code_inline"),
+        "text_inline" => array("text_inline", "sub", "sup", "code_inline", "strong", "em"),
         "section" => array("section"),
         "link" => array("link"),
         "table" => array("table", "table_cell", "table_caption"),
@@ -300,15 +303,17 @@ class ilObjStyleSheet extends ilObject
 
     // tag that are used by style types
     public static array $assigned_tags = array(
-        "text_block" => "div",
+        "text_block" => "p",
         "heading1" => "h1",
         "heading2" => "h2",
         "heading3" => "h3",
         "code_block" => "pre",
+        "em" => "em",
         "text_inline" => "span",
         "code_inline" => "code",
         "sup" => "sup",
         "sub" => "sub",
+        "strong" => "strong",
         "section" => "div",
         "link" => "a",
         "table" => "table",
@@ -391,9 +396,9 @@ class ilObjStyleSheet extends ilObject
             array("type" => "heading2", "class" => "Headline2"),
             array("type" => "heading3", "class" => "Headline3"),
             array("type" => "text_inline", "class" => "Comment"),
-            array("type" => "text_inline", "class" => "Emph"),
+            array("type" => "em", "class" => "Emph"),
             array("type" => "text_inline", "class" => "Quotation"),
-            array("type" => "text_inline", "class" => "Strong"),
+            array("type" => "strong", "class" => "Strong"),
             array("type" => "text_inline", "class" => "Accent"),
             array("type" => "text_inline", "class" => "Important"),
             array("type" => "code_inline", "class" => "CodeInline"),
@@ -517,6 +522,7 @@ class ilObjStyleSheet extends ilObject
         $this->type = "sty";
         $this->style = array();
         $this->ilias = $DIC["ilias"];
+        $this->domain = $DIC->contentStyle()->internal()->domain();
 
         if ($a_call_by_reference) {
             $this->ilias->raiseError("Can't instantiate style object via reference id.", $this->ilias->error_obj->FATAL);
@@ -1906,7 +1912,7 @@ class ilObjStyleSheet extends ilObject
 
         // unzip file
         if (strtolower($file["extension"]) == "zip") {
-            ilFileUtils::unzip($im_dir . "/" . $file_name);
+            $this->domain->resources()->zip()->unzipFile($im_dir . "/" . $file_name);
             $subdir = basename($file["basename"], "." . $file["extension"]);
             if (!is_dir($im_dir . "/" . $subdir)) {
                 $subdir = "style";				// check style subdir
@@ -2612,14 +2618,22 @@ class ilObjStyleSheet extends ilObject
         $r["r"] = substr($a_rgb, 0, 2);
         $r["g"] = substr($a_rgb, 2, 2);
         $r["b"] = substr($a_rgb, 4, 2);
-
         if ($as_dec) {
-            $r["r"] = (int) hexdec($r["r"]);
-            $r["g"] = (int) hexdec($r["g"]);
-            $r["b"] = (int) hexdec($r["b"]);
+            $r["r"] = self::hexdec($r["r"]);
+            $r["g"] = self::hexdec($r["g"]);
+            $r["b"] = self::hexdec($r["b"]);
         }
 
         return $r;
+    }
+
+    protected static function hexdec(string $hex): int
+    {
+        $hex = preg_replace("/[^a-fA-F0-9]+/", "", $hex);
+        if ($hex === "") {
+            $hex = "0";
+        }
+        return (int) hexdec($hex);
     }
 
     /**

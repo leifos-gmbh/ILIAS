@@ -202,7 +202,7 @@ class assFormulaQuestionGUI extends assQuestionGUI
 
     public function isSaveCommand(): bool
     {
-        return in_array($this->ctrl->getCmd(), array('saveFQ', 'saveEdit', 'saveReturnFQ'));
+        return in_array($this->ctrl->getCmd(), array('save', 'saveEdit', 'saveReturn'));
     }
 
     /**
@@ -554,8 +554,8 @@ class assFormulaQuestionGUI extends assQuestionGUI
         $this->populateTaxonomyFormSection($form);
 
         $form->addCommandButton('parseQuestion', $this->lng->txt("parseQuestion"));
-        $form->addCommandButton('saveReturnFQ', $this->lng->txt("save_return"));
-        $form->addCommandButton('saveFQ', $this->lng->txt("save"));
+        $form->addCommandButton('saveReturn', $this->lng->txt("save_return"));
+        $form->addCommandButton('save', $this->lng->txt("save"));
 
         $errors = $checked;
 
@@ -748,87 +748,6 @@ class assFormulaQuestionGUI extends assQuestionGUI
         $this->editQuestion();
     }
 
-    public function saveReturnFQ(): void
-    {
-        global $DIC;
-        $ilUser = $DIC['ilUser'];
-        $old_id = $this->request->getQuestionId();
-        $result = $this->writePostData();
-        if ($result == 0) {
-            $ilUser->setPref("tst_lastquestiontype", $this->object->getQuestionType());
-            $ilUser->writePref("tst_lastquestiontype", $this->object->getQuestionType());
-            $this->saveTaxonomyAssignments();
-            $this->object->saveToDb();
-            $originalexists = false;
-            if ($this->object->getOriginalId() != null && $this->questioninfo->questionExistsInPool($this->object->getOriginalId())) {
-                $originalexists = true;
-            }
-            if (($this->request->raw("calling_test") || ($this->request->isset('calling_consumer') && (int) $this->request->raw('calling_consumer')))
-                && $originalexists && assQuestion::_isWriteable($this->object->getOriginalId(), $ilUser->getId())) {
-                $this->ctrl->redirect($this, "originalSyncForm");
-            } elseif ($this->request->raw("calling_test")) {
-                $test = new ilObjTest($this->request->raw("calling_test"));
-                $q_id = $this->object->getId();
-                if (!assQuestion::_questionExistsInTest($this->object->getId(), $test->getTestId())) {
-                    global $DIC;
-                    $tree = $DIC['tree'];
-                    $ilDB = $DIC['ilDB'];
-                    $component_repository = $DIC['component.repository'];
-
-                    $test = new ilObjTest($this->request->raw("calling_test"), true);
-
-                    $testQuestionSetConfigFactory = new ilTestQuestionSetConfigFactory(
-                        $tree,
-                        $ilDB,
-                        $this->lng,
-                        $this->logger,
-                        $component_repository,
-                        $test,
-                        $this->questioninfo
-                    );
-
-                    $test->insertQuestion(
-                        $testQuestionSetConfigFactory->getQuestionSetConfig(),
-                        $this->object->getId(),
-                        true
-                    );
-
-                    if ($this->request->isset('prev_qid')) {
-                        $test->moveQuestionAfter($this->object->getId(), $this->request->raw('prev_qid'));
-                    }
-
-                    $this->ctrl->setParameter($this, 'calling_test', $this->request->raw("calling_test"));
-                }
-                $this->tpl->setOnScreenMessage('success', $this->lng->txt("msg_obj_modified"), true);
-                $this->ctrl->redirectByClass('ilAssQuestionPreviewGUI', ilAssQuestionPreviewGUI::CMD_SHOW);
-            } else {
-                if ($this->object->getId() != $old_id) {
-                    $this->callNewIdListeners($this->object->getId());
-                    $this->tpl->setOnScreenMessage('success', $this->lng->txt("msg_obj_modified"), true);
-                    $this->ctrl->redirectByClass("ilobjquestionpoolgui", "questions");
-                }
-                $this->tpl->setOnScreenMessage('success', $this->lng->txt("msg_obj_modified"), true);
-                $this->ctrl->redirectByClass("ilAssQuestionPreviewGUI", ilAssQuestionPreviewGUI::CMD_SHOW);
-            }
-        } else {
-            $ilUser->setPref("tst_lastquestiontype", $this->object->getQuestionType());
-            $ilUser->writePref("tst_lastquestiontype", $this->object->getQuestionType());
-            $this->object->saveToDb();
-            $this->editQuestion();
-        }
-    }
-
-    public function saveFQ(): void
-    {
-        $result = $this->writePostData();
-
-        if ($result == 1) {
-            $this->editQuestion();
-        } else {
-            $this->saveTaxonomyAssignments();
-            $this->save();
-        }
-    }
     /**
      * check input fields
      */
@@ -866,8 +785,8 @@ class assFormulaQuestionGUI extends assQuestionGUI
         $show_manual_scoring = false,
         $show_question_text = true
     ): string {
-        // get the solution of the user for the active pass or from the last pass if allowed
-        $user_solution = array();
+        $user_solution = $this->object->getVariableSolutionValuesForPass($active_id, $pass);
+
         if (($active_id > 0) && (!$show_correct_solution)) {
             $user_solution["active_id"] = $active_id;
             $user_solution["pass"] = $pass;
@@ -1029,12 +948,9 @@ class assFormulaQuestionGUI extends assQuestionGUI
                 $user_solution[$matches[1]] = $solution_value["value2"];
             }
         }
-        // fau.
 
-        if (!$this->object->hasRequiredVariableSolutionValues($user_solution)) {
-            foreach ($this->object->getInitialVariableSolutionValues() as $val1 => $val2) {
-                $this->object->saveCurrentSolution($active_id, $pass, $val1, $val2, true);
-            }
+        if ($user_solution === []) {
+            $user_solution = $this->object->getVariableSolutionValuesForPass($active_id, $pass);
         }
 
         // generate the question output

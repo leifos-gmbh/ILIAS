@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=0);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,12 +16,8 @@ declare(strict_types=0);
  *
  *********************************************************************/
 
-/**
- * Tracking query class. Put any complex queries into this class. Keep
- * tracking class small.
- * @author  Jörg Lützenkirchen <luetzenkirchen@leifos.com>
- * @ingroup ServicesTracking
- */
+declare(strict_types=0);
+
 class ilTrQuery
 {
     public static function getObjectsStatusForUser(
@@ -210,7 +204,7 @@ class ilTrQuery
                 "title" => $status_info["scos_title"][$sco_id],
                 "status" => (int) $status,
                 "type" => "sahs",
-                "score" => (int) $scores[$sco_id]
+                "score" => (int) ($scores[$sco_id] ?? 0)
             );
         }
         return $items;
@@ -1958,7 +1952,7 @@ class ilTrQuery
             if ($row[$tree->getTreePk()] < 0) {
                 $res[$row["type"]]["deleted"] = ($res[$row["type"]]["deleted"] ?? 0) + 1;
             } else {
-                $res[$row['type']]['deleted'] = 0;
+                $res[$row["type"]]["deleted"] = ($res[$row["type"]]["deleted"] ?? 0);
             }
         }
 
@@ -2298,5 +2292,18 @@ class ilTrQuery
         }
 
         return $res;
+    }
+
+    public static function getObjectTypeStatisticsMinYear()
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+        $query = 'select min(yyyy) min from obj_type_stat';
+        $res = $db->query($query);
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            return $row->min;
+        }
+        return date('Y');
     }
 }

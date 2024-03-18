@@ -37,7 +37,6 @@ class ilObject
     public const TABLE_OBJECT_DATA = "object_data";
 
     private ?ilObjectProperties $object_properties = null;
-    private ?ObjectReferenceProperties $object_reference_properties = null;
 
     protected ilLogger $obj_log;
     protected ?ILIAS $ilias;
@@ -138,7 +137,7 @@ class ilObject
     public function getObjectProperties(): ilObjectProperties
     {
         if ($this->object_properties === null) {
-            $this->object_properties = $this->object_dic['object_properties_agregator']->getFor($this->id);
+            $this->object_properties = $this->object_dic['object_properties_agregator']->getFor($this->id, $this->type);
         }
         return $this->object_properties;
     }
@@ -339,7 +338,13 @@ class ilObject
 
     final public function setTitle(string $title): void
     {
-        $this->title = ilStr::shortenTextExtended($title, $this->max_title ?? self::TITLE_LENGTH, $this->add_dots);
+        $property = $this->getObjectProperties()->getPropertyTitleAndDescription()->withTitle(
+            ilStr::shortenTextExtended($title, $this->max_title ?? self::TITLE_LENGTH, $this->add_dots)
+        );
+
+        $this->object_properties = $this->getObjectProperties()->withPropertyTitleAndDescription($property);
+
+        $this->title = $property->getTitle();
 
         // WebDAV needs to access the untranslated title of an object
         $this->untranslatedTitle = $this->title;
@@ -350,11 +355,16 @@ class ilObject
         return $this->desc;
     }
 
-    final public function setDescription(string $desc): void
+    final public function setDescription(string $description): void
     {
+        $property = $this->getObjectProperties()
+            ->getPropertyTitleAndDescription()->withDescription($description);
+
+        $this->object_properties = $this->getObjectProperties()->withPropertyTitleAndDescription($property);
+
         // Shortened form is storted in object_data. Long form is stored in object_description
-        $this->desc = ilStr::shortenTextExtended($desc, $this->max_desc, $this->add_dots);
-        $this->long_desc = ilStr::shortenTextExtended($desc, ilObject::LONG_DESC_LENGTH);
+        $this->desc = $property->getDescription();
+        $this->long_desc = $property->getLongDescription();
     }
 
     /**
@@ -362,12 +372,14 @@ class ilObject
      */
     public function getLongDescription(): string
     {
-        if (strlen($this->long_desc)) {
+        if ($this->long_desc !== '') {
             return $this->long_desc;
-        } elseif (strlen($this->desc)) {
+        }
+
+        if ($this->desc !== '') {
             return $this->desc;
         }
-        return "";
+        return '';
     }
 
     final public function getImportId(): string
@@ -544,6 +556,7 @@ class ilObject
         ];
 
         $this->db->insert(self::TABLE_OBJECT_DATA, $values);
+        $this->object_properties = null;
 
         if ($this->supportsOfflineHandling()) {
             $property_is_online = $this->getObjectProperties()->getPropertyIsOnline()->withOffline();
@@ -601,54 +614,7 @@ class ilObject
 
     public function update(): bool
     {
-        $values = [
-            "title" => ["text", $this->getTitle()],
-            "description" => ["text", ilStr::subStr($this->getDescription(), 0, 128)],
-            "last_update" => ["date", $this->db->now()],
-            "import_id" => ["text", $this->getImportId()],
-            "offline" => ["integer", $this->supportsOfflineHandling() ? $this->getOfflineStatus() : null]
-        ];
-
-        $where = [
-            "obj_id" => ["integer", $this->getId()]
-        ];
-
-        $this->db->update(self::TABLE_OBJECT_DATA, $values, $where);
-
-        $sql =
-            "SELECT last_update" . PHP_EOL
-            . "FROM " . self::TABLE_OBJECT_DATA . PHP_EOL
-            . "WHERE obj_id = " . $this->db->quote($this->getId(), "integer") . PHP_EOL
-        ;
-        $obj_set = $this->db->query($sql);
-        $obj_rec = $this->db->fetchAssoc($obj_set);
-        $this->last_update = $obj_rec["last_update"];
-
-        if ($this->obj_definition->isRBACObject($this->getType())) {
-            // Update long description
-            $sql =
-                "SELECT obj_id, description" . PHP_EOL
-                . "FROM object_description" . PHP_EOL
-                . "WHERE obj_id = " . $this->db->quote($this->getId(), 'integer') . PHP_EOL
-            ;
-            $res = $this->db->query($sql);
-
-            if ($res->numRows()) {
-                $values = [
-                    'description' => ['clob',$this->getLongDescription()]
-                ];
-                $where = [
-                    'obj_id' => ['integer',$this->getId()]
-                ];
-                $this->db->update('object_description', $values, $where);
-            } else {
-                $values = [
-                    'description' => ['clob',$this->getLongDescription()],
-                    'obj_id' => ['integer',$this->getId()]
-                ];
-                $this->db->insert('object_description', $values);
-            }
-        }
+        $this->getObjectProperties()->storeCoreProperties();
 
         $this->app_event_handler->raise(
             'Services/Object',
@@ -1613,12 +1579,13 @@ class ilObject
             $this->obj_log->debug("title incl. copy info: " . $title);
         }
 
-        // create instance
+        /** @var ilObject $new_obj */
         $new_obj = new $class_name(0, false);
         $new_obj->setOwner($ilUser->getId());
-        $new_obj->setTitle($title);
-        $new_obj->setDescription($this->getLongDescription());
-        $new_obj->setType($this->getType());
+        $new_obj->title = $title;
+        $new_obj->long_desc = $this->getLongDescription();
+        $new_obj->desc = $this->getDescription();
+        $new_obj->type = $this->getType();
 
         // Choose upload mode to avoid creation of additional settings, db entries ...
         $new_obj->create(true);
@@ -1683,33 +1650,136 @@ class ilObject
     {
         $cp_options = ilCopyWizardOptions::_getInstance($copy_id);
         if (!$cp_options->isRootNode($this->getRefId())) {
-            $this->obj_log->debug("No root node.");
             return $this->getTitle();
         }
-        $this->obj_log->debug("Root node.");
-        $nodes = $this->tree->getChilds($target_id);
 
-        $title_unique = false;
-        $numberOfCopy = 1;
-        $handleExtension = ($this->getType() == "file"); // #14883
-        $title = ilObjFileAccess::_appendNumberOfCopyToFilename($this->getTitle(), $numberOfCopy, $handleExtension);
-        while (!$title_unique) {
-            $found = 0;
-            foreach ($nodes as $node) {
-                $this->obj_log->debug("Compare " . $title . " and " . $node['title']);
-                if (($title == $node['title']) && ($this->getType() == $node['type'])) {
-                    $found++;
-                }
-            }
+        $obj_translations = ilObjectTranslation::getInstance($this->getId());
 
-            if ($found === 0) {
-                break;
-            }
+        $other_children_of_same_type = $this->tree->getChildsByType($target_id, $this->type);
 
-            $title = ilObjFileAccess::_appendNumberOfCopyToFilename(
+        if ($obj_translations->getLanguages() === []) {
+            $existing_titles = array_map(
+                fn(array $child): string => $child['title'],
+                $other_children_of_same_type
+            );
+
+            return $this->appendNumberOfCopiesToTitle(
+                $this->lng->txt('copy_of_suffix'),
+                $this->lng->txt('copy_n_of_suffix'),
                 $this->getTitle(),
-                ++$numberOfCopy,
-                $handleExtension
+                $existing_titles
+            );
+        }
+
+        return $this->appendCopyInfoToTranslations($obj_translations, $other_children_of_same_type);
+    }
+
+    private function appendCopyInfoToTranslations(
+        ilObjectTranslation $obj_translations,
+        array $other_children_of_same_type
+    ): string {
+        $nodes_translations = array_map(
+            fn(array $child): ilObjectTranslation =>
+                ilObjectTranslation::getInstance($child['obj_id']),
+            $other_children_of_same_type
+        );
+
+        $title_translations_per_lang = array_reduce(
+            $nodes_translations,
+            $this->getCallbackForTitlesPerLanguageTransformation(),
+            []
+        );
+
+        $new_languages = [];
+        foreach($obj_translations->getLanguages() as $language) {
+            $lang_code = $language->getLanguageCode();
+            $language->setTitle(
+                $this->appendNumberOfCopiesToTitle(
+                    $this->lng->txtlng('common', 'copy_of_suffix', $lang_code),
+                    $this->lng->txtlng('common', 'copy_n_of_suffix', $lang_code),
+                    $language->getTitle(),
+                    $title_translations_per_lang[$lang_code] ?? []
+                )
+            );
+            $new_languages[$lang_code] = $language;
+        }
+        $obj_translations->setLanguages($new_languages);
+
+        return $obj_translations->getDefaultTitle();
+    }
+
+    private function getCallbackForTitlesPerLanguageTransformation(): callable
+    {
+        return function (array $npl, ?ilObjectTranslation $nt): array {
+            $langs = $nt->getLanguages();
+            foreach($langs as $lang) {
+                if (!array_key_exists($lang->getLanguageCode(), $npl)) {
+                    $npl[$lang->getLanguageCode()] = [];
+                }
+                $npl[$lang->getLanguageCode()][] = $lang->getTitle();
+            }
+            return $npl;
+        };
+    }
+
+    private function appendNumberOfCopiesToTitle(
+        string $copy_suffix,
+        string $copy_n_suffix,
+        string $title,
+        array $other_titles_for_lang
+    ): string {
+        $title_without_suffix = $this->buildTitleWithoutCopySuffix($copy_suffix, $copy_n_suffix, $title);
+        $title_with_suffix = "{$title_without_suffix} {$copy_suffix}";
+        if ($other_titles_for_lang === []
+            || $this->isTitleUnique($title_with_suffix, $other_titles_for_lang)) {
+            return $title_with_suffix;
+        }
+
+        for ($i = 2;true;$i++) {
+            $title_with_suffix = $title_without_suffix . ' ' . sprintf($copy_n_suffix, $i);
+            if ($this->isTitleUnique($title_with_suffix, $other_titles_for_lang)) {
+                return $title_with_suffix;
+            }
+        }
+    }
+
+    private function isTitleUnique(string $title, array $nodes): bool
+    {
+        foreach ($nodes as $node) {
+            if (($title === $node)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function buildTitleWithoutCopySuffix(string $copy_suffix, string $copy_n_suffix, string $title): string
+    {
+        /*
+         * create a regular expression from the language text copy_n_of_suffix, so that
+         * we can match it against $filenameWithoutExtension, and retrieve the number of the copy.
+         * for example, if copy_n_of_suffix is 'Copy (%1s)', this creates the regular
+         * expression '/ Copy \\([0-9]+)\\)$/'.
+         */
+        $regexp_for_suffix = preg_replace(
+            '/([\^$.\[\]|()?*+{}])/',
+            '\\\\${1}',
+            ' '
+            . $copy_n_suffix
+        );
+        $regexp_for_file_name = '/' . preg_replace('/%1\\\\\$s/', '([0-9]+)', $regexp_for_suffix) . '$/';
+
+        if (preg_match($regexp_for_file_name, $title, $matches)) {
+            return substr($title, 0, -strlen($matches[0]));
+        }
+
+        if (str_ends_with($title, " {$copy_suffix}")) {
+            return substr(
+                $title,
+                0,
+                -strlen(
+                    " {$copy_suffix}"
+                )
             );
         }
 

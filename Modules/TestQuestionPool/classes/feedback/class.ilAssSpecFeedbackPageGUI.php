@@ -22,8 +22,9 @@
  * @author Alex Killing <alex.killing@gmx.de>
  *
  * @ilCtrl_Calls ilAssSpecFeedbackPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMDEditorGUI
- * @ilCtrl_Calls ilAssSpecFeedbackPageGUI: ilPublicUserProfileGUI, ilNoteGUI
+ * @ilCtrl_Calls ilAssSpecFeedbackPageGUI: ilPublicUserProfileGUI, ilCommentGUI
  * @ilCtrl_Calls ilAssSpecFeedbackPageGUI: ilPropertyFormGUI, ilInternalLinkGUI
+ * @ilCtrl_IsCalledBy ilAssSpecFeedbackPageGUI: ilObjQuestionPoolGUI, ilObjTestGUI, ilRepositoryGUI, ilCommonActionDispatcherGUI
  *
  * @ingroup ModulesTestQuestionPool
  */

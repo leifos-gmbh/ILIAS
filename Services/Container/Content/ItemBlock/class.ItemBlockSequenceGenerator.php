@@ -67,9 +67,12 @@ class ItemBlockSequenceGenerator
         $this->block_sequence = $block_sequence;
         $this->item_set_manager = $item_set_manager;
         $this->container = $container;
-        $this->block_limit = (int) \ilContainer::_lookupContainerSetting($container->getId(), "block_limit");
         $this->mode_manager = $this->domain_service->content()->mode($container);
         $this->include_empty_blocks = $include_empty_blocks;
+        $this->block_limit = 0;
+        if (!$this->mode_manager->isActiveItemOrdering()) {
+            $this->block_limit = (int) \ilContainer::_lookupContainerSetting($container->getId(), "block_limit");
+        }
     }
 
     public function getSequence(): ItemBlockSequence
@@ -373,6 +376,11 @@ class ItemBlockSequenceGenerator
         $ref_ids = $this->getItemGroupItemRefIds($item_group_ref_id);
         $this->accumulateRefIds($ref_ids);
         $block_items = $this->determineBlockItems($ref_ids);
+        // #16493
+        if (!$this->access->checkAccess("visible", "", $item_group_ref_id) ||
+            !$this->access->checkAccess("read", "", $item_group_ref_id)) {
+            return null;
+        }
         // otherwise empty item groups will simply "vanish" from the repository
         if (count($block_items->getRefIds()) > 0 || $this->access->checkAccess('write', '', $item_group_ref_id)) {
             return $this->data_service->itemBlock(

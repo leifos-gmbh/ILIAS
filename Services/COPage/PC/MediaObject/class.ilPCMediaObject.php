@@ -418,6 +418,33 @@ class ilPCMediaObject extends ilPageContent
             return $a_output;
         }
 
+        if ($a_mode === "edit") {
+            $a_output = str_replace(
+                "{{{{{Unsupported Media Type}}}}}",
+                $this->ui->renderer()->render(
+                    $this->ui->factory()->messageBox()->info(
+                        $this->lng->txt("copg_unsupported_media_type")
+                    )
+                ),
+                $a_output
+            );
+            // currently media objects, when in translation mode
+            $a_output = str_replace(
+                "{{{{{No Media Type}}}}}",
+                '<div class="copg-new-content-placeholder">' .
+                $this->ui->renderer()->render(
+                    $this->ui->factory()->symbol()->icon()->standard("pemed", "pemed", 'medium')
+                ) . "</div>",
+                $a_output
+            );
+        } else {
+            $a_output = str_replace(
+                "{{{{{Unsupported Media Type}}}}}",
+                "",
+                $a_output
+            );
+        }
+
         // add fullscreen modals
         $page = $this->getPage();
         $suffix = "-" . $page->getParentType() . "-" . $page->getId();

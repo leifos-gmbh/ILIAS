@@ -235,10 +235,12 @@ class ilMailFolderGUI
 
         $isTrashFolder = $this->currentFolderId === $this->mbox->getTrashFolder();
 
+        $selected_mail_ids = $this->getMailIdsFromRequest(true);
         if (!$this->errorDelete && $isTrashFolder && 'deleteMails' === $this->parseCommand($this->ctrl->getCmd())) {
             $confirmationGui = new ilConfirmationGUI();
             $confirmationGui->setHeaderText($this->lng->txt('mail_sure_delete'));
-            foreach ($this->getMailIdsFromRequest() as $mailId) {
+            $selected_mail_ids = $this->getMailIdsFromRequest();
+            foreach ($selected_mail_ids as $mailId) {
                 $confirmationGui->addHiddenItem('mail_id[]', (string) $mailId);
             }
             $this->ctrl->setParameter($this, 'mobj_id', $this->currentFolderId);
@@ -264,7 +266,7 @@ class ilMailFolderGUI
         }
 
         $mailtable = $this->getMailFolderTable();
-        $mailtable->setSelectedItems($this->getMailIdsFromRequest(true));
+        $mailtable->setSelectedItems($selected_mail_ids);
 
         try {
             $mailtable->prepareHTML();
@@ -398,6 +400,12 @@ class ilMailFolderGUI
         }
 
         $folderData = $this->mbox->getFolderData($this->currentFolderId);
+        if ($folderData === null) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('mail_operation_on_invalid_folder'), true);
+            $this->ctrl->setParameterByClass(ilMailGUI::class, 'mobj_id', $this->mbox->getInboxFolder());
+            $this->ctrl->redirectByClass(ilMailGUI::class);
+        }
+
         if ($folderData['title'] === $form->getInput('subfolder_title')) {
             $this->showFolder();
             return;
@@ -418,7 +426,7 @@ class ilMailFolderGUI
         if (null === $form) {
             $form = $this->getSubFolderForm('edit');
             $form->setValuesByArray(
-                ['subfolder_title' => $this->mbox->getFolderData($this->currentFolderId)['title']]
+                ['subfolder_title' => $this->mbox->getFolderData($this->currentFolderId)['title'] ?? '']
             );
         }
 
@@ -614,6 +622,7 @@ class ilMailFolderGUI
         $this->ctrl->clearParameters($this);
 
         $form = new ilPropertyFormGUI();
+        $form->setId('MailContent');
         $form->setPreventDoubleSubmission(false);
         $form->setTableWidth('100%');
         $this->ctrl->setParameter($this, 'mobj_id', $mailData['folder_id']);
@@ -675,7 +684,7 @@ class ilMailFolderGUI
                 $this->ctrl->setParameter($this, 'mail_id', $mailId);
                 $this->ctrl->setParameter($this, 'mobj_id', $mailData['folder_id']);
                 $this->ctrl->setParameter($this, 'user', $sender->getId());
-                $linked_fullname = '<br /><a href="' . $this->ctrl->getLinkTarget(
+                $linked_fullname = '<br /><a class="mailusername" href="' . $this->ctrl->getLinkTarget(
                     $this,
                     'showUser'
                 ) . '" title="' . $linked_fullname . '">' . $linked_fullname . '</a>';
@@ -762,6 +771,12 @@ class ilMailFolderGUI
         }
 
         $currentFolderData = $this->mbox->getFolderData((int) $mailData['folder_id']);
+        if ($currentFolderData === null) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('mail_operation_on_invalid_folder'), true);
+            $this->ctrl->setParameterByClass(ilMailGUI::class, 'mobj_id', $this->mbox->getInboxFolder());
+            $this->ctrl->redirectByClass(ilMailGUI::class);
+        }
+
         $this->ctrl->setParameter($this, 'mobj_id', $this->currentFolderId);
         $this->tabs->addTab(
             'current_folder',
@@ -780,16 +795,14 @@ class ilMailFolderGUI
                 $folder['obj_id'] !== $mailData['folder_id']) {
                 $folder_name = $folder['title'];
                 if ($folder['type'] !== 'user_folder') {
-                    $folder_name = $this->lng->txt(
-                        'mail_' . $folder['title']
-                    ) . ($folder['type'] === 'trash' ? ' (' . $this->lng->txt('delete') . ')' : '');
+                    $folder_name = $this->lng->txt('mail_' . $folder['title']);
                 }
 
                 $move_links[] = $this->ui_factory->button()->shy(
                     sprintf(
                         $this->lng->txt('mail_move_to_folder_x'),
                         $folder_name
-                    ),
+                    ) . ($folder['type'] === 'trash' ? ' (' . $this->lng->txt('delete') . ')' : ''),
                     '#',
                 )->withOnLoadCode(static fn($id): string => "
                         document.getElementById('$id').addEventListener('click', function(e) {
@@ -813,6 +826,28 @@ class ilMailFolderGUI
                             return false;
                         });");
             }
+        }
+
+        if ($isTrashFolder) {
+            $deleteBtn = $this->ui_factory->button()
+                                          ->standard($this->lng->txt('delete'), '#')
+                                          ->withOnLoadCode(static fn($id): string => "
+                    document.getElementById('$id').addEventListener('click', function() {
+                        const frm = this.closest('form'),
+                            action = new URL(frm.action),
+                            action_params = new URLSearchParams(action.search);
+    
+                        action_params.delete('cmd');
+                        action_params.append('cmd', 'deleteMails');
+    
+                        action.search = action_params.toString();
+    
+                        frm.action = action.href;
+                        frm.submit();
+                        return false;
+                    });
+                ");
+            $this->toolbar->addComponent($deleteBtn);
         }
 
         if ($move_links !== []) {
@@ -1048,7 +1083,6 @@ class ilMailFolderGUI
             $this->currentFolderId === $this->mbox->getSentFolder(),
             $this->currentFolderId === $this->mbox->getDraftsFolder()
         );
-        $table->initFilter();
 
         return $table;
     }

@@ -60,6 +60,9 @@ const ClozeQuestionGapBuilder = (function () {
         if (gap.type === 'text' || gap.type === 'select') {
           gap.values.forEach(
             (value) => {
+              if (value.answer === undefined) {
+                value.answer = '';
+              }
               value.answer = value.answer.replace('&#123;', '{');
               value.answer = value.answer.replace('&#125;', '}');
             },
@@ -440,7 +443,7 @@ const ClozeQuestionGapBuilder = (function () {
     let stringBuild = '';
     ClozeSettings.gaps_php[0][gap_count - 1].values.forEach((entry) => {
       if (entry.answer !== undefined) {
-        stringBuild += `${entry.answer.replace(/\[/g, '[&hairsp;')},`;
+        stringBuild += `${entry.answer.toString().replace(/\[/g, '[&hairsp;')},`;
       }
     });
     stringBuild = stringBuild.replace(/,+$/, '');
@@ -908,11 +911,13 @@ const ClozeQuestionGapBuilder = (function () {
         let number = true;
         let select_at_least_on_positive = false;
         entry.values.forEach((values) => {
-          points += parseFloat(values.points);
-          if (parseFloat(values.points) > 0) {
+          let points_value = values.points;
+          points_value = points_value.toString().replace(',', '.');
+          points += parseFloat(points_value);
+          if (parseFloat(points_value) > 0) {
             select_at_least_on_positive = true;
           }
-          if (isNaN(values.points) || values.points === '') {
+          if (isNaN(points_value) || points_value === '') {
             pro.highlightRed($(`#gap_${row}\\[points\\]\\[${counter}\\]`));
             number = false;
           } else {
@@ -955,7 +960,7 @@ const ClozeQuestionGapBuilder = (function () {
   };
 
   pro.checkInputIsNumeric = function (number, row, field) {
-    if (isNaN(number) || number === '') {
+    if (isNaN(number.toString().replace(',', '.')) || number === '') {
       pro.highlightRed($(`.gap_${row}_numeric${field}`));
       return 1;
     }

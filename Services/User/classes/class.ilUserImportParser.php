@@ -60,7 +60,7 @@ class ilUserImportParser extends ilSaxParser
     protected array $prefs; // Missing array type.
     protected string $current_role_action;
     protected string $current_role_type;
-    protected int $current_role_id = 0;
+    protected string $current_role_id = '0';
     protected string $cdata;
     protected array $role_assign; // Missing array type.
     protected string $req_send_mail;
@@ -391,7 +391,7 @@ class ilUserImportParser extends ilSaxParser
                 if (($internal_id = ilUtil::__extractId($current_role_id, (int) IL_INST_ID)) > 0) {
                     $current_role_id = $internal_id;
                 }
-                $this->current_role_id = (int) $current_role_id;
+                $this->current_role_id = $current_role_id;
                 $this->current_role_type = $a_attribs["Type"];
                 break;
         }
@@ -411,7 +411,7 @@ class ilUserImportParser extends ilSaxParser
                 if (($internal_id = ilUtil::__extractId($current_role_id, (int) IL_INST_ID)) > 0) {
                     $current_role_id = $internal_id;
                 }
-                $this->current_role_id = $current_role_id;
+                $this->current_role_id = (string) $current_role_id;
                 $this->current_role_type = $a_attribs["Type"];
                 $this->current_role_action = (!isset($a_attribs["Action"])) ? "Assign" : $a_attribs["Action"];
                 break;
@@ -430,6 +430,8 @@ class ilUserImportParser extends ilSaxParser
                 break;
 
             case "User":
+                $this->containedTags = [];
+
                 $this->acc_mail->reset();
                 $this->prefs = [];
                 $this->currentPrefKey = null;
@@ -451,8 +453,8 @@ class ilUserImportParser extends ilSaxParser
                 $this->user_id = -1;
                 if (isset($a_attribs["Id"]) && $this->getUserMappingMode() === self::IL_USER_MAPPING_ID) {
                     if (is_numeric($a_attribs["Id"])) {
-                        $this->user_id = $a_attribs["Id"];
-                    } elseif ($id = ilUtil::__extractId($a_attribs["Id"], (int) IL_INST_ID) > 0) {
+                        $this->user_id = (int) $a_attribs["Id"];
+                    } elseif (($id = (int) ilUtil::__extractId($a_attribs["Id"], (int) IL_INST_ID)) > 0) {
                         $this->user_id = $id;
                     }
                 }
@@ -559,7 +561,7 @@ class ilUserImportParser extends ilSaxParser
                 if ($a_attribs['Id'] == "") {
                     $this->logFailure($this->userObj->getLogin(), sprintf($this->lng->txt("usrimport_xml_attribute_missing"), "Role", "Id"));
                 }
-                $this->current_role_id = (int) $a_attribs["Id"];
+                $this->current_role_id = $a_attribs["Id"];
                 $this->current_role_type = $a_attribs["Type"];
                 if ($this->current_role_type !== 'Global'
                 && $this->current_role_type !== 'Local') {
@@ -592,8 +594,8 @@ class ilUserImportParser extends ilSaxParser
 
                 if (!is_null($a_attribs["Id"]) && $this->getUserMappingMode() === self::IL_USER_MAPPING_ID) {
                     if (is_numeric($a_attribs["Id"])) {
-                        $this->user_id = $a_attribs["Id"];
-                    } elseif ($id = ilUtil::__extractId($a_attribs["Id"], (int) IL_INST_ID) > 0) {
+                        $this->user_id = (int) $a_attribs["Id"];
+                    } elseif (($id = (int) ilUtil::__extractId($a_attribs["Id"], (int) IL_INST_ID)) > 0) {
                         $this->user_id = $id;
                     }
                 }
@@ -1023,8 +1025,8 @@ class ilUserImportParser extends ilSaxParser
 
                             // default time limit settings
                             if (!$this->time_limit_set) {
-                                $this->userObj->setTimeLimitUnlimited(1);
-                                $this->userObj->setTimeLimitMessage(0);
+                                $this->userObj->setTimeLimitUnlimited(true);
+                                $this->userObj->setTimeLimitMessage('');
 
                                 if (!$this->approve_date_set) {
                                     $this->userObj->setApproveDate(date("Y-m-d H:i:s"));
@@ -1098,7 +1100,7 @@ class ilUserImportParser extends ilSaxParser
                             //set role entries
                             foreach ($this->roles as $role_id => $role) {
                                 if (isset($this->role_assign[$role_id]) && $this->role_assign[$role_id]) {
-                                    $this->assignToRole($this->userObj, $this->role_assign[$role_id]);
+                                    $this->assignToRole($this->userObj, (int) $this->role_assign[$role_id]);
                                 }
                             }
 

@@ -49,6 +49,13 @@ $cursor-disabled: not-allowed !default;
 	border-top: s.$il-caret-width-base solid \9; // IE8
 	border-right: s.$il-caret-width-base solid transparent;
 	border-left: s.$il-caret-width-base solid transparent;
+	@media (prefers-contrast: more) {
+		border: none;
+		&:before {
+			font-family: il-icons;
+			content: "\e604";
+		}
+	}
   }
   
   // The dropdown wrapper (div)
@@ -56,11 +63,6 @@ $cursor-disabled: not-allowed !default;
   .dropdown {
 	position: relative;
 	display: inline-block; // so dropdown can be in one line with a button
-  }
-  
-  // Prevent the focus on the dropdown toggle when closing dropdowns
-  .dropdown-toggle:focus {
-	outline: 0;
   }
   
   // The dropdown menu (ul)
@@ -71,7 +73,9 @@ $cursor-disabled: not-allowed !default;
 	z-index: $zindex-dropdown;
 	display: none; // none by default, but block on "open" of the menu
 	float: left;
+	overflow: auto;
 	min-width: 160px;
+	max-height: 50vh;
 	padding: 5px 0;
 	margin: 2px 0 0; // override default ul
 	font-size: s.$il-font-size-base;

@@ -286,7 +286,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
                     $template->parseCurrentBlock();
                 }
             }
-            if (strlen($answer->getImage())) {
+            if ($answer->hasImage()) {
                 $template->setCurrentBlock("answer_image");
                 if ($this->object->getThumbSize()) {
                     $template->setVariable("ANSWER_IMAGE_URL", $this->object->getImagePathWeb() . $this->object->getThumbPrefix() . $answer->getImage());
@@ -303,7 +303,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
                 $template->parseCurrentBlock();
             }
 
-            if ($show_inline_feedback) {
+            if (($show_feedback || !$this->isTestPresentationContext()) && $show_inline_feedback) {
                 $this->populateInlineFeedback($template, $answer_id, $user_solution);
             }
             $template->setCurrentBlock("answer_row");
@@ -343,7 +343,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         }
         $questionoutput = $template->get();
         $feedback = ($show_feedback && !$this->isTestPresentationContext()) ? $this->getGenericFeedbackOutput((int) $active_id, $pass) : "";
-        if (strlen($feedback)) {
+        if ($feedback !== '') {
             $cssClass = (
                 $this->hasCorrectSolution($active_id, $pass) ?
                 ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_CORRECT : ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_WRONG
@@ -370,7 +370,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $template = new ilTemplate("tpl.il_as_qpl_mc_sr_output.html", true, true, "Modules/TestQuestionPool");
         foreach ($keys as $answer_id) {
             $answer = $this->object->answers[$answer_id];
-            if (strlen($answer->getImage())) {
+            if ($answer->hasImage()) {
                 if ($this->object->getThumbSize()) {
                     $template->setCurrentBlock("preview");
                     $template->setVariable("URL_PREVIEW", $this->object->getImagePathWeb() . $answer->getImage());
@@ -449,7 +449,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $template = new ilTemplate("tpl.il_as_qpl_mc_sr_output.html", true, true, "Modules/TestQuestionPool");
         foreach ($keys as $answer_id) {
             $answer = $this->object->answers[$answer_id];
-            if (strlen($answer->getImage())) {
+            if ($answer->hasImage()) {
                 if ($this->object->getThumbSize()) {
                     $template->setCurrentBlock("preview");
                     $template->setVariable("URL_PREVIEW", $this->object->getImagePathWeb() . $answer->getImage());
@@ -645,7 +645,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
                     $answertext,
                     $choice['points'][$index],
                     $index,
-                    '',
+                    null,
                     $choice['answer_id'][$index]
                 );
             }
@@ -655,7 +655,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
         foreach ($choice['answer'] as $index => $answertext) {
             $answertext = htmlentities($answertext);
-            $picturefile = $choice['imagename'][$index] ?? '';
+            $picturefile = $choice['imagename'][$index] ?? null;
             $file_org_name = $_FILES['choice']['name']['image'][$index] ?? '';
             $file_temp_name = $_FILES['choice']['tmp_name']['image'][$index] ?? '';
 

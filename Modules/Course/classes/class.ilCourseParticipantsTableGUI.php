@@ -161,7 +161,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
         foreach ($this->getSelectedColumns() as $field) {
             switch ($field) {
                 case 'gender':
-                    $a_set['gender'] = $a_set['gender'] ? $this->lng->txt('gender_' . $a_set['gender']) : '';
+                    $a_set['gender'] = ($a_set['gender'] ?? '') ? $this->lng->txt('gender_' . $a_set['gender']) : '';
                     $this->tpl->setCurrentBlock('custom_fields');
                     $this->tpl->setVariable('VAL_CUST', $a_set[$field]);
                     $this->tpl->parseCurrentBlock();
@@ -180,7 +180,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
                 case 'consultation_hour':
                     $this->tpl->setCurrentBlock('custom_fields');
                     $dts = array();
-                    foreach ((array) $a_set['consultation_hours'] as $ch) {
+                    foreach ((array) ($a_set['consultation_hours'] ?? []) as $ch) {
                         $tmp = ilDatePresentation::formatPeriod(
                             new ilDateTime($ch['dt'], IL_CAL_UNIX),
                             new ilDateTime($ch['dtend'], IL_CAL_UNIX)

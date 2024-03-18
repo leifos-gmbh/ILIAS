@@ -88,7 +88,7 @@ class ilDclTextFieldModel extends ilDclBaseFieldModel
                 //for text it has to be case insensitive.
                 $record_value = $record->getRecordFieldValue($this->getId());
 
-                if (strtolower($this->normalizeValue($record_value)) == strtolower($this->normalizeValue(nl2br($value)))
+                if (strtolower((string)$this->normalizeValue($record_value)) == strtolower((string)$this->normalizeValue(nl2br($value)))
                     && ($record->getId() != $record_id
                         || $record_id == 0)
                 ) {
@@ -223,8 +223,8 @@ class ilDclTextFieldModel extends ilDclBaseFieldModel
     public function checkTitlesForImport(array &$titles, array &$import_fields): void
     {
         foreach ($titles as $k => $title) {
-            if (!ilStr::isUtf8($title)) {
-                $title = utf8_encode($title);
+            if (!mb_detect_encoding($title, "UTF-8", true) == "UTF-8") {
+                $title = mb_convert_encoding($title, 'UTF-8', 'ISO-8859-1');
             }
             if ($title == $this->getTitle()) {
                 $import_fields[$k] = $this;

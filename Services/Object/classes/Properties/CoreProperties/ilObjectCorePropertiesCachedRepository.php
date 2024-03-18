@@ -38,12 +38,13 @@ class ilObjectCorePropertiesCachedRepository implements ilObjectCorePropertiesRe
     private array $data_cache = [];
 
     public function __construct(
-        private ilDBInterface $database,
-        private UIServices $ui,
-        private ResourceStorageService $storage_services,
-        private ilObjectTileImageStakeholder $storage_stakeholder,
-        private ilObjectTileImageFlavourDefinition $flavour_definition,
-        private ObjectTypeSpecificPropertiesFactory $object_type_specific_properties_factory
+        private readonly ilDBInterface $database,
+        private readonly ilObjectDefinition $obj_definition,
+        private readonly UIServices $ui,
+        private readonly ResourceStorageService $storage_services,
+        private readonly ilObjectTileImageStakeholder $storage_stakeholder,
+        private readonly ilObjectTileImageFlavourDefinition $flavour_definition,
+        private readonly ObjectTypeSpecificPropertiesFactory $object_type_specific_properties_factory
     ) {
     }
 
@@ -57,11 +58,11 @@ class ilObjectCorePropertiesCachedRepository implements ilObjectCorePropertiesRe
         $this->data_cache = [];
     }
 
-    public function getFor(?int $object_id): ilObjectCoreProperties
+    public function getFor(?int $object_id, string $type = null): ilObjectCoreProperties
     {
         if ($object_id === null
             || $object_id === 0) {
-            return $this->getDefaultCoreProperties();
+            return $this->getDefaultCoreProperties($type);
         }
 
         if (!isset($this->data_cache[$object_id])) {
@@ -135,15 +136,17 @@ class ilObjectCorePropertiesCachedRepository implements ilObjectCorePropertiesRe
             'title' => [ilDBConstants::T_TEXT, $properties->getPropertyTitleAndDescription()->getTitle()],
             'description' => [ilDBConstants::T_TEXT, $properties->getPropertyTitleAndDescription()->getDescription()],
             'owner' => [ilDBConstants::T_INTEGER, $properties->getOwner()],
-            'create_date' => [ilDBConstants::T_DATETIME, $properties->getCreateDate()->format('Y-m-d H:i:s')],
-            'last_update' => [ilDBConstants::T_DATETIME, $properties->getLastUpdateDate()->format('Y-m-d H:i:s')],
+            'create_date' => [ilDBConstants::T_DATETIME, $properties->getCreateDate()?->format('Y-m-d H:i:s')],
+            'last_update' => [ilDBConstants::T_DATETIME, (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s')],
             'import_id' => [ilDBConstants::T_TEXT, $properties->getImportId()],
             'offline' => [ilDBConstants::T_INTEGER, (int) !$properties->getPropertyIsOnline()->getIsOnline()],
             'tile_image_rid' => [ilDBConstants::T_TEXT, $properties->getPropertyTileImage()->getTileImage()->getRid()]
         ];
         $this->database->update(self::CORE_PROPERTIES_TABLE, $storage_array, $where);
 
-        $this->storeLongDescription($properties->getPropertyTitleAndDescription()->getLongDescription(), $where);
+        if ($this->obj_definition->isRBACObject($properties->getType())) {
+            $this->storeLongDescription($properties->getPropertyTitleAndDescription()->getLongDescription(), $where);
+        }
 
         unset($this->data_cache[$properties->getObjectId()]);
 
@@ -167,13 +170,13 @@ class ilObjectCorePropertiesCachedRepository implements ilObjectCorePropertiesRe
         );
     }
 
-    private function getDefaultCoreProperties(): ilObjectCoreProperties
+    private function getDefaultCoreProperties(?string $type): ilObjectCoreProperties
     {
-        return new ilObjectCoreProperties(
+        return (new ilObjectCoreProperties(
             new ilObjectPropertyTitleAndDescription(),
             new ilObjectPropertyIsOnline(),
             new ilObjectPropertyTileImage()
-        );
+        ))->withType($type);
     }
 
     /**
@@ -230,8 +233,8 @@ class ilObjectCorePropertiesCachedRepository implements ilObjectCorePropertiesRe
                 'type' => $row['type'],
                 'owner' => $row['owner'],
                 'import_id' => $row['import_id'],
-                'create_date' => new DateTimeImmutable($row['create_date']),
-                'update_date' => new DateTimeImmutable($row['last_update'])
+                'create_date' => $row['create_date'] !== null ? new DateTimeImmutable($row['create_date']) : null,
+                'update_date' => $row['last_update'] !== null ? new DateTimeImmutable($row['last_update']) : null
             ];
         }
 

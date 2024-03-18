@@ -27,16 +27,12 @@ use ILIAS\GlobalScreen\Scope\Layout\Factory\MainBarModification;
 use ILIAS\UI\Component\MainControls\MainBar;
 use ILIAS\GlobalScreen\Scope\Layout\Factory\MetaBarModification;
 use ILIAS\UI\Component\MainControls\MetaBar;
-use ILIAS\UI\Implementation\Component\Signal;
 use ILIAS\DI\Container;
 use ILIAS\UI\Implementation\Component\SignalGeneratorInterface;
 use ILIAS\GlobalScreen\Scope\Layout\Factory\PageBuilderModification;
-use ILIAS\GlobalScreen\Scope\Layout\Builder\PageBuilder;
 use ILIAS\GlobalScreen\Scope\Layout\Provider\PagePart\PagePartProvider;
 use ILIAS\UI\Component\Layout\Page\Page;
 use ILIAS\GlobalScreen\Scope\Layout\Builder\StandardPageBuilder;
-use ILIAS\GlobalScreen\Scope\Layout\Provider\PagePart\StandardPagePartProvider;
-use ILIAS\GlobalScreen\Scope\Layout\Provider\PagePart\DecoratedPagePartProvider;
 use ILIAS\Data\URI;
 
 /**
@@ -93,11 +89,17 @@ class EmbeddedApplicationGSProvider extends AbstractModificationProvider
                 $builder = new StandardPageBuilder();
                 $page_part_provider = new EmbeddedApplicationPagePartProvider($page_part_provider);
 
+                $back_to = $this->dic->ctrl()->getLinkTargetByClass(
+                    \ilWOPIEmbeddedApplicationGUI::class,
+                    \ilWOPIEmbeddedApplicationGUI::CMD_RETURN
+                );
+                $back_to = new URI(rtrim(ILIAS_HTTP_PATH, '/') . '/' . ltrim($back_to, './'));
+
                 return $builder->build($page_part_provider)
                                ->withModeInfo(
                                    $uif->mainControls()->modeInfo(
                                        $this->dic->language()->txt('close_wopi_editor'),
-                                       new URI($_SERVER['HTTP_REFERER'])
+                                       $back_to
                                    )
                                );
             }

@@ -48,7 +48,7 @@ class ilStudyProgrammeMembersTableGUI extends ilTable2GUI
         string $parent_cmd = '',
         string $template_context = ''
     ) {
-        $this->setId("sp_member_list");
+        $this->setId("sp_member_list_" . $prg_obj_id);
         $this->prg_obj_id = $prg_obj_id;
         $this->prg_user_table = $prg_user_table;
         $this->custom_filter = $custom_filter;
@@ -228,9 +228,14 @@ class ilStudyProgrammeMembersTableGUI extends ilTable2GUI
                     $this->tpl->parseCurrentBlock();
                     break;
                 default:
-                    $this->tpl->setCurrentBlock('udf');
-                    $this->tpl->setVariable("UDF", $row->getUserInformation()->getUserData($column));
-                    $this->tpl->parseCurrentBlock();
+                    $value = $row->getUserInformation()->getUserData($column);
+                    if($value == null || trim($value) === '') {
+                        $this->tpl->touchBlock('udf');
+                    } else {
+                        $this->tpl->setCurrentBlock('udf');
+                        $this->tpl->setVariable("UDF", $value);
+                        $this->tpl->parseCurrentBlock();
+                    }
             }
         }
         $actions = $this->getPossibleActions(
@@ -336,9 +341,11 @@ class ilStudyProgrammeMembersTableGUI extends ilTable2GUI
             'changeExpireDateMulti' => $this->lng->txt('prg_multi_change_expire_date'),
             'markAccreditedMulti' => $this->lng->txt('prg_multi_mark_accredited'),
             'unmarkAccreditedMulti' => $this->lng->txt('prg_multi_unmark_accredited'),
-            'updateCertificateMulti' => $this->lng->txt('prg_multi_update_certificate'),
-            'removeCertificateMulti' => $this->lng->txt('prg_multi_remove_certificate')
         ];
+        if($this->prg->isCertificateActive()) {
+            $permissions_for_edit_individual_plan['updateCertificateMulti'] = $this->lng->txt('prg_multi_update_certificate');
+            $permissions_for_edit_individual_plan['removeCertificateMulti'] = $this->lng->txt('prg_multi_remove_certificate');
+        }
 
         $permissions_for_manage = [
             'removeUserMulti' => $this->lng->txt('prg_multi_remove_user'),
@@ -399,8 +406,6 @@ class ilStudyProgrammeMembersTableGUI extends ilTable2GUI
         if ($is_root) {
             $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_SHOW_INDIVIDUAL_PLAN;
             $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_REMOVE_USER;
-            $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_UNMARK_RELEVANT;
-            $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_MARK_RELEVANT;
             $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_UPDATE_FROM_CURRENT_PLAN;
             $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_ACKNOWLEDGE_COURSES;
             $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_CHANGE_DEADLINE;
@@ -412,7 +417,21 @@ class ilStudyProgrammeMembersTableGUI extends ilTable2GUI
         }
         if ($status == ilPRGProgress::STATUS_IN_PROGRESS) {
             $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_MARK_ACCREDITED;
+            if(! $is_root) {
+                $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_UNMARK_RELEVANT;
+            }
         }
+        if ($status == ilPRGProgress::STATUS_NOT_RELEVANT) {
+            $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_MARK_RELEVANT;
+        }
+        if ($status == ilPRGProgress::STATUS_COMPLETED ||
+            $status == ilPRGProgress::STATUS_ACCREDITED
+            && $this->prg->isCertifcateActive()
+        ) {
+            $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_UPDATE_CERTIFICATE;
+            $actions[] = ilObjStudyProgrammeMembersGUI::ACTION_REMOVE_CERTIFICATE;
+        }
+
 
         return $actions;
     }

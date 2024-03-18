@@ -84,9 +84,11 @@ class ilWACPath
     protected string $module_identifier = '';
     protected string $path_without_query = '';
 
-    public function __construct(string $path)
+    public function __construct(string $path, bool $normalize = true)
     {
-        $path = $this->normalizePath($path);
+        if ($normalize) {
+            $path = $this->normalizePath($path);
+        }
 
         $this->setOriginalRequest($path);
         $re = '/' . self::REGEX . '/';
@@ -99,7 +101,7 @@ class ilWACPath
         );
 
 
-        foreach ($result as $k => $v) {
+        foreach (array_keys($result) as $k) {
             if (is_numeric($k)) {
                 unset($result[$k]);
             }
@@ -232,20 +234,32 @@ class ilWACPath
 
     protected function normalizePath(string $path): string
     {
+        $path = ltrim($path, '.');
+        $path = rawurldecode($path);
+
+        // cut everything before "data/" (for installations using a subdirectory)
+        $path = strstr($path, '/' . self::DIR_DATA . '/');
+
         $original_path = parse_url($path, PHP_URL_PATH);
         $query = parse_url($path, PHP_URL_QUERY);
-        $base_path = strstr(realpath("." . $original_path), '/' . self::DIR_DATA . '/', true) . '/';
+
+        $real_data_dir = realpath("./" . self::DIR_DATA);
         $realpath = realpath("." . $original_path);
-        if ($realpath === false) {
-            return $path;
+
+        if (!str_starts_with($realpath, $real_data_dir)) {
+            throw new ilWACException(ilWACException::NOT_FOUND, "Path is not in data directory");
         }
-        $normalized_path = str_replace(
-            $base_path,
-            '',
-            $realpath
+
+        $normalized_path = ltrim(
+            str_replace(
+                $real_data_dir,
+                '',
+                $realpath
+            ),
+            '/'
         );
 
-        return "/" . $normalized_path . (!empty($query) ? '?' . $query : '');
+        return "/" . self::DIR_DATA . '/' . $normalized_path . (empty($query) ? '' : '?' . $query);
     }
 
     public function getPrefix(): string
@@ -310,7 +324,10 @@ class ilWACPath
 
     public function isStreamable(): bool
     {
-        return ($this->isAudio() || $this->isVideo());
+        if ($this->isAudio()) {
+            return true;
+        }
+        return $this->isVideo();
     }
 
     public function isAudio(): bool

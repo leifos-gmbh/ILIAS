@@ -157,7 +157,7 @@ class ilObjFile extends ilObject2 implements ilObjFileImplementationInterface
             $this->initImplementation();
         }
         if ($result->getMetaData()->has(ilCountPDFPagesPreProcessors::PAGE_COUNT)) {
-            $this->setPageCount($result->getMetaData()->get(ilCountPDFPagesPreProcessors::PAGE_COUNT));
+            $this->setPageCount((int) $result->getMetaData()->get(ilCountPDFPagesPreProcessors::PAGE_COUNT));
         }
         $this->updateObjectFromRevision($revision);
 
@@ -191,7 +191,7 @@ class ilObjFile extends ilObject2 implements ilObjFileImplementationInterface
             throw new LogicException('only files with existing resource and revision can be replaced');
         }
         if ($result->getMetaData()->has(ilCountPDFPagesPreProcessors::PAGE_COUNT)) {
-            $this->setPageCount($result->getMetaData()->get(ilCountPDFPagesPreProcessors::PAGE_COUNT));
+            $this->setPageCount((int) $result->getMetaData()->get(ilCountPDFPagesPreProcessors::PAGE_COUNT));
         }
         $this->updateObjectFromRevision($revision);
 
@@ -403,12 +403,13 @@ class ilObjFile extends ilObject2 implements ilObjFileImplementationInterface
         $this->implementation->handleChangedObjectTitle($new_title);
     }
 
+    public function getTitle(): string
+    {
+        return $this->stripTitleOfFileExtension(parent::getTitle());
+    }
+
     protected function doCreate(bool $clone_mode = false): void
     {
-        if (!$clone_mode) {
-            $this->setTitle($this->stripTitleOfFileExtension($this->getTitle()));
-            $this->update();
-        }
         $this->createProperties(true);
         $this->updateCopyright();
         $this->getObjectProperties()->storePropertyIsOnline(new ilObjectPropertyIsOnline(true));
@@ -473,15 +474,6 @@ class ilObjFile extends ilObject2 implements ilObjFileImplementationInterface
         $a_columns = $this->getArrayForDatabase();
         $this->database->update('file_data', $a_columns, [
             'file_id' => [
-                'integer',
-                $this->getId(),
-            ],
-        ]);
-
-        // update metadata with the current file version
-        $meta_version_column = ['meta_version' => ['integer', $this->getVersion()]];
-        $this->database->update('il_meta_lifecycle', $meta_version_column, [
-            'obj_id' => [
                 'integer',
                 $this->getId(),
             ],

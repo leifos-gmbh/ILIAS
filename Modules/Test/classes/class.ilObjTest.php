@@ -26,6 +26,8 @@ use ILIAS\Filesystem\Stream\Streams;
 
 require_once 'Modules/Test/classes/inc.AssessmentConstants.php';
 
+use ILIAS\Refinery\Factory as Refinery;
+
 /**
  * Class ilObjTest
  *
@@ -99,6 +101,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
 
     private TestManScoringDoneHelper $testManScoringDoneHelper;
     protected ilCtrlInterface $ctrl;
+    protected Refinery $refinery;
     protected ilSetting $settings;
     protected ilBenchmark $bench;
     protected ilTestParticipantAccessFilterFactory $participant_access_filter;
@@ -128,6 +131,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
         /** @var ILIAS\DI\Container $DIC */
         global $DIC;
         $this->ctrl = $DIC['ilCtrl'];
+        $this->refinery = $DIC['refinery'];
         $this->settings = $DIC['ilSetting'];
         $this->bench = $DIC['ilBench'];
         $this->testrequest = $DIC->test()->internal()->request();
@@ -171,6 +175,11 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
     public function getLocalDIC(): ILIAS\DI\Container
     {
         return ilTestDIC::dic();
+    }
+
+    public function getQuestionSetConfig(): ilTestQuestionSetConfig
+    {
+        return $this->question_set_config_factory->getQuestionSetConfig();
     }
 
     /**
@@ -1238,6 +1247,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
         $this->db->manipulate("DELETE FROM tst_result_cache WHERE $IN_activeIds");
         $this->db->manipulate("DELETE FROM tst_sequence WHERE $IN_activeIds");
         $this->db->manipulate("DELETE FROM tst_times WHERE $IN_activeIds");
+        $this->db->manipulate('DELETE FROM ' . PassPresentedVariablesRepo::TABLE_NAME . ' WHERE ' . $this->db->in('active_id', $activeIds, false, 'integer'));
 
         if ($this->isRandomTest()) {
             $this->db->manipulate("DELETE FROM tst_test_rnd_qst WHERE $IN_activeIds");
@@ -1820,21 +1830,27 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
         $arrResults = [];
 
         $query = "
-			SELECT		tst_test_result.question_fi,
-						tst_test_result.points reached,
-						tst_test_result.hint_count requested_hints,
-						tst_test_result.hint_points hint_points,
-						tst_test_result.answered answered
+            SELECT
+                tst_test_result.question_fi,
+                tst_test_result.points reached,
+                tst_test_result.hint_count requested_hints,
+                tst_test_result.hint_points hint_points,
+                tst_test_result.answered answered,
+                tst_manual_fb.finalized_evaluation finalized_evaluation
 
-			FROM		tst_test_result
+            FROM tst_test_result
 
-			LEFT JOIN	tst_solutions
-			ON			tst_solutions.active_fi = tst_test_result.active_fi
-			AND			tst_solutions.question_fi = tst_test_result.question_fi
+            LEFT JOIN tst_solutions
+            ON tst_solutions.active_fi = tst_test_result.active_fi
+            AND tst_solutions.question_fi = tst_test_result.question_fi
 
-			WHERE		tst_test_result.active_fi = %s
-			AND			tst_test_result.pass = %s
-		";
+            LEFT JOIN tst_manual_fb
+            ON tst_test_result.active_fi = tst_manual_fb.active_fi
+            AND tst_test_result.question_fi = tst_manual_fb.question_fi
+
+            WHERE tst_test_result.active_fi = %s
+            AND tst_test_result.pass = %s
+        ";
 
         $solutionresult = $this->db->queryF(
             $query,
@@ -1898,7 +1914,8 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
                 "qid" => $row['question_id'],
                 "original_id" => $row["original_id"],
                 "workedthrough" => isset($arrResults[$row['question_id']]) ? 1 : 0,
-                'answered' => $arrResults[$row['question_id']]['answered'] ?? 0
+                'answered' => $arrResults[$row['question_id']]['answered'] ?? 0,
+                'finalized_evaluation' => $arrResults[$row['question_id']]['finalized_evaluation'] ?? 0,
             ];
 
             if (!isset($arrResults[ $row['question_id'] ]['answered']) || !$arrResults[ $row['question_id'] ]['answered']) {
@@ -3088,7 +3105,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
     public static function _instanciateQuestion($question_id): ?assQuestion
     {
         if (strcmp((string) $question_id, "") !== 0) {
-            return assQuestion::instantiateQuestion($question_id);
+            return assQuestion::instantiateQuestion((int) $question_id);
         }
 
         return null;
@@ -3413,7 +3430,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
                     $participant_functionality_settings = $participant_functionality_settings->withSuspendTestAllowed((bool) $metadata["entry"]);
                     break;
                 case "sequence_settings":
-                    $participant_functionality_settings->withPostponedQuestionsMoveToEnd((bool) $metadata["entry"]);
+                    $participant_functionality_settings = $participant_functionality_settings->withPostponedQuestionsMoveToEnd((bool) $metadata["entry"]);
                     break;
                 case "show_marker":
                     $participant_functionality_settings = $participant_functionality_settings->withQuestionMarkingEnabled((bool) $metadata["entry"]);
@@ -3534,6 +3551,9 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
                 case 'obligations_enabled':
                     $question_behaviour_settings = $question_behaviour_settings->withCompulsoryQuestionsEnabled((bool) $metadata['entry']);
                     break;
+                case 'show_summary':
+                    $participant_functionality_settings = $participant_functionality_settings->withQuestionListEnabled(($metadata['entry'] & 1) > 0)
+                        ->withUsrPassOverviewMode((int) $metadata['entry']);
             }
             if (preg_match("/mark_step_\d+/", $metadata["label"])) {
                 $xmlmark = $metadata["entry"];
@@ -4999,16 +5019,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
 
             if ($count > 0) {
                 switch ($filter) {
-                    case 1: // only active users
-                        if ($participant['active']) {
-                            $filtered_participants[$active_id] = $participant;
-                        }
-                        break;
-                    case 2: // only inactive users
-                        if (!$participant['active']) {
-                            $filtered_participants[$active_id] = $participant;
-                        }
-                        break;
                     case 3: // all users
                         $filtered_participants[$active_id] = $participant;
                         break;
@@ -5461,14 +5471,14 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
         }
 
         $bestrow = null;
-        $bestfactor = 0;
+        $bestfactor = 0.0;
         while ($row = $ilDB->fetchAssoc($result)) {
-            if ($row["maxpoints"] > 0) {
-                $factor = $row["points"] / $row["maxpoints"];
+            if ($row["maxpoints"] > 0.0) {
+                $factor = (float) ($row["points"] / $row["maxpoints"]);
             } else {
-                $factor = 0;
+                $factor = 0.0;
             }
-            if ($factor === 0.0 && $bestfactor === 0
+            if ($factor === 0.0 && $bestfactor === 0.0
                 || $factor > $bestfactor) {
                 $bestrow = $row;
                 $bestfactor = $factor;
@@ -5757,6 +5767,8 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
 
     public function &getTestQuestions(): array
     {
+        $tags_trafo = $this->refinery->string()->stripTags();
+
         $query = "
 			SELECT		questions.*,
 						questtypes.type_tag,
@@ -5789,11 +5801,12 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
         $questions = [];
 
         while ($row = $this->db->fetchAssoc($query_result)) {
-            $question = $row;
+            $row['title'] = $tags_trafo->transform($row['title']);
+            $row['description'] = $tags_trafo->transform($row['description'] !== '' && $row['description'] !== null ? $row['description'] : '&nbsp;');
+            $row['author'] = $tags_trafo->transform($row['author']);
+            $row['obligationPossible'] = self::isQuestionObligationPossible($row['question_id']);
 
-            $question['obligationPossible'] = self::isQuestionObligationPossible($row['question_id']);
-
-            $questions[] = $question;
+            $questions[] = $row;
         }
 
         return $questions;
@@ -7966,6 +7979,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
         $scoring = new ilTestScoring($this, $this->db);
         $scoring->setPreserveManualScores($preserve_manscoring);
         $scoring->recalculateSolutions();
+        ilLPStatusWrapper::_updateStatus($this->getId(), $this->user->getId());
     }
 
     public static function getTestObjIdsWithActiveForUserId($userId): array
@@ -8070,6 +8084,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
         $active_id = $test_obj->getActiveIdOfUser($user_id);
 
         $test_session_factory = new ilTestSessionFactory($test_obj, $ilDB, $ilUser);
+
         // Added temporarily bugfix smeyer
         $test_session_factory->reset();
 

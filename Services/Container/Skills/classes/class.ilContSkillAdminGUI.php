@@ -115,6 +115,10 @@ class ilContSkillAdminGUI
                 $this->ctrl->setReturn($this, "listProfiles");
                 $ret = $this->ctrl->forwardCommand($profile_gui);
                 break;
+            case "ilskillprofileuploadhandlergui":
+                $skprof_upl_gui = new ilSkillProfileUploadHandlerGUI();
+                $ret = $this->ctrl->forwardCommand($skprof_upl_gui);
+                break;
             default:
                 if (
                     ($this->access->checkAccess("write", "", $this->ref_id) &&
@@ -421,7 +425,7 @@ class ilContSkillAdminGUI
 
             foreach ($this->requested_combined_skill_ids as $i) {
                 $s = explode(":", $i);
-                $cgui->addItem("id[]", $i, ilBasicSkill::_lookupTitle((int) $s[0], (int) $s[1]));
+                $cgui->addItem("id[]", (string) $i, ilBasicSkill::_lookupTitle((int) $s[0], (int) $s[1]));
             }
 
             $tpl->setContent($cgui->getHTML());
@@ -554,7 +558,7 @@ class ilContSkillAdminGUI
                     $this->tpl->setOnScreenMessage('info', $lng->txt("cont_skill_removal_not_possible"), true);
                     $ctrl->redirect($this, "listProfiles");
                 }
-                $cgui->addItem("id[]", $i, $this->profile_service->lookupProfileTitle($i));
+                $cgui->addItem("id[]", (string) $i, $this->profile_service->lookupProfileTitle($i));
             }
 
             $tpl->setContent($cgui->getHTML());
@@ -640,7 +644,7 @@ class ilContSkillAdminGUI
                     $this->tpl->setOnScreenMessage('info', $lng->txt("cont_skill_deletion_not_possible"), true);
                     $ctrl->redirect($this, "listProfiles");
                 }
-                $cgui->addItem("id[]", $i, $this->profile_service->lookupProfileTitle($i));
+                $cgui->addItem("id[]", (string) $i, $this->profile_service->lookupProfileTitle($i));
             }
 
             $tpl->setContent($cgui->getHTML());

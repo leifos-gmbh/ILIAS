@@ -23,12 +23,13 @@ use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\Data\Range;
 use ILIAS\Data\Order;
+use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\UI\Component\Table;
 use ILIAS\UI\Component\Input\Container\Filter\Standard as Filter;
 use ILIAS\UI\URLBuilder;
 use ILIAS\UI\URLBuilderToken;
-use Psr\Http\Message\ServerRequestInterface;
 use ILIAS\Taxonomy\DomainService as TaxonomyService;
+use ILIAS\Notes\Service as NotesService;
 
 class QuestionTable extends ilAssQuestionList implements Table\DataRetrieval
 {
@@ -36,6 +37,7 @@ class QuestionTable extends ilAssQuestionList implements Table\DataRetrieval
         protected UIFactory $ui_factory,
         protected UIRenderer $ui_renderer,
         protected DataFactory $data_factory,
+        protected Refinery $refinery,
         protected URLBuilder $url_builder,
         protected URLBuilderToken $action_parameter_token,
         protected URLBuilderToken $row_id_token,
@@ -44,10 +46,12 @@ class QuestionTable extends ilAssQuestionList implements Table\DataRetrieval
         protected ilComponentRepository $component_repository,
         protected ilRbacSystem $rbac,
         protected TaxonomyService $taxonomy,
+        protected NotesService $notes_service,
         protected int $parent_obj_id,
         protected int $request_ref_id
     ) {
-        parent::__construct($db, $lng, $component_repository);
+        $lng->loadLanguageModule('qpl');
+        parent::__construct($db, $lng, $refinery, $component_repository, $notes_service);
         $this->setAvailableTaxonomyIds($taxonomy->getUsageOfObject($parent_obj_id));
     }
 
@@ -106,7 +110,13 @@ class QuestionTable extends ilAssQuestionList implements Table\DataRetrieval
             'author' => $field_factory->text($this->lng->txt("author")),
             'lifecycle' => $field_factory->select($this->lng->txt("qst_lifecycle"), $lifecycle_options),
             'type' => $field_factory->select($this->lng->txt("type"), $question_type_options),
-            'commented' => $field_factory->select($this->lng->txt("ass_commented_questions_only"), ['1' => $this->lng->txt('yes'), '0' => $this->lng->txt('no')]),
+            'commented' => $field_factory->select(
+                $this->lng->txt("ass_comments"),
+                [
+                    ilAssQuestionList::QUESTION_COMMENTED_ONLY => $this->lng->txt('qpl_filter_commented_only'),
+                    ilAssQuestionList::QUESTION_COMMENTED_EXCLUDED => $this->lng->txt('qpl_filter_commented_exclude')
+                ]
+            ),
             'taxonomies' => $field_factory->select($this->lng->txt("tax_filter"), $tax_filter_options),
         ];
 
@@ -129,8 +139,8 @@ class QuestionTable extends ilAssQuestionList implements Table\DataRetrieval
         $f = $this->ui_factory->table()->column();
         $df = $this->data_factory->dateFormat();
         $date_format = $df->withTime24($this->data_factory->dateFormat()->germanShort());
-        $icon_yes = $this->ui_renderer->render($this->ui_factory->symbol()->icon()->custom(ilUtil::getImagePath('standard/icon_checked.svg'), 'yes'));
-        $icon_no = $this->ui_renderer->render($this->ui_factory->symbol()->icon()->custom(ilUtil::getImagePath('standard/icon_unchecked.svg'), 'no'));
+        $icon_yes = $this->ui_factory->symbol()->icon()->custom(ilUtil::getImagePath('standard/icon_checked.svg'), 'yes');
+        $icon_no = $this->ui_factory->symbol()->icon()->custom(ilUtil::getImagePath('standard/icon_unchecked.svg'), 'no');
 
         return  [
             'title' => $f->link($this->lng->txt('title')),
@@ -144,6 +154,7 @@ class QuestionTable extends ilAssQuestionList implements Table\DataRetrieval
             'hints' => $f->boolean($this->lng->txt('hints'), $icon_yes, $icon_no)->withIsOptional(true, true),
             'created' => $f->date($this->lng->txt('create_date'), $date_format)->withIsOptional(true, true),
             'tstamp' => $f->date($this->lng->txt('last_update'), $date_format)->withIsOptional(true, true),
+            'comments' => $f->number($this->lng->txt('comments'))->withIsOptional(true, false),
         ];
     }
 
@@ -163,11 +174,15 @@ class QuestionTable extends ilAssQuestionList implements Table\DataRetrieval
             $lifecycle = ilAssQuestionLifecycle::getInstance($record['lifecycle']);
             $record['lifecycle'] = $lifecycle->getTranslation($this->lng);
 
+            $title = $record['title'];
             $to_question = $this->url_builder
                 ->withParameter($this->action_parameter_token, 'preview')
                 ->withParameter($this->row_id_token, $row_id)
                 ->buildURI()->__toString();
-            $record['title'] = $this->ui_factory->link()->standard($record['title'], $to_question);
+            if (!(bool) $record['complete']) {
+                $title .= ' (' . $this->lng->txt('warning_question_not_complete') . ')';
+            }
+            $record['title'] = $this->ui_factory->link()->standard($title, $to_question);
 
             $taxonomies = [];
             foreach ($record['taxonomies'] as $taxonomy_id => $tax_data) {
@@ -260,7 +275,16 @@ class QuestionTable extends ilAssQuestionList implements Table\DataRetrieval
                 return $a[$aspect] <=> $b[$aspect];
             }
 
-            return strcmp($a[$aspect], $b[$aspect]);
+            $aspect_a = '';
+            $aspect_b = '';
+            if ($a[$aspect] !== null) {
+                $aspect_a = $a[$aspect];
+            }
+            if ($b[$aspect] !== null) {
+                $aspect_b = $b[$aspect];
+            }
+
+            return strcmp($aspect_a, $aspect_b);
         });
 
         if ($direction === $order::DESC) {

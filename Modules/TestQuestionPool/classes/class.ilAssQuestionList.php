@@ -16,6 +16,9 @@
  *
  *********************************************************************/
 
+use ILIAS\Notes\Service as NotesService;
+use ILIAS\Refinery\Factory as Refinery;
+
 /**
  * Handles a list of questions
  * @author		Björn Heyser <bheyser@databay.de>
@@ -24,86 +27,18 @@
  */
 class ilAssQuestionList implements ilTaxAssignedItemInfo
 {
-    private ilDBInterface $db;
-    private ilLanguage $lng;
-    private ilComponentRepository $component_repository;
-
-    /**
-     * object ids of parent question containers
-     *
-     * @var array
-     */
-    private $parentObjIdsFilter = array();
-
-    /**
-     * object id of parent question container
-     *
-     * @var integer
-     */
-    private $parentObjId = null;
-
-    /**
-     * object type of parent question container(s)
-     *
-     * @var string
-     */
-    private $parentObjType = 'qpl';
-
-    /**
-     * available taxonomy ids for current parent question container
-     *
-     * @var array
-     */
-    private $availableTaxonomyIds = array();
-
-    /**
-     * question field filters
-     *
-     * @var array
-     */
-    private $fieldFilters = array();
-
-    /**
-     * taxonomy filters
-     *
-     * @var array
-     */
-    private $taxFilters = array();
-
+    private array $parentObjIdsFilter = [];
+    private ?int $parentObjId = null;
+    private string $parentObjType = 'qpl';
+    private array $availableTaxonomyIds = [];
+    private array $fieldFilters = [];
+    private array $taxFilters = [];
     private bool $taxFiltersExcludeAnyObjectsWithTaxonomies = false;
-
-    /**
-     * taxonomy parent ids
-     *
-     * @var array
-     */
-    private $taxParentIds = array();
-
-    /**
-     * taxonomy parent types
-     *
-     * @var array
-     */
-    private $taxParentTypes = array();
-
-    /**
-     * active id for determining answer status
-     *
-     * @var integer
-     */
-    private $answerStatusActiveId = null;
-
-    /**
-     * @var array
-     */
-    private $forcedQuestionIds = array();
-
-    /**
-     * should object_data table be joined?
-     * @var bool
-     */
-    protected $join_obj_data = true;
-
+    private array $taxParentIds = [];
+    private array $taxParentTypes = [];
+    private ?int $answerStatusActiveId = null;
+    private array $forcedQuestionIds = [];
+    protected bool $join_obj_data = true;
 
     /**
      * answer status domain for single questions
@@ -119,17 +54,12 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
     public const ANSWER_STATUS_FILTER_NON_ANSWERED_ONLY = 'nonAnswered';
     public const ANSWER_STATUS_FILTER_WRONG_ANSWERED_ONLY = 'wrongAnswered';
 
-    /**
-     * answer status filter
-     *
-     * @var string
-     */
     private $answerStatusFilter = null;
 
     public const QUESTION_INSTANCE_TYPE_ORIGINALS = 'QST_INSTANCE_TYPE_ORIGINALS';
     public const QUESTION_INSTANCE_TYPE_DUPLICATES = 'QST_INSTANCE_TYPE_DUPLICATES';
     public const QUESTION_INSTANCE_TYPE_ALL = 'QST_INSTANCE_TYPE_ALL';
-    private $questionInstanceTypeFilter = self::QUESTION_INSTANCE_TYPE_ORIGINALS;
+    private string $questionInstanceTypeFilter = self::QUESTION_INSTANCE_TYPE_ORIGINALS;
 
     private $includeQuestionIdsFilter = null;
     private $excludeQuestionIdsFilter = null;
@@ -137,20 +67,21 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
     public const QUESTION_COMPLETION_STATUS_COMPLETE = 'complete';
     public const QUESTION_COMPLETION_STATUS_INCOMPLETE = 'incomplete';
     public const QUESTION_COMPLETION_STATUS_BOTH = 'complete/incomplete';
-    private $questionCompletionStatusFilter = self::QUESTION_COMPLETION_STATUS_BOTH;
+    private string $questionCompletionStatusFilter = self::QUESTION_COMPLETION_STATUS_BOTH;
 
-    /**
-     * the questions loaded by set criteria
-     *
-     * @var array
-     */
-    protected $questions = array();
+    public const QUESTION_COMMENTED_ONLY = '1';
+    public const QUESTION_COMMENTED_EXCLUDED = '2';
+    protected ?string $filter_comments = null;
 
-    public function __construct(ilDBInterface $db, ilLanguage $lng, ilComponentRepository $component_repository)
-    {
-        $this->db = $db;
-        $this->lng = $lng;
-        $this->component_repository = $component_repository;
+    protected array $questions = [];
+
+    public function __construct(
+        private ilDBInterface $db,
+        private ilLanguage $lng,
+        private Refinery $refinery,
+        private ilComponentRepository $component_repository,
+        private ?NotesService $notes_service = null
+    ) {
     }
 
     public function getParentObjId(): ?int
@@ -173,9 +104,6 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
         $this->parentObjType = $parentObjType;
     }
 
-    /**
-     * @return array
-     */
     public function getParentObjIdsFilter(): array
     {
         return $this->parentObjIdsFilter;
@@ -191,7 +119,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 
     public function setQuestionInstanceTypeFilter($questionInstanceTypeFilter): void
     {
-        $this->questionInstanceTypeFilter = $questionInstanceTypeFilter;
+        $this->questionInstanceTypeFilter = (string)$questionInstanceTypeFilter;
     }
 
     public function getQuestionInstanceTypeFilter()
@@ -327,7 +255,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 
     private function getFieldFilterExpressions(): array
     {
-        $expressions = array();
+        $expressions = [];
 
         foreach ($this->fieldFilters as $fieldName => $fieldValue) {
             switch ($fieldName) {
@@ -371,7 +299,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
         }
 
         foreach ($this->taxFilters as $taxId => $taxNodes) {
-            $questionIds = array();
+            $questionIds = [];
 
             $forceBypass = true;
 
@@ -447,7 +375,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 
     private function getQuestionIdsFilterExpressions(): array
     {
-        $expressions = array();
+        $expressions = [];
 
         if (is_array($this->getIncludeQuestionIdsFilter())) {
             $expressions[] = $this->db->in(
@@ -487,7 +415,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 
     private function getAnswerStatusFilterExpressions(): array
     {
-        $expressions = array();
+        $expressions = [];
 
         switch ($this->getAnswerStatusFilter()) {
             case self::ANSWER_STATUS_FILTER_ALL_NON_CORRECT:
@@ -547,7 +475,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 
     private function getConditionalFilterExpression(): string
     {
-        $CONDITIONS = array();
+        $CONDITIONS = [];
 
         if ($this->getQuestionInstanceTypeFilterExpression() !== null) {
             $CONDITIONS[] = $this->getQuestionInstanceTypeFilterExpression();
@@ -638,10 +566,10 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
     {
         $this->checkFilters();
 
+        $tags_trafo = $this->refinery->string()->stripTags();
+
         $query = $this->buildQuery();
-
         $res = $this->db->query($query);
-
         while ($row = $this->db->fetchAssoc($res)) {
             $row = ilAssQuestionType::completeMissingPluginName($row);
 
@@ -649,15 +577,42 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
                 continue;
             }
 
+            $row['title'] = $tags_trafo->transform($row['title'] ?? '&nbsp;');
+            $row['description'] = $tags_trafo->transform($row['description'] !== '' && $row['description'] !== null ? $row['description'] : '&nbsp;');
+            $row['author'] = $tags_trafo->transform($row['author']);
             $row['taxonomies'] = $this->loadTaxonomyAssignmentData($row['obj_fi'], $row['question_id']);
-
             $row['ttype'] = $this->lng->txt($row['type_tag']);
-
             $row['feedback'] = $this->hasGenericFeedback((int)$row['question_id']);
             $row['hints'] = $this->hasHints((int)$row['question_id']);
+            $row['comments'] = $this->getNumberOfCommentsForQuestion($row['question_id']);
+
+            if (
+                $this->filter_comments === self::QUESTION_COMMENTED_ONLY && $row['comments'] === 0
+                || $this->filter_comments === self::QUESTION_COMMENTED_EXCLUDED && $row['comments'] > 0
+            ) {
+                continue;
+            }
 
             $this->questions[ $row['question_id'] ] = $row;
         }
+    }
+
+    protected function getNumberOfCommentsForQuestion(int $question_id): int
+    {
+        if ($this->notes_service === null) {
+            return 0;
+        }
+        $notes_context = $this->notes_service->data()->context(
+            $this->getParentObjId(),
+            $question_id,
+            'quest'
+        );
+        return $this->notes_service->domain()->getNrOfCommentsForContext($notes_context);
+    }
+
+    public function setCommentFilter(int $commented = null)
+    {
+        $this->filter_comments = $commented;
     }
 
     protected function hasGenericFeedback(int $question_id): bool
@@ -678,7 +633,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 
     private function loadTaxonomyAssignmentData($parentObjId, $questionId): array
     {
-        $taxAssignmentData = array();
+        $taxAssignmentData = [];
 
         foreach ($this->getAvailableTaxonomyIds() as $taxId) {
             $taxTree = new ilTaxonomyTree($taxId);
@@ -689,7 +644,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 
             foreach ($assignments as $assData) {
                 if (!isset($taxAssignmentData[ $assData['tax_id'] ])) {
-                    $taxAssignmentData[ $assData['tax_id'] ] = array();
+                    $taxAssignmentData[ $assData['tax_id'] ] = [];
                 }
 
                 $nodeData = $taxTree->getNodeData($assData['node_id']);

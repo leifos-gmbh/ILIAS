@@ -103,7 +103,7 @@ class ItemPresentationManager
             if ($user->getId() !== ANONYMOUS_USER_ID &&
                 is_object($this->container) &&
                 $rbacsystem->checkAccess("write", $this->container->getRefId())) {
-                $this->can_order = true;
+                $this->can_order = (\ilContainerSortingSettings::_lookupSortMode($this->container->getId()) === \ilContainer::SORT_MANUAL);
             }
         }
         return $this->can_order;
@@ -203,6 +203,12 @@ class ItemPresentationManager
     {
         $this->init();
         return $this->item_set->getRawDataByRefId($ref_id);
+    }
+
+    public function getAllRefIds(): ?array
+    {
+        $this->init();
+        return $this->item_set->getAllRefIds();
     }
 
     public function getRefIdsOfType(string $type): array

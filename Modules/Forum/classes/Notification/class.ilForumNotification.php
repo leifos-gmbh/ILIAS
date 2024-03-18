@@ -183,6 +183,8 @@ class ilForumNotification
     public function insertAdminForce(): void
     {
         $next_id = $this->db->nextId('frm_notification');
+        $this->setNotificationId($next_id);
+
         $this->db->manipulateF(
             '
 			INSERT INTO frm_notification
@@ -406,6 +408,7 @@ class ilForumNotification
             $result[(int) $row['user_id']]['admin_force_noti'] = (int) $row['admin_force_noti'];
             $result[(int) $row['user_id']]['user_toggle_noti'] = (int) $row['user_toggle_noti'];
             $result[(int) $row['user_id']]['interested_events'] = (int) $row['interested_events'];
+            $result[(int) $row['user_id']]['user_id_noti'] = (int) $row['user_id_noti'];
         }
 
         return $result;
@@ -537,6 +540,20 @@ class ilForumNotification
             $this->readAllForcedEvents();
         }
 
+        if (!isset(self::$forced_events_cache[$user_id])) {
+            self::$forced_events_cache[$user_id] = $this->createMissingNotification($user_id);
+        }
+
         return self::$forced_events_cache[$user_id];
+    }
+
+    private function createMissingNotification(int $user_id): self
+    {
+        $new_object = new self($this->ref_id);
+        $new_object->setUserId($user_id);
+        $new_object->setForumId($this->forum_id);
+        $new_object->insertAdminForce();
+
+        return $new_object;
     }
 }

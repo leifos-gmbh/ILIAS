@@ -2479,7 +2479,11 @@ class ilObjContentObjectGUI extends ilObjectGUI
 
         if ($ilAccess->checkAccess("read", "", $a_target)) {
             $ctrl->setParameterByClass("ilLMPresentationGUI", "ref_id", $a_target);
-            $ctrl->redirectByClass("ilLMPresentationGUI", "resume");
+            if (ilObjLearningModuleAccess::_lookupSetting("lm_starting_point") == "first") {
+                $ctrl->redirectByClass("ilLMPresentationGUI", "");
+            } else {
+                $ctrl->redirectByClass("ilLMPresentationGUI", "resume");
+            }
         } elseif ($ilAccess->checkAccess("visible", "", $a_target)) {
             $ctrl->setParameterByClass("ilLMPresentationGUI", "ref_id", $a_target);
             $ctrl->redirectByClass("ilLMPresentationGUI", "infoScreen");
@@ -2924,6 +2928,7 @@ class ilObjContentObjectGUI extends ilObjectGUI
 
         $exp = new ilSearchRootSelector($ilCtrl->getLinkTarget($this, 'showLMGlossarySelector'));
         $exp->setExpand($this->requested_search_root_expand ?: $tree->readRootId());
+        $exp->setPathOpen($this->object->getRefId());
         $exp->setExpandTarget($ilCtrl->getLinkTarget($this, 'showLMGlossarySelector'));
         $exp->setTargetClass(get_class($this));
         $exp->setCmd('confirmGlossarySelection');

@@ -265,7 +265,7 @@ class SettingsFormGUI
         $online->setChecked(!$survey->getOfflineStatus());
         $form->addItem($online);
 
-        $dur = new \ilDateDurationInputGUI($lng->txt('rep_visibility_until'), "access_period");
+        $dur = new \ilDateDurationInputGUI($lng->txt('rep_time_based_availability'), "access_period");
         $dur->setShowTime(true);
         $date = $survey->getActivationStartDate();
         $dur->setStart($date
@@ -495,8 +495,8 @@ class SettingsFormGUI
             $txt[] = "[" . strtoupper($placeholder) . "]: " . $lng->txt($caption);
         }
         $txt = implode("<br />", $txt);
-        $participantdatainfo = new \ilNonEditableValueGUI($lng->txt("mailparticipantdata_placeholder"), "", true);
-        $participantdatainfo->setValue($txt);
+        $participantdatainfo = new \ilNonEditableValueGUI($lng->txt("svy_placeholders_label"), "", true);
+        $participantdatainfo->setValue($lng->txt("mailparticipantdata_placeholder") . "<br />" . $txt);
 
         $mailnotification->addSubItem($mailaddresses);
         $mailnotification->addSubItem($participantdata);

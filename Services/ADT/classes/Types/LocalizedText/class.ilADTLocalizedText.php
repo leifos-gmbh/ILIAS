@@ -1,7 +1,22 @@
 <?php
 
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 declare(strict_types=1);
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
  * Class ilADTLocalizedText
@@ -38,6 +53,12 @@ class ilADTLocalizedText extends ilADTText
     protected function isValidDefinition(ilADTDefinition $a_def): bool
     {
         return $a_def instanceof ilADTLocalizedTextDefinition;
+    }
+
+    public function reset(): void
+    {
+        parent::reset();
+        $this->translations = [];
     }
 
     /**
@@ -83,7 +104,14 @@ class ilADTLocalizedText extends ilADTText
      */
     public function isNull(): bool
     {
-        return !$this->getLength() && !count($this->getTranslations());
+        $has_translation = false;
+        foreach ($this->getTranslations() as $translation) {
+            if ($translation !== '') {
+                $has_translation = true;
+                break;
+            }
+        }
+        return !$this->getLength() && !$has_translation;
     }
 
     /**

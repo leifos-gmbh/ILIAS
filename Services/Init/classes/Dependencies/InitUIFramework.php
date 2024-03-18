@@ -138,6 +138,7 @@ class InitUIFramework
         };
         $c["ui.factory.table"] = function ($c) {
             $row_builder = new ILIAS\UI\Implementation\Component\Table\DataRowBuilder();
+
             return new ILIAS\UI\Implementation\Component\Table\Factory(
                 $c["ui.signal_generator"],
                 $c['ui.factory.input.viewcontrol'],
@@ -145,11 +146,14 @@ class InitUIFramework
                 $c["ui.data_factory"],
                 $c["ui.factory.table.column"],
                 $c["ui.factory.table.action"],
-                $row_builder
+                $row_builder,
+                $c["ui.storage"]
             );
         };
         $c["ui.factory.table.column"] = function ($c) {
-            return new ILIAS\UI\Implementation\Component\Table\Column\Factory();
+            return new ILIAS\UI\Implementation\Component\Table\Column\Factory(
+                $c["lng"]
+            );
         };
         $c["ui.factory.table.action"] = function ($c) {
             return new ILIAS\UI\Implementation\Component\Table\Action\Factory();
@@ -342,6 +346,32 @@ class InitUIFramework
 
         $c["ui.factory.entity"] = function ($c) {
             return new ILIAS\UI\Implementation\Component\Entity\Factory();
+        };
+
+        // currently this is will be a session storage because we cannot store
+        // data on the client, see https://mantis.ilias.de/view.php?id=38503.
+        $c["ui.storage"] = function ($c): ArrayAccess {
+            return new class () implements ArrayAccess {
+                public function offsetExists(mixed $offset): bool
+                {
+                    return ilSession::has($offset);
+                }
+                public function offsetGet(mixed $offset): mixed
+                {
+                    return ilSession::get($offset);
+                }
+                public function offsetSet(mixed $offset, mixed $value): void
+                {
+                    if (!is_string($offset)) {
+                        throw new InvalidArgumentException('Offset needs to be of type string.');
+                    }
+                    ilSession::set($offset, $value);
+                }
+                public function offsetUnset(mixed $offset): void
+                {
+                    ilSession::clear($offset);
+                }
+            };
         };
     }
 }

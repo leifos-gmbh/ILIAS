@@ -482,7 +482,7 @@ class ilQuestionBrowserTableGUI extends ilTable2GUI
         foreach ($this->getSelectedColumns() as $c) {
             if (strcmp($c, 'description') == 0) {
                 $this->tpl->setCurrentBlock('description');
-                $this->tpl->setVariable("QUESTION_COMMENT", (isset($a_set["description"]) && $a_set["description"] !== '') ? $a_set["description"] : "&nbsp;");
+                $this->tpl->setVariable("QUESTION_COMMENT", $a_set['description']);
                 $this->tpl->parseCurrentBlock();
             }
             if (strcmp($c, 'type') == 0) {
@@ -558,6 +558,6 @@ class ilQuestionBrowserTableGUI extends ilTable2GUI
     {
         $ajax_hash = ilCommonActionDispatcherGUI::buildAjaxHash(1, $this->request->getRefId(), 'quest', $this->parent_obj->object->getId(), 'quest', $questionId);
         $update_code = "il.UI.counter.getCounterObject($(\".ilTableOuter\")).incrementStatusCount(1);";
-        return ilNoteGUI::getListCommentsJSCall($ajax_hash, $update_code);
+        return ilCommentGUI::getListCommentsJSCall($ajax_hash, $update_code);
     }
 }

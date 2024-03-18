@@ -73,9 +73,7 @@ trait ilObjFileInfoProvider
             $version_date = (new ilDateTime($version->getDate(), IL_CAL_DATETIME))->get(IL_CAL_DATETIME);
         }
         // version uploader
-        $versions = $this->getFileObj()->getVersions();
-        $versions = array_shift($versions);
-        $version_uploader = $versions["user_id"] ?? -1; // unknown uploader
+        $version_uploader = $version["user_id"] ?? -1; // unknown uploader
         // download link
         $download_link_tpl = null;
         if ($this->getAccessHandler()->checkAccessOfUser(
@@ -92,7 +90,8 @@ trait ilObjFileInfoProvider
             $this->getLanguage()->txt("version") => $version_nr,
             $this->getLanguage()->txt("version_uploaded") => $version_date,
             $this->getLanguage()->txt("file_uploaded_by") => ilUserUtil::getNamePresentation($version_uploader),
-            $this->getLanguage()->txt("download_link") => $download_link_tpl->get()
+            $this->getLanguage()->txt("download_link") => $download_link_tpl->get(),
+            $this->getLanguage()->txt("download_link") => $download_link_tpl->get(),
         ];
     }
 
@@ -102,8 +101,9 @@ trait ilObjFileInfoProvider
     public function getFileInfoForAuthorsAndAdmins(): array
     {
         $amount_of_downloads = null;
+
         if ($this->getGeneralSettings()->isShowAmountOfDownloads()) {
-            sprintf(
+            $amount_of_downloads = sprintf(
                 $this->getLanguage()->txt("amount_of_downloads_since"),
                 $this->getFileObj()->getAmountOfDownloads(),
                 $this->getFileObj()->getCreateDate(),

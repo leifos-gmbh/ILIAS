@@ -40,6 +40,7 @@ use ILIAS\Services\WOPI\Discovery\ActionTarget;
  * @ilCtrl_Calls ilObjFileGUI: ilObjectMetaDataGUI, ilInfoScreenGUI, ilPermissionGUI, ilObjectCopyGUI
  * @ilCtrl_Calls ilObjFileGUI: ilExportGUI, ilWorkspaceAccessGUI, ilPortfolioPageGUI, ilCommonActionDispatcherGUI
  * @ilCtrl_Calls ilObjFileGUI: ilLearningProgressGUI, ilFileVersionsGUI, ilWOPIEmbeddedApplicationGUI
+ * @ilCtrl_Calls ilObjFileGUI: ilFileCommonSettingsGUI
  * @ingroup      ModulesFile
  */
 class ilObjFileGUI extends ilObject2GUI
@@ -49,7 +50,7 @@ class ilObjFileGUI extends ilObject2GUI
     use ilObjFileTransformation;
 
     public const UPLOAD_MAX_FILES = 100;
-    public const PARAM_FILES = 0;
+    public const PARAM_FILES = 'files';
     public const PARAM_TITLE = 'title';
     public const PARAM_DESCRIPTION = 'description';
     public const PARAM_COPYRIGHT_ID = "copyright_id";
@@ -170,7 +171,7 @@ class ilObjFileGUI extends ilObject2GUI
 
                 $ilTabs->activateTab("id_meta");
 
-                $md_gui = new ilObjectMetaDataGUI($this->object);
+                $md_gui = new ilObjectMetaDataGUI($this->object, null, null, $this->call_by_reference);
 
                 // todo: make this work
                 // $md_gui->addMDObserver($this->object,'MDUpdateListener','Technical');
@@ -244,6 +245,9 @@ class ilObjFileGUI extends ilObject2GUI
                 $action = $this->action_repo->getActionForSuffix(
                     $this->object->getFileExtension(),
                     ActionTarget::EDIT
+                ) ?? $this->action_repo->getActionForSuffix(
+                    $this->object->getFileExtension(),
+                    ActionTarget::VIEW
                 );
                 if (null === $action) {
                     $this->error->raiseError($this->lng->txt("no_action_avaliable"), $this->error->MESSAGE);
@@ -265,6 +269,20 @@ class ilObjFileGUI extends ilObject2GUI
                 );
                 break;
 
+            case strtolower(ilFileCommonSettingsGUI::class):
+                $this->initSettingsTab();
+                $this->tabs_gui->activateSubTab("service_settings");
+                $this->ctrl->forwardCommand(
+                    new ilFileCommonSettingsGUI(
+                        $this->object,
+                        $this->ctrl,
+                        $this->tpl,
+                        $this->lng,
+                        $this->object_service
+                    )
+                );
+                break;
+
             default:
                 // in personal workspace use object2gui
                 if ($this->id_type === self::WORKSPACE_NODE_ID) {
@@ -277,6 +295,7 @@ class ilObjFileGUI extends ilObject2GUI
                     $ilTabs->clearTargets();
 
                     parent::executeCommand();
+                    break; // otherwise subtabs are duplicated
                 }
 
                 if (empty($cmd) || $cmd === 'render') {
@@ -299,8 +318,11 @@ class ilObjFileGUI extends ilObject2GUI
         $this->infoScreen();
     }
 
-    protected function addUIFormToAccordion(ilAccordionGUI $accordion, Standard $form, int $form_type): void
-    {
+    protected function addUIFormToAccordion(
+        ilAccordionGUI $accordion,
+        Standard $form,
+        int $form_type
+    ): void {
         // abort if form-type is unknown
         if (!in_array($form_type, [self::CFORM_NEW, self::CFORM_CLONE, self::CFORM_IMPORT], true)) {
             return;
@@ -326,18 +348,11 @@ class ilObjFileGUI extends ilObject2GUI
         if (!in_array($form_type, [self::CFORM_NEW, self::CFORM_CLONE, self::CFORM_IMPORT], true)) {
             return;
         }
-
-        // see bug #0016217
-        if (method_exists($this, "getCreationFormTitle") && !empty(
-            ($title = $this->getCreationFormTitle(
-                $form_type
-            ))
-        )) {
-            $form->setTitle($title);
-        }
+        $title = $form->getTitle();
+        $form->setTitle(''); // see https://mantis.ilias.de/view.php?id=37786
 
         $tpl = new ilTemplate("tpl.creation_acc_head.html", true, true, "Services/Object");
-        $tpl->setVariable("TITLE", $this->lng->txt("option") . " " . $form_type . ": " . $form->getTitle());
+        $tpl->setVariable("TITLE", $this->lng->txt("option") . " " . $form_type . ": " . $title);
 
         $accordion->addItem($tpl->get(), $form->getHTML());
     }
@@ -410,7 +425,7 @@ class ilObjFileGUI extends ilObject2GUI
             DataSize::MB
         );
 
-        $inputs[] = $this->ui->factory()->input()->field()->file(
+        $inputs[self::PARAM_FILES] = $this->ui->factory()->input()->field()->file(
             $this->upload_handler,
             $this->lng->txt('upload_files'),
             sprintf(
@@ -435,7 +450,7 @@ class ilObjFileGUI extends ilObject2GUI
 
         // add input for copyright selection if enabled in the metadata settings
         if (ilMDSettings::_getInstance()->isCopyrightSelectionActive()) {
-            $inputs[] = $this->getCopyrightSelectionInput('set_license_for_all_files');
+            $inputs[self::PARAM_COPYRIGHT_ID] = $this->getCopyrightSelectionInput('set_license_for_all_files');
         }
 
         return $this->ui->factory()->input()->container()->form()->standard(
@@ -463,7 +478,7 @@ class ilObjFileGUI extends ilObject2GUI
             $form = $this->initUploadForm()->withRequest($this->request);
             $data = $form->getData();
         }
-        $files = $data[self::PARAM_FILES] ?? null;
+        $files = $data[self::PARAM_FILES] ?? $data[0] ?? null;
 
         if (empty($files)) {
             $form = $this->initUploadForm()->withRequest($this->request);
@@ -487,7 +502,7 @@ class ilObjFileGUI extends ilObject2GUI
                         $rid,
                         $file_data[self::PARAM_TITLE] ?? null,
                         $file_data[self::PARAM_DESCRIPTION] ?? null,
-                        $data[self::PARAM_COPYRIGHT_ID] ?? null
+                        $data[self::PARAM_COPYRIGHT_ID] ?? $data[1] ?? null
                     );
                 } catch (Throwable $t) {
                     $errors = true;
@@ -561,7 +576,7 @@ class ilObjFileGUI extends ilObject2GUI
         $this->object->getObjectProperties()->storePropertyTitleAndDescription($updated_title_and_description);
 
         $this->object->setImportantInfo($inputs['file_info']['important_info']);
-        $this->object->setRating($inputs['file_info']['rating'] ?? false);
+        $this->object->setRating($inputs['obj_features']['rating'] ?? false);
         $this->object->setOnclickMode((int) $inputs['file_info']['on_click_action']);
         $this->object->update();
 
@@ -591,14 +606,13 @@ class ilObjFileGUI extends ilObject2GUI
     public function edit(): void
     {
         global $DIC;
-        $ilTabs = $DIC['ilTabs'];
         $ilErr = $DIC['ilErr'];
 
         if (!$this->checkPermissionBool("write")) {
             $ilErr->raiseError($this->lng->txt("msg_no_perm_write"));
         }
 
-        $ilTabs->activateTab("settings");
+        $this->initSettingsTab();
 
         $form = $this->initPropertiesForm();
 
@@ -619,21 +633,10 @@ class ilObjFileGUI extends ilObject2GUI
         $important_info = $this->inputs->field()->markdown(
             new ilUIMarkdownPreviewGUI(),
             $this->lng->txt('important_info'),
+            $this->lng->txt('important_info_byline')
         )->withValue(
             $this->object->getImportantInfo() ?? ""
         );
-
-        $enable_rating = null;
-        if ($this->id_type === self::REPOSITORY_NODE_ID) {
-            $this->lng->loadLanguageModule('rating');
-
-            $enable_rating = $this->inputs->field()->checkbox(
-                $this->lng->txt('rating_activate_rating'),
-                $this->lng->txt('rating_activate_rating_info')
-            )->withValue(
-                $this->object->hasRating()
-            );
-        }
 
         $on_click_action = $this->inputs->field()->radio(
             $this->lng->txt('on_click_action')
@@ -650,7 +653,6 @@ class ilObjFileGUI extends ilObject2GUI
         $input_groups = array_filter([
             "title_and_description" => $title_and_description,
             "important_info" => $important_info,
-            "rating" => $enable_rating,
             "on_click_action" => $on_click_action
         ], static fn($input) => null !== $input);
 
@@ -683,10 +685,28 @@ class ilObjFileGUI extends ilObject2GUI
             );
         }
 
+        $additional_features_section = null;
+        if ($this->id_type === self::REPOSITORY_NODE_ID) {
+            $this->lng->loadLanguageModule('rating');
+
+            $enable_rating = $this->inputs->field()->checkbox(
+                $this->lng->txt('rating_activate_rating'),
+                $this->lng->txt('rating_activate_rating_info')
+            )->withValue(
+                $this->object->hasRating()
+            );
+            $additional_features_section = $this->inputs->field()->section(
+                ["rating" => $enable_rating],
+                $this->lng->txt('obj_features')
+            );
+        }
+
+
         $inputs = array_filter([
             "file_info" => $file_info_section,
             "availability" => $availability_section,
-            "presentation" => $presentation_section
+            "presentation" => $presentation_section,
+            "obj_features" => $additional_features_section
         ], static fn($input) => null !== $input);
 
         return $this->inputs->container()->form()->standard(
@@ -749,7 +769,7 @@ class ilObjFileGUI extends ilObject2GUI
 
     protected function editExternal(): void
     {
-        $this->ctrl->redirectByClass(ilWOPIEmbeddedApplicationGUI::class, ilWOPIEmbeddedApplicationGUI::CMD_INDEX);
+        $this->ctrl->redirectByClass(ilWOPIEmbeddedApplicationGUI::class, ilWOPIEmbeddedApplicationGUI::CMD_EDIT);
     }
 
     /**
@@ -803,7 +823,7 @@ class ilObjFileGUI extends ilObject2GUI
                                             $this->lng->txt('open_external_editor'),
                                             $this->ctrl->getLinkTargetByClass(
                                                 \ilWOPIEmbeddedApplicationGUI::class,
-                                                \ilWOPIEmbeddedApplicationGUI::CMD_INDEX
+                                                \ilWOPIEmbeddedApplicationGUI::CMD_EDIT
                                             )
                                         );
             $this->toolbar->addComponent($external_editor);
@@ -905,6 +925,34 @@ class ilObjFileGUI extends ilObject2GUI
         // standard meta data
         $info->addMetaDataSections($this->object->getId(), 0, $this->object->getType());
 
+        if (!$kiosk_mode) { // in kiosk mode we don't want to show the following sections
+            // links to resource
+            if ($this->access->checkAccess("write", "", $this->ref_id) ||
+                $this->access->checkAccess("edit_permissions", "", $this->ref_id)) {
+                $rs = ilObject::_getAllReferences($this->obj_id);
+                $refs = [];
+                foreach ($rs as $r) {
+                    if ($this->tree->isInTree($r)) {
+                        $refs[] = $r;
+                    }
+                }
+                if (count($refs) > 1) {
+                    $links = $sep = "";
+                    foreach ($refs as $r) {
+                        $cont_loc = new ilLocatorGUI();
+                        $cont_loc->addContextItems($r, true);
+                        $links .= $sep . $cont_loc->getHTML();
+                        $sep = "<br />";
+                    }
+
+                    $info->addProperty(
+                        $this->lng->txt("res_links"),
+                        '<div class="small">' . $links . '</div>'
+                    );
+                }
+            }
+        }
+
         // File Info
         $info->addSection($this->lng->txt("file_info"));
         if ($kiosk_mode) {
@@ -934,54 +982,51 @@ class ilObjFileGUI extends ilObject2GUI
     protected function setTabs(): void
     {
         global $DIC;
-        $ilTabs = $DIC['ilTabs'];
-        $lng = $DIC['lng'];
         $ilHelp = $DIC['ilHelp'];
-
         $ilHelp->setScreenIdComponent(ilObjFile::OBJECT_TYPE);
 
         $this->ctrl->setParameter($this, "ref_id", $this->node_id);
 
         if ($this->checkPermissionBool("write")) {
-            $ilTabs->addTab(
+            $this->tabs_gui->addTab(
                 "id_versions",
-                $lng->txt(self::CMD_VERSIONS),
+                $this->lng->txt(self::CMD_VERSIONS),
                 $this->ctrl->getLinkTargetByClass(ilFileVersionsGUI::class, ilFileVersionsGUI::CMD_DEFAULT)
             );
         }
 
         if ($this->checkPermissionBool("visible") || $this->checkPermissionBool("read")) {
-            $ilTabs->addTab(
+            $this->tabs_gui->addTab(
                 "id_info",
-                $lng->txt("info_short"),
+                $this->lng->txt("info_short"),
                 $this->ctrl->getLinkTargetByClass(["ilobjfilegui", "ilinfoscreengui"], "showSummary")
             );
         }
 
         if ($this->checkPermissionBool("write")) {
-            $ilTabs->addTab(
+            $this->tabs_gui->addTab(
                 "settings",
-                $lng->txt("settings"),
+                $this->lng->txt("settings"),
                 $this->ctrl->getLinkTarget($this, self::CMD_EDIT)
             );
         }
 
         if (ilLearningProgressAccess::checkAccess($this->object->getRefId())) {
-            $ilTabs->addTab(
+            $this->tabs_gui->addTab(
                 'learning_progress',
-                $lng->txt('learning_progress'),
+                $this->lng->txt('learning_progress'),
                 $this->ctrl->getLinkTargetByClass([self::class, 'illearningprogressgui'], '')
             );
         }
 
         // meta data
         if ($this->checkPermissionBool("write")) {
-            $mdgui = new ilObjectMetaDataGUI($this->object);
+            $mdgui = new ilObjectMetaDataGUI($this->object, null, null, $this->call_by_reference);
             $mdtab = $mdgui->getTab();
             if ($mdtab) {
-                $ilTabs->addTab(
+                $this->tabs_gui->addTab(
                     "id_meta",
-                    $lng->txt("meta_data"),
+                    $this->lng->txt("meta_data"),
                     $mdtab
                 );
             }
@@ -989,15 +1034,35 @@ class ilObjFileGUI extends ilObject2GUI
 
         // export
         if ($this->checkPermissionBool("write")) {
-            $ilTabs->addTab(
+            $this->tabs_gui->addTab(
                 "export",
-                $lng->txt("export"),
+                $this->lng->txt("export"),
                 $this->ctrl->getLinkTargetByClass("ilexportgui", "")
             );
         }
 
         // will add permission tab if needed
         parent::setTabs();
+    }
+
+    protected function initSettingsTab(): void
+    {
+        $this->tabs_gui->activateTab("settings");
+        // add subtab for common settings
+        $this->tabs_gui->addSubTab(
+            'file_settings',
+            $this->lng->txt('settings'),
+            $this->ctrl->getLinkTargetByClass(self::class, self::CMD_EDIT)
+        );
+        if (in_array('file', ilAdvancedMDRecord::_getActivatedObjTypes(), true)) {
+            $this->tabs_gui->addSubTab(
+                'service_settings',
+                $this->lng->txt('service_settings'),
+                $this->ctrl->getLinkTargetByClass(ilFileCommonSettingsGUI::class, ilFileCommonSettingsGUI::CMD_EDIT)
+            );
+        }
+
+        $this->tabs_gui->activateSubTab("file_settings");
     }
 
     public static function _goto($a_target, $a_additional = null): void

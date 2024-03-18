@@ -821,8 +821,23 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                 }
             }
         }
-        $top_threads = $this->factory->item()->group($this->lng->txt('top_thema'), $top_group);
-        $normal_threads = $this->factory->item()->group($this->lng->txt('thema'), $thread_group);
+
+        $found_threads = false;
+        if(count($top_group) > 0) {
+            $top_threads = $this->factory->item()->group($this->lng->txt('top_thema'), $top_group);
+            $found_threads = true;
+        } else {
+            $top_threads = $this->factory->item()->group('', $top_group);
+        }
+
+        if(count($thread_group) > 0) {
+            $normal_threads = $this->factory->item()->group($this->lng->txt('thema'), $thread_group);
+            $found_threads = true;
+        } else {
+            $normal_threads = $this->factory->item()->group('', $thread_group);
+        }
+
+
         $url = $this->http->request()->getRequestTarget();
         $current_page = 0;
         if ($this->http->wrapper()->query()->has(ilForumProperties::PAGE_NAME_THREAD_OVERVIEW)) {
@@ -839,10 +854,18 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                                         ->withPageSize(ilForumProperties::PAGE_SIZE_THREAD_OVERVIEW)
                                         ->withCurrentPage($current_page);
 
-        $vc_container = $this->factory->panel()->standard(
-            $this->lng->txt('thread_overview'),
-            [$top_threads, $normal_threads]
-        )->withViewControls($view_control);
+        if ($found_threads === false) {
+            $vc_container = $this->factory->panel()->listing()->standard(
+                $this->lng->txt('thread_overview'),
+                [$this->factory->item()->group($this->lng->txt('frm_no_threads'), [])]);
+        } else {
+            $vc_container = $this->factory->panel()->listing()->standard(
+                $this->lng->txt('thread_overview'),
+                [$top_threads, $normal_threads]
+            )->withViewControls($view_control);
+        }
+
+
 
         $default_html = $this->renderer->render($vc_container);
         $modals = $this->renderer->render($this->modal_collection);
@@ -857,6 +880,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
         );
         $forwarder->setPresentationMode(ilForumPageCommandForwarder::PRESENTATION_MODE_PRESENTATION);
         $this->initStyleSheets();
+
         $this->tpl->setContent($forwarder->forward() . $default_html . $modals);
     }
 
@@ -2026,11 +2050,12 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
 
         $this->tpl->setTitleIcon(ilObject::_getIcon(0, "big", "frm"));
 
-        $ref_id = $this->retrieveRefId();
-
         $this->tabs_gui->setBackTarget(
             $this->lng->txt('frm_all_threads'),
-            'ilias.php?baseClass=ilRepositoryGUI&amp;ref_id=' . $ref_id
+            $this->ctrl->getLinkTarget(
+                $this,
+                'showThreads'
+            )
         );
 
         /** @var ilForum $frm */
@@ -4137,6 +4162,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
         $default_form->addInputItem(ilForumThreadFormGUI::MESSAGE_INPUT);
         $default_form->addInputItem(ilForumThreadFormGUI::FILE_UPLOAD_INPUT);
         $default_form->addInputItem(ilForumThreadFormGUI::ALLOW_NOTIFICATION_INPUT);
+        $default_form->addInputItem(ilForumThreadFormGUI::AUTOSAVE_INFO);
 
         $default_form->generateDefaultForm();
 
@@ -5933,10 +5959,16 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
             $modal->setHeading($this->lng->txt('restore_draft_from_autosave'));
             $modal->setId('frm_autosave_restore');
             $form_tpl = new ilTemplate('tpl.restore_thread_draft.html', true, true, 'Modules/Forum');
+            $first_open = null;
 
             foreach ($draftsFromHistory as $history_instance) {
                 $accordion = new ilAccordionGUI();
                 $accordion->setId('acc_' . $history_instance->getHistoryId());
+                $accordion->setBehaviour(ilAccordionGUI::ALL_CLOSED);
+                if ($first_open === null) {
+                    $first_open = $history_instance->getHistoryId();
+                    $accordion->setBehaviour(ilAccordionGUI::FIRST_OPEN);
+                }
 
                 $form_tpl->setCurrentBlock('list_item');
                 $message = ilRTE::_replaceMediaObjectImageSrc($history_instance->getPostMessage(), 1);
@@ -5946,7 +5978,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                     IL_CAL_DATETIME
                 ));
                 $this->ctrl->setParameter($this, 'history_id', $history_instance->getHistoryId());
-                $header = $history_date;
+                $header = $history_date . ': ' . $history_instance->getPostSubject();
 
                 $accordion_tpl = new ilTemplate(
                     'tpl.restore_thread_draft_accordion_content.html',
@@ -5954,7 +5986,6 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                     true,
                     'Modules/Forum'
                 );
-                $accordion_tpl->setVariable('HEADER', $history_instance->getPostSubject());
                 $accordion_tpl->setVariable('MESSAGE', $message);
                 $accordion_tpl->setVariable(
                     'BUTTON',

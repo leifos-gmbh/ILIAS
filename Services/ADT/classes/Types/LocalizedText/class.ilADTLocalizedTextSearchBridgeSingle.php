@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 class ilADTLocalizedTextSearchBridgeSingle extends ilADTTextSearchBridgeSingle
 {
@@ -119,8 +119,12 @@ class ilADTLocalizedTextSearchBridgeSingle extends ilADTTextSearchBridgeSingle
     public function isInCondition(ilADT $a_adt): bool
     {
         if ($this->getADT()->getCopyOfDefinition()->isComparableTo($a_adt)) {
-            foreach ($a_adt->getTranslations() as $language => $txt) {
-                if (strcasecmp($txt, $this->getADT()->getText()) === 0) {
+            $relevant_translation = $a_adt->getCopyOfDefinition()->getMultilingualValueSupport() ?
+                $a_adt->getTranslations() :
+                [$a_adt->getTextForLanguage($a_adt->getCopyOfDefinition()->getDefaultLanguage())];
+
+            foreach ($relevant_translation as $txt) {
+                if (str_contains(strtolower($txt), strtolower($this->getADT()->getText()))) {
                     return true;
                 }
             }

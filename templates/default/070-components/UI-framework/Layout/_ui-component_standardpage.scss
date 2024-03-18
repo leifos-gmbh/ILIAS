@@ -80,6 +80,7 @@ header {
 .breadcrumbs {
 	position: sticky;
 	top: 0;
+	min-height: $il-standard-page-breadcrumbs-height;
 	align-items: center;
 	background-color: $il-standard-page-breadcrumbs-bg-color;
 	display: flex;
@@ -103,7 +104,7 @@ div.il-system-infos {
     display: flex;
     flex-direction: row;
     height: $il-standard-page-header-height;
-    padding: 0 15px;
+    padding: 0 $il-padding-xlarge-horizontal;
     position: fixed;
     width: 100%;
     justify-content: space-between;
@@ -314,6 +315,7 @@ footer {
 	header {
 		position: -webkit-sticky;
 		position: sticky;
+		overflow-x: clip;
 		width: 100%;
 		top: 0;
 	}
@@ -322,7 +324,6 @@ footer {
 	.header-inner {
 		position: relative;
 	    height: $il-standard-page-small-header-height;
-	    padding: 0;
 	    width: 100%;
 		box-shadow: $il-standard-page-header-shadow-bottom;
 	}
@@ -508,8 +509,7 @@ footer {
 				display: none !important;
 			}
 		}
-		.il-layout-page-content,
-		.il-layout-page-content div	{
+		.il-layout-page-content {
 			display: block;
 		}
 	}

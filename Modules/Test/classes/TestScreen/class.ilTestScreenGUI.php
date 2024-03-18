@@ -27,6 +27,7 @@ use ILIAS\UI\Component\MessageBox\MessageBox;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\HTTP\Services as HTTPServices;
+use ILIAS\Refinery\Factory as Refinery;
 
 /**
  * Class ilTestScreenGUI
@@ -47,6 +48,7 @@ class ilTestScreenGUI
         private readonly UIFactory $ui_factory,
         private readonly UIRenderer $ui_renderer,
         private readonly ilLanguage $lng,
+        private readonly Refinery $refinery,
         private readonly ilCtrl $ctrl,
         private readonly ilGlobalTemplateInterface $tpl,
         private readonly HTTPServices $http,
@@ -89,7 +91,11 @@ class ilTestScreenGUI
         $elements = $this->handleRenderMessageBox($elements);
         $elements = $this->handleRenderIntroduction($elements);
 
-        $this->tpl->setContent($this->ui_renderer->render(!$this->object->getOfflineStatus() ? $this->handleRenderLauncher($elements) : $elements));
+        $this->tpl->setContent(
+            $this->ui_renderer->render(
+                $this->testCanBeStarted() ? $this->handleRenderLauncher($elements) : $elements
+            )
+        );
     }
 
     private function handleRenderMessageBox(array $elements): array
@@ -301,10 +307,18 @@ class ilTestScreenGUI
         }
 
         if ($this->main_settings->getAccessSettings()->getPasswordEnabled()) {
-            $modal_inputs['exam_password'] = $this->ui_factory->input()->field()->text(
+            $modal_inputs['exam_password'] = $this->ui_factory->input()->field()->password(
                 $this->lng->txt('tst_exam_password'),
                 $this->lng->txt('tst_exam_password_label')
-            )->withRequired(true);
+            )->withRevelation(true)
+            ->withRequired(true)
+            ->withAdditionalTransformation(
+                $this->refinery->custom()->transformation(
+                    static function (ILIAS\Data\Password $value): string {
+                        return $value->toString();
+                    }
+                )
+            );
         }
 
         if ($this->user->isAnonymous()) {
@@ -322,7 +336,7 @@ class ilTestScreenGUI
         }
 
         if ($this->main_settings->getParticipantFunctionalitySettings()->getUsePreviousAnswerAllowed()
-            && $this->test_passes_selector->hasTestPassedOnce($this->test_session->getActiveId())) {
+            && $this->test_passes_selector->getLastFinishedPass() >= 0) {
             $modal_inputs['exam_use_previous_answers'] = $this->ui_factory->input()->field()->checkbox(
                 $this->lng->txt('tst_exam_use_previous_answers'),
                 $this->lng->txt('tst_exam_use_previous_answers_label')
@@ -422,6 +436,16 @@ class ilTestScreenGUI
         }
     }
 
+    private function testCanBeStarted(): bool
+    {
+        if ($this->object->getOfflineStatus()
+            || !$this->object->isComplete($this->object->getQuestionSetConfig())) {
+            return false;
+        }
+
+        return true;
+    }
+
     private function isUserOutOfProcessingTime(): bool
     {
         $test_behaviour_settings = $this->object->getMainSettings()->getTestBehaviourSettings();
@@ -473,7 +497,7 @@ class ilTestScreenGUI
             $this->main_settings->getIntroductionSettings()->getExamConditionsCheckboxEnabled()
             || $this->main_settings->getAccessSettings()->getPasswordEnabled()
             || $this->main_settings->getParticipantFunctionalitySettings()->getUsePreviousAnswerAllowed()
-                && $this->test_passes_selector->hasTestPassedOnce($this->test_session->getActiveId())
+                && $this->test_passes_selector->getLastFinishedPass() >= 0
             || $this->user->isAnonymous()
         );
     }

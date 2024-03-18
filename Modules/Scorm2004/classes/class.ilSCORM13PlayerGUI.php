@@ -363,6 +363,7 @@ class ilSCORM13PlayerGUI
 
         $initSuspendData = null;
         $initAdlactData = null;
+        $initGlobalobjData = null;
         if ($this->slm->getSequencing() == true) {
             $initSuspendData = json_decode($this->getSuspendDataInit());
             $initAdlactData = json_decode($this->getADLActDataInit());
@@ -1163,7 +1164,7 @@ class ilSCORM13PlayerGUI
                 while ($row = $ilDB->fetchAssoc($res)) {
                     $tmp_result = array();
                     foreach ($row as $key => $value) {
-                        if ($k === "comment" && $key === "c_timestamp" && strpos($value, ' ') == 10) {
+                        if ($k === "comment" && $key === "c_timestamp" && strpos((string) $value, ' ') == 10) {
                             $value = str_replace(' ', 'T', $value);
                         }
                         $tmp_result[] = $value;
@@ -1579,6 +1580,7 @@ class ilSCORM13PlayerGUI
     {
         global $DIC;
         $filename = ilUtil::stripSlashes($DIC->http()->wrapper()->query()->retrieve('logFile', $DIC->refinery()->kindlyTo()->string()));
+        $filename = str_replace('/', '', $filename);
         //Header
         header('Content-Type: text/html; charset=UTF-8');
         echo file_get_contents($this->logDirectory() . "/" . $filename);
@@ -1840,6 +1842,7 @@ class ilSCORM13PlayerGUI
         //delete files
         if ($logdata->action === "DELETE") {
             $filename = $logdata->value;
+            $filename = str_replace('/', '', $filename);
             $path = $this->logDirectory() . "/" . $filename;
             unlink($path);
             return;

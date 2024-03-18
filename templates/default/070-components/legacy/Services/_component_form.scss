@@ -136,6 +136,10 @@ input[type="checkbox"] {
 
 	// Placeholder
 	@include placeholder;
+	
+	&[required] {
+		@include placeholder($il-input-color);
+	}
 
 	// Unstyle the caret on `<select>`s in IE10+.
 	&::-ms-expand {
@@ -341,7 +345,6 @@ input[type="checkbox"] {
 	font-size: $il-standard-form-byline-font-size;
 
 	margin: $il-margin-large-vertical 0 $il-margin-large-horizontal;
-	padding: 0;
 
 	clear: both;
 
@@ -350,12 +353,7 @@ input[type="checkbox"] {
 	}
 
 	&.alert-danger {
-		margin: $il-margin-small-vertical 0 0;
-		padding: 0 $il-padding-small-vertical 0 $il-padding-small-vertical;
-
-		color: $il-alert-danger-text;
-		background-color: $il-alert-danger-bg;
-		border-color: $il-alert-danger-border;
+		margin-bottom: $il-margin-small-vertical;
 	}
 }
 
@@ -461,8 +459,28 @@ input[type="checkbox"] {
 
 	.form-group {
 		margin: 0px;
-		padding: $il-padding-base-vertical 0;
+		padding-top: $il-padding-base-vertical;
+		bottom: $il-padding-base-vertical;
 		background-color: $il-main-bg;
+	}
+
+	// In navbar-form, allow folks to *not* use `.form-group`
+	.row > {
+		input, textarea, select {
+			&.form-control {
+				margin-left: $il-padding-xxlarge-horizontal;
+			}
+		}
+
+		.btn, input.btn, .tox-tinymce, div.input {
+			margin-left: $il-padding-xxlarge-horizontal;
+		}
+
+		.tox-tinymce {
+			padding-left: 0;
+			padding-right: 0;
+		}
+
 	}
 
 	// Consistent vertical alignment of radios and checkboxes
@@ -488,6 +506,7 @@ input[type="checkbox"] {
 	label {
 		color: $il-standard-form-label-color;
 		font-size: 100%;
+		padding-right: $il-padding-xlarge-horizontal*2;
 	}
 
 	.control-label {
@@ -565,6 +584,12 @@ input[type="checkbox"] {
 
 	.col-sm-9.il_textarea {
 		width: 100%;
+	}
+}
+
+.ilFormRequired {
+	&--top {
+		padding-bottom: $il-padding-xs-horizontal;
 	}
 }
 
@@ -672,6 +697,8 @@ div.ilHFormFooter .ilFormCmds {
 .btn-file {
 	position: relative;
 	overflow: hidden;
+
+	@include il-focus-within-outline-only();
 }
 
 .btn-file input[type=file] {
@@ -688,14 +715,6 @@ div.ilHFormFooter .ilFormCmds {
 	background: white;
 	cursor: inherit;
 	display: block;
-}
-
-.ilFormInnerCol {
-	padding: 0;
-}
-
-.ilFormInnerCol .form-group {
-	margin: 0;
 }
 
 input:invalid {

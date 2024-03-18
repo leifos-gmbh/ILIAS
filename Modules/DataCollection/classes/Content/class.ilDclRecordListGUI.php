@@ -250,7 +250,7 @@ class ilDclRecordListGUI
             $file = $form->getInput("import_file");
             $file_location = $file["tmp_name"];
             $simulate = $form->getInput("simulate");
-            $this->importRecords($file_location, $simulate);
+            $this->importRecords($file_location, (bool)$simulate);
         } else {
             $this->showImportExcel($form);
         }
@@ -561,6 +561,8 @@ class ilDclRecordListGUI
             self::class,
             self::CMD_SHOW
         );
+        $this->ctrl->setParameterByClass(self::class, self::GET_TABLEVIEW_ID, $this->tableview_id);
+
     }
 
     protected function checkAccess(): bool

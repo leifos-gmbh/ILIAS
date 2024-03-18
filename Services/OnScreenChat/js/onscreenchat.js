@@ -73,7 +73,7 @@
 
 	$scope.il.OnScreenChat = {
 		config: {},
-		container: $('<div></div>').addClass('row').addClass('iosOnScreenChat'),
+		container: $('<div></div>').addClass('iosOnScreenChat'),
 		storage: undefined,
 		user: undefined,
 		historyBlocked: false,
@@ -195,7 +195,6 @@
 			$('body').append(
 				$('<div></div>')
 					.attr('id', 'onscreenchat-container')
-					.addClass('container')
 					.append(getModule().container)
 
 			);
@@ -251,16 +250,6 @@
 					scroll(getModule().onScroll);
 				getModule().container.append(conversationWindow);
 				getModule().addMessagesOnOpen(conversation);
-
-				conversationWindow.find('[data-toggle="tooltip"]').tooltip({
-					container: 'body',
-					viewport: { selector: 'body', padding: 10 }
-				});
-				conversationWindow.find('[data-toggle="participants-tooltip"]').tooltip({
-					container: 'body',
-					viewport: { selector: 'body', padding: 10 },
-					template: '<div class="tooltip ilOnScreenChatWindowHeaderTooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
-				});
 
 				newDomElementsCreated = true;
 			}
@@ -1157,11 +1146,6 @@
 			});
 
 			il.ExtLink.autolink(chatBody.find('[data-onscreenchat-body-msg]'));
-			chatBody.find('[data-toggle="tooltip"]').tooltip({
-				placement: 'left',
-				container: 'body',
-				viewport: { selector: 'body', padding: 10 }
-			});
 
 			if (prepend === false) {
 				getModule().scrollBottom(chatWindow);
@@ -1408,9 +1392,11 @@
 		let _participants = participants;
 
 		this.format = function () {
-			return $("<ul/>").append(_participants.map(function(elm) {
-				return $("<li/>").html("&raquo; "  + elm);
-			})).wrap("<div/>").parent().html();
+			let i = 1;
+
+			return _participants.map(function(elm) {
+				return (i++ + ". ") + elm
+			}).join(" / ");
 		};
 	};
 

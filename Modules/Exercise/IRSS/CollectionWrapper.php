@@ -25,6 +25,10 @@ use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Exercise\InternalDataService;
 use ILIAS\ResourceStorage\Identification\ResourceIdentification;
+use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\Filesystem\Stream\FileStream;
+use ILIAS\Filesystem\Stream\Streams;
+use ILIAS\Filesystem\Util\LegacyPathHelper;
 
 class CollectionWrapper
 {
@@ -73,6 +77,21 @@ class CollectionWrapper
         $this->irss->collection()->remove($id, $stakeholder, true);
     }
 
+    public function copyResourcesToDir(
+        string $rcid,
+        ResourceStakeholder $stakeholder,
+        string $dir
+    ) {
+        $collection = $this->irss->collection()->get($this->irss->collection()->id($rcid));
+        foreach ($collection->getResourceIdentifications() as $rid) {
+            $info = $this->irss->manage()->getResource($rid)
+                               ->getCurrentRevision()
+                               ->getInformation();
+            $stream = $this->irss->consume()->stream($rid);
+            $stream->getContents();
+        }
+    }
+
     public function importFilesFromLegacyUploadToCollection(
         ResourceCollection $collection,
         array $file_input,
@@ -105,6 +124,38 @@ class CollectionWrapper
             // we store the collection after all files have been added
             $this->irss->collection()->store($collection);
         }
+    }
+
+    public function importFilesFromDirectoryToCollection(
+        ResourceCollection $collection,
+        string $directory,
+        ResourceStakeholder $stakeholder
+    ): void {
+        $sourceFS = LegacyPathHelper::deriveFilesystemFrom($directory);
+        $sourceDir = LegacyPathHelper::createRelativePath($directory);
+
+        // check if arguments are directories
+        if (!$sourceFS->hasDir($sourceDir)) {
+            return;
+        }
+
+        $sourceList = $sourceFS->listContents($sourceDir, false);
+
+        foreach ($sourceList as $item) {
+            if ($item->isDir()) {
+                continue;
+            }
+            try {
+                $stream = $sourceFS->readStream($item->getPath());
+                $rid = $this->irss->manage()->stream(
+                    $stream,
+                    $stakeholder
+                );
+                $collection->add($rid);
+            } catch (\ILIAS\Filesystem\Exception\FileAlreadyExistsException $e) {
+            }
+        }
+        $this->irss->collection()->store($collection);
     }
 
     protected function getResourceIdForIdString(string $rid): ?ResourceIdentification
@@ -143,12 +194,38 @@ class CollectionWrapper
         return "";
     }
 
+    public function importFileFromUploadResult(
+        UploadResult $result,
+        ResourceStakeholder $stakeholder
+    ): string {
+        // if the result is not OK, we skip it
+        if (!$result->isOK()) {
+            return "";
+        }
+
+        // we store the file in the IRSS
+        $rid = $this->irss->manage()->upload(
+            $result,
+            $stakeholder
+        );
+        return $rid->serialize();
+    }
+
     public function deliverFile(string $rid): void
     {
         $id = $this->getResourceIdForIdString($rid);
         if ($id) {
             $this->irss->consume()->download($id)->run();
         }
+    }
+
+    public function stream(string $rid): ?FileStream
+    {
+        $id = $this->getResourceIdForIdString($rid);
+        if ($id) {
+            return $this->irss->consume()->stream($id)->getStream();
+        }
+        return null;
     }
 
     public function getCollectionResourcesInfo(
@@ -190,4 +267,32 @@ class CollectionWrapper
         return "";
     }
 
+    public function deleteResource(string $rid, ResourceStakeholder $stakeholder): void
+    {
+        if ($rid !== "") {
+            $res = $this->getResourceIdForIdString($rid);
+            if ($res) {
+                $this->irss->manage()->remove($this->getResourceIdForIdString($rid), $stakeholder);
+            }
+        }
+    }
+
+    public function addEntryOfZipResourceToCollection(
+        string $rid,
+        string $entry,
+        ResourceCollection $target_collection,
+        ResourceStakeholder $target_stakeholder
+    ) {
+        $entry_parts = explode("/", $entry);
+        $zip = new \ZipArchive();
+        if ($zip->open($this->stream($rid)->getMetadata()['uri'], \ZipArchive::RDONLY)) {
+            $feedback_rid = $this->irss->manage()->stream(
+                Streams::ofResource($zip->getStream($entry)),
+                $target_stakeholder,
+                $entry_parts[2]
+            );
+            $target_collection->add($feedback_rid);
+            $this->irss->collection()->store($target_collection);
+        }
+    }
 }

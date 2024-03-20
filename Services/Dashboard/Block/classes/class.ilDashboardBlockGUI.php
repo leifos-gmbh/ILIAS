@@ -18,6 +18,8 @@
 
 declare(strict_types=1);
 
+use ILIAS\HTTP\Services;
+use ILIAS\Refinery\Factory;
 use ILIAS\UI\Implementation\Component\ReplaceSignal;
 use JetBrains\PhpStorm\NoReturn;
 use ILIAS\UI\Component\Card\RepositoryObject;
@@ -42,8 +44,8 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
     private mixed $objDefinition;
     protected ilSetting $settings;
     protected ilLogger $logging;
-    protected ILIAS\HTTP\Services $http;
-    private ILIAS\Refinery\Factory $refinery;
+    protected Services $http;
+    private Factory $refinery;
     protected ilPDSelectedItemsBlockViewSettings $viewSettings;
     /** @var array<string, BlockDTO[]> */
     protected array $data;
@@ -284,7 +286,6 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
         uasort($groups['ended'], $orderByDate);
         $groups['not_dated'] = $this->sortByTitle($groups['not_dated']);
 
-        // map keys to titles
         foreach ($groups as $key => $group) {
             $groups[$this->lng->txt('pd_' . $key)] = $group;
             unset($groups[$key]);
@@ -304,13 +305,6 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
         $data = $this->getData();
         /** @var BlockDTO[] $data */
         $data = array_merge(...array_values($data));
-        $provider = new ilPDSelectedItemsBlockMembershipsProvider($this->viewSettings->getActor());
-
-        foreach ($data as $item) {
-            if (isset($object_types_by_container[$item->getType()])) {
-                $object_types_by_container[$item->getType()]['items'][] = $item;
-            }
-        }
 
         foreach ($object_types_by_container as $type_title => $type) {
             if (!$this->objDefinition->isPlugin($type_title)) {
@@ -320,8 +314,10 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
                 $title = $pl->txt("objs_" . $type_title);
             }
 
-            if (isset($type['items'])) {
-                $grouped_items[$title] = $type['items'];
+            foreach ($data as $item) {
+                if (in_array($item->getType(), $type['objs'])) {
+                    $grouped_items[$title][] = $item;
+                }
             }
         }
 
@@ -692,9 +688,6 @@ abstract class ilDashboardBlockGUI extends ilBlockGUI implements ilDesktopItemHa
 
     abstract public function confirmedRemoveObject(): void;
 
-    /**
-     * @throws ilException
-     */
     public function byType(string $a_type): ilObjectListGUI
     {
         $class = $this->objDefinition->getClassName($a_type);

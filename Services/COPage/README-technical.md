@@ -12,7 +12,7 @@ In order to use the page component in your component you first need to extend yo
 	</copage>
 ```
 
-The `{PARENT_TYPE}` should be unique through the ILIAS code base, e.g. this could be the module repository type of your component.
+The `{PARENT_TYPE}` should be unique through the ILIAS code base, e.g. this could be the module repository type of your component. But please note that page parent types and repository object types are not the same. Some repository components may implementy multiple page parent types, others may share the same parent page type, e.g. container pages.
 
 You will need implement new classes in your component that derive from these classes of the COPage component:
 
@@ -41,6 +41,19 @@ public function getParentType()
 ```
 
 Please do not overwrite the constructor of this class.
+
+**Setting the Page Parent ID**
+
+If your page belongs to a repository object, set the parent ID of the page to the object ID of your repository object when creating new pages:
+
+```
+  $new_page_object = new ...();
+  $new_page_object->setParentId($this->object->getId());   // $this->object is an ilObject instance
+  ...
+```
+
+This will enable the default WAC checking for embedded media objects.
+
 
 **class {BASIC_CLASS_NAME}GUI extends \ilPageObjectGUI**
 
@@ -77,6 +90,63 @@ public function init()
 Depending on where you want to use the presentation or editing features of the component, you will need to init and embed your {BASIC_CLASS_NAME}GUI in your `executeCommand()` methods.
 
 A good example for how this can be done is `Modules/ContentPage/classes/class.ilContentPagePageCommandForwarder.php`.
+
+** Import / Export **
+
+To add pages to the export, you need to add tail dependencies for the COPage component:
+
+```
+    public function getXmlExportTailDependencies(
+        string $a_entity,
+        string $a_target_release,
+        array $a_ids
+    ): array {
+        $deps = [];
+
+        if ($a_entity == "...") {
+        
+            $your_page_parent_type = "...";
+            $pg_ids = [];
+        
+            // get all page IDs and prefix them with your parent type
+            foreach ($a_ids as $obj_id) {
+                $pg_ids = array_merge($pg_ids, array_map(static function ($i) {
+                    return $your_page_parent_type . ":" $i;
+                }, yourFunctionToGetAllPageIds($obj_id));
+            }
+
+            $deps = array(
+                array(
+                    "component" => "Services/COPage",
+                    "entity" => "pg",
+                    "ids" => $pg_ids),
+            );
+
+        }
+
+        return $deps;
+    }
+```
+
+On import you need to add a mapping for your pages. Since your component has to manage the page IDs (COPage will not create these) you need to tell the COPage importer the mapping between import ID and the new ID for the page. This might happen in your importXmlRepresentation() method of your importer class or in importRecord() method when using datasets:
+
+```
+    public function importXmlRepresentation(string $a_entity, string $a_id, string $a_xml, ilImportMapping $a_mapping): void
+    {
+        ...
+        $your_page_parent_type = "...";
+        $a_mapping->addMapping(
+            "Services/COPage",
+            "pg",
+            $your_page_parent_type . ":" . $old_id,
+            $your_page_parent_type . ":" . $new_id
+        );
+        ...
+    }
+```
+
+Since the COPage dependency is a tail dependency, it will run after your import methods and assign the pages with the old import IDs to the new IDs.
+
 
 ### Implementing new page components
 

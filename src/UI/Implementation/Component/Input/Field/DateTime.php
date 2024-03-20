@@ -243,9 +243,6 @@ class DateTime extends FormInput implements C\Input\Field\DateTime
 			il.UI.input.onFieldUpdate(event, '$id', $('#$id').find('input').val());";
     }
 
-    /**
-     * @inheritdoc
-     */
     public function isComplex(): bool
     {
         return false;

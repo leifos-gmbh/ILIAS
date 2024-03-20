@@ -35,6 +35,7 @@ use ILIAS\UI\Implementation\Component\JavaScriptBindable;
 use ILIAS\FileUpload\Handler\FileInfoResult;
 use ILIAS\Data\DataSize;
 use ILIAS\UI\Implementation\Component\Input\Input;
+use ILIAS\UI\Implementation\Component\Input\Container\Filter\ProxyFilterField;
 
 /**
  * Class Renderer
@@ -106,34 +107,34 @@ class Renderer extends AbstractComponentRenderer
                 return $default_renderer->render($component->getInputs());
 
             case ($component instanceof F\Text):
-                return $this->renderTextField($component);
+                return $this->renderTextField($component, $default_renderer);
 
             case ($component instanceof F\Numeric):
-                return $this->renderNumericField($component);
+                return $this->renderNumericField($component, $default_renderer);
 
             case ($component instanceof F\Checkbox):
-                return $this->renderCheckboxField($component);
+                return $this->renderCheckboxField($component, $default_renderer);
 
             case ($component instanceof F\Tag):
-                return $this->renderTagField($component);
+                return $this->renderTagField($component, $default_renderer);
 
             case ($component instanceof F\Password):
                 return $this->renderPasswordField($component, $default_renderer);
 
             case ($component instanceof F\Select):
-                return $this->renderSelectField($component);
+                return $this->renderSelectField($component, $default_renderer);
 
             case ($component instanceof F\Markdown):
                 return $this->renderMarkdownField($component, $default_renderer);
 
             case ($component instanceof F\Textarea):
-                return $this->renderTextareaField($component);
+                return $this->renderTextareaField($component, $default_renderer);
 
             case ($component instanceof F\Radio):
-                return $this->renderRadioField($component);
+                return $this->renderRadioField($component, $default_renderer);
 
             case ($component instanceof F\MultiSelect):
-                return $this->renderMultiSelectField($component);
+                return $this->renderMultiSelectField($component, $default_renderer);
 
             case ($component instanceof F\DateTime):
                 return $this->renderDateTimeField($component, $default_renderer);
@@ -142,13 +143,13 @@ class Renderer extends AbstractComponentRenderer
                 return $this->renderFileField($component, $default_renderer);
 
             case ($component instanceof F\Url):
-                return $this->renderUrlField($component);
+                return $this->renderUrlField($component, $default_renderer);
 
             case ($component instanceof F\Hidden):
                 return $this->renderHiddenField($component);
 
             case ($component instanceof F\ColorPicker):
-                return $this->renderColorPickerField($component);
+                return $this->renderColorPickerField($component, $default_renderer);
 
             default:
                 throw new LogicException("Cannot render '" . get_class($component) . "'");
@@ -158,6 +159,7 @@ class Renderer extends AbstractComponentRenderer
     protected function wrapInFormContext(
         FormInput $component,
         string $input_html,
+        RendererInterface $default_renderer,
         string $id_pointing_to_input = '',
         string $dependant_group_html = '',
         bool $bind_label_with_for = true
@@ -209,7 +211,7 @@ class Renderer extends AbstractComponentRenderer
         return $name;
     }
 
-    protected function bindJSandApplyId(FormInput $component, Template $tpl): string
+    protected function bindJSandApplyId(FormInput|ProxyFilterField $component, Template $tpl): string
     {
         $id = $this->bindJavaScript($component) ?? $this->createId();
         $tpl->setVariable("ID", $id);
@@ -255,7 +257,7 @@ class Renderer extends AbstractComponentRenderer
         };
     }
 
-    protected function renderTextField(F\Text $component): string
+    protected function renderTextField(F\Text $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.text.html", true, true);
         $this->applyName($component, $tpl);
@@ -267,20 +269,20 @@ class Renderer extends AbstractComponentRenderer
         $this->applyValue($component, $tpl, $this->escapeSpecialChars());
         $this->maybeDisable($component, $tpl);
         $id = $this->bindJSandApplyId($component, $tpl);
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
-    protected function renderNumericField(F\Numeric $component): string
+    protected function renderNumericField(F\Numeric $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.numeric.html", true, true);
         $this->applyName($component, $tpl);
         $this->applyValue($component, $tpl, $this->escapeSpecialChars());
         $this->maybeDisable($component, $tpl);
         $id = $this->bindJSandApplyId($component, $tpl);
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
-    protected function renderCheckboxField(F\Checkbox $component): string
+    protected function renderCheckboxField(F\Checkbox $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.checkbox.html", true, true);
         $this->applyName($component, $tpl);
@@ -292,7 +294,7 @@ class Renderer extends AbstractComponentRenderer
         $this->maybeDisable($component, $tpl);
         $id = $this->bindJSandApplyId($component, $tpl);
 
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
     protected function renderOptionalGroup(F\OptionalGroup $component, RendererInterface $default_renderer): string
@@ -316,7 +318,7 @@ class Renderer extends AbstractComponentRenderer
         $this->maybeDisable($component, $tpl);
         $id = $this->bindJSandApplyId($component, $tpl);
 
-        return $this->wrapInFormContext($component, $tpl->get(), $id, $dependant_group_html);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id, $dependant_group_html);
     }
 
     protected function renderSwitchableGroup(F\SwitchableGroup $component, RendererInterface $default_renderer): string
@@ -357,10 +359,10 @@ class Renderer extends AbstractComponentRenderer
             $tpl->parseCurrentBlock();
         }
 
-        return $this->wrapInFormContext($component, $tpl->get());
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer);
     }
 
-    protected function renderTagField(F\Tag $component): string
+    protected function renderTagField(F\Tag $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.tag_input.html", true, true);
         $this->applyName($component, $tpl);
@@ -391,7 +393,7 @@ class Renderer extends AbstractComponentRenderer
             $tpl->setVariable("READONLY", "readonly");
         }
 
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
     protected function renderPasswordField(F\Password $component, RendererInterface $default_renderer): string
@@ -429,10 +431,10 @@ class Renderer extends AbstractComponentRenderer
         $tpl->setVariable('ID_CONTAINER', $id . "_container");
         $this->applyValue($component, $tpl, $this->escapeSpecialChars());
         $this->maybeDisable($component, $tpl);
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
-    public function renderSelectField(F\Select $component): string
+    public function renderSelectField(F\Select $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.select.html", true, true);
         $this->applyName($component, $tpl);
@@ -467,7 +469,7 @@ class Renderer extends AbstractComponentRenderer
         $this->maybeDisable($component, $tpl);
         $id = $this->bindJSandApplyId($component, $tpl);
 
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
     protected function renderMarkdownField(F\Markdown $component, RendererInterface $default_renderer): string
@@ -533,10 +535,10 @@ class Renderer extends AbstractComponentRenderer
         }
 
         // label must point to the wrapped textarea input, not the markdown input.
-        return $this->wrapInFormContext($component, $markdown_tpl->get(), $textarea_id);
+        return $this->wrapInFormContext($component, $markdown_tpl->get(), $default_renderer, $textarea_id);
     }
 
-    protected function renderTextareaField(F\Textarea $component): string
+    protected function renderTextareaField(F\Textarea $component, RendererInterface $default_renderer): string
     {
         /** @var $component F\Textarea */
         $component = $component->withAdditionalOnLoadCode(
@@ -550,7 +552,7 @@ class Renderer extends AbstractComponentRenderer
         $tpl = $this->getPreparedTextareaTemplate($component);
         $id = $this->bindJSandApplyId($component, $tpl);
 
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
     protected function getPreparedTextareaTemplate(F\Textarea $component): Template
@@ -574,7 +576,7 @@ class Renderer extends AbstractComponentRenderer
         return $tpl;
     }
 
-    protected function renderRadioField(F\Radio $component): string
+    protected function renderRadioField(F\Radio $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.radio.html", true, true);
         $id = $this->bindJSandApplyId($component, $tpl);
@@ -603,10 +605,10 @@ class Renderer extends AbstractComponentRenderer
             $tpl->parseCurrentBlock();
         }
 
-        return $this->wrapInFormContext($component, $tpl->get());
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer);
     }
 
-    protected function renderMultiSelectField(F\MultiSelect $component): string
+    protected function renderMultiSelectField(F\MultiSelect $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.multiselect.html", true, true);
         $id = $this->bindJSandApplyId($component, $tpl);
@@ -635,14 +637,14 @@ class Renderer extends AbstractComponentRenderer
             $tpl->touchBlock("no_options");
         }
 
-        return $this->wrapInFormContext($component, $tpl->get());
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
     protected function renderDateTimeField(F\DateTime $component, RendererInterface $default_renderer): string
     {
         list($component, $tpl) = $this->internalRenderDateTimeField($component, $default_renderer);
         $id = $this->bindJSandApplyId($component, $tpl);
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
     /**
@@ -708,7 +710,7 @@ class Renderer extends AbstractComponentRenderer
         $input = array_shift($inputs); //from
         list($input, $tpl) = $this->internalRenderDateTimeField($input, $default_renderer);
         $first_input_id = $this->bindJSandApplyId($input, $tpl);
-        $input_html = $this->wrapInFormContext($input, $tpl->get(), $first_input_id);
+        $input_html = $this->wrapInFormContext($input, $tpl->get(), $default_renderer, $first_input_id);
 
         $input = array_shift($inputs) //until
             ->withAdditionalPickerconfig(['useCurrent' => false]);
@@ -718,7 +720,7 @@ class Renderer extends AbstractComponentRenderer
         $id = $this->bindJSandApplyId($component, $tpl);
         $tpl->setVariable('DURATION', $input_html);
 
-        return $this->wrapInFormContext($component, $tpl->get(), $first_input_id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
     protected function renderSection(F\Section $section, RendererInterface $default_renderer): string
@@ -747,14 +749,14 @@ class Renderer extends AbstractComponentRenderer
         return $section_tpl->get();
     }
 
-    protected function renderUrlField(F\Url $component): string
+    protected function renderUrlField(F\Url $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.url.html", true, true);
         $this->applyName($component, $tpl);
         $this->applyValue($component, $tpl, $this->escapeSpecialChars());
         $this->maybeDisable($component, $tpl);
         $id = $this->bindJSandApplyId($component, $tpl);
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 
     protected function renderFileField(FI\File $input, RendererInterface $default_renderer): string
@@ -804,6 +806,7 @@ class Renderer extends AbstractComponentRenderer
         return $this->wrapInFormContext(
             $input,
             $template->get(),
+            $default_renderer,
             $js_id,
             "",
             false
@@ -1042,13 +1045,13 @@ class Renderer extends AbstractComponentRenderer
         return $mime_type_string;
     }
 
-    protected function renderColorPickerField(F\ColorPicker $component): string
+    protected function renderColorPickerField(F\ColorPicker $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.colorpicker.html", true, true);
         $this->applyName($component, $tpl);
         $tpl->setVariable('VALUE', $component->getValue());
         $id = $this->bindJSandApplyId($component, $tpl);
 
-        return $this->wrapInFormContext($component, $tpl->get());
+        return $this->wrapInFormContext($component, $tpl->get(), $default_renderer, $id);
     }
 }

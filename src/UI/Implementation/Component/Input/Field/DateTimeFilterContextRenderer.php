@@ -23,7 +23,6 @@ namespace ILIAS\UI\Implementation\Component\Input\Field;
 use ILIAS\UI\Renderer as RendererInterface;
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
 use ILIAS\UI\Implementation\Render\Template;
-use ILIAS\UI\Component\Input\Container\Filter\FilterInput;
 
 /**
  * Class DateTimeContextRenderer
@@ -31,17 +30,19 @@ use ILIAS\UI\Component\Input\Container\Filter\FilterInput;
  */
 class DateTimeFilterContextRenderer extends FilterContextRenderer
 {
-    protected function wrapInFilterContext(
-        FilterInput $component,
+    protected function wrapInFormContext(
+        FormInput $component,
         string $input_html,
         RendererInterface $default_renderer,
-        string $id_pointing_to_input = ""
+        string $id_pointing_to_input = '',
+        string $dependant_group_html = '',
+        bool $bind_label_with_for = true
     ): string {
         $tpl = $this->getTemplate("tpl.context_form.html", true, true);
 
         $tpl->setVariable("INPUT", $input_html);
 
-        if ($id_pointing_to_input) {
+        if ($id_pointing_to_input && $bind_label_with_for) {
             $tpl->setCurrentBlock("for");
             $tpl->setVariable("ID", $id_pointing_to_input);
             $tpl->parseCurrentBlock();

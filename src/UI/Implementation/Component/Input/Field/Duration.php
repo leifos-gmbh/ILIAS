@@ -321,9 +321,6 @@ class Duration extends Group implements C\Input\Field\Duration
         return $clone;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function isComplex(): bool
     {
         return true;

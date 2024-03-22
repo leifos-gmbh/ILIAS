@@ -1282,7 +1282,12 @@ class ilObject
     {
         global $DIC;
 
-        $ilObjDataCache = $DIC["ilObjDataCache"];
+        // cdpatch: added if and else branch to make update 5.4 -> 7 work
+        if (isset($DIC["ilObjDataCache"])) {
+            $ilObjDataCache = $DIC["ilObjDataCache"];
+        } else {
+            $ilObjDataCache = new ilObjectDataCache();
+        }
 
         if ($a_reference) {
             return $ilObjDataCache->lookupType($ilObjDataCache->lookupObjId($a_id));

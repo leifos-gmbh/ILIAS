@@ -958,7 +958,44 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
         $ev->setItems($items);
         $ev->update();
     }
-    
+
+    // cdpatch start
+    public function uploadMaterialObject()
+    {
+        global $tree, $ilCtrl, $lng;
+
+        include_once './Modules/Session/classes/class.ilEventItems.php';
+        $ev = new ilEventItems($this->object->getId());
+        $items = $ev->getItems();
+//var_dump($_FILES); exit;
+        if (strlen($_FILES['new_file']['name'])) {
+            include_once './Modules/File/classes/class.ilObjFile.php';
+            $file = new ilObjFile();
+            $file->setTitle(ilUtil::stripSlashes($_FILES['new_file']['name']));
+            $file->setDescription('');
+            $file->setFileName(ilUtil::stripSlashes($_FILES['new_file']['name']));
+            $file->setFileType($_FILES['new_file']['type']);
+            $file->setFileSize($_FILES['new_file']['size']);
+            $file->create();
+            $new_ref_id = $file->createReference();
+            $file->putInTree($tree->getParentId($this->object->getRefId()));
+            $file->setPermissions($tree->getParentId($this->object->getRefId()));
+            $file->createDirectory();
+            $file->getUploadFile(
+                $_FILES['new_file']['tmp_name'],
+                $_FILES['new_file']['name']
+            );
+
+            $items[] = $new_ref_id;
+            ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
+        }
+
+        $ev->setItems($items);
+        $ev->update();
+
+        $ilCtrl->redirect($this, "materials");
+    }
+    // cdpatch end
     
     
     /**
@@ -1300,8 +1337,23 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
         $tree = $DIC['tree'];
         $objDefinition = $DIC['objDefinition'];
 
+        // cdpatch start
+        $ilToolbar = $DIC["ilToolbar"];
+        $ilCtrl = $DIC->ctrl();
+        $lng = $DIC->language();
+
+        $ilToolbar->setFormAction($ilCtrl->getFormAction($this), true);
+        include_once("./Services/Form/classes/class.ilTextInputGUI.php");
+
+        include_once("./Services/Form/classes/class.ilFileInputGUI.php");
+        $fi = new ilFileInputGUI($this->lng->txt("crs_new_file"), "new_file");
+        $fi->setSize(10);
+        $ilToolbar->addInputItem($fi, true);
+        $ilToolbar->addFormButton($lng->txt("upload"), "uploadMaterial");
+        $ilToolbar->addSeparator();
+        // cdpatch end
+
         $this->tabs_gui->activateTab('materials');
-        
         // #11337 - support ANY parent container (crs, grp, fld)
         $parent_ref_id = $tree->getParentId($this->object->getRefId());
         
@@ -1458,8 +1510,10 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
         ilDatePresentation::setUseRelativeDates(true);
         $desc .= " " . $this->object->getTitle();
         $list->setTitle($this->lng->txt('sess_attendance_list'), $desc);
-        
-        $list->addPreset('mark', $this->lng->txt('trac_mark'), true);
+
+        // cdpatch start
+        //$list->addPreset('mark', $this->lng->txt('trac_mark'), true);
+        // cdpatch end
         $list->addPreset('comment', $this->lng->txt('trac_comment'), true);
         if ($this->object->enabledRegistration()) {
             $list->addPreset('registered', $this->lng->txt('event_tbl_registered'), true);

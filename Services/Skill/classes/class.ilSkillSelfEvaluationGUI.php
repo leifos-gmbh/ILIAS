@@ -73,6 +73,8 @@ class ilSkillSelfEvaluationGUI
     {
         $ilCtrl = $this->ctrl;
 
+        $this->tpl->setTitle($this->lng->txt("skmg_self_evaluation"));
+
         $cmd = $ilCtrl->getCmd("listSelfEvaluations");
         $this->$cmd();
     }

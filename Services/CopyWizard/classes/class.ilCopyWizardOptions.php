@@ -41,6 +41,10 @@ class ilCopyWizardOptions
     protected ilDBInterface $db;
     protected ilTree $tree;
 
+    // begin-patch bghw veda
+    const TRAINING_COURSE_TRAIN = -100;
+    // end-patch bghw veda
+    
     private int $copy_id;
     private array $options = [];
     private array $tmp_tree = [];
@@ -143,6 +147,39 @@ class ilCopyWizardOptions
             "options" => array('clob', serialize(array($a_root)))
         ));
     }
+
+    // begin-patch bghw veda
+    /**
+     * @param $info
+     * @return bool
+     */
+    public function saveTrainingCourseInfo($info): bool
+    {
+        global $DIC;
+
+        $ilDB = $DIC['ilDB'];
+
+        $ilDB->insert("copy_wizard_options", array(
+            "copy_id" => array("integer", $this->getCopyId()),
+            "source_id" => array("integer", self::TRAINING_COURSE_TRAIN),
+            "options" => array('clob', serialize([$info]))
+        ));
+
+        return true;
+    }
+
+    /**
+     * @return \Swagger\Client\Model\Ausbildungszug[]
+     */
+    public function getTrainingCourseInfo() : ?array
+    {
+        if (array_key_exists(self::TRAINING_COURSE_TRAIN, $this->options)) {
+            $options = $this->getOptions(self::TRAINING_COURSE_TRAIN);
+            return $options[0];
+        }
+        return null;
+    }
+    // begin-patch bghw veda
 
     /**
      * Is root node

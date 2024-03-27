@@ -30,6 +30,8 @@ use ILIAS\MetaData\Services\Reader\Reader;
 use ILIAS\MetaData\Services\Paths\Paths;
 use ILIAS\MetaData\Services\Manipulator\Manipulator;
 use ILIAS\DI\Container as GlobalContainer;
+use ILIAS\MetaData\Services\Derivation\SourceSelectorInterface;
+use ILIAS\MetaData\Services\Derivation\SourceSelector;
 
 class Services implements ServicesInterface
 {
@@ -67,12 +69,31 @@ class Services implements ServicesInterface
 
     public function manipulate(int $obj_id, int $sub_id, string $type): ManipulatorInterface
     {
+        if ($sub_id === 0) {
+            $sub_id = $obj_id;
+        }
+
         $repo = $this->internal_services->repository()->repository();
         $set = $repo->getMD($obj_id, $sub_id, $type);
         return new Manipulator(
             $this->internal_services->manipulator()->manipulator(),
             $set
         );
+    }
+
+    public function derive(): SourceSelectorInterface
+    {
+        return new SourceSelector($this->internal_services->repository()->repository());
+    }
+
+    public function deleteAll(int $obj_id, int $sub_id, string $type): void
+    {
+        if ($sub_id === 0) {
+            $sub_id = $obj_id;
+        }
+
+        $repo = $this->internal_services->repository()->repository();
+        $repo->deleteAllMD($obj_id, $sub_id, $type);
     }
 
     public function paths(): PathsInterface

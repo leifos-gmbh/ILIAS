@@ -25,6 +25,7 @@ use ILIAS\MetaData\Services\DataHelper\DataHelperInterface;
 use ILIAS\MetaData\Services\Manipulator\ManipulatorInterface;
 use ILIAS\MetaData\Services\Reader\ReaderInterface;
 use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Services\Derivation\SourceSelectorInterface;
 
 interface ServicesInterface
 {
@@ -51,17 +52,22 @@ interface ServicesInterface
     ): ReaderInterface;
 
     /**
-     * Get a manipulator, which can manipulate the LOM of an ILIAS object. The object is specified
-     * with three parameters:
-     * 1. **obj_id:** The `obj_id` of the object if it is a repository object, else the
-     * `obj_id` of its parent repository object. If the object does not have
-     * a fixed parent  (e.g. MediaObject), then this parameter is 0.
-     * 2. **sub_id:** The `obj_id` of the object. If the object is a repository object by
-     * itself and not a sub-object, then you can set this parameter to 0, but
-     * we recommend passing the `obj_id` again.
-     * 3. **type:** The type of the object (and not its parent's), e.g. `'crs'` or `'lm'`.
+     * Get a manipulator, which can manipulate the LOM of an ILIAS object.
+     * See {@see \ILIAS\MetaData\Services\ServicesInterface::read()} for a description of the parameters.
      */
     public function manipulate(int $obj_id, int $sub_id, string $type): ManipulatorInterface;
+
+    /**
+     * Derives LOM from a target, for a source. Encompasses both copying LOM between
+     * ILIAS objects as well as import from and export to XML.
+     */
+    public function derive(): SourceSelectorInterface;
+
+    /**
+     * Delete all LOM of an ILIAS object. See {@see \ILIAS\MetaData\Services\ServicesInterface::read()}
+     * for a description of the parameters.
+     */
+    public function deleteAll(int $obj_id, int $sub_id, string $type): void;
 
     /**
      * Elements in LOM are identified by paths to them from the root. Get a collection of

@@ -18,19 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Utilities;
+namespace ILIAS\MetaData\Services\Derivation;
 
-use ILIAS\MetaData\Elements\RessourceID\RessourceIDInterface;
-use ILIAS\MetaData\Elements\SetInterface;
-
-interface DatabaseManipulatorInterface
+interface FromXMLDerivatorInterface
 {
-    public function manipulateMD(SetInterface $set): void;
-
     /**
-     * Copies the set as it is in the database, ignores markers and scaffolds.
+     * Imports a LOM set from the source XML element to the given object. Always deletes whatever
+     * metadata already exist at the target. See {@see \ILIAS\MetaData\Services\ServicesInterface::read()}
+     * for a description of the parameters.
      */
-    public function copyMD(SetInterface $from_set, RessourceIDInterface $to_ressource_id): void;
-
-    public function deleteAllMD(RessourceIDInterface $ressource_id): void;
+    public function forObject(int $obj_id, int $sub_id, string $type): void;
 }

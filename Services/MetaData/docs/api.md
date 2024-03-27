@@ -9,8 +9,8 @@ or contribute a fix via [Pull Request](../../../docs/development/contributing.md
 and manipulated. It can be obtained from the `DIC` via the method
 `learningObjectMetadata`.
 
-The API offers four different sub-services. In the following, we will
-explain what they offer and how they can be used.
+In the following, we will explain what functionality the API offers,
+and how it can be used.
 
 ## `read`
 
@@ -37,7 +37,7 @@ in the set of the current ILIAS object.
 
 ### Examples
 
-To read out the title of a course with `obj_id` 380, call `read` with
+To read out the title of a Course with `obj_id` 380, call `read` with
 the [appropriate IDs](identifying_objects.md), and then `firstData`
 with the right [path](#paths). Since this returns a data object, one
 then has to extract the actual value with `value`:
@@ -124,7 +124,7 @@ be deleted, along with their sub-elements.
 
 ### Examples
 
-To update the title in the LOM metadata of a course with `obj_id`
+To update the title in the LOM metadata of a Course with `obj_id`
 380, call `manipulate` with the [appropriate IDs](identifying_objects.md),
 then `prepareCreateOrUpdate` with the right [path](#paths), and
 finally `execute`:
@@ -280,6 +280,83 @@ $lom->manipulate(380, 380, 'crs')
 
 The custom path ensures, that even when the `structure` element does
 not already exist, it will be created with the right source.
+
+## `derive`
+
+`derive` can be used a LOM set for a target from that of a source. This
+encompasses copying between ILIAS objects, exporting to XML, and
+importing from XML, depending on the chosen type of source and target.
+
+When calling `derive`, a `SourceSelector` object is returned. There,
+either an ILIAS object can be identified as a source by a triple of 
+IDs as explained [here](identifying_objects.md), or a `SimpleXMLElement` can be given.
+Depending on the type of the source, a `Derivator` is returned, where
+a target can be chosen analogously.
+
+When both source and target are ILIAS objects, the `Derivator` creates
+a LOM set for the target by copying the LOM of the source. Any previous
+LOM of the target object is deleted before copying.
+
+When the source is a `SimpleXMLElement` and the target an ILIAS object,
+the `Derivator` creates a LOM set for the target by importing from XML.
+Likewise, any previous LOM of the target object is deleted before importing.
+
+Lastly, if the source is an ILIAS object and the target a `SimpleXMLElement`,
+the LOM of the source is exported to XML.
+
+### Examples
+
+To copy the LOM of a chapter with `obj_id` 2 in a Learning Module with
+`obj_id` 325 to a course with `obj_id` 380, choose those objects as 
+target and source with the appropriate IDs:
+
+````
+$lom->derive()
+    ->fromObject(325, 2, 'st')
+    ->forObject(380, 380, 'crs');
+````
+
+To export the LOM of the chapter to XML, choose the chapter as the source
+and XML as the target:
+
+````
+$xml = $lom->derive()
+           ->fromObject(325, 2, 'st')
+           ->forXML();
+````
+
+To import the LOM of the course from XML, pass the `SimpleXMLElement`
+as the source, and the course as the target:
+
+````
+$lom->derive()
+    ->fromXML($xml)
+    ->forObject(380, 380, 'crs');
+````
+
+## `deleteAll`
+
+`deleteAll` simply deletes all LOM of an ILIAS object, the object being
+by identified by a triple of IDs as explained [here](identifying_objects.md).
+
+Note that consistency of the LOM set is not checked before deletion,
+all occurences of the given object will scrubbed indiscriminately from
+the LOM tables.
+
+### Examples
+
+To delete all LOM of a Course with `obj_id` 380, call `deleteAll` with
+the [appropriate IDs](identifying_objects.md):
+
+````
+$lom->deleteAll(380, 380, 'crs');
+````
+
+or for a chapter with `obj_id` 2 in a Learning Module with `obj_id` 325:
+
+````
+$lom->deleteAll(325, 2, 'st');
+````
 
 ## `paths`
 

@@ -72,6 +72,20 @@ interface RepositoryInterface
      */
     public function manipulateMD(SetInterface $set): void;
 
+    /**
+     * Copies a metadata set from one object to another.
+     * Always deletes whatever metadata already exist at
+     * the target.
+     */
+    public function copyMD(
+        int $from_obj_id,
+        int $from_sub_id,
+        string $from_type,
+        int $to_obj_id,
+        int $to_sub_id,
+        string $to_type
+    ): void;
+
     public function deleteAllMD(
         int $obj_id,
         int $sub_id,

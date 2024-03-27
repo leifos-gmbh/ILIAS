@@ -1820,8 +1820,13 @@ class ilObject
      */
     public function cloneMetaData(ilObject $target_obj): bool
     {
-        $md = new ilMD($this->getId(), 0, $this->getType());
-        $md->cloneMD($target_obj->getId(), 0, $target_obj->getType());
+        /**
+         * Just for testing
+         */
+        global $DIC;
+        $DIC->learningObjectMetadata()->derive()
+                                      ->fromXML($this->getId(), 0, $this->getType())
+                                      ->forObject($target_obj->getId(), 0, $target_obj->getType());
         return true;
     }
 

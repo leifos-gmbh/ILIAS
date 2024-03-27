@@ -92,6 +92,29 @@ class LOMDatabaseRepository implements RepositoryInterface
         $this->manipulator->manipulateMD($set);
     }
 
+    public function copyMD(
+        int $from_obj_id,
+        int $from_sub_id,
+        string $from_type,
+        int $to_obj_id,
+        int $to_sub_id,
+        string $to_type
+    ): void {
+        global $DIC;
+        $DIC->logger()->root()->dump('from_obj_id: ' . $from_obj_id);
+        $DIC->logger()->root()->dump('from_sub_id: ' . $from_sub_id);
+        $DIC->logger()->root()->dump('from_type: ' . $from_type);
+        $DIC->logger()->root()->dump('to_obj_id: ' . $to_obj_id);
+        $DIC->logger()->root()->dump('to_sub_id: ' . $to_sub_id);
+        $DIC->logger()->root()->dump('to_type: ' . $to_type);
+        $from_ressource_id = $this->ressource_factory->ressourceID($from_obj_id, $from_sub_id, $from_type);
+        $to_ressource_id = $this->ressource_factory->ressourceID($to_obj_id, $to_sub_id, $to_type);
+
+        $this->manipulator->deleteAllMD($to_ressource_id);
+        $from_set = $this->reader->getMD($from_ressource_id);
+        $this->manipulator->copyMD($from_set, $to_ressource_id);
+    }
+
     public function deleteAllMD(
         int $obj_id,
         int $sub_id,

@@ -302,7 +302,7 @@ the `Derivator` creates a LOM set for the target by importing from XML.
 Likewise, any previous LOM of the target object is deleted before importing.
 
 Lastly, if the source is an ILIAS object and the target a `SimpleXMLElement`,
-the LOM of the source is exported to XML.
+the `Derivator` creates a `SimpleXMLElement` from the LOM of the source.
 
 ### Examples
 
@@ -340,8 +340,8 @@ $lom->derive()
 by identified by a triple of IDs as explained [here](identifying_objects.md).
 
 Note that consistency of the LOM set is not checked before deletion,
-all occurences of the given object will scrubbed indiscriminately from
-the LOM tables.
+all occurences of the given object will be scrubbed indiscriminately
+from the LOM tables.
 
 ### Examples
 

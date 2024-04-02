@@ -26,6 +26,7 @@ use ILIAS\MetaData\Services\Manipulator\ManipulatorInterface;
 use ILIAS\MetaData\Services\Reader\ReaderInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Services\Derivation\SourceSelectorInterface;
+use ILIAS\MetaData\Services\Search\SearcherInterface;
 
 interface ServicesInterface
 {
@@ -50,6 +51,8 @@ interface ServicesInterface
         string $type,
         PathInterface $limited_to = null
     ): ReaderInterface;
+
+    public function search(): SearcherInterface;
 
     /**
      * Get a manipulator, which can manipulate the LOM of an ILIAS object.

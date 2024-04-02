@@ -29,6 +29,8 @@ use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Repository\Utilities\DatabaseReaderInterface;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactoryInterface;
+use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
+use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
 
 class LOMDatabaseRepository implements RepositoryInterface
 {
@@ -76,6 +78,19 @@ class LOMDatabaseRepository implements RepositoryInterface
                 $this->ressource_factory->ressourceID($obj_id, $sub_id, $type)
             )
         );
+    }
+
+    /**
+     * @return RessourceIDInterface[]
+     */
+    public function searchMD(
+        ClauseInterface $clause,
+        FilterInterface ...$filters
+    ): \Generator {
+        /**
+         * TODO implement this
+         */
+        yield from [];
     }
 
     /**

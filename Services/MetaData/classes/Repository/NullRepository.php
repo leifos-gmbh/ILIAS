@@ -25,6 +25,9 @@ use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Repository\Utilities\NullScaffoldProvider;
 use ILIAS\MetaData\Repository\Utilities\ScaffoldProviderInterface;
+use ILIAS\MetaData\Elements\RessourceID\RessourceIDInterface;
+use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
+use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
 
 class NullRepository implements RepositoryInterface
 {
@@ -36,6 +39,16 @@ class NullRepository implements RepositoryInterface
     public function getMDOnPath(PathInterface $path, int $obj_id, int $sub_id, string $type): SetInterface
     {
         return new NullSet();
+    }
+
+    /**
+     * @return RessourceIDInterface[]
+     */
+    public function searchMD(
+        ClauseInterface $clause,
+        FilterInterface ...$filters
+    ): \Generator {
+        yield from [];
     }
 
     public function scaffolds(): ScaffoldProviderInterface

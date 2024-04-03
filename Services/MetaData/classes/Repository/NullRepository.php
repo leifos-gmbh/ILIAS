@@ -46,6 +46,8 @@ class NullRepository implements RepositoryInterface
      */
     public function searchMD(
         ClauseInterface $clause,
+        ?int $limit,
+        ?int $offset,
         FilterInterface ...$filters
     ): \Generator {
         yield from [];

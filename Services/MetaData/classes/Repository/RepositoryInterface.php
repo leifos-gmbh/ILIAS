@@ -68,6 +68,8 @@ interface RepositoryInterface
      */
     public function searchMD(
         ClauseInterface $clause,
+        ?int $limit,
+        ?int $offset,
         FilterInterface ...$filters
     ): \Generator;
 

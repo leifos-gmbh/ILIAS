@@ -23,5 +23,7 @@ namespace ILIAS\MetaData\Repository\Search;
 enum Mode: string
 {
     case EQUALS = 'equals';
-    case LIKE = 'like';
+    case CONTAINS = 'contains';
+    case STARTS_WITH = 'starts_with';
+    case ENDS_WITH = 'ends_with';
 }

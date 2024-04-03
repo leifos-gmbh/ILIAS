@@ -61,10 +61,14 @@ class Searcher implements SearcherInterface
      */
     public function search(
         ClauseInterface $clause,
+        ?int $limit,
+        ?int $offset,
         FilterInterface ...$filters
     ): \Generator {
         yield from $this->repository->searchMD(
             $clause,
+            $limit,
+            $offset,
             ...$filters
         );
     }

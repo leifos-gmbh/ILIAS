@@ -36,10 +36,15 @@ interface SearcherInterface
     ): FilterInterface;
 
     /**
+     * Results are always sorted first by obj_id, then sub_id, then type.
+     * Multiple filters are joined with a logical OR, values within the
+     * same filter with AND.
      * @return RessourceIDInterface[]
      */
     public function search(
         ClauseInterface $clause,
+        ?int $limit,
+        ?int $offset,
         FilterInterface ...$filters
     ): \Generator;
 }

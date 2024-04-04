@@ -18,13 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Services\Manipulator;
+namespace ILIAS\MetaData\Repository\Search\Filters;
 
-use ILIAS\MetaData\Elements\SetInterface;
-
-interface FactoryInterface
+class NullFactory implements FactoryInterface
 {
     public function get(
-        SetInterface $set
-    ): ManipulatorInterface;
+        ?int $obj_id,
+        ?int $sub_id,
+        ?string $type
+    ): FilterInterface {
+        return new NullFilter();
+    }
 }

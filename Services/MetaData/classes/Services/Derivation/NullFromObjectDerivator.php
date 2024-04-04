@@ -18,13 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Services\Manipulator;
+namespace ILIAS\MetaData\Services\Derivation;
 
-use ILIAS\MetaData\Elements\SetInterface;
-
-interface FactoryInterface
+class NullFromObjectDerivator implements FromObjectDerivatorInterface
 {
-    public function get(
-        SetInterface $set
-    ): ManipulatorInterface;
+    public function forObject(int $obj_id, int $sub_id, string $type): void
+    {
+    }
+
+    public function forXML(): \SimpleXMLElement
+    {
+        return new \SimpleXMLElement('<xml></xml>');
+    }
 }

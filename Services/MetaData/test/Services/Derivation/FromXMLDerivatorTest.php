@@ -18,13 +18,19 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Services\Manipulator;
+namespace ILIAS\MetaData\Services\Derivation;
 
-use ILIAS\MetaData\Elements\SetInterface;
+use PHPUnit\Framework\TestCase;
 
-interface FactoryInterface
+class FromXMLDerivatorTest extends TestCase
 {
-    public function get(
-        SetInterface $set
-    ): ManipulatorInterface;
+    public function testForObject(): void
+    {
+        // TODO test after implementation
+    }
+
+    public function testForObjectWithSubIDZero(): void
+    {
+        // TODO test after implementation
+    }
 }

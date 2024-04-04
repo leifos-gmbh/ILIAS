@@ -22,9 +22,11 @@ namespace ILIAS\MetaData\Services\Manipulator;
 
 use ILIAS\MetaData\Elements\SetInterface;
 
-interface FactoryInterface
+class NullFactory implements FactoryInterface
 {
     public function get(
         SetInterface $set
-    ): ManipulatorInterface;
+    ): ManipulatorInterface {
+        return new NullManipulator();
+    }
 }

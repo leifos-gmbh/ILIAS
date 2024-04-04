@@ -38,11 +38,10 @@ class SourceSelector implements SourceSelectorInterface
             $sub_id = $obj_id;
         }
 
-        return new FromObjectDerivator(
+        return $this->getFromObjectDerivator(
             $obj_id,
             $sub_id,
-            $type,
-            $this->repository
+            $type
         );
     }
 
@@ -50,6 +49,16 @@ class SourceSelector implements SourceSelectorInterface
     {
         return new FromXMLDerivator(
             $xml,
+            $this->repository
+        );
+    }
+
+    protected function getFromObjectDerivator(int $obj_id, int $sub_id, string $type): FromObjectDerivatorInterface
+    {
+        return new FromObjectDerivator(
+            $obj_id,
+            $sub_id,
+            $type,
             $this->repository
         );
     }

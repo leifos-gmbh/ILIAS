@@ -18,13 +18,24 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Services\Manipulator;
+namespace ILIAS\MetaData\Services\Reader;
 
-use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Elements\Data\DataInterface;
+use ILIAS\MetaData\Elements\Data\NullData;
 
-interface FactoryInterface
+class NullReader implements ReaderInterface
 {
-    public function get(
-        SetInterface $set
-    ): ManipulatorInterface;
+    /**
+     * @return DataInterface[]
+     */
+    public function allData(PathInterface $path): \Generator
+    {
+        yield from [];
+    }
+
+    public function firstData(PathInterface $path): DataInterface
+    {
+        return new NullData();
+    }
 }

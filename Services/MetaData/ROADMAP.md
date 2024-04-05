@@ -47,17 +47,7 @@ replaced by bespoke iterator classes.
 ### Make Greater Use of Null Objects
 
 `null` as a return type should be replaced by proper null objects.
-A good starting point might be `Tags` from `Dictionaries`. 
-
-### Query Smarter
-
-Currently, every metadata element is queried separately, even if
-they are persisted in the same table. This should be optimized.
-
-Furthermore, the methods constructing the bespoke queries for
-the MD elements in ilMDLOMDatabaseDictionary are a bit of
-a mess, with a lot of overlap between them. This can be done in 
-a more elegant way.
+A good starting point might be `Tags` from `Dictionaries`.
 
 ### Stricter formatting of 'format' and 'entity'
 

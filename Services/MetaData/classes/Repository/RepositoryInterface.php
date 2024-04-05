@@ -64,6 +64,9 @@ interface RepositoryInterface
     ): SetInterface;
 
     /**
+     * Results are always ordered first by obj_id, then sub_id, then type.
+     * Multiple filters are joined with a logical OR, values within the
+     * same filter with AND.
      * @return RessourceIDInterface[]
      */
     public function searchMD(

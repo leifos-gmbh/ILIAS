@@ -26,23 +26,43 @@ use ILIAS\MetaData\Repository\Search\Mode;
 use ILIAS\MetaData\Repository\Search\Clauses\Properties\JoinProperties;
 use ILIAS\MetaData\Repository\Search\Operator;
 use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicProperties;
+use ILIAS\MetaData\Paths\Steps\NullStep;
+use ILIAS\MetaData\Paths\PathInterface;
 
 class ClauseWithPropertiesAndFactoryTest extends TestCase
 {
+    protected function getNonEmptyPath(): PathInterface
+    {
+        return new class () extends NullPath {
+            public function steps(): \Generator
+            {
+                yield new NullStep();
+            }
+        };
+    }
+
     public function testGetBasicClause(): void
     {
         $factory = new Factory();
-        $basic_clause = $factory->getBasicClause(new NullPath(), Mode::CONTAINS, 'value');
+        $basic_clause = $factory->getBasicClause($this->getNonEmptyPath(), Mode::CONTAINS, 'value');
 
         $this->assertFalse($basic_clause->isJoin());
         $this->assertNull($basic_clause->joinProperties());
         $this->assertNotNull($basic_clause->basicProperties());
     }
 
+    public function testGetBasicClauseEmptyPathException(): void
+    {
+        $factory = new Factory();
+
+        $this->expectException(\ilMDRepositoryException::class);
+        $basic_clause = $factory->getBasicClause(new NullPath(), Mode::CONTAINS, 'value');
+    }
+
     public function testGetBasicClauseNotNegated(): void
     {
         $factory = new Factory();
-        $basic_clause = $factory->getBasicClause(new NullPath(), Mode::CONTAINS, 'value');
+        $basic_clause = $factory->getBasicClause($this->getNonEmptyPath(), Mode::CONTAINS, 'value');
 
         $this->assertFalse($basic_clause->isNegated());
     }
@@ -50,7 +70,7 @@ class ClauseWithPropertiesAndFactoryTest extends TestCase
     public function testBasicClausePath(): void
     {
         $factory = new Factory();
-        $path = new NullPath();
+        $path = $this->getNonEmptyPath();
         $basic_clause = $factory->getBasicClause($path, Mode::CONTAINS, 'value');
         $this->assertSame($path, $basic_clause->basicProperties()->path());
     }
@@ -58,14 +78,14 @@ class ClauseWithPropertiesAndFactoryTest extends TestCase
     public function testBasicClauseMode(): void
     {
         $factory = new Factory();
-        $basic_clause = $factory->getBasicClause(new NullPath(), Mode::CONTAINS, 'value');
+        $basic_clause = $factory->getBasicClause($this->getNonEmptyPath(), Mode::CONTAINS, 'value');
         $this->assertSame(Mode::CONTAINS, $basic_clause->basicProperties()->mode());
     }
 
     public function testBasicClauseValue(): void
     {
         $factory = new Factory();
-        $basic_clause = $factory->getBasicClause(new NullPath(), Mode::CONTAINS, 'value');
+        $basic_clause = $factory->getBasicClause($this->getNonEmptyPath(), Mode::CONTAINS, 'value');
         $this->assertSame('value', $basic_clause->basicProperties()->value());
     }
 
@@ -73,7 +93,7 @@ class ClauseWithPropertiesAndFactoryTest extends TestCase
     {
         $factory = new Factory();
         $join_props = new JoinProperties(Operator::AND, new NullClause(), new NullClause());
-        $basic_props = new BasicProperties(new NullPath(), Mode::ENDS_WITH, 'value');
+        $basic_props = new BasicProperties($this->getNonEmptyPath(), Mode::ENDS_WITH, 'value');
         $clause = new Clause(false, true, $join_props, $basic_props);
 
         $negated = $factory->getNegatedClause($clause);
@@ -88,7 +108,7 @@ class ClauseWithPropertiesAndFactoryTest extends TestCase
     {
         $factory = new Factory();
         $join_props = new JoinProperties(Operator::AND, new NullClause(), new NullClause());
-        $basic_props = new BasicProperties(new NullPath(), Mode::ENDS_WITH, 'value');
+        $basic_props = new BasicProperties($this->getNonEmptyPath(), Mode::ENDS_WITH, 'value');
         $clause = new Clause(true, true, $join_props, $basic_props);
 
         $negated = $factory->getNegatedClause($clause);

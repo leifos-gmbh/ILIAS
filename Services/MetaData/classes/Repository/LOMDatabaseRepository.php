@@ -31,6 +31,7 @@ use ILIAS\MetaData\Repository\Utilities\DatabaseReaderInterface;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactoryInterface;
 use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
 use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
+use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseSearcherInterface;
 
 class LOMDatabaseRepository implements RepositoryInterface
 {
@@ -38,6 +39,7 @@ class LOMDatabaseRepository implements RepositoryInterface
     protected ScaffoldProviderInterface $scaffold_provider;
     protected DatabaseManipulatorInterface $manipulator;
     protected DatabaseReaderInterface $reader;
+    protected DatabaseSearcherInterface $searcher;
     protected CleanerInterface $cleaner;
 
     public function __construct(
@@ -89,10 +91,7 @@ class LOMDatabaseRepository implements RepositoryInterface
         ?int $offset,
         FilterInterface ...$filters
     ): \Generator {
-        /**
-         * TODO implement this
-         */
-        yield from [];
+        yield from $this->searcher->search($clause, $limit, $offset, ...$filters);
     }
 
     /**

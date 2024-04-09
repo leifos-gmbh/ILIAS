@@ -33,6 +33,10 @@ class Factory implements FactoryInterface
         Mode $mode,
         string $value
     ): ClauseInterface {
+        if (count(iterator_to_array($path->steps())) === 0) {
+            throw new \ilMDRepositoryException('Paths in search clauses must not be empty.');
+        }
+
         return new Clause(
             false,
             false,

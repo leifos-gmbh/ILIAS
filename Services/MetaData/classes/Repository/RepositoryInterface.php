@@ -51,7 +51,9 @@ interface RepositoryInterface
     /**
      * Returns an MD set with only the elements specified on a path, and all nested
      * subelements of the last elements on the path.
-     * The path must start from the root element.
+     * The path must start from the root element. Note that path filters are ignored,
+     * and if the path contains steps to super elements, it is only followed down to
+     * the first element that the path returns to.
      * Note that resulting partial MD sets might not be completely valid, due to
      * conditions between elements. Be careful when dealing with vocabularies, or
      * Technical > Requirement > OrComposite.

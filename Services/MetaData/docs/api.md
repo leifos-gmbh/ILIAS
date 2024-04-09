@@ -21,6 +21,10 @@ needs to be identified by a triple of IDs as explained [here](identifying_object
 Optionally, one can also specify metadata elements via a [path](#paths).
 In this case, not the whole metadata set is read out, but only the
 elements on the path along with all sub-elements of its last element.
+Beware that filters on the path are ignored, and that if the path
+contains steps to super elements, it is only followed down to
+the first element that the path returns to (see [here](#paths) for
+details).
 
 `read` returns a `Reader` object, which can then be used to access the
 values of different elements in the (partial) set, selected via [paths](#paths).

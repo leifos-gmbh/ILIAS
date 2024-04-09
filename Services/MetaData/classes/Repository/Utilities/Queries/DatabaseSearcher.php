@@ -26,19 +26,25 @@ use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
 use ILIAS\MetaData\Repository\Search\Operator;
 use ILIAS\MetaData\Repository\Search\Mode;
 use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicProperties;
+use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParserInterface;
+use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabaseParsedPathsInterface;
 
 class DatabaseSearcher implements DatabaseSearcherInterface
 {
     protected RessourceIDFactoryInterface $ressource_factory;
+    protected DatabasePathsParserInterface $paths_parser;
     protected \ilDBInterface $db;
     protected \ilLogger $logger;
 
     public function __construct(
         RessourceIDFactoryInterface $ressource_factory,
+        DatabasePathsParserInterface $paths_parser,
         \ilDBInterface $db,
         \ilLogger $logger
     ) {
         $this->ressource_factory = $ressource_factory;
+        $this->paths_parser = $paths_parser;
         $this->db = $db;
         $this->logger = $logger;
     }
@@ -49,8 +55,10 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         ?int $offset,
         FilterInterface ...$filters
     ): \Generator {
+        $parsed_paths = $this->paths_parser->forSearch(...$this->getAllPathsFromClause($clause));
+
         $result = $this->db->query(
-            $select . ' WHERE ' . $this->getClauseForQueryWhere($clause) .
+            $parsed_paths->selectForQuery() . ' WHERE ' . $this->getClauseForQueryWhere($clause, $parsed_paths) .
             $this->getFiltersForQueryWhere(...$filters) . ' ORDER BY rbac_id, obj_id, obj_type' .
             $this->getLimitAndOffsetForQuery($limit, $offset)
         );
@@ -61,6 +69,25 @@ class DatabaseSearcher implements DatabaseSearcherInterface
                 (int) $row['obj_id'],
                 (string) $row['type']
             );
+        }
+    }
+
+    /**
+     * @return PathInterface[]
+     */
+    protected function getAllPathsFromClause(ClauseInterface $clause, int $depth = 0): \Generator
+    {
+        if ($depth > 50) {
+            throw new \ilMDRepositoryException('Search clause is nested to deep.');
+        }
+
+        if (!$clause->isJoin()) {
+            yield $clause->basicProperties()->path();
+            return;
+        }
+
+        foreach ($clause->joinProperties()->subClauses() as $sub_clause) {
+            yield from $this->getAllPathsFromClause($sub_clause, $depth + 1);
         }
     }
 
@@ -101,21 +128,24 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         return $query_limit . $query_offset;
     }
 
-    protected function getClauseForQueryWhere(ClauseInterface $clause, int $depth = 0): string
-    {
+    protected function getClauseForQueryWhere(
+        ClauseInterface $clause,
+        DatabaseParsedPathsInterface $parsed_paths,
+        int $depth = 0
+    ): string {
         if ($depth > 50) {
             throw new \ilMDRepositoryException('Search clause is nested to deep.');
         }
 
         if (!$clause->isJoin()) {
-            return $this->getBasicClauseForQueryWhere($clause->basicProperties());
+            return $this->getBasicClauseForQueryWhere($clause->basicProperties(), $parsed_paths);
         }
 
         $join_props = $clause->joinProperties();
 
         $sub_clauses_for_query = [];
         foreach ($join_props->subClauses() as $sub_clause) {
-            $sub_clauses_for_query[] = $this->getClauseForQueryWhere($sub_clause, $depth + 1);
+            $sub_clauses_for_query[] = $this->getClauseForQueryWhere($sub_clause, $parsed_paths, $depth + 1);
         }
 
         switch ($join_props->operator()) {
@@ -134,8 +164,10 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         return '(' . implode(' ' . $operator_for_query . ' ', $sub_clauses_for_query) . ')';
     }
 
-    protected function getBasicClauseForQueryWhere(BasicProperties $basic_props): string
-    {
+    protected function getBasicClauseForQueryWhere(
+        BasicProperties $basic_props,
+        DatabaseParsedPathsInterface $parsed_paths
+    ): string {
         switch ($basic_props->mode()) {
             case Mode::EQUALS:
                 $comparison = '= ' .
@@ -161,6 +193,6 @@ class DatabaseSearcher implements DatabaseSearcherInterface
                 throw new \ilMDRepositoryException('Invalid search mode.');
         }
 
-        return $this->db->quoteIdentifier($this->getAliasForPath($basic_props->path())) . ' ' . $comparison;
+        return $this->db->quoteIdentifier($parsed_paths->columnForPath($basic_props->path())) . ' ' . $comparison;
     }
 }

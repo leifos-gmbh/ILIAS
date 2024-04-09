@@ -136,6 +136,7 @@ class Services
                 $this->structure_services->structure(),
                 $this->databaseDictionary(),
                 $this->path_services->navigatorFactory(),
+                $this->path_services->pathFactory(),
                 $querier,
                 $logger
             ),

@@ -55,6 +55,15 @@ The fields technical>format and the various entities should conform
 to different standards (e.g. entities should be vcards). This could
 be supported better in ILIAS, currently any string is valid.
 
+### Allow `INDEX` path filters in search
+
+It should be investigated, how path filters of type `INDEX` can be
+taken into account in the search, to allow for search queries like
+'Find objects where the **first** author is Dr. No'.
+
+These filters make translating the search queries to SQL much more
+complex, so the cost might outweigh the use.
+
 ### Vocabularies
 
 Allow adding other vocabularies than LOM. This could be implemented

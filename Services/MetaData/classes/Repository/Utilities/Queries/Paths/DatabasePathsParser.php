@@ -29,6 +29,9 @@ use ILIAS\MetaData\Paths\Navigator\StructureNavigatorInterface;
 use ILIAS\MetaData\Repository\Dictionary\TagInterface;
 use ILIAS\MetaData\Paths\Filters\FilterInterface as PathFilter;
 use ILIAS\MetaData\Paths\Filters\FilterType;
+use ILIAS\MetaData\Paths\Steps\StepToken;
+use ILIAS\MetaData\Elements\Data\Type;
+use ILIAS\MetaData\Vocabularies\Dictionary\LOMDictionaryInitiator as LOMVocabInitiator;
 
 class DatabasePathsParser implements DatabasePathsParserInterface
 {
@@ -83,12 +86,23 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                 }
             }
 
-            $joins[] = implode(' JOIN ', $tables) . ' ON ' . implode(' AND ', $conditions);
+            if (!empty($tables)) {
+                $join = implode(' JOIN ', $tables);
+                if (!empty($conditions)) {
+                    $join .= ' ON ' . implode(' AND ', $conditions);
+                }
+                $joins[] = $join;
+            }
+            $path_number++;
         }
 
-        $select = 'SELECT DISTINCT p1t1.rbac_id, p1t1.obj_id, p1t1.obj_type FROM (' .
-            implode(' JOIN ', $joins) . ')';
-        return new DatabaseParsedPaths($select, ...$column_names);
+        if (!empty($joins)) {
+            $select = 'SELECT DISTINCT p1t1.rbac_id, p1t1.obj_id, p1t1.obj_type FROM (' .
+                implode(' JOIN ', $joins) . ')';
+        } else {
+            throw new \ilMDRepositoryException('No tables found for search.');
+        }
+        return new DatabaseParsedPaths('p1t1', $select, ...$column_names);
     }
 
     /**
@@ -98,7 +112,65 @@ class DatabasePathsParser implements DatabasePathsParserInterface
         StructureNavigatorInterface $navigator,
         int $path_number
     ): \Generator {
-        $parent_tables_aliases = [];
+        $table_aliases = [];
+        $current_tag = null;
+        $current_table = '';
+        $table_number = 1;
+
+        while ($navigator->hasNextStep()) {
+            $navigator = $navigator->nextStep();
+            $current_tag = $this->dictionary->tagForElement($navigator->element());
+
+            if ($current_tag?->table() && $current_table !== $current_tag?->table()) {
+                $parent_table = $current_table;
+                $current_table = $current_tag->table();
+                $this->checkTable($current_table);
+
+                /**
+                 * If the step goes back to a previous table, reuse the same
+                 * alias, but if it goes down again to the same table, use a new
+                 * alias (since path filter might mean you're on different
+                 * branches now).
+                 */
+                if ($navigator->currentStep()->name() === StepToken::SUPER) {
+                    $alias = $table_aliases[$current_table];
+                } else {
+                    $alias = 'p' . $path_number . 't' . $table_number;
+                    $table_aliases[$current_table] = $alias;
+                    $table_number++;
+
+                    yield self::JOIN_TABLE => $this->db->quoteIdentifier($this->table($current_table)) .
+                        ' AS ' . $this->db->quoteIdentifier($alias);
+                }
+
+                if (!$current_tag->hasParent()) {
+                    yield self::JOIN_CONDITION => $this->getBaseJoinConditionsForTable($alias);
+                    continue;
+                }
+
+                yield self::JOIN_CONDITION => $this->getBaseJoinConditionsForTable(
+                    $alias,
+                    $table_aliases[$parent_table],
+                    $parent_table,
+                    $current_tag->parent()
+                );
+            }
+
+            foreach ($navigator->currentStep()->filters() as $filter) {
+                yield self::JOIN_CONDITION => $this->getJoinConditionFromPathFilter(
+                    $table_aliases[$current_table],
+                    $current_table,
+                    $current_tag?->hasData() ? $current_tag->dataField() : null,
+                    $navigator->element()->getDefinition()->dataType() === Type::VOCAB_SOURCE ?
+                        LOMVocabInitiator::SOURCE :
+                        '',
+                    $filter
+                );
+            }
+        }
+
+        yield self::COLUMN_NAME => $this->db->quoteIdentifier($table_aliases[$current_table]) .
+            '.' . ($current_tag?->hasData() ? $this->db->quoteIdentifier($current_tag->dataField()) : "''");
     }
 
     protected function getBaseJoinConditionsForTable(
@@ -129,9 +201,15 @@ class DatabasePathsParser implements DatabasePathsParserInterface
         return implode(' AND ', $conditions);
     }
 
+    /**
+     * Direct_data is only needed to make vocab sources work until
+     * controlled vocabularies are implemented.
+     */
     protected function getJoinConditionFromPathFilter(
         string $table_alias,
-        TagInterface $tag,
+        string $table,
+        ?string $data_field,
+        string $direct_data,
         PathFilter $filter
     ): string {
         $table_alias = $this->db->quoteIdentifier($table_alias);
@@ -150,7 +228,7 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                 return '';
 
             case FilterType::MDID:
-                $column = $table_alias . '.' . $this->db->quoteIdentifier($this->IDName($tag->table()));
+                $column = $table_alias . '.' . $this->db->quoteIdentifier($this->IDName($table));
                 return $column . ' IN (' . implode(', ', $quoted_values) . ')';
                 break;
 
@@ -159,9 +237,9 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                 return '';
 
             case FilterType::DATA:
-                $column = "''";
-                if ($tag->hasData()) {
-                    $column = $table_alias . '.' . $this->db->quoteIdentifier($tag->dataField());
+                $column = $this->db->quote($direct_data, \ilDBConstants::T_TEXT);
+                if (!is_null($data_field)) {
+                    $column = $table_alias . '.' . $this->db->quoteIdentifier($data_field);
                 }
                 return $column . ' IN (' . implode(', ', $quoted_values) . ')';
                 break;

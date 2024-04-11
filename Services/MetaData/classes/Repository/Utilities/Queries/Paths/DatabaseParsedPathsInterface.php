@@ -27,4 +27,6 @@ interface DatabaseParsedPathsInterface
     public function selectForQuery(): string;
 
     public function columnForPath(PathInterface $path): string;
+
+    public function tableAliasForFilters(): string;
 }

@@ -47,12 +47,14 @@ class LOMDatabaseRepository implements RepositoryInterface
         ScaffoldProviderInterface $scaffold_provider,
         DatabaseManipulatorInterface $manipulator,
         DatabaseReaderInterface $reader,
+        DatabaseSearcherInterface $searcher,
         CleanerInterface $cleaner
     ) {
         $this->ressource_factory = $ressource_factory;
         $this->scaffold_provider = $scaffold_provider;
         $this->manipulator = $manipulator;
         $this->reader = $reader;
+        $this->searcher = $searcher;
         $this->cleaner = $cleaner;
     }
 

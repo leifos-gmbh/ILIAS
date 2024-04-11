@@ -50,6 +50,8 @@ use ILIAS\Metadata\Repository\Search\Clauses\FactoryInterface as ClauseFactoryIn
 use ILIAS\MetaData\Repository\Search\Filters\FactoryInterface as FilterFactoryInterface;
 use ILIAS\MetaData\Repository\Search\Clauses\Factory as ClauseFactory;
 use ILIAS\MetaData\Repository\Search\Filters\Factory as FilterFactory;
+use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseSearcher;
+use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParser;
 
 class Services
 {
@@ -118,7 +120,7 @@ class Services
         );
         $element_factory = new ElementFactory($data_factory);
         return $this->repository = new LOMDatabaseRepository(
-            new RessourceIDFactory(),
+            $ressource_id_factory = new RessourceIDFactory(),
             new ScaffoldProvider(
                 new ScaffoldFactory($data_factory),
                 $this->path_services->pathFactory(),
@@ -138,6 +140,17 @@ class Services
                 $this->path_services->navigatorFactory(),
                 $this->path_services->pathFactory(),
                 $querier,
+                $logger
+            ),
+            new DatabaseSearcher(
+                $ressource_id_factory,
+                new DatabasePathsParser(
+                    $this->dic->database(),
+                    $this->structure_services->structure(),
+                    $this->databaseDictionary(),
+                    $this->path_services->navigatorFactory()
+                ),
+                $this->dic->database(),
                 $logger
             ),
             new Cleaner(

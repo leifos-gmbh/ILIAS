@@ -29,11 +29,14 @@ class DatabaseParsedPaths implements DatabaseParsedPathsInterface
      */
     protected array $column_names_by_path;
     protected string $select;
+    protected string $table_alias_for_filters;
 
     public function __construct(
+        string $table_alias_for_filters,
         string $select,
         ColumnNameAssignment ...$colum_names
     ) {
+        $this->table_alias_for_filters = $table_alias_for_filters;
         $this->select = $select;
         $this->column_names_by_path = [];
         foreach ($colum_names as $colum_name) {
@@ -53,5 +56,10 @@ class DatabaseParsedPaths implements DatabaseParsedPathsInterface
             throw new \ilMDRepositoryException('No column found for path: ' . $path_string);
         }
         return $this->column_names_by_path[$path_string];
+    }
+
+    public function tableAliasForFilters(): string
+    {
+        return $this->table_alias_for_filters;
     }
 }

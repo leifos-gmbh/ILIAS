@@ -113,9 +113,53 @@ class ilMDEditorGUI
         $xml_writer = new ilMD2XML($this->obj_id, $this->sub_id, $this->type);
         $xml_writer->startExport();
 
+        global $DIC;
+        $paths = $DIC->learningObjectMetadata()->paths();
+        $searcher = $DIC->learningObjectMetadata()->search();
+        $clause_factory = $searcher->getClauseFactory();
+        $author_clause = $clause_factory->getBasicClause(
+            $paths->authors(),
+            \ILIAS\MetaData\Repository\Search\Mode::EQUALS,
+            'erster'
+        );
+        $katze_clause = $clause_factory->getBasicClause(
+            $paths->custom()->withNextStep('lifeCycle')
+                  ->withNextStep('contribute')
+                  ->withNextStep('role')
+                  ->withNextStep('value')
+                  ->withAdditionalFilterAtCurrentStep(ILIAS\MetaData\Paths\Filters\FilterType::DATA, 'graphical designer')
+                  ->withNextStepToSuperElement()
+                  ->withNextStep('source')
+                  ->withAdditionalFilterAtCurrentStep(ILIAS\MetaData\Paths\Filters\FilterType::DATA, 'LOMv1.0')
+                  ->withNextStepToSuperElement()
+                  ->withNextStepToSuperElement()
+                  ->withNextStep('entity')
+                  ->get(),
+            \ILIAS\MetaData\Repository\Search\Mode::EQUALS,
+            'Katze'
+        );
+
+        $result = $searcher->search(
+            $clause_factory->getJoinedClauses(
+                \ILIAS\MetaData\Repository\Search\Operator::OR,
+                $author_clause,
+                $katze_clause
+            ),
+            null,
+            null,
+            $searcher->getFilter(429, null, 'crs'),
+            $searcher->getFilter(null, null, 'mob')
+        );
+        $rendered_results = "<br> SEARCH RESULTS:";
+        foreach ($result as $result_item) {
+            $rendered_results .= "<br> obj id: " . $result_item->objID() .
+                ", sub id: " . $result_item->subID() .
+                ", type: " . $result_item->type();
+        }
+
         $button = $this->renderButtonToFullEditor();
 
-        $this->tpl->setContent($button . htmlentities($xml_writer->getXML()));
+        $this->tpl->setContent($button . htmlentities($xml_writer->getXML()) . $rendered_results);
         return true;
     }
 

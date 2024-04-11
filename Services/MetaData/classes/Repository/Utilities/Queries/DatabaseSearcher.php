@@ -58,16 +58,19 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         $parsed_paths = $this->paths_parser->forSearch(...$this->getAllPathsFromClause($clause));
 
         $result = $this->db->query(
-            $parsed_paths->selectForQuery() . ' WHERE ' . $this->getClauseForQueryWhere($clause, $parsed_paths) .
-            $this->getFiltersForQueryWhere(...$filters) . ' ORDER BY rbac_id, obj_id, obj_type' .
-            $this->getLimitAndOffsetForQuery($limit, $offset)
+            $query = $parsed_paths->selectForQuery() . ' WHERE ' . $this->getClauseForQueryWhere($clause, $parsed_paths) .
+            $this->getFiltersForQueryWhere($parsed_paths->tableAliasForFilters(), ...$filters) .
+            ' ORDER BY rbac_id, obj_id, obj_type' . $this->getLimitAndOffsetForQuery($limit, $offset)
         );
+
+        global $DIC;
+        $DIC->logger()->root()->dump($query);
 
         while ($row = $this->db->fetchAssoc($result)) {
             yield $this->ressource_factory->ressourceID(
                 (int) $row['rbac_id'],
                 (int) $row['obj_id'],
-                (string) $row['type']
+                (string) $row['obj_type']
             );
         }
     }
@@ -91,23 +94,30 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         }
     }
 
-    protected function getFiltersForQueryWhere(FilterInterface ...$filters): string
-    {
+    protected function getFiltersForQueryWhere(
+        string $table_alias,
+        FilterInterface ...$filters
+    ): string {
         if (empty($filters)) {
             return '';
         }
+
+        $quoted_table_alias = $this->db->quoteIdentifier($table_alias);
 
         $filter_where = [];
         foreach ($filters as $filter) {
             $filter_values = [];
             if (!is_null($filter->objID())) {
-                $filter_values[] = 'rbac_id = ' . $this->db->quote($filter->objID(), \ilDBConstants::T_INTEGER);
+                $filter_values[] = $quoted_table_alias . '.rbac_id = ' .
+                    $this->db->quote($filter->objID(), \ilDBConstants::T_INTEGER);
             }
             if (!is_null($filter->subID())) {
-                $filter_values[] = 'obj_id = ' . $this->db->quote($filter->subID(), \ilDBConstants::T_INTEGER);
+                $filter_values[] = $quoted_table_alias . '.obj_id = ' .
+                    $this->db->quote($filter->subID(), \ilDBConstants::T_INTEGER);
             }
             if (!is_null($filter->type())) {
-                $filter_values[] = 'obj_type = ' . $this->db->quote($filter->type(), \ilDBConstants::T_TEXT);
+                $filter_values[] = $quoted_table_alias . '.obj_type = ' .
+                    $this->db->quote($filter->type(), \ilDBConstants::T_TEXT);
             }
             $filter_where[] = '(' . implode(' AND ', $filter_values) . ')';
         }
@@ -193,6 +203,6 @@ class DatabaseSearcher implements DatabaseSearcherInterface
                 throw new \ilMDRepositoryException('Invalid search mode.');
         }
 
-        return $this->db->quoteIdentifier($parsed_paths->columnForPath($basic_props->path())) . ' ' . $comparison;
+        return $parsed_paths->columnForPath($basic_props->path()) . ' ' . $comparison;
     }
 }

@@ -21,17 +21,16 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Repository\Utilities\Queries\Paths;
 
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Repository\Utilities\Queries\TableNamesHandler;
 use ILIAS\MetaData\Elements\Structure\StructureSetInterface;
 use ILIAS\MetaData\Repository\Dictionary\DictionaryInterface;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Paths\Navigator\StructureNavigatorInterface;
-use ILIAS\MetaData\Repository\Dictionary\TagInterface;
-use ILIAS\MetaData\Paths\Filters\FilterInterface as PathFilter;
-use ILIAS\MetaData\Paths\Filters\FilterType;
 use ILIAS\MetaData\Paths\Steps\StepToken;
 use ILIAS\MetaData\Elements\Data\Type;
 use ILIAS\MetaData\Vocabularies\Dictionary\LOMDictionaryInitiator as LOMVocabInitiator;
+use ILIAS\MetaData\Paths\Filters\FilterInterface as PathFilter;
+use ILIAS\MetaData\Paths\Filters\FilterType;
+use ILIAS\MetaData\Repository\Utilities\Queries\TableNamesHandler;
 
 class DatabasePathsParser implements DatabasePathsParserInterface
 {
@@ -40,6 +39,13 @@ class DatabasePathsParser implements DatabasePathsParserInterface
     protected const JOIN_TABLE = 'join_table';
     protected const JOIN_CONDITION = 'join_condition';
     protected const COLUMN_NAME = 'column_name';
+
+    /**
+     * @var string[]
+     */
+    protected array $path_joins = [];
+
+    protected int $path_number = 1;
 
     /**
      * Just for quoting.
@@ -61,48 +67,69 @@ class DatabasePathsParser implements DatabasePathsParserInterface
         $this->navigator_factory = $navigator_factory;
     }
 
-    public function forSearch(PathInterface ...$paths): DatabaseParsedPathsInterface
+    /**
+     * Make sure that you add paths before calling this.
+     */
+    public function getSelectForQuery(): string
     {
-        $column_names = [];
-        $joins = [];
-
-        $path_number = 1;
-        foreach ($paths as $path) {
-            $navigator = $this->navigator_factory->structureNavigator(
-                $path,
-                $this->structure->getRoot()
-            );
-            $tables = [];
-            $conditions = [];
-            foreach ($this->collectJoinInfos($navigator, $path_number) as $type => $info) {
-                if ($type === self::JOIN_TABLE) {
-                    $tables[] = $info;
-                }
-                if ($type === self::JOIN_CONDITION) {
-                    $conditions[] = $info;
-                }
-                if ($type === self::COLUMN_NAME) {
-                    $column_names[] = new ColumnNameAssignment($path, $info);
-                }
-            }
-
-            if (!empty($tables)) {
-                $join = implode(' JOIN ', $tables);
-                if (!empty($conditions)) {
-                    $join .= ' ON ' . implode(' AND ', $conditions);
-                }
-                $joins[] = $join;
-            }
-            $path_number++;
-        }
-
-        if (!empty($joins)) {
-            $select = 'SELECT DISTINCT p1t1.rbac_id, p1t1.obj_id, p1t1.obj_type FROM (' .
-                implode(' JOIN ', $joins) . ')';
-        } else {
+        $from_expression = '';
+        if (empty($this->path_joins)) {
             throw new \ilMDRepositoryException('No tables found for search.');
+        } elseif (count($this->path_joins) === 1) {
+            $from_expression = $this->path_joins[0];
+        } else {
+            $from_expression = 'il_meta_general AS base';
+            $path_number = 1;
+            foreach ($this->path_joins as $join) {
+                $condition = $this->getBaseJoinConditionsForTable(
+                    'base',
+                    'p' . $path_number . 't1',
+                );
+                $from_expression .= ' LEFT JOIN (' . $join . ') ON ' . $condition;
+                $path_number++;
+            }
         }
-        return new DatabaseParsedPaths('p1t1', $select, ...$column_names);
+
+        return 'SELECT DISTINCT p1t1.rbac_id, p1t1.obj_id, p1t1.obj_type FROM (' . $from_expression . ')';
+    }
+
+    public function addPathAndGetColumn(PathInterface $path): string
+    {
+        $data_column_name = '';
+
+        $navigator = $this->navigator_factory->structureNavigator(
+            $path,
+            $this->structure->getRoot()
+        );
+        $tables = [];
+        $conditions = [];
+        foreach ($this->collectJoinInfos($navigator, $this->path_number) as $type => $info) {
+            if ($type === self::JOIN_TABLE && !empty($info)) {
+                $tables[] = $info;
+            }
+            if ($type === self::JOIN_CONDITION && !empty($info)) {
+                $conditions[] = $info;
+            }
+            if ($type === self::COLUMN_NAME && !empty($info)) {
+                $data_column_name = $info;
+            }
+        }
+
+        if (!empty($tables)) {
+            $join = implode(' JOIN ', $tables);
+            if (!empty($conditions)) {
+                $join .= ' ON ' . implode(' AND ', $conditions);
+            }
+            $this->path_joins[] = $join;
+            $this->path_number++;
+        }
+
+        return $data_column_name;
+    }
+
+    public function getTableAliasForFilters(): ?string
+    {
+        return 'p1t1';
     }
 
     /**
@@ -144,11 +171,15 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                 }
 
                 if (!$current_tag->hasParent()) {
-                    yield self::JOIN_CONDITION => $this->getBaseJoinConditionsForTable($alias);
+                    yield self::JOIN_CONDITION => $this->getBaseJoinConditionsForTable(
+                        'p' . $path_number . 't1',
+                        $alias
+                    );
                     continue;
                 }
 
                 yield self::JOIN_CONDITION => $this->getBaseJoinConditionsForTable(
+                    'p' . $path_number . 't1',
                     $alias,
                     $table_aliases[$parent_table],
                     $parent_table,
@@ -169,23 +200,30 @@ class DatabasePathsParser implements DatabasePathsParserInterface
             }
         }
 
-        yield self::COLUMN_NAME => $this->db->quoteIdentifier($table_aliases[$current_table]) .
-            '.' . ($current_tag?->hasData() ? $this->db->quoteIdentifier($current_tag->dataField()) : "''");
+        $final_table_alias = $this->db->quoteIdentifier($table_aliases[$current_table]);
+        if ($current_tag?->hasData()) {
+            yield self::COLUMN_NAME => 'COALESCE(' . $this->db->quoteIdentifier($table_aliases[$current_table]) .
+                '.' . $this->db->quoteIdentifier($current_tag->dataField()) . ", '')";
+            return;
+        }
+        yield self::COLUMN_NAME => "''";
     }
 
     protected function getBaseJoinConditionsForTable(
+        string $first_table_alias,
         string $table_alias,
         string $parent_table_alias = null,
         string $parent_table = null,
         string $parent_type = null
     ): string {
         $table_alias = $this->db->quoteIdentifier($table_alias);
+        $first_table_alias = $this->db->quoteIdentifier($first_table_alias);
         $conditions = [];
 
-        if ($table_alias !== 'p1t1') {
-            $conditions[] = 'p1t1.rbac_id = ' . $table_alias . '.rbac_id';
-            $conditions[] = 'p1t1.obj_id = ' . $table_alias . '.obj_id';
-            $conditions[] = 'p1t1.obj_type = ' . $table_alias . '.obj_type';
+        if ($table_alias !== $first_table_alias) {
+            $conditions[] = $first_table_alias . '.rbac_id = ' . $table_alias . '.rbac_id';
+            $conditions[] = $first_table_alias . '.obj_id = ' . $table_alias . '.obj_id';
+            $conditions[] = $first_table_alias . '.obj_type = ' . $table_alias . '.obj_type';
         }
 
         if (!is_null($parent_table_alias) && !is_null($parent_table)) {
@@ -239,7 +277,7 @@ class DatabasePathsParser implements DatabasePathsParserInterface
             case FilterType::DATA:
                 $column = $this->db->quote($direct_data, \ilDBConstants::T_TEXT);
                 if (!is_null($data_field)) {
-                    $column = $table_alias . '.' . $this->db->quoteIdentifier($data_field);
+                    $column = 'COALESCE(' . $table_alias . '.' . $this->db->quoteIdentifier($data_field) . ", '')";
                 }
                 return $column . ' IN (' . implode(', ', $quoted_values) . ')';
                 break;

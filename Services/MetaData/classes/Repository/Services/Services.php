@@ -51,7 +51,7 @@ use ILIAS\MetaData\Repository\Search\Filters\FactoryInterface as FilterFactoryIn
 use ILIAS\MetaData\Repository\Search\Clauses\Factory as ClauseFactory;
 use ILIAS\MetaData\Repository\Search\Filters\Factory as FilterFactory;
 use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseSearcher;
-use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParser;
+use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParserFactory;
 
 class Services
 {
@@ -144,7 +144,7 @@ class Services
             ),
             new DatabaseSearcher(
                 $ressource_id_factory,
-                new DatabasePathsParser(
+                new DatabasePathsParserFactory(
                     $this->dic->database(),
                     $this->structure_services->structure(),
                     $this->databaseDictionary(),

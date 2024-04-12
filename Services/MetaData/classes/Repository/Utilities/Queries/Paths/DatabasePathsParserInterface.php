@@ -24,5 +24,9 @@ use ILIAS\MetaData\Paths\PathInterface;
 
 interface DatabasePathsParserInterface
 {
-    public function forSearch(PathInterface ...$paths): DatabaseParsedPathsInterface;
+    public function getSelectForQuery(): string;
+
+    public function addPathAndGetColumn(PathInterface $path): string;
+
+    public function getTableAliasForFilters(): ?string;
 }

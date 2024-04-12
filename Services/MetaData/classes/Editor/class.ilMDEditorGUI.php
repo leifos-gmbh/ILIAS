@@ -138,17 +138,31 @@ class ilMDEditorGUI
             \ILIAS\MetaData\Repository\Search\Mode::EQUALS,
             'Katze'
         );
+        $author_and_katze_clause = $clause_factory->getJoinedClauses(
+            \ILIAS\MetaData\Repository\Search\Operator::AND,
+            $author_clause,
+            $clause_factory->getNegatedClause($katze_clause)
+        );
+        $empty_clause = $clause_factory->getJoinedClauses(
+            \ILIAS\MetaData\Repository\Search\Operator::AND,
+            $author_and_katze_clause,
+            $clause_factory->getNegatedClause($author_and_katze_clause)
+        );
+        $garfield_clause = $clause_factory->getBasicClause(
+            $paths->copyright(),
+            \ILIAS\MetaData\Repository\Search\Mode::EQUALS,
+            'il_copyright_entry__0__5'
+        );
+        $author_and_not_author_clause = $clause_factory->getJoinedClauses(
+            \ILIAS\MetaData\Repository\Search\Operator::AND,
+            $author_clause,
+            $clause_factory->getNegatedClause($author_clause)
+        );
 
         $result = $searcher->search(
-            $clause_factory->getJoinedClauses(
-                \ILIAS\MetaData\Repository\Search\Operator::OR,
-                $author_clause,
-                $katze_clause
-            ),
+            $author_and_katze_clause,
             null,
-            null,
-            $searcher->getFilter(429, null, 'crs'),
-            $searcher->getFilter(null, null, 'mob')
+            null
         );
         $rendered_results = "<br> SEARCH RESULTS:";
         foreach ($result as $result_item) {

@@ -22,11 +22,7 @@ namespace ILIAS\MetaData\Repository\Utilities\Queries\Paths;
 
 use ILIAS\MetaData\Paths\PathInterface;
 
-interface DatabaseParsedPathsInterface
+interface DatabasePathsParserFactoryInterface
 {
-    public function selectForQuery(): string;
-
-    public function columnForPath(PathInterface $path): string;
-
-    public function tableAliasForFilters(): string;
+    public function forSearch(): DatabasePathsParserInterface;
 }

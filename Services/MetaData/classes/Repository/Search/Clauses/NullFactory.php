@@ -29,7 +29,8 @@ class NullFactory implements FactoryInterface
     public function getBasicClause(
         PathInterface $path,
         Mode $mode,
-        string $value
+        string $value,
+        bool $is_mode_negated = false
     ): ClauseInterface {
         return new NullClause();
     }

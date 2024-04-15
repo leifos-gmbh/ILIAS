@@ -29,5 +29,7 @@ interface BasicPropertiesInterface
 
     public function mode(): Mode;
 
+    public function isModeNegated(): bool;
+
     public function value(): string;
 }

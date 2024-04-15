@@ -46,6 +46,7 @@ class DatabasePathsParser implements DatabasePathsParserInterface
     protected array $path_joins = [];
 
     protected int $path_number = 1;
+    protected array $columns_by_path = [];
 
     /**
      * Just for quoting.
@@ -90,11 +91,16 @@ class DatabasePathsParser implements DatabasePathsParserInterface
             }
         }
 
-        return 'SELECT DISTINCT p1t1.rbac_id, p1t1.obj_id, p1t1.obj_type FROM (' . $from_expression . ')';
+        return 'SELECT p1t1.rbac_id, p1t1.obj_id, p1t1.obj_type FROM (' . $from_expression . ')';
     }
 
     public function addPathAndGetColumn(PathInterface $path): string
     {
+        $path_string = $path->toString();
+        if (isset($this->columns_by_path[$path_string])) {
+            return $this->columns_by_path[$path_string];
+        }
+
         $data_column_name = '';
 
         $navigator = $this->navigator_factory->structureNavigator(
@@ -124,7 +130,7 @@ class DatabasePathsParser implements DatabasePathsParserInterface
             $this->path_number++;
         }
 
-        return $data_column_name;
+        return $this->columns_by_path[$path_string] = $data_column_name;
     }
 
     public function getTableAliasForFilters(): ?string

@@ -82,6 +82,29 @@ class ClauseWithPropertiesAndFactoryTest extends TestCase
         $this->assertSame(Mode::CONTAINS, $basic_clause->basicProperties()->mode());
     }
 
+    public function testBasicClauseNegatedModeTrue(): void
+    {
+        $factory = new Factory();
+        $basic_clause = $factory->getBasicClause(
+            $this->getNonEmptyPath(),
+            Mode::CONTAINS,
+            'value',
+            true
+        );
+        $this->assertTrue($basic_clause->basicProperties()->isModeNegated());
+    }
+
+    public function testBasicClauseNegatedModeDefaultFalse(): void
+    {
+        $factory = new Factory();
+        $basic_clause = $factory->getBasicClause(
+            $this->getNonEmptyPath(),
+            Mode::CONTAINS,
+            'value'
+        );
+        $this->assertFalse($basic_clause->basicProperties()->isModeNegated());
+    }
+
     public function testBasicClauseValue(): void
     {
         $factory = new Factory();
@@ -93,7 +116,12 @@ class ClauseWithPropertiesAndFactoryTest extends TestCase
     {
         $factory = new Factory();
         $join_props = new JoinProperties(Operator::AND, new NullClause(), new NullClause());
-        $basic_props = new BasicProperties($this->getNonEmptyPath(), Mode::ENDS_WITH, 'value');
+        $basic_props = new BasicProperties(
+            $this->getNonEmptyPath(),
+            Mode::ENDS_WITH,
+            'value',
+            false
+        );
         $clause = new Clause(false, true, $join_props, $basic_props);
 
         $negated = $factory->getNegatedClause($clause);
@@ -108,7 +136,12 @@ class ClauseWithPropertiesAndFactoryTest extends TestCase
     {
         $factory = new Factory();
         $join_props = new JoinProperties(Operator::AND, new NullClause(), new NullClause());
-        $basic_props = new BasicProperties($this->getNonEmptyPath(), Mode::ENDS_WITH, 'value');
+        $basic_props = new BasicProperties(
+            $this->getNonEmptyPath(),
+            Mode::ENDS_WITH,
+            'value',
+            false
+        );
         $clause = new Clause(true, true, $join_props, $basic_props);
 
         $negated = $factory->getNegatedClause($clause);

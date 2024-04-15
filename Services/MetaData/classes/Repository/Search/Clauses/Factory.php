@@ -31,7 +31,8 @@ class Factory implements FactoryInterface
     public function getBasicClause(
         PathInterface $path,
         Mode $mode,
-        string $value
+        string $value,
+        bool $is_mode_negated = false
     ): ClauseInterface {
         if (count(iterator_to_array($path->steps())) === 0) {
             throw new \ilMDRepositoryException('Paths in search clauses must not be empty.');
@@ -44,7 +45,8 @@ class Factory implements FactoryInterface
             new BasicProperties(
                 $path,
                 $mode,
-                $value
+                $value,
+                $is_mode_negated
             )
         );
     }

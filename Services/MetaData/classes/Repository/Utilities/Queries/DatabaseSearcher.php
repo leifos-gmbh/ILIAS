@@ -56,11 +56,13 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         FilterInterface ...$filters
     ): \Generator {
         $paths_parser = $this->paths_parser_factory->forSearch();
-        $where = $this->getClauseForQueryWhere($clause, $paths_parser);
+        $where = $this->getClauseForQueryHaving($clause, $paths_parser);
+        $quoted_table_alias = $this->db->quoteIdentifier($paths_parser->getTableAliasForFilters());
 
         $result = $this->db->query(
-            $query = $paths_parser->getSelectForQuery() . ' WHERE ' . $where .
-            $this->getFiltersForQueryWhere($paths_parser->getTableAliasForFilters(), ...$filters) .
+            $query = $paths_parser->getSelectForQuery() . ' GROUP BY ' . $quoted_table_alias . '.rbac_id, ' .
+            $quoted_table_alias . '.obj_id, ' . $quoted_table_alias . '.obj_type HAVING ' . $where .
+            $this->getFiltersForQueryHaving($quoted_table_alias, ...$filters) .
             ' ORDER BY rbac_id, obj_id, obj_type' . $this->getLimitAndOffsetForQuery($limit, $offset)
         );
 
@@ -76,15 +78,13 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         }
     }
 
-    protected function getFiltersForQueryWhere(
-        string $table_alias,
+    protected function getFiltersForQueryHaving(
+        string $quoted_table_alias,
         FilterInterface ...$filters
     ): string {
         if (empty($filters)) {
             return '';
         }
-
-        $quoted_table_alias = $this->db->quoteIdentifier($table_alias);
 
         $filter_where = [];
         foreach ($filters as $filter) {
@@ -120,7 +120,7 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         return $query_limit . $query_offset;
     }
 
-    protected function getClauseForQueryWhere(
+    protected function getClauseForQueryHaving(
         ClauseInterface $clause,
         DatabasePathsParserInterface $paths_parser,
         int $depth = 0
@@ -141,7 +141,7 @@ class DatabaseSearcher implements DatabaseSearcherInterface
 
         $sub_clauses_for_query = [];
         foreach ($join_props->subClauses() as $sub_clause) {
-            $sub_clauses_for_query[] = $this->getClauseForQueryWhere($sub_clause, $paths_parser, $depth + 1);
+            $sub_clauses_for_query[] = $this->getClauseForQueryHaving($sub_clause, $paths_parser, $depth + 1);
         }
 
         switch ($join_props->operator()) {
@@ -167,7 +167,7 @@ class DatabaseSearcher implements DatabaseSearcherInterface
 
     protected function getBasicClauseForQueryWhere(
         BasicProperties $basic_props,
-        bool $is_negated,
+        bool $is_clause_negated,
         DatabasePathsParserInterface $paths_parser
     ): string {
         switch ($basic_props->mode()) {
@@ -195,11 +195,17 @@ class DatabaseSearcher implements DatabaseSearcherInterface
                 throw new \ilMDRepositoryException('Invalid search mode.');
         }
 
-        $negation = '';
-        if ($is_negated) {
-            $negation = 'NOT ';
+        $mode_negation = '';
+        if ($basic_props->isModeNegated()) {
+            $mode_negation = 'NOT ';
+        }
+        $clause_negation = '';
+        if ($is_clause_negated) {
+            $clause_negation = 'NOT ';
         }
 
-        return $negation . $paths_parser->addPathAndGetColumn($basic_props->path()) . ' ' . $comparison;
+        return $clause_negation . 'COUNT(CASE WHEN ' . $mode_negation .
+            $paths_parser->addPathAndGetColumn($basic_props->path()) . ' ' . $comparison .
+            ' THEN 1 END) > 0';
     }
 }

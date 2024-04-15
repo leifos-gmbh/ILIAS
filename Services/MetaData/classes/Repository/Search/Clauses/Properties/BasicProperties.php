@@ -27,16 +27,19 @@ class BasicProperties implements BasicPropertiesInterface
 {
     protected PathInterface $path;
     protected Mode $mode;
+    protected bool $is_mode_negated;
     protected string $value;
 
     public function __construct(
         PathInterface $path,
         Mode $mode,
-        string $value
+        string $value,
+        bool $is_mode_negated,
     ) {
         $this->path = $path;
         $this->mode = $mode;
         $this->value = $value;
+        $this->is_mode_negated = $is_mode_negated;
     }
 
     public function path(): PathInterface
@@ -47,6 +50,11 @@ class BasicProperties implements BasicPropertiesInterface
     public function mode(): Mode
     {
         return $this->mode;
+    }
+
+    public function isModeNegated(): bool
+    {
+        return $this->is_mode_negated;
     }
 
     public function value(): string

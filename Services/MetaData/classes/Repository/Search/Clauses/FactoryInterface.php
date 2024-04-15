@@ -30,20 +30,26 @@ interface FactoryInterface
      * Basic search clause with the following semantics:
      * "Find all LOM sets that have at least one element at the
      * end of the path whose value fulfills the condition."
+     * The condition is assembled from mode and value parameters,
+     * e.g. "equals 'cat'" or "starts with 'a'". Negating the mode
+     * leads to e.g. "does not equal 'cat'"
+     *
+     * Filters on the path are taken into account, with the
+     * exception of index filters.
      */
     public function getBasicClause(
         PathInterface $path,
         Mode $mode,
-        string $value
+        string $value,
+        bool $is_mode_negated = false
     ): ClauseInterface;
 
     /**
-     * Note that joining clauses with the same paths can lead
-     * to results that are at first glance counter-intuitive:
-     * joining "Find all LOM sets with a keyword 'key'" and
-     * "Find all LOM sets with a keyword 'different key'" with AND operator
-     * can return results, since a LOM set can contain multiple
-     * keywords.
+     * Joins multiple clauses with an operator, leading to
+     * search clauses like:
+     * "Find all LOM sets that have at least one keyword with
+     * value 'key' and at least one keyword with value 'different key'
+     * and at least one author with value 'name'."
      */
     public function getJoinedClauses(
         Operator $operator,
@@ -53,10 +59,10 @@ interface FactoryInterface
     ): ClauseInterface;
 
     /**
-     * Note that negation will only apply to the condition placed
-     * on values of LOM elements: negating "Find all LOM sets with a keyword 'key'" gives
-     * "Find all LOM sets with a keyword that is not 'key'", and **not**
-     * "Find all LOM sets with **no** keyword 'key'".
+     * Negating a clause does **not** negate the condition on values, e.g.
+     * negating "Find all LOM sets with a keyword 'key'" gives
+     * "Find all LOM sets with **no** keyword 'key'", and **not**
+     * "Find all LOM sets with a keyword that is not 'key'".
      *
      * Further, negation of joined clauses will also apply to the operators
      * accordingly (negating AND-joined clauses will result in negated OR-joined clauses).

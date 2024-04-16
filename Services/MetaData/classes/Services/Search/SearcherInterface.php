@@ -24,15 +24,16 @@ use ILIAS\MetaData\Elements\RessourceID\RessourceIDInterface;
 use ILIAS\Metadata\Repository\Search\Clauses\FactoryInterface;
 use ILIAS\Metadata\Repository\Search\Clauses\ClauseInterface;
 use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
+use ILIAS\MetaData\Repository\Search\Filters\Placeholder;
 
 interface SearcherInterface
 {
     public function getClauseFactory(): FactoryInterface;
 
     public function getFilter(
-        ?int $obj_id,
-        ?int $sub_id,
-        ?string $type
+        int|Placeholder $obj_id = Placeholder::ANY,
+        int|Placeholder $sub_id = Placeholder::ANY,
+        string|Placeholder $type = Placeholder::ANY
     ): FilterInterface;
 
     /**

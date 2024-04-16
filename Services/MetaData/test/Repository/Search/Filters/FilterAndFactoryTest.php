@@ -31,11 +31,11 @@ class FilterAndFactoryTest extends TestCase
         $this->assertSame(23, $filter->objID());
     }
 
-    public function testObjIDNull()
+    public function testObjIDPlaceholder()
     {
         $factory = new Factory();
-        $filter = $factory->get(null, 5, 'type');
-        $this->assertNull($filter->objID());
+        $filter = $factory->get(Placeholder::ANY, 5, 'type');
+        $this->assertSame(Placeholder::ANY, $filter->objID());
     }
 
     public function testSubID()
@@ -45,11 +45,11 @@ class FilterAndFactoryTest extends TestCase
         $this->assertSame(5, $filter->subID());
     }
 
-    public function testSubIDNull()
+    public function testSubIDPlaceholder()
     {
         $factory = new Factory();
-        $filter = $factory->get(245, null, 'type');
-        $this->assertNull($filter->subID());
+        $filter = $factory->get(245, Placeholder::OBJ_ID, 'type');
+        $this->assertSame(Placeholder::OBJ_ID, $filter->subID());
     }
 
     public function testType()
@@ -59,10 +59,10 @@ class FilterAndFactoryTest extends TestCase
         $this->assertSame('type', $filter->type());
     }
 
-    public function testTypeNull()
+    public function testTypePlaceholder()
     {
         $factory = new Factory();
-        $filter = $factory->get(23, 5, null);
-        $this->assertNull($filter->type());
+        $filter = $factory->get(23, 5, Placeholder::ANY);
+        $this->assertSame(Placeholder::ANY, $filter->type());
     }
 }

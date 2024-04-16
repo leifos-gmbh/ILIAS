@@ -26,6 +26,7 @@ use ILIAS\Metadata\Repository\Search\Clauses\ClauseInterface;
 use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
 use ILIAS\MetaData\Repository\Search\Filters\FactoryInterface as FilterFactory;
 use ILIAS\MetaData\Repository\RepositoryInterface;
+use ILIAS\MetaData\Repository\Search\Filters\Placeholder;
 
 class Searcher implements SearcherInterface
 {
@@ -49,10 +50,13 @@ class Searcher implements SearcherInterface
     }
 
     public function getFilter(
-        ?int $obj_id,
-        ?int $sub_id,
-        ?string $type
+        int|Placeholder $obj_id = Placeholder::ANY,
+        int|Placeholder $sub_id = Placeholder::ANY,
+        string|Placeholder $type = Placeholder::ANY
     ): FilterInterface {
+        if ($sub_id === 0) {
+            $sub_id = Placeholder::OBJ_ID;
+        }
         return $this->filter_factory->get($obj_id, $sub_id, $type);
     }
 

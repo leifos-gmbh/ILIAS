@@ -31,6 +31,7 @@ use ILIAS\MetaData\Vocabularies\Dictionary\LOMDictionaryInitiator as LOMVocabIni
 use ILIAS\MetaData\Paths\Filters\FilterInterface as PathFilter;
 use ILIAS\MetaData\Paths\Filters\FilterType;
 use ILIAS\MetaData\Repository\Utilities\Queries\TableNamesHandler;
+use ILIAS\MetaData\Repository\Dictionary\TagInterface;
 
 class DatabasePathsParser implements DatabasePathsParserInterface
 {
@@ -103,10 +104,7 @@ class DatabasePathsParser implements DatabasePathsParserInterface
 
         $data_column_name = '';
 
-        $navigator = $this->navigator_factory->structureNavigator(
-            $path,
-            $this->structure->getRoot()
-        );
+        $navigator = $this->getNavigatorForPath($path);
         $tables = [];
         $conditions = [];
         foreach ($this->collectJoinInfos($navigator, $this->path_number) as $type => $info) {
@@ -135,6 +133,9 @@ class DatabasePathsParser implements DatabasePathsParserInterface
 
     public function getTableAliasForFilters(): ?string
     {
+        if (empty($this->path_joins)) {
+            throw new \ilMDRepositoryException('No tables found for search.');
+        }
         return 'p1t1';
     }
 
@@ -150,9 +151,14 @@ class DatabasePathsParser implements DatabasePathsParserInterface
         $current_table = '';
         $table_number = 1;
 
+        $depth = 0;
         while ($navigator->hasNextStep()) {
+            if ($depth > 20) {
+                throw new \ilMDStructureException('LOM Structure is nested to deep.');
+            }
+
             $navigator = $navigator->nextStep();
-            $current_tag = $this->dictionary->tagForElement($navigator->element());
+            $current_tag = $this->getTagForCurrentStepOfNavigator($navigator);
 
             if ($current_tag?->table() && $current_table !== $current_tag?->table()) {
                 $parent_table = $current_table;
@@ -172,8 +178,8 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                     $table_aliases[$current_table] = $alias;
                     $table_number++;
 
-                    yield self::JOIN_TABLE => $this->db->quoteIdentifier($this->table($current_table)) .
-                        ' AS ' . $this->db->quoteIdentifier($alias);
+                    yield self::JOIN_TABLE => $this->quoteIdentifier($this->table($current_table)) .
+                        ' AS ' . $this->quoteIdentifier($alias);
                 }
 
                 if (!$current_tag->hasParent()) {
@@ -197,22 +203,24 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                 yield self::JOIN_CONDITION => $this->getJoinConditionFromPathFilter(
                     $table_aliases[$current_table],
                     $current_table,
-                    $current_tag?->hasData() ? $current_tag->dataField() : null,
-                    $navigator->element()->getDefinition()->dataType() === Type::VOCAB_SOURCE ?
+                    $current_tag?->hasData() ? $current_tag->dataField() : '',
+                    $this->getDataTypeForCurrentStepOfNavigator($navigator) === Type::VOCAB_SOURCE ?
                         LOMVocabInitiator::SOURCE :
                         '',
                     $filter
                 );
             }
+
+            $depth++;
         }
 
-        $final_table_alias = $this->db->quoteIdentifier($table_aliases[$current_table]);
-        if ($current_tag?->hasData()) {
-            yield self::COLUMN_NAME => 'COALESCE(' . $this->db->quoteIdentifier($table_aliases[$current_table]) .
-                '.' . $this->db->quoteIdentifier($current_tag->dataField()) . ", '')";
-            return;
-        }
-        yield self::COLUMN_NAME => "''";
+        yield self::COLUMN_NAME => $this->getDataColumn(
+            $this->quoteIdentifier($table_aliases[$current_table]),
+            $current_tag?->hasData() ? $current_tag->dataField() : '',
+            $this->getDataTypeForCurrentStepOfNavigator($navigator) === Type::VOCAB_SOURCE ?
+                LOMVocabInitiator::SOURCE :
+                '',
+        );
     }
 
     protected function getBaseJoinConditionsForTable(
@@ -222,8 +230,8 @@ class DatabasePathsParser implements DatabasePathsParserInterface
         string $parent_table = null,
         string $parent_type = null
     ): string {
-        $table_alias = $this->db->quoteIdentifier($table_alias);
-        $first_table_alias = $this->db->quoteIdentifier($first_table_alias);
+        $table_alias = $this->quoteIdentifier($table_alias);
+        $first_table_alias = $this->quoteIdentifier($first_table_alias);
         $conditions = [];
 
         if ($table_alias !== $first_table_alias) {
@@ -234,33 +242,30 @@ class DatabasePathsParser implements DatabasePathsParserInterface
 
         if (!is_null($parent_table_alias) && !is_null($parent_table)) {
             $parent_id_column = $parent_table_alias . '.' .
-                $this->db->quoteIdentifier($this->IDName($parent_table));
+                $this->quoteIdentifier($this->IDName($parent_table));
             $conditions[] = $parent_id_column . ' = ' . $table_alias . '.parent_id';
         }
         if (!is_null($parent_type)) {
-            $conditions[] = $this->db->quote($parent_type, \ilDBConstants::T_TEXT) .
+            $conditions[] = $this->quoteText($parent_type) .
                 ' = ' . $table_alias . '.parent_type';
         }
 
         return implode(' AND ', $conditions);
     }
 
-    /**
-     * Direct_data is only needed to make vocab sources work until
-     * controlled vocabularies are implemented.
-     */
     protected function getJoinConditionFromPathFilter(
         string $table_alias,
         string $table,
-        ?string $data_field,
+        string $data_field,
         string $direct_data,
         PathFilter $filter
     ): string {
-        $table_alias = $this->db->quoteIdentifier($table_alias);
+        $table_alias = $this->quoteIdentifier($table_alias);
         $quoted_values = [];
         foreach ($filter->values() as $value) {
-            $type = $filter->type() === FilterType::DATA ? \ilDBConstants::T_TEXT : \ilDBConstants::T_INTEGER;
-            $quoted_values[] = $this->db->quote($value, $type);
+            $quoted_values[] = $filter->type() === FilterType::DATA ?
+                $this->quoteText($value) :
+                $this->quoteInteger((int) $value);
         }
 
         if (empty($quoted_values)) {
@@ -272,7 +277,7 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                 return '';
 
             case FilterType::MDID:
-                $column = $table_alias . '.' . $this->db->quoteIdentifier($this->IDName($table));
+                $column = $table_alias . '.' . $this->quoteIdentifier($this->IDName($table));
                 return $column . ' IN (' . implode(', ', $quoted_values) . ')';
                 break;
 
@@ -281,15 +286,61 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                 return '';
 
             case FilterType::DATA:
-                $column = $this->db->quote($direct_data, \ilDBConstants::T_TEXT);
-                if (!is_null($data_field)) {
-                    $column = 'COALESCE(' . $table_alias . '.' . $this->db->quoteIdentifier($data_field) . ", '')";
-                }
+                $column = $this->getDataColumn($table_alias, $data_field, $direct_data);
                 return $column . ' IN (' . implode(', ', $quoted_values) . ')';
                 break;
 
             default:
                 throw new \ilMDRepositoryException('Unknown filter type: ' . $filter->type()->value);
         }
+    }
+
+    /**
+     * Direct_data is only needed to make vocab sources work until
+     * controlled vocabularies are implemented.
+     */
+    protected function getDataColumn(
+        string $quoted_table_alias,
+        string $data_field,
+        string $direct_data,
+    ): string {
+        $column = $this->quoteText($direct_data);
+        if ($data_field !== '') {
+            $column = 'COALESCE(' . $quoted_table_alias . '.' . $this->quoteIdentifier($data_field) . ", '')";
+        }
+        return $column;
+    }
+
+    protected function getNavigatorForPath(PathInterface $path): StructureNavigatorInterface
+    {
+        return $this->navigator_factory->structureNavigator(
+            $path,
+            $this->structure->getRoot()
+        );
+    }
+
+    protected function getTagForCurrentStepOfNavigator(StructureNavigatorInterface $navigator): ?TagInterface
+    {
+        return $this->dictionary->tagForElement($navigator->element());
+    }
+
+    protected function getDataTypeForCurrentStepOfNavigator(StructureNavigatorInterface $navigator): Type
+    {
+        return $navigator->element()->getDefinition()->dataType();
+    }
+
+    protected function quoteIdentifier(string $identifier): string
+    {
+        return $this->db->quoteIdentifier($identifier);
+    }
+
+    protected function quoteText(string $text): string
+    {
+        return $this->db->quote($text, \ilDBConstants::T_TEXT);
+    }
+
+    protected function quoteInteger(int $integer): string
+    {
+        return $this->db->quote($integer, \ilDBConstants::T_INTEGER);
     }
 }

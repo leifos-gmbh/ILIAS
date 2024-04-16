@@ -18,22 +18,39 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Filters;
+namespace ILIAS\MetaData\Repository\Dictionary;
 
-class NullFilter implements FilterInterface
+use ILIAS\MetaData\Structure\Dictionaries\Tags\NullTag as BaseNullTag;
+
+class NullTag extends BaseNullTag implements TagInterface
 {
-    public function objID(): int|Placeholder
+    public function hasRowInTable(): bool
     {
-        return Placeholder::ANY;
+        return false;
     }
 
-    public function subID(): int|Placeholder
+    public function table(): string
     {
-        return Placeholder::ANY;
+        return '';
     }
 
-    public function type(): string|Placeholder
+    public function hasData(): bool
     {
-        return Placeholder::ANY;
+        return false;
+    }
+
+    public function dataField(): string
+    {
+        return '';
+    }
+
+    public function hasParent(): bool
+    {
+        return false;
+    }
+
+    public function parent(): string
+    {
+        return '';
     }
 }

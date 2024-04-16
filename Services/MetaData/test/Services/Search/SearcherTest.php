@@ -28,6 +28,7 @@ use ILIAS\MetaData\Repository\Search\Filters\NullFilter;
 use ILIAS\MetaData\Repository\NullRepository;
 use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
 use ILIAS\MetaData\Repository\Search\Clauses\NullClause;
+use ILIAS\MetaData\Repository\Search\Filters\Placeholder;
 
 class SearcherTest extends TestCase
 {
@@ -35,13 +36,19 @@ class SearcherTest extends TestCase
     {
         $clause_factory = new NullClauseFactory();
         $filter_factory = new class () extends NullFilterFactory {
-            public function get(?int $obj_id, ?int $sub_id, ?string $type): FilterInterface
-            {
+            public function get(
+                int|Placeholder $obj_id = Placeholder::ANY,
+                int|Placeholder $sub_id = Placeholder::ANY,
+                string|Placeholder $type = Placeholder::ANY
+            ): FilterInterface {
                 return new class ($obj_id, $sub_id, $type) extends NullFilter {
                     public array $data = [];
 
-                    public function __construct(?int $obj_id, ?int $sub_id, ?string $type)
-                    {
+                    public function __construct(
+                        int|Placeholder $obj_id,
+                        int|Placeholder $sub_id,
+                        string|Placeholder $type
+                    ) {
                         $this->data = [
                             'obj_id' => $obj_id,
                             'sub_id' => $sub_id,
@@ -79,35 +86,46 @@ class SearcherTest extends TestCase
         );
     }
 
-    public function testGetFilterWithObjIDNull(): void
+    public function testGetFilterWithSubIDZero(): void
     {
         $searcher = $this->getSearcher();
 
-        $filter = $searcher->getFilter(null, 98, 'type');
+        $filter = $searcher->getFilter(56, 0, 'type');
         $this->assertSame(
-            ['obj_id' => null, 'sub_id' => 98, 'type' => 'type'],
+            ['obj_id' => 56, 'sub_id' => Placeholder::OBJ_ID, 'type' => 'type'],
             $filter->data
         );
     }
 
-    public function testGetFilterWithSubIDNull(): void
+    public function testGetFilterWithObjIDPlaceholder(): void
     {
         $searcher = $this->getSearcher();
 
-        $filter = $searcher->getFilter(56, null, 'type');
+        $filter = $searcher->getFilter(Placeholder::ANY, 98, 'type');
         $this->assertSame(
-            ['obj_id' => 56, 'sub_id' => null, 'type' => 'type'],
+            ['obj_id' => Placeholder::ANY, 'sub_id' => 98, 'type' => 'type'],
             $filter->data
         );
     }
 
-    public function testGetFilterWithTypeNull(): void
+    public function testGetFilterWithSubIDPlaceholder(): void
     {
         $searcher = $this->getSearcher();
 
-        $filter = $searcher->getFilter(56, 98, null);
+        $filter = $searcher->getFilter(56, Placeholder::ANY, 'type');
         $this->assertSame(
-            ['obj_id' => 56, 'sub_id' => 98, 'type' => null],
+            ['obj_id' => 56, 'sub_id' => Placeholder::ANY, 'type' => 'type'],
+            $filter->data
+        );
+    }
+
+    public function testGetFilterWithTypePlaceholder(): void
+    {
+        $searcher = $this->getSearcher();
+
+        $filter = $searcher->getFilter(56, 98, Placeholder::ANY);
+        $this->assertSame(
+            ['obj_id' => 56, 'sub_id' => 98, 'type' => Placeholder::ANY],
             $filter->data
         );
     }

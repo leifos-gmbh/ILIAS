@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search;
+namespace ILIAS\MetaData\Repository\Search\Clauses;
 
 enum Mode: string
 {

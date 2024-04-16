@@ -23,30 +23,28 @@ namespace ILIAS\MetaData\Repository\Utilities\Queries;
 use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactoryInterface;
 use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
-use ILIAS\MetaData\Repository\Search\Operator;
-use ILIAS\MetaData\Repository\Search\Mode;
+use ILIAS\MetaData\Repository\Search\Clauses\Operator;
+use ILIAS\MetaData\Repository\Search\Clauses\Mode;
 use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicProperties;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParserFactoryInterface;
 use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParserInterface;
+use ILIAS\MetaData\Repository\Search\Filters\Placeholder;
 
 class DatabaseSearcher implements DatabaseSearcherInterface
 {
     protected RessourceIDFactoryInterface $ressource_factory;
     protected DatabasePathsParserFactoryInterface $paths_parser_factory;
     protected \ilDBInterface $db;
-    protected \ilLogger $logger;
 
     public function __construct(
         RessourceIDFactoryInterface $ressource_factory,
         DatabasePathsParserFactoryInterface $paths_parser_factory,
-        \ilDBInterface $db,
-        \ilLogger $logger
+        \ilDBInterface $db
     ) {
         $this->ressource_factory = $ressource_factory;
         $this->paths_parser_factory = $paths_parser_factory;
         $this->db = $db;
-        $this->logger = $logger;
     }
 
     public function search(
@@ -82,28 +80,55 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         string $quoted_table_alias,
         FilterInterface ...$filters
     ): string {
-        if (empty($filters)) {
-            return '';
-        }
-
         $filter_where = [];
         foreach ($filters as $filter) {
             $filter_values = [];
-            if (!is_null($filter->objID())) {
-                $filter_values[] = $quoted_table_alias . '.rbac_id = ' .
-                    $this->db->quote($filter->objID(), \ilDBConstants::T_INTEGER);
+            if ($val = $this->getFilterValueFroCondition($quoted_table_alias, $filter->objID())) {
+                $filter_values[] = $quoted_table_alias . '.rbac_id = ' . $val;
             }
-            if (!is_null($filter->subID())) {
-                $filter_values[] = $quoted_table_alias . '.obj_id = ' .
-                    $this->db->quote($filter->subID(), \ilDBConstants::T_INTEGER);
+            if ($val = $this->getFilterValueFroCondition($quoted_table_alias, $filter->objID())) {
+                $filter_values[] = $quoted_table_alias . '.obj_id = ' . $val;
             }
-            if (!is_null($filter->type())) {
-                $filter_values[] = $quoted_table_alias . '.obj_type = ' .
-                    $this->db->quote($filter->type(), \ilDBConstants::T_TEXT);
+            if ($val = $this->getFilterValueFroCondition($quoted_table_alias, $filter->objID())) {
+                $filter_values[] = $quoted_table_alias . '.obj_type = ' . $val;
             }
-            $filter_where[] = '(' . implode(' AND ', $filter_values) . ')';
+            if (!empty($filter_values)) {
+                $filter_where[] = '(' . implode(' AND ', $filter_values) . ')';
+            }
         }
+
+        if (empty($filter_where)) {
+            return '';
+        }
+
         return ' AND (' . implode(' OR ', $filter_where) . ')';
+    }
+
+    protected function getFilterValueFroCondition(
+        string $quoted_table_alias,
+        string|int|Placeholder $value
+    ): string {
+        if (is_int($value)) {
+            return $this->db->quote($value, \ilDBConstants::T_INTEGER);
+        }
+        if (is_string($value)) {
+            return $this->db->quote($value, \ilDBConstants::T_TEXT);
+        }
+
+        switch ($value) {
+            case Placeholder::OBJ_ID:
+                return $quoted_table_alias . '.rbac_id';
+
+            case Placeholder::SUB_ID:
+                return $quoted_table_alias . '.obj_id';
+
+            case Placeholder::TYPE:
+                return $quoted_table_alias . '.obj_type';
+
+            case Placeholder::ANY:
+            default:
+                return '';
+        }
     }
 
     protected function getLimitAndOffsetForQuery(?int $limit, ?int $offset): string

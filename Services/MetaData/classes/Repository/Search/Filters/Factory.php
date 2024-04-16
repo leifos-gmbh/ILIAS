@@ -23,9 +23,9 @@ namespace ILIAS\MetaData\Repository\Search\Filters;
 class Factory implements FactoryInterface
 {
     public function get(
-        ?int $obj_id,
-        ?int $sub_id,
-        ?string $type
+        int|Placeholder $obj_id = Placeholder::ANY,
+        int|Placeholder $sub_id = Placeholder::ANY,
+        string|Placeholder $type = Placeholder::ANY
     ): FilterInterface {
         return new Filter($obj_id, $sub_id, $type);
     }

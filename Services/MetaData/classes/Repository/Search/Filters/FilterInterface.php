@@ -22,9 +22,9 @@ namespace ILIAS\MetaData\Repository\Search\Filters;
 
 interface FilterInterface
 {
-    public function objID(): ?int;
+    public function objID(): int|Placeholder;
 
-    public function subID(): ?int;
+    public function subID(): int|Placeholder;
 
-    public function type(): ?string;
+    public function type(): string|Placeholder;
 }

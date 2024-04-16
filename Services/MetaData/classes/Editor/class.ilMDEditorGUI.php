@@ -119,17 +119,17 @@ class ilMDEditorGUI
         $clause_factory = $searcher->getClauseFactory();
         $author_clause = $clause_factory->getBasicClause(
             $paths->authors(),
-            \ILIAS\MetaData\Repository\Search\Mode::EQUALS,
+            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
             'erster'
         );
         $second_author_clause = $clause_factory->getBasicClause(
             $paths->authors(),
-            \ILIAS\MetaData\Repository\Search\Mode::EQUALS,
+            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
             'zweiter'
         );
         $negated_mode_author_clause = $clause_factory->getBasicClause(
             $paths->authors(),
-            \ILIAS\MetaData\Repository\Search\Mode::EQUALS,
+            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
             'erster',
             true
         );
@@ -146,36 +146,36 @@ class ilMDEditorGUI
                   ->withNextStepToSuperElement()
                   ->withNextStep('entity')
                   ->get(),
-            \ILIAS\MetaData\Repository\Search\Mode::EQUALS,
+            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
             'Katze'
         );
         $author_and_not_katze_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Operator::AND,
+            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
             $author_clause,
             $clause_factory->getNegatedClause($katze_clause)
         );
         $empty_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Operator::AND,
+            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
             $author_and_not_katze_clause,
             $clause_factory->getNegatedClause($author_and_not_katze_clause)
         );
         $two_authors_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Operator::AND,
+            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
             $author_clause,
             $second_author_clause
         );
         $garfield_clause = $clause_factory->getBasicClause(
             $paths->copyright(),
-            \ILIAS\MetaData\Repository\Search\Mode::EQUALS,
+            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
             'il_copyright_entry__0__5'
         );
         $author_and_not_author_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Operator::AND,
+            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
             $author_clause,
             $clause_factory->getNegatedClause($author_clause)
         );
         $author_and_negated_mode_author_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Operator::AND,
+            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
             $author_clause,
             $negated_mode_author_clause
         );

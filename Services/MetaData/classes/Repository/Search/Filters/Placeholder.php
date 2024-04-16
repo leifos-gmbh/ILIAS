@@ -20,13 +20,10 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Repository\Search\Filters;
 
-class NullFactory implements FactoryInterface
+enum Placeholder: string
 {
-    public function get(
-        int|Placeholder $obj_id = Placeholder::ANY,
-        int|Placeholder $sub_id = Placeholder::ANY,
-        string|Placeholder $type = Placeholder::ANY
-    ): FilterInterface {
-        return new NullFilter();
-    }
+    case OBJ_ID = 'obj_id';
+    case SUB_ID = 'sub_id';
+    case TYPE = 'type';
+    case ANY = 'any';
 }

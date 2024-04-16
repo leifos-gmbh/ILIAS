@@ -150,8 +150,7 @@ class Services
                     $this->databaseDictionary(),
                     $this->path_services->navigatorFactory()
                 ),
-                $this->dic->database(),
-                $logger
+                $this->dic->database()
             ),
             new Cleaner(
                 $element_factory,

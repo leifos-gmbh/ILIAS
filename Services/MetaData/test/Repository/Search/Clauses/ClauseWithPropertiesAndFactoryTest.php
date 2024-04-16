@@ -22,9 +22,7 @@ namespace ILIAS\MetaData\Repository\Search\Clauses;
 
 use PHPUnit\Framework\TestCase;
 use ILIAS\MetaData\Paths\NullPath;
-use ILIAS\MetaData\Repository\Search\Mode;
 use ILIAS\MetaData\Repository\Search\Clauses\Properties\JoinProperties;
-use ILIAS\MetaData\Repository\Search\Operator;
 use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicProperties;
 use ILIAS\MetaData\Paths\Steps\NullStep;
 use ILIAS\MetaData\Paths\PathInterface;

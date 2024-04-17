@@ -113,88 +113,9 @@ class ilMDEditorGUI
         $xml_writer = new ilMD2XML($this->obj_id, $this->sub_id, $this->type);
         $xml_writer->startExport();
 
-        global $DIC;
-        $paths = $DIC->learningObjectMetadata()->paths();
-        $searcher = $DIC->learningObjectMetadata()->search();
-        $clause_factory = $searcher->getClauseFactory();
-        $author_clause = $clause_factory->getBasicClause(
-            $paths->authors(),
-            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
-            'erster'
-        );
-        $second_author_clause = $clause_factory->getBasicClause(
-            $paths->authors(),
-            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
-            'zweiter'
-        );
-        $negated_mode_author_clause = $clause_factory->getBasicClause(
-            $paths->authors(),
-            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
-            'erster',
-            true
-        );
-        $katze_clause = $clause_factory->getBasicClause(
-            $paths->custom()->withNextStep('lifeCycle')
-                  ->withNextStep('contribute')
-                  ->withNextStep('role')
-                  ->withNextStep('value')
-                  ->withAdditionalFilterAtCurrentStep(ILIAS\MetaData\Paths\Filters\FilterType::DATA, 'graphical designer')
-                  ->withNextStepToSuperElement()
-                  ->withNextStep('source')
-                  ->withAdditionalFilterAtCurrentStep(ILIAS\MetaData\Paths\Filters\FilterType::DATA, 'LOMv1.0')
-                  ->withNextStepToSuperElement()
-                  ->withNextStepToSuperElement()
-                  ->withNextStep('entity')
-                  ->get(),
-            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
-            'Katze'
-        );
-        $author_and_not_katze_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
-            $author_clause,
-            $clause_factory->getNegatedClause($katze_clause)
-        );
-        $empty_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
-            $author_and_not_katze_clause,
-            $clause_factory->getNegatedClause($author_and_not_katze_clause)
-        );
-        $two_authors_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
-            $author_clause,
-            $second_author_clause
-        );
-        $garfield_clause = $clause_factory->getBasicClause(
-            $paths->copyright(),
-            \ILIAS\MetaData\Repository\Search\Clauses\Mode::EQUALS,
-            'il_copyright_entry__0__5'
-        );
-        $author_and_not_author_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
-            $author_clause,
-            $clause_factory->getNegatedClause($author_clause)
-        );
-        $author_and_negated_mode_author_clause = $clause_factory->getJoinedClauses(
-            \ILIAS\MetaData\Repository\Search\Clauses\Operator::AND,
-            $author_clause,
-            $negated_mode_author_clause
-        );
-
-        $result = $searcher->search(
-            $two_authors_clause,
-            null,
-            null
-        );
-        $rendered_results = "<br> SEARCH RESULTS:";
-        foreach ($result as $result_item) {
-            $rendered_results .= "<br> obj id: " . $result_item->objID() .
-                ", sub id: " . $result_item->subID() .
-                ", type: " . $result_item->type();
-        }
-
         $button = $this->renderButtonToFullEditor();
 
-        $this->tpl->setContent($button . htmlentities($xml_writer->getXML()) . $rendered_results);
+        $this->tpl->setContent($button . htmlentities($xml_writer->getXML()));
         return true;
     }
 

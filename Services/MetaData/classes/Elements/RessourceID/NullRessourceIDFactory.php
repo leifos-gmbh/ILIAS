@@ -18,15 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Utilities\Queries\Paths;
+namespace ILIAS\MetaData\Elements\RessourceID;
 
-use ILIAS\MetaData\Paths\PathInterface;
-
-interface DatabasePathsParserInterface
+class NullRessourceIDFactory implements RessourceIDFactoryInterface
 {
-    public function getSelectForQuery(): string;
-
-    public function addPathAndGetColumn(PathInterface $path): string;
-
-    public function getTableAliasForFilters(): string;
+    public function ressourceID(
+        int $obj_id,
+        int $sub_id,
+        string $type
+    ): RessourceIDInterface {
+        return new NullRessourceID();
+    }
 }

@@ -18,15 +18,23 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Utilities\Queries\Paths;
+namespace ILIAS\MetaData\Repository\Search\Clauses\Properties;
 
-use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Repository\Search\Clauses\Operator;
+use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
 
-interface DatabasePathsParserInterface
+class NullJoinProperties implements JoinPropertiesInterface
 {
-    public function getSelectForQuery(): string;
+    public function operator(): Operator
+    {
+        return Operator::OR;
+    }
 
-    public function addPathAndGetColumn(PathInterface $path): string;
-
-    public function getTableAliasForFilters(): string;
+    /**
+     * @return ClauseInterface[]
+     */
+    public function subClauses(): \Generator
+    {
+        yield from [];
+    }
 }

@@ -22,11 +22,10 @@ namespace ILIAS\MetaData\Repository\Utilities\Queries\Paths;
 
 use ILIAS\MetaData\Paths\PathInterface;
 
-interface DatabasePathsParserInterface
+class NullDatabasePathsParserFactory implements DatabasePathsParserFactoryInterface
 {
-    public function getSelectForQuery(): string;
-
-    public function addPathAndGetColumn(PathInterface $path): string;
-
-    public function getTableAliasForFilters(): string;
+    public function forSearch(): DatabasePathsParserInterface
+    {
+        return new NullDatabasePathsParser();
+    }
 }

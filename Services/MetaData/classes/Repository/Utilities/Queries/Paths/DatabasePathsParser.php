@@ -44,9 +44,18 @@ class DatabasePathsParser implements DatabasePathsParserInterface
     /**
      * @var string[]
      */
-    protected array $path_joins = [];
+    protected array $path_joins_by_path = [];
+
+    /**
+     * @var array[] sub arrays contain strings
+     */
+    protected array $additional_conditions_by_path = [];
 
     protected int $path_number = 1;
+
+    /**
+     * @var string[]
+     */
     protected array $columns_by_path = [];
 
     /**
@@ -75,24 +84,33 @@ class DatabasePathsParser implements DatabasePathsParserInterface
     public function getSelectForQuery(): string
     {
         $from_expression = '';
-        if (empty($this->path_joins)) {
+        if (empty($this->path_joins_by_path)) {
             throw new \ilMDRepositoryException('No tables found for search.');
-        } elseif (count($this->path_joins) === 1) {
-            $from_expression = $this->path_joins[0];
+        } elseif (count($this->path_joins_by_path) === 1) {
+            $from_expression = array_values($this->path_joins_by_path)[0];
+            $path = array_keys($this->path_joins_by_path)[0];
+            if (isset($this->additional_conditions_by_path[$path])) {
+                $from_expression .= ' WHERE ' .
+                    implode(' AND ', $this->additional_conditions_by_path[$path]);
+            }
         } else {
             $from_expression = 'il_meta_general AS base';
             $path_number = 1;
-            foreach ($this->path_joins as $join) {
+            foreach ($this->path_joins_by_path as $path => $join) {
                 $condition = $this->getBaseJoinConditionsForTable(
                     'base',
                     'p' . $path_number . 't1',
                 );
+                if (isset($this->additional_conditions_by_path[$path])) {
+                    $condition .= ' AND ' .
+                        implode(' AND ', $this->additional_conditions_by_path[$path]);
+                }
                 $from_expression .= ' LEFT JOIN (' . $join . ') ON ' . $condition;
                 $path_number++;
             }
         }
 
-        return 'SELECT p1t1.rbac_id, p1t1.obj_id, p1t1.obj_type FROM (' . $from_expression . ')';
+        return 'SELECT p1t1.rbac_id, p1t1.obj_id, p1t1.obj_type FROM ' . $from_expression;
     }
 
     public function addPathAndGetColumn(PathInterface $path): string
@@ -104,10 +122,9 @@ class DatabasePathsParser implements DatabasePathsParserInterface
 
         $data_column_name = '';
 
-        $navigator = $this->getNavigatorForPath($path);
         $tables = [];
         $conditions = [];
-        foreach ($this->collectJoinInfos($navigator, $this->path_number) as $type => $info) {
+        foreach ($this->collectJoinInfos($path, $this->path_number) as $type => $info) {
             if ($type === self::JOIN_TABLE && !empty($info)) {
                 $tables[] = $info;
             }
@@ -119,21 +136,30 @@ class DatabasePathsParser implements DatabasePathsParserInterface
             }
         }
 
-        if (!empty($tables)) {
+        if (count($tables) === 1 && !empty($conditions)) {
+            $this->path_joins_by_path[$path_string] = $tables[0];
+            /**
+             * If there is just one table on the path, additional conditions
+             * e.g. from filters can't be treated as a join condition on the
+             * path, so it has to be passed one layer up.
+             */
+            $this->additional_conditions_by_path[$path_string] = $conditions;
+            $this->path_number++;
+        } elseif (!empty($tables)) {
             $join = implode(' JOIN ', $tables);
             if (!empty($conditions)) {
                 $join .= ' ON ' . implode(' AND ', $conditions);
             }
-            $this->path_joins[] = $join;
+            $this->path_joins_by_path[$path_string] = $join;
             $this->path_number++;
         }
 
         return $this->columns_by_path[$path_string] = $data_column_name;
     }
 
-    public function getTableAliasForFilters(): ?string
+    public function getTableAliasForFilters(): string
     {
-        if (empty($this->path_joins)) {
+        if (empty($this->path_joins_by_path)) {
             throw new \ilMDRepositoryException('No tables found for search.');
         }
         return 'p1t1';
@@ -143,9 +169,10 @@ class DatabasePathsParser implements DatabasePathsParserInterface
      * @return string[], key is either self::JOIN_TABLE, self::JOIN_CONDITION or self::COLUMN_NAME
      */
     protected function collectJoinInfos(
-        StructureNavigatorInterface $navigator,
+        PathInterface $path,
         int $path_number
     ): \Generator {
+        $navigator = $this->getNavigatorForPath($path);
         $table_aliases = [];
         $current_tag = null;
         $current_table = '';
@@ -187,20 +214,19 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                         'p' . $path_number . 't1',
                         $alias
                     );
-                    continue;
+                } else {
+                    yield self::JOIN_CONDITION => $this->getBaseJoinConditionsForTable(
+                        'p' . $path_number . 't1',
+                        $alias,
+                        $table_aliases[$parent_table],
+                        $parent_table,
+                        $current_tag->parent()
+                    );
                 }
-
-                yield self::JOIN_CONDITION => $this->getBaseJoinConditionsForTable(
-                    'p' . $path_number . 't1',
-                    $alias,
-                    $table_aliases[$parent_table],
-                    $parent_table,
-                    $current_tag->parent()
-                );
             }
 
             foreach ($navigator->currentStep()->filters() as $filter) {
-                yield self::JOIN_CONDITION => $this->getJoinConditionFromPathFilter(
+                yield self::JOIN_CONDITION => $res = $this->getJoinConditionFromPathFilter(
                     $table_aliases[$current_table],
                     $current_table,
                     $current_tag?->hasData() ? $current_tag->dataField() : '',

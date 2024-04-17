@@ -18,15 +18,31 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Utilities\Queries\Paths;
+namespace ILIAS\MetaData\Repository\Search\Clauses\Properties;
 
 use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Repository\Search\Clauses\Mode;
+use ILIAS\MetaData\Paths\NullPath;
 
-interface DatabasePathsParserInterface
+class NullBasicProperties implements BasicPropertiesInterface
 {
-    public function getSelectForQuery(): string;
+    public function path(): PathInterface
+    {
+        return new NullPath();
+    }
 
-    public function addPathAndGetColumn(PathInterface $path): string;
+    public function mode(): Mode
+    {
+        return Mode::EQUALS;
+    }
 
-    public function getTableAliasForFilters(): string;
+    public function isModeNegated(): bool
+    {
+        return false;
+    }
+
+    public function value(): string
+    {
+        return '';
+    }
 }

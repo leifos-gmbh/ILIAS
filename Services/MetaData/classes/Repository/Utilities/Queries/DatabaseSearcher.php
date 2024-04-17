@@ -25,11 +25,11 @@ use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactoryInterface;
 use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
 use ILIAS\MetaData\Repository\Search\Clauses\Operator;
 use ILIAS\MetaData\Repository\Search\Clauses\Mode;
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicProperties;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParserFactoryInterface;
 use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParserInterface;
 use ILIAS\MetaData\Repository\Search\Filters\Placeholder;
+use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicPropertiesInterface;
 
 class DatabaseSearcher implements DatabaseSearcherInterface
 {
@@ -55,19 +55,14 @@ class DatabaseSearcher implements DatabaseSearcherInterface
     ): \Generator {
         $paths_parser = $this->paths_parser_factory->forSearch();
         $where = $this->getClauseForQueryHaving($clause, $paths_parser);
-        $quoted_table_alias = $this->db->quoteIdentifier($paths_parser->getTableAliasForFilters());
+        $quoted_table_alias = $this->quoteIdentifier($paths_parser->getTableAliasForFilters());
 
-        $result = $this->db->query(
-            $query = $paths_parser->getSelectForQuery() . ' GROUP BY ' . $quoted_table_alias . '.rbac_id, ' .
+        $query = $paths_parser->getSelectForQuery() . ' GROUP BY ' . $quoted_table_alias . '.rbac_id, ' .
             $quoted_table_alias . '.obj_id, ' . $quoted_table_alias . '.obj_type HAVING ' . $where .
             $this->getFiltersForQueryHaving($quoted_table_alias, ...$filters) .
-            ' ORDER BY rbac_id, obj_id, obj_type' . $this->getLimitAndOffsetForQuery($limit, $offset)
-        );
+            ' ORDER BY rbac_id, obj_id, obj_type' . $this->getLimitAndOffsetForQuery($limit, $offset);
 
-        global $DIC;
-        $DIC->logger()->root()->dump($query);
-
-        while ($row = $this->db->fetchAssoc($result)) {
+        foreach ($this->queryDB($query) as $row) {
             yield $this->ressource_factory->ressourceID(
                 (int) $row['rbac_id'],
                 (int) $row['obj_id'],
@@ -83,13 +78,13 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         $filter_where = [];
         foreach ($filters as $filter) {
             $filter_values = [];
-            if ($val = $this->getFilterValueFroCondition($quoted_table_alias, $filter->objID())) {
+            if ($val = $this->getFilterValueForCondition($quoted_table_alias, $filter->objID())) {
                 $filter_values[] = $quoted_table_alias . '.rbac_id = ' . $val;
             }
-            if ($val = $this->getFilterValueFroCondition($quoted_table_alias, $filter->objID())) {
+            if ($val = $this->getFilterValueForCondition($quoted_table_alias, $filter->subID())) {
                 $filter_values[] = $quoted_table_alias . '.obj_id = ' . $val;
             }
-            if ($val = $this->getFilterValueFroCondition($quoted_table_alias, $filter->objID())) {
+            if ($val = $this->getFilterValueForCondition($quoted_table_alias, $filter->type())) {
                 $filter_values[] = $quoted_table_alias . '.obj_type = ' . $val;
             }
             if (!empty($filter_values)) {
@@ -104,15 +99,15 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         return ' AND (' . implode(' OR ', $filter_where) . ')';
     }
 
-    protected function getFilterValueFroCondition(
+    protected function getFilterValueForCondition(
         string $quoted_table_alias,
         string|int|Placeholder $value
     ): string {
         if (is_int($value)) {
-            return $this->db->quote($value, \ilDBConstants::T_INTEGER);
+            return $this->quoteInteger($value);
         }
         if (is_string($value)) {
-            return $this->db->quote($value, \ilDBConstants::T_TEXT);
+            return $this->quoteText($value);
         }
 
         switch ($value) {
@@ -136,11 +131,11 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         $query_limit = '';
         if (!is_null($limit) || !is_null($offset)) {
             $limit = is_null($limit) ? PHP_INT_MAX : $limit;
-            $query_limit = ' LIMIT ' . $this->db->quote($limit, \ilDBConstants::T_INTEGER);
+            $query_limit = ' LIMIT ' . $this->quoteInteger($limit);
         }
         $query_offset = '';
         if (!is_null($offset)) {
-            $query_offset = ' OFFSET ' . $this->db->quote($offset, \ilDBConstants::T_INTEGER);
+            $query_offset = ' OFFSET ' . $this->quoteInteger($offset);
         }
         return $query_limit . $query_offset;
     }
@@ -191,29 +186,29 @@ class DatabaseSearcher implements DatabaseSearcherInterface
     }
 
     protected function getBasicClauseForQueryWhere(
-        BasicProperties $basic_props,
+        BasicPropertiesInterface $basic_props,
         bool $is_clause_negated,
         DatabasePathsParserInterface $paths_parser
     ): string {
         switch ($basic_props->mode()) {
             case Mode::EQUALS:
                 $comparison = '= ' .
-                    $this->db->quote($basic_props->value(), \ilDBConstants::T_TEXT);
+                    $this->quoteText($basic_props->value());
                 break;
 
             case Mode::CONTAINS:
                 $comparison = 'LIKE ' .
-                    $this->db->quote('%' . $basic_props->value() . '%', \ilDBConstants::T_TEXT);
+                    $this->quoteText('%' . $basic_props->value() . '%');
                 break;
 
             case Mode::STARTS_WITH:
                 $comparison = 'LIKE ' .
-                    $this->db->quote($basic_props->value() . '%', \ilDBConstants::T_TEXT);
+                    $this->quoteText($basic_props->value() . '%');
                 break;
 
             case Mode::ENDS_WITH:
                 $comparison = 'LIKE ' .
-                    $this->db->quote('%' . $basic_props->value(), \ilDBConstants::T_TEXT);
+                    $this->quoteText('%' . $basic_props->value());
                 break;
 
             default:
@@ -232,5 +227,29 @@ class DatabaseSearcher implements DatabaseSearcherInterface
         return $clause_negation . 'COUNT(CASE WHEN ' . $mode_negation .
             $paths_parser->addPathAndGetColumn($basic_props->path()) . ' ' . $comparison .
             ' THEN 1 END) > 0';
+    }
+
+    protected function queryDB(string $query): \Generator
+    {
+        $result = $this->db->query($query);
+
+        while ($row = $this->db->fetchAssoc($result)) {
+            yield $row;
+        }
+    }
+
+    protected function quoteIdentifier(string $identifier): string
+    {
+        return $this->db->quoteIdentifier($identifier);
+    }
+
+    protected function quoteText(string $text): string
+    {
+        return $this->db->quote($text, \ilDBConstants::T_TEXT);
+    }
+
+    protected function quoteInteger(int $integer): string
+    {
+        return $this->db->quote($integer, \ilDBConstants::T_INTEGER);
     }
 }

@@ -28,8 +28,20 @@ use ILIAS\MetaData\Repository\Search\Filters\Placeholder;
 
 interface SearcherInterface
 {
+    /**
+     * Get a factory where you can assemble your search clause.
+     */
     public function getClauseFactory(): FactoryInterface;
 
+    /**
+     * Get a filter with which the results of a search can be
+     * restricted. You can either give specific values for
+     * the three identifying parameters of objects (see
+     * {@see \ILIAS\MetaData\Services\ServicesInterface::read()}
+     * for a description of what those are), or placeholders
+     * to accept either any value or to force two parameters
+     * to match.
+     */
     public function getFilter(
         int|Placeholder $obj_id = Placeholder::ANY,
         int|Placeholder $sub_id = Placeholder::ANY,
@@ -42,7 +54,7 @@ interface SearcherInterface
      * same filter with AND.
      * @return RessourceIDInterface[]
      */
-    public function search(
+    public function execute(
         ClauseInterface $clause,
         ?int $limit,
         ?int $offset,

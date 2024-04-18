@@ -40,7 +40,6 @@ use ILIAS\MetaData\Editor\Digest\Digest;
 
 /**
  * @author       Stefan Meyer <smeyer.ilias@gmx.de>
- * @ilCtrl_Calls ilMDEditorGUI: ilFormPropertyDispatchGUI
  */
 class ilMDEditorGUI
 {

@@ -63,7 +63,7 @@ class Searcher implements SearcherInterface
     /**
      * @return RessourceIDInterface[]
      */
-    public function search(
+    public function execute(
         ClauseInterface $clause,
         ?int $limit,
         ?int $offset,

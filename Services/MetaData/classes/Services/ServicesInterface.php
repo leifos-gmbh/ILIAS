@@ -54,6 +54,10 @@ interface ServicesInterface
         PathInterface $limited_to = null
     ): ReaderInterface;
 
+    /**
+     * Get a searcher, in which you can assemble a search clause and filters,
+     * and use these to find objects whose LOM matches the search.
+     */
     public function search(): SearcherInterface;
 
     /**

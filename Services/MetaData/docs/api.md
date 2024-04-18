@@ -4,13 +4,23 @@
 missing or wrong information using the [ILIAS issue tracker](https://mantis.ilias.de)
 or contribute a fix via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).
 
-`Services\Metadata` offers an API with which the [Learning Object Metadata
+The `Metadata` component offers an API with which the [Learning Object Metadata
 (LOM)](lom_structure.md) of ILIAS objects can be read out, processed,
 and manipulated. It can be obtained from the `DIC` via the method
 `learningObjectMetadata`.
 
 In the following, we will explain what functionality the API offers,
 and how it can be used.
+
+## Contents
+
+1. [`read`](#read)
+2. [`search`](#search)
+3. [`manipulate`](#manipulate)
+4. [`derive`](#derive)
+5. [`deleteAll`](#deleteall)
+6. [`paths`](#paths)
+7. [`dataHelper`](#datahelper)
 
 ## `read`
 
@@ -21,10 +31,11 @@ needs to be identified by a triple of IDs as explained [here](identifying_object
 Optionally, one can also specify metadata elements via a [path](#paths).
 In this case, not the whole metadata set is read out, but only the
 elements on the path along with all sub-elements of its last element.
-Beware that filters on the path are ignored, and that if the path
-contains steps to super elements, it is only followed down to
-the first element that the path returns to (see [here](#paths) for
-details).
+
+> Beware that when restricting `read` to a path, filters on the path
+are ignored, and that if the path contains steps to super elements,
+it is only followed down to the first element that the path returns
+to (see [here](#paths) for details).
 
 `read` returns a `Reader` object, which can then be used to access the
 values of different elements in the (partial) set, selected via [paths](#paths).
@@ -91,6 +102,259 @@ $title = $reader->firstData($lom->paths()->title())->value();
 ````
 
 See [here](#paths) for details on custom paths.
+
+## `search`
+
+`search` is used to find objects whose LOM matches some user-defined
+specifications. When calling `search`, a `Searcher` object is
+returned. In the `Searcher`, search `Clauses` and `Filters` can be
+assembled, and using them a search can be performed. In the search
+results, objects are identified by a triple of ID as explained [here](identifying_objects.md).
+
+`Clauses` can be obtained in the `ClauseFactory` available through the
+`Searcher`. Basic `Clauses` consist of a [path](#paths) to a LOM
+element, a search `Mode`, and a value to search for. Additionally, the
+`Mode` can be negated. Searching with just the basic `Clause` then
+finds all objects whose LOM sets have an element specified by the
+path whose value fulfills the condition given by search `Mode`
+and search value (or does not fulfill the condition, in the case
+of the `Mode` being negated).
+
+The search does take into account path filters, with the exception
+of those of type `INDEX`. For more information on paths, see [here](#paths).
+
+>The search is not built to check the (non-)existence of elements
+which do not carry any value. Searches of this nature will not give
+accurate or reliable results.
+
+Multiple `Clauses` can be joined logically into a single `Clause`
+using `AND` or `OR` `Operators`. These joined `Clauses` then can further
+be joined, such that arbitrarily complicated search criteria can be
+assembled from the basic `Clauses`.
+
+Further, `Clauses` can be negated. Negating a basic `Clause` will then
+lead to a search that finds objects with LOM sets that  have **no**
+elements that fulfill the conditions. Note that this leads to different
+results than negating the `Mode` of the basic `Clause` for non-unique
+elements! Negating joined `Clauses` will negate the whole assembled
+logical statement.
+
+Searches will return a `RessourceID` object for each search result,
+and each `RessourceID` identifies an object in ILIAS by a [triple of IDs](identifying_objects.md).
+
+The `Searcher` object can also generate `Filters`. They can be passed
+to the `execute` method in the `Searcher` along with a clause to restrict
+the objects the search will return. Each `Filter` object carries the
+same [triple of IDs](identifying_objects.md) as is returned by the search. Each ID can
+either be a specific value, or a `Placeholder` to allow either any value,
+or set two of the IDs equal to each other. Multiple values in the same
+filter are joined with a logical AND, and multiple filters in the same
+search with a logical OR.
+
+Finally, a limit and offset can also be applied to the search. Both parameters
+can be set independently of each other. The order of results returned by
+the search is consistent, they are ordered by their IDs. 
+
+>The search was built to be versatile, and is as such not particulary
+well optimized for any specific task. If you have a use case for the
+search that performs poorer than you'd like, feel free to report that
+in the [ILIAS issue tracker](https://mantis.ilias.de) or contribute a
+possible improvement to the search via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).
+
+### Examples
+
+To find all objects in ILIAS that have a keyword with value 'Great Content',
+build an according basic `Clause` and pass it to `Searcher::search` with
+limit and offset set to `null`:
+
+````
+$clause = $lom->search()->getClauseFactory()->getBasicClause(
+    $lom->paths()->keywords(),
+    Mode::EQUALS,
+    'Great Content'
+);
+
+$results = $lom->search()->execute($clause, null, null);
+````
+
+By negating the search `Mode` in the basic `Clause` one can find e.g.
+all objects in ILIAS that have a keyword that does not start with 'Great':
+
+````
+$clause = $lom->search()->getClauseFactory()->getBasicClause(
+    $lom->paths()->keywords(),
+    Mode::STARTS_WITH,
+    'Great',
+    true
+);
+
+$results = $lom->search()->execute($clause, null, null);
+````
+
+On the other hand, by negating the whole basic `Clause` one can find
+e.g. all objects that have no keyword ending in 'Content'. Note that 
+because a LOM set can have multiple keywords, this is different to
+searching for all objects that have a keyword that does **not** end with
+content! If an object has a keyword 'Great Content' and a keyword
+'Great Styling', it would be returned in the second search but not in
+the first.
+
+````
+$clause_factory = $lom->search()->getClauseFactory();
+$clause = $clause_factory->getBasicClause(
+    $lom->paths()->keywords(),
+    Mode::ENDS_WITH,
+    'Content'
+);
+$clause = $clause_factory->getNegatedClause($clause);
+
+$results = $lom->search()->execute($clause, null, null);
+````
+
+Joining `Clauses` allows for more specific searches. The following finds
+all objects with a keyword containing 'great', and with an author
+'Dr. Doom':
+
+````
+$clause_factory = $lom->search()->getClauseFactory();
+$keyword_clause = $clause_factory->getBasicClause(
+    $lom->paths()->keywords(),
+    Mode::CONTAINS,
+    'great'
+);
+$author_clause = $clause_factory->getBasicClause(
+    $lom->paths()->authors(),
+    Mode::EQUALS,
+    'Dr. Doom'
+);
+$clause = $clause_factory->getJoinedClauses(
+    Operator::AND,
+    $keyword_clause,
+    $author_clause
+);
+
+$results = $lom->search()->execute($clause, null, null);
+````
+
+Joining clauses even further, one can find e.g. all objects with a
+keyword containing 'great', and with an author 'Dr. Doom' or
+'Dr. House':
+
+````
+$clause_factory = $lom->search()->getClauseFactory();
+$keyword_clause = $clause_factory->getBasicClause(
+    $lom->paths()->keywords(),
+    Mode::CONTAINS,
+    'great'
+);
+$doom_clause = $clause_factory->getBasicClause(
+    $lom->paths()->authors(),
+    Mode::EQUALS,
+    'Dr. Doom'
+);
+$house_clause = $clause_factory->getBasicClause(
+    $lom->paths()->authors(),
+    Mode::EQUALS,
+    'Dr. House'
+);
+$clause = $clause_factory->getJoinedClauses(
+    Operator::AND,
+    $keyword_clause,
+    $clause_factory->getJoinedClauses(
+        Operator::OR,
+        $doom_clause,
+        $house_clause
+    )
+);
+
+$results = $lom->search()->execute($clause, null, null);
+````
+
+To find specifically all Courses with keyword 'Great Content', `Filters`
+can be used to only search for objects which have `'crs'` as the type in
+their [triple of IDs](identifying_objects.md). Since the other two parameters do not need
+to be restricted, one can set them to `Placeholder::ANY`:
+
+````
+$clause = $lom->search()->getClauseFactory()->getBasicClause(
+    $lom->paths()->keywords(),
+    Mode::EQUALS,
+    'Great Content'
+);
+$filter = $lom->search()->getFilter(
+    Placeholder::ANY,
+    Placeholder::ANY,
+    'crs'
+);
+
+$results = $lom->search()->execute($clause, null, null, $filter);
+````
+
+Analogously, one can also search for a specific repository object and
+its subobjects. To only find e.g. the Learning Module with `obj_id` 123
+and its chapters and pages:
+
+````
+$filter = $lom->search()->getFilter(
+    123,
+    Placeholder::ANY,
+    Placeholder::ANY
+);
+
+$results = $lom->search()->execute($clause, null, null, $filter);
+````
+
+Multiple filters are joined with a logical OR, so to search in two different
+Learning Modules with `obj_id`s 123 and 456 simultaneously:
+
+````
+$filter_123 = $lom->search()->getFilter(
+    123,
+    Placeholder::ANY,
+    Placeholder::ANY
+);
+$filter_456 = $lom->search()->getFilter(
+    456,
+    Placeholder::ANY,
+    Placeholder::ANY
+);
+
+$results = $lom->search()->execute(
+    $clause,
+    null,
+    null,
+    $filter_123,
+    $filter_456
+);
+````
+
+`Filters` can also be used to only search repository objects, and not
+their sub-objects. To this end, use placeholders to set the `sub_id` equal
+to the `obj_id`:
+
+````
+$filter = $lom->search()->getFilter(
+    Placeholder::ANY,
+    Placeholder::OBJ_ID,
+    Placeholder::ANY
+);
+
+$results = $lom->search()->execute($clause, null, null, $filter);
+````
+
+Alternatively, one can also filter for objects with `sub_id` equal to 0.
+See [here](identifying_objects.md) for information on how repository objects are indentified
+in the `Metadata` component.
+
+Lastly, limit and offset can be used to e.g. sequentially search through
+objects. The following will first fetch the first five results, then the
+next five, and lastly all remaining results:
+
+````
+$first_five_results = $lom->search()->execute($clause, 5, null);
+$next_five_results = $lom->search()->execute($clause, 5, 5);
+$remaining_results = $lom->search()->execute($clause, null, 10);
+````
 
 ## `manipulate`
 
@@ -391,7 +655,7 @@ this makes paths a powerful tool for working with the `Reader` and
 
 There are three types of filters:
 
-- `'id'`: Filters elements by their ID from the `Services\Metadata`
+- `'id'`: Filters elements by their ID from the `Metadata`
 tables. This is primarily used internally, the API does not expose
 these IDs.
 - `'index`: Filters elements by their index in order, starting from 0.

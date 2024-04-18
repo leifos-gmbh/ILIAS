@@ -4,7 +4,7 @@
 missing or wrong information using the [ILIAS issue tracker](https://mantis.ilias.de)
 or contribute a fix via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).
 
-In `Services/MetaData`, objects in ILIAS are generally identified by
+In the `MetaData` component, objects in ILIAS are generally identified by
 three parameters:
 
 1. **obj_id:** The `obj_id` of the object if it is a repository object, else the

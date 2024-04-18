@@ -130,43 +130,43 @@ class SearcherTest extends TestCase
         );
     }
 
-    public function testSearch(): void
+    public function testExecute(): void
     {
         $searcher = $this->getSearcher();
         $clause = new NullClause();
 
-        $results = iterator_to_array($searcher->search($clause, null, null));
+        $results = iterator_to_array($searcher->execute($clause, null, null));
         $this->assertSame(
             ['clause' => $clause, 'limit' => null, 'offset' => null, 'filters' => []],
             $results
         );
     }
 
-    public function testSearchWithLimit(): void
+    public function testExecuteWithLimit(): void
     {
         $searcher = $this->getSearcher();
         $clause = new NullClause();
 
-        $results = iterator_to_array($searcher->search($clause, 999, null));
+        $results = iterator_to_array($searcher->execute($clause, 999, null));
         $this->assertSame(
             ['clause' => $clause, 'limit' => 999, 'offset' => null, 'filters' => []],
             $results
         );
     }
 
-    public function testSearchWithLimitAndOffset(): void
+    public function testExecuteWithLimitAndOffset(): void
     {
         $searcher = $this->getSearcher();
         $clause = new NullClause();
 
-        $results = iterator_to_array($searcher->search($clause, 999, 333));
+        $results = iterator_to_array($searcher->execute($clause, 999, 333));
         $this->assertSame(
             ['clause' => $clause, 'limit' => 999, 'offset' => 333, 'filters' => []],
             $results
         );
     }
 
-    public function testSearchWithFilters(): void
+    public function testExecuteWithFilters(): void
     {
         $searcher = $this->getSearcher();
         $clause = new NullClause();
@@ -174,7 +174,7 @@ class SearcherTest extends TestCase
         $filter_2 = new NullFilter();
         $filter_3 = new NullFilter();
 
-        $results = iterator_to_array($searcher->search($clause, 999, 333, $filter_1, $filter_2, $filter_3));
+        $results = iterator_to_array($searcher->execute($clause, 999, 333, $filter_1, $filter_2, $filter_3));
         $this->assertSame(
             ['clause' => $clause, 'limit' => 999, 'offset' => 333, 'filters' => [$filter_1, $filter_2, $filter_3]],
             $results

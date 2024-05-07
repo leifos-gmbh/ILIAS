@@ -23,36 +23,32 @@ namespace ILIAS\MetaData\Services\Derivation;
 use PHPUnit\Framework\TestCase;
 use ILIAS\MetaData\Repository\RepositoryInterface;
 use ILIAS\MetaData\Repository\NullRepository;
+use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Elements\NullSet;
 
-class FromObjectDerivatorTest extends TestCase
+class DerivatorTest extends TestCase
 {
-    protected function getFromObjectDerivator(
-        int $from_obj_id,
-        int $from_sub_id,
-        string $from_type
-    ): FromObjectDerivatorInterface {
+    protected function getDerivator(
+        SetInterface $from_set,
+    ): DerivatorInterface {
         $repo = new class () extends NullRepository {
-            public array $copied_md = [];
+            public array $transferred_md = [];
 
-            public function copyMD(
-                int $from_obj_id,
-                int $from_sub_id,
-                string $from_type,
+            public function transferMD(
+                SetInterface $from_set,
                 int $to_obj_id,
                 int $to_sub_id,
                 string $to_type
             ): void {
-                $this->copied_md[] = [
-                    'from_obj_id' => $from_obj_id,
-                    'from_sub_id' => $from_sub_id,
-                    'from_type' => $from_type,
+                $this->transferred_md[] = [
+                    'from_set' => $from_set,
                     'to_obj_id' => $to_obj_id,
                     'to_sub_id' => $to_sub_id,
                     'to_type' => $to_type
                 ];
             }
         };
-        return new class ($from_obj_id, $from_sub_id, $from_type, $repo) extends FromObjectDerivator {
+        return new class ($from_set, $repo) extends Derivator {
             public function exposeRepository(): RepositoryInterface
             {
                 return $this->repository;
@@ -63,47 +59,37 @@ class FromObjectDerivatorTest extends TestCase
 
     public function testForObject(): void
     {
-        $from_object_derivator = $this->getFromObjectDerivator(
-            9,
-            39,
-            'from_type'
-        );
-        $from_object_derivator->forObject(78, 5, 'to_type');
+        $from_set = new NullSet();
+        $derivator = $this->getDerivator($from_set);
+        $derivator->forObject(78, 5, 'to_type');
 
-        $this->assertCount(1, $from_object_derivator->exposeRepository()->copied_md);
+        $this->assertCount(1, $derivator->exposeRepository()->transferred_md);
         $this->assertSame(
             [
-                'from_obj_id' => 9,
-                'from_sub_id' => 39,
-                'from_type' => 'from_type',
+                'from_set' => $from_set,
                 'to_obj_id' => 78,
                 'to_sub_id' => 5,
                 'to_type' => 'to_type'
             ],
-            $from_object_derivator->exposeRepository()->copied_md[0]
+            $derivator->exposeRepository()->transferred_md[0]
         );
     }
 
     public function testForObjectWithSubIDZero(): void
     {
-        $from_object_derivator = $this->getFromObjectDerivator(
-            9,
-            39,
-            'from_type'
-        );
-        $from_object_derivator->forObject(78, 0, 'to_type');
+        $from_set = new NullSet();
+        $derivator = $this->getDerivator($from_set);
+        $derivator->forObject(78, 0, 'to_type');
 
-        $this->assertCount(1, $from_object_derivator->exposeRepository()->copied_md);
+        $this->assertCount(1, $derivator->exposeRepository()->transferred_md);
         $this->assertSame(
             [
-                'from_obj_id' => 9,
-                'from_sub_id' => 39,
-                'from_type' => 'from_type',
+                'from_set' => $from_set,
                 'to_obj_id' => 78,
                 'to_sub_id' => 78,
                 'to_type' => 'to_type'
             ],
-            $from_object_derivator->exposeRepository()->copied_md[0]
+            $derivator->exposeRepository()->transferred_md[0]
         );
     }
 

@@ -26,10 +26,10 @@ interface SourceSelectorInterface
      * Choose an ILIAS object as the source. See {@see \ILIAS\MetaData\Services\ServicesInterface::read()}
      * for a description of the parameters.
      */
-    public function fromObject(int $obj_id, int $sub_id, string $type): FromObjectDerivatorInterface;
+    public function fromObject(int $obj_id, int $sub_id, string $type): DerivatorInterface;
 
     /**
      * Give an XML element as the source.
      */
-    public function fromXML(\SimpleXMLElement $xml): FromXMLDerivatorInterface;
+    public function fromXML(\SimpleXMLElement $xml): DerivatorInterface;
 }

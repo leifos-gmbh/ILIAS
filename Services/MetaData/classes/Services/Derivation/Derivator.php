@@ -21,24 +21,18 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Services\Derivation;
 
 use ILIAS\MetaData\Repository\RepositoryInterface;
+use ILIAS\MetaData\Elements\SetInterface;
 
-class FromObjectDerivator implements FromObjectDerivatorInterface
+class Derivator implements DerivatorInterface
 {
-    protected int $from_obj_id;
-    protected int $from_sub_id;
-    protected string $from_type;
-
+    protected SetInterface $from_set;
     protected RepositoryInterface $repository;
 
     public function __construct(
-        int $from_obj_id,
-        int $from_sub_id,
-        string $from_type,
+        SetInterface $from_set,
         RepositoryInterface $repository
     ) {
-        $this->from_obj_id = $from_obj_id;
-        $this->from_sub_id = $from_sub_id;
-        $this->from_type = $from_type;
+        $this->from_set = $from_set;
         $this->repository = $repository;
     }
 
@@ -48,10 +42,8 @@ class FromObjectDerivator implements FromObjectDerivatorInterface
             $sub_id = $obj_id;
         }
 
-        $this->repository->copyMD(
-            $this->from_obj_id,
-            $this->from_sub_id,
-            $this->from_type,
+        $this->repository->transferMD(
+            $this->from_set,
             $obj_id,
             $sub_id,
             $type

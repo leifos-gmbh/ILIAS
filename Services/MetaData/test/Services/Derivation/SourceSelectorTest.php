@@ -21,32 +21,33 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Services\Derivation;
 
 use PHPUnit\Framework\TestCase;
-use ILIAS\MetaData\Repository\RepositoryInterface;
+use ILIAS\MetaData\Repository\NullRepository;
+use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Elements\NullSet;
 
 class SourceSelectorTest extends TestCase
 {
     protected function getSourceSelector(): SourceSelector
     {
-        return new class () extends SourceSelector {
-            public function __construct()
+        $repo = new class () extends NullRepository {
+            public function getMD(int $obj_id, int $sub_id, string $type): SetInterface
             {
+                return new class ($obj_id, $sub_id, $type) extends NullSet {
+                    public function __construct(
+                        public int $obj_id,
+                        public int $sub_id,
+                        public string $type,
+                    ) {
+                    }
+                };
             }
-
-            protected function getFromObjectDerivator(
-                int $obj_id,
-                int $sub_id,
-                string $type
-            ): FromObjectDerivatorInterface {
-                return new class ($obj_id, $sub_id, $type) extends NullFromObjectDerivator {
-                    public array $data;
-
-                    public function __construct(int $obj_id, int $sub_id, string $type)
+        };
+        return new class ($repo) extends SourceSelector {
+            protected function getDerivator(SetInterface $from_set): DerivatorInterface
+            {
+                return new class ($from_set) extends NullDerivator {
+                    public function __construct(public SetInterface $from_set)
                     {
-                        $this->data = [
-                            'obj_id' => $obj_id,
-                            'sub_id' => $sub_id,
-                            'type' => $type,
-                        ];
                     }
                 };
             }
@@ -56,22 +57,25 @@ class SourceSelectorTest extends TestCase
     public function testFromObject(): void
     {
         $source_selector = $this->getSourceSelector();
-        $from_object_derivator = $source_selector->fromObject(7, 33, 'type');
+        $derivator = $source_selector->fromObject(7, 33, 'type');
 
-        $this->assertSame(
-            ['obj_id' => 7, 'sub_id' => 33, 'type' => 'type'],
-            $from_object_derivator->data
-        );
+        $this->assertSame(7, $derivator->from_set->obj_id);
+        $this->assertSame(33, $derivator->from_set->sub_id);
+        $this->assertSame('type', $derivator->from_set->type);
     }
 
     public function testFromObjectWithSubIDZero(): void
     {
         $source_selector = $this->getSourceSelector();
-        $from_object_derivator = $source_selector->fromObject(67, 0, 'type');
+        $derivator = $source_selector->fromObject(67, 0, 'type');
 
-        $this->assertSame(
-            ['obj_id' => 67, 'sub_id' => 67, 'type' => 'type'],
-            $from_object_derivator->data
-        );
+        $this->assertSame(67, $derivator->from_set->obj_id);
+        $this->assertSame(67, $derivator->from_set->sub_id);
+        $this->assertSame('type', $derivator->from_set->type);
+    }
+
+    public function testFromXML(): void
+    {
+        // TODO test after implementation
     }
 }

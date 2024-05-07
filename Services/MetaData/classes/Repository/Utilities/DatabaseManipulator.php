@@ -74,10 +74,10 @@ class DatabaseManipulator implements DatabaseManipulatorInterface
         }
     }
 
-    public function copyMD(SetInterface $from_set, RessourceIDInterface $to_ressource_id): void
+    public function transferMD(SetInterface $from_set, RessourceIDInterface $to_ressource_id): void
     {
         foreach ($from_set->getRoot()->getSubElements() as $sub) {
-            foreach ($this->collectRowsForCopyingFromElementAndSubElements(
+            foreach ($this->collectRowsForTransferFromElementAndSubElements(
                 0,
                 $sub
             ) as $row) {
@@ -161,7 +161,7 @@ class DatabaseManipulator implements DatabaseManipulatorInterface
         return $collected_rows;
     }
 
-    protected function collectRowsForCopyingFromElementAndSubElements(
+    protected function collectRowsForTransferFromElementAndSubElements(
         int $depth,
         ElementInterface $element,
         AssignmentRowInterface $current_row = null
@@ -196,7 +196,7 @@ class DatabaseManipulator implements DatabaseManipulatorInterface
         foreach ($element->getSubElements() as $sub) {
             $collected_rows = array_merge(
                 $collected_rows,
-                $this->collectRowsForCopyingFromElementAndSubElements(
+                $this->collectRowsForTransferFromElementAndSubElements(
                     $depth + 1,
                     $sub,
                     $current_row

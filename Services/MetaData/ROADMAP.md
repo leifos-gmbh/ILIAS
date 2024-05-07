@@ -64,6 +64,13 @@ taken into account in the search, to allow for search queries like
 These filters make translating the search queries to SQL much more
 complex, so the cost might outweigh the use.
 
+### Allow manipulation of LOM sets during derivation
+
+The `Derivator` in the API could be expanded to contain methods like
+`prepareOmit` and `prepareAddOrChange` to allow changes to the derived
+LOM set before it is persisted. The repository would need to take into
+account more types of markers/scaffolds in `transferMD`.
+
 ### Vocabularies
 
 Allow adding other vocabularies than LOM. This could be implemented

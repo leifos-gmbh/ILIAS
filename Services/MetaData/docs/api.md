@@ -551,25 +551,26 @@ not already exist, it will be created with the right source.
 
 ## `derive`
 
-`derive` can be used a LOM set for a target from that of a source. This
-encompasses copying between ILIAS objects, exporting to XML, and
-importing from XML, depending on the chosen type of source and target.
+`derive` can be used to derive a LOM set for a target from that of a
+source. This encompasses copying between ILIAS objects, exporting to XML,
+and importing from XML, depending on the chosen type of source and target.
 
 When calling `derive`, a `SourceSelector` object is returned. There,
 either an ILIAS object can be identified as a source by a triple of 
 IDs as explained [here](identifying_objects.md), or a `SimpleXMLElement` can be given.
-Depending on the type of the source, a `Derivator` is returned, where
-a target can be chosen analogously.
+A `Derivator` is returned, where a target can be chosen analogously.
 
-When both source and target are ILIAS objects, the `Derivator` creates
+When a target is chosen, the `Derivator` reads out the LOM set from the
+source, and writes it to the target, as appropriate for the types of source
+and target. Common use cases are:
+
+- **Copying:** When both source and target are ILIAS objects, the `Derivator` creates
 a LOM set for the target by copying the LOM of the source. Any previous
 LOM of the target object is deleted before copying.
-
-When the source is a `SimpleXMLElement` and the target an ILIAS object,
+- **Importing:** When the source is a `SimpleXMLElement` and the target an ILIAS object,
 the `Derivator` creates a LOM set for the target by importing from XML.
 Likewise, any previous LOM of the target object is deleted before importing.
-
-Lastly, if the source is an ILIAS object and the target a `SimpleXMLElement`,
+- **Exporting:** Likeweise, when the source is an ILIAS object and the target a `SimpleXMLElement`,
 the `Derivator` creates a `SimpleXMLElement` from the LOM of the source.
 
 ### Examples

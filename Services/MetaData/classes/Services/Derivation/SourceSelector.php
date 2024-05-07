@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Services\Derivation;
 
 use ILIAS\MetaData\Repository\RepositoryInterface;
+use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Elements\NullSet;
 
 class SourceSelector implements SourceSelectorInterface
 {
@@ -32,33 +34,31 @@ class SourceSelector implements SourceSelectorInterface
         $this->repository = $repository;
     }
 
-    public function fromObject(int $obj_id, int $sub_id, string $type): FromObjectDerivatorInterface
+    public function fromObject(int $obj_id, int $sub_id, string $type): DerivatorInterface
     {
         if ($sub_id === 0) {
             $sub_id = $obj_id;
         }
 
-        return $this->getFromObjectDerivator(
-            $obj_id,
-            $sub_id,
-            $type
+        return $this->getDerivator(
+            $this->repository->getMD($obj_id, $sub_id, $type)
         );
     }
 
-    public function fromXML(\SimpleXMLElement $xml): FromXMLDerivatorInterface
+    public function fromXML(\SimpleXMLElement $xml): DerivatorInterface
     {
-        return new FromXMLDerivator(
-            $xml,
-            $this->repository
+        /**
+         * TODO implement this
+         */
+        return $this->getDerivator(
+            new NullSet()
         );
     }
 
-    protected function getFromObjectDerivator(int $obj_id, int $sub_id, string $type): FromObjectDerivatorInterface
+    protected function getDerivator(SetInterface $from_set): DerivatorInterface
     {
-        return new FromObjectDerivator(
-            $obj_id,
-            $sub_id,
-            $type,
+        return new Derivator(
+            $from_set,
             $this->repository
         );
     }

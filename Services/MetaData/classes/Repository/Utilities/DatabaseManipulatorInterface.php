@@ -28,9 +28,9 @@ interface DatabaseManipulatorInterface
     public function manipulateMD(SetInterface $set): void;
 
     /**
-     * Copies the set as it is in the database, ignores markers and scaffolds.
+     * Transfers the set to object, ignores markers and scaffolds.
      */
-    public function copyMD(SetInterface $from_set, RessourceIDInterface $to_ressource_id): void;
+    public function transferMD(SetInterface $from_set, RessourceIDInterface $to_ressource_id): void;
 
     public function deleteAllMD(RessourceIDInterface $ressource_id): void;
 }

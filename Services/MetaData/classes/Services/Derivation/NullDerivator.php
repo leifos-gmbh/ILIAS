@@ -20,12 +20,14 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Services\Derivation;
 
-interface FromXMLDerivatorInterface
+class NullDerivator implements DerivatorInterface
 {
-    /**
-     * Imports a LOM set from the source XML element to the given object. Always deletes whatever
-     * metadata already exist at the target. See {@see \ILIAS\MetaData\Services\ServicesInterface::read()}
-     * for a description of the parameters.
-     */
-    public function forObject(int $obj_id, int $sub_id, string $type): void;
+    public function forObject(int $obj_id, int $sub_id, string $type): void
+    {
+    }
+
+    public function forXML(): \SimpleXMLElement
+    {
+        return new \SimpleXMLElement('<xml></xml>');
+    }
 }

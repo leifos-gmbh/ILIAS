@@ -20,17 +20,17 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Services\Derivation;
 
-use PHPUnit\Framework\TestCase;
-
-class FromXMLDerivatorTest extends TestCase
+interface DerivatorInterface
 {
-    public function testForObject(): void
-    {
-        // TODO test after implementation
-    }
+    /**
+     * Writes the LOM set derived from the source to the given object. Always deletes whatever
+     * metadata already exist at the target. See {@see \ILIAS\MetaData\Services\ServicesInterface::read()}
+     * for a description of the parameters.
+     */
+    public function forObject(int $obj_id, int $sub_id, string $type): void;
 
-    public function testForObjectWithSubIDZero(): void
-    {
-        // TODO test after implementation
-    }
+    /**
+     * Creates an XML export of the LOM set derived from the source.
+     */
+    public function forXML(): \SimpleXMLElement;
 }

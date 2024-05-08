@@ -23,8 +23,6 @@ namespace ILIAS\MetaData\Repository\Services;
 use ILIAS\MetaData\Repository\RepositoryInterface;
 use ILIAS\MetaData\Repository\LOMDatabaseRepository;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactory;
-use ILIAS\MetaData\Manipulator\ScaffoldProvider\ScaffoldProvider;
-use ILIAS\MetaData\Elements\Scaffolds\ScaffoldFactory;
 use ILIAS\MetaData\Elements\Data\DataFactory;
 use ILIAS\MetaData\Repository\Utilities\DatabaseManipulator;
 use ILIAS\MetaData\Repository\Dictionary\LOMDictionaryInitiator as RepositoryDictionaryInitiator;

@@ -30,6 +30,7 @@ use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactoryInterface;
 use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
 use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
 use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseSearcherInterface;
+use ILIAS\MetaData\Repository\IdentifierHandler\IdentifierHandlerInterface;
 
 class LOMDatabaseRepository implements RepositoryInterface
 {
@@ -38,19 +39,22 @@ class LOMDatabaseRepository implements RepositoryInterface
     protected DatabaseReaderInterface $reader;
     protected DatabaseSearcherInterface $searcher;
     protected CleanerInterface $cleaner;
+    protected IdentifierHandlerInterface $identifier_handler;
 
     public function __construct(
         RessourceIDFactoryInterface $ressource_factory,
         DatabaseManipulatorInterface $manipulator,
         DatabaseReaderInterface $reader,
         DatabaseSearcherInterface $searcher,
-        CleanerInterface $cleaner
+        CleanerInterface $cleaner,
+        IdentifierHandlerInterface $identifier_handler
     ) {
         $this->ressource_factory = $ressource_factory;
         $this->manipulator = $manipulator;
         $this->reader = $reader;
         $this->searcher = $searcher;
         $this->cleaner = $cleaner;
+        $this->identifier_handler = $identifier_handler;
     }
 
     public function getMD(
@@ -106,6 +110,7 @@ class LOMDatabaseRepository implements RepositoryInterface
         $to_ressource_id = $this->ressource_factory->ressourceID($to_obj_id, $to_sub_id, $to_type);
 
         $this->cleaner->checkMarkers($from_set);
+        $from_set = $this->identifier_handler->prepareUpdateOfIdentifier($from_set, $to_ressource_id);
         $this->manipulator->deleteAllMD($to_ressource_id);
         $this->manipulator->transferMD($from_set, $to_ressource_id);
     }

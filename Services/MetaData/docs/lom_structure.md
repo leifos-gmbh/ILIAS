@@ -407,5 +407,9 @@ Since the value of the element `general > title > string` is
 synchronized with the  title of the ILIAS object the LOM set belongs
 to, neither it nor its super-elements can be deleted.
 
-The sub-elements of the first `general > identifier` can neither
-be edited nor deleted, along with their super-elements.
+The sub-elements of the first `general > identifier` are fixed and can
+neither be edited nor deleted, along with their super-elements. The
+`catalog` sub-element is always set to `ILIAS` and the `entry` to
+`il_{Installation ID}_{Object Type}_{Object ID}`. `Object ID` refers
+here to either the `sub_id` if it is non-zero, and otherwise to the
+`obj_id` of the object as defined [here](identifying_objects.md).

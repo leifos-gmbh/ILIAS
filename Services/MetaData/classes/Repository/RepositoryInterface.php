@@ -87,8 +87,10 @@ interface RepositoryInterface
     public function manipulateMD(SetInterface $set): void;
 
     /**
-     * Transfers a metadata set to an object, regardless of its source. Markers
-     * and Scaffolds are ignored.
+     * Transfers a metadata set to an object, regardless of its source. Takes
+     * The data from 'create or update' markers takes priority over the data
+     * carried by marked elements, but 'delete' markers and unmarked scaffolds
+     * are ignored.
      * Always deletes whatever metadata already exist at the target.
      */
     public function transferMD(

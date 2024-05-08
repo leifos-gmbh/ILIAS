@@ -171,10 +171,12 @@ class DatabaseManipulator implements DatabaseManipulatorInterface
         }
 
         $collected_rows = [];
+        $marker = $this->marker($element);
 
-        if ($element->isScaffold()) {
+        if ($element->isScaffold() && $marker?->action() !== MarkerAction::CREATE_OR_UPDATE) {
             return [];
         }
+        $data_value = !is_null($marker?->dataValue()) ? $marker->dataValue() : $element->getData()->value();
 
         $tag = $this->tag($element);
         if (!is_null($next_row = $this->getNewRowIfNecessary(NoID::SCAFFOLD, $tag, $current_row))) {
@@ -186,7 +188,7 @@ class DatabaseManipulator implements DatabaseManipulatorInterface
             $current_row->addAction($this->assignment_factory->action(
                 Action::CREATE,
                 $tag,
-                $element->getData()->value()
+                $data_value
             ));
             if (!$current_row->id()) {
                 $current_row->setId($this->querier->nextID($current_row->table()));

@@ -50,6 +50,8 @@ use ILIAS\MetaData\Repository\Search\Clauses\Factory as ClauseFactory;
 use ILIAS\MetaData\Repository\Search\Filters\Factory as FilterFactory;
 use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseSearcher;
 use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParserFactory;
+use ILIAS\MetaData\Repository\IdentifierHandler\IdentifierHandler;
+use ILIAS\MetaData\Manipulator\Services\Services as ManipulatorServices;
 
 class Services
 {
@@ -65,19 +67,22 @@ class Services
     protected StructureServices $structure_services;
     protected VocabulariesServices $vocabularies_services;
     protected DataHelperServices $data_helper_services;
+    protected ManipulatorServices $manipulator_services;
 
     public function __construct(
         GlobalContainer $dic,
         PathServices $path_services,
         StructureServices $structure_services,
         VocabulariesServices $vocabularies_services,
-        DataHelperServices $data_helper_services
+        DataHelperServices $data_helper_services,
+        ManipulatorServices $manipulator_services
     ) {
         $this->dic = $dic;
         $this->path_services = $path_services;
         $this->structure_services = $structure_services;
         $this->vocabularies_services = $vocabularies_services;
         $this->data_helper_services = $data_helper_services;
+        $this->manipulator_services = $manipulator_services;
     }
 
     public function constraintDictionary(): ValidationDictionary
@@ -155,6 +160,10 @@ class Services
                 ),
                 $this->constraintDictionary(),
                 $logger
+            ),
+            new IdentifierHandler(
+                $this->manipulator_services->manipulator(),
+                $this->path_services->pathFactory()
             )
         );
     }

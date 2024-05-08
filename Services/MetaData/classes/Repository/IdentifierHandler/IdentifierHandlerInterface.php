@@ -18,19 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Utilities;
+namespace ILIAS\MetaData\Repository\IdentifierHandler;
 
-use ILIAS\MetaData\Elements\RessourceID\RessourceIDInterface;
 use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Elements\RessourceID\RessourceIDInterface;
 
-interface DatabaseManipulatorInterface
+interface IdentifierHandlerInterface
 {
-    public function manipulateMD(SetInterface $set): void;
-
-    /**
-     * Transfers the set to object, ignores unmarked scaffolds and delete markers.
-     */
-    public function transferMD(SetInterface $from_set, RessourceIDInterface $to_ressource_id): void;
-
-    public function deleteAllMD(RessourceIDInterface $ressource_id): void;
+    public function prepareUpdateOfIdentifier(
+        SetInterface $set,
+        RessourceIDInterface $ressource_id
+    ): SetInterface;
 }

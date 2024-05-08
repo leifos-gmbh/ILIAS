@@ -60,16 +60,17 @@ class InternalServices
             $this->path_services,
             $this->structure_services
         );
+        $this->manipulator_services = new ManipulatorServices(
+            $this->path_services,
+            $this->structure_services
+        );
         $this->repository_services = new RepositoryServices(
             $this->dic,
             $this->path_services,
             $this->structure_services,
             $this->vocabularies_services,
-            $this->data_helper_services
-        );
-        $this->manipulator_services = new ManipulatorServices(
-            $this->path_services,
-            $this->structure_services
+            $this->data_helper_services,
+            $this->manipulator_services
         );
         $this->editor_services = new EditorServices(
             $this->dic,

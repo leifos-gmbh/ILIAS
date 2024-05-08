@@ -23,7 +23,7 @@ namespace ILIAS\MetaData\Repository\Services;
 use ILIAS\MetaData\Repository\RepositoryInterface;
 use ILIAS\MetaData\Repository\LOMDatabaseRepository;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactory;
-use ILIAS\MetaData\Repository\Utilities\ScaffoldProvider;
+use ILIAS\MetaData\Manipulator\ScaffoldProvider\ScaffoldProvider;
 use ILIAS\MetaData\Elements\Scaffolds\ScaffoldFactory;
 use ILIAS\MetaData\Elements\Data\DataFactory;
 use ILIAS\MetaData\Repository\Utilities\DatabaseManipulator;
@@ -121,12 +121,6 @@ class Services
         $element_factory = new ElementFactory($data_factory);
         return $this->repository = new LOMDatabaseRepository(
             $ressource_id_factory = new RessourceIDFactory(),
-            new ScaffoldProvider(
-                new ScaffoldFactory($data_factory),
-                $this->path_services->pathFactory(),
-                $this->path_services->navigatorFactory(),
-                $this->structure_services->structure()
-            ),
             new DatabaseManipulator(
                 $this->databaseDictionary(),
                 $querier,

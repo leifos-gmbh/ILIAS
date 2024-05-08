@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Elements\Scaffolds;
 
 use ILIAS\MetaData\Elements\ElementInterface;
-use ILIAS\MetaData\Repository\Utilities\ScaffoldProviderInterface;
+use ILIAS\MetaData\Manipulator\ScaffoldProvider\ScaffoldProviderInterface;
 
 interface ScaffoldableInterface
 {

@@ -20,10 +20,8 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Repository;
 
-use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Repository\Utilities\ScaffoldProviderInterface;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDInterface;
 use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
 use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
@@ -77,8 +75,6 @@ interface RepositoryInterface
         ?int $offset,
         FilterInterface ...$filters
     ): \Generator;
-
-    public function scaffolds(): ScaffoldProviderInterface;
 
     /**
      * Follows a trail of markers from the root element,

@@ -29,7 +29,7 @@ use ILIAS\MetaData\Structure\Definitions\DefinitionInterface;
 use ILIAS\MetaData\Elements\Markers\MarkerInterface;
 use ILIAS\MetaData\Elements\Data\DataInterface;
 use ILIAS\MetaData\Elements\Markers\Action;
-use ILIAS\MetaData\Repository\Utilities\ScaffoldProviderInterface;
+use ILIAS\MetaData\Manipulator\ScaffoldProvider\ScaffoldProviderInterface;
 
 class Element extends BaseElement implements ElementInterface
 {

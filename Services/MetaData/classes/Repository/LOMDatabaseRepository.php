@@ -20,11 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Repository;
 
-use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Repository\Validation\CleanerInterface;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDInterface;
 use ILIAS\MetaData\Repository\Utilities\DatabaseManipulatorInterface;
-use ILIAS\MetaData\Repository\Utilities\ScaffoldProviderInterface;
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Repository\Utilities\DatabaseReaderInterface;
@@ -36,7 +34,6 @@ use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseSearcherInterface;
 class LOMDatabaseRepository implements RepositoryInterface
 {
     protected RessourceIDFactoryInterface $ressource_factory;
-    protected ScaffoldProviderInterface $scaffold_provider;
     protected DatabaseManipulatorInterface $manipulator;
     protected DatabaseReaderInterface $reader;
     protected DatabaseSearcherInterface $searcher;
@@ -44,14 +41,12 @@ class LOMDatabaseRepository implements RepositoryInterface
 
     public function __construct(
         RessourceIDFactoryInterface $ressource_factory,
-        ScaffoldProviderInterface $scaffold_provider,
         DatabaseManipulatorInterface $manipulator,
         DatabaseReaderInterface $reader,
         DatabaseSearcherInterface $searcher,
         CleanerInterface $cleaner
     ) {
         $this->ressource_factory = $ressource_factory;
-        $this->scaffold_provider = $scaffold_provider;
         $this->manipulator = $manipulator;
         $this->reader = $reader;
         $this->searcher = $searcher;
@@ -94,14 +89,6 @@ class LOMDatabaseRepository implements RepositoryInterface
         FilterInterface ...$filters
     ): \Generator {
         yield from $this->searcher->search($clause, $limit, $offset, ...$filters);
-    }
-
-    /**
-     * @return ElementInterface[]
-     */
-    public function scaffolds(): ScaffoldProviderInterface
-    {
-        return $this->scaffold_provider;
     }
 
     public function manipulateMD(SetInterface $set): void

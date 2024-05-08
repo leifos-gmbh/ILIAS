@@ -22,19 +22,24 @@ namespace ILIAS\MetaData\Services\Manipulator;
 
 use ILIAS\MetaData\Manipulator\ManipulatorInterface as InternalManipulator;
 use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Repository\RepositoryInterface;
 
 class Factory implements FactoryInterface
 {
     protected InternalManipulator $internal_manipulator;
+    protected RepositoryInterface $repository;
 
     /**
      * Note that the general Manipulator used in MetaData does not have an
      * mutable internal state (prepared changes are tracked in the set), but
      * the Manipulator exposed through the API does.
      */
-    public function __construct(InternalManipulator $internal_manipulator)
-    {
+    public function __construct(
+        InternalManipulator $internal_manipulator,
+        RepositoryInterface $repository,
+    ) {
         $this->internal_manipulator = $internal_manipulator;
+        $this->repository = $repository;
     }
 
     public function get(
@@ -42,6 +47,7 @@ class Factory implements FactoryInterface
     ): ManipulatorInterface {
         return new Manipulator(
             $this->internal_manipulator,
+            $this->repository,
             $set
         );
     }

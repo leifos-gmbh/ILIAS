@@ -69,7 +69,7 @@ class InternalServices
         );
         $this->manipulator_services = new ManipulatorServices(
             $this->path_services,
-            $this->repository_services
+            $this->structure_services
         );
         $this->editor_services = new EditorServices(
             $this->dic,

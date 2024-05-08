@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Utilities;
+namespace ILIAS\MetaData\Manipulator\ScaffoldProvider;
 
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactoryInterface;

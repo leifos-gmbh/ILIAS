@@ -102,7 +102,7 @@ class Manipulator implements ManipulatorInterface
 
     public function execute(SetInterface $set): void
     {
-        $this->base_manipulator->execute($set);
+        $this->repository->manipulateMD($set);
     }
 
     /**

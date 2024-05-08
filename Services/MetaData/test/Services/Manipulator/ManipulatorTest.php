@@ -26,6 +26,8 @@ use ILIAS\MetaData\Paths\NullPath;
 use ILIAS\MetaData\Manipulator\NullManipulator as NullInternalManipulator;
 use ILIAS\MetaData\Elements\NullSet;
 use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Repository\RepositoryInterface;
+use ILIAS\MetaData\Repository\NullRepository;
 
 class ManipulatorTest extends TestCase
 {
@@ -82,22 +84,30 @@ class ManipulatorTest extends TestCase
                 ];
                 return $cloned_set;
             }
+        };
 
-            public function execute(SetInterface $set): void
+        $repository = new class () extends NullRepository {
+            public array $executed_actions = [];
+
+            public function manipulateMD(SetInterface $set): void
             {
-                $set->executed_actions = $set->actions;
+                $this->executed_actions[] = $set->actions;
             }
         };
 
         $set = new class () extends NullSet {
             public array $actions = [];
-            public array $executed_actions = [];
         };
 
-        return new class ($internal_manipulator, $set) extends Manipulator {
+        return new class ($internal_manipulator, $repository, $set) extends Manipulator {
             public function exposeSet(): SetInterface
             {
                 return $this->set;
+            }
+
+            public function exposeRepository(): RepositoryInterface
+            {
+                return $this->repository;
             }
         };
     }
@@ -246,19 +256,21 @@ class ManipulatorTest extends TestCase
             ->prepareDelete($this->getPath($exp3['path']))
             ->prepareCreateOrUpdate($this->getPath($exp4['path']), ...$exp4['values']);
         $manipulator->execute();
-        $manipulator5 = $manipulator
+        $manipulator = $manipulator
             ->prepareForceCreate($this->getPath($exp5['path']), ...$exp5['values'])
             ->prepareDelete($this->getPath($exp6['path']))
             ->prepareCreateOrUpdate($this->getPath($exp7['path']), ...$exp7['values']);
-        $manipulator5->execute();
+        $manipulator->execute();
 
+        $executed_actions = $manipulator->exposeRepository()->executed_actions;
+        $this->assertCount(2, $executed_actions);
         $this->assertSame(
             [$exp1, $exp2, $exp3, $exp4],
-            $manipulator->exposeSet()->executed_actions
+            $executed_actions[0]
         );
         $this->assertSame(
             [$exp1, $exp2, $exp3, $exp4, $exp5, $exp6, $exp7],
-            $manipulator5->exposeSet()->executed_actions
+            $executed_actions[1]
         );
     }
 }

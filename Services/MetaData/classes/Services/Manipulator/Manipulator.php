@@ -23,17 +23,21 @@ namespace ILIAS\MetaData\Services\Manipulator;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Manipulator\ManipulatorInterface as InternalManipulator;
 use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Repository\RepositoryInterface;
 
 class Manipulator implements ManipulatorInterface
 {
     protected InternalManipulator $internal_manipulator;
+    protected RepositoryInterface $repository;
     protected SetInterface $set;
 
     public function __construct(
         InternalManipulator $internal_manipulator,
+        RepositoryInterface $repository,
         SetInterface $set
     ) {
         $this->internal_manipulator = $internal_manipulator;
+        $this->repository = $repository;
         $this->set = $set;
     }
 
@@ -72,7 +76,7 @@ class Manipulator implements ManipulatorInterface
 
     public function execute(): void
     {
-        $this->internal_manipulator->execute($this->set);
+        $this->repository->manipulateMD($this->set);
     }
 
     protected function getCloneWithNewSet(SetInterface $set): ManipulatorInterface

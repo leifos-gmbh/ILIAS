@@ -155,7 +155,8 @@ class Services implements ServicesInterface
             return $this->manipulator_factory;
         }
         return $this->manipulator_factory = new ManipulatorFactory(
-            $this->internal_services->manipulator()->manipulator()
+            $this->internal_services->manipulator()->manipulator(),
+            $this->internal_services->repository()->repository()
         );
     }
 

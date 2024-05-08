@@ -23,8 +23,6 @@ namespace ILIAS\MetaData\Repository;
 use ILIAS\MetaData\Elements\NullSet;
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Repository\Utilities\NullScaffoldProvider;
-use ILIAS\MetaData\Repository\Utilities\ScaffoldProviderInterface;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDInterface;
 use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
 use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
@@ -51,11 +49,6 @@ class NullRepository implements RepositoryInterface
         FilterInterface ...$filters
     ): \Generator {
         yield from [];
-    }
-
-    public function scaffolds(): ScaffoldProviderInterface
-    {
-        return new NullScaffoldProvider();
     }
 
     public function manipulateMD(SetInterface $set): void

@@ -23,10 +23,18 @@ namespace ILIAS\MetaData\Elements\Scaffolds;
 use ILIAS\MetaData\Structure\Definitions\DefinitionInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Elements\NullElement;
+use ILIAS\MetaData\Elements\NullSet;
 
-interface ScaffoldFactoryInterface
+class NullScaffoldFactory implements ScaffoldFactoryInterface
 {
-    public function scaffold(DefinitionInterface $definition): ElementInterface;
+    public function scaffold(DefinitionInterface $definition): ElementInterface
+    {
+        return new NullElement();
+    }
 
-    public function set(DefinitionInterface $root_definition): SetInterface;
+    public function set(DefinitionInterface $root_definition): SetInterface
+    {
+        return new NullSet();
+    }
 }

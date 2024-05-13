@@ -30,37 +30,9 @@ use ILIAS\MetaData\Elements\Set;
 use ILIAS\MetaData\Elements\RessourceID\NullRessourceID;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactoryInterface;
 
-class ScaffoldFactory implements ScaffoldFactoryInterface
+interface ScaffoldFactoryInterface
 {
-    protected DataFactoryInterface $data_factory;
-    protected RessourceIDFactoryInterface $ressource_id_factory;
+    public function scaffold(DefinitionInterface $definition): ElementInterface;
 
-    public function __construct(
-        DataFactoryInterface $data_factory,
-        RessourceIDFactoryInterface $ressource_id_factory
-    ) {
-        $this->data_factory = $data_factory;
-        $this->ressource_id_factory = $ressource_id_factory;
-    }
-
-    public function scaffold(DefinitionInterface $definition): ElementInterface
-    {
-        return new Element(
-            NoID::SCAFFOLD,
-            $definition,
-            $this->data_factory->null()
-        );
-    }
-
-    public function set(DefinitionInterface $root_definition): SetInterface
-    {
-        return new Set(
-            $this->ressource_id_factory->null(),
-            new Element(
-                NoID::ROOT,
-                $root_definition,
-                $this->data_factory->null()
-            )
-        );
-    }
+    public function set(DefinitionInterface $root_definition): SetInterface;
 }

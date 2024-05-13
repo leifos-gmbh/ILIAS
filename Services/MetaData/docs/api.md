@@ -557,13 +557,19 @@ and importing from XML, depending on the chosen type of source and target.
 
 When calling `derive`, a `SourceSelector` object is returned. There,
 either an ILIAS object can be identified as a source by a triple of 
-IDs as explained [here](identifying_objects.md), or a `SimpleXMLElement` can be given.
-A `Derivator` is returned, where a target can be chosen analogously.
+IDs as explained [here](identifying_objects.md), a `SimpleXMLElement` can be given, or 
+a LOM set can be created from basic fields. A `Derivator` is returned, where as target either an object
+or XML can be chosen analogously.
 
 When a target is chosen, the `Derivator` reads out the LOM set from the
 source, and writes it to the target, as appropriate for the types of source
 and target. Common use cases are:
 
+- **Creation:** When the target is an ILIAS object and title, description
+and language are given as the source, a new LOM set is created for the
+object containing the given data. Note that description and language are
+optional, but title is not. Any previous LOM of the target object
+is deleted before copying.
 - **Copying:** When both source and target are ILIAS objects, the `Derivator` creates
 a LOM set for the target by copying the LOM of the source. Any previous
 LOM of the target object is deleted before copying.
@@ -575,9 +581,23 @@ the `Derivator` creates a `SimpleXMLElement` from the LOM of the source.
 
 ### Examples
 
+To create a new LOM set for a course with `obj_id` 380, pass its title,
+description and language as basic properties, and choose the course as
+the target:
+
+````
+$lom->derive()
+    ->fromBasicProperties(
+        'title',
+        'description',
+        'en'
+    )
+    ->forObject(380, 380, 'crs');
+````
+
 To copy the LOM of a chapter with `obj_id` 2 in a Learning Module with
-`obj_id` 325 to a course with `obj_id` 380, choose those objects as 
-target and source with the appropriate IDs:
+`obj_id` 325 to the course, choose those objects as target and source
+with the appropriate IDs:
 
 ````
 $lom->derive()

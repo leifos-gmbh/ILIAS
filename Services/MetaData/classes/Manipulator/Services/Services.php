@@ -30,6 +30,7 @@ use ILIAS\MetaData\Manipulator\ScaffoldProvider\ScaffoldProviderInterface;
 use ILIAS\MetaData\Manipulator\ScaffoldProvider\ScaffoldProvider;
 use ILIAS\MetaData\Elements\Scaffolds\ScaffoldFactory;
 use ILIAS\MetaData\Elements\Data\DataFactory;
+use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactory;
 
 class Services
 {
@@ -69,7 +70,10 @@ class Services
             return $this->scaffold_provider;
         }
         return $this->scaffold_provider = new ScaffoldProvider(
-            new ScaffoldFactory(new DataFactory()),
+            new ScaffoldFactory(
+                new DataFactory(),
+                new RessourceIDFactory()
+            ),
             $this->path_services->pathFactory(),
             $this->path_services->navigatorFactory(),
             $this->structure_services->structure()

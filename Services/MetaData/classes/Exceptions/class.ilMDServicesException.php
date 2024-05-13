@@ -18,20 +18,6 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Elements\RessourceID;
-
-class RessourceIDFactory implements RessourceIDFactoryInterface
+class ilMDServicesException extends ilException
 {
-    public function ressourceID(
-        int $obj_id,
-        int $sub_id,
-        string $type
-    ): RessourceIDInterface {
-        return new RessourceID($obj_id, $sub_id, $type);
-    }
-
-    public function null(): RessourceIDInterface
-    {
-        return new NullRessourceID();
-    }
 }

@@ -39,6 +39,10 @@ use ILIAS\MetaData\Services\Reader\Factory as ReaderFactory;
 use ILIAS\MetaData\Services\Manipulator\FactoryInterface as ManipulatorFactoryInterface;
 use ILIAS\MetaData\Services\Manipulator\Factory as ManipulatorFactory;
 use ILIAS\MetaData\Repository\RepositoryInterface;
+use ILIAS\MetaData\Services\Derivation\Creation\Creator;
+use ILIAS\MetaData\Elements\Scaffolds\ScaffoldFactory;
+use ILIAS\MetaData\Elements\Data\DataFactory;
+use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactory;
 
 class Services implements ServicesInterface
 {
@@ -104,7 +108,16 @@ class Services implements ServicesInterface
             return $this->derivation_source_selector;
         }
         return $this->derivation_source_selector = new SourceSelector(
-            $this->internal_services->repository()->repository()
+            $this->internal_services->repository()->repository(),
+            new Creator(
+                $this->internal_services->manipulator()->manipulator(),
+                $this->internal_services->paths()->pathFactory(),
+                new ScaffoldFactory(
+                    new DataFactory(),
+                    new RessourceIDFactory()
+                ),
+                $this->internal_services->structure()->structure()
+            )
         );
     }
 

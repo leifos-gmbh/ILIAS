@@ -91,6 +91,23 @@ new classes as the new MD editor does.
 
 ### Customizable LOM Digest
 
-Allow customizing what elements are part of the LOM Digest in
-administration settings. It would also be worth thinking about 
-how to implement multilinguality in the Digest.
+Customizing of LOM Digest could be made possible for plugins, in
+order to tailor the screen better to every installations configuration.
+
+### Clean up Elements Folder
+
+Currently, the Elements folder does not have its own service, so
+creation of the factories contained therein is not centralized.
+
+For the factories for elements and structure elements, centralization
+does not make much sense: those elements only make sense when created
+in bulk and corss-referenced (sub- and super-elements), but the
+factories only offer creation of single objects. The actual creation of
+elements in context is done by higher order infrastructure such as the
+repository. Those factories should thus only be created for that specific
+part of the infrastructure and not reused.
+
+Factories for scaffolds, ressource IDs and data on the other hand
+can be reused just fine, and should be offered through a service.
+Markers are a special case, I'm not sure whether they are needed outside
+of the manipulator.

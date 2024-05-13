@@ -29,4 +29,9 @@ class NullRessourceIDFactory implements RessourceIDFactoryInterface
     ): RessourceIDInterface {
         return new NullRessourceID();
     }
+
+    public function null(): RessourceIDInterface
+    {
+        return new NullRessourceID();
+    }
 }

@@ -18,20 +18,18 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Elements\RessourceID;
+namespace ILIAS\MetaData\Services\Derivation\Creation;
 
-class RessourceIDFactory implements RessourceIDFactoryInterface
+use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\Elements\NullSet;
+
+class NullCreator implements CreatorInterface
 {
-    public function ressourceID(
-        int $obj_id,
-        int $sub_id,
-        string $type
-    ): RessourceIDInterface {
-        return new RessourceID($obj_id, $sub_id, $type);
-    }
-
-    public function null(): RessourceIDInterface
-    {
-        return new NullRessourceID();
+    public function createSet(
+        string $title,
+        string $description = '',
+        string $language = '',
+    ): SetInterface {
+        return new NullSet();
     }
 }

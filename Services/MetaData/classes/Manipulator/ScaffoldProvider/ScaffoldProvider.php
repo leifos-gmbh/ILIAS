@@ -24,17 +24,17 @@ use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactoryInterface;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Elements\Structure\StructureSetInterface;
-use ILIAS\MetaData\Elements\Scaffolds\ScaffoldFactory;
+use ILIAS\MetaData\Elements\Scaffolds\ScaffoldFactoryInterface;
 
 class ScaffoldProvider implements ScaffoldProviderInterface
 {
-    protected ScaffoldFactory $scaffold_factory;
+    protected ScaffoldFactoryInterface $scaffold_factory;
     protected PathFactoryInterface $path_factory;
     protected NavigatorFactoryInterface $navigator_factory;
     protected StructureSetInterface $structure;
 
     public function __construct(
-        ScaffoldFactory $scaffold_factory,
+        ScaffoldFactoryInterface $scaffold_factory,
         PathFactoryInterface $path_factory,
         NavigatorFactoryInterface $navigator_factory,
         StructureSetInterface $structure,

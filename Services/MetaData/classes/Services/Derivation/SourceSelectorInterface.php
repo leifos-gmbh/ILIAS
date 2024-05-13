@@ -32,4 +32,14 @@ interface SourceSelectorInterface
      * Give an XML element as the source.
      */
     public function fromXML(\SimpleXMLElement $xml): DerivatorInterface;
+
+    /**
+     * Choose some basic properties to generate a new LOM set from.
+     * Note that the title must not be empty.
+     */
+    public function fromBasicProperties(
+        string $title,
+        string $description = '',
+        string $language = ''
+    ): DerivatorInterface;
 }

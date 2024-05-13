@@ -24,6 +24,7 @@ use PHPUnit\Framework\TestCase;
 use ILIAS\MetaData\Repository\NullRepository;
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Elements\NullSet;
+use ILIAS\MetaData\Services\Derivation\Creation\NullCreator;
 
 class SourceSelectorTest extends TestCase
 {
@@ -42,7 +43,25 @@ class SourceSelectorTest extends TestCase
                 };
             }
         };
-        return new class ($repo) extends SourceSelector {
+
+        $creator = new class () extends NullCreator {
+            public function createSet(
+                string $title,
+                string $description = '',
+                string $language = ''
+            ): SetInterface {
+                return new class ($title, $description, $language) extends NullSet {
+                    public function __construct(
+                        public string $title,
+                        public string $description,
+                        public string $language
+                    ) {
+                    }
+                };
+            }
+        };
+
+        return new class ($repo, $creator) extends SourceSelector {
             protected function getDerivator(SetInterface $from_set): DerivatorInterface
             {
                 return new class ($from_set) extends NullDerivator {
@@ -77,5 +96,20 @@ class SourceSelectorTest extends TestCase
     public function testFromXML(): void
     {
         // TODO test after implementation
+    }
+
+    public function testFromBasicProperties(): void
+    {
+        $source_selector = $this->getSourceSelector();
+
+        $derivator = $source_selector->fromBasicProperties(
+            'great title',
+            'amazing description',
+            'best language'
+        );
+
+        $this->assertSame('great title', $derivator->from_set->title);
+        $this->assertSame('amazing description', $derivator->from_set->description);
+        $this->assertSame('best language', $derivator->from_set->language);
     }
 }

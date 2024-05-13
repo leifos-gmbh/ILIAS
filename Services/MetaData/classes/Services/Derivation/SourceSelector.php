@@ -22,16 +22,19 @@ namespace ILIAS\MetaData\Services\Derivation;
 
 use ILIAS\MetaData\Repository\RepositoryInterface;
 use ILIAS\MetaData\Elements\SetInterface;
-use ILIAS\MetaData\Elements\NullSet;
+use ILIAS\MetaData\Services\Derivation\Creation\CreatorInterface;
 
 class SourceSelector implements SourceSelectorInterface
 {
     protected RepositoryInterface $repository;
+    protected CreatorInterface $creator;
 
     public function __construct(
-        RepositoryInterface $repository
+        RepositoryInterface $repository,
+        CreatorInterface $creator
     ) {
         $this->repository = $repository;
+        $this->creator = $creator;
     }
 
     public function fromObject(int $obj_id, int $sub_id, string $type): DerivatorInterface
@@ -51,7 +54,17 @@ class SourceSelector implements SourceSelectorInterface
          * TODO implement this
          */
         return $this->getDerivator(
-            new NullSet()
+            new \ILIAS\MetaData\Elements\NullSet()
+        );
+    }
+
+    public function fromBasicProperties(
+        string $title,
+        string $description = '',
+        string $language = ''
+    ): DerivatorInterface {
+        return $this->getDerivator(
+            $this->creator->createSet($title, $description, $language)
         );
     }
 

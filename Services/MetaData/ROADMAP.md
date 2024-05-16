@@ -111,3 +111,12 @@ Factories for scaffolds, ressource IDs and data on the other hand
 can be reused just fine, and should be offered through a service.
 Markers are a special case, I'm not sure whether they are needed outside
 of the manipulator.
+
+### Internationalization of LangStrings
+
+Elements consisting of a string and a language could be allowed to
+contain multiple such tuples, such that e.g. translations of the title
+can be stored in LOM.
+
+This would need expansive changes to the database structure, and a new
+input element for multilangual text input.

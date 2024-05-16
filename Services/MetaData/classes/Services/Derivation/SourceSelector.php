@@ -48,16 +48,6 @@ class SourceSelector implements SourceSelectorInterface
         );
     }
 
-    public function fromXML(\SimpleXMLElement $xml): DerivatorInterface
-    {
-        /**
-         * TODO implement this
-         */
-        return $this->getDerivator(
-            new \ILIAS\MetaData\Elements\NullSet()
-        );
-    }
-
     public function fromBasicProperties(
         string $title,
         string $description = '',

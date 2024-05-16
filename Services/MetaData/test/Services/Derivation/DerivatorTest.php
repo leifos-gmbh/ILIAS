@@ -92,9 +92,4 @@ class DerivatorTest extends TestCase
             $derivator->exposeRepository()->transferred_md[0]
         );
     }
-
-    public function testForXML(): void
-    {
-        // TODO test after implementation
-    }
 }

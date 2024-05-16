@@ -68,7 +68,7 @@ interface ServicesInterface
 
     /**
      * Derives LOM from a target, for a source. Encompasses both copying LOM between
-     * ILIAS objects as well as import from and export to XML.
+     * ILIAS objects and creating LOM for an object from some basic properties.
      */
     public function derive(): SourceSelectorInterface;
 

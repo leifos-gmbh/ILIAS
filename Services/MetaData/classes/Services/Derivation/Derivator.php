@@ -49,12 +49,4 @@ class Derivator implements DerivatorInterface
             $type
         );
     }
-
-    public function forXML(): \SimpleXMLElement
-    {
-        /**
-         * TODO: implement this
-         */
-        return new \SimpleXMLElement('<xml></xml>');
-    }
 }

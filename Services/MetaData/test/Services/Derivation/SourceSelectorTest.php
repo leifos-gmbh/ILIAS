@@ -93,11 +93,6 @@ class SourceSelectorTest extends TestCase
         $this->assertSame('type', $derivator->from_set->type);
     }
 
-    public function testFromXML(): void
-    {
-        // TODO test after implementation
-    }
-
     public function testFromBasicProperties(): void
     {
         $source_selector = $this->getSourceSelector();

@@ -18,14 +18,17 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Services\Derivation;
+namespace ILIAS\MetaData\XML\Dictionary;
 
-interface DerivatorInterface
+use ILIAS\MetaData\Elements\Base\BaseElementInterface;
+use ILIAS\MetaData\XML\Version;
+
+class NullDictionary implements DictionaryInterface
 {
-    /**
-     * Writes the LOM set derived from the source to the given object. Always deletes whatever
-     * metadata already exist at the target. See {@see \ILIAS\MetaData\Services\ServicesInterface::read()}
-     * for a description of the parameters.
-     */
-    public function forObject(int $obj_id, int $sub_id, string $type): void;
+    public function tagForElement(
+        BaseElementInterface $element,
+        Version $version
+    ): ?TagInterface {
+        return null;
+    }
 }

@@ -18,14 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Services\Derivation;
+namespace ILIAS\MetaData\XML;
 
-interface DerivatorInterface
+enum SpecialCase: string
 {
-    /**
-     * Writes the LOM set derived from the source to the given object. Always deletes whatever
-     * metadata already exist at the target. See {@see \ILIAS\MetaData\Services\ServicesInterface::read()}
-     * for a description of the parameters.
-     */
-    public function forObject(int $obj_id, int $sub_id, string $type): void;
+    case LANGSTRING = 'langstring';
+    case COPYRIGHT = 'copyright';
+    case OMITTED = 'omitted';
+    case AS_ATTRIBUTE = 'as_attribute';
 }

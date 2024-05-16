@@ -557,13 +557,13 @@ and importing from XML, depending on the chosen type of source and target.
 
 When calling `derive`, a `SourceSelector` object is returned. There,
 either an ILIAS object can be identified as a source by a triple of 
-IDs as explained [here](identifying_objects.md), a `SimpleXMLElement` can be given, or 
-a LOM set can be created from basic fields. A `Derivator` is returned, where as target either an object
-or XML can be chosen analogously.
+IDs as explained [here](identifying_objects.md), or a LOM set can be created from basic
+fields. A `Derivator` is returned, where an object can be chosen
+analogously as the target.
 
 When a target is chosen, the `Derivator` reads out the LOM set from the
-source, and writes it to the target, as appropriate for the types of source
-and target. Common use cases are:
+source, and writes it to the target object. Currently, the two use cases
+are:
 
 - **Creation:** When the target is an ILIAS object and title, description
 and language are given as the source, a new LOM set is created for the
@@ -573,11 +573,9 @@ is deleted before copying.
 - **Copying:** When both source and target are ILIAS objects, the `Derivator` creates
 a LOM set for the target by copying the LOM of the source. Any previous
 LOM of the target object is deleted before copying.
-- **Importing:** When the source is a `SimpleXMLElement` and the target an ILIAS object,
-the `Derivator` creates a LOM set for the target by importing from XML.
-Likewise, any previous LOM of the target object is deleted before importing.
-- **Exporting:** Likeweise, when the source is an ILIAS object and the target a `SimpleXMLElement`,
-the `Derivator` creates a `SimpleXMLElement` from the LOM of the source.
+
+In the future, XML might be supported as source and target to also allow
+import and export of LOM sets via the API.
 
 ### Examples
 

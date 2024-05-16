@@ -25,9 +25,4 @@ class NullDerivator implements DerivatorInterface
     public function forObject(int $obj_id, int $sub_id, string $type): void
     {
     }
-
-    public function forXML(): \SimpleXMLElement
-    {
-        return new \SimpleXMLElement('<xml></xml>');
-    }
 }

@@ -350,7 +350,7 @@ class StandardTest extends TestCase
             <?xml version="1.0"?>
             <el1>
                 <el1.1>
-                    <string language="br">oo</string>
+                    <string language="br"/>
                 </el1.1>
             </el1>
             XML;

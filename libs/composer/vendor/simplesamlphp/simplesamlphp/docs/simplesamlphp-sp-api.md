@@ -226,8 +226,7 @@ See the [`saml:SP`](./saml:sp) reference for information about available SAML au
 ### Example
 
     $idp = $auth->getAuthData('saml:sp:IdP');
-    $nameID = $auth->getAuthData('saml:sp:NameID')->getValue();
-    printf('You are %s, logged in from %s', htmlspecialchars($nameID), htmlspecialchars($idp));
+    print('You are logged in from: ' . htmlspecialchars($idp));
 
 
 `getLoginURL`

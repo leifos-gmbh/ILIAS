@@ -3,7 +3,7 @@
         'name' => 'ilias/ilias',
         'pretty_version' => 'dev-trunk',
         'version' => 'dev-trunk',
-        'reference' => '948f6b454aedd15d0c3f50bbf82053b947d45a77',
+        'reference' => '4a667c12cd5db07fc304cb5d3794b81388081441',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../../../',
         'aliases' => array(),
@@ -112,7 +112,7 @@
         'ilias/ilias' => array(
             'pretty_version' => 'dev-trunk',
             'version' => 'dev-trunk',
-            'reference' => '948f6b454aedd15d0c3f50bbf82053b947d45a77',
+            'reference' => '4a667c12cd5db07fc304cb5d3794b81388081441',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../../../',
             'aliases' => array(),

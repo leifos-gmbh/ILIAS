@@ -4765,6 +4765,7 @@
                 "issues": "https://github.com/tvdijen/simplesamlphp-module-sanitycheck/issues",
                 "source": "https://github.com/tvdijen/simplesamlphp-module-sanitycheck"
             },
+            "abandoned": true,
             "install-path": "../simplesamlphp/simplesamlphp/modules/sanitycheck"
         },
         {

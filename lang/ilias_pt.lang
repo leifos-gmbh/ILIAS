@@ -6279,6 +6279,7 @@ content#:#cont_dir_file#:#Sem a declaração de tamanho, este pode ser controlad
 content#:#cont_dir_renamed#:#O diretório mudou de nome.
 content#:#cont_disable_def_feedback#:#Desativar feedback predefinido de perguntas
 content#:#cont_disable_def_feedback_info#:#Se estiver desativado, as perguntas respondidas não apresentam nenhum feedback para o aluno. Tem de fornecer feedbacks personalizados para as suas perguntas.
+content#:#cont_double_click_to_delete#:#Double-click on content elements to select them for (de-)activation or deletion.###14 05 2024 new variable
 content#:#cont_download#:#Download
 content#:#cont_download_no_download#:#Roman i, ii, …
 content#:#cont_download_no_menu#:#Área de mapa guardada
@@ -13321,6 +13322,7 @@ rbac#:#mobs_visible#:#Definições guardadas
 rbac#:#mobs_write#:#Número necessário de visitas
 rbac#:#moderate#:#Moderar
 rbac#:#moderate_frm#:#Moderar
+rbac#:#msg_anonymous_cannot_be_assigned#:#Anonymous cannot be assigned to a role.###19 03 2024 new variable
 rbac#:#msg_no_roles_of_type#:#Nenhumas funções disponíveis com definição de filtro selecionada
 rbac#:#news_add_news#:#Adicionar notícias
 rbac#:#nots_edit_permissions#:#User can change permission settings of Notes administration.###30 04 2021 new variable

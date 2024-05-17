@@ -67,29 +67,27 @@ class Standard implements WriterInterface
             throw new \ilMDXMLException('LOM set is nested too deep.');
         }
 
-        $tag = $this->getTagForElement($element);
-
         if ($tag?->isExportedAsLangString()) {
             $this->addLangStringToXML($element, $xml);
             return;
         }
 
         foreach ($element->getSubElements() as $sub_element) {
-            $child_tag = $this->getTagForElement($sub_element);
-            $child_name = $sub_element->getDefinition()->name();
-            $child_value = $this->getDataValue($sub_element->getData(), $child_tag);
+            $sub_tag = $this->getTagForElement($sub_element);
+            $sub_name = $sub_element->getDefinition()->name();
+            $sub_value = $this->getDataValue($sub_element->getData(), $sub_tag);
 
-            if ($child_tag?->isOmitted()) {
+            if ($sub_tag?->isOmitted()) {
                 continue;
             }
 
-            if ($child_tag?->isExportedAsAttribute()) {
-                $xml->addAttribute($child_name, $child_value);
+            if ($sub_tag?->isExportedAsAttribute()) {
+                $xml->addAttribute($sub_name, (string) $sub_value);
                 continue;
             }
 
-            $child_xml = $xml->addChild($child_name, $child_value);
-            $this->addSubElementsToXML($sub_element, $child_tag, $child_xml, $depth + 1);
+            $child_xml = $xml->addChild($sub_name, $sub_value);
+            $this->addSubElementsToXML($sub_element, $sub_tag, $child_xml, $depth + 1);
         }
     }
 
@@ -137,7 +135,7 @@ class Standard implements WriterInterface
         ?TagInterface $tag
     ): ?string {
         if ($tag?->isTranslatedAsCopyright()) {
-            return $this->getValueForCopyright($data);
+            return $this->copyright_handler->copyrightForExport($data->value());
         }
 
         switch ($data->type()) {
@@ -160,11 +158,6 @@ class Standard implements WriterInterface
             default:
                 return $data->value();
         }
-    }
-
-    protected function getValueForCopyright(DataInterface $data): string
-    {
-        return $this->copyright_handler->copyrightForExport($data->value());
     }
 
     protected function getTagForElement(ElementInterface $element): ?TagInterface

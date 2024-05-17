@@ -322,6 +322,52 @@ class StandardTest extends TestCase
         $this->assertXmlStringEqualsXmlString($expected_xml, $xml->asXML());
     }
 
+    public function testWriteWithLangStringLanguageNone(): void
+    {
+        $set_array = [
+            'name' => 'el1',
+            'type' => Type::NULL,
+            'value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1.1',
+                    'type' => Type::NULL,
+                    'value' => '',
+                    'specials' => [SpecialCase::LANGSTRING],
+                    'subs' => [
+                        [
+                            'name' => 'string',
+                            'type' => Type::STRING,
+                            'value' => 'some text',
+                            'subs' => []
+                        ],
+                        [
+                            'name' => 'language',
+                            'type' => Type::LANG,
+                            'value' => 'xx',
+                            'subs' => []
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $expected_xml = /** @lang text */ <<<XML
+            <?xml version="1.0"?>
+            <el1>
+                <el1.1>
+                    <string language="none">some text</string>
+                </el1.1>
+            </el1>
+            XML;
+
+        $writer = $this->getStandardWriter();
+        $set = $this->getSet($set_array);
+        $xml = $writer->write($set);
+
+        $this->assertXmlStringEqualsXmlString($expected_xml, $xml->asXML());
+    }
+
     public function testWriteWithLangStringNoString(): void
     {
         $set_array = [

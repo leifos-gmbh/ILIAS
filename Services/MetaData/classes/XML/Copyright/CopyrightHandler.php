@@ -26,4 +26,14 @@ class CopyrightHandler implements CopyrightHandlerInterface
     {
         return \ilMDCopyrightSelectionEntry::_lookupCopyright($copyright, true);
     }
+
+    public function copyrightFromExport(string $copyright): string
+    {
+        $entry_id = \ilMDCopyrightSelectionEntry::lookupCopyrightByText($copyright);
+        if (!$entry_id) {
+            return $copyright;
+        } else {
+            return \ilMDCopyrightSelectionEntry::createIdentifier($entry_id);
+        }
+    }
 }

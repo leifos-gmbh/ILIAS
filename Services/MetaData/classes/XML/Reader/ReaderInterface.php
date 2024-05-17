@@ -18,11 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\XML\Copyright;
+namespace ILIAS\MetaData\XML\Reader;
 
-interface CopyrightHandlerInterface
+use SimpleXMLElement;
+use ILIAS\MetaData\Elements\SetInterface;
+use ILIAS\MetaData\XML\Version;
+
+interface ReaderInterface
 {
-    public function copyrightForExport(string $copyright): string;
-
-    public function copyrightFromExport(string $copyright): string;
+    public function read(
+        SimpleXMLElement $xml,
+        Version $version
+    ): SetInterface;
 }

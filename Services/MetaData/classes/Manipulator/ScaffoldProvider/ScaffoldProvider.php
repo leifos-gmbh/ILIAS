@@ -25,6 +25,7 @@ use ILIAS\MetaData\Paths\FactoryInterface as PathFactoryInterface;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Elements\Structure\StructureSetInterface;
 use ILIAS\MetaData\Elements\Scaffolds\ScaffoldFactoryInterface;
+use ILIAS\MetaData\Elements\SetInterface;
 
 class ScaffoldProvider implements ScaffoldProviderInterface
 {
@@ -79,5 +80,10 @@ class ScaffoldProvider implements ScaffoldProviderInterface
         ) {
             yield '' => $this->scaffold_factory->scaffold($previous_sub);
         }
+    }
+
+    public function set(): SetInterface
+    {
+        return $this->scaffold_factory->set($this->structure->getRoot()->getDefinition());
     }
 }

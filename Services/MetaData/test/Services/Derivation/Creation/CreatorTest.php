@@ -24,8 +24,6 @@ use PHPUnit\Framework\TestCase;
 use ILIAS\MetaData\Services\Derivation\Creation\Creator;
 use ILIAS\MetaData\Manipulator\NullManipulator;
 use ILIAS\MetaData\Paths\NullFactory as NullPathFactory;
-use ILIAS\MetaData\Elements\Scaffolds\NullScaffoldFactory;
-use ILIAS\MetaData\Elements\Structure\NullStructureSet;
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\NullBuilder as NullPathBuilder;
@@ -34,9 +32,8 @@ use ILIAS\MetaData\Paths\Filters\FilterType;
 use ILIAS\MetaData\Paths\NullPath;
 use ILIAS\MetaData\Structure\Definitions\DefinitionInterface;
 use ILIAS\MetaData\Elements\NullSet;
-use ILIAS\MetaData\Elements\Structure\StructureElementInterface;
-use ILIAS\MetaData\Elements\Structure\NullStructureElement;
 use ILIAS\MetaData\Structure\Definitions\NullDefinition;
+use ILIAS\MetaData\Manipulator\ScaffoldProvider\NullScaffoldProvider;
 
 class CreatorTest extends TestCase
 {
@@ -120,34 +117,16 @@ class CreatorTest extends TestCase
             }
         };
 
-        $scaffold_factory = new class () extends NullScaffoldFactory {
-            public function set(DefinitionInterface $root_definition): SetInterface
+        $scaffold_provider = new class () extends NullScaffoldProvider {
+            public function set(): SetInterface
             {
-                return new class ($root_definition) extends NullSet {
+                return new class () extends NullSet {
                     public array $prepared_changes = [];
-
-                    public function __construct(public DefinitionInterface $root_definition)
-                    {
-                    }
                 };
             }
         };
 
-        $structure = new class () extends NullStructureSet {
-            public function getRoot(): StructureElementInterface
-            {
-                return new class () extends NullStructureElement {
-                    public function getDefinition(): DefinitionInterface
-                    {
-                        return new class () extends NullDefinition {
-                            public string $exposed = 'yes, I am the correct definition';
-                        };
-                    }
-                };
-            }
-        };
-
-        return new Creator($manipulator, $path_factory, $scaffold_factory, $structure);
+        return new Creator($manipulator, $path_factory, $scaffold_provider);
     }
 
     public function testCreateSet(): void
@@ -161,7 +140,6 @@ class CreatorTest extends TestCase
             'values' => ['some title']
         ];
         $prepared_changes = $set->prepared_changes;
-        $this->assertSame('yes, I am the correct definition', $set->root_definition->exposed);
         $this->assertCount(1, $prepared_changes);
         $this->assertContains($expected_title_changes, $prepared_changes);
     }
@@ -185,7 +163,6 @@ class CreatorTest extends TestCase
             'values' => ['tg']
         ];
         $prepared_changes = $set->prepared_changes;
-        $this->assertSame('yes, I am the correct definition', $set->root_definition->exposed);
         $this->assertCount(3, $prepared_changes);
         $this->assertContains($expected_title_changes, $prepared_changes);
         $this->assertContains($expected_title_lang_changes, $prepared_changes);
@@ -207,7 +184,6 @@ class CreatorTest extends TestCase
             'values' => ['some description']
         ];
         $prepared_changes = $set->prepared_changes;
-        $this->assertSame('yes, I am the correct definition', $set->root_definition->exposed);
         $this->assertCount(2, $prepared_changes);
         $this->assertContains($expected_title_changes, $prepared_changes);
         $this->assertContains($expected_description_changes, $prepared_changes);
@@ -240,7 +216,6 @@ class CreatorTest extends TestCase
             'values' => ['tg']
         ];
         $prepared_changes = $set->prepared_changes;
-        $this->assertSame('yes, I am the correct definition', $set->root_definition->exposed);
         $this->assertCount(5, $prepared_changes);
         $this->assertContains($expected_title_changes, $prepared_changes);
         $this->assertContains($expected_title_lang_changes, $prepared_changes);

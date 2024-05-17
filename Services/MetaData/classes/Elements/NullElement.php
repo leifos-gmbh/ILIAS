@@ -51,7 +51,7 @@ class NullElement extends NullBaseElement implements ElementInterface
         return new NullMarker();
     }
 
-    public function mark(MarkerFactoryInterface $factory, Action $action, string $data_value = '')
+    public function mark(MarkerFactoryInterface $factory, Action $action, string $data_value = ''): void
     {
     }
 

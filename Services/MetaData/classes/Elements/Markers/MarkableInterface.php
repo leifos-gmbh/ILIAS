@@ -43,5 +43,5 @@ interface MarkableInterface
         MarkerFactoryInterface $factory,
         Action $action,
         string $data_value = ''
-    );
+    ): void;
 }

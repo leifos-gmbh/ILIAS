@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Manipulator\ScaffoldProvider;
 
 use ILIAS\MetaData\Elements\ElementInterface;
+use ILIAS\MetaData\Elements\SetInterface;
 
 interface ScaffoldProviderInterface
 {
@@ -34,4 +35,9 @@ interface ScaffoldProviderInterface
     public function getScaffoldsForElement(
         ElementInterface $element
     ): \Generator;
+
+    /**
+     * Returns an empty LOM set, containing only the root element.
+     */
+    public function set(): SetInterface;
 }

@@ -24,26 +24,22 @@ use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Manipulator\ManipulatorInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Elements\Scaffolds\ScaffoldFactoryInterface;
-use ILIAS\MetaData\Elements\Structure\StructureSetInterface;
+use ILIAS\MetaData\Manipulator\ScaffoldProvider\ScaffoldProviderInterface;
 
 class Creator implements CreatorInterface
 {
     protected ManipulatorInterface $manipulator;
     protected PathFactory $path_factory;
-    protected ScaffoldFactoryInterface $scaffold_factory;
-    protected StructureSetInterface $structure;
+    protected ScaffoldProviderInterface $scaffold_provider;
 
     public function __construct(
         ManipulatorInterface $manipulator,
         PathFactory $path_factory,
-        ScaffoldFactoryInterface $scaffold_factory,
-        StructureSetInterface $structure
+        ScaffoldProviderInterface $scaffold_provider
     ) {
         $this->manipulator = $manipulator;
         $this->path_factory = $path_factory;
-        $this->scaffold_factory = $scaffold_factory;
-        $this->structure = $structure;
+        $this->scaffold_provider = $scaffold_provider;
     }
 
     public function createSet(
@@ -51,7 +47,7 @@ class Creator implements CreatorInterface
         string $description = '',
         string $language = ''
     ): SetInterface {
-        $set = $this->scaffold_factory->set($this->structure->getRoot()->getDefinition());
+        $set = $this->scaffold_provider->set();
 
         $set = $this->prepareTitle($set, $title, $language);
         $set = $this->prepareDescription($set, $description, $language);

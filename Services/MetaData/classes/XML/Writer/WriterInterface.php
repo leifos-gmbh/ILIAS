@@ -24,5 +24,11 @@ use ILIAS\MetaData\Elements\SetInterface;
 
 interface WriterInterface
 {
+    /**
+     * Currently, this does not write information from markers to xml,
+     * so calling this with a set from a standard reader will give
+     * back empty XML.
+     * This should be changed before adding XML to the API.
+     */
     public function write(SetInterface $set): \SimpleXMLElement;
 }

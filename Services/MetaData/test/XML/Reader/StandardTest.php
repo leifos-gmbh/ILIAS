@@ -41,15 +41,21 @@ use ILIAS\MetaData\Elements\Markers\MarkerFactoryInterface;
 use ILIAS\MetaData\Elements\Data\Type;
 use SimpleXMLElement;
 use ILIAS\MetaData\XML\Version;
+use ILIAS\MetaData\Elements\Base\BaseElementInterface;
+use ILIAS\MetaData\XML\Dictionary\TagInterface;
+use ILIAS\MetaData\XML\Dictionary\NullTag;
+use ILIAS\MetaData\XML\SpecialCase;
 
 class StandardTest extends TestCase
 {
     /**
      * Element data types and tag information are contained hyphen-separated in
      * their names in the xml:
-     * name = actual name - data type
+     * name = actual name - data type - first special case for tag . version - second special case...
      *
-     * Using the name 'failme' will lead to a refusal to add the element as scaffold.
+     * A few exceptions:
+     * Using the name 'failme' will lead to a refusal to add the element as scaffold, and
+     * 'string' and 'language' as name are treated separately to accomodate langstrings.
      *
      * In the actual reader this info is derived from the LOM structure via
      * the scaffold provider, but that is cumbersome to mock here.
@@ -97,8 +103,17 @@ class StandardTest extends TestCase
 
                 $info_from_name = explode('-', $name);
 
+                // langstrings need to treated as a special case
+                if ($name === 'string') {
+                    $type = Type::STRING;
+                } elseif ($name === 'language') {
+                    $type = Type::LANG;
+                } else {
+                    $type = Type::from($info_from_name[1]);
+                }
+
                 $scaffold->exposed_data['name'] = $name;
-                $scaffold->exposed_data['type'] = Type::from($info_from_name[1]);
+                $scaffold->exposed_data['type'] = $type;
 
                 return $scaffold;
             }
@@ -153,6 +168,45 @@ class StandardTest extends TestCase
         };
 
         $dictionary = new class () extends NullDictionary {
+            public function tagForElement(
+                BaseElementInterface $element,
+                Version $version
+            ): ?TagInterface {
+                $info_from_name = explode('-', $element->getDefinition()->name());
+
+                //throw away name and type
+                array_shift($info_from_name);
+                array_shift($info_from_name);
+
+                $langstring = false;
+                $omitted = false;
+                foreach ($info_from_name as $info) {
+                    if ($info === SpecialCase::LANGSTRING->value . '.' . $version->value) {
+                        $langstring = true;
+                    }
+                    if ($info === SpecialCase::OMITTED->value . '.' . $version->value) {
+                        $omitted = true;
+                    }
+                }
+
+                return new class ($langstring, $omitted) extends NullTag {
+                    public function __construct(
+                        protected bool $langstring,
+                        protected bool $omitted
+                    ) {
+                    }
+
+                    public function isExportedAsLangString(): bool
+                    {
+                        return $this->langstring;
+                    }
+
+                    public function isOmitted(): bool
+                    {
+                        return $this->omitted;
+                    }
+                };
+            }
         };
 
         $copyright_handler = new class () extends NullCopyrightHandler {
@@ -308,25 +362,386 @@ class StandardTest extends TestCase
 
     public function testReadWithLangstring(): void
     {
+        $xml_string = /** @lang text */ <<<XML
+            <?xml version="1.0"?>
+            <correctroot>
+                <el1-none-langstring.10.0>
+                    <string language="br">some text</string>
+                </el1-none-langstring.10.0>
+            </correctroot>
+            XML;
+        $xml = new SimpleXMLElement($xml_string);
+
+        $expected_data = [
+            'name' => 'correctroot',
+            'type' => Type::NULL,
+            'marker_action' => Action::CREATE_OR_UPDATE,
+            'marker_value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1-none-langstring.10.0',
+                    'type' => Type::NULL,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => '',
+                    'subs' => [
+                        [
+                            'name' => 'string',
+                            'type' => Type::STRING,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'some text',
+                            'subs' => []
+                        ],
+                        [
+                            'name' => 'language',
+                            'type' => Type::LANG,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'br',
+                            'subs' => []
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $reader = $this->getReader();
+        $result_set = $reader->read($xml, Version::V10_0);
+
+        $this->assertEquals(
+            $expected_data,
+            $result_set->getRoot()->exposeData()
+        );
+    }
+
+    public function testReadWithLangstringInDifferentVersion(): void
+    {
+        $xml_string = /** @lang text */ <<<XML
+            <?xml version="1.0"?>
+            <correctroot>
+                <el1-none-langstring.4.1.0>
+                    <el1.1-string>val1.1</el1.1-string>
+                    <el1.2-lang>val1.2</el1.2-lang>
+                </el1-none-langstring.4.1.0>
+            </correctroot>
+            XML;
+        $xml = new SimpleXMLElement($xml_string);
+
+        $expected_data = [
+            'name' => 'correctroot',
+            'type' => Type::NULL,
+            'marker_action' => Action::CREATE_OR_UPDATE,
+            'marker_value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1-none-langstring.4.1.0',
+                    'type' => Type::NULL,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => '',
+                    'subs' => [
+                        [
+                            'name' => 'el1.1-string',
+                            'type' => Type::STRING,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'val1.1',
+                            'subs' => []
+                        ],
+                        [
+                            'name' => 'el1.2-lang',
+                            'type' => Type::LANG,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'val1.2',
+                            'subs' => []
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $reader = $this->getReader();
+        $result_set = $reader->read($xml, Version::V10_0);
+
+        $this->assertEquals(
+            $expected_data,
+            $result_set->getRoot()->exposeData()
+        );
     }
 
     public function testReadWithLangstringLanguageNone(): void
     {
+        $xml_string = /** @lang text */ <<<XML
+            <?xml version="1.0"?>
+            <correctroot>
+                <el1-none-langstring.10.0>
+                    <string language="none">some text</string>
+                </el1-none-langstring.10.0>
+            </correctroot>
+            XML;
+        $xml = new SimpleXMLElement($xml_string);
+
+        $expected_data = [
+            'name' => 'correctroot',
+            'type' => Type::NULL,
+            'marker_action' => Action::CREATE_OR_UPDATE,
+            'marker_value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1-none-langstring.10.0',
+                    'type' => Type::NULL,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => '',
+                    'subs' => [
+                        [
+                            'name' => 'string',
+                            'type' => Type::STRING,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'some text',
+                            'subs' => []
+                        ],
+                        [
+                            'name' => 'language',
+                            'type' => Type::LANG,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'xx',
+                            'subs' => []
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $reader = $this->getReader();
+        $result_set = $reader->read($xml, Version::V10_0);
+
+        $this->assertEquals(
+            $expected_data,
+            $result_set->getRoot()->exposeData()
+        );
     }
 
     public function testReadWithLangstringNoLanguage(): void
     {
+        $xml_string = /** @lang text */ <<<XML
+            <?xml version="1.0"?>
+            <correctroot>
+                <el1-none-langstring.10.0>
+                    <string>some text</string>
+                </el1-none-langstring.10.0>
+            </correctroot>
+            XML;
+        $xml = new SimpleXMLElement($xml_string);
+
+        $expected_data = [
+            'name' => 'correctroot',
+            'type' => Type::NULL,
+            'marker_action' => Action::CREATE_OR_UPDATE,
+            'marker_value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1-none-langstring.10.0',
+                    'type' => Type::NULL,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => '',
+                    'subs' => [
+                        [
+                            'name' => 'string',
+                            'type' => Type::STRING,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'some text',
+                            'subs' => []
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $reader = $this->getReader();
+        $result_set = $reader->read($xml, Version::V10_0);
+
+        $this->assertEquals(
+            $expected_data,
+            $result_set->getRoot()->exposeData()
+        );
     }
 
     public function testReadWithLangstringNoString(): void
     {
+        $xml_string = /** @lang text */ <<<XML
+            <?xml version="1.0"?>
+            <correctroot>
+                <el1-none-langstring.10.0>
+                    <string language="pl"/>
+                </el1-none-langstring.10.0>
+            </correctroot>
+            XML;
+        $xml = new SimpleXMLElement($xml_string);
+
+        $expected_data = [
+            'name' => 'correctroot',
+            'type' => Type::NULL,
+            'marker_action' => Action::CREATE_OR_UPDATE,
+            'marker_value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1-none-langstring.10.0',
+                    'type' => Type::NULL,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => '',
+                    'subs' => [
+                        [
+                            'name' => 'language',
+                            'type' => Type::LANG,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'pl',
+                            'subs' => []
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $reader = $this->getReader();
+        $result_set = $reader->read($xml, Version::V10_0);
+
+        $this->assertEquals(
+            $expected_data,
+            $result_set->getRoot()->exposeData()
+        );
     }
 
     public function testReadWithOmittedDataCarryingElement(): void
     {
+        $xml_string = /** @lang text */ <<<XML
+            <?xml version="1.0"?>
+            <correctroot>
+                <el1-string>val1</el1-string>
+                <el2-none>
+                    <el2.1-non_neg_int-omitted.10.0>val2.1</el2.1-non_neg_int-omitted.10.0>
+                    <el2.2-duration>val2.2</el2.2-duration>
+                </el2-none>
+            </correctroot>
+            XML;
+        $xml = new SimpleXMLElement($xml_string);
+
+        $expected_data = [
+            'name' => 'correctroot',
+            'type' => Type::NULL,
+            'marker_action' => Action::CREATE_OR_UPDATE,
+            'marker_value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1-string',
+                    'type' => Type::STRING,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => 'val1',
+                    'subs' => []
+                ],
+                [
+                    'name' => 'el2-none',
+                    'type' => Type::NULL,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => '',
+                    'subs' => [
+                        [
+                            'name' => 'el2.1-non_neg_int-omitted.10.0',
+                            'type' => Type::NON_NEG_INT,
+                            'subs' => []
+                        ],
+                        [
+                            'name' => 'el2.2-duration',
+                            'type' => Type::DURATION,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'val2.2',
+                            'subs' => []
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $reader = $this->getReader();
+        $result_set = $reader->read($xml, Version::V10_0);
+
+        $this->assertEquals(
+            $expected_data,
+            $result_set->getRoot()->exposeData()
+        );
     }
 
     public function testReadWithOmittedContainerElement(): void
     {
+        $xml_string = /** @lang text */ <<<XML
+            <?xml version="1.0"?>
+            <correctroot>
+                <el1-none-omitted.10.0>
+                    <el1.1-non_neg_int>val1.1</el1.1-non_neg_int>
+                    <el1.2-duration>val1.2</el1.2-duration>
+                </el1-none-omitted.10.0>
+                <el2-string>val2</el2-string>
+            </correctroot>
+            XML;
+        $xml = new SimpleXMLElement($xml_string);
+
+        $expected_data = [
+            'name' => 'correctroot',
+            'type' => Type::NULL,
+            'marker_action' => Action::CREATE_OR_UPDATE,
+            'marker_value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1-none-omitted.10.0',
+                    'type' => Type::NULL,
+                    'subs' => []
+                ],
+                [
+                    'name' => 'el2-string',
+                    'type' => Type::STRING,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => 'val2',
+                    'subs' => []
+                ],
+            ]
+        ];
+
+        $reader = $this->getReader();
+        $result_set = $reader->read($xml, Version::V10_0);
+
+        $this->assertEquals(
+            $expected_data,
+            $result_set->getRoot()->exposeData()
+        );
+    }
+
+    public function testReadWithOmittedInDifferentVersion(): void
+    {
+        $xml_string = /** @lang text */ <<<XML
+            <?xml version="1.0"?>
+            <correctroot>
+                <el1-string-omitted.4.1.0>val1</el1-string-omitted.4.1.0>
+            </correctroot>
+            XML;
+        $xml = new SimpleXMLElement($xml_string);
+
+        $expected_data = [
+            'name' => 'correctroot',
+            'type' => Type::NULL,
+            'marker_action' => Action::CREATE_OR_UPDATE,
+            'marker_value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1-string-omitted.4.1.0',
+                    'type' => Type::STRING,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => 'val1',
+                    'subs' => []
+                ],
+            ]
+        ];
+
+        $reader = $this->getReader();
+        $result_set = $reader->read($xml, Version::V10_0);
+
+        $this->assertEquals(
+            $expected_data,
+            $result_set->getRoot()->exposeData()
+        );
     }
 }

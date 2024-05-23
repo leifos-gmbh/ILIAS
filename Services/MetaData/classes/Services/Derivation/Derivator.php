@@ -46,7 +46,8 @@ class Derivator implements DerivatorInterface
             $this->from_set,
             $obj_id,
             $sub_id,
-            $type
+            $type,
+            true
         );
     }
 }

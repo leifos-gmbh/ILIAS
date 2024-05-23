@@ -44,4 +44,9 @@ interface MarkableInterface
         Action $action,
         string $data_value = ''
     ): void;
+
+    /**
+     * Removes markers from this element, and recursively from all sub-elements.
+     */
+    public function unmark(): void;
 }

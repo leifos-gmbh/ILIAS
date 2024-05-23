@@ -21,28 +21,37 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\XML\Services;
 
 use ILIAS\MetaData\XML\Writer\Standard as StandardWriter;
+use ILIAS\MetaData\XML\Writer\WriterInterface;
 use ILIAS\MetaData\XML\Dictionary\LOMDictionaryInitiator;
 use ILIAS\MetaData\XML\Dictionary\TagFactory;
 use ILIAS\MetaData\Paths\Services\Services as PathServices;
 use ILIAS\MetaData\Structure\Services\Services as StructureServices;
 use ILIAS\MetaData\XML\Copyright\CopyrightHandler;
+use ILIAS\MetaData\XML\Reader\Standard as StandardReader;
+use ILIAS\MetaData\XML\Reader\ReaderInterface;
+use ILIAS\MetaData\Elements\Markers\MarkerFactory;
+use ILIAS\MetaData\Manipulator\Services\Services as ManipulatorServices;
 
 class Services
 {
-    protected StandardWriter $standard_writer;
+    protected WriterInterface $standard_writer;
+    protected ReaderInterface $standard_reader;
 
     protected PathServices $path_services;
     protected StructureServices $structure_services;
+    protected ManipulatorServices $manipulator_services;
 
     public function __construct(
         PathServices $path_services,
-        StructureServices $structure_services
+        StructureServices $structure_services,
+        ManipulatorServices $manipulator_services
     ) {
         $this->path_services = $path_services;
         $this->structure_services = $structure_services;
+        $this->manipulator_services = $manipulator_services;
     }
 
-    public function standardWriter(): StandardWriter
+    public function standardWriter(): WriterInterface
     {
         if (isset($this->standard_writer)) {
             return $this->standard_writer;
@@ -53,6 +62,24 @@ class Services
             $this->structure_services->structure()
         ))->get();
         return $this->standard_writer = new StandardWriter(
+            $dictionary,
+            new CopyrightHandler()
+        );
+    }
+
+    public function standardReader(): ReaderInterface
+    {
+        if (isset($this->standard_reader)) {
+            return $this->standard_reader;
+        }
+        $dictionary = (new LOMDictionaryInitiator(
+            new TagFactory(),
+            $this->path_services->pathFactory(),
+            $this->structure_services->structure()
+        ))->get();
+        return $this->standard_reader = new StandardReader(
+            new MarkerFactory(),
+            $this->manipulator_services->scaffoldProvider(),
             $dictionary,
             new CopyrightHandler()
         );

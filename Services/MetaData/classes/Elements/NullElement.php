@@ -55,6 +55,10 @@ class NullElement extends NullBaseElement implements ElementInterface
     {
     }
 
+    public function unmark(): void
+    {
+    }
+
     public function addScaffoldsToSubElements(ScaffoldProviderInterface $scaffold_provider): void
     {
     }

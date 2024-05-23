@@ -52,6 +52,7 @@ use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseSearcher;
 use ILIAS\MetaData\Repository\Utilities\Queries\Paths\DatabasePathsParserFactory;
 use ILIAS\MetaData\Repository\IdentifierHandler\IdentifierHandler;
 use ILIAS\MetaData\Manipulator\Services\Services as ManipulatorServices;
+use ILIAS\MetaData\Elements\Markers\MarkerFactory;
 
 class Services
 {
@@ -151,6 +152,7 @@ class Services
             ),
             new Cleaner(
                 $element_factory,
+                new MarkerFactory(),
                 $this->structure_services->structure(),
                 new DataValidator(
                     new DataValidatorService(

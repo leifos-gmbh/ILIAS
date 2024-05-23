@@ -285,7 +285,7 @@ class StandardTest extends TestCase
         );
     }
 
-    public function testReadWrongStructureException(): void
+    public function testReadWrongStructure(): void
     {
         $xml_string = /** @lang text */ <<<XML
             <?xml version="1.0"?>
@@ -299,10 +299,44 @@ class StandardTest extends TestCase
             XML;
         $xml = new SimpleXMLElement($xml_string);
 
-        $reader = $this->getReader();
+        $expected_data = [
+            'name' => 'correctroot',
+            'type' => Type::NULL,
+            'marker_action' => Action::CREATE_OR_UPDATE,
+            'marker_value' => '',
+            'subs' => [
+                [
+                    'name' => 'el1-string',
+                    'type' => Type::STRING,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => 'val1',
+                    'subs' => []
+                ],
+                [
+                    'name' => 'el2-none',
+                    'type' => Type::NULL,
+                    'marker_action' => Action::CREATE_OR_UPDATE,
+                    'marker_value' => '',
+                    'subs' => [
+                        [
+                            'name' => 'el2.2-duration',
+                            'type' => Type::DURATION,
+                            'marker_action' => Action::CREATE_OR_UPDATE,
+                            'marker_value' => 'val2.2',
+                            'subs' => []
+                        ]
+                    ]
+                ]
+            ]
+        ];
 
-        $this->expectException(\ilMDXMLException::class);
+        $reader = $this->getReader();
         $result_set = $reader->read($xml, Version::V10_0);
+
+        $this->assertEquals(
+            $expected_data,
+            $result_set->getRoot()->exposeData()
+        );
     }
 
     public function testReadInvalidRootException(): void

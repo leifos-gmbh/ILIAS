@@ -59,7 +59,8 @@ class NullRepository implements RepositoryInterface
         SetInterface $from_set,
         int $to_obj_id,
         int $to_sub_id,
-        string $to_type
+        string $to_type,
+        bool $throw_error_if_invalid
     ): void {
     }
 

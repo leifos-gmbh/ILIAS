@@ -105,11 +105,16 @@ class LOMDatabaseRepository implements RepositoryInterface
         SetInterface $from_set,
         int $to_obj_id,
         int $to_sub_id,
-        string $to_type
+        string $to_type,
+        bool $throw_error_if_invalid
     ): void {
         $to_ressource_id = $this->ressource_factory->ressourceID($to_obj_id, $to_sub_id, $to_type);
 
-        $this->cleaner->checkMarkers($from_set);
+        if ($throw_error_if_invalid) {
+            $this->cleaner->checkMarkers($from_set);
+        } else {
+            $this->cleaner->cleanMarkers($from_set);
+        }
         $from_set = $this->identifier_handler->prepareUpdateOfIdentifier($from_set, $to_ressource_id);
         $this->manipulator->deleteAllMD($to_ressource_id);
         $this->manipulator->transferMD($from_set, $to_ressource_id);

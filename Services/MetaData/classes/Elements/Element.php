@@ -112,6 +112,14 @@ class Element extends BaseElement implements ElementInterface
         }
     }
 
+    public function unmark(): void
+    {
+        $this->setMarker(null);
+        foreach ($this->getSubElements() as $sub_element) {
+            $sub_element->unmark();
+        }
+    }
+
     protected function setMarker(?MarkerInterface $marker): void
     {
         $this->marker = $marker;

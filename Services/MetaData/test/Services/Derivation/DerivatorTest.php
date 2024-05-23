@@ -33,12 +33,14 @@ class DerivatorTest extends TestCase
     ): DerivatorInterface {
         $repo = new class () extends NullRepository {
             public array $transferred_md = [];
+            public array $error_thrown = [];
 
             public function transferMD(
                 SetInterface $from_set,
                 int $to_obj_id,
                 int $to_sub_id,
-                string $to_type
+                string $to_type,
+                bool $throw_error_if_invalid
             ): void {
                 $this->transferred_md[] = [
                     'from_set' => $from_set,
@@ -46,6 +48,7 @@ class DerivatorTest extends TestCase
                     'to_sub_id' => $to_sub_id,
                     'to_type' => $to_type
                 ];
+                $this->error_thrown[] = $throw_error_if_invalid;
             }
         };
         return new class ($from_set, $repo) extends Derivator {
@@ -73,6 +76,8 @@ class DerivatorTest extends TestCase
             ],
             $derivator->exposeRepository()->transferred_md[0]
         );
+        $this->assertCount(1, $derivator->exposeRepository()->error_thrown);
+        $this->assertTrue($derivator->exposeRepository()->error_thrown[0]);
     }
 
     public function testForObjectWithSubIDZero(): void
@@ -91,5 +96,7 @@ class DerivatorTest extends TestCase
             ],
             $derivator->exposeRepository()->transferred_md[0]
         );
+        $this->assertCount(1, $derivator->exposeRepository()->error_thrown);
+        $this->assertTrue($derivator->exposeRepository()->error_thrown[0]);
     }
 }

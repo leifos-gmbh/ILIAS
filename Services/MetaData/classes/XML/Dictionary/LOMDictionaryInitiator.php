@@ -50,12 +50,87 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator
     {
         $structure = $this->getStructure();
 
-        $this->addTagsToCopyright($structure);
-        $this->addTagsToOtherLangStrings($structure);
+        $this->addTagsToGeneral($structure);
+        $this->addTagsToLifeCycle($structure);
+        $this->addTagsToMetaMetadata($structure);
+        $this->addTagsToTechnical($structure);
+        $this->addTagsToEducational($structure);
+        $this->addTagsToRights($structure);
+        $this->addTagsToRelation($structure);
+        $this->addTagsToAnnotation($structure);
+        $this->addTagsToClassification($structure);
     }
 
-    protected function addTagsToCopyright(StructureSetInterface $structure): void
+    protected function addTagsToGeneral(StructureSetInterface $structure): void
     {
+        $root = $structure->getRoot();
+
+        $general = $root->getSubElement('general');
+        $this->addTagsToLangString($general->getSubElement('title'));
+        $this->addTagsToLangString($general->getSubElement('description'));
+        $this->addTagsToLangString($general->getSubElement('keyword'));
+        $this->addTagsToLangString($general->getSubElement('coverage'));
+    }
+
+    protected function addTagsToLifeCycle(StructureSetInterface $structure): void
+    {
+        $root = $structure->getRoot();
+
+        $lifecycle = $root->getSubElement('lifeCycle');
+        $this->addTagsToLangString($lifecycle->getSubElement('version'));
+        $this->addTagsToLangString(
+            $lifecycle->getSubElement('contribute')
+                      ->getSubElement('date')
+                      ->getSubElement('description')
+        );
+    }
+
+    protected function addTagsToMetaMetadata(StructureSetInterface $structure): void
+    {
+        $root = $structure->getRoot();
+
+        $metametadata = $root->getSubElement('metaMetadata');
+        $this->addTagsToLangString(
+            $metametadata->getSubElement('contribute')
+                         ->getSubElement('date')
+                         ->getSubElement('description')
+        );
+    }
+
+    protected function addTagsToTechnical(StructureSetInterface $structure): void
+    {
+        $root = $structure->getRoot();
+
+        $technical = $root->getSubElement('technical');
+        $this->addTagsToLangString($technical->getSubElement('installationRemarks'));
+        $this->addTagsToLangString($technical->getSubElement('otherPlatformRequirements'));
+        $this->addTagsToLangString(
+            $technical->getSubElement('duration')
+                      ->getSubElement('description')
+        );
+    }
+
+    protected function addTagsToEducational(StructureSetInterface $structure): void
+    {
+        $root = $structure->getRoot();
+
+        $educational = $root->getSubElement('educational');
+        $this->addTagsToLangString($educational->getSubElement('typicalAgeRange'));
+        $this->addTagsToLangString($educational->getSubElement('description'));
+        $this->addTagsToLangString(
+            $educational->getSubElement('typicalLearningTime')
+                        ->getSubElement('description')
+        );
+    }
+
+    protected function addTagsToRights(StructureSetInterface $structure): void
+    {
+        $root = $structure->getRoot();
+
+        $rights = $root->getSubElement('rights');
+        $description = $rights->getSubElement('description');
+        $this->addTagsToLangString($description);
+
         $tag_10 = new Tag(
             Version::V10_0,
             SpecialCase::COPYRIGHT
@@ -65,71 +140,37 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator
             SpecialCase::COPYRIGHT
         );
 
-        $copyright = $structure->getRoot()
-                               ->getSubElement('rights')
-                               ->getSubElement('description')
-                               ->getSubElement('string');
-
-        $this->addTagToElement($tag_10, $copyright);
-        $this->addTagToElement($tag_4, $copyright);
+        $description_string = $description->getSubElement('string');
+        $this->addTagToElement($tag_10, $description_string);
+        $this->addTagToElement($tag_4, $description_string);
     }
 
-    protected function addTagsToOtherLangStrings(StructureSetInterface $structure): void
+    protected function addTagsToRelation(StructureSetInterface $structure): void
     {
         $root = $structure->getRoot();
-
-        $general = $root->getSubElement('general');
-        $this->addTagsToLangString($general->getSubElement('title'));
-        $this->addTagsToLangString($general->getSubElement('description'));
-        $this->addTagsToLangString($general->getSubElement('keyword'));
-        $this->addTagsToLangString($general->getSubElement('coverage'));
-
-        $lifecycle = $root->getSubElement('lifeCycle');
-        $this->addTagsToLangString($lifecycle->getSubElement('version'));
-        $this->addTagsToLangString(
-            $lifecycle->getSubElement('contribute')
-                      ->getSubElement('date')
-                      ->getSubElement('description')
-        );
-
-        $metametadata = $root->getSubElement('metaMetadata');
-        $this->addTagsToLangString(
-            $metametadata->getSubElement('contribute')
-                         ->getSubElement('date')
-                         ->getSubElement('description')
-        );
-
-        $technical = $root->getSubElement('technical');
-        $this->addTagsToLangString($technical->getSubElement('installationRemarks'));
-        $this->addTagsToLangString($technical->getSubElement('otherPlatformRequirements'));
-        $this->addTagsToLangString(
-            $technical->getSubElement('duration')
-                      ->getSubElement('description')
-        );
-
-        $educational = $root->getSubElement('educational');
-        $this->addTagsToLangString($educational->getSubElement('typicalAgeRange'));
-        $this->addTagsToLangString($educational->getSubElement('description'));
-        $this->addTagsToLangString(
-            $educational->getSubElement('typicalLearningTime')
-                        ->getSubElement('description')
-        );
-
-        $rights = $root->getSubElement('rights');
-        $this->addTagsToLangString($rights->getSubElement('description'));
 
         $relation = $root->getSubElement('relation');
         $this->addTagsToLangString(
             $relation->getSubElement('resource')
                      ->getSubElement('description')
         );
+    }
+
+    protected function addTagsToAnnotation(StructureSetInterface $structure): void
+    {
+        $root = $structure->getRoot();
 
         $annotation = $root->getSubElement('annotation');
         $this->addTagsToLangString(
             $annotation->getSubElement('date')
-                     ->getSubElement('description')
+                       ->getSubElement('description')
         );
         $this->addTagsToLangString($annotation->getSubElement('description'));
+    }
+
+    protected function addTagsToClassification(StructureSetInterface $structure): void
+    {
+        $root = $structure->getRoot();
 
         $classification = $root->getSubElement('classification');
         $taxon_path = $classification->getSubElement('taxonPath');

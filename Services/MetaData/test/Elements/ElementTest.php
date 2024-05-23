@@ -286,6 +286,22 @@ class ElementTest extends TestCase
         $this->assertSame(Action::NEUTRAL, $el->getMarker()->action());
     }
 
+    public function testUnmark(): void
+    {
+        $el111 = $this->getElement(111);
+        $el11 = $this->getElement(11, $el111);
+        $el1 = $this->getElement(1, $el11);
+        $root = $this->getElement(NoID::ROOT, $el1);
+
+        $el111->mark($this->getMarkerFactory(), Action::CREATE_OR_UPDATE);
+        $el11->unmark();
+
+        $this->assertTrue($root->isMarked());
+        $this->assertTrue($el1->isMarked());
+        $this->assertFalse($el11->isMarked());
+        $this->assertFalse($el111->isMarked());
+    }
+
     public function testAddScaffolds(): void
     {
         $second = $this->getElementWithName(6, 'second');

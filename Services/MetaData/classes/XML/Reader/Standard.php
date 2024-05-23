@@ -105,7 +105,7 @@ class Standard implements ReaderInterface
                 $child_or_attrib_xml->getName(),
             );
             if (is_null($sub_scaffold)) {
-                throw new \ilMDXMLException('Invalid LOM structure in XML.');
+                continue;
             }
 
             $sub_tag = $this->dictionary->tagForElement($sub_scaffold, $version);
@@ -176,6 +176,8 @@ class Standard implements ReaderInterface
         ?TagInterface $tag,
         string $value
     ): string {
+        $value = strip_tags($value);
+
         if ($tag?->isTranslatedAsCopyright()) {
             return $this->copyright_handler->copyrightFromExport($value);
         }

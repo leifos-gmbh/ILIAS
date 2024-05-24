@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\XML\Writer;
+namespace ILIAS\MetaData\XML\Writer\Standard;
 
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
@@ -28,6 +28,7 @@ use ILIAS\MetaData\XML\Version;
 use ILIAS\MetaData\Elements\Data\DataInterface;
 use ILIAS\MetaData\XML\Dictionary\TagInterface;
 use ILIAS\MetaData\XML\Copyright\CopyrightHandlerInterface;
+use ILIAS\MetaData\XML\Writer\WriterInterface;
 
 class Standard implements WriterInterface
 {

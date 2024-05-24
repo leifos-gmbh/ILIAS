@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\XML\Reader;
+namespace ILIAS\MetaData\XML\Reader\Standard;
 
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\XML\Version;
@@ -31,8 +31,9 @@ use ILIAS\MetaData\Elements\Markers\Action;
 use ILIAS\MetaData\Elements\Data\Type;
 use ILIAS\MetaData\Structure\Definitions\DefinitionInterface;
 use ILIAS\MetaData\XML\Copyright\CopyrightHandlerInterface;
+use ILIAS\MetaData\XML\Reader\ReaderInterface;
 
-class Standard implements ReaderInterface
+class StructurallyCoupled implements ReaderInterface
 {
     protected MarkerFactoryInterface $marker_factory;
     protected ScaffoldProviderInterface $scaffold_provider;
@@ -51,6 +52,10 @@ class Standard implements ReaderInterface
         $this->copyright_handler = $copyright_handler;
     }
 
+    /**
+     * Assumes that the structure of the xml is identical to the structure of
+     * LOM in ILIAS, with exceptions defined in the dictionary.
+     */
     public function read(
         \SimpleXMLElement $xml,
         Version $version

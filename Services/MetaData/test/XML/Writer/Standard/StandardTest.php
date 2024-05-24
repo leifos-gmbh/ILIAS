@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\XML\Writer;
+namespace ILIAS\MetaData\XML\Writer\Standard;
 
 use PHPUnit\Framework\TestCase;
 use ILIAS\MetaData\XML\Dictionary\NullDictionary;

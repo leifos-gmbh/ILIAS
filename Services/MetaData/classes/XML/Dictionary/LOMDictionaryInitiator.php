@@ -189,12 +189,7 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator
             Version::V10_0,
             SpecialCase::LANGSTRING
         );
-        $tag_4 = new Tag(
-            Version::V4_1_0,
-            SpecialCase::LANGSTRING
-        );
 
         $this->addTagToElement($tag_10, $element);
-        $this->addTagToElement($tag_4, $element);
     }
 }

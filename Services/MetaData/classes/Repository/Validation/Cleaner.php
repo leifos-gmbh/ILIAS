@@ -180,8 +180,8 @@ class Cleaner implements CleanerInterface
             case Restriction::NOT_DELETABLE:
                 if ($marker->action() === Action::DELETE) {
                     $this->throwErrorOrLog($element, 'cannot be deleted.', !$replace_by_neutral);
+                    $element->mark($this->marker_factory, Action::NEUTRAL);
                 }
-                $element->mark($this->marker_factory, Action::NEUTRAL);
                 break;
 
             case Restriction::NOT_EDITABLE:
@@ -190,8 +190,8 @@ class Cleaner implements CleanerInterface
                     $element->getMDID() !== NoID::SCAFFOLD
                 ) {
                     $this->throwErrorOrLog($element, 'cannot be edited.', !$replace_by_neutral);
+                    $element->mark($this->marker_factory, Action::NEUTRAL);
                 }
-                $element->mark($this->marker_factory, Action::NEUTRAL);
                 break;
         }
     }

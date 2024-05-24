@@ -20,17 +20,19 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\XML\Services;
 
-use ILIAS\MetaData\XML\Writer\Standard as StandardWriter;
+use ILIAS\MetaData\XML\Writer\Standard\Standard as StandardWriter;
 use ILIAS\MetaData\XML\Writer\WriterInterface;
 use ILIAS\MetaData\XML\Dictionary\LOMDictionaryInitiator;
 use ILIAS\MetaData\XML\Dictionary\TagFactory;
 use ILIAS\MetaData\Paths\Services\Services as PathServices;
 use ILIAS\MetaData\Structure\Services\Services as StructureServices;
 use ILIAS\MetaData\XML\Copyright\CopyrightHandler;
-use ILIAS\MetaData\XML\Reader\Standard as StandardReader;
+use ILIAS\MetaData\XML\Reader\Standard\Standard as StandardReader;
 use ILIAS\MetaData\XML\Reader\ReaderInterface;
 use ILIAS\MetaData\Elements\Markers\MarkerFactory;
 use ILIAS\MetaData\Manipulator\Services\Services as ManipulatorServices;
+use ILIAS\MetaData\XML\Reader\Standard\StructurallyCoupled;
+use ILIAS\MetaData\XML\Reader\Standard\Legacy;
 
 class Services
 {
@@ -77,11 +79,20 @@ class Services
             $this->path_services->pathFactory(),
             $this->structure_services->structure()
         ))->get();
+        $marker_factory = new MarkerFactory();
+        $copyright_handler = new CopyrightHandler();
         return $this->standard_reader = new StandardReader(
-            new MarkerFactory(),
-            $this->manipulator_services->scaffoldProvider(),
-            $dictionary,
-            new CopyrightHandler()
+            new StructurallyCoupled(
+                $marker_factory,
+                $this->manipulator_services->scaffoldProvider(),
+                $dictionary,
+                $copyright_handler
+            ),
+            new Legacy(
+                $marker_factory,
+                $this->manipulator_services->scaffoldProvider(),
+                $copyright_handler
+            )
         );
     }
 }

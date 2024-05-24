@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\XML\Reader;
+namespace ILIAS\MetaData\XML\Reader\Standard;
 
 use PHPUnit\Framework\TestCase;
 use ILIAS\MetaData\Elements\Scaffolds\NullScaffoldFactory;
@@ -46,7 +46,7 @@ use ILIAS\MetaData\XML\Dictionary\TagInterface;
 use ILIAS\MetaData\XML\Dictionary\NullTag;
 use ILIAS\MetaData\XML\SpecialCase;
 
-class StandardTest extends TestCase
+class StructurallyCoupledTest extends TestCase
 {
     /**
      * Element data types and tag information are contained hyphen-separated in
@@ -142,7 +142,7 @@ class StandardTest extends TestCase
         };
     }
 
-    protected function getReader(): Standard
+    protected function getReader(): StructurallyCoupled
     {
         $root = $this->getElement();
         $root->exposed_data = ['name' => 'correctroot', 'type' => Type::NULL];
@@ -216,7 +216,7 @@ class StandardTest extends TestCase
             }
         };
 
-        return new Standard(
+        return new StructurallyCoupled(
             new NullMarkerFactory(),
             $scaffold_provider,
             $dictionary,

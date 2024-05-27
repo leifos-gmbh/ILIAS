@@ -120,3 +120,20 @@ can be stored in LOM.
 
 This would need expansive changes to the database structure, and a new
 input element for multilangual text input.
+
+### Improve Unit Test Coverage
+
+The following classes are not yet covered by unit tests:
+
+- everything in `Editor`
+- `GlobalScreen/ilMDKeywordExposer`
+- `Manipulator/ScaffoldProvider`
+- everything in `Paths`
+- everything in `Repository` except `Repository/Search`,
+`Repository/Utilities/Queries/DatabaseSearcher`, and
+`Repository/Utilities/Queries/Paths`
+- `Services\InternalServices` (along with all `Services` used by it),
+also all methods in `Services\Services` that don't do anything except
+lazily instantiate an object
+- everything in `Vocabularies`
+- `XML/Copyright`, `XML/Dictionary`, and `XML/Reader/Standard/Legacy`

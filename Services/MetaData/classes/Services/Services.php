@@ -112,11 +112,7 @@ class Services implements ServicesInterface
             new Creator(
                 $this->internal_services->manipulator()->manipulator(),
                 $this->internal_services->paths()->pathFactory(),
-                new ScaffoldFactory(
-                    new DataFactory(),
-                    new RessourceIDFactory()
-                ),
-                $this->internal_services->structure()->structure()
+                $this->internal_services->manipulator()->scaffoldProvider()
             )
         );
     }

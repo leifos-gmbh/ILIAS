@@ -28,16 +28,17 @@ With `read`, one can read out the LOM of a specific ILIAS object.
 
 When calling `read`, the object whose metadata one wants to read out
 needs to be identified by a triple of IDs as explained [here](identifying_objects.md).
-Optionally, one can also specify metadata elements via a [path](#paths).
+Optionally, one can in addition specify metadata elements via a [path](#paths).
 In this case, not the whole metadata set is read out, but only the
-elements on the path along with all sub-elements of its last element.
+elements on the path. If the path ends at an element that has
+sub-elements, reading continues recursively.
 
 > Beware that when restricting `read` to a path, filters on the path
-are ignored, and that if the path contains steps to super elements,
+are ignored. Further, if the path contains steps to super elements,
 it is only followed down to the first element that the path returns
 to (see [here](#paths) for details).
 
-`read` returns a `Reader` object, which can then be used to access the
+`read` returns a `Reader`, which can then be used to access the
 values of different elements in the (partial) set, selected via [paths](#paths).
 These values are returned as data objects, containing the actual value
 as a string, and its data type (see [here](lom_structure.md) for details
@@ -46,9 +47,8 @@ is consistent. To further process the values, see the [data
 helper](#datahelper).
 
 Note that the `Reader` returns null data objects for elements not
-carrying any data according to the [LOM standard](lom_structure.md), and when 
-requesting the `firstData` of an element that does not exist at all
-in the set of the current ILIAS object.
+carrying any data, and when requesting the `firstData` of an element
+that does not exist at all in the set of the current ILIAS object.
 
 ### Examples
 
@@ -106,7 +106,7 @@ See [here](#paths) for details on custom paths.
 ## `search`
 
 `search` is used to find objects whose LOM matches some user-defined
-specifications. When calling `search`, a `Searcher` object is
+specifications. When calling `search`, a `Searcher` is
 returned. In the `Searcher`, search `Clauses` and `Filters` can be
 assembled, and using them a search can be performed. In the search
 results, objects are identified by a triple of ID as explained [here](identifying_objects.md).
@@ -115,9 +115,9 @@ results, objects are identified by a triple of ID as explained [here](identifyin
 `Searcher`. Basic `Clauses` consist of a [path](#paths) to a LOM
 element, a search `Mode`, and a value to search for. Additionally, the
 `Mode` can be negated. Searching with just the basic `Clause` then
-finds all objects whose LOM sets have an element specified by the
-path whose value fulfills the condition given by search `Mode`
-and search value (or does not fulfill the condition, in the case
+finds all objects whose LOM sets have at least one element specified
+by the path, and whose value fulfills the condition given by search `Mode`
+and value (or does not fulfill the condition, in the case
 of the `Mode` being negated).
 
 The search does take into account path filters, with the exception
@@ -134,21 +134,21 @@ assembled from the basic `Clauses`.
 
 Further, `Clauses` can be negated. Negating a basic `Clause` will then
 lead to a search that finds objects with LOM sets that  have **no**
-elements that fulfill the conditions. Note that this leads to different
-results than negating the `Mode` of the basic `Clause` for non-unique
-elements! Negating joined `Clauses` will negate the whole assembled
-logical statement.
+elements that fulfill the conditions. Note that this can lead to different
+results than negating the `Mode` of the basic `Clause`! Negating joined
+`Clauses` will negate the whole assembled logical statement.
 
 Searches will return a `RessourceID` object for each search result,
 and each `RessourceID` identifies an object in ILIAS by a [triple of IDs](identifying_objects.md).
 
-The `Searcher` object can also generate `Filters`. They can be passed
-to the `execute` method in the `Searcher` along with a clause to restrict
+The `Searcher` can also generate `Filters`. These `Filters` can be passed
+to the `execute` method in the `Searcher` in addition to a clause to restrict
 the objects the search will return. Each `Filter` object carries the
 same [triple of IDs](identifying_objects.md) as is returned by the search. Each ID can
-either be a specific value, or a `Placeholder` to allow either any value,
-or set two of the IDs equal to each other. Multiple values in the same
-filter are joined with a logical AND, and multiple filters in the same
+either be a specific value, or a `Placeholder`. Using `Placeholders`, the
+filter can be configured to allow either any value for an ID, or only allow
+values that match the value of one of the other IDs. Multiple values in
+the same filter are joined with a logical AND, and multiple filters in the same
 search with a logical OR.
 
 Finally, a limit and offset can also be applied to the search. Both parameters
@@ -157,7 +157,7 @@ the search is consistent, they are ordered by their IDs.
 
 >The search was built to be versatile, and is as such not particulary
 well optimized for any specific task. If you have a use case for the
-search that performs poorer than you'd like, feel free to report that
+search that performs especially poorly, feel free to report that
 in the [ILIAS issue tracker](https://mantis.ilias.de) or contribute a
 possible improvement to the search via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).
 
@@ -359,13 +359,12 @@ $remaining_results = $lom->search()->execute($clause, null, 10);
 ## `manipulate`
 
 With `manipulate`, one can edit an ILIAS object's LOM by deleting
-elements, changing their value or adding new ones.
+elements, changing their value or adding new elements.
 
-When calling `manipulate`, an object needs to be identified by a triple
-of IDs as explained [here](identifying_objects.md). A `Manipulator`
-object is returned.
+When calling `manipulate`, the object in question needs to be identified
+by a triple of IDs as explained [here](identifying_objects.md). A `Manipulator` is returned.
 
-The `Manipulator` offers a few `prepare` methods, with which changes
+The `Manipulator` offers a few `prepare` methods, with which the changes
 one wants to make to the metadata can be collected. Upon calling
 `execute`, all changes registered to the `Manipulator` are carried
 out simultaneously.
@@ -377,18 +376,18 @@ there are less elements than provided values, new elements will be set
 to be created according to the path to hold the leftover values.<br>
 If one of the provided values is not valid for the data type of the
 selected elements, or if it is not possible to add enough elements to the
-LOM set to fit all values, an error will be thrown (either by this method
-or by `execute`). Make sure that you are not trying to give multiple 
-values to unique elements (see [here](lom_structure.md) for details).<br>
+LOM set to fit all values, an exception will be thrown (either by this method
+or when calling `execute`). Make sure that you are not trying to give
+multiple values to unique elements (see [here](lom_structure.md) for details).<br>
 For further details on how the `Manipulator` works see [here](manipulator.md).
 - `prepareForceCreate`: This behaves identically to the above, but will
 always create new elements, and never update existing ones.<br>
 The warning given above goes double here; if not enough of the requested
-elements can be created, an error will be thrown. We recommend only using
+elements can be created, an exception will be thrown. We recommend only using
 this method over `prepareCreateOrUpdate` when absolutely necessary, and
-if at all possible only for non-unique elements.
+only for non-unique elements.
 - `prepareDelete`: All elements selected by a [path](#paths) are set to
-be deleted, along with their sub-elements.
+be deleted. All their sub-elements are recursively deleted as well.
 
 ### Examples
 
@@ -404,7 +403,7 @@ $lom->manipulate(380, 380, 'crs')
 ````
 
 Note that adding a second value to `prepareCreateOrUpdate` would lead
-to an error. The manipulator would try to create a second `title` element
+to an exception. The manipulator would try to create a second `title` element
 to hold the additional value, but this is not possible since `title`
 is unique.
 
@@ -552,17 +551,21 @@ not already exist, it will be created with the right source.
 ## `derive`
 
 `derive` can be used to derive a LOM set for a target from that of a
-source. This encompasses copying between ILIAS objects, exporting to XML,
-and importing from XML, depending on the chosen type of source and target.
+source. This encompasses copying between ILIAS objects and creating
+a LOM set for an object from basic properties, depending on the chosen
+type of source and target.
 
-When calling `derive`, a `SourceSelector` object is returned. There,
+In the future, XML might be supported as source and target to also allow
+import and export of LOM sets via the API.
+
+When calling `derive`, a `SourceSelector` is returned. There,
 either an ILIAS object can be identified as a source by a triple of 
 IDs as explained [here](identifying_objects.md), or a LOM set can be created from basic
 fields. A `Derivator` is returned, where an object can be chosen
 analogously as the target.
 
 When a target is chosen, the `Derivator` reads out the LOM set from the
-source, and writes it to the target object. Currently, the two use cases
+source, and writes it to the target. Currently, the two use cases
 are:
 
 - **Creation:** When the target is an ILIAS object and title, description
@@ -573,9 +576,6 @@ is deleted before copying.
 - **Copying:** When both source and target are ILIAS objects, the `Derivator` creates
 a LOM set for the target by copying the LOM of the source. Any previous
 LOM of the target object is deleted before copying.
-
-In the future, XML might be supported as source and target to also allow
-import and export of LOM sets via the API.
 
 ### Examples
 
@@ -600,24 +600,6 @@ with the appropriate IDs:
 ````
 $lom->derive()
     ->fromObject(325, 2, 'st')
-    ->forObject(380, 380, 'crs');
-````
-
-To export the LOM of the chapter to XML, choose the chapter as the source
-and XML as the target:
-
-````
-$xml = $lom->derive()
-           ->fromObject(325, 2, 'st')
-           ->forXML();
-````
-
-To import the LOM of the course from XML, pass the `SimpleXMLElement`
-as the source, and the course as the target:
-
-````
-$lom->derive()
-    ->fromXML($xml)
     ->forObject(380, 380, 'crs');
 ````
 
@@ -664,11 +646,11 @@ or one only wants to select an element if it fulfills a certain condition),
 one can attach one or multiple filters to a step. Filters will be explained
 in more detail below.
 
-Lastly, steps can also lead to the super-elements (or parent) of
-the current elements. This is useful if one only wants to select elements
-that contain certain sub-elements. Especially in combination with filters,
-this makes paths a powerful tool for working with the `Reader` and
-`Manipulator`. See the examples for possible ways to make use of this.
+Lastly, steps can also lead to the super-elements of the current elements.
+This is useful if one only wants to select elements that contain certain
+sub-elements. Especially in combination with filters, this makes paths a
+powerful tool for working with e.g. the `Reader` and `Manipulator`. See the
+examples for possible ways to make use of this.
 
 ### Filters
 
@@ -702,8 +684,8 @@ $lom->paths()
 ````
 
 Note that it does not stop at the element `title`, since that element
-consists  not only of the `string`, can also contain a `language` sub-element.
-Many elements work similarly, often times one needs to go one step
+consists  not only of the `string`, but can also contain a `language` sub-element.
+Many elements work similarly, often one needs to go one step
 further than one would think to get to the data-carrying element. If
 in doubt, consult the [LOM Standard](lom_structure.md).
 
@@ -796,7 +778,7 @@ $lom->paths()
 ## `dataHelper`
 
 `dataHelper` is used to transform the data-values of LOM elements from
-various LOM-internal formats into more useful forms.
+various LOM-internal formats into something more useful.
 
 `makePresentable` returns the value of a data-object as something
 that can be shown to the user: vocabulary values and languages will be

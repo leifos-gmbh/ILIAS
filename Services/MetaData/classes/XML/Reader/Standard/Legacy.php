@@ -26,7 +26,6 @@ use ILIAS\MetaData\XML\Copyright\CopyrightHandlerInterface;
 use ILIAS\MetaData\XML\Version;
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\XML\Reader\ReaderInterface;
-use ILIAS\LegalDocuments\Value\Meta;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Elements\Markers\Action;
 

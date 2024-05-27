@@ -28,6 +28,8 @@ interface ScaffoldableInterface
     /**
      * Scaffolds are used to mark where elements could potentially be created.
      * Adds all possible scaffolds to this element's sub-elements.
+     * Scaffolds are added such that the order of elements as suggested by the structure
+     * is preserved.
      */
     public function addScaffoldsToSubElements(
         ScaffoldProviderInterface $scaffold_provider
@@ -36,6 +38,8 @@ interface ScaffoldableInterface
     /**
      * If possible, adds a scaffold with the given name to this element's sub-elements,
      * and returns it.
+     * Scaffolds are added such that the order of elements as suggested by the structure
+     * is preserved.
      * @return ElementInterface[]
      */
     public function addScaffoldToSubElements(

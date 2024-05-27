@@ -65,8 +65,8 @@ class ilMetaDataExporter extends ilXmlExporter
     {
         return [
             "10.0" => [
-                "namespace" => "http://www.ilias.de/Services/MetaData/meta/4_1",
-                "xsd_file" => "ilias_meta_4_1.xsd",
+                "namespace" => "http://www.ilias.de/Services/MetaData/meta/10_0",
+                "xsd_file" => "ilias_meta_10_0.xsd",
                 "min" => "10.0",
                 "max" => ""
             ],

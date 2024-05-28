@@ -37,6 +37,17 @@ interface ScaffoldProviderInterface
     ): \Generator;
 
     /**
+     * Returns the names of all possible sub-elements for the
+     * given element in the order defined by the structure.
+     * This is needed to bring order the sub-elements of an element
+     * in the right order after e.g. scaffolds were added.
+     * @return string[]
+     */
+    public function getPossibleSubElementNamesForElementInOrder(
+        ElementInterface $element
+    ): \Generator;
+
+    /**
      * Returns an empty LOM set, containing only the root element.
      */
     public function set(): SetInterface;

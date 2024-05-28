@@ -52,33 +52,43 @@ class ScaffoldProvider implements ScaffoldProviderInterface
     public function getScaffoldsForElement(
         ElementInterface $element
     ): \Generator {
+        $sub_names = [];
+        foreach ($element->getSubElements() as $sub) {
+            $sub_names[] = $sub->getDefinition()->name();
+        }
+
+        foreach ($this->getPossibleSubElementDefinitionsForElementInOrder($element) as $sub_definition) {
+            if (
+                !$sub_definition->unique() ||
+                !in_array($sub_definition->name(), $sub_names)
+            ) {
+                yield $this->scaffold_factory->scaffold($sub_definition);
+            }
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getPossibleSubElementNamesForElementInOrder(
+        ElementInterface $element
+    ): \Generator {
+        foreach ($this->getPossibleSubElementDefinitionsForElementInOrder($element) as $sub_definition) {
+            yield $sub_definition->name();
+        }
+    }
+
+    protected function getPossibleSubElementDefinitionsForElementInOrder(
+        ElementInterface $element
+    ): \Generator {
         $navigator = $this->navigator_factory->structureNavigator(
             $this->path_factory->toElement($element),
             $this->structure->getRoot()
         );
         $structure_element = $navigator->elementAtFinalStep();
 
-        $sub_names = [];
-        foreach ($element->getSubElements() as $sub) {
-            $sub_names[] = $sub->getDefinition()->name();
-        }
-
-        $previous_sub = null;
         foreach ($structure_element->getSubElements() as $sub) {
-            $sub = $sub->getDefinition();
-            if (
-                isset($previous_sub) &&
-                (!$previous_sub->unique() || !in_array($previous_sub->name(), $sub_names))
-            ) {
-                yield $sub->name() => $this->scaffold_factory->scaffold($previous_sub);
-            }
-            $previous_sub = $sub;
-        }
-        if (
-            isset($previous_sub) &&
-            (!$previous_sub->unique() || !in_array($previous_sub->name(), $sub_names))
-        ) {
-            yield '' => $this->scaffold_factory->scaffold($previous_sub);
+            yield $sub->getDefinition();
         }
     }
 

@@ -144,10 +144,20 @@ class ElementTest extends TestCase
                 $first = $this->getScaffold('first');
                 $second = $this->getScaffold('second');
                 $third = $this->getScaffold('third');
+                $fourth = $this->getScaffold('fourth');
 
-                yield 'second' => $first;
-                yield 'third' => $second;
-                yield '' => $third;
+                yield $first;
+                yield $second;
+                yield $third;
+                yield $fourth;
+            }
+
+            public function getPossibleSubElementNamesForElementInOrder(ElementInterface $element): \Generator
+            {
+                yield 'first';
+                yield 'second';
+                yield 'third';
+                yield 'fourth';
             }
         };
     }
@@ -305,7 +315,8 @@ class ElementTest extends TestCase
     public function testAddScaffolds(): void
     {
         $second = $this->getElementWithName(6, 'second');
-        $el = $this->getElement(13, $second);
+        $fourth = $this->getElementWithName(6, 'fourth');
+        $el = $this->getElement(13, $second, $fourth);
 
         $el->addScaffoldsToSubElements($this->getScaffoldProvider());
 
@@ -320,6 +331,11 @@ class ElementTest extends TestCase
         $subs->next();
         $this->assertTrue($subs->current()->isScaffold());
         $this->assertSame('third', $subs->current()->getDefinition()->name());
+        $subs->next();
+        $this->assertSame($fourth, $subs->current());
+        $subs->next();
+        $this->assertTrue($subs->current()->isScaffold());
+        $this->assertSame('fourth', $subs->current()->getDefinition()->name());
         $subs->next();
         $this->assertNull($subs->current());
     }
@@ -339,6 +355,27 @@ class ElementTest extends TestCase
         $this->assertSame('second', $subs->current()->getDefinition()->name());
         $subs->next();
         $this->assertSame($third, $subs->current());
+        $subs->next();
+        $this->assertNull($subs->current());
+    }
+
+
+
+    public function testAddScaffoldByNameWithGap(): void
+    {
+        $second = $this->getElementWithName(6, 'second');
+        $fourth = $this->getElementWithName(17, 'fourth');
+        $el = $this->getElement(13, $second, $fourth);
+
+        $el->addScaffoldToSubElements($this->getScaffoldProvider(), 'second');
+
+        $subs = $el->getSubElements();
+        $this->assertSame($second, $subs->current());
+        $subs->next();
+        $this->assertTrue($subs->current()->isScaffold());
+        $this->assertSame('second', $subs->current()->getDefinition()->name());
+        $subs->next();
+        $this->assertSame($fourth, $subs->current());
         $subs->next();
         $this->assertNull($subs->current());
     }

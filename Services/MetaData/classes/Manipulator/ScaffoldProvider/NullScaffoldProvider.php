@@ -31,6 +31,11 @@ class NullScaffoldProvider implements ScaffoldProviderInterface
         yield from [];
     }
 
+    public function getPossibleSubElementNamesForElementInOrder(ElementInterface $element): \Generator
+    {
+        yield from [];
+    }
+
     public function set(): SetInterface
     {
         return new NullSet();

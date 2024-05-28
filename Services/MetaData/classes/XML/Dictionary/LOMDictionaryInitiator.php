@@ -30,12 +30,14 @@ use ILIAS\MetaData\Elements\Structure\StructureElementInterface;
 class LOMDictionaryInitiator extends BaseDictionaryInitiator
 {
     protected PathFactoryInterface $path_factory;
+    protected TagFactoryInterface $tag_factory;
 
     public function __construct(
         TagFactoryInterface $tag_factory,
         PathFactoryInterface $path_factory,
         StructureSetInterface $structure
     ) {
+        $this->tag_factory = $tag_factory;
         $this->path_factory = $path_factory;
         parent::__construct($path_factory, $structure);
     }
@@ -131,11 +133,11 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator
         $description = $rights->getSubElement('description');
         $this->addTagsToLangString($description);
 
-        $tag_10 = new Tag(
+        $tag_10 = $this->tag_factory->tag(
             Version::V10_0,
             SpecialCase::COPYRIGHT
         );
-        $tag_4 = new Tag(
+        $tag_4 = $this->tag_factory->tag(
             Version::V4_1_0,
             SpecialCase::COPYRIGHT
         );
@@ -185,7 +187,7 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator
 
     protected function addTagsToLangString(StructureElementInterface $element): void
     {
-        $tag_10 = new Tag(
+        $tag_10 = $this->tag_factory->tag(
             Version::V10_0,
             SpecialCase::LANGSTRING
         );

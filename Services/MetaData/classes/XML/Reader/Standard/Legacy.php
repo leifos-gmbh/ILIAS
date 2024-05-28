@@ -387,11 +387,17 @@ class Legacy implements ReaderInterface
         foreach ($xml->Type->OperatingSystem as $os_xml) {
             $orc_scaffold = $this->addScaffoldAndMark($scaffold, 'orComposite');
             $this->prepareAddingOfVocabulary('type', 'operating system', $orc_scaffold);
+
+            $name = (string) $os_xml->attributes()->Name;
+            if ($name === 'MacOS') {
+                $name = 'macos';
+            }
             $this->prepareAddingOfVocabulary(
                 'name',
-                (string) $os_xml->attributes()->Name,
+                $name,
                 $orc_scaffold
             );
+
             $min_version = (string) ($os_xml->attributes()->MinimumVersion ?? '');
             $max_version = (string) ($os_xml->attributes()->MaximumVersion ?? '');
             if ($min_version !== '') {

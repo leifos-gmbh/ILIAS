@@ -160,9 +160,10 @@
    <xs:element name="string">
     <xs:complexType>
      <xs:simpleContent>
-      <xs:extension base="CharacterString"/>
+      <xs:extension base="CharacterString">
+       <xs:attribute name="language" type="LanguageCode" use="optional"/>
+      </xs:extension>
      </xs:simpleContent>
-     <xs:attribute name="language" type="LanguageCode" use="optional"/>
     </xs:complexType>
    </xs:element>
   </xs:sequence>

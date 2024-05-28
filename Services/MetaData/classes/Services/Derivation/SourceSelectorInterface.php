@@ -30,7 +30,9 @@ interface SourceSelectorInterface
 
     /**
      * Choose some basic properties to generate a new LOM set from.
-     * Note that the title must not be empty.
+     * The title must be set.
+     *
+     * @throws \ilMDServicesException if title is empty string
      */
     public function fromBasicProperties(
         string $title,

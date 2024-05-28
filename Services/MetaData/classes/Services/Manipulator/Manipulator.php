@@ -45,11 +45,19 @@ class Manipulator implements ManipulatorInterface
         PathInterface $path,
         string ...$values
     ): ManipulatorInterface {
-        $set = $this->internal_manipulator->prepareCreateOrUpdate(
-            $this->set,
-            $path,
-            ...$values
-        );
+        try {
+            $set = $this->internal_manipulator->prepareCreateOrUpdate(
+                $this->set,
+                $path,
+                ...$values
+            );
+        } catch (\ilMDPathException $e) {
+            throw new \ilMDServicesException(
+                'Failed to prepare create or update values ' . implode(', ', $values) .
+                ' at "' . $path->toString() . '": ' . $e->getMessage()
+            );
+        }
+
         return $this->getCloneWithNewSet($set);
     }
 
@@ -57,11 +65,19 @@ class Manipulator implements ManipulatorInterface
         PathInterface $path,
         string ...$values
     ): ManipulatorInterface {
-        $set = $this->internal_manipulator->prepareForceCreate(
-            $this->set,
-            $path,
-            ...$values
-        );
+        try {
+            $set = $this->internal_manipulator->prepareForceCreate(
+                $this->set,
+                $path,
+                ...$values
+            );
+        } catch (\ilMDPathException $e) {
+            throw new \ilMDServicesException(
+                'Failed to force-create values ' . implode(', ', $values) .
+                ' at "' . $path->toString() . '": ' . $e->getMessage()
+            );
+        }
+
         return $this->getCloneWithNewSet($set);
     }
 
@@ -76,7 +92,14 @@ class Manipulator implements ManipulatorInterface
 
     public function execute(): void
     {
-        $this->repository->manipulateMD($this->set);
+        try {
+            $this->repository->manipulateMD($this->set);
+        } catch (\ilMDRepositoryException $e) {
+            throw new \ilMDServicesException(
+                'Failed to execute manipulations: ' . $e->getMessage()
+            );
+        }
+
     }
 
     protected function getCloneWithNewSet(SetInterface $set): ManipulatorInterface

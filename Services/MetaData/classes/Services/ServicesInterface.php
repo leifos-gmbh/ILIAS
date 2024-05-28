@@ -42,8 +42,8 @@ interface ServicesInterface
      * 3. **type:** The type of the object (and not its parent's), e.g. `'crs'` or `'lm'`.
      *
      * Optionally, a path can be specified to which the reading is restricted: the reader
-     * will then only have access to elements on the path, along with all sub-elements
-     * of the last element of the path.
+     * will then only have access to elements on the path, along with recursively all
+     * sub-elements of the last element of the path.
      * Note that path filters are ignored, and if the path contains steps to super elements,
      * it is only followed down to the first element that the path returns to.
      */

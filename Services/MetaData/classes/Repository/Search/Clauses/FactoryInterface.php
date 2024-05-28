@@ -34,6 +34,8 @@ interface FactoryInterface
      *
      * Filters on the path are taken into account, with the
      * exception of index filters.
+     *
+     * @throws \ilMDRepositoryException if the path does not contain any steps
      */
     public function getBasicClause(
         PathInterface $path,

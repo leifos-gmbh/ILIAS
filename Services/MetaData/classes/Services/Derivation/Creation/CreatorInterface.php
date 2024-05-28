@@ -24,6 +24,9 @@ use ILIAS\MetaData\Elements\SetInterface;
 
 interface CreatorInterface
 {
+    /**
+     * @throws \ilMDServicesException if title is empty string
+     */
     public function createSet(
         string $title,
         string $description = '',

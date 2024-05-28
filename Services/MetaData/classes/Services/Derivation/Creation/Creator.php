@@ -42,6 +42,9 @@ class Creator implements CreatorInterface
         $this->scaffold_provider = $scaffold_provider;
     }
 
+    /**
+     * @throws \ilMDServicesException if title is empty string
+     */
     public function createSet(
         string $title,
         string $description = '',
@@ -56,6 +59,9 @@ class Creator implements CreatorInterface
         return $set;
     }
 
+    /**
+     * @throws \ilMDServicesException if title is empty string
+     */
     protected function prepareTitle(
         SetInterface $set,
         string $title,

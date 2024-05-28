@@ -48,6 +48,9 @@ class SourceSelector implements SourceSelectorInterface
         );
     }
 
+    /**
+     * @throws \ilMDServicesException if title is empty string
+     */
     public function fromBasicProperties(
         string $title,
         string $description = '',

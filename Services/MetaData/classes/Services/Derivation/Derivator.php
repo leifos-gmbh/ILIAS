@@ -36,18 +36,27 @@ class Derivator implements DerivatorInterface
         $this->repository = $repository;
     }
 
+    /**
+     * @throws \ilMDServicesException
+     */
     public function forObject(int $obj_id, int $sub_id, string $type): void
     {
         if ($sub_id === 0) {
             $sub_id = $obj_id;
         }
 
-        $this->repository->transferMD(
-            $this->from_set,
-            $obj_id,
-            $sub_id,
-            $type,
-            true
-        );
+        try {
+            $this->repository->transferMD(
+                $this->from_set,
+                $obj_id,
+                $sub_id,
+                $type,
+                true
+            );
+        } catch (\ilMDRepositoryException $e) {
+            throw new \ilMDServicesException(
+                'Failed to derive LOM set: ' . $e->getMessage()
+            );
+        }
     }
 }

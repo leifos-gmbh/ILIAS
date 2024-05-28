@@ -30,10 +30,15 @@ class DerivatorTest extends TestCase
 {
     protected function getDerivator(
         SetInterface $from_set,
+        bool $throw_exception = false
     ): DerivatorInterface {
-        $repo = new class () extends NullRepository {
+        $repo = new class ($throw_exception) extends NullRepository {
             public array $transferred_md = [];
             public array $error_thrown = [];
+
+            public function __construct(protected bool $throw_exception)
+            {
+            }
 
             public function transferMD(
                 SetInterface $from_set,
@@ -42,6 +47,10 @@ class DerivatorTest extends TestCase
                 string $to_type,
                 bool $throw_error_if_invalid
             ): void {
+                if ($this->throw_exception) {
+                    throw new \ilMDRepositoryException('failed');
+                }
+
                 $this->transferred_md[] = [
                     'from_set' => $from_set,
                     'to_obj_id' => $to_obj_id,
@@ -98,5 +107,14 @@ class DerivatorTest extends TestCase
         );
         $this->assertCount(1, $derivator->exposeRepository()->error_thrown);
         $this->assertTrue($derivator->exposeRepository()->error_thrown[0]);
+    }
+
+    public function testForObjectException(): void
+    {
+        $from_set = new NullSet();
+        $derivator = $this->getDerivator($from_set, true);
+
+        $this->expectException(\ilMDServicesException::class);
+        $derivator->forObject(78, 0, 'to_type');
     }
 }

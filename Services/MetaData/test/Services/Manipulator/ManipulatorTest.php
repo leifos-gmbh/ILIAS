@@ -40,16 +40,24 @@ class ManipulatorTest extends TestCase
         };
     }
 
-    protected function getManipulator(): Manipulator
+    protected function getManipulator(bool $throw_exception = false): Manipulator
     {
-        $internal_manipulator = new class () extends NullInternalManipulator {
+        $internal_manipulator = new class ($throw_exception) extends NullInternalManipulator {
             public array $executed_actions = [];
+
+            public function __construct(protected bool $throw_exception)
+            {
+            }
 
             public function prepareCreateOrUpdate(
                 SetInterface $set,
                 PathInterface $path,
                 string ...$values
             ): SetInterface {
+                if ($this->throw_exception) {
+                    throw new \ilMDPathException('failed');
+                }
+
                 $cloned_set = clone $set;
                 $cloned_set->actions[] = [
                     'action' => 'create or update',
@@ -64,6 +72,10 @@ class ManipulatorTest extends TestCase
                 PathInterface $path,
                 string ...$values
             ): SetInterface {
+                if ($this->throw_exception) {
+                    throw new \ilMDPathException('failed');
+                }
+
                 $cloned_set = clone $set;
                 $cloned_set->actions[] = [
                     'action' => 'force create',
@@ -86,11 +98,19 @@ class ManipulatorTest extends TestCase
             }
         };
 
-        $repository = new class () extends NullRepository {
+        $repository = new class ($throw_exception) extends NullRepository {
             public array $executed_actions = [];
+
+            public function __construct(protected bool $throw_exception)
+            {
+            }
 
             public function manipulateMD(SetInterface $set): void
             {
+                if ($this->throw_exception) {
+                    throw new \ilMDRepositoryException('failed');
+                }
+
                 $this->executed_actions[] = $set->actions;
             }
         };
@@ -149,7 +169,15 @@ class ManipulatorTest extends TestCase
         );
     }
 
-    public function testPrepareForce(): void
+    public function testPrepareCreateOrUpdateException(): void
+    {
+        $manipulator = $this->getManipulator(true);
+
+        $this->expectException(\ilMDServicesException::class);
+        $manipulator->prepareCreateOrUpdate($this->getPath('path'));
+    }
+
+    public function testPrepareForceCreate(): void
     {
         $exp1 = [
             'action' => 'force create',
@@ -184,6 +212,14 @@ class ManipulatorTest extends TestCase
             [$exp1, $exp2],
             $manipulator2->exposeSet()->actions
         );
+    }
+
+    public function testPrepareForceCreateException(): void
+    {
+        $manipulator = $this->getManipulator(true);
+
+        $this->expectException(\ilMDServicesException::class);
+        $manipulator->prepareForceCreate($this->getPath('path'));
     }
 
     public function testPrepareDelete(): void
@@ -272,5 +308,13 @@ class ManipulatorTest extends TestCase
             [$exp1, $exp2, $exp3, $exp4, $exp5, $exp6, $exp7],
             $executed_actions[1]
         );
+    }
+
+    public function testExecuteException(): void
+    {
+        $manipulator = $this->getManipulator(true);
+
+        $this->expectException(\ilMDServicesException::class);
+        $manipulator->execute();
     }
 }

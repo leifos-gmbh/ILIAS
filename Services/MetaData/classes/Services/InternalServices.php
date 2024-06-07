@@ -86,9 +86,11 @@ class InternalServices
             $this->dic
         );
         $this->xml_services = new XMLServices(
+            $this->dic,
             $this->path_services,
             $this->structure_services,
-            $this->manipulator_services
+            $this->manipulator_services,
+            $this->copyright_services
         );
     }
 

@@ -37,7 +37,7 @@ use ILIAS\MetaData\Editor\Digest\ContentType as DigestContentType;
 use ILIAS\MetaData\Editor\Full\Services\Tables\Table;
 use ILIAS\MetaData\Editor\Digest\DigestInitiator;
 use ILIAS\MetaData\Editor\Digest\Digest;
-use ILIAS\MetaData\XML\Writer\WriterInterface as XMLWriter;
+use ILIAS\MetaData\XML\Writer\SimpleDC\SimpleDCInterface as XMLWriter;
 
 /**
  * @author       Stefan Meyer <smeyer.ilias@gmx.de>
@@ -88,7 +88,7 @@ class ilMDEditorGUI
         $this->global_screen = $services->dic()->globalScreen();
         $this->tabs = $services->dic()->tabs();
         $this->ui_factory = $services->dic()->ui()->factory();
-        $this->xml_writer = $services->xml()->standardWriter();
+        $this->xml_writer = $services->xml()->simpleDCWriter();
 
         $this->obj_id = $obj_id;
         $this->sub_id = $sub_id === 0 ? $obj_id : $sub_id;
@@ -114,9 +114,14 @@ class ilMDEditorGUI
     {
         $button = $this->renderButtonToFullEditor();
 
-        $xml = $this->xml_writer->write($this->repository->getMD($this->obj_id, $this->sub_id, $this->type));
+        //$xml = $this->xml_writer->write($this->repository->getMD($this->obj_id, $this->sub_id, $this->type));
+        $xml = $this->xml_writer->write(
+            $this->repository->getMD($this->obj_id, $this->sub_id, $this->type),
+            new ILIAS\Data\ReferenceId(567)
+        );
         $dom = new DOMDocument('1.0');
         $dom->formatOutput = true;
+        $dom->preserveWhiteSpace = false;
         $dom->loadXML($xml->asXML());
         $this->tpl->setContent($button . '<pre>' . htmlentities($dom->saveXML()) . '</pre>');
         return true;

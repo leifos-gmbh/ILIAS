@@ -18,13 +18,25 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\XML\Copyright;
+namespace ILIAS\MetaData\XML\Copyright\Links;
 
-interface CopyrightHandlerInterface
+use ILIAS\StaticURL\Services as URLService;
+use ILIAS\Data\URI;
+use ILIAS\Data\ReferenceId;
+
+class LinkGenerator implements LinkGeneratorInterface
 {
-    public function copyrightForExport(string $copyright): string;
+    protected URLService $url_service;
 
-    public function copyrightFromExport(string $copyright): string;
+    public function __construct(URLService $url_service)
+    {
+        $this->url_service = $url_service;
+    }
 
-    public function copyrightAsString(string $copyright): string;
+    public function generateLinkForReference(
+        ReferenceId $ref_id,
+        string $type
+    ): URI {
+        return $this->url_service->builder()->build($type, $ref_id);
+    }
 }

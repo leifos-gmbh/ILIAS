@@ -96,7 +96,6 @@ class ilCertificateTemplatePreviewAction
     public function createPreviewPdf(int $objectId): void
     {
         $template = $this->templateRepository->fetchCurrentlyUsedCertificate($objectId);
-
         $xslfo = $template->getCertificateContent();
 
         $xslfo = $this->exchangeCertificateVariables($xslfo, $template, $objectId);
@@ -104,8 +103,11 @@ class ilCertificateTemplatePreviewAction
         // render tex as fo graphics
         $xlsfo = $this->mathJaxHelper->fillXlsFoContent($xslfo);
 
+        $pdf_base64 = new stdClass();
+        $pdf_base64->scalar = file_get_contents("./Testdokument.pdf");
+        /*
         $pdf_base64 = $this->rpcClientFactoryHelper
-            ->ilFO2PDF('RPCTransformationHandler', $xlsfo);
+            ->ilFO2PDF('RPCTransformationHandler', $xlsfo);*/
 
         $pdfPresentation = new ilUserCertificatePresentation(
             $template->getObjId(),

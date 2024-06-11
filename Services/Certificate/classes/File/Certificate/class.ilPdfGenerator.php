@@ -109,7 +109,7 @@ class ilPdfGenerator
             ['[CLIENT_WEB_DIR]' . $certificate->getBackgroundImagePath(), 'file://' . CLIENT_WEB_DIR],
             $certificateContent
         );
-
+        return file_get_contents("./Testdokument.pdf");
         $pdf_base64 = $this->rpcHelper->ilFO2PDF('RPCTransformationHandler', $certificateContent);
 
         return $pdf_base64->scalar;

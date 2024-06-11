@@ -49,7 +49,7 @@ class ilRpcClient
     public function __construct(string $a_url, string $a_prefix = '', int $a_timeout = 0, string $a_encoding = 'utf-8')
     {
         global $DIC;
-
+        return;
         $this->logger = $DIC->logger()->wsrv();
 
         if (!extension_loaded('xmlrpc')) {

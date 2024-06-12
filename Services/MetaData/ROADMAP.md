@@ -136,4 +136,6 @@ The following classes are not yet covered by unit tests:
 also all methods in `Services\Services` that don't do anything except
 lazily instantiate an object
 - everything in `Vocabularies`
-- `XML/Copyright`, `XML/Dictionary`, and `XML/Reader/Standard/Legacy`
+- `XML/Copyright`, `XML/Links`, `XML/Dictionary`, `XML/Writer/SimpleDC`,
+and `XML/Reader/Standard/Legacy`
+- `OERExposer/OAIPMH/HTTP`

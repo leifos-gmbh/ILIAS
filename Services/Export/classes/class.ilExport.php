@@ -17,6 +17,9 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+use ILIAS\Export\ilExportDummy;
+
 /**
  * Export
  * @author    Alex Killing <alex.killing@gmx.de>
@@ -375,6 +378,25 @@ class ilExport
 
         $this->manifest_writer->xmlEndTag('Manifest');
         $this->manifest_writer->xmlDumpFile($this->export_run_dir . "/manifest.xml", false);
+        #
+        #
+        $results = [];
+        # comment out "$results = $this->myProc..." to restore normal export behavior
+        $results = $this->myProcessExporter($comp, $class, $a_type, $a_target_release, [$a_id]);
+        if (count($results) > 0) {
+            $results[] = [
+                'xml' => $this->manifest_writer->xmlDumpMem(false),
+                'path' => "/manifest.xml"
+            ];
+            $export_dummy = new ilExportDummy();
+            $export_dummy->initTable();
+            #$export_dummy->clearEntries();
+            $export_dummy->saveXML($a_id, $results);
+            #$export_dummy->debug();
+            $export_dummy->download($a_id, $sub_dir);
+        }
+        #
+        #
 
         // zip the file
         $this->log->debug("zip: " . $export_dir . "/" . $new_file);
@@ -618,6 +640,141 @@ class ilExport
 
         $this->log->debug("returning " . ((int) $success) . " for " . $a_entity);
         return $success;
+    }
+
+    public function myProcessExporter(
+        string $a_comp,
+        string $a_class,
+        string $a_entity,
+        string $a_target_release,
+        array $a_id = null
+    ): array {
+        $success = true;
+        $this->log->debug("process exporter, comp: " . $a_comp . ", class: " . $a_class . ", entity: " . $a_entity .
+            ", target release " . $a_target_release . ", id: " . print_r($a_id, true));
+
+        if (!is_array($a_id)) {
+            if ($a_id == "") {
+                return [];
+            }
+            $a_id = [$a_id];
+        }
+
+        // get exporter object
+        if (!class_exists($a_class)) {
+            $export_class_file = "./" . $a_comp . "/classes/class." . $a_class . ".php";
+            if (!is_file($export_class_file)) {
+                throw new ilExportException('Export class file "' . $export_class_file . '" not found.');
+            }
+        }
+
+        $exp = new $a_class();
+        $exp->setExport($this);
+        if (!isset($this->cnt[$a_comp])) {
+            $this->cnt[$a_comp] = 1;
+        } else {
+            $this->cnt[$a_comp]++;
+        }
+        $set_dir_relative = $a_comp . "/set_" . $this->cnt[$a_comp];
+        $set_dir_absolute = $this->export_run_dir . "/" . $set_dir_relative;
+        $exp->init();
+
+        // process head dependencies
+        $this->log->debug("process head dependencies for " . $a_entity);
+        $sequence = $exp->getXmlExportHeadDependencies($a_entity, $a_target_release, $a_id);
+        $results = [];
+        foreach ($sequence as $s) {
+            $comp = explode("/", $s["component"]);
+            $exp_class = "il" . $comp[1] . "Exporter";
+            $results = array_merge(
+                $results,
+                $this->myProcessExporter(
+                    $s["component"],
+                    $exp_class,
+                    $s["entity"],
+                    $a_target_release,
+                    $s["ids"]
+                )
+            );
+        }
+
+        // write export.xml file
+        $export_writer = new ilXmlWriter();
+        $export_writer->xmlHeader();
+
+        $sv = $exp->determineSchemaVersion($a_entity, $a_target_release);
+        $sv["uses_dataset"] ??= false;
+        $sv['xsd_file'] ??= '';
+        $this->log->debug("schema version for entity: $a_entity, target release: $a_target_release");
+        $this->log->debug("...is: " . $sv["schema_version"] . ", namespace: " . $sv["namespace"] .
+            ", xsd file: " . $sv["xsd_file"] . ", uses_dataset: " . ((int) $sv["uses_dataset"]));
+
+        $attribs = array("InstallationId" => IL_INST_ID,
+            "InstallationUrl" => ILIAS_HTTP_PATH,
+            "Entity" => $a_entity,
+            "SchemaVersion" => $sv["schema_version"],
+            /* "TargetRelease" => $a_target_release, */
+            "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+            "xmlns:exp" => "http://www.ilias.de/Services/Export/exp/4_1",
+            "xsi:schemaLocation" => "http://www.ilias.de/Services/Export/exp/4_1 " . ILIAS_HTTP_PATH . "/xml/ilias_export_4_1.xsd"
+        );
+        if ($sv["namespace"] != "" && $sv["xsd_file"] != "") {
+            $attribs["xsi:schemaLocation"] .= " " . $sv["namespace"] . " " .
+                ILIAS_HTTP_PATH . "/xml/" . $sv["xsd_file"];
+            $attribs["xmlns"] = $sv["namespace"];
+        }
+        if ($sv["uses_dataset"]) {
+            $attribs["xsi:schemaLocation"] .= " " .
+                "http://www.ilias.de/Services/DataSet/ds/4_3 " . ILIAS_HTTP_PATH . "/xml/ilias_ds_4_3.xsd";
+            $attribs["xmlns:ds"] = "http://www.ilias.de/Services/DataSet/ds/4_3";
+        }
+        $export_writer->xmlStartTag('exp:Export', $attribs);
+
+        $dir_cnt = 1;
+        foreach ($a_id as $id) {
+            $exp->setExportDirectories(
+                $set_dir_relative . "/expDir_" . $dir_cnt,
+                $set_dir_absolute . "/expDir_" . $dir_cnt
+            );
+            $export_writer->xmlStartTag('exp:ExportItem', array("Id" => $id));
+            $xml = $exp->getXmlRepresentation($a_entity, $sv["schema_version"], (string) $id);
+            $export_writer->appendXML($xml);
+            $export_writer->xmlEndTag('exp:ExportItem');
+            $dir_cnt++;
+        }
+
+        $export_writer->xmlEndTag('exp:Export');
+        $xml = $export_writer->xmlDumpMem(false);
+        $results[] = [
+            'xml' => $xml,
+            'path' => $set_dir_relative . "/export.xml"
+        ];
+
+        $this->manifest_writer->xmlElement(
+            "ExportFile",
+            array("Component" => $a_comp, "Path" => $set_dir_relative . "/export.xml")
+        );
+
+        // process tail dependencies
+        $this->log->debug("process tail dependencies of " . $a_entity);
+        $sequence = $exp->getXmlExportTailDependencies($a_entity, $a_target_release, $a_id);
+        foreach ($sequence as $s) {
+            $comp = explode("/", $s["component"]);
+            $exp_class = "il" . $comp[1] . "Exporter";
+            $results = array_merge(
+                $results,
+                $this->myProcessExporter(
+                    $s["component"],
+                    $exp_class,
+                    $s["entity"],
+                    $a_target_release,
+                    (array) $s["ids"]
+                )
+            );
+        }
+
+        $this->log->debug("returning " . ((int) $success) . " for " . $a_entity);
+        return $results;
     }
 
     protected static function createPathFromId(int $a_container_id, string $a_name): string

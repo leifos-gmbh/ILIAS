@@ -27,6 +27,10 @@ class ilMDSettings
 
     protected ilSetting $settings;
     private bool $copyright_selection_active = false;
+    private bool $oai_pmh_active = false;
+    private string $oai_repository_name = '';
+    private string $oai_identifier_prefix = '';
+    private string $oai_contact_mail = '';
 
     private function __construct()
     {
@@ -51,9 +55,53 @@ class ilMDSettings
         $this->copyright_selection_active = $a_status;
     }
 
+    public function isOAIPMHActive(): bool
+    {
+        return $this->oai_pmh_active;
+    }
+
+    public function activateOAIPMH(bool $a_status): void
+    {
+        $this->oai_pmh_active = $a_status;
+    }
+
+    public function getOAIRepositoryName(): string
+    {
+        return $this->oai_repository_name;
+    }
+
+    public function setOAIRepositoryName(string $oai_repository_name): void
+    {
+        $this->oai_repository_name = $oai_repository_name;
+    }
+
+    public function getOAIIdentifierPrefix(): string
+    {
+        return $this->oai_identifier_prefix;
+    }
+
+    public function setOAIIdentifierPrefix(string $oai_identifier_prefix): void
+    {
+        $this->oai_identifier_prefix = $oai_identifier_prefix;
+    }
+
+    public function getOAIContactMail(): string
+    {
+        return $this->oai_contact_mail;
+    }
+
+    public function setOAIContactMail(string $oai_contact_mail): void
+    {
+        $this->oai_contact_mail = $oai_contact_mail;
+    }
+
     public function save(): void
     {
         $this->settings->set('copyright_selection_active', (string) $this->isCopyrightSelectionActive());
+        $this->settings->set('oai_pmh_active', (string) $this->isOAIPMHActive());
+        $this->settings->set('oai_repository_name', $this->getOAIRepositoryName());
+        $this->settings->set('oai_identifier_prefix', $this->getOAIIdentifierPrefix());
+        $this->settings->set('oai_contact_mail', $this->getOAIContactMail());
     }
 
     private function read(): void
@@ -61,5 +109,9 @@ class ilMDSettings
         $this->settings = new ilSetting('md_settings');
 
         $this->copyright_selection_active = (bool) $this->settings->get('copyright_selection_active', '0');
+        $this->oai_pmh_active = (bool) $this->settings->get('oai_pmh_active', '0');
+        $this->oai_repository_name = (string) $this->settings->get('oai_repository_name', '');
+        $this->oai_identifier_prefix = (string) $this->settings->get('oai_identifier_prefix', '');
+        $this->oai_contact_mail = (string) $this->settings->get('oai_contact_mail', '');
     }
 }

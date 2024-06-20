@@ -64,6 +64,39 @@ class Request implements RequestInterface
     {
         return array_key_exists($argument->value, $this->arguments);
     }
+    /**
+     * @param Argument[] $required
+     * @param Argument[] $optional
+     * @param Argument[] $exclusive
+     */
+    public function hasCorrectArguments(
+        array $required,
+        array $optional,
+        array $exclusive
+    ): bool {
+        foreach ($exclusive as $argument) {
+            if ($this->hasArgument($argument)) {
+                return $this->countArguments() === 1;
+            }
+        }
+        foreach ($required as $argument) {
+            if (!$this->hasArgument($argument)) {
+                return false;
+            }
+        }
+        $expected_count = count($required);
+        foreach ($optional as $argument) {
+            if ($this->hasArgument($argument)) {
+                $expected_count += 1;
+            }
+        }
+        return $this->countArguments() === $expected_count;
+    }
+
+    protected function countArguments(): int
+    {
+        return count($this->arguments);
+    }
 
     public function argumentKeys(): \Generator
     {

@@ -28,17 +28,13 @@ interface WriterInterface
 {
     public function writeError(Error $error, string $message): \DOMDocument;
 
-    /**
-     * Writes the elements needed to respond to an identify request
-     * in a dummy root node.
-     */
     public function writeIdentifyElements(
         string $repository_name,
         URI $base_url,
         \DateTimeImmutable $earliest_datestamp,
         string $first_admin_email,
         string ...$further_admin_emails
-    ): \DOMDocument;
+    ): \Generator;
 
     /**
      * Currently only oai_dc.
@@ -67,6 +63,11 @@ interface WriterInterface
 
     public function writeResponse(
         RequestInterface $request,
-        \DOMDocument ...$contents_or_errors
+        \DOMDocument ...$contents
+    ): \DOMDocument;
+
+    public function writeErrorResponse(
+        RequestInterface $request,
+        \DOMDocument ...$errors
     ): \DOMDocument;
 }

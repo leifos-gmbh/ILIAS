@@ -37,6 +37,20 @@ interface RequestInterface
     public function hasArgument(Argument $argument): bool;
 
     /**
+     * Returns true if this either has all required arguments,
+     * any subset of the optional arguments, and no others,
+     * or if this has only one of the exclusive arguments.
+     * @param Argument[] $required
+     * @param Argument[] $optional
+     * @param Argument[] $exclusive
+     */
+    public function hasCorrectArguments(
+        array $required,
+        array $optional,
+        array $exclusive
+    ): bool;
+
+    /**
      * @return Argument[]
      */
     public function argumentKeys(): \Generator;

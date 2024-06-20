@@ -24,6 +24,7 @@ use ILIAS\MetaData\OAIPMH\Responses\Error;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
 use ILIAS\MetaData\OAIPMH\Requests\Argument;
 use ILIAS\Data\URI;
+use ILIAS\MetaData\OAIPMH\Requests\Verb;
 
 class Writer implements WriterInterface
 {
@@ -45,57 +46,51 @@ class Writer implements WriterInterface
         \DateTimeImmutable $earliest_datestamp,
         string $first_admin_email,
         string ...$further_admin_emails
-    ): \DOMDocument {
-        $xml = new \DomDocument('1.0', 'UTF-8');
-
-        $root = $xml->createElement('Identify');
-        $xml->appendChild($root);
-
-        $name_xml = $xml->createElement(
+    ): \Generator {
+        yield $this->writeSingleElementXML(
             'repositoryName',
             $repository_name
         );
-        $root->appendChild($name_xml);
-
-        $url_xml = $xml->createElement(
+        yield $this->writeSingleElementXML(
             'baseURL',
             (string) $base_url
         );
-        $root->appendChild($url_xml);
-
-        $version_xml = $xml->createElement(
+        yield $this->writeSingleElementXML(
             'protocolVersion',
             '2.0'
         );
-        $root->appendChild($version_xml);
-
-        $earliest_xml = $xml->createElement(
+        yield $this->writeSingleElementXML(
             'earliestDatestamp',
             $earliest_datestamp->format('Y-m-d')
         );
-        $root->appendChild($earliest_xml);
-
-        $deleted_xml = $xml->createElement(
+        yield $this->writeSingleElementXML(
             'deletedRecord',
             'no'
         );
-        $root->appendChild($deleted_xml);
-
-        $granularity_xml = $xml->createElement(
+        yield $this->writeSingleElementXML(
             'granularity',
             'YYYY-MM-DD'
         );
-        $root->appendChild($granularity_xml);
 
         array_unshift($further_admin_emails, $first_admin_email);
         foreach ($further_admin_emails as $admin_email) {
-            $admin_xml = $xml->createElement(
+            yield $this->writeSingleElementXML(
                 'adminEmail',
                 $admin_email
             );
-            $root->appendChild($admin_xml);
         }
+    }
 
+    protected function writeSingleElementXML(
+        string $element_name,
+        string $element_value
+    ): \DOMDocument {
+        $xml = new \DomDocument('1.0', 'UTF-8');
+        $element_xml = $xml->createElement(
+            $element_name,
+            $element_value
+        );
+        $xml->appendChild($element_xml);
         return $xml;
     }
 
@@ -189,7 +184,7 @@ class Writer implements WriterInterface
 
     public function writeResponse(
         RequestInterface $request,
-        \DOMDocument ...$contents_or_errors
+        \DOMDocument ...$contents
     ): \DOMDocument {
         $xml = new \DomDocument('1.0', 'UTF-8');
 
@@ -204,9 +199,32 @@ class Writer implements WriterInterface
         $verb_xml = $xml->createElement($request->verb()->value);
         $root->appendChild($verb_xml);
 
-        foreach ($contents_or_errors as $content_or_error_xml) {
+        foreach ($contents as $content_xml) {
             $verb_xml->appendChild(
-                $xml->importNode($content_or_error_xml->documentElement, true)
+                $xml->importNode($content_xml->documentElement, true)
+            );
+        }
+
+        return $xml;
+    }
+
+    public function writeErrorResponse(
+        RequestInterface $request,
+        \DOMDocument ...$errors
+    ): \DOMDocument {
+        $xml = new \DomDocument('1.0', 'UTF-8');
+
+        $root = $this->createRootElement($xml);
+        $xml->appendChild($root);
+
+        $date_xml = $this->createDateElement($xml);
+        $root->appendChild($date_xml);
+        $request_xml = $this->createRequestElement($xml, $request);
+        $root->appendChild($request_xml);
+
+        foreach ($errors as $error_xml) {
+            $root->appendChild(
+                $xml->importNode($error_xml->documentElement, true)
             );
         }
 
@@ -247,10 +265,12 @@ class Writer implements WriterInterface
             'request',
             (string) $request->baseURL()
         );
-        $request_xml->setAttribute(
-            Argument::VERB->value,
-            $request->verb()->value
-        );
+        if ($request->verb() !== Verb::NULL) {
+            $request_xml->setAttribute(
+                Argument::VERB->value,
+                $request->verb()->value
+            );
+        }
         foreach ($request->argumentKeys() as $key) {
             $request_xml->setAttribute(
                 $key->value,

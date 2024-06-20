@@ -28,5 +28,19 @@ interface RepositoryInterface
     public function getExposedRecords(
         ?\DateTimeImmutable $from = null,
         ?\DateTimeImmutable $until = null
-    ): \Generator;
+    ): array;
+
+    /**
+     * @return RecordInfosInterface[]
+     */
+    public function getExposedRecordInfos(
+        ?\DateTimeImmutable $from = null,
+        ?\DateTimeImmutable $until = null
+    ): array;
+
+    public function getEarliestExposedDatestamp(): \DateTimeImmutable;
+
+    public function getExposedRecordByIdentifier(string $identifier): ?RecordInterface;
+
+    public function doesExposedRecordWithIdentifierExist(string $identifier): ?RecordInterface;
 }

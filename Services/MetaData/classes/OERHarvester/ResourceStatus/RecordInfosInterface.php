@@ -18,15 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OAIPMH\Requests;
+namespace ILIAS\MetaData\OERHarvester\ResourceStatus;
 
-enum Argument: string
+interface RecordInfosInterface
 {
-    case VERB = 'verb';
-    case IDENTIFIER = 'identifier';
-    case MD_PREFIX = 'metadataPrefix';
-    case FROM_DATE = 'from';
-    case UNTIL_DATE = 'until';
-    case RESUMPTION_TOKEN = 'resumptionToken';
-    case SET = 'set';
+    public function identfifier(): string;
+
+    public function datestamp(): \DateTimeImmutable;
 }

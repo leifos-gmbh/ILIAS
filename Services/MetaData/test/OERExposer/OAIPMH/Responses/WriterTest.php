@@ -107,48 +107,83 @@ class WriterTest extends TestCase
         $this->assertXmlStringEqualsXmlString($expected_xml, $xml->saveXML());
     }
 
-    public function testWriteIdentifyElements(): void
+    public function testWriteIdentifyElementsOneAdmin(): void
     {
-        $expected_xml = <<<XML
-            <Identify>
-                <repositoryName>my repository</repositoryName>
-                <baseURL>http://www.my.org/test/repository</baseURL>
-                <protocolVersion>2.0</protocolVersion>
-                <earliestDatestamp>2017-11-04</earliestDatestamp>
-                <deletedRecord>no</deletedRecord>
-                <granularity>YYYY-MM-DD</granularity>
-                <adminEmail>somemail@my.org</adminEmail>
-            </Identify>
-            XML;
+        $expected_xmls = [
+            <<<XML
+            <repositoryName>my repository</repositoryName>
+            XML,
+            <<<XML
+            <baseURL>http://www.my.org/test/repository</baseURL>
+            XML,
+            <<<XML
+            <protocolVersion>2.0</protocolVersion>
+            XML,
+            <<<XML
+            <earliestDatestamp>2017-11-04</earliestDatestamp>
+            XML,
+            <<<XML
+            <deletedRecord>no</deletedRecord>
+            XML,
+            <<<XML
+            <granularity>YYYY-MM-DD</granularity>
+            XML,
+            <<<XML
+            <adminEmail>somemail@my.org</adminEmail>
+            XML
+        ];
 
         $writer = $this->getWriter();
-        $xml = $writer->writeIdentifyElements(
+        $xmls = $writer->writeIdentifyElements(
             'my repository',
             $this->getURI('http://www.my.org/test/repository'),
             new \DateTimeImmutable('2017-11-04', new \DateTimeZone('UTC')),
             'somemail@my.org'
         );
 
-        $this->assertXmlStringEqualsXmlString($expected_xml, $xml->saveXML());
+        $index = 0;
+        foreach ($xmls as $xml) {
+            if ($index < count($expected_xmls)) {
+                $this->assertXmlStringEqualsXmlString($expected_xmls[$index], $xml->saveXML());
+            }
+            $index++;
+        }
+        $this->assertSame(count($expected_xmls), $index);
     }
-    public function testWriteIdentifyElementsNoAdmins(): void
+    public function testWriteIdentifyElementsMultipleAdmins(): void
     {
-        $expected_xml = <<<XML
-            <Identify>
-                <repositoryName>my repository</repositoryName>
-                <baseURL>http://www.my.org/test/repository</baseURL>
-                <protocolVersion>2.0</protocolVersion>
-                <earliestDatestamp>2017-11-04</earliestDatestamp>
-                <deletedRecord>no</deletedRecord>
-                <granularity>YYYY-MM-DD</granularity>
-                <adminEmail>somemail@my.org</adminEmail>
-                <adminEmail>othermail@my.org</adminEmail>
-                <adminEmail>thirdmail@my.org</adminEmail>
-            </Identify>
-            XML;
+        $expected_xmls = [
+            <<<XML
+            <repositoryName>my repository</repositoryName>
+            XML,
+            <<<XML
+            <baseURL>http://www.my.org/test/repository</baseURL>
+            XML,
+            <<<XML
+            <protocolVersion>2.0</protocolVersion>
+            XML,
+            <<<XML
+            <earliestDatestamp>2017-11-04</earliestDatestamp>
+            XML,
+            <<<XML
+            <deletedRecord>no</deletedRecord>
+            XML,
+            <<<XML
+            <granularity>YYYY-MM-DD</granularity>
+            XML,
+            <<<XML
+            <adminEmail>somemail@my.org</adminEmail>
+            XML,
+            <<<XML
+            <adminEmail>othermail@my.org</adminEmail>
+            XML,
+            <<<XML
+            <adminEmail>thirdmail@my.org</adminEmail>
+            XML
+        ];
 
         $writer = $this->getWriter();
-        $xml = $writer->writeIdentifyElements(
+        $xmls = $writer->writeIdentifyElements(
             'my repository',
             $this->getURI('http://www.my.org/test/repository'),
             new \DateTimeImmutable('2017-11-04', new \DateTimeZone('UTC')),
@@ -157,7 +192,14 @@ class WriterTest extends TestCase
             'thirdmail@my.org'
         );
 
-        $this->assertXmlStringEqualsXmlString($expected_xml, $xml->saveXML());
+        $index = 0;
+        foreach ($xmls as $xml) {
+            if ($index < count($expected_xmls)) {
+                $this->assertXmlStringEqualsXmlString($expected_xmls[$index], $xml->saveXML());
+            }
+            $index++;
+        }
+        $this->assertSame(count($expected_xmls), $index);
     }
 
 
@@ -282,6 +324,90 @@ class WriterTest extends TestCase
         );
         $writer = $this->getWriter('2018-08-21T02:30:35Z');
         $xml = $writer->writeResponse($request, $content1_doc, $content2_doc);
+
+        $this->assertXmlStringEqualsXmlString($expected_xml, $xml->saveXML());
+    }
+
+    public function testWriteErrorResponse(): void
+    {
+        $content1_xml = <<<XML
+            <some>
+              <con>tent</con>
+            </some>
+            XML;
+
+        $content2_xml = <<<XML
+            <different>
+              <bits>and</bits>
+              <bobs variety="much"/>
+            </different>
+            XML;
+
+        $expected_xml_start = /** @lang text */ <<<XML
+            <?xml version="1.0" encoding="UTF-8" ?>
+            <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+             <responseDate>2018-08-21T02:30:35Z</responseDate>
+             <request verb="ListIdentifiers" identifier="identifier_val"
+                      metadataPrefix="metadataPrefix_val">http://www.my.org/test/repository</request>
+            XML;
+
+        $expected_xml_end = /** @lang text */ <<<XML
+            </OAI-PMH>
+            XML;
+
+        $expected_xml = $expected_xml_start . $content1_xml . $content2_xml . $expected_xml_end;
+        $content1_doc = new \DomDocument();
+        $content1_doc->loadXML($content1_xml);
+        $content2_doc = new \DomDocument();
+        $content2_doc->loadXML($content2_xml);
+        $request = $this->getRequest(
+            'http://www.my.org/test/repository',
+            Verb::LIST_IDENTIFIERS,
+            Argument::IDENTIFIER,
+            Argument::MD_PREFIX
+        );
+        $writer = $this->getWriter('2018-08-21T02:30:35Z');
+        $xml = $writer->writeErrorResponse($request, $content1_doc, $content2_doc);
+
+        $this->assertXmlStringEqualsXmlString($expected_xml, $xml->saveXML());
+    }
+
+
+
+    public function testWriteErrorResponseNoVerb(): void
+    {
+        $content_xml = <<<XML
+            <some>
+              <con>tent</con>
+            </some>
+            XML;
+
+        $expected_xml_start = /** @lang text */ <<<XML
+            <?xml version="1.0" encoding="UTF-8" ?>
+            <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+             <responseDate>2018-08-21T02:30:35Z</responseDate>
+             <request identifier="identifier_val" metadataPrefix="metadataPrefix_val">http://www.my.org/test/repository</request>
+            XML;
+
+        $expected_xml_end = /** @lang text */ <<<XML
+            </OAI-PMH>
+            XML;
+
+        $expected_xml = $expected_xml_start . $content_xml . $expected_xml_end;
+        $content_doc = new \DomDocument();
+        $content_doc->loadXML($content_xml);
+        $request = $this->getRequest(
+            'http://www.my.org/test/repository',
+            Verb::NULL,
+            Argument::IDENTIFIER,
+            Argument::MD_PREFIX
+        );
+        $writer = $this->getWriter('2018-08-21T02:30:35Z');
+        $xml = $writer->writeErrorResponse($request, $content_doc);
 
         $this->assertXmlStringEqualsXmlString($expected_xml, $xml->saveXML());
     }

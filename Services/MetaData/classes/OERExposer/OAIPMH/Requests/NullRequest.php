@@ -51,6 +51,11 @@ class NullRequest implements RequestInterface
         return false;
     }
 
+    public function hasCorrectArguments(array $required, array $optional, array $exclusive): bool
+    {
+        return false;
+    }
+
     /**
      * @return Argument[]
      */

@@ -22,9 +22,7 @@ namespace ILIAS\MetaData\OERHarvester\ResourceStatus;
 
 interface RecordInterface
 {
-    public function identfifier(): string;
-
-    public function datestamp(): \DateTimeImmutable;
+    public function infos(): RecordInfosInterface;
 
     public function metadata(): \DOMDocument;
 }

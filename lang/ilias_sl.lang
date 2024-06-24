@@ -6293,6 +6293,7 @@ content#:#cont_dir_file#:#Seznam/datoteka
 content#:#cont_dir_renamed#:#Seznam je bil preimenovan.
 content#:#cont_disable_def_feedback#:#Onemogoči privzete povratne informacije
 content#:#cont_disable_def_feedback_info#:#Onemogoči privzete povratne informacije po odgovorjenih vprašanjih.
+content#:#cont_double_click_to_delete#:#Double-click on content elements to select them for (de-)activation or deletion.###14 05 2024 new variable
 content#:#cont_download#:#Prenos
 content#:#cont_download_no_download#:#Funkcija prenosa je trenutno onemogočena. Zato datoteka učencem ne bo na voljo.
 content#:#cont_download_no_menu#:#Meni učnega modula je trenutno onemogočen. Zato datoteka učencem ne bo na voljo.
@@ -13335,6 +13336,7 @@ rbac#:#mobs_visible#:#Administracija medijskih objektov in skupin medijev je vid
 rbac#:#mobs_write#:#Uredi nastavitve za medijske objekte in skupine medijev
 rbac#:#moderate#:#Moderiraj
 rbac#:#moderate_frm#:#Moderiraj
+rbac#:#msg_anonymous_cannot_be_assigned#:#Anonymous cannot be assigned to a role.###19 03 2024 new variable
 rbac#:#msg_no_roles_of_type#:#Z izbrano nastavitvijo filtra ni na voljo nobene vloge
 rbac#:#news_add_news#:#Ustvari novosti
 rbac#:#nots_edit_permissions#:#User can change permission settings of Notes administration.###19 08 2022 new variable

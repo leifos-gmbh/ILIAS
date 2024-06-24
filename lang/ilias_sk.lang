@@ -6279,6 +6279,7 @@ content#:#cont_dir_file#:#Adresář/soubor
 content#:#cont_dir_renamed#:#Adresář byl přejmenován.
 content#:#cont_disable_def_feedback#:#Disable Default Question Feedback###24 10 2013 new variable
 content#:#cont_disable_def_feedback_info#:#If disabled, answered questions will not show any feedback for the learner. You need to provide custom feedbacks for your questions.###24 10 2013 new variable
+content#:#cont_double_click_to_delete#:#Double-click on content elements to select them for (de-)activation or deletion.###14 05 2024 new variable
 content#:#cont_download#:#Download###27 01 2015 new variable
 content#:#cont_download_no_download#:#Stažení pro uživatele nebude dostupné, dokud nebude aktivována vlastnost ke stažení.
 content#:#cont_download_no_menu#:#Stažení pro uživatele nebude dostupné, dokud nebude aktivována nabídka výukového modulu.
@@ -13321,6 +13322,7 @@ rbac#:#mobs_visible#:#Nastavení mediálních objektů/zásobníků je viditeln�
 rbac#:#mobs_write#:#Upravit nastavení mediálního objektu/zásobníku
 rbac#:#moderate#:#Moderate###10 11 2011 new variable
 rbac#:#moderate_frm#:#Moderovat
+rbac#:#msg_anonymous_cannot_be_assigned#:#Anonymous cannot be assigned to a role.###19 03 2024 new variable
 rbac#:#msg_no_roles_of_type#:#Žádná role pro vybrané nastavení filtru nenalezena
 rbac#:#news_add_news#:#Add News###25 10 2016 new variable
 rbac#:#nots_edit_permissions#:#User can change permission settings of Notes administration.###30 04 2021 new variable

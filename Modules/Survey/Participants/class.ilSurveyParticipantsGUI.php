@@ -1498,7 +1498,7 @@ class ilSurveyParticipantsGUI
             $this->object->addAppraisee($ilUser->getId());
         }
 
-        $this->ctrl->redirect($this->parent_gui, "infoScreen");
+        $this->ctrl->redirect($this->parent_gui, "run");
     }
 
     public function initMailRatersForm(
@@ -1725,11 +1725,11 @@ class ilSurveyParticipantsGUI
         $ilTabs->clearTargets();
         $ilTabs->setBackTarget(
             $this->lng->txt("menuback"),
-            $this->ctrl->getLinkTarget($this->parent_gui, "infoScreen")
+            $this->ctrl->getLinkTarget($this->parent_gui, "run")
         );
 
         if (!$this->object->isAppraisee($ilUser->getId())) {
-            $this->ctrl->redirect($this->parent_gui, "infoScreen");
+            $this->ctrl->redirect($this->parent_gui, "run");
         }
 
         $cgui = new ilConfirmationGUI();
@@ -1744,7 +1744,7 @@ class ilSurveyParticipantsGUI
 
     public function confirmAppraiseeCloseCancelObject(): void
     {
-        $this->ctrl->redirect($this->parent_gui, "infoScreen");
+        $this->ctrl->redirect($this->parent_gui, "run");
     }
 
     public function appraiseeCloseObject(): void
@@ -1752,12 +1752,12 @@ class ilSurveyParticipantsGUI
         $ilUser = $this->user;
 
         if (!$this->object->isAppraisee($ilUser->getId())) {
-            $this->ctrl->redirect($this->parent_gui, "infoScreen");
+            $this->ctrl->redirect($this->parent_gui, "run");
         }
 
         $this->object->closeAppraisee($ilUser->getId());
         $this->tpl->setOnScreenMessage('success', $this->lng->txt("survey_360_appraisee_close_action_success"), true);
-        $this->ctrl->redirect($this->parent_gui, "infoScreen");
+        $this->ctrl->redirect($this->parent_gui, "run");
     }
 
     public function confirmAdminAppraiseesCloseObject(): void

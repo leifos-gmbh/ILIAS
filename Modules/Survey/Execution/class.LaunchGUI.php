@@ -27,6 +27,8 @@ use ILIAS\Survey\Access\AccessManager;
 use ILIAS\Survey\Participants\StatusManager;
 use ILIAS\Survey\Mode\FeatureConfig;
 use ILIAS\UI\Component\MessageBox\MessageBox;
+use ILIAS\UI\Component\Launcher\Inline;
+use ILIAS\Data\Result;
 
 class LaunchGUI
 {
@@ -66,9 +68,21 @@ class LaunchGUI
 
         switch ($next_class) {
             default:
-                if (in_array($cmd, array("launch"))) {
+                if (in_array($cmd, array("launch", "start", "resume"))) {
                     $this->$cmd();
                 }
+        }
+    }
+
+    public function initSession(): void
+    {
+        $ctrl = $this->gui->ctrl();
+        $main_tpl = $this->gui->ui()->mainTemplate();
+        try {
+            $this->run_manager->initSession($this->requested_code);
+        } catch (\ilWrongSurveyCodeException $e) {
+            $main_tpl->setOnScreenMessage("failure", $e->getMessage(), true);
+            $ctrl->redirectByClass(self::class, "launch");
         }
     }
 
@@ -80,17 +94,8 @@ class LaunchGUI
         $main_tpl = $this->gui->ui()->mainTemplate();
         $lng = $this->domain->lng();
 
-        // appraisee info
-        $this->determineAppraiseeInfo();
-
         // init session
-        try {
-            $this->run_manager->initSession($this->requested_code);
-        } catch (\ilWrongSurveyCodeException $e) {
-            $main_tpl->setOnScreenMessage("failure", $e->getMessage(), true);
-            $ctrl->redirectByClass(self::class, "launch");
-        }
-        $anonymous_code = $this->run_manager->getCode();
+        $this->initSession();
 
         // completed message
         if ($this->status_manager->cantStartAgain()) {
@@ -107,6 +112,66 @@ class LaunchGUI
 
         // confirmation mail button / input (omitted, since abandoned)
 
+        if ($launcher = $this->getLauncher()) {
+            $mt = $this->gui->mainTemplate();
+            $mt->setContent($r->render($launcher));
+        } else {
+            if (!is_null($mbox = $this->getMessageBox())) {
+                $mt = $this->gui->mainTemplate();
+                $mt->setContent($r->render($mbox));
+            }
+        }
+    }
+
+    protected function forwardInputsToParameters(): void
+    {
+        $ctrl = $this->gui->ctrl();
+        $request = $this->gui->http()->request();
+        $launcher = $this->getLauncher();
+        if ($launcher) {
+            $launcher = $launcher->withRequest($request);
+            $result = $launcher->getResult();
+            if ($result && $result->isOK()) {
+                foreach ($result->value() as $key => $value) {
+                    if ($key === "appraisee_id") {
+                        $ctrl->setParameterByClass(\ilSurveyExecutionGUI::class, "appr_id", $value);
+                    }
+                    if ($key === "anonymous_id") {
+                        $this->requested_code = $value;
+                        $ctrl->setParameterByClass(\ilSurveyExecutionGUI::class, "anonymous_id", $value);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function start(): void
+    {
+        $ctrl = $this->gui->ctrl();
+        $this->forwardInputsToParameters();
+        $this->initSession();
+        $ctrl->redirectByClass(\ilSurveyExecutionGUI::class, "start");
+    }
+
+    protected function resume(): void
+    {
+        $ctrl = $this->gui->ctrl();
+        $this->forwardInputsToParameters();
+        $this->initSession();
+        $ctrl->redirectByClass(\ilSurveyExecutionGUI::class, "resume");
+    }
+
+    protected function getLauncher(): ?Inline
+    {
+        $f = $this->gui->ui()->factory();
+        $ctrl = $this->gui->ctrl();
+        $lng = $this->domain->lng();
+
+        $anonymous_code = $this->run_manager->getCode();
+
+        // appraisee info
+        $this->determineAppraiseeInfo();
+
         $this->determineNotStartableReasons();
 
         // enter code?
@@ -117,7 +182,7 @@ class LaunchGUI
                 $lng->txt("enter_anonymous_id")
             );
             $this->launch_target = $ctrl->getLinkTargetByClass(
-                \ilSurveyExecutionGUI::class,
+                self::class,
                 "start"
             );
             $this->launch_title = $lng->txt("start_survey");
@@ -141,10 +206,10 @@ class LaunchGUI
 
         // access information
         if (!$this->feature_config->usesAppraisees()) {
-            $this->launch_messages[] = $this->lng->txt("survey_results_anonymization") . ": " .
-                !$this->survey->hasAnonymizedResults()
-                    ? $lng->txt("survey_results_personalized_info")
-                    : $lng->txt("survey_results_anonymized_info");
+            $this->launch_messages[] = $lng->txt("survey_results_anonymization") . ": " .
+            !$this->survey->hasAnonymizedResults()
+                ? $lng->txt("survey_results_personalized_info")
+                : $lng->txt("survey_results_anonymized_info");
             if ($this->access_manager->canAccessEvaluation()) {
                 $this->launch_messages[] = $lng->txt("evaluation_access") . ": " .
                     $lng->txt("evaluation_access_info");
@@ -164,10 +229,9 @@ class LaunchGUI
                 $launcher = $launcher->withInputs(
                     $f->input()->field()->group($this->launch_inputs),
                     function () {
-
                     },
                     null
-                );
+                )->withModalSubmitLabel($this->launch_title);
             }
 
             if (!is_null($mbox = $this->getMessageBox())) {
@@ -175,15 +239,9 @@ class LaunchGUI
                     $mbox
                 );
             }
-
-            $mt = $this->gui->mainTemplate();
-            $mt->setContent($r->render($launcher));
-        } else {
-            if (!is_null($mbox = $this->getMessageBox())) {
-                $mt = $this->gui->mainTemplate();
-                $mt->setContent($r->render($mbox));
-            }
+            return $launcher;
         }
+        return null;
     }
 
     protected function getMessageBox(): ?MessageBox
@@ -221,7 +279,6 @@ class LaunchGUI
 
     protected function determineAppraiseeInfo(): void
     {
-
         $survey = $this->survey;
         $lng = $this->domain->lng();
         $ctrl = $this->gui->ctrl();
@@ -280,13 +337,13 @@ class LaunchGUI
                 if ($this->run_manager->hasStarted() &&
                     !$this->run_manager->hasFinished()) {
                     $this->launch_target = $ctrl->getLinkTargetByClass(
-                        \ilSurveyExecutionGUI::class,
+                        self::class,
                         "resume"
                     );
                     $this->launch_title = $lng->txt("resume_survey");
                 } elseif (!$this->run_manager->hasStarted()) {
                     $this->launch_target = $ctrl->getLinkTargetByClass(
-                        \ilSurveyExecutionGUI::class,
+                        self::class,
                         "start"
                     );
                     $this->launch_title = $lng->txt("start_survey");
@@ -371,7 +428,7 @@ class LaunchGUI
                             $appraisee_options
                         )->withRequired(true)->withValue(key($appraisee_options));
                         $this->launch_target = $ctrl->getLinkTargetByClass(
-                            \ilSurveyExecutionGUI::class,
+                            self::class,
                             "start"
                         );
                         $this->launch_title = $lng->txt("start_survey");

@@ -279,6 +279,7 @@ class ilObjSurveyGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
                 break;
 
             case strtolower(\ILIAS\Survey\Execution\LaunchGUI::class):
+                $ilTabs->activateTab("run");
                 $this->ctrl->forwardCommand(
                     $this->gui->execution()->launchGUI(
                         $this->survey
@@ -395,6 +396,14 @@ class ilObjSurveyGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
         }
 
         $ilHelp->setScreenIdComponent("svy");
+
+        if ($this->checkPermissionBool("read")) {
+            $this->tabs_gui->addTab(
+                "run",
+                $this->lng->txt("obj_svy"),
+                $this->ctrl->getLinkTarget($this, 'run')
+            );
+        }
 
         if ($this->checkPermissionBool("write")) {
             $this->tabs_gui->addTab(

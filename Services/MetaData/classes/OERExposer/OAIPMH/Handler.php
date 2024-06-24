@@ -38,6 +38,8 @@ class Handler
     protected ResourceStatusRepositoryInterface $resource_status_repository;
 
     protected readonly string $valid_md_prefix;
+    protected readonly int $max_list_size;
+    protected readonly URI $base_url;
 
     public function __construct(
         RequestParserInterface $request_parser,
@@ -51,6 +53,8 @@ class Handler
         $this->resource_status_repository = $resource_status_repository;
 
         $this->valid_md_prefix = 'oai_dc';
+        $this->max_list_size = 100;
+        $this->base_url = new URI('Insert base URL here');
     }
 
     /**
@@ -328,7 +332,7 @@ class Handler
     protected function getEmptyRequest(Verb $verb): RequestInterface
     {
         return new Request(
-            new URI('Insert base URL here'),
+            $this->base_url,
             $verb
         );
     }

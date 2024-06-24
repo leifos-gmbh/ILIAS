@@ -27,7 +27,9 @@ interface RepositoryInterface
      */
     public function getExposedRecords(
         ?\DateTimeImmutable $from = null,
-        ?\DateTimeImmutable $until = null
+        ?\DateTimeImmutable $until = null,
+        ?int $limit = null,
+        ?int $offset = null
     ): array;
 
     /**
@@ -35,8 +37,15 @@ interface RepositoryInterface
      */
     public function getExposedRecordInfos(
         ?\DateTimeImmutable $from = null,
-        ?\DateTimeImmutable $until = null
+        ?\DateTimeImmutable $until = null,
+        ?int $limit = null,
+        ?int $offset = null
     ): array;
+
+    public function getExposedRecordCount(
+        ?\DateTimeImmutable $from = null,
+        ?\DateTimeImmutable $until = null
+    ): int;
 
     public function getEarliestExposedDatestamp(): \DateTimeImmutable;
 

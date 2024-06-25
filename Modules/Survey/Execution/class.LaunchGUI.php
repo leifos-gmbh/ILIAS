@@ -29,6 +29,7 @@ use ILIAS\Survey\Mode\FeatureConfig;
 use ILIAS\UI\Component\MessageBox\MessageBox;
 use ILIAS\UI\Component\Launcher\Inline;
 use ILIAS\Data\Result;
+use ILIAS\UI\Component\Panel\Standard;
 
 class LaunchGUI
 {
@@ -42,6 +43,8 @@ class LaunchGUI
     protected string $launch_target = "";
     protected array $launch_inputs = [];
     protected array $launch_messages = [];
+
+    protected array $launch_information = [];
     protected array $launch_message_buttons = [];
     protected array $launch_message_links = [];
 
@@ -112,21 +115,34 @@ class LaunchGUI
 
         // confirmation mail button / input (omitted, since abandoned)
 
-        if ($launcher = $this->getLauncher()) {
-            $mt = $this->gui->mainTemplate();
-            $mt->setContent($r->render($launcher));
-        } else {
-            if (!is_null($mbox = $this->getMessageBox())) {
-                $mt = $this->gui->mainTemplate();
-                $mt->setContent($r->render($mbox));
-            }
+        $items = [];
+
+        $this->collectData();
+
+        // message box
+        if ($mbox = $this->getMessageBox()) {
+            $items[] = $mbox;
         }
+
+        // panel
+        if ($panel = $this->getPanel()) {
+            $items[] = $panel;
+        }
+
+        // launcher
+        if ($launcher = $this->getLauncher()) {
+            $items[] = $launcher;
+        }
+
+        $mt = $this->gui->mainTemplate();
+        $mt->setContent($r->render($items));
     }
 
     protected function forwardInputsToParameters(): void
     {
         $ctrl = $this->gui->ctrl();
         $request = $this->gui->http()->request();
+        $this->collectData();
         $launcher = $this->getLauncher();
         if ($launcher) {
             $launcher = $launcher->withRequest($request);
@@ -161,11 +177,11 @@ class LaunchGUI
         $ctrl->redirectByClass(\ilSurveyExecutionGUI::class, "resume");
     }
 
-    protected function getLauncher(): ?Inline
+    protected function collectData(): void
     {
-        $f = $this->gui->ui()->factory();
         $ctrl = $this->gui->ctrl();
         $lng = $this->domain->lng();
+        $f = $this->gui->ui()->factory();
 
         $anonymous_code = $this->run_manager->getCode();
 
@@ -176,7 +192,7 @@ class LaunchGUI
 
         // enter code?
         if ($this->status_manager->mustEnterCode($anonymous_code)) {
-            $this->launch_messages[] = $lng->txt("anonymization") . ": " .
+            $this->launch_information[$lng->txt("svy_code")] =
                 $lng->txt("anonymize_anonymous_introduction");
             $this->launch_inputs["anonymous_id"] = $f->input()->field()->text(
                 $lng->txt("enter_anonymous_id")
@@ -201,20 +217,26 @@ class LaunchGUI
         // introduction
         if ($this->survey->getIntroduction() !== '') {
             $introduction = $this->survey->getIntroduction();
-            $this->launch_messages[] = $this->survey->prepareTextareaOutput($introduction);
+            $this->launch_information[] = $this->survey->prepareTextareaOutput($introduction);
         }
 
         // access information
         if (!$this->feature_config->usesAppraisees()) {
-            $this->launch_messages[] = $lng->txt("survey_results_anonymization") . ": " .
+            $this->launch_information[$lng->txt("survey_results_anonymization")] =
             !$this->survey->hasAnonymizedResults()
                 ? $lng->txt("survey_results_personalized_info")
                 : $lng->txt("survey_results_anonymized_info");
             if ($this->access_manager->canAccessEvaluation()) {
-                $this->launch_messages[] = $lng->txt("evaluation_access") . ": " .
+                $this->launch_messages[$lng->txt("evaluation_access")] =
                     $lng->txt("evaluation_access_info");
             }
         }
+    }
+
+
+    protected function getLauncher(): ?Inline
+    {
+        $f = $this->gui->ui()->factory();
 
         if ($this->launch_target !== "") {
             $data_factory = new \ILIAS\Data\Factory();
@@ -234,12 +256,42 @@ class LaunchGUI
                 )->withModalSubmitLabel($this->launch_title);
             }
 
-            if (!is_null($mbox = $this->getMessageBox())) {
-                $launcher = $launcher->withStatusMessageBox(
-                    $mbox
-                );
-            }
             return $launcher;
+        }
+        return null;
+    }
+
+    protected function getPanel(): ?Standard
+    {
+        $f = $this->gui->ui()->factory();
+        $lng = $this->domain->lng();
+
+        if (count($this->launch_information) > 0) {
+
+            $items = [];
+            $key_value = [];
+
+            foreach ($this->launch_information as $key => $value) {
+                if (is_numeric($key)) {
+                    $items[] = $f->legacy($value);
+                } else {
+                    $key_value[$key] = $value;
+                }
+            }
+
+            if (count($key_value) > 0) {
+                if (count($items) > 0) {
+                    $items[] = $f->divider()->horizontal();
+                }
+                $items[] = $f->listing()->descriptive($key_value);
+            }
+
+            $panel = $f->panel()->standard(
+                $lng->txt("svy_information"),
+                $items
+            );
+
+            return $panel;
         }
         return null;
     }
@@ -274,7 +326,8 @@ class LaunchGUI
         if (in_array($survey->get360Results(), [\ilObjSurvey::RESULTS_360_OWN, \ilObjSurvey::RESULTS_360_ALL], true)) {
             $privacy_info .= " " . $lng->txt("svy_app_see_rater_info");
         }
-        $this->launch_messages[] = $lng->txt("svy_privacy_info") . ": " . $privacy_info;
+        //$this->launch_messages[] = $lng->txt("svy_privacy_info") . ": " . $privacy_info;
+        $this->launch_information[$lng->txt("svy_privacy_info")] = $privacy_info;
     }
 
     protected function determineAppraiseeInfo(): void
@@ -289,7 +342,9 @@ class LaunchGUI
 
             $appr_data = $survey->getAppraiseesData();
             $appr_data = $appr_data[$this->user_id];
-            $this->launch_messages[] = $lng->txt("survey_360_raters_status_info") . ": " . $appr_data["finished"];
+
+            $this->launch_information[$lng->txt("svy_your_raters")] =
+                sprintf($lng->txt("svy_your_raters_finished"), $appr_data["finished"]);
 
             if ($survey->get360Mode()) {
                 if (!$appr_data["closed"]) {
@@ -306,11 +361,11 @@ class LaunchGUI
                     if ($survey->getSkillService()) {
                         $txt .= "_skill";
                     }
-                    $this->launch_messages[] = $lng->txt("status") . ": " . $lng->txt($txt);
+                    $this->launch_messages[] = $lng->txt($txt);
                 } else {
                     \ilDatePresentation::setUseRelativeDates(false);
                     $dt = new \ilDateTime($appr_data["closed"], IL_CAL_UNIX);
-                    $this->launch_messages[] = $lng->txt("status") . ": " . sprintf(
+                    $this->launch_information[$lng->txt("status")] = sprintf(
                         $lng->txt("survey_360_appraisee_close_action_status"),
                         \ilDatePresentation::formatDate($dt)
                     );
@@ -376,50 +431,39 @@ class LaunchGUI
 
                     $list = array();
                     $appraisee_options = [];
+                    $closed = 0;
+                    $open = 0;
+                    $finished = 0;
                     foreach ($appr_ids as $appr_id) {
                         if ($survey->isAppraiseeClosed($appr_id)) {
                             // closed
                             $list[$appr_id] = $lng->txt("survey_360_appraisee_is_closed");
+                            $closed++;
+                            if ($active_appraisees[$appr_id] ?? false) {
+                                $finished++;
+                            }
                         } elseif (array_key_exists($appr_id, $active_appraisees)) {
                             // already done
                             if ($active_appraisees[$appr_id]) {
                                 $list[$appr_id] = $lng->txt("already_completed_survey");
+                                $finished++;
                             }
                             // resume
                             else {
                                 $list[$appr_id] = array("resume", $lng->txt("resume_survey"));
+                                $open++;
                             }
                         } else {
                             // start
                             $list[$appr_id] = array("start", $lng->txt("start_survey"));
+                            $open++;
                         }
-                    }
-
-                    //$info->addSection($this->lng->txt("survey_360_rate_other_appraisees"));
-
-                    if (!$this->status_manager->isAppraisee()) {
-                        $this->addPrivacyInfo($info);
                     }
 
                     foreach ($list as $appr_id => $item) {
                         $appr_name = \ilUserUtil::getNamePresentation($appr_id, false, false, "", true);
-
-                        if (!is_array($item)) {
-                            $this->launch_messages[] = $appr_name . ": " . $item;
-                        } else {
+                        if (is_array($item)) {
                             $appraisee_options[$appr_id] = $appr_name;
-                            /*
-                            $this->ctrl->setParameter($output_gui, "appr_id", $appr_id);
-                            $href = $this->ctrl->getLinkTarget($output_gui, $item[0]);
-                            $this->ctrl->setParameter($output_gui, "appr_id", "");
-
-                            $button = $this->gui->button(
-                                $item[1],
-                                $href
-                            );
-                            $big_button_360 = '<div>' . $button->render() . '</div>';
-
-                            $info->addProperty($appr_name, $big_button_360);*/
                         }
                     }
                     if (count($appraisee_options) > 0) {
@@ -431,8 +475,20 @@ class LaunchGUI
                             self::class,
                             "start"
                         );
-                        $this->launch_title = $lng->txt("start_survey");
+                        $this->launch_title = $lng->txt("survey_360_rate_other_appraisee");
                     }
+
+                    $status_txt = ($open === 0)
+                        ? $lng->txt("svy_0_open_appraisees")
+                        : sprintf($lng->txt("svy_x_open_appraisees"), $open);
+                    if ($finished > 0) {
+                        $status_txt .= " " . sprintf($lng->txt("svy_finished_x_appraisees"), $finished);
+                    }
+                    if ($closed > 0) {
+                        $status_txt .= " " . sprintf($lng->txt("svy_x_appraisees_closed_for_raters"), $closed);
+                    }
+                    $this->launch_information[$lng->txt("svy_your_appraisees")] = $status_txt;
+
                 } elseif (!$status_manager->isAppraisee()) {
                     $this->launch_messages[] = $lng->txt("survey_360_no_appraisees");
                     //$this->main_tpl->setOnScreenMessage('failure', $this->lng->txt("survey_360_no_appraisees"));

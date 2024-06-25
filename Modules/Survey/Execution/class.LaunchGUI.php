@@ -207,7 +207,8 @@ class LaunchGUI
         $this->determineMainLink($anonymous_code);
 
         // add as appraisee
-        if ($this->status_manager->canAddItselfAsAppraisee()) { // #14968
+        if ($this->status_manager->canAddItselfAsAppraisee() &&
+            $this->access_manager->canStartSurvey()) { // #14968
             $this->launch_message_buttons[] = $f->button()->standard(
                 $lng->txt("survey_360_add_self_appraisee"),
                 $ctrl->getLinkTargetByClass(\ilSurveyParticipantsGUI::class, "addSelfAppraisee")

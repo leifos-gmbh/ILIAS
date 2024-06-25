@@ -527,7 +527,7 @@ class LaunchGUI
             if ($this->access_manager->canEditSettings()) {
                 $this->launch_message_links[] = $f->link()->standard(
                     $lng->txt("survey_edit_settings"),
-                    $ctrl->getLinkTarget($this->survey_gui, "properties")
+                    $ctrl->getLinkTargetByClass(\ilObjSurveyGUI::class, "properties")
                 );
             }
         }

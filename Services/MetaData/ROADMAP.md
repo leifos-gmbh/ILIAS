@@ -138,4 +138,4 @@ lazily instantiate an object
 - everything in `Vocabularies`
 - `XML/Copyright`, `XML/Links`, `XML/Dictionary`, `XML/Writer/SimpleDC`,
 and `XML/Reader/Standard/Legacy`
-- `OERExposer/OAIPMH/HTTP`
+- `OERExposer/OAIPMH/HTTP`, `OERExposer/OAIPMH/Initiator`

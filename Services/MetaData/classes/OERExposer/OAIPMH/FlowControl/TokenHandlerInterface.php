@@ -18,15 +18,24 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERExposer\OAIPMH\Requests;
+namespace ILIAS\MetaData\OERExposer\OAIPMH\FlowControl;
 
-enum Verb: string
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
+
+interface TokenHandlerInterface
 {
-    case NULL = 'NoVerb';
-    case GET_RECORD = 'GetRecord';
-    case IDENTIFY = 'Identify';
-    case LIST_IDENTIFIERS = 'ListIdentifiers';
-    case LIST_MD_FORMATS = 'ListMetadataFormats';
-    case LIST_RECORDS = 'ListRecords';
-    case LIST_SETS = 'ListSets';
+    public function generateToken(
+        int $offset,
+        ?\DateTimeImmutable $from_date,
+        ?\DateTimeImmutable $until_date
+    ): string;
+
+    public function isTokenValid(string $token): bool;
+
+    public function appendArgumentsFromTokenToRequest(
+        RequestInterface $request,
+        string $token
+    ): RequestInterface;
+
+    public function getOffsetFromToken(string $token): int;
 }

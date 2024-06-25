@@ -22,12 +22,11 @@ namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
 
 use PHPUnit\Framework\TestCase;
 use ILIAS\Data\URI;
-use ILIAS\MetaData\OAIPMH\Responses\Error;
-use DOMDocument;
+use ILIAS\MetaData\OERExposer\OAIPMH\Responses\Error;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\NullRequest;
-use ILIAS\MetaData\OAIPMH\Requests\Verb;
-use ILIAS\MetaData\OAIPMH\Requests\Argument;
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Verb;
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
 
 class WriterTest extends TestCase
 {

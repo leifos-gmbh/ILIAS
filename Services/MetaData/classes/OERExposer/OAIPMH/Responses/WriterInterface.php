@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
 
-use ILIAS\MetaData\OAIPMH\Responses\Error;
+use ILIAS\MetaData\OERExposer\OAIPMH\Responses\Error;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
 use ILIAS\Data\URI;
 

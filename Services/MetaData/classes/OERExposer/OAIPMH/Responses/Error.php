@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OAIPMH\Responses;
+namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
 
 enum Error: string
 {

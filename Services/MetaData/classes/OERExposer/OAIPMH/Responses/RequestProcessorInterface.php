@@ -18,15 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERExposer\OAIPMH\Requests;
+namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
 
-enum Verb: string
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
+
+interface RequestProcessorInterface
 {
-    case NULL = 'NoVerb';
-    case GET_RECORD = 'GetRecord';
-    case IDENTIFY = 'Identify';
-    case LIST_IDENTIFIERS = 'ListIdentifiers';
-    case LIST_MD_FORMATS = 'ListMetadataFormats';
-    case LIST_RECORDS = 'ListRecords';
-    case LIST_SETS = 'ListSets';
+    public function getResponseToRequest(RequestInterface $request): \DomDocument;
 }

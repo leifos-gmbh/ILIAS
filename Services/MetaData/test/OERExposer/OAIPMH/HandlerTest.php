@@ -18,13 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERExposer\OAIPMH\HTTP;
+namespace ILIAS\MetaData\OERExposer\OAIPMH;
 
-use ILIAS\MetaData\OAIPMH\Requests\Argument;
+use PHPUnit\Framework\TestCase;
 
-interface RequestParserInterface
+class HandlerTest extends TestCase
 {
-    public function hasArgument(Argument $argument): bool;
-
-    public function retrieveArgument(Argument $argument): string;
 }

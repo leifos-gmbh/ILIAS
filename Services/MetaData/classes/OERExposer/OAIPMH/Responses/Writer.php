@@ -20,14 +20,17 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
 
-use ILIAS\MetaData\OAIPMH\Responses\Error;
+use ILIAS\MetaData\OERExposer\OAIPMH\Responses\Error;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
-use ILIAS\MetaData\OAIPMH\Requests\Argument;
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
 use ILIAS\Data\URI;
-use ILIAS\MetaData\OAIPMH\Requests\Verb;
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Verb;
+use ILIAS\MetaData\OERExposer\OAIPMH\DateHelper;
 
 class Writer implements WriterInterface
 {
+    use DateHelper;
+
     public function writeError(Error $error, string $message): \DOMDocument
     {
         $xml = new \DomDocument('1.0', 'UTF-8');
@@ -61,7 +64,7 @@ class Writer implements WriterInterface
         );
         yield $this->writeSingleElementXML(
             'earliestDatestamp',
-            $earliest_datestamp->format('Y-m-d')
+            $this->getFormattedDate($earliest_datestamp)
         );
         yield $this->writeSingleElementXML(
             'deletedRecord',
@@ -139,7 +142,7 @@ class Writer implements WriterInterface
 
         $datestamp = $xml->createElement(
             'datestamp',
-            $datestamp->format('Y-m-d')
+            $this->getFormattedDate($datestamp)
         );
         $root->appendChild($datestamp);
 
@@ -253,7 +256,7 @@ class Writer implements WriterInterface
     {
         return $xml->createElement(
             'responseDate',
-            $this->getCurrentDateTime()->format('Y-m-d\TH:i:sp')
+            $this->getFormattedDateTime($this->getCurrentDateTime())
         );
     }
 
@@ -278,10 +281,5 @@ class Writer implements WriterInterface
             );
         }
         return $request_xml;
-    }
-
-    protected function getCurrentDateTime(): \DateTimeImmutable
-    {
-        return new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
 }

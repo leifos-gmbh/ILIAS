@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OAIPMH\Requests;
+namespace ILIAS\MetaData\OERExposer\OAIPMH\Requests;
 
 enum Argument: string
 {

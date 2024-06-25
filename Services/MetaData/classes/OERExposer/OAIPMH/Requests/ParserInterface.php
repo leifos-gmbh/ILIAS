@@ -20,13 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\OERExposer\OAIPMH\Requests;
 
-enum Verb: string
+use ILIAS\Data\URI;
+
+interface ParserInterface
 {
-    case NULL = 'NoVerb';
-    case GET_RECORD = 'GetRecord';
-    case IDENTIFY = 'Identify';
-    case LIST_IDENTIFIERS = 'ListIdentifiers';
-    case LIST_MD_FORMATS = 'ListMetadataFormats';
-    case LIST_RECORDS = 'ListRecords';
-    case LIST_SETS = 'ListSets';
+    public function parseFromHTTP(URI $base_url): RequestInterface;
 }

@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\OERExposer\OAIPMH\Requests;
 
-use ILIAS\MetaData\OAIPMH\Requests\Verb;
-use ILIAS\MetaData\OAIPMH\Requests\Argument;
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Verb;
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
 use ILIAS\Data\URI;
 
 interface RequestInterface

@@ -22,9 +22,9 @@ namespace ILIAS\MetaData\OERExposer\OAIPMH\HTTP;
 
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory as Refinery;
-use ILIAS\MetaData\OAIPMH\Requests\Argument;
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
 
-class RequestParser implements RequestParserInterface
+class Wrapper implements WrapperInterface
 {
     protected GlobalHttpState $http;
     protected Refinery $refinery;
@@ -37,13 +37,13 @@ class RequestParser implements RequestParserInterface
         $this->refinery = $refinery;
     }
 
-    public function hasArgument(Argument $argument): bool
+    public function requestHasArgument(Argument $argument): bool
     {
         return $this->http->wrapper()->query()->has($argument->value) ||
             $this->http->wrapper()->post()->has($argument->value);
     }
 
-    public function retrieveArgument(Argument $argument): string
+    public function retrieveArgumentFromRequest(Argument $argument): string
     {
         if ($this->http->wrapper()->query()->has($argument->value)) {
             return $this->http->wrapper()->query()->retrieve(

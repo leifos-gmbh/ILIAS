@@ -18,15 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERExposer\OAIPMH\Requests;
+namespace ILIAS\MetaData\OERExposer\OAIPMH\HTTP;
 
-enum Verb: string
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
+
+interface WrapperInterface
 {
-    case NULL = 'NoVerb';
-    case GET_RECORD = 'GetRecord';
-    case IDENTIFY = 'Identify';
-    case LIST_IDENTIFIERS = 'ListIdentifiers';
-    case LIST_MD_FORMATS = 'ListMetadataFormats';
-    case LIST_RECORDS = 'ListRecords';
-    case LIST_SETS = 'ListSets';
+    public function requestHasArgument(Argument $argument): bool;
+
+    public function retrieveArgumentFromRequest(Argument $argument): string;
 }

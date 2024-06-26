@@ -42,15 +42,15 @@ class Handler
         $this->base_url = new URI('Insert base URL here');
     }
 
-    public function sendResponse(): void
+    public function sendResponseToRequest(): void
     {
         if ($this->initiator->settings()->isOAIPMHActive()) {
-            // TODO return http error
+            $this->initiator->httpWrapper()->sendResponseAndClose(404);
         }
 
         $response = $this->initiator->requestProcessor()->getResponseToRequest(
             $this->initiator->requestParser()->parseFromHTTP($this->base_url)
         );
-        // TODO send out the response (extend http wrapper)
+        $this->initiator->httpWrapper()->sendResponseAndClose(200, $response);
     }
 }

@@ -27,4 +27,9 @@ interface WrapperInterface
     public function requestHasArgument(Argument $argument): bool;
 
     public function retrieveArgumentFromRequest(Argument $argument): string;
+
+    public function sendResponseAndClose(
+        int $status_code,
+        \DOMDocument $body = null
+    ): void;
 }

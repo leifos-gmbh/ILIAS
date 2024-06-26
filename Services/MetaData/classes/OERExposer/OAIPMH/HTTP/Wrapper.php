@@ -23,6 +23,8 @@ namespace ILIAS\MetaData\OERExposer\OAIPMH\HTTP;
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
+use ILIAS\HTTP\Response\ResponseHeader;
+use ILIAS\Filesystem\Stream\Streams;
 
 class Wrapper implements WrapperInterface
 {
@@ -58,5 +60,22 @@ class Wrapper implements WrapperInterface
             );
         }
         return '';
+    }
+
+    public function sendResponseAndClose(
+        int $status_code,
+        \DOMDocument $body = null
+    ): void {
+        $response = $this->http->response()
+                               ->withHeader(ResponseHeader::CONTENT_TYPE, 'text/xml')
+                               ->withStatus($status_code);
+
+        if (!is_null($body)) {
+            $response = $response->withBody(Streams::ofString($body->saveXML()));
+        }
+
+        $this->http->saveResponse($response);
+        $this->http->sendResponse();
+        $this->http->close();
     }
 }

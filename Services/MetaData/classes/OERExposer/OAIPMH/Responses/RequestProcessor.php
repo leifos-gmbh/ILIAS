@@ -26,13 +26,14 @@ use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
 use ILIAS\MetaData\OERHarvester\ResourceStatus\RepositoryInterface as ResourceStatusRepositoryInterface;
 use ILIAS\MetaData\OERExposer\OAIPMH\FlowControl\TokenHandlerInterface;
 use ILIAS\MetaData\OERExposer\OAIPMH\DateHelper;
+use ILIAS\MetaData\Settings\SettingsInterface;
 
 class RequestProcessor implements RequestProcessorInterface
 {
     use DateHelper;
 
     protected WriterInterface $writer;
-    protected \ilMDSettings $settings;
+    protected SettingsInterface $settings;
     protected ResourceStatusRepositoryInterface $resource_status_repository;
     protected TokenHandlerInterface $token_handler;
 
@@ -41,7 +42,7 @@ class RequestProcessor implements RequestProcessorInterface
 
     public function __construct(
         WriterInterface $writer,
-        \ilMDSettings $settings,
+        SettingsInterface $settings,
         ResourceStatusRepositoryInterface $resource_status_repository,
         TokenHandlerInterface $token_handler
     ) {
@@ -85,7 +86,7 @@ class RequestProcessor implements RequestProcessorInterface
     protected function getRecord(RequestInterface $request): \DomDocument
     {
         $errors = [];
-        if ($request->hasCorrectArguments([Argument::IDENTIFIER, Argument::MD_PREFIX], [], [])) {
+        if (!$request->hasCorrectArguments([Argument::IDENTIFIER, Argument::MD_PREFIX], [], [])) {
             $errors[] = $this->writeBadArgumentError(
                 Verb::GET_RECORD,
                 ...$request->argumentKeys()
@@ -107,7 +108,7 @@ class RequestProcessor implements RequestProcessorInterface
             $identifier = $request->argumentValue(Argument::IDENTIFIER);
             if (!$this->isIdentifierValid($identifier)) {
                 $errors[] = $this->writer->writeError(
-                    Error::BAD_ARGUMENT,
+                    Error::ID_DOES_NOT_EXIST,
                     'Identifier "' . $identifier . '" is invalid for this repository.'
                 );
             } elseif (is_null($record = $this->resource_status_repository->getExposedRecordByIdentifier(
@@ -126,7 +127,7 @@ class RequestProcessor implements RequestProcessorInterface
         return $this->writer->writeResponse(
             $request,
             $this->writer->writeRecord(
-                $record->infos()->identfifier(),
+                $this->settings->getOAIIdentifierPrefix() . $record->infos()->identfifier(),
                 $record->infos()->datestamp(),
                 $record->metadata()
             )
@@ -159,7 +160,7 @@ class RequestProcessor implements RequestProcessorInterface
     protected function listMetadataFormats(RequestInterface $request): \DomDocument
     {
         $errors = [];
-        if ($request->hasCorrectArguments([], [Argument::IDENTIFIER], [])) {
+        if (!$request->hasCorrectArguments([], [Argument::IDENTIFIER], [])) {
             $errors[] = $this->writeBadArgumentError(
                 Verb::LIST_MD_FORMATS,
                 ...$request->argumentKeys()
@@ -170,7 +171,7 @@ class RequestProcessor implements RequestProcessorInterface
             $identifier = $request->argumentValue(Argument::IDENTIFIER);
             if (!$this->isIdentifierValid($identifier)) {
                 $errors[] = $this->writer->writeError(
-                    Error::BAD_ARGUMENT,
+                    Error::ID_DOES_NOT_EXIST,
                     'Identifier "' . $identifier . '" is invalid for this repository.'
                 );
             } elseif (!$this->resource_status_repository->doesExposedRecordWithIdentifierExist(
@@ -195,7 +196,7 @@ class RequestProcessor implements RequestProcessorInterface
     protected function listSets(RequestInterface $request): \DomDocument
     {
         $errors = [];
-        if ($request->hasCorrectArguments([], [], [Argument::RESUMPTION_TOKEN])) {
+        if (!$request->hasCorrectArguments([], [], [Argument::RESUMPTION_TOKEN])) {
             $errors[] = $this->writeBadArgumentError(
                 Verb::LIST_SETS,
                 ...$request->argumentKeys()
@@ -216,7 +217,7 @@ class RequestProcessor implements RequestProcessorInterface
         RequestInterface $request
     ): \DomDocument {
         $errors = [];
-        if ($request->hasCorrectArguments(
+        if (!$request->hasCorrectArguments(
             [Argument::MD_PREFIX],
             [Argument::FROM_DATE, Argument::UNTIL_DATE, Argument::SET],
             [Argument::RESUMPTION_TOKEN]
@@ -353,7 +354,11 @@ class RequestProcessor implements RequestProcessorInterface
         if (empty($arguments)) {
             $message = $verb->value . ' must come with additional arguments.';
         } else {
-            $message = implode(', ', $arguments) .
+            $arg_strings = [];
+            foreach ($arguments as $argument) {
+                $arg_strings[] = $argument->value;
+            }
+            $message = implode(', ', $arg_strings) .
             ' is not a valid set of arguments for ' . $verb->value . '.';
         }
         return $this->writer->writeError(

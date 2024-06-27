@@ -22,10 +22,10 @@ namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
 
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
 
-/**
- * Processes OAI PMH requests according to https://www.openarchives.org/OAI/openarchivesprotocol.html
- */
-interface RequestProcessorInterface
+class NullRequestProcessor implements RequestProcessorInterface
 {
-    public function getResponseToRequest(RequestInterface $request): \DomDocument;
+    public function getResponseToRequest(RequestInterface $request): \DomDocument
+    {
+        return new \DomDocument();
+    }
 }

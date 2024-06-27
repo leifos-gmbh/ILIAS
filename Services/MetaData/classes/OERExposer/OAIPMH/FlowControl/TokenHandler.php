@@ -102,7 +102,7 @@ class TokenHandler implements TokenHandlerInterface
         if (isset($token_parts[2])) {
             $request = $request->withArgument(
                 Argument::FROM_DATE,
-                $token_parts[1]
+                $token_parts[2]
             );
         }
 

@@ -18,14 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
+namespace ILIAS\MetaData\OERExposer\OAIPMH\Requests;
 
-use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
+use ILIAS\Data\URI;
 
-/**
- * Processes OAI PMH requests according to https://www.openarchives.org/OAI/openarchivesprotocol.html
- */
-interface RequestProcessorInterface
+class NullParser implements ParserInterface
 {
-    public function getResponseToRequest(RequestInterface $request): \DomDocument;
+    public function parseFromHTTP(URI $base_url): RequestInterface
+    {
+        return new NullRequest();
+    }
 }

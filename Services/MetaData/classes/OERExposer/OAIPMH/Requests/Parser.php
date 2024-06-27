@@ -40,7 +40,7 @@ class Parser implements ParserInterface
     {
         $verb = Verb::NULL;
         if ($this->http->requestHasArgument(Argument::VERB)) {
-            $verb = $this->http->retrieveArgumentFromRequest(Argument::VERB);
+            $verb = Verb::tryFrom($this->http->retrieveArgumentFromRequest(Argument::VERB)) ?? Verb::NULL;
         }
 
         $request = $this->getEmptyRequest($verb, $base_url);
@@ -52,7 +52,7 @@ class Parser implements ParserInterface
             ) {
                 continue;
             }
-            $request->withArgument(
+            $request = $request->withArgument(
                 $argument,
                 rawurldecode($this->http->retrieveArgumentFromRequest($argument))
             );

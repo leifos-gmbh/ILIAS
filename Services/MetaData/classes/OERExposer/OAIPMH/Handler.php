@@ -20,17 +20,11 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\OERExposer\OAIPMH;
 
-use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
-use ILIAS\MetaData\OERExposer\OAIPMH\HTTP\WrapperInterface as HTTPWrapperInterface;
-use ILIAS\MetaData\OERExposer\OAIPMH\HTTP\Wrapper as HTTPWrapper;
-use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Verb;
-use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
-use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Request;
 use ILIAS\Data\URI;
 
 class Handler
 {
-    protected Initiator $initiator;
+    protected InitiatorInterface $initiator;
 
     protected readonly URI $base_url;
 
@@ -44,8 +38,9 @@ class Handler
 
     public function sendResponseToRequest(): void
     {
-        if ($this->initiator->settings()->isOAIPMHActive()) {
+        if (!$this->initiator->settings()->isOAIPMHActive()) {
             $this->initiator->httpWrapper()->sendResponseAndClose(404);
+            return;
         }
 
         $response = $this->initiator->requestProcessor()->getResponseToRequest(

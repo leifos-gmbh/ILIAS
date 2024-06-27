@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\OERHarvester\ResourceStatus;
 
-interface RepositoryInterface
+class NullRepository implements RepositoryInterface
 {
     /**
      * @return RecordInterface[]
@@ -30,7 +30,9 @@ interface RepositoryInterface
         ?\DateTimeImmutable $until = null,
         ?int $limit = null,
         ?int $offset = null
-    ): \Generator;
+    ): \Generator {
+        yield from [];
+    }
 
     /**
      * @return RecordInfosInterface[]
@@ -40,16 +42,29 @@ interface RepositoryInterface
         ?\DateTimeImmutable $until = null,
         ?int $limit = null,
         ?int $offset = null
-    ): \Generator;
+    ): \Generator {
+        yield from [];
+    }
 
     public function getExposedRecordCount(
         ?\DateTimeImmutable $from = null,
         ?\DateTimeImmutable $until = null
-    ): int;
+    ): int {
+        return 0;
+    }
 
-    public function getEarliestExposedDatestamp(): \DateTimeImmutable;
+    public function getEarliestExposedDatestamp(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('@0');
+    }
 
-    public function getExposedRecordByIdentifier(string $identifier): ?RecordInterface;
+    public function getExposedRecordByIdentifier(string $identifier): ?RecordInterface
+    {
+        return null;
+    }
 
-    public function doesExposedRecordWithIdentifierExist(string $identifier): bool;
+    public function doesExposedRecordWithIdentifierExist(string $identifier): bool
+    {
+        return false;
+    }
 }

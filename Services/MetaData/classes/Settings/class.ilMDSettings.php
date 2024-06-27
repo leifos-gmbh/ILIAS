@@ -18,10 +18,12 @@
 
 declare(strict_types=1);
 
+use ILIAS\MetaData\Settings\SettingsInterface;
+
 /**
  * @author  Stefan Meyer <meyer@leifos.com>
  */
-class ilMDSettings
+class ilMDSettings implements SettingsInterface
 {
     protected static ?self $instance = null;
 

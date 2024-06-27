@@ -18,14 +18,17 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
+namespace ILIAS\MetaData\OERHarvester\ResourceStatus;
 
-use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
-
-/**
- * Processes OAI PMH requests according to https://www.openarchives.org/OAI/openarchivesprotocol.html
- */
-interface RequestProcessorInterface
+class NullRecordInfos implements RecordInfosInterface
 {
-    public function getResponseToRequest(RequestInterface $request): \DomDocument;
+    public function identfifier(): string
+    {
+        return '';
+    }
+
+    public function datestamp(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('@0');
+    }
 }

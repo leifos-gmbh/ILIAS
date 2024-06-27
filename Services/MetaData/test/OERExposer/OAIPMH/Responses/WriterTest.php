@@ -30,7 +30,7 @@ use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
 
 class WriterTest extends TestCase
 {
-    public function getURI(string $string): URI
+    protected function getURI(string $string): URI
     {
         $url = $this->createMock(URI::class);
         $url->method('__toString')->willReturn($string);
@@ -40,7 +40,7 @@ class WriterTest extends TestCase
     /**
      * argument values are just the names of the values prepended with '_val'
      */
-    public function getRequest(
+    protected function getRequest(
         string $base_url,
         Verb $verb,
         Argument ...$arguments,
@@ -80,7 +80,7 @@ class WriterTest extends TestCase
         };
     }
 
-    public function getWriter(string $current_time = '@0'): Writer
+    protected function getWriter(string $current_time = '@0'): Writer
     {
         return new class ($current_time) extends Writer {
             public function __construct(protected string $current_time)

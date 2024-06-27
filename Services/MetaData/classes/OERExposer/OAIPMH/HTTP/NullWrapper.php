@@ -18,14 +18,25 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
+namespace ILIAS\MetaData\OERExposer\OAIPMH\HTTP;
 
-use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
+use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
 
-/**
- * Processes OAI PMH requests according to https://www.openarchives.org/OAI/openarchivesprotocol.html
- */
-interface RequestProcessorInterface
+class NullWrapper implements WrapperInterface
 {
-    public function getResponseToRequest(RequestInterface $request): \DomDocument;
+    public function requestHasArgument(Argument $argument): bool
+    {
+        return false;
+    }
+
+    public function retrieveArgumentFromRequest(Argument $argument): string
+    {
+        return '';
+    }
+
+    public function sendResponseAndClose(
+        int $status_code,
+        \DOMDocument $body = null
+    ): void {
+    }
 }

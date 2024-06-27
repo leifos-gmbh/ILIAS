@@ -29,13 +29,9 @@ use ILIAS\MetaData\OERExposer\OAIPMH\Responses\RequestProcessorInterface;
 use ILIAS\MetaData\OERExposer\OAIPMH\Responses\RequestProcessor;
 use ILIAS\MetaData\OERExposer\OAIPMH\Responses\Writer;
 use ILIAS\MetaData\OERExposer\OAIPMH\FlowControl\TokenHandler;
+use ILIAS\MetaData\Settings\SettingsInterface;
 
-/**
- * The OAI PMH interface does not use the usual internal services of
- * the MetaData component, as it should be lightweight and decoupled
- * from everything else as much as possible.
- */
-class Initiator
+class Initiator implements InitiatorInterface
 {
     protected Container $dic;
 
@@ -60,7 +56,7 @@ class Initiator
         );
     }
 
-    public function settings(): \ilMDSettings
+    public function settings(): SettingsInterface
     {
         return \ilMDSettings::_getInstance();
     }

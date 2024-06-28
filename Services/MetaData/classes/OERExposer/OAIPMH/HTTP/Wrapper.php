@@ -64,6 +64,7 @@ class Wrapper implements WrapperInterface
 
     public function sendResponseAndClose(
         int $status_code,
+        string $message = '',
         \DOMDocument $body = null
     ): void {
         $response = $this->http->response()

@@ -37,7 +37,7 @@ use ILIAS\MetaData\OERHarvester\ResourceStatus\NullRecord;
 use ILIAS\MetaData\OERHarvester\ResourceStatus\RecordInfosInterface;
 use ILIAS\MetaData\OERHarvester\ResourceStatus\NullRecordInfos;
 
-class RequestProcessorTest extends TestCase
+abstract class RequestProcessorTest extends TestCase
 {
     protected function getDate(string $string): \DateTimeImmutable
     {
@@ -190,7 +190,7 @@ class RequestProcessorTest extends TestCase
                 $doc = new \DOMDocument();
                 $doc->appendChild($doc->createElement(
                     'token',
-                    $token . ':' . $complete_list_size . ':' . $cursor
+                    $token . ',fullsize=' . $complete_list_size . ',cursor=' . $cursor
                 ));
                 return $doc;
             }
@@ -276,13 +276,55 @@ class RequestProcessorTest extends TestCase
      */
     protected function getRepository(
         string $earliest_datestamp = null,
+        int $record_count = 0,
         string ...$identifiers
     ): RepositoryInterface {
         $earliest_datestamp = $this->getDate($earliest_datestamp ?? '@0');
-        return new class ($earliest_datestamp, $identifiers) extends NullRepository {
+        $records = [];
+        foreach ($identifiers as $identifier) {
+            $records[$identifier] = new class ($identifier) extends NullRecord {
+                public function __construct(protected string $identifier)
+                {
+                }
+
+                public function infos(): RecordInfosInterface
+                {
+                    return new class ($this->identifier) extends NullRecordInfos {
+                        public function __construct(protected string $identifier)
+                        {
+                        }
+
+                        public function datestamp(): \DateTimeImmutable
+                        {
+                            return new \DateTimeImmutable(
+                                explode('+', $this->identifier)[1],
+                                new \DateTimeZone('UTC')
+                            );
+                        }
+
+                        public function identfifier(): string
+                        {
+                            return $this->identifier;
+                        }
+                    };
+                }
+
+                public function metadata(): \DOMDocument
+                {
+                    $doc = new \DOMDocument();
+                    $doc->appendChild($doc->createElement('md', 'md for ' . $this->identifier));
+                    return $doc;
+                }
+            };
+        }
+
+        return new class ($earliest_datestamp, $record_count, $records) extends NullRepository {
+            public array $exposed_parameters = [];
+
             public function __construct(
                 protected \DateTimeImmutable $earliest_datestamp,
-                protected array $identifiers,
+                protected int $record_count,
+                protected array $records
             ) {
             }
 
@@ -293,624 +335,92 @@ class RequestProcessorTest extends TestCase
 
             public function doesExposedRecordWithIdentifierExist(string $identifier): bool
             {
-                return in_array($identifier, $this->identifiers);
+                return in_array($identifier, array_keys($this->records));
             }
 
             public function getExposedRecordByIdentifier(string $identifier): ?RecordInterface
             {
-                if (!$this->doesExposedRecordWithIdentifierExist($identifier)) {
-                    return null;
+                return $this->records[$identifier] ?? null;
+            }
+
+            public function getExposedRecords(
+                ?\DateTimeImmutable $from = null,
+                ?\DateTimeImmutable $until = null,
+                ?int $limit = null,
+                ?int $offset = null
+            ): \Generator {
+                $this->exposed_parameters[] = [
+                    'from' => $from?->format('Y-m-d'),
+                    'until' => $until?->format('Y-m-d'),
+                    'limit' => $limit,
+                    'offset' => $offset,
+                ];
+                yield from $this->records;
+            }
+
+            public function getExposedRecordInfos(
+                ?\DateTimeImmutable $from = null,
+                ?\DateTimeImmutable $until = null,
+                ?int $limit = null,
+                ?int $offset = null
+            ): \Generator {
+                $this->exposed_parameters[] = [
+                    'from' => $from?->format('Y-m-d'),
+                    'until' => $until?->format('Y-m-d'),
+                    'limit' => $limit,
+                    'offset' => $offset,
+                ];
+                foreach ($this->records as $record) {
+                    yield $record->infos();
                 }
+            }
 
-                return new class ($identifier) extends NullRecord {
-                    public function __construct(protected string $identifier)
-                    {
-                    }
-
-                    public function infos(): RecordInfosInterface
-                    {
-                        return new class ($this->identifier) extends NullRecordInfos {
-                            public function __construct(protected string $identifier)
-                            {
-                            }
-
-                            public function datestamp(): \DateTimeImmutable
-                            {
-                                return new \DateTimeImmutable(
-                                    explode('+', $this->identifier)[1],
-                                    new \DateTimeZone('UTC')
-                                );
-                            }
-
-                            public function identfifier(): string
-                            {
-                                return $this->identifier;
-                            }
-                        };
-                    }
-
-                    public function metadata(): \DOMDocument
-                    {
-                        $doc = new \DOMDocument();
-                        $doc->appendChild($doc->createElement('md', 'md for ' . $this->identifier));
-                        return $doc;
-                    }
-                };
+            public function getExposedRecordCount(
+                ?\DateTimeImmutable $from = null,
+                ?\DateTimeImmutable $until = null
+            ): int {
+                return $this->record_count;
             }
         };
     }
 
-    protected function getTokenHandler(): TokenHandlerInterface
-    {
-        return new NullTokenHandler();
-    }
-
-    public function testGetResponseToRequestBadVerbError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings(),
-            $this->getRepository(),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:NoVerb:</response_info>
-              <error>badVerb</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest('base url', Verb::NULL, []));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    /*
-     * GetRecord
-     */
-
-    public function testGetResponseToRequestGetRecord(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(null, 'id+2022-11-27'),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <response>
-              <response_info>base url:GetRecord:identifier=prefix_id+2022-11-27,metadataPrefix=oai_dc</response_info>
-              <record>
-                <record_info>prefix_id+2022-11-27:2022-11-27</record_info>
-                <md>md for id+2022-11-27</md>
-              </record>
-            </response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::GET_RECORD,
-            [Argument::IDENTIFIER->value => 'prefix_id+2022-11-27', Argument::MD_PREFIX->value => 'oai_dc']
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestGetRecordBadArgumentsError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(null, 'id+2022-11-27'),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:GetRecord:identifier=prefix_id+2022-11-27</response_info>
-              <error>badArgument</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::GET_RECORD,
-            [Argument::IDENTIFIER->value => 'prefix_id+2022-11-27'],
-            false
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestGetRecordWrongMDFormatError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(null, 'id+2022-11-27'),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:GetRecord:identifier=prefix_id+2022-11-27,metadataPrefix=invalid</response_info>
-              <error>cannotDisseminateFormat</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::GET_RECORD,
-            [Argument::IDENTIFIER->value => 'prefix_id+2022-11-27', Argument::MD_PREFIX->value => 'invalid']
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestGetRecordInvalidIdentifierError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(null, 'id+2022-11-27'),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:GetRecord:identifier=invalid_id+2022-11-27,metadataPrefix=oai_dc</response_info>
-              <error>idDoesNotExist</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::GET_RECORD,
-            [Argument::IDENTIFIER->value => 'invalid_id+2022-11-27', Argument::MD_PREFIX->value => 'oai_dc']
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestGetRecordNotFoundError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:GetRecord:identifier=prefix_id+2022-11-27,metadataPrefix=oai_dc</response_info>
-              <error>idDoesNotExist</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::GET_RECORD,
-            [Argument::IDENTIFIER->value => 'prefix_id+2022-11-27', Argument::MD_PREFIX->value => 'oai_dc']
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestGetRecordMultipleErrors(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:GetRecord:identifier=prefix_id+2022-11-27,metadataPrefix=invalid,from=date</response_info>
-              <error>badArgument</error>
-              <error>cannotDisseminateFormat</error>
-              <error>idDoesNotExist</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::GET_RECORD,
-            [Argument::IDENTIFIER->value => 'prefix_id+2022-11-27', Argument::MD_PREFIX->value => 'invalid', Argument::FROM_DATE->value => 'date'],
-            false
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    /*
-     * Identify
-     */
-
-    public function testGetResponseToRequestIdentify(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('', 'name of repo', 'mail of contact'),
-            $this->getRepository('2021-10-20'),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <response>
-              <response_info>base url:Identify:</response_info>
-              <info>name of repo</info>
-              <info>base url</info>
-              <info>2021-10-20</info>
-              <info>mail of contact</info>
-            </response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::IDENTIFY,
-            []
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestIdentifyBadArgumentsError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('', 'name of repo', 'mail of contact'),
-            $this->getRepository('2021-10-20'),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:Identify:from=some date</response_info>
-              <error>badArgument</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::IDENTIFY,
-            [Argument::FROM_DATE->value => 'some date'],
-            false
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    /*
-     * ListIdentifiers
-     */
-
-    public function testGetResponseToRequestListIdentifiers(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersWithFromDate(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersWithUntilDate(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersWithBothDates(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersWithResumptionToken(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersWithResumptionTokenWithFromDate(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersBadArgumentsError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersBadResumptionTokenError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersInvalidFromDateError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersInvalidUntilDateError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersWrongMDFormatError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersNoRecordsFoundError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersNoSetsError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListIdentifiersMultipleErrors(): void
-    {
-    }
-
-    /*
-     * ListMetadataFormats
-     */
-
-    public function testGetResponseToRequestListMetadataFormats(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings(),
-            $this->getRepository(),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <response>
-              <response_info>base url:ListMetadataFormats:</response_info>
-              <md_format>some metadata</md_format>
-            </response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::LIST_MD_FORMATS,
-            []
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestListMetadataFormatsWithIdentifier(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(null, 'id'),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <response>
-              <response_info>base url:ListMetadataFormats:identifier=prefix_id</response_info>
-              <md_format>some metadata</md_format>
-            </response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::LIST_MD_FORMATS,
-            [Argument::IDENTIFIER->value => 'prefix_id']
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestListMetadataFormatsBadArgumentsError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings(),
-            $this->getRepository(),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:ListMetadataFormats:until=some date</response_info>
-              <error>badArgument</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::LIST_MD_FORMATS,
-            [Argument::UNTIL_DATE->value => 'some date'],
-            false
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestListMetadataFormatsInvalidIdentifierError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(null, 'no prefix'),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:ListMetadataFormats:identifier=no prefix</response_info>
-              <error>idDoesNotExist</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::LIST_MD_FORMATS,
-            [Argument::IDENTIFIER->value => 'no prefix']
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestListMetadataFormatsRecordNotFoundError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:ListMetadataFormats:identifier=prefix_id</response_info>
-              <error>idDoesNotExist</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::LIST_MD_FORMATS,
-            [Argument::IDENTIFIER->value => 'prefix_id']
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestListMetadataFormatsMultipleErrors(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings('prefix_'),
-            $this->getRepository(),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:ListMetadataFormats:identifier=prefix_id,until=some date</response_info>
-              <error>badArgument</error>
-              <error>idDoesNotExist</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::LIST_MD_FORMATS,
-            [Argument::IDENTIFIER->value => 'prefix_id', Argument::UNTIL_DATE->value => 'some date'],
-            false
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    /*
-     * ListRecords
-     */
-
-    public function testGetResponseToRequestListRecords(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsWithFromDate(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsWithUntilDate(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsWithBothDates(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsWithResumptionToken(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsWithResumptionTokenWithFromDate(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsBadArgumentsError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsBadResumptionTokenError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsInvalidFromDateError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsInvalidUntilDateError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsWrongMDFormatError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsNoRecordsFoundError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsNoSetsError(): void
-    {
-    }
-
-    public function testGetResponseToRequestListRecordsMultipleErrors(): void
-    {
-    }
-
-    /*
-     * ListSets
-     */
-
-    public function testGetResponseToRequestListSetsNoSetsError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings(),
-            $this->getRepository(),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:ListSets:</response_info>
-              <error>noSetHierarchy</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest('base url', Verb::LIST_SETS, []));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
-    }
-
-    public function testGetResponseToRequestListSetsNotSetsAndBadArgumentsError(): void
-    {
-        $processor = new RequestProcessor(
-            $this->getWriter(),
-            $this->getSettings(),
-            $this->getRepository(),
-            $this->getTokenHandler()
-        );
-
-        $expected_response = <<<XML
-            <error_response>
-              <response_info>base url:ListSets:identifier=some id</response_info>
-              <error>badArgument</error>
-              <error>noSetHierarchy</error>
-            </error_response>
-            XML;
-
-        $response = $processor->getResponseToRequest($this->getRequest(
-            'base url',
-            Verb::LIST_SETS,
-            [Argument::IDENTIFIER->value => 'some id'],
-            false
-        ));
-
-        $this->assertXmlStringEqualsXmlString($expected_response, $response->saveXML());
+    protected function getTokenHandler(
+        bool $valid_token = true,
+        ?RequestInterface $appended_request = null
+    ): TokenHandlerInterface {
+        return new class ($valid_token, $appended_request) extends NullTokenHandler {
+            public function __construct(
+                protected bool $valid_token,
+                protected ?RequestInterface $appended_request
+            ) {
+            }
+
+            public function generateToken(
+                int $offset,
+                ?\DateTimeImmutable $from_date,
+                ?\DateTimeImmutable $until_date
+            ): string {
+                return 'next_offset=' . $offset . ':' .
+                    'from=' . $from_date?->format('Y-m-d') . ':' .
+                    'until=' . $until_date?->format('Y-m-d');
+            }
+
+            public function isTokenValid(string $token): bool
+            {
+                return $this->valid_token;
+            }
+
+            public function appendArgumentsFromTokenToRequest(
+                RequestInterface $request,
+                string $token
+            ): RequestInterface {
+                return $this->appended_request;
+            }
+
+            public function getOffsetFromToken(string $token): int
+            {
+                return (int) str_replace('next_offset=', '', explode(':', $token)[0]);
+            }
+        };
     }
 }

@@ -44,24 +44,38 @@ class HandlerTest extends TestCase
 
     protected function getInitiator(
         bool $activated,
-        string $content
+        string $content,
+        bool $processor_throws_exception = false,
+        bool $processor_throws_error = false,
+        bool $processor_triggers_error = false
     ): InitiatorInterface {
-        return new class ($activated, $content) extends NullInitiator {
+        return new class (
+            $activated,
+            $content,
+            $processor_throws_exception,
+            $processor_throws_error,
+            $processor_triggers_error
+        ) extends NullInitiator {
             protected HTTPWrapperInterface $wrapper;
 
             public function __construct(
                 protected bool $activated,
-                protected string $content
+                protected string $content,
+                protected bool $processor_throws_exception,
+                protected bool $processor_throws_error,
+                protected bool $processor_triggers_error
             ) {
                 $this->wrapper = new class () extends NullWrapper {
                     public array $exposed_responses = [];
 
                     public function sendResponseAndClose(
                         int $status_code,
+                        string $message = '',
                         \DOMDocument $body = null
                     ): void {
                         $this->exposed_responses[] = [
                             'status' => $status_code,
+                            'message' => $message,
                             'body' => $body?->saveXML($body->documentElement)
                         ];
                     }
@@ -115,9 +129,30 @@ class HandlerTest extends TestCase
 
             public function requestProcessor(): RequestProcessorInterface
             {
-                return new class () extends NullRequestProcessor {
+                return new class (
+                    $this->processor_throws_exception,
+                    $this->processor_throws_error,
+                    $this->processor_triggers_error
+                ) extends NullRequestProcessor {
+                    public function __construct(
+                        protected bool $throws_exception,
+                        protected bool $throws_error,
+                        protected bool $triggers_error
+                    ) {
+                    }
+
                     public function getResponseToRequest(RequestInterface $request): \DomDocument
                     {
+                        if ($this->throws_exception) {
+                            throw new \ilMDOERExposerException('exception message');
+                        }
+                        if ($this->throws_error) {
+                            throw new \Error('thrown error message');
+                        }
+                        if ($this->triggers_error) {
+                            trigger_error('triggered error message', E_USER_ERROR);
+                        }
+
                         $url = (string) $request->baseURL();
                         $content = $request->exposeContent();
                         $doc = new \DOMDocument();
@@ -169,7 +204,7 @@ class HandlerTest extends TestCase
 
         $this->assertCount(1, $initiator->exposeHTTPResponses());
         $this->assertEquals(
-            ['status' => 200, 'body' => '<content>some url~!~some content</content>'],
+            ['status' => 200, 'message' => '', 'body' => '<content>some url~!~some content</content>'],
             $initiator->exposeHTTPResponses()[0] ?? []
         );
     }
@@ -189,7 +224,76 @@ class HandlerTest extends TestCase
 
         $this->assertCount(1, $initiator->exposeHTTPResponses());
         $this->assertEquals(
-            ['status' => 404, 'body' => null],
+            ['status' => 404, 'message' => '', 'body' => null],
+            $initiator->exposeHTTPResponses()[0] ?? []
+        );
+    }
+
+    public function testSendResponseToRequestProcessorThrowsException(): void
+    {
+        $initiator = $this->getInitiator(
+            true,
+            '',
+            true,
+            false,
+            false
+        );
+        $handler = $this->getHandler(
+            'some url',
+            $initiator
+        );
+
+        $handler->sendResponseToRequest();
+
+        $this->assertCount(1, $initiator->exposeHTTPResponses());
+        $this->assertEquals(
+            ['status' => 500, 'message' => 'exception message', 'body' => null],
+            $initiator->exposeHTTPResponses()[0] ?? []
+        );
+    }
+
+    public function testSendResponseToRequestProcessorThrowsError(): void
+    {
+        $initiator = $this->getInitiator(
+            true,
+            '',
+            false,
+            true,
+            false
+        );
+        $handler = $this->getHandler(
+            'some url',
+            $initiator
+        );
+
+        $handler->sendResponseToRequest();
+
+        $this->assertCount(1, $initiator->exposeHTTPResponses());
+        $this->assertEquals(
+            ['status' => 500, 'message' => 'thrown error message', 'body' => null],
+            $initiator->exposeHTTPResponses()[0] ?? []
+        );
+    }
+
+    public function testSendResponseToRequestProcessorTriggersError(): void
+    {
+        $initiator = $this->getInitiator(
+            true,
+            '',
+            false,
+            false,
+            true
+        );
+        $handler = $this->getHandler(
+            'some url',
+            $initiator
+        );
+
+        $handler->sendResponseToRequest();
+
+        $this->assertCount(1, $initiator->exposeHTTPResponses());
+        $this->assertEquals(
+            ['status' => 500, 'message' => 'triggered error message', 'body' => null],
             $initiator->exposeHTTPResponses()[0] ?? []
         );
     }

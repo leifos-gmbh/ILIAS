@@ -262,7 +262,7 @@ class RequestProcessor implements RequestProcessorInterface
 
         $from_date = null;
         if ($effective_request->hasArgument(Argument::FROM_DATE)) {
-            $from_date_string = $request->argumentValue(Argument::FROM_DATE);
+            $from_date_string = $effective_request->argumentValue(Argument::FROM_DATE);
             if ($this->isStringValidAsDate($from_date_string)) {
                 $from_date = $this->getDateFromString($from_date_string);
             } else {
@@ -274,7 +274,7 @@ class RequestProcessor implements RequestProcessorInterface
         }
         $until_date = null;
         if ($effective_request->hasArgument(Argument::UNTIL_DATE)) {
-            $until_date_string = $request->argumentValue(Argument::UNTIL_DATE);
+            $until_date_string = $effective_request->argumentValue(Argument::UNTIL_DATE);
             if ($this->isStringValidAsDate($until_date_string)) {
                 $until_date = $this->getDateFromString($until_date_string);
             } else {
@@ -331,9 +331,13 @@ class RequestProcessor implements RequestProcessorInterface
         ) {
             $new_token = '';
             if ($offset + $this->max_list_size < $count) {
-                $this->token_handler->generateToken($offset, $from_date, $until_date);
+                $new_token = $this->token_handler->generateToken(
+                    $offset + $this->max_list_size,
+                    $from_date,
+                    $until_date
+                );
             }
-            $content_xmls = $this->writer->writeResumptionToken(
+            $content_xmls[] = $this->writer->writeResumptionToken(
                 $new_token,
                 $count,
                 $offset

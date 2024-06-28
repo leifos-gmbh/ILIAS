@@ -43,9 +43,21 @@ class Handler
             return;
         }
 
-        $response = $this->initiator->requestProcessor()->getResponseToRequest(
-            $this->initiator->requestParser()->parseFromHTTP($this->base_url)
-        );
-        $this->initiator->httpWrapper()->sendResponseAndClose(200, $response);
+        set_error_handler(static function (int $errno, string $errstr, string $errfile, int $errline): never {
+            throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+        });
+
+        try {
+            $response = $this->initiator->requestProcessor()->getResponseToRequest(
+                $this->initiator->requestParser()->parseFromHTTP($this->base_url)
+            );
+        } catch (\Throwable $e) {
+            $this->initiator->httpWrapper()->sendResponseAndClose(500, $e->getMessage());
+            return;
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->initiator->httpWrapper()->sendResponseAndClose(200, '', $response);
     }
 }

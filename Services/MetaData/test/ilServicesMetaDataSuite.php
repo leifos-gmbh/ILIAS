@@ -29,15 +29,19 @@ class ilServicesMetaDataSuite extends TestSuite
 
         $dir = new RecursiveDirectoryIterator(__DIR__);
         $iterator = new RecursiveIteratorIterator($dir);
-        $test_files = new RegexIterator($iterator, '/Test\.php$/');
 
-        /** @var SplFileInfo $test_file */
-        foreach ($test_files as $test_file) {
-            require_once $test_file->getPathname();
+        $test_files = new RegexIterator($iterator, '/Test\.php$/');
+        $abstract_test_files = new RegexIterator($iterator, '/TestCase\.php$/');
+
+        /** @var SplFileInfo $abstract_test_file */
+        foreach ($abstract_test_files as $abstract_test_file) {
+            require_once $abstract_test_file->getPathname();
         }
 
         /** @var SplFileInfo $test_file */
         foreach ($test_files as $test_file) {
+            require_once $test_file->getPathname();
+
             $class_name = preg_replace('/.*test\/(.*?)(\.php)/', '$1', $test_file->getPathname());
             $class_name = str_replace('/', '\\', $class_name);
             $class_name = '\\ILIAS\\MetaData\\' . $class_name;

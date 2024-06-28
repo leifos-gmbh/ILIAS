@@ -37,7 +37,7 @@ use ILIAS\MetaData\OERHarvester\ResourceStatus\NullRecord;
 use ILIAS\MetaData\OERHarvester\ResourceStatus\RecordInfosInterface;
 use ILIAS\MetaData\OERHarvester\ResourceStatus\NullRecordInfos;
 
-abstract class RequestProcessorTest extends TestCase
+abstract class RequestProcessorTestCase extends TestCase
 {
     protected function getDate(string $string): \DateTimeImmutable
     {

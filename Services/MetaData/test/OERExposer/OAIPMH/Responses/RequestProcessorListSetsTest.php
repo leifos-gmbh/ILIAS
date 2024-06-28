@@ -23,7 +23,7 @@ namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Verb;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
 
-class RequestProcessorListSetsTest extends RequestProcessorTest
+class RequestProcessorListSetsTest extends RequestProcessorTestCase
 {
     public function testGetResponseToRequestListSetsNoSetsError(): void
     {

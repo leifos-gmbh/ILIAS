@@ -25,6 +25,7 @@ use ILIAS\Data\URI;
 class Handler
 {
     protected InitiatorInterface $initiator;
+    protected \ilLogger $logger;
 
     protected readonly URI $base_url;
 
@@ -32,8 +33,9 @@ class Handler
     {
         global $DIC;
 
+        $this->logger = $DIC->logger()->meta();
         $this->initiator = new Initiator($DIC);
-        $this->base_url = new URI('Insert base URL here');
+        $this->base_url = new URI(rtrim(ILIAS_HTTP_PATH, '/') . '/oai.php');
     }
 
     public function sendResponseToRequest(): void
@@ -52,6 +54,7 @@ class Handler
                 $this->initiator->requestParser()->parseFromHTTP($this->base_url)
             );
         } catch (\Throwable $e) {
+            $this->logError($e->getMessage());
             $this->initiator->httpWrapper()->sendResponseAndClose(500, $e->getMessage());
             return;
         } finally {
@@ -59,5 +62,10 @@ class Handler
         }
 
         $this->initiator->httpWrapper()->sendResponseAndClose(200, '', $response);
+    }
+
+    protected function logError(string $message): void
+    {
+        $this->logger->error($message);
     }
 }

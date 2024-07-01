@@ -69,7 +69,7 @@ class Wrapper implements WrapperInterface
     ): void {
         $response = $this->http->response()
                                ->withHeader(ResponseHeader::CONTENT_TYPE, 'text/xml')
-                               ->withStatus($status_code);
+                               ->withStatus($status_code, $message);
 
         if (!is_null($body)) {
             $response = $response->withBody(Streams::ofString($body->saveXML()));

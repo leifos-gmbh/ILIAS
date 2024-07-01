@@ -181,10 +181,17 @@ class HandlerTest extends TestCase
     ): Handler {
         $base_url = $this->getURI($base_url);
         return new class ($initiator, $base_url) extends Handler {
+            public array $exposed_logged_errors = [];
+
             public function __construct(
                 protected InitiatorInterface $initiator,
                 protected readonly URI $base_url
             ) {
+            }
+
+            protected function logError(string $message): void
+            {
+                $this->exposed_logged_errors[] = $message;
             }
         };
     }
@@ -250,6 +257,10 @@ class HandlerTest extends TestCase
             ['status' => 500, 'message' => 'exception message', 'body' => null],
             $initiator->exposeHTTPResponses()[0] ?? []
         );
+        $this->assertEquals(
+            ['exception message'],
+            $handler->exposed_logged_errors
+        );
     }
 
     public function testSendResponseToRequestProcessorThrowsError(): void
@@ -273,6 +284,10 @@ class HandlerTest extends TestCase
             ['status' => 500, 'message' => 'thrown error message', 'body' => null],
             $initiator->exposeHTTPResponses()[0] ?? []
         );
+        $this->assertEquals(
+            ['thrown error message'],
+            $handler->exposed_logged_errors
+        );
     }
 
     public function testSendResponseToRequestProcessorTriggersError(): void
@@ -295,6 +310,10 @@ class HandlerTest extends TestCase
         $this->assertEquals(
             ['status' => 500, 'message' => 'triggered error message', 'body' => null],
             $initiator->exposeHTTPResponses()[0] ?? []
+        );
+        $this->assertEquals(
+            ['triggered error message'],
+            $handler->exposed_logged_errors
         );
     }
 }

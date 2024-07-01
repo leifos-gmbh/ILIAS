@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ResourceStatus;
+namespace ILIAS\MetaData\OERHarvester\ExposedRecords;
 
 interface RecordInterface
 {

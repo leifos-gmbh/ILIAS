@@ -18,53 +18,44 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ResourceStatus;
+namespace ILIAS\MetaData\OERHarvester\ExposedRecords;
 
-class NullRepository implements RepositoryInterface
+interface RepositoryInterface
 {
     /**
      * @return RecordInterface[]
      */
-    public function getExposedRecords(
+    public function getRecords(
         ?\DateTimeImmutable $from = null,
         ?\DateTimeImmutable $until = null,
         ?int $limit = null,
         ?int $offset = null
-    ): \Generator {
-        yield from [];
-    }
+    ): \Generator;
 
     /**
      * @return RecordInfosInterface[]
      */
-    public function getExposedRecordInfos(
+    public function getRecordInfos(
         ?\DateTimeImmutable $from = null,
         ?\DateTimeImmutable $until = null,
         ?int $limit = null,
         ?int $offset = null
-    ): \Generator {
-        yield from [];
-    }
+    ): \Generator;
 
-    public function getExposedRecordCount(
+    public function getRecordCount(
         ?\DateTimeImmutable $from = null,
         ?\DateTimeImmutable $until = null
-    ): int {
-        return 0;
-    }
+    ): int;
 
-    public function getEarliestExposedDatestamp(): \DateTimeImmutable
-    {
-        return new \DateTimeImmutable('@0');
-    }
+    public function getEarliestDatestamp(): \DateTimeImmutable;
 
-    public function getExposedRecordByIdentifier(string $identifier): ?RecordInterface
-    {
-        return null;
-    }
+    public function getRecordByIdentifier(string $identifier): ?RecordInterface;
 
-    public function doesExposedRecordWithIdentifierExist(string $identifier): bool
-    {
-        return false;
-    }
+    public function doesRecordWithIdentifierExist(string $identifier): bool;
+
+    public function createRecord(string $identifier, \DOMDocument $metadata): void;
+
+    public function updateRecord(string $identifier, \DOMDocument $metadata): void;
+
+    public function deleteRecord(string $identifier): void;
 }

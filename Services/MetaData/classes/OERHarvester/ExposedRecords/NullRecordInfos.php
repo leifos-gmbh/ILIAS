@@ -18,11 +18,17 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ResourceStatus;
+namespace ILIAS\MetaData\OERHarvester\ExposedRecords;
 
-interface RecordInfosInterface
+class NullRecordInfos implements RecordInfosInterface
 {
-    public function identfifier(): string;
+    public function identfifier(): string
+    {
+        return '';
+    }
 
-    public function datestamp(): \DateTimeImmutable;
+    public function datestamp(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('@0');
+    }
 }

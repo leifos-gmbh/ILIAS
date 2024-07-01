@@ -22,34 +22,20 @@ namespace ILIAS\MetaData\OERHarvester\ResourceStatus;
 
 interface RepositoryInterface
 {
-    /**
-     * @return RecordInterface[]
-     */
-    public function getExposedRecords(
-        ?\DateTimeImmutable $from = null,
-        ?\DateTimeImmutable $until = null,
-        ?int $limit = null,
-        ?int $offset = null
-    ): \Generator;
+    public function isHarvestingBlocked(int $obj_id): bool;
+
+    public function setHarvestingBlocked(int $obj_id, bool $blocked): void;
+
+    public function isAlreadyHarvested(int $obj_id): bool;
+
+    public function getHarvestRefID(int $obj_id): int;
+
+    public function addHarvestRefID(int $obj_id, int $harvested_ref_id): void;
 
     /**
-     * @return RecordInfosInterface[]
+     * @return int[]
      */
-    public function getExposedRecordInfos(
-        ?\DateTimeImmutable $from = null,
-        ?\DateTimeImmutable $until = null,
-        ?int $limit = null,
-        ?int $offset = null
-    ): \Generator;
+    public function filterOutBlockedOrAlreadyHarvestedObjects(int ...$obj_ids): array;
 
-    public function getExposedRecordCount(
-        ?\DateTimeImmutable $from = null,
-        ?\DateTimeImmutable $until = null
-    ): int;
-
-    public function getEarliestExposedDatestamp(): \DateTimeImmutable;
-
-    public function getExposedRecordByIdentifier(string $identifier): ?RecordInterface;
-
-    public function doesExposedRecordWithIdentifierExist(string $identifier): bool;
+    public function deleteStatus(int $obj_id): void;
 }

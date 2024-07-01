@@ -30,7 +30,6 @@ use ILIAS\MetaData\OERExposer\OAIPMH\Responses\RequestProcessor;
 use ILIAS\MetaData\OERExposer\OAIPMH\Responses\Writer;
 use ILIAS\MetaData\OERExposer\OAIPMH\FlowControl\TokenHandler;
 use ILIAS\MetaData\Settings\SettingsInterface;
-use ILIAS\MetaData\OERHarvester\ResourceStatus\NullRepository;
 
 class Initiator implements InitiatorInterface
 {
@@ -80,7 +79,7 @@ class Initiator implements InitiatorInterface
         return $this->request_processor = new RequestProcessor(
             new Writer(),
             $this->settings(),
-            new NullRepository(),
+            new \ILIAS\MetaData\OERHarvester\ExposedRecords\NullRepository(),
             new TokenHandler()
         );
     }

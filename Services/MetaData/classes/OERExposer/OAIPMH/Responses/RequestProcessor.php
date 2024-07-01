@@ -23,7 +23,7 @@ namespace ILIAS\MetaData\OERExposer\OAIPMH\Responses;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Verb;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
-use ILIAS\MetaData\OERHarvester\ResourceStatus\RepositoryInterface as ResourceStatusRepositoryInterface;
+use ILIAS\MetaData\OERHarvester\ExposedRecords\RepositoryInterface as ExposedRecordsRepository;
 use ILIAS\MetaData\OERExposer\OAIPMH\FlowControl\TokenHandlerInterface;
 use ILIAS\MetaData\OERExposer\OAIPMH\DateHelper;
 use ILIAS\MetaData\Settings\SettingsInterface;
@@ -34,7 +34,7 @@ class RequestProcessor implements RequestProcessorInterface
 
     protected WriterInterface $writer;
     protected SettingsInterface $settings;
-    protected ResourceStatusRepositoryInterface $resource_status_repository;
+    protected ExposedRecordsRepository $records_repository;
     protected TokenHandlerInterface $token_handler;
 
     protected readonly string $valid_md_prefix;
@@ -43,12 +43,12 @@ class RequestProcessor implements RequestProcessorInterface
     public function __construct(
         WriterInterface $writer,
         SettingsInterface $settings,
-        ResourceStatusRepositoryInterface $resource_status_repository,
+        ExposedRecordsRepository $resource_status_repository,
         TokenHandlerInterface $token_handler
     ) {
         $this->writer = $writer;
         $this->settings = $settings;
-        $this->resource_status_repository = $resource_status_repository;
+        $this->records_repository = $resource_status_repository;
         $this->token_handler = $token_handler;
 
         $this->valid_md_prefix = 'oai_dc';
@@ -111,7 +111,7 @@ class RequestProcessor implements RequestProcessorInterface
                     Error::ID_DOES_NOT_EXIST,
                     'Identifier "' . $identifier . '" is invalid for this repository.'
                 );
-            } elseif (is_null($record = $this->resource_status_repository->getExposedRecordByIdentifier(
+            } elseif (is_null($record = $this->records_repository->getRecordByIdentifier(
                 $this->removePrefixFromIdentifier($identifier)
             ))) {
                 $errors[] = $this->writer->writeError(
@@ -151,7 +151,7 @@ class RequestProcessor implements RequestProcessorInterface
             ...$this->writer->writeIdentifyElements(
                 $this->settings->getOAIRepositoryName(),
                 $request->baseURL(),
-                $this->resource_status_repository->getEarliestExposedDatestamp(),
+                $this->records_repository->getEarliestDatestamp(),
                 $this->settings->getOAIContactMail()
             )
         );
@@ -174,7 +174,7 @@ class RequestProcessor implements RequestProcessorInterface
                     Error::ID_DOES_NOT_EXIST,
                     'Identifier "' . $identifier . '" is invalid for this repository.'
                 );
-            } elseif (!$this->resource_status_repository->doesExposedRecordWithIdentifierExist(
+            } elseif (!$this->records_repository->doesRecordWithIdentifierExist(
                 $this->removePrefixFromIdentifier($identifier)
             )) {
                 $errors[] = $this->writer->writeError(
@@ -287,7 +287,7 @@ class RequestProcessor implements RequestProcessorInterface
 
         $content_xmls = [];
         if ($effective_request->verb() === Verb::LIST_IDENTIFIERS) {
-            $record_infos = $this->resource_status_repository->getExposedRecordInfos(
+            $record_infos = $this->records_repository->getRecordInfos(
                 $from_date,
                 $until_date,
                 $this->max_list_size,
@@ -300,7 +300,7 @@ class RequestProcessor implements RequestProcessorInterface
                 );
             }
         } elseif ($effective_request->verb() === Verb::LIST_RECORDS) {
-            $records = $this->resource_status_repository->getExposedRecords(
+            $records = $this->records_repository->getRecords(
                 $from_date,
                 $until_date,
                 $this->max_list_size,
@@ -324,7 +324,7 @@ class RequestProcessor implements RequestProcessorInterface
             );
         }
 
-        $count = $this->resource_status_repository->getExposedRecordCount($from_date, $until_date);
+        $count = $this->records_repository->getRecordCount($from_date, $until_date);
         if (
             $request->hasArgument(Argument::RESUMPTION_TOKEN) ||
             $this->max_list_size < $count

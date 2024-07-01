@@ -27,15 +27,15 @@ use ILIAS\MetaData\OERExposer\OAIPMH\Requests\Argument;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\RequestInterface;
 use ILIAS\MetaData\OERExposer\OAIPMH\Requests\NullRequest;
 use ILIAS\MetaData\Settings\NullSettings;
-use ILIAS\MetaData\OERHarvester\ResourceStatus\NullRepository;
+use ILIAS\MetaData\OERHarvester\ExposedRecords\NullRepository;
 use ILIAS\MetaData\OERExposer\OAIPMH\FlowControl\NullTokenHandler;
 use ILIAS\MetaData\Settings\SettingsInterface;
-use ILIAS\MetaData\OERHarvester\ResourceStatus\RepositoryInterface;
+use ILIAS\MetaData\OERHarvester\ExposedRecords\RepositoryInterface;
 use ILIAS\MetaData\OERExposer\OAIPMH\FlowControl\TokenHandlerInterface;
-use ILIAS\MetaData\OERHarvester\ResourceStatus\RecordInterface;
-use ILIAS\MetaData\OERHarvester\ResourceStatus\NullRecord;
-use ILIAS\MetaData\OERHarvester\ResourceStatus\RecordInfosInterface;
-use ILIAS\MetaData\OERHarvester\ResourceStatus\NullRecordInfos;
+use ILIAS\MetaData\OERHarvester\ExposedRecords\RecordInterface;
+use ILIAS\MetaData\OERHarvester\ExposedRecords\NullRecord;
+use ILIAS\MetaData\OERHarvester\ExposedRecords\RecordInfosInterface;
+use ILIAS\MetaData\OERHarvester\ExposedRecords\NullRecordInfos;
 
 abstract class RequestProcessorTestCase extends TestCase
 {
@@ -328,22 +328,22 @@ abstract class RequestProcessorTestCase extends TestCase
             ) {
             }
 
-            public function getEarliestExposedDatestamp(): \DateTimeImmutable
+            public function getEarliestDatestamp(): \DateTimeImmutable
             {
                 return $this->earliest_datestamp;
             }
 
-            public function doesExposedRecordWithIdentifierExist(string $identifier): bool
+            public function doesRecordWithIdentifierExist(string $identifier): bool
             {
                 return in_array($identifier, array_keys($this->records));
             }
 
-            public function getExposedRecordByIdentifier(string $identifier): ?RecordInterface
+            public function getRecordByIdentifier(string $identifier): ?RecordInterface
             {
                 return $this->records[$identifier] ?? null;
             }
 
-            public function getExposedRecords(
+            public function getRecords(
                 ?\DateTimeImmutable $from = null,
                 ?\DateTimeImmutable $until = null,
                 ?int $limit = null,
@@ -358,7 +358,7 @@ abstract class RequestProcessorTestCase extends TestCase
                 yield from $this->records;
             }
 
-            public function getExposedRecordInfos(
+            public function getRecordInfos(
                 ?\DateTimeImmutable $from = null,
                 ?\DateTimeImmutable $until = null,
                 ?int $limit = null,
@@ -375,7 +375,7 @@ abstract class RequestProcessorTestCase extends TestCase
                 }
             }
 
-            public function getExposedRecordCount(
+            public function getRecordCount(
                 ?\DateTimeImmutable $from = null,
                 ?\DateTimeImmutable $until = null
             ): int {

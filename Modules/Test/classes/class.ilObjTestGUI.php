@@ -113,6 +113,7 @@ class ilObjTestGUI extends ilObjectGUI
         $lng = $DIC['lng'];
         $ilCtrl = $DIC['ilCtrl'];
         $ilDB = $DIC['ilDB'];
+        $refinery = $DIC['refinery'];
         $ilPluginAdmin = $DIC['ilPluginAdmin'];
         $tree = $DIC['tree'];
         $lng->loadLanguageModule("assessment");
@@ -136,7 +137,7 @@ class ilObjTestGUI extends ilObjectGUI
             $this->testSessionFactory = new ilTestSessionFactory($this->object);
 
             require_once 'Modules/Test/classes/class.ilTestSequenceFactory.php';
-            $this->testSequenceFactory = new ilTestSequenceFactory($ilDB, $lng, $ilPluginAdmin, $this->object);
+            $this->testSequenceFactory = new ilTestSequenceFactory($ilDB, $lng, $refinery, $ilPluginAdmin, $this->object);
 
             require_once 'Modules/Test/classes/class.ilTestAccess.php';
             $this->setTestAccess(new ilTestAccess($this->ref_id, $this->object->getTestId()));
@@ -579,6 +580,7 @@ class ilObjTestGUI extends ilObjectGUI
                     $ilPluginAdmin,
                     $this->object,
                     $ilAccess,
+                    $DIC['refinery'],
                     $DIC['ui.factory'],
                     $DIC['ui.renderer']
                 );
@@ -595,7 +597,7 @@ class ilObjTestGUI extends ilObjectGUI
                 $this->prepareOutput();
                 $this->addHeaderAction();
                 require_once 'Modules/Test/classes/class.ilTestSkillAdministrationGUI.php';
-                $gui = new ilTestSkillAdministrationGUI($ilias, $this->ctrl, $ilAccess, $ilTabs, $this->tpl, $this->lng, $ilDB, $tree, $ilPluginAdmin, $this->object, $this->ref_id);
+                $gui = new ilTestSkillAdministrationGUI($ilias, $this->ctrl, $ilAccess, $ilTabs, $this->tpl, $this->lng, $this->refinery, $ilDB, $tree, $ilPluginAdmin, $this->object, $this->ref_id);
                 $this->ctrl->forwardCommand($gui);
                 break;
 
@@ -2959,8 +2961,20 @@ class ilObjTestGUI extends ilObjectGUI
 
         $info->addSection($this->lng->txt("tst_general_properties"));
         if ($this->object->getShowInfo()) {
-            $info->addProperty($this->lng->txt("author"), $this->object->getAuthor());
-            $info->addProperty($this->lng->txt("title"), $this->object->getTitle());
+            $info->addProperty(
+                $this->lng->txt("author"),
+                strip_tags(
+                    $this->object->getAuthor(),
+                    ilObjectGUI::ALLOWED_TAGS_IN_TITLE_AND_DESCRIPTION
+                )
+            );
+            $info->addProperty(
+                $this->lng->txt("title"),
+                strip_tags(
+                    $this->object->getTitle(),
+                    ilObjectGUI::ALLOWED_TAGS_IN_TITLE_AND_DESCRIPTION
+                )
+            );
         }
         if (!$this->object->getOfflineStatus() &&
             $this->object->isComplete($this->testQuestionSetConfigFactory->getQuestionSetConfig()) &&

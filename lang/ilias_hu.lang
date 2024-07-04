@@ -6293,6 +6293,7 @@ content#:#cont_dir_file#:#Mappa / fájl
 content#:#cont_dir_renamed#:#A mappát sikeresen átnevezte.
 content#:#cont_disable_def_feedback#:#Alapértelmezett kérdés-visszajelzés tiltása
 content#:#cont_disable_def_feedback_info#:#Ha ki van kapcsolva, megválaszolt kérdések semmilyen visszajelzést nem jelenítenek meg a hallgatónak. Egyéni visszajelzéseket szükséges megadni a kérdésekhez.
+content#:#cont_double_click_to_delete#:#Double-click on content elements to select them for (de-)activation or deletion.###14 05 2024 new variable
 content#:#cont_download#:#Letöltés
 content#:#cont_download_no_download#:#A felhasználók nem fognak tudni letölteni, mert a letöltés nincs aktiválva.
 content#:#cont_download_no_menu#:#A felhasználók nem fognak tudni letölteni, mert a tananyagmenü nincs aktiválva.
@@ -13335,6 +13336,7 @@ rbac#:#mobs_visible#:#A felhasználó láthatja a Rendszerbeállítások » Méd
 rbac#:#mobs_write#:#A felhasználó módosíthatja a Rendszerbeállítások » Médiaobjektumok és -gyűjtemények beállításait
 rbac#:#moderate#:#Moderálás
 rbac#:#moderate_frm#:#Moderálás
+rbac#:#msg_anonymous_cannot_be_assigned#:#Anonymous cannot be assigned to a role.###19 03 2024 new variable
 rbac#:#msg_no_roles_of_type#:#Nincsenek elérhetők szerepek a kiválasztott szűrőbeállítással.
 rbac#:#news_add_news#:#Hír létrehozása
 rbac#:#nots_edit_permissions#:#A felhasználó módosíthatja a Rendszerbeállítások » Jegyzetek jogosultsági beállításait

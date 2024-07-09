@@ -221,10 +221,9 @@ class ilMDCopyrightSelectionGUI
         if ($form->checkInput()) {
             $this->MDSettings()->activateCopyrightSelection((bool) $form->getInput('active'));
             $this->MDSettings()->activateOAIPMH((bool) $form->getInput('oai_active'));
-            $this->MDSettings()->setOAIRepositoryName((string) $form->getInput('oai_repository_name'));
-            $this->MDSettings()->setOAIIdentifierPrefix((string) $form->getInput('oai_identifier_prefix'));
-            $this->MDSettings()->setOAIContactMail((string) $form->getInput('oai_contact_mail'));
-            $this->MDSettings()->save();
+            $this->MDSettings()->saveOAIRepositoryName((string) $form->getInput('oai_repository_name'));
+            $this->MDSettings()->saveOAIIdentifierPrefix((string) $form->getInput('oai_identifier_prefix'));
+            $this->MDSettings()->saveOAIContactMail((string) $form->getInput('oai_contact_mail'));
             $this->tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'), true);
             $this->ctrl->redirect($this, 'showCopyrightSettings');
         }

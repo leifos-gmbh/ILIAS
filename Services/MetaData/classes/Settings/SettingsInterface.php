@@ -24,23 +24,21 @@ interface SettingsInterface
 {
     public function isCopyrightSelectionActive(): bool;
 
-    public function activateCopyrightSelection(bool $a_status): void;
+    public function activateCopyrightSelection(bool $status): void;
 
     public function isOAIPMHActive(): bool;
 
-    public function activateOAIPMH(bool $a_status): void;
+    public function activateOAIPMH(bool $status): void;
 
     public function getOAIRepositoryName(): string;
 
-    public function setOAIRepositoryName(string $oai_repository_name): void;
+    public function saveOAIRepositoryName(string $oai_repository_name): void;
 
     public function getOAIIdentifierPrefix(): string;
 
-    public function setOAIIdentifierPrefix(string $oai_identifier_prefix): void;
+    public function saveOAIIdentifierPrefix(string $oai_identifier_prefix): void;
 
     public function getOAIContactMail(): string;
 
-    public function setOAIContactMail(string $oai_contact_mail): void;
-
-    public function save(): void;
+    public function saveOAIContactMail(string $oai_contact_mail): void;
 }

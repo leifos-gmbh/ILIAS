@@ -27,7 +27,7 @@ class NullSettings implements SettingsInterface
         return false;
     }
 
-    public function activateCopyrightSelection(bool $a_status): void
+    public function activateCopyrightSelection(bool $status): void
     {
     }
 
@@ -36,7 +36,7 @@ class NullSettings implements SettingsInterface
         return false;
     }
 
-    public function activateOAIPMH(bool $a_status): void
+    public function activateOAIPMH(bool $status): void
     {
     }
 
@@ -45,7 +45,7 @@ class NullSettings implements SettingsInterface
         return '';
     }
 
-    public function setOAIRepositoryName(string $oai_repository_name): void
+    public function saveOAIRepositoryName(string $oai_repository_name): void
     {
     }
 
@@ -54,7 +54,7 @@ class NullSettings implements SettingsInterface
         return '';
     }
 
-    public function setOAIIdentifierPrefix(string $oai_identifier_prefix): void
+    public function saveOAIIdentifierPrefix(string $oai_identifier_prefix): void
     {
     }
 
@@ -63,11 +63,7 @@ class NullSettings implements SettingsInterface
         return '';
     }
 
-    public function setOAIContactMail(string $oai_contact_mail): void
-    {
-    }
-
-    public function save(): void
+    public function saveOAIContactMail(string $oai_contact_mail): void
     {
     }
 }

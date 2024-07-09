@@ -52,9 +52,10 @@ class ilMDSettings implements SettingsInterface
         return $this->copyright_selection_active;
     }
 
-    public function activateCopyrightSelection(bool $a_status): void
+    public function activateCopyrightSelection(bool $status): void
     {
-        $this->copyright_selection_active = $a_status;
+        $this->copyright_selection_active = $status;
+        $this->settings->set('copyright_selection_active', (string) $status);
     }
 
     public function isOAIPMHActive(): bool
@@ -62,9 +63,10 @@ class ilMDSettings implements SettingsInterface
         return $this->oai_pmh_active;
     }
 
-    public function activateOAIPMH(bool $a_status): void
+    public function activateOAIPMH(bool $status): void
     {
-        $this->oai_pmh_active = $a_status;
+        $this->oai_pmh_active = $status;
+        $this->settings->set('oai_pmh_active', (string) $status);
     }
 
     public function getOAIRepositoryName(): string
@@ -72,9 +74,10 @@ class ilMDSettings implements SettingsInterface
         return $this->oai_repository_name;
     }
 
-    public function setOAIRepositoryName(string $oai_repository_name): void
+    public function saveOAIRepositoryName(string $oai_repository_name): void
     {
         $this->oai_repository_name = $oai_repository_name;
+        $this->settings->set('oai_repository_name', $oai_repository_name);
     }
 
     public function getOAIIdentifierPrefix(): string
@@ -82,9 +85,10 @@ class ilMDSettings implements SettingsInterface
         return $this->oai_identifier_prefix;
     }
 
-    public function setOAIIdentifierPrefix(string $oai_identifier_prefix): void
+    public function saveOAIIdentifierPrefix(string $oai_identifier_prefix): void
     {
         $this->oai_identifier_prefix = $oai_identifier_prefix;
+        $this->settings->set('oai_identifier_prefix', $oai_identifier_prefix);
     }
 
     public function getOAIContactMail(): string
@@ -92,18 +96,10 @@ class ilMDSettings implements SettingsInterface
         return $this->oai_contact_mail;
     }
 
-    public function setOAIContactMail(string $oai_contact_mail): void
+    public function saveOAIContactMail(string $oai_contact_mail): void
     {
         $this->oai_contact_mail = $oai_contact_mail;
-    }
-
-    public function save(): void
-    {
-        $this->settings->set('copyright_selection_active', (string) $this->isCopyrightSelectionActive());
-        $this->settings->set('oai_pmh_active', (string) $this->isOAIPMHActive());
-        $this->settings->set('oai_repository_name', $this->getOAIRepositoryName());
-        $this->settings->set('oai_identifier_prefix', $this->getOAIIdentifierPrefix());
-        $this->settings->set('oai_contact_mail', $this->getOAIContactMail());
+        $this->settings->set('oai_contact_mail', $oai_contact_mail);
     }
 
     private function read(): void

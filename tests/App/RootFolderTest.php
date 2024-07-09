@@ -72,6 +72,7 @@ final class RootFolderTest extends TestCase
         'studip_referrer.php',
         'unzip_test_file.zip',
         'webdav.php',
+        'oai.php',
         '.DS_Store',
         '.buildpath',
         '.project'

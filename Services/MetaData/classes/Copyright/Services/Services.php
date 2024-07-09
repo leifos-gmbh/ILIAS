@@ -25,11 +25,14 @@ use ILIAS\MetaData\Copyright\RepositoryInterface;
 use ILIAS\MetaData\Copyright\DatabaseRepository;
 use ILIAS\MetaData\Copyright\RendererInterface;
 use ILIAS\MetaData\Copyright\Renderer;
+use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface;
+use ILIAS\MetaData\Copyright\Identifiers\Handler;
 
 class Services
 {
     protected RepositoryInterface $repository;
     protected RendererInterface $renderer;
+    protected HandlerInterface $handler;
 
     protected GlobalContainer $dic;
 
@@ -58,5 +61,13 @@ class Services
             $this->dic->ui()->factory(),
             $this->dic->resourceStorage()
         );
+    }
+
+    public function identifiersHandler(): HandlerInterface
+    {
+        if (isset($this->handler)) {
+            return $this->handler;
+        }
+        return $this->handler = new Handler();
     }
 }

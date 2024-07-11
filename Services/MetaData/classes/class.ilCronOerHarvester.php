@@ -115,14 +115,14 @@ class ilCronOerHarvester extends ilCronJob
 
         // source for exposing
         $ex_target = new ilRepositorySelector2InputGUI(
-            $this->lng->txt('meta_oer_exposing_source'),
-            'exposing_source',
+            $this->lng->txt('meta_oer_exposed_source'),
+            'exposed_source',
             false,
             $a_form
         );
 
         $ex_explorer = $ex_target->getExplorerGUI();
-        $ex_explorer->setSelectMode('exposing_source', false);
+        $ex_explorer->setSelectMode('exposed_source', false);
         $ex_explorer->setRootId(ROOT_FOLDER_ID);
         $ex_explorer->setTypeWhiteList(['cat']);
 
@@ -165,7 +165,7 @@ class ilCronOerHarvester extends ilCronJob
         }
 
         $this->settings->saveContainerRefIDForHarvesting((int) $a_form->getInput('target'));
-        $this->settings->saveContainerRefIDForExposing((int) $a_form->getInput('exposing_source'));
+        $this->settings->saveContainerRefIDForExposing((int) $a_form->getInput('exposed_source'));
         $this->settings->saveCopyrightEntryIDsSelectedForHarvesting(...$copyrights);
         return true;
     }

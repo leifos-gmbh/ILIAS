@@ -487,7 +487,6 @@ class ilMDCopyrightSelectionGUI
 
         $oai_contact_mail = new ilTextInputGUI($this->lng->txt('md_oai_contact_mail'), 'oai_contact_mail');
         $oai_contact_mail->setValue($this->MDSettings()->getOAIContactMail());
-        $oai_contact_mail->setInfo($this->lng->txt('md_oai_contact_mail_info'));
         $oai_contact_mail->setRequired(true);
         $oai_check->addSubItem($oai_contact_mail);
 

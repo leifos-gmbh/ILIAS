@@ -22,6 +22,11 @@ namespace ILIAS\MetaData\OERHarvester\ExposedRecords;
 
 class NullRecordInfos implements RecordInfosInterface
 {
+    public function objID(): int
+    {
+        return 0;
+    }
+
     public function identfifier(): string
     {
         return '';

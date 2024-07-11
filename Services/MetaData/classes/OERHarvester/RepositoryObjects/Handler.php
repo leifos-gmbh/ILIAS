@@ -40,7 +40,7 @@ class Handler implements HandlerInterface
         return $new_ref_id;
     }
 
-    public function isObjectReferencedInContainer(int $obj_id, int $container_ref_id): bool
+    public function getObjectReferenceIDInContainer(int $obj_id, int $container_ref_id): ?int
     {
         $ref_ids = \ilObject::_getAllReferences($obj_id);
         foreach ($ref_ids as $ref_id) {
@@ -48,14 +48,31 @@ class Handler implements HandlerInterface
                 continue;
             }
             if ($this->tree->isGrandChild($container_ref_id, $ref_id)) {
-                return true;
+                return $ref_id;
             }
         }
-        return false;
+        return null;
     }
 
-    public function isReferenceDeleted(int $ref_id): bool
+    public function isObjectDeleted(int $obj_id): bool
     {
-        return $this->tree->isDeleted($ref_id);
+        $exists = false;
+        foreach (\ilObject::_getAllReferences($obj_id) as $ref_id => $tmp) {
+            if (!$this->tree->isDeleted($ref_id)) {
+                $exists = true;
+            }
+        }
+        return !$exists;
+    }
+
+    public function deleteReference(int $ref_id): void
+    {
+        $object = \ilObjectFactory::getInstanceByRefId($ref_id);
+        $object->delete();
+    }
+
+    public function getTypeOfReferencedObject(int $ref_id): string
+    {
+        return \ilObject::_lookupType($ref_id, true);
     }
 }

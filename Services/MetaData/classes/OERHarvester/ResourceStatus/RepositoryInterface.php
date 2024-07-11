@@ -28,14 +28,21 @@ interface RepositoryInterface
 
     public function isAlreadyHarvested(int $obj_id): bool;
 
+    /**
+     * @return int[]
+     */
+    public function getAllHarvestedObjIDs(): \Generator;
+
     public function getHarvestRefID(int $obj_id): int;
 
     public function addHarvestRefID(int $obj_id, int $harvested_ref_id): void;
 
+    public function deleteHarvestRefID(int $obj_id): void;
+
     /**
      * @return int[]
      */
-    public function filterOutBlockedOrAlreadyHarvestedObjects(int ...$obj_ids): array;
+    public function filterOutBlockedObjects(int ...$obj_ids): \Generator;
 
     public function deleteStatus(int $obj_id): void;
 }

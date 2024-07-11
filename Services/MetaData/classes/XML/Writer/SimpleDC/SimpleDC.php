@@ -50,7 +50,7 @@ class SimpleDC implements SimpleDCInterface
 
     public function write(
         SetInterface $set,
-        ReferenceId $object_ref_id
+        int $object_ref_id
     ): \SimpleXMLElement {
         $xml = new \SimpleXMLElement(<<<XML
             <oai_dc:dc 
@@ -265,14 +265,17 @@ class SimpleDC implements SimpleDCInterface
     protected function addIdentifierToXML(
         \SimpleXMLElement $xml,
         SetInterface $set,
-        ReferenceId $object_ref_id
+        int $object_ref_id
     ): void {
         $type = $set->getRessourceID()->type();
         if ($type === '') {
             return;
         }
 
-        $link = $this->link_generator->generateLinkForReference($object_ref_id, $type);
+        $link = $this->link_generator->generateLinkForReference(
+            new ReferenceId($object_ref_id),
+            $type
+        );
         $this->addNamespacedChildToXML($xml, 'identifier', (string) $link);
     }
 

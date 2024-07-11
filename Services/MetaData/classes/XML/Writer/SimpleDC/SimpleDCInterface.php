@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\XML\Writer\SimpleDC;
 
 use ILIAS\MetaData\Elements\SetInterface;
-use ILIAS\Data\ReferenceId;
 
 interface SimpleDCInterface
 {
@@ -36,6 +35,6 @@ interface SimpleDCInterface
      */
     public function write(
         SetInterface $set,
-        ReferenceId $object_ref_id
+        int $object_ref_id
     ): \SimpleXMLElement;
 }

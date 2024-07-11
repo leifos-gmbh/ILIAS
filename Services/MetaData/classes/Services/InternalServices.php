@@ -83,7 +83,9 @@ class InternalServices
             $this->presentation_services
         );
         $this->copyright_services = new CopyrightServices(
-            $this->dic
+            $this->dic,
+            $this->repository_services,
+            $this->path_services
         );
         $this->xml_services = new XMLServices(
             $this->dic,

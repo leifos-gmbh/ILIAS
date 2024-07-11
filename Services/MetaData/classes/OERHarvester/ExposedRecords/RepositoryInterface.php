@@ -23,6 +23,7 @@ namespace ILIAS\MetaData\OERHarvester\ExposedRecords;
 interface RepositoryInterface
 {
     /**
+     * Order of returned records is stable.
      * @return RecordInterface[]
      */
     public function getRecords(
@@ -33,6 +34,7 @@ interface RepositoryInterface
     ): \Generator;
 
     /**
+     * Order of returned records is stable.
      * @return RecordInfosInterface[]
      */
     public function getRecordInfos(
@@ -53,9 +55,11 @@ interface RepositoryInterface
 
     public function doesRecordWithIdentifierExist(string $identifier): bool;
 
-    public function createRecord(string $identifier, \DOMDocument $metadata): void;
+    public function doesRecordExistForObjID(int $obj_id): bool;
 
-    public function updateRecord(string $identifier, \DOMDocument $metadata): void;
+    public function createRecord(int $obj_id, string $identifier, \DOMDocument $metadata): void;
 
-    public function deleteRecord(string $identifier): void;
+    public function updateRecord(int $obj_id, \DOMDocument $metadata): void;
+
+    public function deleteRecord(int $obj_id): void;
 }

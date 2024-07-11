@@ -18,20 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\RepositoryObjects;
+namespace ILIAS\MetaData\Copyright\Search;
 
-interface HandlerInterface
+class NullFactory implements FactoryInterface
 {
-    /**
-     * Returns the new ref ID.
-     */
-    public function referenceObjectInTargetContainer(int $obj_id, int $container_ref_id): int;
-
-    public function getObjectReferenceIDInContainer(int $obj_id, int $container_ref_id): ?int;
-
-    public function isObjectDeleted(int $obj_id): bool;
-
-    public function deleteReference(int $ref_id): void;
-
-    public function getTypeOfReferencedObject(int $ref_id): string;
+    public function get(): SearcherInterface
+    {
+        return new NullSearcher();
+    }
 }

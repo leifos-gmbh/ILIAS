@@ -18,11 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester;
+namespace ILIAS\MetaData\OERHarvester\ResourceStatus;
 
-use ILIAS\MetaData\OERHarvester\Results\WrapperInterface as Result;
+use PHPUnit\Framework\TestCase;
 
-interface HarvesterInterface
+class RepositoryTest extends TestCase
 {
-    public function run(Result $result): Result;
 }

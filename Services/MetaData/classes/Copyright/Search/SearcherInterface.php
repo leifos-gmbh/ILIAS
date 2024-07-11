@@ -18,20 +18,18 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\RepositoryObjects;
+namespace ILIAS\MetaData\Copyright\Search;
 
-interface HandlerInterface
+use ILIAS\MetaData\Elements\RessourceID\RessourceIDInterface;
+
+interface SearcherInterface
 {
     /**
-     * Returns the new ref ID.
+     * @return RessourceIDInterface[]
      */
-    public function referenceObjectInTargetContainer(int $obj_id, int $container_ref_id): int;
+    public function search(int ...$entry_ids): \Generator;
 
-    public function getObjectReferenceIDInContainer(int $obj_id, int $container_ref_id): ?int;
+    public function withRestrictionToRepositoryObjects(bool $restricted): SearcherInterface;
 
-    public function isObjectDeleted(int $obj_id): bool;
-
-    public function deleteReference(int $ref_id): void;
-
-    public function getTypeOfReferencedObject(int $ref_id): string;
+    public function withAdditionalTypeFilter(string $type): SearcherInterface;
 }

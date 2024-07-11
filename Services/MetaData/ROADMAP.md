@@ -126,6 +126,7 @@ input element for multilangual text input.
 The following classes are not yet covered by unit tests:
 
 - everything in `Editor`
+- everything in `Settings`
 - `GlobalScreen/ilMDKeywordExposer`
 - `Manipulator/ScaffoldProvider`
 - everything in `Paths`
@@ -139,3 +140,4 @@ lazily instantiate an object
 - `XML/Copyright`, `XML/Links`, `XML/Dictionary`, `XML/Writer/SimpleDC`,
 and `XML/Reader/Standard/Legacy`
 - `OERExposer/OAIPMH/HTTP`, `OERExposer/OAIPMH/Initiator`
+- `OERHarvester/RepositoryObjects`, `OERHarvester/Settings`, `OERHarvester/Results`

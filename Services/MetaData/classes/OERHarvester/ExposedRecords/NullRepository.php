@@ -68,15 +68,20 @@ class NullRepository implements RepositoryInterface
         return false;
     }
 
-    public function createRecord(string $identifier, \DOMDocument $metadata): void
+    public function doesRecordExistForObjID(int $obj_id): bool
+    {
+        return false;
+    }
+
+    public function createRecord(int $obj_id, string $identifier, \DOMDocument $metadata): void
     {
     }
 
-    public function updateRecord(string $identifier, \DOMDocument $metadata): void
+    public function updateRecord(int $obj_id, \DOMDocument $metadata): void
     {
     }
 
-    public function deleteRecord(string $identifier): void
+    public function deleteRecord(int $obj_id): void
     {
     }
 }

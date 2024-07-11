@@ -27,13 +27,22 @@ class NullHandler implements HandlerInterface
         return 0;
     }
 
-    public function isObjectReferencedInContainer(int $obj_id, int $container_ref_id): bool
+    public function getObjectReferenceIDInContainer(int $obj_id, int $container_ref_id): ?int
+    {
+        return null;
+    }
+
+    public function isObjectDeleted(int $obj_id): bool
     {
         return false;
     }
 
-    public function isReferenceDeleted(int $ref_id): bool
+    public function deleteReference(int $ref_id): void
     {
-        return false;
+    }
+
+    public function getTypeOfReferencedObject(int $ref_id): string
+    {
+        return '';
     }
 }

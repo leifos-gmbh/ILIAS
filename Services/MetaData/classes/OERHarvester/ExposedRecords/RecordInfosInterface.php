@@ -22,6 +22,8 @@ namespace ILIAS\MetaData\OERHarvester\ExposedRecords;
 
 interface RecordInfosInterface
 {
+    public function objID(): int;
+
     public function identfifier(): string;
 
     public function datestamp(): \DateTimeImmutable;

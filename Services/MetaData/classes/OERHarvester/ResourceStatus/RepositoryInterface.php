@@ -35,7 +35,7 @@ interface RepositoryInterface
 
     public function getHarvestRefID(int $obj_id): int;
 
-    public function addHarvestRefID(int $obj_id, int $harvested_ref_id): void;
+    public function setHarvestRefID(int $obj_id, int $harvested_ref_id): void;
 
     public function deleteHarvestRefID(int $obj_id): void;
 

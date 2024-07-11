@@ -67,10 +67,14 @@ class Settings implements SettingsInterface
         if (isset($this->selected_cp_entry_ids)) {
             return $this->selected_cp_entry_ids;
         }
-        return $this->selected_cp_entry_ids = unserialize(
+        $ids_from_storage = unserialize(
             $this->settings->get('templates', serialize([])),
             ['allowed_classes' => false]
         );
+        foreach ($ids_from_storage as $id) {
+            $this->selected_cp_entry_ids[] = (int) $id;
+        }
+        return $this->selected_cp_entry_ids;
     }
 
     public function isCopyrightEntryIDSelectedForHarvesting(int $id): bool

@@ -82,7 +82,7 @@ class Services
         return $this->handler = new Handler();
     }
 
-    public function SearcherFactory(): FactoryInterface
+    public function searcherFactory(): FactoryInterface
     {
         if (isset($this->searcher_factory)) {
             return $this->searcher_factory;

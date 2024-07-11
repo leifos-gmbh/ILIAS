@@ -22,11 +22,11 @@ namespace ILIAS\MetaData\OERHarvester;
 
 use ILIAS\MetaData\OERHarvester\Results\WrapperInterface as Result;
 use ILIAS\MetaData\OERHarvester\Settings\SettingsInterface;
-use ILIAS\MetaData\OERHarvester\RepositoryObjects\Handler as ObjectHandler;
+use ILIAS\MetaData\OERHarvester\RepositoryObjects\HandlerInterface as ObjectHandler;
 use ILIAS\MetaData\OERHarvester\ResourceStatus\RepositoryInterface as StatusRepository;
 use ILIAS\MetaData\OERHarvester\ExposedRecords\RepositoryInterface as ExposedRecordRepository;
-use ILIAS\MetaData\Copyright\Search\Factory as CopyrightSearchFactory;
-use ILIAS\MetaData\OERHarvester\XML\Writer as SimpleDCXMLWriter;
+use ILIAS\MetaData\Copyright\Search\FactoryInterface as CopyrightSearchFactory;
+use ILIAS\MetaData\OERHarvester\XML\WriterInterface as SimpleDCXMLWriter;
 use ILIAS\MetaData\OERHarvester\ExposedRecords\RecordInterface;
 
 class Harvester
@@ -159,6 +159,12 @@ class Harvester
         array $currently_harvested_obj_ids
     ): int {
         $count = 0;
+
+        $target_ref_id = $this->settings->getContainerRefIDForHarvesting();
+        if (!$target_ref_id) {
+            return 0;
+        }
+
         foreach ($harvestable_obj_ids as $obj_id) {
             if (in_array($obj_id, $currently_harvested_obj_ids)) {
                 continue;
@@ -168,7 +174,7 @@ class Harvester
             try {
                 $new_ref_id = $this->object_handler->referenceObjectInTargetContainer(
                     $obj_id,
-                    $this->settings->getContainerRefIDForHarvesting()
+                    $target_ref_id
                 );
             } catch (\Exception $e) {
                 $this->logger->error(
@@ -177,7 +183,7 @@ class Harvester
                 );
                 continue;
             }
-            $this->status_repository->addHarvestRefID($obj_id, $new_ref_id);
+            $this->status_repository->setHarvestRefID($obj_id, $new_ref_id);
             $count++;
         }
         return $count;
@@ -192,15 +198,17 @@ class Harvester
     ): int {
         $count = 0;
 
+        $source_ref_id = $this->settings->getContainerRefIDForExposing();
+        if (!$source_ref_id) {
+            return 0;
+        }
+
         $already_exposed = [];
         foreach ($this->exposed_record_repository->getRecords() as $record) {
             $obj_id = $record->infos()->objID();
             $already_exposed[] = $obj_id;
 
-            $ref_id = $this->object_handler->getObjectReferenceIDInContainer(
-                $obj_id,
-                $this->settings->getContainerRefIDForExposing()
-            );
+            $ref_id = $this->object_handler->getObjectReferenceIDInContainer($obj_id, $source_ref_id);
 
             if (!in_array($obj_id, $harvestable_obj_ids) || is_null($ref_id)) {
                 $this->logger->debug('Deleting exposed record for object with obj_id: ' . $obj_id);
@@ -227,10 +235,7 @@ class Harvester
                 continue;
             }
 
-            $ref_id = $this->object_handler->getObjectReferenceIDInContainer(
-                $obj_id,
-                $this->settings->getContainerRefIDForExposing()
-            );
+            $ref_id = $this->object_handler->getObjectReferenceIDInContainer($obj_id, $source_ref_id);
             if (is_null($ref_id)) {
                 continue;
             }
@@ -240,7 +245,6 @@ class Harvester
                 $ref_id,
                 $this->object_handler->getTypeOfReferencedObject($ref_id)
             );
-
 
             $this->logger->debug('Creating exposed record for object with obj_id: ' . $obj_id);
             $this->exposed_record_repository->createRecord($obj_id, (string) $obj_id, $simple_dc_xml);

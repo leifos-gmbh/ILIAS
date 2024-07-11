@@ -18,10 +18,28 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\XML;
+namespace ILIAS\MetaData\OERHarvester\ExposedRecords;
 
-use PHPUnit\Framework\TestCase;
-
-class WriterTest extends TestCase
+class Record implements RecordInterface
 {
+    protected RecordInfosInterface $infos;
+    protected \DOMDocument $metadata;
+
+    public function __construct(
+        RecordInfosInterface $infos,
+        \DOMDocument $metadata
+    ) {
+        $this->infos = $infos;
+        $this->metadata = $metadata;
+    }
+
+    public function infos(): RecordInfosInterface
+    {
+        return $this->infos;
+    }
+
+    public function metadata(): \DOMDocument
+    {
+        return $this->metadata;
+    }
 }

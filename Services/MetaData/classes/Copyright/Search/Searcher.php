@@ -61,7 +61,7 @@ class Searcher implements SearcherInterface
     /**
      * @return RessourceIDInterface[]
      */
-    public function search(int ...$entry_ids): \Generator
+    public function search(int $first_entry_id, int ...$further_entry_ids): \Generator
     {
         $path_to_copyright = $this->path_factory->custom()
                                                 ->withNextStep('rights')
@@ -70,28 +70,39 @@ class Searcher implements SearcherInterface
                                                 ->get();
 
         $copyright_search_clauses = [];
-        foreach ($entry_ids as $entry_id) {
+        foreach ([$first_entry_id, ...$further_entry_ids] as $entry_id) {
             $copyright_search_clauses[] = $this->search_clause_factory->getBasicClause(
                 $path_to_copyright,
                 Mode::EQUALS,
                 $this->copyright_identifier_handler->buildIdentifierFromEntryID($entry_id)
             );
         }
-        $joined_search_clause = $this->search_clause_factory->getJoinedClauses(
-            Operator::OR,
-            ...$copyright_search_clauses
-        );
+        if (count($copyright_search_clauses) > 1) {
+            $full_search_clause = $this->search_clause_factory->getJoinedClauses(
+                Operator::OR,
+                ...$copyright_search_clauses
+            );
+        } else {
+            $full_search_clause = $copyright_search_clauses[0];
+        }
 
-        $type_filters = [];
+        $filters = [];
         foreach ($this->types as $type) {
-            $type_filters[] = $this->search_filter_factory->get(
+            $filters[] = $this->search_filter_factory->get(
                 Placeholder::ANY,
                 $this->restricted_to_repo_objects ? Placeholder::OBJ_ID : Placeholder::ANY,
                 $type
             );
         }
+        if (empty($filters) && $this->restricted_to_repo_objects) {
+            $filters[] = $this->search_filter_factory->get(
+                Placeholder::ANY,
+                Placeholder::OBJ_ID,
+                Placeholder::ANY
+            );
+        }
 
-        yield from $this->lom_repository->searchMD($joined_search_clause, null, null, ...$type_filters);
+        yield from $this->lom_repository->searchMD($full_search_clause, null, null, ...$filters);
     }
 
     public function withRestrictionToRepositoryObjects(bool $restricted): SearcherInterface

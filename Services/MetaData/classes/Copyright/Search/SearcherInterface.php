@@ -27,7 +27,7 @@ interface SearcherInterface
     /**
      * @return RessourceIDInterface[]
      */
-    public function search(int ...$entry_ids): \Generator;
+    public function search(int $first_entry_id, int ...$further_entry_ids): \Generator;
 
     public function withRestrictionToRepositoryObjects(bool $restricted): SearcherInterface;
 

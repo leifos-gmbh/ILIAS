@@ -140,4 +140,5 @@ lazily instantiate an object
 - `XML/Copyright`, `XML/Links`, `XML/Dictionary`, `XML/Writer/SimpleDC`,
 and `XML/Reader/Standard/Legacy`
 - `OERExposer/OAIPMH/HTTP`, `OERExposer/OAIPMH/Initiator`
-- `OERHarvester/RepositoryObjects`, `OERHarvester/Settings`, `OERHarvester/Results`
+- `OERHarvester/RepositoryObjects`, `OERHarvester/Settings`,
+`OERHarvester/Results`, `OERHarvester/Initiator`

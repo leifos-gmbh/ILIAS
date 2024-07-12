@@ -18,10 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Copyright\Search;
+namespace ILIAS\MetaData\XML\Writer\SimpleDC;
 
-use PHPUnit\Framework\TestCase;
+use ILIAS\MetaData\Elements\SetInterface;
 
-class FactoryAndSearcherTest extends TestCase
+class NullSimpleDC implements SimpleDCInterface
 {
+    public function write(
+        SetInterface $set,
+        int $object_ref_id
+    ): \SimpleXMLElement {
+        return new \SimpleXMLElement('<root/>');
+    }
 }

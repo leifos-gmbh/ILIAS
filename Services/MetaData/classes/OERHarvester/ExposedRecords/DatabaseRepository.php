@@ -41,7 +41,7 @@ class DatabaseRepository implements RepositoryInterface
         $res = $this->query(
             'SELECT * FROM il_meta_oer_exposed' .
             $this->getDatesWhereCondition($from, $until) .
-            'ORDER BY obj_id' . $this->getLimitAndOffset($limit, $offset)
+            ' ORDER BY obj_id' . $this->getLimitAndOffset($limit, $offset)
         );
 
         foreach ($res as $row) {
@@ -61,7 +61,7 @@ class DatabaseRepository implements RepositoryInterface
         $res = $this->query(
             'SELECT obj_id, identifier, datestamp FROM il_meta_oer_exposed' .
             $this->getDatesWhereCondition($from, $until) .
-            'ORDER BY obj_id' . $this->getLimitAndOffset($limit, $offset)
+            ' ORDER BY obj_id' . $this->getLimitAndOffset($limit, $offset)
         );
 
         foreach ($res as $row) {
@@ -197,7 +197,7 @@ class DatabaseRepository implements RepositoryInterface
         if (empty($wheres)) {
             return '';
         }
-        return ' WHERE ' . implode(' AND ', $wheres) . ' ';
+        return ' WHERE ' . implode(' AND ', $wheres);
     }
 
     protected function getLimitAndOffset(
@@ -216,6 +216,9 @@ class DatabaseRepository implements RepositoryInterface
         return $query_limit . $query_offset;
     }
 
+    /**
+     * @return array[]
+     */
     protected function query(string $query): \Generator
     {
         $res = $this->db->query($query);

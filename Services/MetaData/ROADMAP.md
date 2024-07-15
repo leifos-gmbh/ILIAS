@@ -29,14 +29,9 @@ the old MD editor, but is not part of the LOM standard. It
 would be nice to get rid of it, should it not be used anywhere
 else in ILIAS.
 
-### Refactor ilMDCopyrightSelectionEntry
+### Copyright in API
 
-The class ilMDCopyrightSelectionEntry could need some refactoring
-(get rid of static functions, etc.). Maybe it would make sense
-to roll this into the custom vocabularies.
-
-This might also apply to related classes (e.g. 
-ilOerHarvesterSettings).
+Information about copyright entries should be available vai the API.
 
 ### Replace Generic Generators With Custom Iterators
 

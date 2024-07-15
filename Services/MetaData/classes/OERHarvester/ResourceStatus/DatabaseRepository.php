@@ -32,7 +32,7 @@ class DatabaseRepository implements RepositoryInterface
     public function isHarvestingBlocked(int $obj_id): bool
     {
         $res = $this->query(
-            'SELECT blocked from il_meta_oer_stat WHERE obj_id = ' . $this->quoteInteger($obj_id)
+            'SELECT blocked FROM il_meta_oer_stat WHERE obj_id = ' . $this->quoteInteger($obj_id)
         );
 
         foreach ($res as $row) {
@@ -55,7 +55,7 @@ class DatabaseRepository implements RepositoryInterface
     public function isAlreadyHarvested(int $obj_id): bool
     {
         $res = $this->query(
-            'SELECT href_id from il_meta_oer_stat WHERE obj_id = ' . $this->quoteInteger($obj_id)
+            'SELECT href_id FROM il_meta_oer_stat WHERE obj_id = ' . $this->quoteInteger($obj_id)
         );
 
         foreach ($res as $row) {
@@ -70,18 +70,18 @@ class DatabaseRepository implements RepositoryInterface
     public function getAllHarvestedObjIDs(): \Generator
     {
         $res = $this->query(
-            'SELECT href_id from il_meta_oer_stat'
+            'SELECT obj_id FROM il_meta_oer_stat WHERE href_id > 0'
         );
 
         foreach ($res as $row) {
-            yield (int) $row['href_id'];
+            yield (int) $row['obj_id'];
         }
     }
 
     public function getHarvestRefID(int $obj_id): int
     {
         $res = $this->query(
-            'SELECT href_id from il_meta_oer_stat WHERE obj_id = ' . $this->quoteInteger($obj_id)
+            'SELECT href_id FROM il_meta_oer_stat WHERE obj_id = ' . $this->quoteInteger($obj_id)
         );
 
         foreach ($res as $row) {

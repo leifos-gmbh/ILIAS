@@ -63,7 +63,7 @@ class Harvester
             $messages = [];
 
             $harvestable_obj_ids = $this->findHarvestableObjectIDs();
-            $currently_harvested_obj_ids = $this->status_repository->getAllHarvestedObjIDs();
+            $currently_harvested_obj_ids = iterator_to_array($this->status_repository->getAllHarvestedObjIDs());
 
             $deletion_count = $this->deleteDeprecatedReferences(
                 $harvestable_obj_ids,
@@ -133,11 +133,11 @@ class Harvester
             }
 
             $ref_id = $this->status_repository->getHarvestRefID($obj_id);
-            $this->logger->debug('Deleting deprecated object with ref_id: ' . $ref_id);
+            $this->logDebug('Deleting deprecated object with ref_id: ' . $ref_id);
             try {
                 $this->object_handler->deleteReference($ref_id);
             } catch (\Exception $e) {
-                $this->logger->error(
+                $this->logError(
                     'Error when deleting harvested reference with ref_id ' .
                     $ref_id . ': ' . $e->getMessage()
                 );
@@ -170,14 +170,14 @@ class Harvester
                 continue;
             }
 
-            $this->logger->debug('Creating new reference for object with obj_id: ' . $obj_id);
+            $this->logDebug('Creating new reference for object with obj_id: ' . $obj_id);
             try {
                 $new_ref_id = $this->object_handler->referenceObjectInTargetContainer(
                     $obj_id,
                     $target_ref_id
                 );
             } catch (\Exception $e) {
-                $this->logger->error(
+                $this->logError(
                     'Error when creating reference for object with obj_id ' .
                     $obj_id . ': ' . $e->getMessage()
                 );
@@ -211,7 +211,7 @@ class Harvester
             $ref_id = $this->object_handler->getObjectReferenceIDInContainer($obj_id, $source_ref_id);
 
             if (!in_array($obj_id, $harvestable_obj_ids) || is_null($ref_id)) {
-                $this->logger->debug('Deleting exposed record for object with obj_id: ' . $obj_id);
+                $this->logDebug('Deleting exposed record for object with obj_id: ' . $obj_id);
                 $this->exposed_record_repository->deleteRecord($obj_id);
                 $count++;
                 continue;
@@ -224,7 +224,7 @@ class Harvester
             );
 
             if ($simple_dc_xml->saveXML() !== $record->metadata()->saveXML()) {
-                $this->logger->debug('Updating exposed record for object with obj_id: ' . $obj_id);
+                $this->logDebug('Updating exposed record for object with obj_id: ' . $obj_id);
                 $this->exposed_record_repository->updateRecord($obj_id, $simple_dc_xml);
                 $count++;
             }
@@ -246,11 +246,21 @@ class Harvester
                 $this->object_handler->getTypeOfReferencedObject($ref_id)
             );
 
-            $this->logger->debug('Creating exposed record for object with obj_id: ' . $obj_id);
+            $this->logDebug('Creating exposed record for object with obj_id: ' . $obj_id);
             $this->exposed_record_repository->createRecord($obj_id, (string) $obj_id, $simple_dc_xml);
             $count++;
         }
 
         return $count;
+    }
+
+    protected function logDebug(string $message): void
+    {
+        $this->logger->debug($message);
+    }
+
+    protected function logError(string $message): void
+    {
+        $this->logger->error($message);
     }
 }

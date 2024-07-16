@@ -164,20 +164,25 @@ class HarvesterTest extends TestCase
      */
     protected function getStatusRepository(
         array $currently_harvested = [],
-        array $blocked_obj_ids = []
+        array $blocked_obj_ids = [],
+        bool $throw_error = false
     ): StatusRepository {
-        return new class ($currently_harvested, $blocked_obj_ids) extends NullStatusRepository {
+        return new class ($currently_harvested, $blocked_obj_ids, $throw_error) extends NullStatusRepository {
             public array $exposed_deletions = [];
             public array $exposed_creations = [];
 
             public function __construct(
                 protected array $currently_harvested,
-                protected array $blocked_obj_ids
+                protected array $blocked_obj_ids,
+                protected bool $throw_error
             ) {
             }
 
             public function getAllHarvestedObjIDs(): \Generator
             {
+                if ($this->throw_error === true) {
+                    throw new ilMDOERHarvesterException('error');
+                }
                 yield from array_keys($this->currently_harvested);
             }
 
@@ -255,7 +260,8 @@ class HarvesterTest extends TestCase
                         public function metadata(): \DOMDocument
                         {
                             $xml = new \DOMDocument();
-                            return $xml->loadXML($this->metadata);
+                            $xml->loadXML($this->metadata);
+                            return $xml;
                         }
                     };
                 }
@@ -343,17 +349,29 @@ class HarvesterTest extends TestCase
         };
     }
 
-    protected function getXMLWriter(): SimpleDCXMLWriter
+    /**
+     * Metadata is passed as array via obj_id => metadata-xml as string
+     */
+    protected function getXMLWriter(array $returned_md = []): SimpleDCXMLWriter
     {
-        return new class () extends NullWriter {
+        return new class ($returned_md) extends NullWriter {
+            public array $exposed_params = [];
+
+            public function __construct(protected array $returned_md)
+            {
+            }
+
             public function writeSimpleDCMetaData(int $obj_id, int $ref_id, string $type): \DOMDocument
             {
+                $this->exposed_params[] = [
+                    'obj_id' => $obj_id,
+                    'ref_id' => $ref_id,
+                    'type' => $type
+                ];
+
                 $xml = new \DOMDocument();
-                return $xml->loadXML(
-                    '<md><obj_id>' . $obj_id . '</obj_id>' .
-                    '<ref_id>' . $ref_id . '</ref_id>' .
-                    '<type>' . $type . '</type></md>'
-                );
+                $xml->loadXML($this->returned_md[$obj_id]);
+                return $xml;
             }
         };
     }
@@ -667,45 +685,327 @@ class HarvesterTest extends TestCase
 
     public function testRunDeleteExposedRecordIncorrectTypeOrCopyright(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 456),
+            $this->getObjectHandler([], 456, [32, 45]),
+            $this->getStatusRepository([32 => 12332]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
+            $search_factory = $this->getSearchFactory(32),
+            $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_OK, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 1 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertSame(
+            [[
+                 'restricted' => true,
+                 'types' => ['type', 'second type'],
+                 'entries' => [12, 5]
+             ]],
+            $search_factory->exposed_search_params
+        );
+        $this->assertEmpty($record_repo->exposed_creations);
+        $this->assertEmpty($record_repo->exposed_updates);
+        $this->assertSame(
+            [['obj_id' => 45]],
+            $record_repo->exposed_deletions
+        );
     }
 
     public function testRunDeleteExposedRecordBlocked(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 456),
+            $this->getObjectHandler([], 456, [32, 45]),
+            $this->getStatusRepository([32 => 12332], [45]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
+            $this->getSearchFactory(32, 45),
+            $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_OK, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 1 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_creations);
+        $this->assertEmpty($record_repo->exposed_updates);
+        $this->assertSame(
+            [['obj_id' => 45]],
+            $record_repo->exposed_deletions
+        );
     }
 
     public function testRunDeleteExposedRecordObjectDeleted(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 456),
+            $this->getObjectHandler([45], 456, [32, 45]),
+            $this->getStatusRepository([32 => 12332]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
+            $this->getSearchFactory(32, 45),
+            $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_OK, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 1 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_creations);
+        $this->assertEmpty($record_repo->exposed_updates);
+        $this->assertSame(
+            [['obj_id' => 45]],
+            $record_repo->exposed_deletions
+        );
     }
 
     public function testRunDeleteExposedRecordNotInSourceContainer(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 456),
+            $this->getObjectHandler([], 456, [32]),
+            $this->getStatusRepository([32 => 12332, 45 => 12345]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
+            $this->getSearchFactory(32, 45),
+            $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_OK, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 1 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_creations);
+        $this->assertEmpty($record_repo->exposed_updates);
+        $this->assertSame(
+            [['obj_id' => 45]],
+            $record_repo->exposed_deletions
+        );
     }
 
     public function testRunUpdateExposedRecord(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 456),
+            $this->getObjectHandler([], 456, [32, 45]),
+            $this->getStatusRepository([32 => 12332, 45 => 12345]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
+            $this->getSearchFactory(32, 45),
+            $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 changed</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_OK, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 1 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_creations);
+        $this->assertCount(1, $record_repo->exposed_updates);
+        $this->assertSame(45, $record_repo->exposed_updates[0]['obj_id']);
+        $this->assertXmlStringEqualsXmlString(
+            '<el>45 changed</el>',
+            $record_repo->exposed_updates[0]['metadata']
+        );
+        $this->assertEmpty($record_repo->exposed_deletions);
+        $this->assertEquals(
+            [
+                ['obj_id' => 32, 'ref_id' => 45632, 'type' => 'type_45632'],
+                ['obj_id' => 45, 'ref_id' => 45645, 'type' => 'type_45645']
+            ],
+            $writer->exposed_params
+        );
     }
 
     public function testRunCreateNewExposedRecord(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 456),
+            $this->getObjectHandler([], 456, [32, 45]),
+            $this->getStatusRepository([32 => 12332, 45 => 12345]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
+            $this->getSearchFactory(32, 45),
+            $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_OK, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 1 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_updates);
+        $this->assertCount(1, $record_repo->exposed_creations);
+        $this->assertSame(45, $record_repo->exposed_creations[0]['obj_id']);
+        $this->assertSame('45', $record_repo->exposed_creations[0]['identifier']);
+        $this->assertXmlStringEqualsXmlString(
+            '<el>45 new</el>',
+            $record_repo->exposed_creations[0]['metadata']
+        );
+        $this->assertEmpty($record_repo->exposed_deletions);
+        $this->assertEquals(
+            [
+                ['obj_id' => 32, 'ref_id' => 45632, 'type' => 'type_45632'],
+                ['obj_id' => 45, 'ref_id' => 45645, 'type' => 'type_45645']
+            ],
+            $writer->exposed_params
+        );
     }
 
     public function testRunDoNotCreateNewExposedRecordWhenBlocked(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 456),
+            $this->getObjectHandler([], 456, [32, 45]),
+            $this->getStatusRepository([32 => 12332], [45]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
+            $this->getSearchFactory(32, 45),
+            $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_NO_ACTION, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 0 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_updates);
+        $this->assertEmpty($record_repo->exposed_creations);
+        $this->assertEmpty($record_repo->exposed_deletions);
     }
 
     public function testRunDoNotCreateNewExposedRecordWhenObjectDeleted(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 456),
+            $this->getObjectHandler([45], 456, [32, 45]),
+            $this->getStatusRepository([32 => 12332]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
+            $this->getSearchFactory(32, 45),
+            $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_NO_ACTION, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 0 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_updates);
+        $this->assertEmpty($record_repo->exposed_creations);
+        $this->assertEmpty($record_repo->exposed_deletions);
     }
 
     public function testRunDoNotCreateNewExposedRecordWhenNotInSourceContainer(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 456),
+            $this->getObjectHandler([], 456, [32]),
+            $this->getStatusRepository([32 => 12332, 45 => 12345]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
+            $this->getSearchFactory(32, 45),
+            $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_NO_ACTION, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 0 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_updates);
+        $this->assertEmpty($record_repo->exposed_creations);
+        $this->assertEmpty($record_repo->exposed_deletions);
     }
 
     public function testRunDoNotCreateNewExposedRecordWhenNoSourceContainerIsSet(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5], 123, 0),
+            $this->getObjectHandler([], 456, [32, 45]),
+            $this->getStatusRepository([32 => 12332, 45 => 12345]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
+            $this->getSearchFactory(32, 45),
+            $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_NO_ACTION, $result->exposed_status);
+        $this->assertSame(
+            'Deleted 0 deprecated references.<br>' .
+            'Created 0 new references.<br>' .
+            'Created, updated, or deleted 0 exposed records.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_updates);
+        $this->assertEmpty($record_repo->exposed_creations);
+        $this->assertEmpty($record_repo->exposed_deletions);
     }
 
     public function testRunWithUnforeseenError(): void
     {
+        $harvester = new Harvester(
+            $this->getSettings(['type', 'second type'], [12, 5]),
+            $object_handler = $this->getObjectHandler(),
+            $status_repo = $this->getStatusRepository([], [], true),
+            $this->getExposedRecordRepository(),
+            $search_factory = $this->getSearchFactory(),
+            $this->getXMLWriter(),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(\ilCronJobResult::STATUS_FAIL, $result->exposed_status);
+        $this->assertSame(
+            'error',
+            $result->exposed_message
+        );
     }
 }

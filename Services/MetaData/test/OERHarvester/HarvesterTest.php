@@ -869,7 +869,7 @@ class HarvesterTest extends TestCase
         $this->assertEmpty($record_repo->exposed_updates);
         $this->assertCount(1, $record_repo->exposed_creations);
         $this->assertSame(45, $record_repo->exposed_creations[0]['obj_id']);
-        $this->assertSame('45', $record_repo->exposed_creations[0]['identifier']);
+        $this->assertSame('il__type_45645_45', $record_repo->exposed_creations[0]['identifier']);
         $this->assertXmlStringEqualsXmlString(
             '<el>45 new</el>',
             $record_repo->exposed_creations[0]['metadata']

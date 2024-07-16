@@ -240,14 +240,20 @@ class Harvester
                 continue;
             }
 
+            $type = $this->object_handler->getTypeOfReferencedObject($ref_id);
+
             $simple_dc_xml = $this->xml_writer->writeSimpleDCMetaData(
                 $obj_id,
                 $ref_id,
-                $this->object_handler->getTypeOfReferencedObject($ref_id)
+                $type
             );
 
             $this->logDebug('Creating exposed record for object with obj_id: ' . $obj_id);
-            $this->exposed_record_repository->createRecord($obj_id, (string) $obj_id, $simple_dc_xml);
+            $this->exposed_record_repository->createRecord(
+                $obj_id,
+                $this->buildIdentifier($obj_id, $type),
+                $simple_dc_xml
+            );
             $count++;
         }
 
@@ -262,5 +268,10 @@ class Harvester
     protected function logError(string $message): void
     {
         $this->logger->error($message);
+    }
+
+    protected function buildIdentifier(int $obj_id, string $type): string
+    {
+        return 'il__' . $type . '_' . $obj_id;
     }
 }

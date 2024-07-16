@@ -236,13 +236,13 @@ class RepositoryTest extends TestCase
 
     public function testFilterOutBlockedObjects(): void
     {
-        $repo = $this->getRepository([['obj_id' => '32'], ['obj_id' => '909'], ['obj_id' => '55']]);
+        $repo = $this->getRepository([['obj_id' => '5'], ['obj_id' => '123'], ['obj_id' => '876']]);
 
         $obj_ids = iterator_to_array($repo->filterOutBlockedObjects(32, 5, 909, 123, 876, 55));
 
         $this->assertSame(
             [
-                'SELECT' . ' obj_id FROM il_meta_oer_stat WHERE NOT blocked = 1 AND ' .
+                'SELECT' . ' obj_id FROM il_meta_oer_stat WHERE blocked = 1 AND ' .
                 '~obj_id~in~(32,5,909,123,876,55)~'
             ],
             $repo->exposed_queries

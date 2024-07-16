@@ -114,12 +114,19 @@ class DatabaseRepository implements RepositoryInterface
     public function filterOutBlockedObjects(int ...$obj_ids): \Generator
     {
         $res = $this->query(
-            'SELECT obj_id FROM il_meta_oer_stat WHERE NOT blocked = 1 AND ' .
+            'SELECT obj_id FROM il_meta_oer_stat WHERE blocked = 1 AND ' .
             $this->inWithIntegers('obj_id', ...$obj_ids)
         );
 
+        $blocked_ids = [];
         foreach ($res as $row) {
-            yield (int) $row['obj_id'];
+            $blocked_ids[] = (int) $row['obj_id'];
+        }
+
+        foreach ($obj_ids as $obj_id) {
+            if (!in_array($obj_id, $blocked_ids)) {
+                yield $obj_id;
+            }
         }
     }
 

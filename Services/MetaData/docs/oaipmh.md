@@ -5,12 +5,12 @@ missing or wrong information using the [ILIAS issue tracker](https://mantis.ilia
 or contribute a fix via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).
 
 The OER Harvester is a cron job that can find and collect Objects under
-appropriate [copyright licenses](copyrights.md) in the Repository of the installation.
+appropriate [copyright licences](copyrights.md) in the Repository of the installation.
 These objects are referenced in a pre-configured Category such that for
 example a public area on an installation can automatically be populated
 with OER found on the installation.
 
-Further, an OAI-PMH interface can be activated with which appropriate Objects
+Further, an OAI-PMH interface can be activated, with which appropriate Objects
 in a Category can be queried externally. For example, OER referatories can
 then harvest the OER previously collected in the public area.
 
@@ -26,11 +26,11 @@ objects.
 The OER Harvester needs to be activated in the 'Cron Jobs' Administration.
 For it to actually harvest Objects, copyright selection has to be enabled in
 the 'Metadata' Administration. In the cron job configuration of the Harvester,
-to-be-collected licenses then need to be chosen, along with Categories
+to-be-collected licences then need to be chosen, along with Categories
 for the harvested and published OER (see below for details).
 
 Disabling the copyright selection again after Objects have already had
-licenses assigned is not recommended, and can lead to unpredictable results
+licences assigned is not recommended, and can lead to unpredictable results
 when running the OER Harvester.
 
 ### Harvesting
@@ -42,7 +42,7 @@ The following conditions must be fulfilled for an Object to be harvested:
 - The Object must be in the Repository, and it must not be in the
   Trash (or deleted entirely).
 - The Object must be of a supported type.
-- In the Object's LOM, the copyright must be one of those chosen in the
+- In the Object's LOM, the copyright must be one of those selected in the
 Harvester's cron job configuration.
 - The Object must not be blocked from being harvested (see 
 [below](#blocking-individual-objects)).
@@ -51,10 +51,10 @@ manually deleted from the Category for harvested OER still count as harvested.
 - In the Harvester's cron job configuration, a Category for harvested OER
 must be set.
 
-If any of these conditions except the last two are not fulfilled anymore for a
+If any of these conditions except the last two are not fulfilled any more for a
 previously harvested Object, the Harvester deletes its reference from the
-Category for harvested OER. Additionally it does not count as harvested
-anymore, and could thus be harvested again in the future. Only Objects
+Category for harvested OER. Additionally, it does not count as harvested
+any more, and could thus be harvested again in the future. Only Objects
 unflagged in this way can be harvested again.
 
 
@@ -62,7 +62,7 @@ unflagged in this way can be harvested again.
 
 Users with access to an Object's 'Metadata'-tab can block the Object from
 being harvested. The option is offered when choosing an eligible copyright
-license for an Object with a type supported by the Harvester.
+licence for an Object with a type supported by the Harvester.
 
 Blocking an already harvested Object will lead to its reference in the
 Category for harvested OER being deleted when the Harvester is executed next.
@@ -76,7 +76,7 @@ compiled for an Object if the following conditions are fulfilled:
 - The Object must be in the Repository, and it must not be in the
   Trash (or deleted entirely).
 - The Object must be of a supported type.
-- In the Object's LOM, the copyright must be one of those chosen in the
+- In the Object's LOM, the copyright must be one of those selected in the
   Harvester's cron job configuration.
 - The Object must not be blocked from being harvested (see
   [below](#blocking-individual-objects)).
@@ -89,7 +89,7 @@ Note that most of these conditions match those [for harvesting](#harvesting),
 such that for the most part records are compiled for Objects that were
 previously harvested, although this is not technically a prerequisite.
 
-If any of these conditions are not fulfilled anymore for a previously exposed
+If any of these conditions are not fulfilled any more for a previously exposed
 Object, the Object's record will be deleted, and it will not be
 available through the OAI-PMH interface on future requests.
 
@@ -100,14 +100,14 @@ for details), including the date of change.
 #### Automatic Publishing
 
 The OER Harvester can be configured in such a way that for every harvested
-Object a record is compiled immediately. Then OER on the installation are
+Object, a record is compiled immediately. Then OER on the installation are
 effectively published automatically through the OAI-PMH interface, as soon as an
-eligible copyright is chosen for them. If that is the desired behavior, choose
+eligible copyright is chosen for them. If that is the desired behaviour, choose
 the same Category for harvested and published OER in the Harvester's cron
 job configuration.
 
 If on the other hand OER should not be published automatically, for example
-for quality control, two different Categories should be chosen. In this case,
+for quality control, two different Categories should be selected. In this case,
 Objects must be moved (or linked) manually from the Category for harvested OER to that for
 published OER.
 
@@ -118,7 +118,7 @@ Harvester can be queried by external parties via an interface implementing
 the [OAI-PMH protocol](https://www.openarchives.org/OAI/openarchivesprotocol.html).
 The associated endpoint is `{ILIAS base path}/oai.php`.
 
-Note that records of OER contained in responses contain static links
+Note that records of OER in responses contain static links
 to the associated Objects in the Category for published OER. For exposed
 Objects to be available for interested external users, that Category should
 thus be in the public area of the installation.
@@ -141,7 +141,7 @@ always kept up to date.
 
 ### Implementation
 
-The implementation of the OAI-PMH interface is for the most part minimal as specified 
+The implementation of the OAI-PMH interface is for the most part minimal, as specified 
 [here](https://www.openarchives.org/OAI/2.0/guidelines-repository.htm#MinimalImplementation).
 The only supported metadata format is Simple DC, there are no `about` containers,
 sets are not implemented, responses are not compressed, deletion of records

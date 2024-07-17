@@ -31,6 +31,7 @@ use ILIAS\Container\Content\ItemBlock\ItemBlockSequenceGenerator;
  */
 class DomainService
 {
+    protected \ILIAS\COPage\PC\Resources\ResourcesManager $copage_resources;
     protected \ILIAS\Repository\Clipboard\ClipboardManager $repo_clipboard;
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
@@ -71,6 +72,7 @@ class DomainService
         $this->domain_service = $domain_service;
         $this->item_repo = $this->repo_service->content()->item();
         $this->mode_repo = $this->repo_service->content()->mode();
+        $this->copage_resources = $DIC->copage()->internal()->domain()->pc()->resources();
     }
 
     /**
@@ -95,14 +97,16 @@ class DomainService
     public function itemPresentation(
         \ilContainer $container,
         ?\ilContainerUserFilter $container_user_filter,
-        bool $include_empty_blocks = true
+        bool $include_empty_blocks = true,
+        ?string $lang = null
     ): ItemPresentationManager {
         return new ItemPresentationManager(
             $this->domain_service,
             $container,
             $container_user_filter,
             $this->repo_clipboard,
-            $include_empty_blocks
+            $include_empty_blocks,
+            $lang
         );
     }
 
@@ -216,7 +220,8 @@ class DomainService
             self::$mode_managers[$container->getId()] = new ModeManager(
                 $container,
                 $this->mode_repo,
-                $this->repo_clipboard
+                $this->repo_clipboard,
+                $this->domain_service->user()->getId()
             );
         }
         return self::$mode_managers[$container->getId()];
@@ -243,15 +248,18 @@ class DomainService
         \ilContainer $container,
         BlockSequence $block_sequence,
         ItemSetManager $item_set_manager,
-        bool $include_empty_blocks = true
+        bool $include_empty_blocks = true,
+        ?string $lang = null
     ): ItemBlockSequenceGenerator {
         return new ItemBlockSequenceGenerator(
             $this->data_service->content(),
             $this->domain_service,
+            $this->copage_resources,
             $container,
             $block_sequence,
             $item_set_manager,
-            $include_empty_blocks
+            $include_empty_blocks,
+            $lang
         );
     }
 }

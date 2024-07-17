@@ -840,6 +840,12 @@ class ilContainerRenderer
         foreach($this->item_presentation->getAllRefIds() as $ref_id) {
             $rd = $this->item_presentation->getRawDataByRefId($ref_id);
             $preloader->addItem($rd["obj_id"], $rd["type"], $ref_id);
+            if ($rd["type"] === "sess") {
+                $ev_items = ilObjectActivation::getItemsByEvent((int) $rd["obj_id"]);
+                foreach ($ev_items as $ev_item) {
+                    $preloader->addItem((int) $ev_item["obj_id"], $ev_item["type"], $ev_item["ref_id"]);
+                }
+            }
         }
         $preloader->preload();
 
@@ -994,11 +1000,19 @@ class ilContainerRenderer
 
         // remove embedded, but unrendered blocks
         foreach ($this->item_presentation->getPageEmbeddedBlockIds() as $id) {
-            $page_html = preg_replace(
-                '~\[list-' . $id . '\]~i',
-                "",
-                $page_html
-            );
+            if (is_numeric($id)) {
+                $page_html = preg_replace(
+                    '~\[item-group-' . $id . '\]~i',
+                    "",
+                    $page_html
+                );
+            } else {
+                $page_html = preg_replace(
+                    '~\[list-' . $id . '\]~i',
+                    "",
+                    $page_html
+                );
+            }
         }
 
         if ($valid) {

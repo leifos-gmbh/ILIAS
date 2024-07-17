@@ -108,7 +108,7 @@ class ilDclRecordListTableGUI extends ilTable2GUI
                     }
                 }
             } else {
-                $default_sort_title = ilDclCache::getFieldCache((int)$fieldId)->getTitle();
+                $default_sort_title = ilDclCache::getFieldCache((int) $fieldId)->getTitle();
             }
             $this->setDefaultOrderField($default_sort_title);
         }
@@ -178,6 +178,7 @@ class ilDclRecordListTableGUI extends ilTable2GUI
             }
 
             $this->ctrl->setParameterByClass(ilDclFieldEditGUI::class, "record_id", $record->getId());
+            $this->ctrl->setParameterByClass(ilDclDetailedViewGUI::class, "table_id", $record->getTableId());
             $this->ctrl->setParameterByClass(ilDclDetailedViewGUI::class, "record_id", $record->getId());
             $this->ctrl->setParameterByClass(ilDclDetailedViewGUI::class, "tableview_id", $this->tableview->getId());
             $this->ctrl->setParameterByClass(ilDclRecordEditGUI::class, "record_id", $record->getId());

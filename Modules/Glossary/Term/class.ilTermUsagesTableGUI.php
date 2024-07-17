@@ -55,11 +55,11 @@ class ilTermUsagesTableGUI extends ilTable2GUI
         $agg_usages = array();
         foreach ($usages as $k => $usage) {
             if (empty($agg_usages[$usage["type"] . ":" . $usage["id"]])) {
-                $usage["hist_nr"] = array($usage["hist_nr"]);
+                $usage["hist_nr"] = array($usage["hist_nr"] ?? 0);
                 $agg_usages[$usage["type"] . ":" . $usage["id"]] = $usage;
             } else {
                 $agg_usages[$usage["type"] . ":" . $usage["id"]]["hist_nr"][] =
-                    $usage["hist_nr"];
+                    $usage["hist_nr"] ?? 0;
             }
         }
 
@@ -229,7 +229,7 @@ class ilTermUsagesTableGUI extends ilTable2GUI
             if ($item["sub_txt"] != "") {
                 $this->tpl->setVariable("SEP", ", ");
                 $this->tpl->setVariable("SUB_TXT", $item["sub_txt"]);
-                if ($item["sub_title"] != "") {
+                if (($item["sub_title"] ?? "") != "") {
                     $this->tpl->setVariable("SEP2", ": ");
                     $this->tpl->setVariable("SUB_TITLE", $item["sub_title"]);
                 }

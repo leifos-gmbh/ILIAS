@@ -242,7 +242,14 @@ class UIWrapper
 
         if ($updated !== true) {
             if (is_array($updated)) {
-                $error = implode("<br />", $updated);
+                $error = "";
+                foreach ($updated as $u) {
+                    if (is_array($u)) {
+                        $error .= implode("<br />", $u);
+                    } else {
+                        $error .= "<br />" . $u;
+                    }
+                }
             } elseif (is_string($updated)) {
                 $error = $updated;
             } else {
@@ -251,6 +258,7 @@ class UIWrapper
         } else {
             $page_gui->setOutputMode(\ilPageObjectGUI::EDIT);
             $page_gui->setDefaultLinkXml(); // fixes #31225
+            $page_gui->setTemplateOutput(false);
             $page_data = $page_gui->showPage();
             $pc_model = $page_gui->getPageObject()->getPCModel();
             $last_change = $page_gui->getPageObject()->getLastChange();

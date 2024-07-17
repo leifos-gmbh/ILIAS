@@ -189,7 +189,9 @@ class ilPersonalProfileGUI
         }
 
         // User has uploaded a file of a captured image
-        $this->uploads->process();
+        if (!$this->uploads->hasBeenProcessed()) {
+            $this->uploads->process();
+        }
         $existing_rid = $this->irss->manage()->find($this->user->getAvatarRid());
         $revision_title = 'Avatar for user ' . $this->user->getLogin();
 
@@ -218,7 +220,7 @@ class ilPersonalProfileGUI
                 }
             }
             if ($avatar_upload_result === null || !isset($rid)) {
-                $this->tpl->setOnScreenMessage('failure', $this->lng->txt('upload_error', true));
+                $this->tpl->setOnScreenMessage('failure', $this->lng->txt('upload_error'), true);
                 $this->ctrl->redirect($this, 'showProfile');
             }
             $this->user->setAvatarRid($rid->serialize());
@@ -239,7 +241,7 @@ class ilPersonalProfileGUI
         );
         $data = base64_decode($img);
         if ($data === false) {
-            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('upload_error', true));
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('upload_error'), true);
             $this->ctrl->redirect($this, 'showProfile');
         }
         $stream = Streams::ofString($data);
@@ -1099,10 +1101,13 @@ class ilPersonalProfileGUI
         $checked_values = [];
         $post = $this->profile_request->getParsedBody();
         foreach ($post as $k => $v) {
-            if (strpos($k, 'chk_') === 0 && substr($k, -2) === $key_suffix) {
-                $k = str_replace(['-1', '-2'], '', $k);
-                $checked_values[$k] = $v;
+            if (strpos($k, 'chk_') !== 0) {
+                continue;
             }
+            if  (substr($k, -2) === $key_suffix) {
+                $k = str_replace(['-1', '-2'], '', $k);
+            }
+            $checked_values[$k] = $v;
         }
         foreach ($this->user_defined_fields->getVisibleDefinitions() as $field_id => $definition) {
             if (isset($post['chk_udf_' . $definition['field_id'] . $key_suffix])) {

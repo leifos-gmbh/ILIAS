@@ -142,6 +142,11 @@ class ilUserTableGUI extends ilTable2GUI
     {
         $user_defined_fields = ilUserDefinedFields::_getInstance();
         foreach ($user_defined_fields->getDefinitions() as $field => $definition) {
+            if ($this->mode === self::MODE_LOCAL_USER
+                && $definition['visib_lua'] === '0') {
+                continue;
+            }
+
             $this->udf_fields["udf_" . $field] = [
                 "txt" => $definition["field_name"],
                 "default" => false,
@@ -189,23 +194,23 @@ class ilUserTableGUI extends ilTable2GUI
         $cols["lastname"] = [
             "txt" => $lng->txt("lastname"),
             "default" => true];
-        if ($this->getMode() == self::MODE_USER_FOLDER) {
+
+        $cols["access_until"] = [
+            "txt" => $lng->txt("access_until"),
+            "default" => true];
+        $cols["last_login"] = [
+            "txt" => $lng->txt("last_login"),
+            "default" => true];
+
+        // #13967
+        $cols["create_date"] = [
+            "txt" => $lng->txt("create_date")];
+        $cols["approve_date"] = [
+            "txt" => $lng->txt("approve_date")];
+        $cols["agree_date"] = [
+            "txt" => $lng->txt("agree_date")];
+        if ($this->getMode() === self::MODE_LOCAL_USER) {
             $ufs = $up->getStandardFields();
-
-            $cols["access_until"] = [
-                "txt" => $lng->txt("access_until"),
-                "default" => true];
-            $cols["last_login"] = [
-                "txt" => $lng->txt("last_login"),
-                "default" => true];
-
-            // #13967
-            $cols["create_date"] = [
-                "txt" => $lng->txt("create_date")];
-            $cols["approve_date"] = [
-                "txt" => $lng->txt("approve_date")];
-            $cols["agree_date"] = [
-                "txt" => $lng->txt("agree_date")];
         } else {
             $ufs = $up->getLocalUserAdministrationFields();
         }
@@ -240,12 +245,8 @@ class ilUserTableGUI extends ilTable2GUI
             "txt" => $lng->txt("auth_mode"),
             "default" => false];
 
-
-        // custom user fields
-        if ($this->getMode() == self::MODE_USER_FOLDER) {
-            foreach ($this->udf_fields as $k => $field) {
-                $cols[$k] = $field;
-            }
+        foreach ($this->udf_fields as $k => $field) {
+            $cols[$k] = $field;
         }
 
         // fields that are always shown
@@ -301,7 +302,7 @@ class ilUserTableGUI extends ilTable2GUI
             return;
         }
 
-        if (isset($this->filter['user_ids']) && is_array($this->filter['user_ids']) && !count($this->filter['user_ids'])) {
+        if (isset($this->filter['user_ids']) && is_array($this->filter['user_ids']) && $this->filter['user_ids'] === []) {
             $this->setMaxCount(0);
             $this->setData([]);
             return;
@@ -336,13 +337,13 @@ class ilUserTableGUI extends ilTable2GUI
         $query->setUdfFilter($udf_filter);
         $usr_data = $query->query();
 
-        if (count($usr_data["set"]) == 0 && $this->getOffset() > 0) {
+        if (count($usr_data['set']) == 0 && $this->getOffset() > 0) {
             $this->resetOffset();
             $query->setOffset($this->getOffset());
             $usr_data = $query->query();
         }
 
-        foreach ($usr_data["set"] as $k => $user) {
+        foreach ($usr_data['set'] as $k => $user) {
             if (in_array('org_units', $this->getSelectedColumns())) {
                 $usr_data['set'][$k]['org_units'] = ilObjUser::lookupOrgUnitsRepresentation($user['usr_id']);
             }
@@ -350,25 +351,25 @@ class ilUserTableGUI extends ilTable2GUI
 
             $current_time = time();
             if ($user['active']) {
-                if ($user["time_limit_unlimited"]) {
-                    $txt_access = $lng->txt("access_unlimited");
-                    $usr_data["set"][$k]["access_class"] = "smallgreen";
-                } elseif ($user["time_limit_until"] < $current_time) {
-                    $txt_access = $lng->txt("access_expired");
-                    $usr_data["set"][$k]["access_class"] = "smallred";
+                if ($user['time_limit_unlimited']) {
+                    $txt_access = $lng->txt('access_unlimited');
+                    $usr_data['set'][$k]['access_class'] = 'smallgreen';
+                } elseif ($user['time_limit_until'] < $current_time) {
+                    $txt_access = $lng->txt('access_expired');
+                    $usr_data['set'][$k]['access_class'] = 'smallred';
                 } else {
-                    $txt_access = ilDatePresentation::formatDate(new ilDateTime($user["time_limit_until"], IL_CAL_UNIX));
-                    $usr_data["set"][$k]["access_class"] = "small";
+                    $txt_access = ilDatePresentation::formatDate(new ilDateTime($user['time_limit_until'], IL_CAL_UNIX));
+                    $usr_data['set'][$k]['access_class'] = 'small';
                 }
             } else {
-                $txt_access = $lng->txt("inactive");
-                $usr_data["set"][$k]["access_class"] = "smallred";
+                $txt_access = $lng->txt('inactive');
+                $usr_data['set'][$k]['access_class'] = 'smallred';
             }
-            $usr_data["set"][$k]["access_until"] = $txt_access;
+            $usr_data['set'][$k]['access_until'] = $txt_access;
         }
 
-        $this->setMaxCount($usr_data["cnt"]);
-        $this->setData($usr_data["set"]);
+        $this->setMaxCount($usr_data['cnt']);
+        $this->setData($usr_data['set']);
     }
 
     public function addFilterItemValue($filter, $value): void // Missing parameter types.

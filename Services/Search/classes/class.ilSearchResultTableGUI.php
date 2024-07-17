@@ -1,8 +1,22 @@
 <?php
 
-declare(strict_types=1);
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
+declare(strict_types=1);
 
 /**
 * TableGUI class for search results
@@ -34,11 +48,6 @@ class ilSearchResultTableGUI extends ilTable2GUI
         parent::__construct($a_parent_obj, $a_parent_cmd);
         $this->setTitle($this->lng->txt("search_results"));
         $this->setLimit(999);
-        //		$this->setId("srcres");
-
-        //$this->addColumn("", "", "1", true);
-        #$this->addColumn($this->lng->txt("type"), "type", "1");
-        #$this->addColumn($this->lng->txt("search_title_description"), "title_sort");
         $this->addColumn($this->lng->txt("type"), "type", "1");
         $this->addColumn($this->lng->txt("search_title_description"), "title");
 
@@ -48,7 +57,6 @@ class ilSearchResultTableGUI extends ilTable2GUI
         }
 
         if ($this->enabledRelevance()) {
-            #$this->addColumn($this->lng->txt('lucene_relevance_short'),'s_relevance','50px');
             $this->addColumn($this->lng->txt('lucene_relevance_short'), 'relevance', '50px');
             $this->setDefaultOrderField("s_relevance");
             $this->setDefaultOrderDirection("desc");
@@ -60,7 +68,6 @@ class ilSearchResultTableGUI extends ilTable2GUI
         $this->setEnableHeader(true);
         $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
         $this->setRowTemplate("tpl.search_result_row.html", "Services/Search");
-        //$this->disable("footer");
         $this->setEnableTitle(true);
         $this->setEnableNumInfo(false);
         $this->setShowRowsSelector(false);
@@ -102,7 +109,7 @@ class ilSearchResultTableGUI extends ilTable2GUI
         $description = $a_set['description'];
         $relevance = $a_set['relevance'];
 
-        if (!$type) {
+        if (!$type || $this->objDefinition->isSideBlock($type)) {
             return;
         }
 
@@ -118,7 +125,22 @@ class ilSearchResultTableGUI extends ilTable2GUI
 
         $this->tpl->setVariable("ACTION_HTML", $item_list_gui->getCommandsHTML());
 
-        if ($html = $item_list_gui->getListItemHTML($ref_id, $obj_id, $title, $description)) {
+        if ($html = $item_list_gui->getListItemHTML($ref_id, $obj_id, '#SRC_HIGHLIGHT_TITLE', '#SRC_HIGHLIGHT_DESC')) {
+            // replace highlighted title/description
+            $html = str_replace(
+                [
+                    '#SRC_HIGHLIGHT_TITLE',
+                    '#SRC_HIGHLIGHT_DESC'
+                ],
+                [
+                    $title,
+                    strip_tags(
+                        $description,
+                        ['span']
+                    )
+                ],
+                $html
+            );
             $item_html[$ref_id]['html'] = $html;
             $item_html[$ref_id]['type'] = $type;
         }

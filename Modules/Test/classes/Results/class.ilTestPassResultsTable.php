@@ -185,7 +185,7 @@ class ilTestPassResultsTable
 
             $important_fields = [
                 $lng->txt('question_id') => (string)$question->getId(),
-                $lng->txt('question_type') => $question->getType(),
+                $lng->txt('question_type') => $lng->txt($question->getType()),
                 $lng->txt('points') => sprintf(
                     '%s/%s (%s%%)',
                     (string)$question->getUserScore(),
@@ -193,7 +193,11 @@ class ilTestPassResultsTable
                     (string)$question->getUserScorePercent()
                 )
             ];
-            $stats = $ui_factory->listing()->characteristicValue()->text($important_fields);
+
+            $stats_fields = $important_fields;
+            $stats_fields[$lng->txt('tst_question_hints_requested_hint_count_header')] = (string)$question->getNumberOfRequestedHints();
+            $stats = $ui_factory->listing()->characteristicValue()->text($stats_fields);
+
             $user_answer = $question->getUserAnswer();
             $best_solution = $env->getShowBestSolution() ? $question->getBestSolution() : '';
 

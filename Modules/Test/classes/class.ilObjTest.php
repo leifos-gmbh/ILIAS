@@ -921,11 +921,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
     */
     public function getReportingDate(): ?string
     {
-        $date = $this->getScoreSettings()->getResultSummarySettings()->getReportingDate();
-        if ($date) {
-            $date = $date->format('YmdHis'); //legacy-reasons ;(
-        }
-        return $date;
+        return $this->getScoreSettings()->getResultSummarySettings()->getReportingDate()?->format('YmdHis');
     }
 
     public function getNrOfTries(): int
@@ -1012,7 +1008,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
     public function getProcessingTimeAsMinutes()
     {
         if ($this->processing_time !== null) {
-            if (preg_match("/(\d{2}):(\d{2}):(\d{2})/is", (string)$this->processing_time, $matches)) {
+            if (preg_match("/(\d{2}):(\d{2}):(\d{2})/is", (string) $this->processing_time, $matches)) {
                 return ($matches[1] * 60) + $matches[2];
             }
         }
@@ -1030,7 +1026,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
     public function getProcessingTimeInSeconds($active_id = ""): int
     {
         $processing_time = $this->getMainSettings()->getTestBehaviourSettings()->getProcessingTime() ?? '';
-        if (preg_match("/(\d{2}):(\d{2}):(\d{2})/", (string)$processing_time, $matches)) {
+        if (preg_match("/(\d{2}):(\d{2}):(\d{2})/", (string) $processing_time, $matches)) {
             $extratime = $this->getExtraTime($active_id) * 60;
             return ($matches[1] * 3600) + ($matches[2] * 60) + $matches[3] + $extratime;
         } else {
@@ -2647,11 +2643,18 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
                         while ($row = $this->db->fetchAssoc($result)) {
                             $tpass = array_key_exists("pass", $row) ? $row["pass"] : 0;
 
+                            if (
+                                !isset($row["question_fi"], $row["points"], $row["sequence"]) ||
+                                !is_numeric($row["question_fi"]) || !is_numeric($row["points"]) || !is_numeric($row["sequence"])
+                            ) {
+                                continue;
+                            }
+
                             $data->getParticipant($active_id)->addQuestion(
-                                $row["original_id"],
-                                $row["question_fi"],
-                                $row["points"],
-                                $row["sequence"],
+                                (int) $row["original_id"],
+                                (int) $row["question_fi"],
+                                (float) $row["points"],
+                                (int) $row["sequence"],
                                 $tpass
                             );
 
@@ -2932,7 +2935,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
     {
         $name = "";
         if (strlen($firstname . $lastname . $title) == 0) {
-            $name = $this->lng->txt("deleted_user");
+            $name = $this->lng->txt('deleted_user');
         } else {
             if ($user_id == ANONYMOUS_USER_ID) {
                 $name = $lastname;
@@ -3335,7 +3338,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
                     break;
 
                 case "highscore_score":
-                    $gamification_settings = $gamification_settings->withHighscoreScore((bool)$metadata["entry"]);
+                    $gamification_settings = $gamification_settings->withHighscoreScore((bool) $metadata["entry"]);
                     break;
 
                 case "highscore_percentage":
@@ -3362,7 +3365,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
                     $gamification_settings = $gamification_settings->withHighscoreTopNum((int) $metadata["entry"]);
                     break;
                 case "use_previous_answers":
-                    $participant_functionality_settings = $participant_functionality_settings->withUsePreviousAnswerAllowed((bool)$metadata["entry"]);
+                    $participant_functionality_settings = $participant_functionality_settings->withUsePreviousAnswerAllowed((bool) $metadata["entry"]);
                     break;
                 case "title_output":
                     $question_behaviour_settings = $question_behaviour_settings->withQuestionTitleOutputMode((int) $metadata["entry"]);
@@ -3432,7 +3435,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
                     $result_details_settings = $result_details_settings->withExportSettings((int) $metadata["entry"]);
                     break;
                 case "score_cutting":
-                    $scoring_settings = $scoring_settings->withScoreCutting((int)$metadata["entry"]);
+                    $scoring_settings = $scoring_settings->withScoreCutting((int) $metadata["entry"]);
                     break;
                 case "password":
                     $access_settings = $access_settings->withPasswordEnabled(
@@ -3780,11 +3783,11 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
         $a_xml_writer->xmlEndTag('qtimetadatafield');
 
         // score reporting date
-        if ($this->getReportingDate()) {
+        if ($this->getScoreSettings()->getResultSummarySettings()->getReportingDate() !== null) {
             $a_xml_writer->xmlStartTag("qtimetadatafield");
             $a_xml_writer->xmlElement("fieldlabel", null, "reporting_date");
             $reporting_date = $this->buildPeriodFromFormatedDateString(
-                $this->getScoreSettings()->getResultSummarySettings()->getReportingDate()->format('Y-m-d G:m:s')
+                $this->getScoreSettings()->getResultSummarySettings()->getReportingDate()->format('Y-m-d H:m:s')
             );
             $a_xml_writer->xmlElement("fieldentry", null, $reporting_date);
             $a_xml_writer->xmlEndTag("qtimetadatafield");
@@ -4585,14 +4588,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
         $new_obj->setTmpCopyWizardCopyId($copy_id);
         $this->cloneMetaData($new_obj);
 
-        //copy online status if object is not the root copy object
-        $cp_options = ilCopyWizardOptions::_getInstance($copy_id);
-        if ($cp_options->isRootNode($this->getRefId())) {
-            $new_obj->getObjectProperties()->storePropertyIsOnline(
-                $new_obj->getObjectProperties()->getPropertyIsOnline()->withOffline()
-            );
-        }
-
         $new_obj->saveToDb();
         $new_obj->addToNewsOnOnline(false, $new_obj->getObjectProperties()->getPropertyIsOnline()->getIsOnline());
         $this->getMainSettingsRepository()->store(
@@ -4773,29 +4768,31 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
     /**
     * Returns the text answer of a given user for a given question
     *
-    * @param integer $user_id The user id
-    * @param integer $question_id The question id
+    * @param integer $active_id
+    * @param integer $question_id
     * @return string The answer text
     * @access public
     */
     public function getTextAnswer($active_id, $question_id, $pass = null): string
     {
-        $res = "";
         if (($active_id) && ($question_id)) {
-            if (is_null($pass)) {
+            if ($pass === null) {
                 $pass = assQuestion::_getSolutionMaxPass($question_id, $active_id);
             }
-            $result = $this->db->queryF(
+            if ($pass === null) {
+                return '';
+            }
+            $query = $this->db->queryF(
                 "SELECT value1 FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s",
                 ['integer', 'integer', 'integer'],
                 [$active_id, $question_id, $pass]
             );
-            if ($result->numRows() == 1) {
-                $row = $this->db->fetchAssoc($result);
-                $res = $row["value1"];
+            $result = $this->db->fetchAll($query);
+            if (count($result) == 1) {
+                return $result[0]["value1"];
             }
         }
-        return $res;
+        return '';
     }
 
     /**
@@ -5290,6 +5287,10 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware
                 $reached_points = 0;
                 $max_points = 0;
                 $pass = ilObjTest::_getResultPass($active_id);
+                // abort if no valid pass can be found
+                if (!is_int($pass)) {
+                    continue;
+                }
                 foreach ($this->questions as $value) {
                     $question = ilObjTest::_instanciateQuestion($value);
                     if (is_object($question)) {

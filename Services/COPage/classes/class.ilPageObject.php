@@ -379,6 +379,9 @@ abstract class ilPageObject
             return true;
         }
         $error = null;
+        if ($this->getXMLContent() === "") {
+            $this->setXMLContent("<PageObject></PageObject>");
+        }
         $this->dom = $this->dom_util->docFromString($this->getXMLContent(true), $error);
         $path = "//PageObject";
         if (is_null($this->dom)) {
@@ -1088,7 +1091,7 @@ s     */
     /**
      * Validate the page content agains page DTD
      */
-    public function validateDom(): ?array
+    public function validateDom(bool $throw = false): ?array
     {
         $this->stripHierIDs();
 
@@ -1096,7 +1099,7 @@ s     */
         //libxml_disable_entity_loader(false);
 
         $error = null;
-        $this->dom_util->validate($this->dom, $error);
+        $this->dom_util->validate($this->dom, $error, $throw);
         return $error;
     }
 
@@ -1275,6 +1278,8 @@ s     */
         $this->buildDom(true);
         $dom_doc = $this->getDomDoc();
 
+        $errors = $this->validateDom(true);
+
         $iel = $this->containsDeactivatedElements($content);
         $inl = $this->containsIntLinks($content);
         // create object
@@ -1317,6 +1322,8 @@ s     */
 
         $this->buildDom(true);
         $dom_doc = $this->getDomDoc();
+
+        $errors = $this->validateDom(true);
 
         $iel = $this->containsDeactivatedElements($content);
         $inl = $this->containsIntLinks($content);
@@ -2980,12 +2987,32 @@ s     */
     public function getPCModel(): array
     {
         $model = [];
+        /*
+        $this->log->debug("--- Get page model start");
+        $model = [];
         foreach ($this->getAllPCIds() as $pc_id) {
             $co = $this->getContentObjectForPcId($pc_id);
             if ($co !== null) {
                 $co_model = $co->getModel();
                 if ($co_model !== null) {
                     $model[$pc_id] = $co_model;
+                }
+            }
+        }
+        $this->log->debug("--- Get page model end");
+        */
+
+        $config = $this->getPageConfig();
+        foreach ($this->pc_definition->getPCDefinitions() as $def) {
+            $model_provider = $this->pc_definition->getPCModelProviderByName($def["name"]);
+            if ($config->getEnablePCType($def["name"])) {
+                if (!is_null($model_provider)) {
+                    foreach ($model_provider->getModels(
+                        $this->dom_util,
+                        $this
+                    ) as $pc_id => $co_model) {
+                        $model[$pc_id] = $co_model;
+                    }
                 }
             }
         }

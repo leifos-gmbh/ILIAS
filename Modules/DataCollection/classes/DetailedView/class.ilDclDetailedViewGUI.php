@@ -17,6 +17,7 @@
  *********************************************************************/
 
 declare(strict_types=1);
+
 /**
  * @ilCtrl_Calls ilDclDetailedViewGUI: ilDclDetailedViewDefinitionGUI, ilEditClipboardGUI
  */
@@ -211,7 +212,7 @@ class ilDclDetailedViewGUI
         foreach ($table->getStandardFields() as $field) {
             $html = str_ireplace(
                 "[" . $field->getId() . "]",
-                $this->record_obj->getRecordFieldSingleHTML($field->getId()),
+                $this->record_obj->getRecordFieldSingleHTML($field->getId(), ['tableview_id' => $this->tableview_id]),
                 $html
             );
         }
@@ -221,7 +222,7 @@ class ilDclDetailedViewGUI
         $tpl->setPermanentLink(
             'dcl',
             filter_input(INPUT_GET, 'ref_id', FILTER_VALIDATE_INT),
-            '_' . $this->tableview_id . '_' . $this->record_obj->getId()
+            $this->table->getId() . '_' . $this->tableview_id . '_' . $this->record_obj->getId()
         );
 
         // Buttons for previous/next records
@@ -313,7 +314,7 @@ class ilDclDetailedViewGUI
     protected function renderComments(bool $edit = false): string
     {
         if (!$edit) {
-            return $this->notesGUI->getCommentsHTML();
+            return $this->notesGUI->getListHTML();
         } else {
             return $this->notesGUI->editNoteForm();
         }
@@ -407,7 +408,7 @@ class ilDclDetailedViewGUI
         );
         //we then partially load the records. note that this also fills up session data.
         $this->table->getPartialRecords(
-            (string)$this->table->getId(),
+            (string) $this->table->getId(),
             $list->getOrderField(),
             $list->getOrderDirection(),
             $list->getLimit(),

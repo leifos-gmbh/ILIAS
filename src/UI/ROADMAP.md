@@ -27,7 +27,9 @@ when to provide an Icon, restrictions of the Title (lengths, nouns vs verbs etc.
 subjects: [Feature Wiki](https://docu.ilias.de/goto_docu_wiki_wpage_6080_1357.html). 
 However, this has not been decided yet and is thus most certainly up for discussion.
 
-Note; One important aspect here, will be to clarify at some point the relation to the [Global Screen](../GlobalScreen). 
+Note; One important aspect here, will be to clarify at some point the relation to the [Global Screen](../GlobalScreen).
+
+The need for a title section component was also discovered while discussing [this PR for the Test & Assessment kiosk mode header](https://github.com/ILIAS-eLearning/ILIAS/pull/7311). This shows that there are use cases beyond the content page title and actions that should be taken into account. Maybe the UI Entity could serve as inspiration for how properties and actions in a title sections could be arranged with effective visual weighting by relevance and semantic grouping.
 
 ### Tabs and Sub Tabs (advanced, variable)
 Note that a major part of the work for this Components will be to setup a comprehensive set of rules on the naming of 
@@ -411,6 +413,18 @@ Following advantages will be gained:
 - getting rid of some jQuery dependencies as it was decided to avoid those
 
 Note: the package can be found in the node_modules directory. With ILIAS 10 it will be found in the public/node_modules directory.
+
+### Add Accessibility for UI Input "Button" > "Month"
+
+The DateTime Input Field was adjusted to HTML5 to make accessibility possible. The UI
+Input field for Duration uses those changes too. The JavaScript Bootstrap DateTimePicker
+files could not be deleted, because the UI Input Button "Month" still uses this library.
+There's currently no HTML5 Picker for that scenario available - the input type "month" in HTML5
+acts like a text type field. We need a accessible Input Button field "Month".
+
+Following tasks have to be done:
+- creating and diskussing a concept
+- implementing the solution after the concept got approved
 
 
 ## Ideas and Food for Thought

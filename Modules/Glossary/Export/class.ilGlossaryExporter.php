@@ -24,12 +24,16 @@
 class ilGlossaryExporter extends ilXmlExporter
 {
     private ilGlossaryDataSet $ds;
+    protected \ILIAS\Glossary\Metadata\MetadataManager $metadata;
 
     public function init(): void
     {
+        global $DIC;
+
         $this->ds = new ilGlossaryDataSet();
         $this->ds->setExportDirectories($this->dir_relative, $this->dir_absolute);
         $this->ds->setDSPrefix("ds");
+        $this->metadata = $DIC->glossary()->internal()->domain()->metadata();
     }
 
     public function getXmlExportTailDependencies(
@@ -38,13 +42,6 @@ class ilGlossaryExporter extends ilXmlExporter
         array $a_ids
     ): array {
         if ($a_entity == "glo") {
-            $md_ids = array();
-
-            // glo related ids
-            foreach ($a_ids as $id) {
-                $md_ids[] = $id . ":0:glo";
-            }
-
             // definition related ids
             $page_ids = array();
             foreach ($a_ids as $id) {
@@ -66,7 +63,6 @@ class ilGlossaryExporter extends ilXmlExporter
 
                 foreach ($terms as $t) {
                     $page_ids[] = "term:" . $t["id"];
-                    $md_ids[] = $id . ":" . $t["id"] . ":term";
                 }
             }
             // definition pages and their metadat
@@ -74,11 +70,7 @@ class ilGlossaryExporter extends ilXmlExporter
                 array(
                     "component" => "Services/COPage",
                     "entity" => "pg",
-                    "ids" => $page_ids),
-                array(
-                    "component" => "Services/MetaData",
-                    "entity" => "md",
-                    "ids" => $md_ids),
+                    "ids" => $page_ids)
             );
 
             // taxonomy
@@ -103,7 +95,7 @@ class ilGlossaryExporter extends ilXmlExporter
                 $rec_ids = $this->getActiveAdvMDRecords($id);
                 if (count($rec_ids)) {
                     foreach ($rec_ids as $rec_id) {
-                        $advmd_ids[] = $id . ":" . $rec_id;
+                        $advmd_ids[] = $id . ":" . $rec_id->getRecordId();
                     }
                 }
             }
@@ -138,6 +130,14 @@ class ilGlossaryExporter extends ilXmlExporter
 
     protected function getActiveAdvMDRecords(int $a_id): array
     {
+        $active = [];
+        foreach (ilObject::_getAllReferences($a_id) as $ref_id) {
+            foreach ($this->metadata->getActiveAdvMDRecords($ref_id) as $rec) {
+                $active[$rec->getRecordId()] = $rec;
+            }
+        }
+        return $active;
+
         $active = array();
         // selected globals
         $sel_globals = ilAdvancedMDRecord::getObjRecSelection($a_id, "term");

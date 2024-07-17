@@ -21,11 +21,11 @@ require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 use ILIAS\DI\RBACServices;
 use ILIAS\Taxonomy\Service;
 use Psr\Http\Message\ServerRequestInterface as HttpRequest;
-use ILIAS\DI\UIServices as UIServices;
 use ILIAS\TestQuestionPool\QuestionInfoService as QuestionInfoService;
 use ILIAS\UI\URLBuilder;
 use ILIAS\UI\URLBuilderToken;
 use ILIAS\Data\Factory as DataFactory;
+use ILIAS\GlobalScreen\Services as GlobalScreen;
 
 /**
  * Class ilObjQuestionPoolGUI
@@ -62,6 +62,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
     protected RBACServices $rbac;
     protected ilComponentLogger $log;
     protected ilHelpGUI $help;
+    protected GlobalScreen $global_screen;
     protected ilComponentFactory $component_factory;
     protected ilComponentRepository $component_repository;
     protected ilNavigationHistory $navigation_history;
@@ -81,6 +82,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
         $this->rbac = $DIC->rbac();
         $this->log = $DIC['ilLog'];
         $this->help = $DIC['ilHelp'];
+        $this->global_screen = $DIC['global_screen'];
         $this->component_factory = $DIC['component.factory'];
         $this->component_repository = $DIC['component.repository'];
         $this->navigation_history = $DIC['ilNavigationHistory'];
@@ -232,7 +234,8 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                     $this->lng,
                     $ilDB,
                     $ilUser,
-                    $randomGroup
+                    $randomGroup,
+                    $this->global_screen
                 );
 
                 $gui->initQuestion((int) $this->qplrequest->raw('q_id'), $this->object->getId());
@@ -491,7 +494,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                         $this->tpl->setOnScreenMessage('failure', $this->lng->txt('msg_no_questions_selected'), true);
                         $this->ctrl->redirect($this, 'questions');
                     }
-                    if (! is_array($ids)) {
+                    if ($ids[0] === 'ALL_OBJECTS') {
+                        $ids = $this->object->getAllQuestionIds();
+                    }
+                    if (!is_array($ids)) {
                         $ids = explode(',', $ids);
                     }
                     $ids = array_map('intval', $ids);
@@ -1281,6 +1287,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             );
         }
 
+        $this->tpl->setPermanentLink($this->object->getType(), $this->object->getRefId());
         $out[] = $this->getTable();
         $this->tpl->setContent(implode('', $out));
     }
@@ -1549,7 +1556,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             $q_gui = assQuestionGUI::_getQuestionGUI('', $this->qplrequest->getQuestionId());
             if ($q_gui->object instanceof assQuestion) {
                 $q_gui->object->setObjId($this->object->getId());
-                $title = $q_gui->object->getTitle();
+                $title = $this->object->getTitle() . ': ' . $q_gui->object->getTitle();
                 if (!$title) {
                     $title = $this->lng->txt('new') . ': ' . $this->questioninfo->getQuestionTypeName(
                         $q_gui->object->getId()
@@ -1888,10 +1895,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             $this->lng,
             $this->component_repository,
             $this->rbac_system,
-            $this->taxonomy->domain(),
+            $this->object->getShowTaxonomies() ? $this->taxonomy->domain() : null,
             $this->notes_service,
             $this->object->getId(),
-            (int)$this->qplrequest->getRefId()
+            (int) $this->qplrequest->getRefId()
         );
 
         /**
@@ -1902,22 +1909,25 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
         $filter = $table->getFilter($this->ui_service, $filter_action);
 
         $filter_params = $this->ui_service->filter()->getData($filter);
+
         if ($filter_params) {
             foreach (array_filter($filter_params) as $item => $value) {
 
                 switch ($item) {
                     case 'taxonomies':
-                        if($value === 'null') {
-                            $table->addTaxonomyFilterNoTaxonomySet(true);
-                        } else {
-                            $tax_nodes = explode('-', $value);
-                            $tax_id = array_shift($tax_nodes);
-                            $table->addTaxonomyFilter(
-                                $tax_id,
-                                $tax_nodes,
-                                $this->object->getId(),
-                                $this->object->getType()
-                            );
+                        foreach($value as $tax_value) {
+                            if($tax_value === 'null') {
+                                $table->addTaxonomyFilterNoTaxonomySet(true);
+                            } else {
+                                $tax_nodes = explode('-', $tax_value);
+                                $tax_id = array_shift($tax_nodes);
+                                $table->addTaxonomyFilter(
+                                    $tax_id,
+                                    $tax_nodes,
+                                    $this->object->getId(),
+                                    $this->object->getType()
+                                );
+                            }
                         }
                         break;
                     case 'commented':

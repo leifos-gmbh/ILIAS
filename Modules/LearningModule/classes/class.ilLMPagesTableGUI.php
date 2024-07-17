@@ -90,11 +90,11 @@ class ilLMPagesTableGUI extends ilTable2GUI
         $active = ilLMPage::_lookupActive(
             $a_set["obj_id"],
             $this->lm->getType(),
-            $this->lm_set->get("time_scheduled_page_activation")
+            (bool) $this->lm_set->get("time_scheduled_page_activation")
         );
 
         // is page scheduled?
-        $img_sc = ($this->lm_set->get("time_scheduled_page_activation") &&
+        $img_sc = ((bool) $this->lm_set->get("time_scheduled_page_activation") &&
             ilLMPage::_isScheduledActivation($a_set["obj_id"], $this->lm->getType()))
             ? "_sc"
             : "";

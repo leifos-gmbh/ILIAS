@@ -120,9 +120,6 @@ class ilObjIndividualAssessmentGUI extends ilObjectGUI
                 $this->ctrl->forwardCommand($info);
                 break;
             case 'illearningprogressgui':
-                if (!$this->object->accessHandler()->mayReadObject()) {
-                    $this->handleAccessViolation();
-                }
                 $this->tabs_gui->activateTab(self::TAB_LP);
                 $learning_progress = new ilLearningProgressGUI(
                     ilLearningProgressBaseGUI::LP_CONTEXT_REPOSITORY,
@@ -155,7 +152,7 @@ class ilObjIndividualAssessmentGUI extends ilObjectGUI
             default:
                 if (!$cmd) {
                     $cmd = 'view';
-                    if ($this->object->accessHandler()->mayEditMembers()) {
+                    if ($this->object->accessHandler()->mayViewAnyUser() || $this->object->accessHandler()->mayEditMembers()) {
                         $this->ctrl->setCmdClass('ilIndividualassessmentmembersgui');
                         $cmd = 'members';
                     }
@@ -325,7 +322,7 @@ class ilObjIndividualAssessmentGUI extends ilObjectGUI
         }
 
         if (($this->object->accessHandler()->mayViewAllUsers()
-            || $this->object->accessHandler()->mayGradeAllUsers()
+            || $this->object->accessHandler()->mayEditLearningProgressSettings()
             || ($this->object->loadMembers()->userAllreadyMember($this->usr)
             && $this->object->isActiveLP()))
             && ilObjUserTracking::_enabledLearningProgress()) {

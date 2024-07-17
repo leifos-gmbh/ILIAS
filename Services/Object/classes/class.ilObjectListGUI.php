@@ -25,6 +25,7 @@ use ILIAS\UI\Component\Modal\Modal;
 use ILIAS\UI\Component\Card\RepositoryObject;
 use ILIAS\UI\Component\Item\Item;
 use ILIAS\UI\Component\Image\Image;
+use ILIAS\UI\Implementation\Component\SignalGenerator;
 use ILIAS\Notes\Note;
 use ILIAS\HTTP\Services as HTTPServices;
 use ILIAS\Object\ilObjectDIC;
@@ -568,7 +569,10 @@ class ilObjectListGUI
     }
     public function setTitle(string $title): void
     {
-        $this->title = $title;
+        $this->title = strip_tags(
+            $title,
+            ilObjectGUI::ALLOWED_TAGS_IN_TITLE_AND_DESCRIPTION
+        );
     }
 
     /**
@@ -581,7 +585,10 @@ class ilObjectListGUI
 
     public function setDescription(string $description): void
     {
-        $this->description = $description;
+        $this->description = strip_tags(
+            $description,
+            ilObjectGUI::ALLOWED_TAGS_IN_TITLE_AND_DESCRIPTION
+        );
     }
 
     /**
@@ -2520,7 +2527,7 @@ class ilObjectListGUI
             }
         }
 
-        $this->title = ilObject::_lookupTitle($this->obj_id);
+        $this->setTitle(ilObject::_lookupTitle($this->obj_id));
         $htpl->setVariable(
             'ACTION_DROP_DOWN',
             $this->insertCommands(false, false, '', true)
@@ -2911,7 +2918,7 @@ class ilObjectListGUI
         $content = $this->tpl->get();
         $file_upload_dropzone = new ilObjFileUploadDropzone($this->ref_id, $content);
         if ($this->context === self::CONTEXT_REPOSITORY
-            && $this->requested_cmd === "view"
+            && ($this->requested_cmd === "view" || $this->requested_cmd === "" || $this->requested_cmd === "render")
             && $file_upload_dropzone->isUploadAllowed($this->type)
         ) {
             return $file_upload_dropzone->getDropzoneHtml();
@@ -3242,10 +3249,10 @@ class ilObjectListGUI
         $def_command = $this->getDefaultCommand();
 
         $dropdown = $ui->factory()->dropdown()->standard($actions)
-                       ->withAriaLabel(sprintf(
-                           $this->lng->txt('actions_for'),
-                           htmlspecialchars(addslashes($title))
-                       ));
+            ->withAriaLabel(sprintf(
+                $this->lng->txt('actions_for'),
+                htmlspecialchars(addslashes($title))
+            ));
 
         // workaround for #26205
         // we should get rid of _top links completely and gifure our how
@@ -3261,32 +3268,26 @@ class ilObjectListGUI
             $this->modifySAHSlaunch($def_cmd_link, $def_cmd_frame);
 
         $image = $this->getTileImage();
+
+
+
         if ($def_cmd_link != '') {    // #24256
             if ($def_cmd_frame !== '' && ($modified_link === $def_cmd_link)) {
-                $image = $image->withAdditionalOnLoadCode(function ($id) use (
-                    $def_cmd_frame,
-                    $def_cmd_link
-                ): string {
-                    return
-                        '$("#' . $id . '").click(function(e) { window.open("' . str_replace(
+                $signal = (new SignalGenerator())->create();
+                $this->main_tpl->addOnLoadCode(
+                    "$(document).on('{$signal->getId()}', function(event, signalData) {"
+                        . ' window.open("' . str_replace(
                             '&amp;',
                             '&',
                             $def_cmd_link
-                        ) . '", "' . $def_cmd_frame . '");});';
-                });
+                        ) . '", "' . $def_cmd_frame . '");'
+                    . '});'
+                );
+
+                $image = $image->withAction($signal);
 
                 $button =
-                    $ui->factory()->button()->shy($title, "")->withAdditionalOnLoadCode(function ($id) use (
-                        $def_cmd_frame,
-                        $def_cmd_link
-                    ): string {
-                        return
-                            '$("#' . $id . '").click(function(e) { window.open("' . str_replace(
-                                '&amp;',
-                                '&',
-                                $def_cmd_link
-                            ) . '", "' . $def_cmd_frame . '");});';
-                    });
+                    $ui->factory()->button()->shy($title, '')->appendOnClick($signal);
                 $title = $ui->renderer()->render($button);
             } else {
                 $image = $image->withAction($modified_link);
@@ -3311,6 +3312,21 @@ class ilObjectListGUI
             ->icon()
             ->standard($type, $this->lng->txt('obj_' . $type))
         ;
+
+
+
+        if ($this->obj_definition->isActivePluginType($type)) {
+            $class_name = 'il' . $this->obj_definition->getClassName($type) . 'Plugin';
+            if ($class_name !== 'ilPlugin'
+            && method_exists($class_name, '_getIcon')) {
+                $pl = ilObjectPlugin::getPluginObjectByType($type);
+                $icon = $this->ui
+                    ->factory()
+                    ->symbol()
+                    ->icon()
+                    ->custom(call_user_func([$class_name, '_getIcon'], $type, 'small', $obj_id), $pl->txt('obj_' . $type));
+            }
+        }
 
         // card title action
         $card_title_action = '';
@@ -3384,7 +3400,7 @@ class ilObjectListGUI
     private function getTileImage(): Image
     {
         return $this->object_properties->getPropertyTileImage()
-            ->getTileImage()->getImage();
+            ->getTileImage()->getImage($this->ui->factory()->image());
     }
 
     /**

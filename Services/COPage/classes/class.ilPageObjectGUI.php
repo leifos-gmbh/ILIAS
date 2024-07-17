@@ -844,7 +844,6 @@ class ilPageObjectGUI
 
         switch ($next_class) {
             case 'ilobjectmetadatagui':
-                //$this->tabs_gui->activateTab("meta_data");
                 $this->setBackToEditTabs();
                 $md_gui = new ilObjectMetaDataGUI($this->meta_data_rep_obj, $this->meta_data_type, $this->meta_data_sub_obj_id);
                 if (is_object($this->meta_data_observer_obj)) {
@@ -1146,7 +1145,6 @@ class ilPageObjectGUI
             if ($this->getEnabledPageFocus()) {
                 $tpl->touchBlock("page_focus");
             }
-
             // presentation
             if ($this->isPageContainerToBeRendered()) {
                 $tpl->touchBlock("page_container_1");
@@ -2092,7 +2090,8 @@ class ilPageObjectGUI
         if ($this->profile_back_url != "") {
             return $this->profile_back_url;
         }
-        if ($this->getOutputMode() === self::OFFLINE) {
+        if ($this->getOutputMode() === self::OFFLINE ||
+            $this->getOutputMode() === self::PRINTING) {
             return "";
         }
         return $this->ctrl->getLinkTargetByClass(strtolower(get_class($this)), "preview");
@@ -2751,8 +2750,8 @@ class ilPageObjectGUI
         $tpl = new ilTemplate("tpl.page_compare.html", true, true, "Services/COPage");
 
         $pg = $this->obj;
-        $l_page = ilPageObjectFactory::getInstance($pg->getParentType(), $pg->getId(), $this->request->getInt("left"));
-        $r_page = ilPageObjectFactory::getInstance($pg->getParentType(), $pg->getId(), $this->request->getInt("right"));
+        $l_page = ilPageObjectFactory::getInstance($pg->getParentType(), $pg->getId(), $this->request->getInt("left"), $pg->getLanguage());
+        $r_page = ilPageObjectFactory::getInstance($pg->getParentType(), $pg->getId(), $this->request->getInt("right"), $pg->getLanguage());
 
         $compare = $this->compare->compare(
             $this->getPageObject(),

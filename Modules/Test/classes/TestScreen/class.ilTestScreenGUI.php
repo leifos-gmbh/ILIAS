@@ -21,6 +21,7 @@ declare(strict_types=1);
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\Data\Link;
 use ILIAS\Data\Result;
+use ILIAS\UI\Component\Component;
 use ILIAS\UI\Component\Launcher\Launcher;
 use ILIAS\UI\Component\Launcher\Factory as LauncherFactory;
 use ILIAS\UI\Component\MessageBox\MessageBox;
@@ -43,6 +44,7 @@ class ilTestScreenGUI
     private readonly ilObjTestMainSettings $main_settings;
     private readonly ilTestSession $test_session;
     private readonly DataFactory $data_factory;
+    private ilTestPasswordChecker $password_checker;
 
     public function __construct(
         private readonly ilObjTest $object,
@@ -57,6 +59,7 @@ class ilTestScreenGUI
         private readonly ilTabsGUI $tabs,
         private readonly ilAccessHandler $access,
         private readonly ilDBInterface $database,
+        private readonly ilRbacSystem $rbac_system
     ) {
         $this->ref_id = $this->object->getRefId();
         $this->main_settings = $this->object->getMainSettings();
@@ -67,20 +70,26 @@ class ilTestScreenGUI
         $this->test_passes_selector = new ilTestPassesSelector($this->database, $this->object);
         $this->test_passes_selector->setActiveId($this->test_session->getActiveId());
         $this->test_passes_selector->setLastFinishedPass($this->test_session->getLastFinishedPass());
+        $this->password_checker = new ilTestPasswordChecker($this->rbac_system, $this->user, $this->object, $this->lng);
     }
 
     public function executeCommand(): void
     {
         if ($this->access->checkAccess('read', '', $this->ref_id)) {
-            $this->{$this->ctrl->getCmd()}();
-        } else {
-            $this->tpl->setOnScreenMessage('failure', sprintf(
-                $this->lng->txt('msg_no_perm_read_item'),
-                $this->object->getTitle()
-            ), true);
-            $this->ctrl->setParameterByClass('ilrepositorygui', 'ref_id', ROOT_FOLDER_ID);
-            $this->ctrl->redirectByClass('ilrepositorygui');
+            $this->{$this->ctrl->getCmd(self::DEFAULT_CMD)}();
+            return;
         }
+
+        if (!$this->object->getMainSettings()->getAdditionalSettings()->getHideInfoTab()) {
+            $this->ctrl->redirectByClass(ilObjTestGUI::class, 'infoScreen');
+        }
+
+        $this->tpl->setOnScreenMessage('failure', sprintf(
+            $this->lng->txt('msg_no_perm_read_item'),
+            $this->object->getTitle()
+        ), true);
+        $this->ctrl->setParameterByClass('ilrepositorygui', 'ref_id', ROOT_FOLDER_ID);
+        $this->ctrl->redirectByClass('ilrepositorygui');
     }
 
     public function testScreen(): void
@@ -90,6 +99,9 @@ class ilTestScreenGUI
 
         $elements = [];
 
+        if ($this->areSkillLevelThresholdsMissing()) {
+            $elements = [$this->getSkillLevelThresholdsMissingInfo()];
+        }
         $elements = $this->handleRenderMessageBox($elements);
         $elements = $this->handleRenderIntroduction($elements);
 
@@ -252,8 +264,6 @@ class ilTestScreenGUI
 
         if ($this->hasAvailablePasses()) {
             if ($this->lastPassSuspended()) {
-                ilSession::set('tst_password_' . $this->object->getTestId(), $this->object->getPassword());
-
                 $launcher = $launcher->inline($this->getResumeLauncherLink());
             }
             if ($this->newPassCanBeStarted()) {
@@ -394,6 +404,7 @@ class ilTestScreenGUI
                             $conditions_met = false;
                             $message .= $this->lng->txt('tst_exam_password_invalid_message') . '<br>';
                         }
+                        $this->password_checker->setUserEnteredPassword($password);
                         break;
                     case 'exam_access_code':
                         if ($anonymous && !empty($value)) {
@@ -502,5 +513,56 @@ class ilTestScreenGUI
                 && $this->test_passes_selector->getLastFinishedPass() >= 0
             || $this->user->isAnonymous()
         );
+    }
+
+    private function getSkillLevelThresholdsMissingInfo(): Component
+    {
+        $message = $this->lng->txt('tst_skl_level_thresholds_missing');
+
+        $link_target = $this->buildLinkTarget(
+            ilTestSkillLevelThresholdsGUI::CMD_SHOW_SKILL_THRESHOLDS
+        );
+
+        $link = $this->ui_factory->link()->standard(
+            $this->lng->txt('tst_skl_level_thresholds_link'),
+            $link_target
+        );
+
+        return $this->ui_factory->messageBox()->failure($message)->withLinks([$link]);
+    }
+
+    private function areSkillLevelThresholdsMissing(): bool
+    {
+        if (!$this->object->isSkillServiceEnabled()) {
+            return false;
+        }
+
+        $questionContainerId = $this->object->getId();
+
+        $assignmentList = new ilAssQuestionSkillAssignmentList($this->database);
+        $assignmentList->setParentObjId($questionContainerId);
+        $assignmentList->loadFromDb();
+
+        foreach ($assignmentList->getUniqueAssignedSkills() as $data) {
+            foreach ($data['skill']->getLevelData() as $level) {
+                $threshold = new ilTestSkillLevelThreshold($this->database);
+                $threshold->setTestId($this->object->getTestId());
+                $threshold->setSkillBaseId($data['skill_base_id']);
+                $threshold->setSkillTrefId($data['skill_tref_id']);
+                $threshold->setSkillLevelId($level['id']);
+
+                if (!$threshold->dbRecordExists()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function buildLinkTarget(string $cmd = null): string
+    {
+        $target = array_merge(['ilRepositoryGUI', 'ilObjTestGUI'], ['ilTestSkillAdministrationGUI', 'ilTestSkillLevelThresholdsGUI']);
+        return $this->ctrl->getLinkTargetByClass($target, $cmd);
     }
 }

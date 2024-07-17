@@ -394,12 +394,13 @@ class ilForumAppEventListener implements ilAppEventListener
                         break;
 
                     case 'afterPostDeletion':
-                        $post = $a_parameter['post'];
+                        foreach ($a_parameter['user_ids'] as $user_id) {
+                            ilLPStatusWrapper::_updateStatus(
+                                $a_parameter['obj_id'],
+                                $user_id
+                            );
+                        }
 
-                        ilLPStatusWrapper::_updateStatus(
-                            $a_parameter['obj_id'],
-                            $post->getPosAuthorId()
-                        );
                         break;
 
                     case 'savedAsDraft':
@@ -468,6 +469,8 @@ class ilForumAppEventListener implements ilAppEventListener
             case 'Services/User':
                 if ($a_event === 'deleteUser') {
                     ilForumPostDraft::deleteDraftsByUserId($a_parameter['usr_id']);
+                    ilObjForum::_deleteUser($a_parameter['usr_id']);
+                    break;
                 }
                 break;
         }

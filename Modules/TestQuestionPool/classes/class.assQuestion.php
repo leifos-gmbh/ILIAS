@@ -21,6 +21,11 @@ use ILIAS\TA\Questions\assQuestionSuggestedSolution;
 use ILIAS\TA\Questions\assQuestionSuggestedSolutionsDatabaseRepository;
 use ILIAS\DI\Container;
 use ILIAS\Skill\Service\SkillUsageService;
+use ILIAS\Notes\Service as NotesService;
+use ILIAS\Notes\InternalDataService as NotesInternalDataService;
+use ILIAS\Notes\NoteDBRepository as NotesRepo;
+use ILIAS\Notes\NotesManager;
+use ILIAS\Notes\Note;
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
@@ -843,7 +848,7 @@ abstract class assQuestion
      */
     public function getSolutionValues($active_id, $pass = null, bool $authorized = true): array
     {
-        if (is_null($pass)) {
+        if ($pass === null && is_numeric($active_id)) {
             $pass = $this->getSolutionMaxPass((int) $active_id);
         }
 
@@ -1056,6 +1061,7 @@ abstract class assQuestion
         }
 
         $this->deleteTaxonomyAssignments();
+        $this->deleteComments();
 
         try {
             ilObjQuestionPool::_updateQuestionCount($this->getObjId());
@@ -1394,6 +1400,7 @@ abstract class assQuestion
         $this->feedbackOBJ->duplicateFeedback($originalQuestionId, $duplicateQuestionId);
         $this->duplicateQuestionHints($originalQuestionId, $duplicateQuestionId);
         $this->duplicateSkillAssignments($originalParentId, $originalQuestionId, $duplicateParentId, $duplicateQuestionId);
+        $this->duplicateComments($originalParentId, $originalQuestionId, $duplicateParentId, $duplicateQuestionId);
     }
 
     protected function beforeSyncWithOriginal(int $origQuestionId, int $dupQuestionId, int $origParentObjId, int $dupParentObjId): void
@@ -1408,15 +1415,77 @@ abstract class assQuestion
     protected function onCopy(int $sourceParentId, int $sourceQuestionId, int $targetParentId, int $targetQuestionId): void
     {
         $this->copySuggestedSolutionFiles($sourceParentId, $sourceQuestionId);
-
-        // duplicate question feeback
         $this->feedbackOBJ->duplicateFeedback($sourceQuestionId, $targetQuestionId);
-
-        // duplicate question hints
         $this->duplicateQuestionHints($sourceQuestionId, $targetQuestionId);
-
-        // duplicate skill assignments
         $this->duplicateSkillAssignments($sourceParentId, $sourceQuestionId, $targetParentId, $targetQuestionId);
+        $this->duplicateComments($sourceParentId, $sourceQuestionId, $targetParentId, $targetQuestionId);
+    }
+
+    protected function duplicateComments(
+        int $parent_source_id,
+        int $source_id,
+        int $parent_target_id,
+        int $target_id
+    ): void {
+        $manager = $this->getNotesManager();
+        $data_service = $this->getNotesDataService();
+        $notes = $manager->getNotesForRepositoryObjIds([$parent_source_id], Note::PUBLIC);
+        $notes = array_filter(
+            $notes,
+            fn($n) => $n->getContext()->getSubObjId() === $source_id
+        );
+
+        foreach($notes as $note) {
+            $new_context = $data_service->context(
+                $parent_target_id,
+                $target_id,
+                $note->getContext()->getType()
+            );
+            $new_note = $data_service->note(
+                -1,
+                $new_context,
+                $note->getText(),
+                $note->getAuthor(),
+                $note->getType(),
+                $note->getCreationDate(),
+                $note->getUpdateDate(),
+                $note->getRecipient()
+            );
+            $manager->createNote($new_note, [], true);
+        }
+    }
+
+    protected function deleteComments(): void
+    {
+        $repo = $this->getNotesRepo();
+        $manager = $this->getNotesManager();
+        $source_id = $this->getId();
+        $notes = $manager->getNotesForRepositoryObjIds([$this->getObjId()], Note::PUBLIC);
+        $notes = array_filter(
+            $notes,
+            fn($n) => $n->getContext()->getSubObjId() === $source_id
+        );
+        foreach($notes as $note) {
+            $repo->deleteNote($note->getId());
+        }
+    }
+
+    protected function getNotesManager(): NotesManager
+    {
+        $service = new NotesService($this->dic);
+        return $service->internal()->domain()->notes();
+    }
+
+    protected function getNotesDataService(): NotesInternalDataService
+    {
+        $service = new NotesService($this->dic);
+        return $service->internal()->data();
+    }
+
+    protected function getNotesRepo(): NotesRepo
+    {
+        $service = new NotesService($this->dic);
+        return $service->internal()->repo()->note();
     }
 
     public function deleteSuggestedSolutions(): void
@@ -1436,10 +1505,12 @@ abstract class assQuestion
         return null;
     }
 
-    protected function syncSuggestedSolutions(int $source_question_id, int $target_question_id): void
-    {
-        $this->getSuggestedSolutionsRepo()->syncForQuestion($source_question_id, $target_question_id);
-        $this->syncSuggestedSolutionFiles($source_question_id);
+    protected function syncSuggestedSolutions(
+        int $target_question_id,
+        int $target_obj_id
+    ): void {
+        $this->getSuggestedSolutionsRepo()->syncForQuestion($this->getId(), $target_question_id);
+        $this->syncSuggestedSolutionFiles($target_question_id, $target_obj_id);
     }
 
     /**
@@ -1470,10 +1541,16 @@ abstract class assQuestion
         }
     }
 
-    protected function syncSuggestedSolutionFiles(int $original_id): void
-    {
+    protected function syncSuggestedSolutionFiles(
+        int $target_question_id,
+        int $target_obj_id
+    ): void {
         $filepath = $this->getSuggestedSolutionPath();
-        $filepath_original = str_replace("/$this->id/solution", "/$original_id/solution", $filepath);
+        $filepath_original = str_replace(
+            "{$this->getObjId()}/{$this->id}/solution",
+            "{$target_obj_id}/{$target_question_id}/solution",
+            $filepath
+        );
         ilFileUtils::delDir($filepath_original);
         foreach ($this->suggested_solutions as $index => $solution) {
             if ($solution->isOfTypeFile()) {
@@ -1642,7 +1719,7 @@ abstract class assQuestion
         $original->createPageObject();
         $original->copyPageOfQuestion($this->getId());
 
-        $this->syncSuggestedSolutions($this->getId(), $this->getOriginalId());
+        $this->syncSuggestedSolutions($this->getOriginalId(), $original_obj_id);
         $this->syncXHTMLMediaObjectsOfQuestion();
         $this->afterSyncWithOriginal($this->getId(), $this->getOriginalId(), $this->getObjId(), $original_obj_id);
         $this->syncHints();
@@ -1688,7 +1765,7 @@ abstract class assQuestion
         $this->points = $points;
     }
 
-    public function getSolutionMaxPass(int $active_id): int
+    public function getSolutionMaxPass(int $active_id): ?int
     {
         return self::_getSolutionMaxPass($this->getId(), $active_id);
     }
@@ -1696,7 +1773,7 @@ abstract class assQuestion
     /**
     * Returns the maximum pass a users question solution
     */
-    public static function _getSolutionMaxPass(int $question_id, int $active_id): int
+    public static function _getSolutionMaxPass(int $question_id, int $active_id): ?int
     {
         // the following code was the old solution which added the non answered
         // questions of a pass from the answered questions of the previous pass
@@ -1709,12 +1786,12 @@ abstract class assQuestion
             array('integer','integer'),
             array($active_id, $question_id)
         );
-        if ($result->numRows() == 1) {
+        if ($result->numRows() === 1) {
             $row = $ilDB->fetchAssoc($result);
-            return (int) $row["maxpass"];
+            return $row["maxpass"];
         }
 
-        return 0;
+        return null;
     }
 
     public static function _isWriteable(int $question_id, int $user_id): bool
@@ -1857,19 +1934,22 @@ abstract class assQuestion
         }
 
         if ($points <= $maxpoints) {
-            if (is_null($pass)) {
+            if ($pass === null) {
                 $pass = assQuestion::_getSolutionMaxPass($question_id, $active_id);
             }
 
-            // retrieve the already given points
+            $rowsnum = 0;
             $old_points = 0;
-            $result = $ilDB->queryF(
-                "SELECT points FROM tst_test_result WHERE active_fi = %s AND question_fi = %s AND pass = %s",
-                array('integer','integer','integer'),
-                array($active_id, $question_id, $pass)
-            );
-            $manual = ($manualscoring) ? 1 : 0;
-            $rowsnum = $result->numRows();
+
+            if ($pass !== null) {
+                $result = $ilDB->queryF(
+                    "SELECT points FROM tst_test_result WHERE active_fi = %s AND question_fi = %s AND pass = %s",
+                    array('integer','integer','integer'),
+                    array($active_id, $question_id, $pass)
+                );
+                $manual = ($manualscoring) ? 1 : 0;
+                $rowsnum = $result->numRows();
+            }
             if ($rowsnum > 0) {
                 $row = $ilDB->fetchAssoc($result);
                 $old_points = $row["points"];
@@ -2572,7 +2652,7 @@ abstract class assQuestion
             "value1" => array("clob", $value1),
             "value2" => array("clob", $value2),
             "pass" => array("integer", $pass),
-            "tstamp" => array("integer", ((int)$tstamp > 0) ? (int)$tstamp : time()),
+            "tstamp" => array("integer", ((int) $tstamp > 0) ? (int) $tstamp : time()),
             'authorized' => array('integer', (int) $authorized)
         );
 
@@ -2766,7 +2846,7 @@ abstract class assQuestion
 
     public function authorizedSolutionExists(int $active_id, ?int $pass): bool
     {
-        if (is_null($pass)) {
+        if ($pass === null) {
             return false;
         }
         $solutionAvailability = $this->lookupForExistingSolutions($active_id, $pass);

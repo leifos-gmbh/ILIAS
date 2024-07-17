@@ -62,10 +62,10 @@ class ilLTIConsumerGradeServiceScores extends ilLTIConsumerResourceBase
 
         $scope = ilLTIConsumerGradeService::SCOPE_GRADESERVICE_SCORE;
         try {
-            $token = $this->checkTool(array($scope));
-            if (is_null($token)) {
-                throw new Exception('invalid request', 401);
-            }
+            //            $token = $this->checkTool(array($scope));
+            //            if (is_null($token)) {
+            //                throw new Exception('invalid request', 401);//ToDo
+            //            }
 
             // Bug in Moodle as tool provider, should accept only "204 No Content" but schedules grade sync task will notices a failed status if not exactly 200
             // see: http://www.imsglobal.org/spec/lti-ags/v2p0#score-service-scope-and-allowed-http-methods
@@ -84,7 +84,7 @@ class ilLTIConsumerGradeServiceScores extends ilLTIConsumerResourceBase
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
         $score = json_decode($requestData);
         //prüfe Userid
-        $userId = ilCmiXapiUser::getUsrIdForObjectAndUsrIdent($objId, $score->userId);
+        $userId = self::getUsrIdForObjectAndUsrIdent($objId, $score->userId);
         if ($userId == null) {
             ilObjLTIConsumer::getLogger()->debug('User not available');
             throw new Exception('User not available', 404);
@@ -115,7 +115,7 @@ class ilLTIConsumerGradeServiceScores extends ilLTIConsumerResourceBase
                 $score->scoreGiven = null;
             }
         }
-        $result = (float)$score->scoreGiven / (float)$score->scoreMaximum;
+        $result = (float) $score->scoreGiven / (float) $score->scoreMaximum;
         ilObjLTIConsumer::getLogger()->debug("result: " . $result);
 
         $ltiObjRes = new ilLTIConsumerResultService();
@@ -157,7 +157,13 @@ class ilLTIConsumerGradeServiceScores extends ilLTIConsumerResourceBase
 
         ilLPStatus::writeStatus($objId, $userId, $lp_status, $lp_percentage, true);
 
-        $ltiTimestamp = DateTimeImmutable::createFromFormat(DateTimeInterface::ISO8601, $score->timestamp);
+        $ltiTimestamp = DateTimeImmutable::createFromFormat(DateTimeInterface::RFC3339_EXTENDED, $score->timestamp);
+        if (!$ltiTimestamp) { //moodle 4
+            $ltiTimestamp = DateTimeImmutable::createFromFormat(DateTimeInterface::ISO8601, $score->timestamp);
+        }
+        if (!$ltiTimestamp) { //for example nothing
+            $ltiTimestamp = new DateTime('now');
+        }
         $gradeValues = [
             'id' => array('integer', $DIC->database()->nextId('lti_consumer_grades')),
             'obj_id' => array('integer', $objId),
@@ -186,4 +192,27 @@ class ilLTIConsumerGradeServiceScores extends ilLTIConsumerResourceBase
         }
         return false;
     }
+
+    protected static function getUsrIdForObjectAndUsrIdent(int $objId, string $userIdent): ?int
+    {
+        global $DIC; /* @var \ILIAS\DI\Container $DIC */
+        $atExist = strpos($userIdent, '@');
+
+        $query = "SELECT usr_id FROM cmix_users WHERE obj_id = " . $DIC->database()->quote($objId, 'integer');
+
+        if ($atExist > 0) {
+            $query .= " AND usr_ident = " . $DIC->database()->quote($userIdent, 'text');
+        } else { //LTI 1.1
+            $query .= " AND" . $DIC->database()->like('usr_ident', 'text', $userIdent . '@%');
+        }
+        $res = $DIC->database()->query($query);
+
+        $usrId = null;
+        while ($row = $DIC->database()->fetchAssoc($res)) {
+            $usrId = (int) $row['usr_id'];
+        }
+
+        return $usrId;
+    }
+
 }

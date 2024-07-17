@@ -109,7 +109,7 @@ class ilLMNavigationStatus
             $active = ilLMPage::_lookupActive(
                 $obj_id,
                 $this->lm->getType(),
-                $this->lm_set->get("time_scheduled_page_activation")
+                (bool) $this->lm_set->get("time_scheduled_page_activation")
             );
 
             if (!$active &&
@@ -131,8 +131,16 @@ class ilLMNavigationStatus
             (bool) $this->lm_set->get("time_scheduled_page_activation")
         );
 
+        $show = $active;
+
+        // look, whether activation data should be shown
+        $act_data = ilLMPage::_lookupActivationData((int) $curr_node["obj_id"], $this->lm->getType());
+        if ($act_data["show_activation_info"] ?? false) {
+            $show = true;
+        }
+
         if ($curr_node["type"] == "pg" &&
-            $active) {		// page in tree -> return page id
+            $show) {		// page in tree -> return page id
             $page_id = $curr_node["obj_id"];
         } else { 		// no page -> search for next page and return its id
             $succ_node = true;
@@ -145,7 +153,7 @@ class ilLMNavigationStatus
                     $active = ilLMPage::_lookupActive(
                         $page_id,
                         $this->lm->getType(),
-                        $this->lm_set->get("time_scheduled_page_activation")
+                        (bool) $this->lm_set->get("time_scheduled_page_activation")
                     );
                 }
             }
@@ -225,10 +233,9 @@ class ilLMNavigationStatus
                 $active = ilLMPage::_lookupActive(
                     $c_id,
                     $this->lm->getType(),
-                    $this->lm_set->get("time_scheduled_page_activation")
+                    (bool) $this->lm_set->get("time_scheduled_page_activation")
                 );
             }
-
             if (is_array($succ_node) && $succ_node["obj_id"] > 0 &&
                 $user_id == ANONYMOUS_USER_ID &&
                 ($this->lm->getPublicAccessMode() == "selected" &&

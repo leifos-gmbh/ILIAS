@@ -60,25 +60,25 @@ class TokenHandler implements TokenHandlerInterface
         }
 
         if (
-            !isset($token_parts[1]) ||
-            !is_int($token_parts[1]) ||
-            $token_parts[1] < 0
+            !isset($token_parts[0]) ||
+            !is_int($token_parts[0]) ||
+            $token_parts[0] < 0
         ) {
             return false;
         }
 
         if (
-            !isset($token_parts[2]) ||
-            !is_string($token_parts[2]) ||
-            !$this->isStringValidAsDate($token_parts[2])
+            !isset($token_parts[1]) ||
+            !is_string($token_parts[1]) ||
+            !$this->isStringValidAsDate($token_parts[1])
         ) {
             return false;
         }
 
         // last parameter is optional
         if (
-            isset($token_parts[3]) &&
-            (!is_string($token_parts[3]) || !$this->isStringValidAsDate($token_parts[2]))
+            isset($token_parts[2]) &&
+            (!is_string($token_parts[2]) || !$this->isStringValidAsDate($token_parts[2]))
         ) {
             return false;
         }

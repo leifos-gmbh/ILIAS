@@ -81,6 +81,7 @@ class TokenHandlerTest extends TestCase
         $offset_from_token = $handler->getOffsetFromToken($token);
         $request_from_token = $handler->appendArgumentsFromTokenToRequest($this->getRequest(), $token);
 
+        $this->assertTrue($handler->isTokenValid($token));
         $this->assertSame(32, $offset_from_token);
         $this->assertNull($request_from_token->exposed_from_date);
         $this->assertSame('2022-10-30', $request_from_token->exposed_until_date);
@@ -98,6 +99,7 @@ class TokenHandlerTest extends TestCase
         $offset_from_token = $handler->getOffsetFromToken($token);
         $request_from_token = $handler->appendArgumentsFromTokenToRequest($this->getRequest(), $token);
 
+        $this->assertTrue($handler->isTokenValid($token));
         $this->assertSame(32, $offset_from_token);
         $this->assertSame('2021-10-30', $request_from_token->exposed_from_date);
         $this->assertSame('2022-10-30', $request_from_token->exposed_until_date);
@@ -115,6 +117,7 @@ class TokenHandlerTest extends TestCase
         $offset_from_token = $handler->getOffsetFromToken($token);
         $request_from_token = $handler->appendArgumentsFromTokenToRequest($this->getRequest(), $token);
 
+        $this->assertTrue($handler->isTokenValid($token));
         $this->assertSame(32, $offset_from_token);
         $this->assertNull($request_from_token->exposed_from_date);
         $this->assertSame('2022-09-30', $request_from_token->exposed_until_date);
@@ -132,6 +135,7 @@ class TokenHandlerTest extends TestCase
         $offset_from_token = $handler->getOffsetFromToken($token);
         $request_from_token = $handler->appendArgumentsFromTokenToRequest($this->getRequest(), $token);
 
+        $this->assertTrue($handler->isTokenValid($token));
         $this->assertSame(32, $offset_from_token);
         $this->assertNull($request_from_token->exposed_from_date);
         $this->assertSame('2022-10-30', $request_from_token->exposed_until_date);
@@ -149,8 +153,75 @@ class TokenHandlerTest extends TestCase
         $offset_from_token = $handler->getOffsetFromToken($token);
         $request_from_token = $handler->appendArgumentsFromTokenToRequest($this->getRequest(), $token);
 
+        $this->assertTrue($handler->isTokenValid($token));
         $this->assertSame(32, $offset_from_token);
         $this->assertSame('2023-10-30', $request_from_token->exposed_from_date);
         $this->assertSame('2021-10-30', $request_from_token->exposed_until_date);
+    }
+
+    public function testIsTokenValidNonsenseString(): void
+    {
+        $handler = $this->getTokenHandler($this->getDate('2022-10-30'));
+
+        $this->assertFalse($handler->isTokenValid('sadadsadsgr'));
+    }
+
+    public function testIsTokenValidNonsenseAppended(): void
+    {
+        $handler = $this->getTokenHandler($this->getDate('2022-10-30'));
+        $token = $handler->generateToken(
+            32,
+            $this->getDate('2023-10-30'),
+            $this->getDate('2021-10-30'),
+        );
+
+        $this->assertFalse($handler->isTokenValid($token . 'sadadsadsgr'));
+    }
+
+    public function testIsTokenValidEmptyArray(): void
+    {
+        $handler = $this->getTokenHandler($this->getDate('2022-10-30'));
+
+        $this->assertFalse($handler->isTokenValid(base64_encode(json_encode([]))));
+    }
+
+    public function testIsTokenValidNoUntilDate(): void
+    {
+        $handler = $this->getTokenHandler($this->getDate('2022-10-30'));
+
+        $this->assertFalse($handler->isTokenValid(base64_encode(json_encode([5]))));
+    }
+
+    public function testIsTokenValidTooManyDates(): void
+    {
+        $handler = $this->getTokenHandler($this->getDate('2022-10-30'));
+
+        $this->assertFalse(
+            $handler->isTokenValid(
+                base64_encode(json_encode([5, '2023-10-30', '2021-10-30', '2051-10-30']))
+            )
+        );
+    }
+
+    public function testIsTokenValidNoNonNumericOffset(): void
+    {
+        $handler = $this->getTokenHandler($this->getDate('2022-10-30'));
+
+        $this->assertFalse(
+            $handler->isTokenValid(
+                base64_encode(json_encode(['asdsasd', '2023-10-30']))
+            )
+        );
+    }
+
+    public function testIsTokenValidInvalidDate(): void
+    {
+        $handler = $this->getTokenHandler($this->getDate('2022-10-30'));
+
+        $this->assertFalse(
+            $handler->isTokenValid(
+                base64_encode(json_encode([5, '2023-99-99']))
+            )
+        );
     }
 }

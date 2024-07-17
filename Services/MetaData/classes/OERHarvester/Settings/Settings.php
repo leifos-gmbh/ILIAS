@@ -71,6 +71,7 @@ class Settings implements SettingsInterface
             $this->settings->get('templates', serialize([])),
             ['allowed_classes' => false]
         );
+        $this->selected_cp_entry_ids = [];
         foreach ($ids_from_storage as $id) {
             $this->selected_cp_entry_ids[] = (int) $id;
         }

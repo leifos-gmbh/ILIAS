@@ -22,12 +22,14 @@ namespace ILIAS\MetaData\XML\Copyright;
 
 use ILIAS\MetaData\Copyright\RepositoryInterface as CopyrightRepository;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface as IdentifierHandler;
+use ILIAS\MetaData\Copyright\RendererInterface as CopyrightRenderer;
 use ILIAS\MetaData\Copyright\EntryInterface;
 
 class CopyrightHandler implements CopyrightHandlerInterface
 {
     protected CopyrightRepository $copyright_repository;
     protected IdentifierHandler $identifier_handler;
+    protected CopyrightRenderer $copyright_renderer;
 
     /**
      * @var EntryInterface[]
@@ -36,10 +38,12 @@ class CopyrightHandler implements CopyrightHandlerInterface
 
     public function __construct(
         CopyrightRepository $copyright_repository,
-        IdentifierHandler $identifier_handler
+        IdentifierHandler $identifier_handler,
+        CopyrightRenderer $copyright_renderer
     ) {
         $this->copyright_repository = $copyright_repository;
         $this->identifier_handler = $identifier_handler;
+        $this->copyright_renderer = $copyright_renderer;
     }
 
     public function copyrightForExport(string $copyright): string
@@ -94,18 +98,7 @@ class CopyrightHandler implements CopyrightHandlerInterface
 
         $entry_id = $this->identifier_handler->parseEntryIDFromIdentifier($copyright);
         $entry_data = $this->copyright_repository->getEntry($entry_id)->copyrightData();
-        $full_name = $entry_data->fullName();
-        $link = $entry_data->link();
-
-        $res = [];
-        if ($full_name !== '') {
-            $res[] = $full_name;
-        }
-        if ($link !== null) {
-            $res[] = (string) $link;
-        }
-
-        return implode(' ', $res);
+        return $this->copyright_renderer->toString($entry_data);
     }
 
     /**

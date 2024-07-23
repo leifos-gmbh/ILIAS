@@ -18,19 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Copyright;
+namespace ILIAS\MetaData\Services\CopyrightHelper;
 
-use ILIAS\UI\Component\Image\Image;
-use ILIAS\UI\Component\Link\Link;
-use ILIAS\UI\Component\Legacy\Legacy;
+use PHPUnit\Framework\TestCase;
 
-interface RendererInterface
+class CopyrightHelperTest extends TestCase
 {
-    /**
-     * Returns a string in a legacy UI component if only a string can be returned.
-     * @return Image[]|Link[]|Legacy[]
-     */
-    public function toUIComponents(CopyrightDataInterface $copyright): array;
-
-    public function toString(CopyrightDataInterface $copyright): string;
 }

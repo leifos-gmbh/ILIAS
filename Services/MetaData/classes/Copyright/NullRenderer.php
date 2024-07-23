@@ -24,13 +24,19 @@ use ILIAS\UI\Component\Image\Image;
 use ILIAS\UI\Component\Link\Link;
 use ILIAS\UI\Component\Legacy\Legacy;
 
-interface RendererInterface
+class NullRenderer implements RendererInterface
 {
     /**
      * Returns a string in a legacy UI component if only a string can be returned.
      * @return Image[]|Link[]|Legacy[]
      */
-    public function toUIComponents(CopyrightDataInterface $copyright): array;
+    public function toUIComponents(CopyrightDataInterface $copyright): array
+    {
+        return [];
+    }
 
-    public function toString(CopyrightDataInterface $copyright): string;
+    public function toString(CopyrightDataInterface $copyright): string
+    {
+        return '';
+    }
 }

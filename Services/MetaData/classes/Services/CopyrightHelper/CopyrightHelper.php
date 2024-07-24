@@ -157,7 +157,7 @@ class CopyrightHelper implements CopyrightHelperInterface
         $selection_active = $this->isCopyrightSelectionActive();
         $default_entry_id = 0;
         if ($selection_active) {
-            $default_id = $this->copyright_repo->getDefaultEntry()->id();
+            $default_entry_id = $this->copyright_repo->getDefaultEntry()->id();
         }
 
         $copyright_search_clauses = [];
@@ -170,6 +170,7 @@ class CopyrightHelper implements CopyrightHelperInterface
 
             if (
                 !$selection_active ||
+                !$this->identifier_handler->isIdentifierValid($copyright_id) ||
                 $this->identifier_handler->parseEntryIDFromIdentifier($copyright_id) !== $default_entry_id
             ) {
                 continue;
@@ -203,20 +204,6 @@ class CopyrightHelper implements CopyrightHelperInterface
         );
     }
 
-    protected function getCopyrightEntryWrapper(EntryInterface $entry): CopyrightInterface
-    {
-        return new Copyright(
-            $this->renderer,
-            $this->identifier_handler,
-            $entry
-        );
-    }
-
-    protected function getNullCopyrightEntryWrapper(): CopyrightInterface
-    {
-        return new NullCopyright();
-    }
-
     protected function getRawCopyright(ReaderInterface $reader): string
     {
         return $reader->firstData($this->getCopyrightDescriptionPath())->value();
@@ -229,5 +216,19 @@ class CopyrightHelper implements CopyrightHelperInterface
                                   ->withNextStep('description')
                                   ->withNextStep('string')
                                   ->get();
+    }
+
+    protected function getCopyrightEntryWrapper(EntryInterface $entry): CopyrightInterface
+    {
+        return new Copyright(
+            $this->renderer,
+            $this->identifier_handler,
+            $entry
+        );
+    }
+
+    protected function getNullCopyrightEntryWrapper(): CopyrightInterface
+    {
+        return new NullCopyright();
     }
 }

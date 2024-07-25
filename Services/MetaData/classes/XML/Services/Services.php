@@ -80,8 +80,11 @@ class Services
             new CopyrightHandler(
                 $this->copyright_services->repository(),
                 $this->copyright_services->identifiersHandler(),
-                $this->copyright_services->renderer()
-            )
+                $this->copyright_services->renderer(),
+                \ilMDSettings::_getInstance()
+            ),
+            $this->path_services->pathFactory(),
+            $this->manipulator_services->manipulator()
         );
     }
 
@@ -99,7 +102,8 @@ class Services
         $copyright_handler = new CopyrightHandler(
             $this->copyright_services->repository(),
             $this->copyright_services->identifiersHandler(),
-            $this->copyright_services->renderer()
+            $this->copyright_services->renderer(),
+            \ilMDSettings::_getInstance()
         );
         return $this->standard_reader = new StandardReader(
             new StructurallyCoupled(
@@ -127,7 +131,8 @@ class Services
             new CopyrightHandler(
                 $this->copyright_services->repository(),
                 $this->copyright_services->identifiersHandler(),
-                $this->copyright_services->renderer()
+                $this->copyright_services->renderer(),
+                \ilMDSettings::_getInstance()
             ),
             new LinkGenerator($this->dic['static_url'])
         );

@@ -333,6 +333,17 @@ class CopyrightHelperTest extends TestCase
         $this->assertTrue($helper->hasPresetCopyright($reader));
     }
 
+    public function testHasPresetCopyrightTrueEmpty(): void
+    {
+        $helper = $this->getCopyrightHelper(
+            $this->getSettings(true),
+            $this->getCopyrightRepository([13, 77, 932, 5], [77], 13)
+        );
+        $reader = $this->getReader('');
+
+        $this->assertTrue($helper->hasPresetCopyright($reader));
+    }
+
     public function testHasPresetCopyrightFalse(): void
     {
         $helper = $this->getCopyrightHelper(

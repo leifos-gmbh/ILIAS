@@ -22,6 +22,11 @@ namespace ILIAS\MetaData\XML\Copyright;
 
 class NullCopyrightHandler implements CopyrightHandlerInterface
 {
+    public function isCopyrightSelectionActive(): bool
+    {
+        return false;
+    }
+
     public function copyrightForExport(string $copyright): string
     {
         return '';

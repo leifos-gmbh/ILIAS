@@ -32,6 +32,8 @@ use ILIAS\MetaData\Copyright\CopyrightDataInterface;
 use ILIAS\MetaData\Copyright\NullCopyrightData;
 use ILIAS\MetaData\Copyright\RendererInterface;
 use ILIAS\MetaData\Copyright\NullRenderer;
+use ILIAS\MetaData\Settings\SettingsInterface;
+use ILIAS\MetaData\Settings\NullSettings;
 
 class CopyrightHandlerTest extends TestCase
 {
@@ -45,21 +47,28 @@ class CopyrightHandlerTest extends TestCase
     protected function getCopyrightEntry(
         int $id,
         string $full_name,
-        ?string $link
+        ?string $link,
+        bool $default = false
     ): EntryInterface {
         $url = is_null($link) ? null : $this->getURI($link);
 
-        return new class ($id, $full_name, $url) extends NullEntry {
+        return new class ($id, $full_name, $url, $default) extends NullEntry {
             public function __construct(
                 protected int $id,
                 protected string $full_name,
-                protected ?URI $url
+                protected ?URI $url,
+                protected bool $default
             ) {
             }
 
             public function id(): int
             {
                 return $this->id;
+            }
+
+            public function isDefault(): bool
+            {
+                return $this->default;
             }
 
             public function copyrightData(): CopyrightDataInterface
@@ -106,6 +115,16 @@ class CopyrightHandlerTest extends TestCase
                 }
                 return new NullEntry();
             }
+
+            public function getDefaultEntry(): EntryInterface
+            {
+                foreach ($this->entries as $entry) {
+                    if ($entry->isDefault()) {
+                        return $entry;
+                    }
+                }
+                return new NullEntry();
+            }
         };
     }
 
@@ -139,6 +158,44 @@ class CopyrightHandlerTest extends TestCase
         };
     }
 
+    protected function getSettings(bool $selection_active): SettingsInterface
+    {
+        return new class ($selection_active) extends NullSettings {
+            public function __construct(protected bool $selection_active)
+            {
+            }
+
+            public function isCopyrightSelectionActive(): bool
+            {
+                return $this->selection_active;
+            }
+        };
+    }
+
+    public function testIsCopyrightSelectionActiveTrue(): void
+    {
+        $handler = new CopyrightHandler(
+            $this->getCopyrightRepository(),
+            $this->getIdentifierHandler(),
+            $this->getRenderer(),
+            $this->getSettings(true)
+        );
+
+        $this->assertTrue($handler->isCopyrightSelectionActive());
+    }
+
+    public function testIsCopyrightSelectionActiveFalse(): void
+    {
+        $handler = new CopyrightHandler(
+            $this->getCopyrightRepository(),
+            $this->getIdentifierHandler(),
+            $this->getRenderer(),
+            $this->getSettings(false)
+        );
+
+        $this->assertFalse($handler->isCopyrightSelectionActive());
+    }
+
     public function testCopyrightAsString(): void
     {
         $entries = [
@@ -149,11 +206,32 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
             'rendered full name: "second entry" and link: "http://www.example2.com"',
+            $handler->copyrightAsString('valid_identifier_55')
+        );
+    }
+
+    public function testCopyrightAsStringInactiveCPSelection(): void
+    {
+        $entries = [
+            $this->getCopyrightEntry(13, 'first entry', 'https://www.example1.com'),
+            $this->getCopyrightEntry(55, 'second entry', 'http://www.example2.com'),
+            $this->getCopyrightEntry(123, 'third entry', 'https://www.example3.com/something')
+        ];
+        $handler = new CopyrightHandler(
+            $this->getCopyrightRepository(...$entries),
+            $this->getIdentifierHandler(),
+            $this->getRenderer(),
+            $this->getSettings(false)
+        );
+
+        $this->assertSame(
+            'valid_identifier_55',
             $handler->copyrightAsString('valid_identifier_55')
         );
     }
@@ -168,7 +246,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -187,7 +266,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -206,7 +286,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -225,12 +306,53 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
             '',
             $handler->copyrightForExport('valid_identifier_678')
+        );
+    }
+
+    public function testCopyrightForExportInactiveCPSelection(): void
+    {
+        $entries = [
+            $this->getCopyrightEntry(13, 'first entry', 'https://www.example1.com'),
+            $this->getCopyrightEntry(55, 'second entry', 'http://www.example2.com'),
+            $this->getCopyrightEntry(123, 'third entry', 'https://www.example3.com/something')
+        ];
+        $handler = new CopyrightHandler(
+            $this->getCopyrightRepository(...$entries),
+            $this->getIdentifierHandler(),
+            $this->getRenderer(),
+            $this->getSettings(false)
+        );
+
+        $this->assertSame(
+            'valid_identifier_55',
+            $handler->copyrightForExport('valid_identifier_55')
+        );
+    }
+
+    public function testCopyrightForExportEmpty(): void
+    {
+        $entries = [
+            $this->getCopyrightEntry(13, 'first entry', 'https://www.example1.com'),
+            $this->getCopyrightEntry(55, 'second entry', 'http://www.example2.com', true),
+            $this->getCopyrightEntry(123, 'third entry', 'https://www.example3.com/something')
+        ];
+        $handler = new CopyrightHandler(
+            $this->getCopyrightRepository(...$entries),
+            $this->getIdentifierHandler(),
+            $this->getRenderer(),
+            $this->getSettings(true)
+        );
+
+        $this->assertSame(
+            'http://www.example2.com',
+            $handler->copyrightForExport('')
         );
     }
 
@@ -244,7 +366,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -263,7 +386,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -282,7 +406,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -301,7 +426,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -320,7 +446,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -339,7 +466,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -362,12 +490,33 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
             'just some text which contains first entry',
             $handler->copyrightFromExport('just some text which contains first entry')
+        );
+    }
+
+    public function testCopyrightFromExportInactiveCPSelection(): void
+    {
+        $entries = [
+            $this->getCopyrightEntry(13, 'first entry', null),
+            $this->getCopyrightEntry(55, 'second entry', 'http://www.example2.com'),
+            $this->getCopyrightEntry(123, 'third entry', 'https://www.example3.com/something')
+        ];
+        $handler = new CopyrightHandler(
+            $this->getCopyrightRepository(...$entries),
+            $this->getIdentifierHandler(),
+            $this->getRenderer(),
+            $this->getSettings(false)
+        );
+
+        $this->assertSame(
+            'some text containing http://www.example2.com',
+            $handler->copyrightFromExport('some text containing http://www.example2.com')
         );
     }
 
@@ -381,7 +530,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -404,7 +554,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -423,7 +574,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -442,7 +594,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(
@@ -461,7 +614,8 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer()
+            $this->getRenderer(),
+            $this->getSettings(true)
         );
 
         $this->assertSame(

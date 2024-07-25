@@ -35,9 +35,10 @@ interface CopyrightHelperInterface
 
     /**
      * Is the copyright in the LOM of the reader's object selected
-     * from the presets? If not, then the object either has no
-     * copyright information, or custom copyright information
-     * was manually entered.
+     * from the presets? If not, custom copyright information
+     * was entered manually. If no copyright is assigned to the
+     * object, it is treated like it has the default
+     * copyright licence, and true is returned here.
      *
      * Always returns false if copyright selection is not active.
      */

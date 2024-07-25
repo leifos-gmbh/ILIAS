@@ -24,12 +24,14 @@ use ILIAS\MetaData\Copyright\RepositoryInterface as CopyrightRepository;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface as IdentifierHandler;
 use ILIAS\MetaData\Copyright\RendererInterface as CopyrightRenderer;
 use ILIAS\MetaData\Copyright\EntryInterface;
+use ILIAS\MetaData\Settings\SettingsInterface;
 
 class CopyrightHandler implements CopyrightHandlerInterface
 {
     protected CopyrightRepository $copyright_repository;
     protected IdentifierHandler $identifier_handler;
     protected CopyrightRenderer $copyright_renderer;
+    protected SettingsInterface $settings;
 
     /**
      * @var EntryInterface[]
@@ -39,21 +41,31 @@ class CopyrightHandler implements CopyrightHandlerInterface
     public function __construct(
         CopyrightRepository $copyright_repository,
         IdentifierHandler $identifier_handler,
-        CopyrightRenderer $copyright_renderer
+        CopyrightRenderer $copyright_renderer,
+        SettingsInterface $settings
     ) {
         $this->copyright_repository = $copyright_repository;
         $this->identifier_handler = $identifier_handler;
         $this->copyright_renderer = $copyright_renderer;
+        $this->settings = $settings;
     }
 
     public function copyrightForExport(string $copyright): string
     {
-        if (!$this->identifier_handler->isIdentifierValid($copyright)) {
+        if (!$this->isCopyrightSelectionActive()) {
             return $copyright;
         }
 
-        $entry_id = $this->identifier_handler->parseEntryIDFromIdentifier($copyright);
-        $entry_data = $this->copyright_repository->getEntry($entry_id)->copyrightData();
+        if (!$this->identifier_handler->isIdentifierValid($copyright) && $copyright !== '') {
+            return $copyright;
+        }
+
+        if ($copyright === '') {
+            $entry_data = $this->copyright_repository->getDefaultEntry()->copyrightData();
+        } else {
+            $entry_id = $this->identifier_handler->parseEntryIDFromIdentifier($copyright);
+            $entry_data = $this->copyright_repository->getEntry($entry_id)->copyrightData();
+        }
         $full_name = $entry_data->fullName();
         $link = $entry_data->link();
 
@@ -65,6 +77,10 @@ class CopyrightHandler implements CopyrightHandlerInterface
 
     public function copyrightFromExport(string $copyright): string
     {
+        if (!$this->isCopyrightSelectionActive()) {
+            return $copyright;
+        }
+
         // url should be made to match regardless of scheme
         $normalized_copyright = str_replace('https://', 'http://', $copyright);
 
@@ -92,7 +108,10 @@ class CopyrightHandler implements CopyrightHandlerInterface
 
     public function copyrightAsString(string $copyright): string
     {
-        if (!$this->identifier_handler->isIdentifierValid($copyright)) {
+        if (
+            !$this->isCopyrightSelectionActive() ||
+            !$this->identifier_handler->isIdentifierValid($copyright)
+        ) {
             return $copyright;
         }
 
@@ -110,5 +129,10 @@ class CopyrightHandler implements CopyrightHandlerInterface
             $this->copyright_entries = iterator_to_array($this->copyright_repository->getAllEntries());
         }
         yield from $this->copyright_entries;
+    }
+
+    public function isCopyrightSelectionActive(): bool
+    {
+        return $this->settings->isCopyrightSelectionActive();
     }
 }

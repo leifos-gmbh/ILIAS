@@ -52,9 +52,7 @@ class ilLPStatusTypicalLearningTime extends ilLPStatus
 
     public static function _getStatusInfo(int $a_obj_id): array
     {
-        $status_info['tlt'] = ilMDEducational::_getTypicalLearningTimeSeconds(
-            $a_obj_id
-        );
+        $status_info['tlt'] = parent::_getTypicalLearningTime($a_obj_id);
         return $status_info;
     }
 
@@ -91,7 +89,7 @@ class ilLPStatusTypicalLearningTime extends ilLPStatus
         int $a_usr_id,
         ?object $a_obj = null
     ): int {
-        $tlt = ilMDEducational::_getTypicalLearningTimeSeconds($a_obj_id);
+        $tlt = parent::_getTypicalLearningTime($a_obj_id);
         $re = ilChangeEvent::_lookupReadEvents($a_obj_id, $a_usr_id);
         $spent = (int) ($re[0]["spent_seconds"] ?? 0);
 

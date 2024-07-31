@@ -144,7 +144,10 @@ class ilMMItemTranslationGUI
         $form->setFormAction($this->ctrl()->getFormAction($this));
 
         // additional languages
-        $options = ilMDLanguageItem::_getLanguages();
+        $options = [];
+        foreach ($this->learningObjectMetadata()->dataHelper()->getAllLanguages() as $language) {
+            $options[$language->value()] = $language->presentableLabel();
+        }
         $options = array("" => $this->lng()->txt("please_select")) + $options;
         $si = new ilSelectInputGUI($this->lng()->txt("additional_langs"), "additional_langs");
         $si->setOptions($options);

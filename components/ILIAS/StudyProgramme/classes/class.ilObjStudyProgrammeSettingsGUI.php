@@ -21,6 +21,7 @@ declare(strict_types=1);
 use ILIAS\UI\Component\Input\Factory;
 use ILIAS\UI\Implementation\Component\Input\Field\Factory as InputFieldFactory;
 use ILIAS\UI\Renderer;
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
 
 /**
  * @ilCtrl_Calls ilObjStudyProgrammeSettingsGUI: ilStudyProgrammeCommonSettingsGUI
@@ -56,6 +57,7 @@ class ilObjStudyProgrammeSettingsGUI
     protected ilStudyProgrammeCommonSettingsGUI $common_settings_gui;
     protected ilTabsGUI $tabs;
     protected ILIAS\HTTP\Wrapper\RequestWrapper $request_wrapper;
+    protected LOMServices $lom_services;
 
     protected ?ilObjStudyProgramme $object;
     protected string $tmp_heading;
@@ -73,7 +75,8 @@ class ilObjStudyProgrammeSettingsGUI
         ilStudyProgrammeTypeRepository $type_repository,
         ilStudyProgrammeCommonSettingsGUI $common_settings_gui,
         ilTabsGUI $tabs,
-        ILIAS\HTTP\Wrapper\RequestWrapper $request_wrapper
+        ILIAS\HTTP\Wrapper\RequestWrapper $request_wrapper,
+        LOMServices $lom_services
     ) {
         $this->tpl = $tpl;
         $this->ctrl = $ilCtrl;
@@ -87,6 +90,7 @@ class ilObjStudyProgrammeSettingsGUI
         $this->common_settings_gui = $common_settings_gui;
         $this->tabs = $tabs;
         $this->request_wrapper = $request_wrapper;
+        $this->lom_services = $lom_services;
 
         $this->object = null;
 
@@ -263,7 +267,10 @@ class ilObjStudyProgrammeSettingsGUI
         InputFieldFactory $ff,
         ilObjectTranslation $trans
     ): ILIAS\UI\Component\Input\Field\Section {
-        $languages = ilMDLanguageItem::_getLanguages();
+        $languages = [];
+        foreach ($this->lom_services->dataHelper()->getAllLanguages() as $language) {
+            $languages[$language->value()] = $language->presentableLabel();
+        }
         $lang = array_key_exists($trans->getDefaultLanguage(), $languages) ? $languages[$trans->getDefaultLanguage()] : '?';
         return $ff->section(
             [

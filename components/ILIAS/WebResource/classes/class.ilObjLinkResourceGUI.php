@@ -170,11 +170,6 @@ class ilObjLinkResourceGUI extends ilObject2GUI
         }
 
         if (!$this->getCreationMode()) {
-            ilMDUtils::_fillHTMLMetaTags(
-                $this->object->getId(),
-                $this->object->getId(),
-                'webr'
-            );
             $this->addHeaderAction();
         }
     }

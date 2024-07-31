@@ -17,6 +17,7 @@
  *********************************************************************/
 
 use ILIAS\Repository\Resources\ZipAdapter;
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
 
 /**
  * Handler class for multi srt upload
@@ -28,6 +29,7 @@ class ilMobMultiSrtUpload
     protected ZipAdapter $zip;
     protected ilMobMultiSrtInt $multi_srt;
     protected ilLanguage $lng;
+    protected LOMServices $lom_services;
 
     /**
      * @param ilMobMultiSrtInt $a_multi_srt adapter implementation
@@ -39,6 +41,7 @@ class ilMobMultiSrtUpload
 
         $lng = $DIC->language();
         $this->zip = $DIC->mediaObjects()->internal()->domain()->resources()->zip();
+        $this->lom_services = $DIC->learningObjectMetadata();
 
         $this->lng = $lng;
         $this->multi_srt = $a_multi_srt;
@@ -89,7 +92,10 @@ class ilMobMultiSrtUpload
     {
         $items = array();
 
-        $lang_codes = ilMDLanguageItem::_getPossibleLanguageCodes();
+        $lang_codes = [];
+        foreach ($this->lom_services->dataHelper()->getAllLanguages() as $language) {
+            $lang_codes[] = $language->value();
+        }
 
         $dir = $this->getMultiSrtUploadDir();
         $files = ilFileUtils::getDir($dir);

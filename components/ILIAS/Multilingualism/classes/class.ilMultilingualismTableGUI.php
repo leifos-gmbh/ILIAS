@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
+
 /**
  * TableGUI class for title/description translations
  *
@@ -28,6 +30,7 @@ class ilMultilingualismTableGUI extends ilTable2GUI
     protected string $base_cmd;
     protected bool $incl_desc;
     protected ilAccessHandler $access;
+    protected LOMServices $lom_services;
 
     public function __construct(
         object $a_parent_obj,
@@ -42,6 +45,7 @@ class ilMultilingualismTableGUI extends ilTable2GUI
         $this->lng = $DIC->language();
         $this->access = $DIC->access();
         $ilCtrl = $DIC->ctrl();
+        $this->lom_services = $DIC->learningObjectMetadata();
 
         parent::__construct($a_parent_obj, $a_parent_cmd);
         $this->incl_desc = $a_incl_desc;
@@ -112,7 +116,10 @@ class ilMultilingualismTableGUI extends ilTable2GUI
         $this->tpl->setVariable("NR", $this->nr);
 
         // lang selection
-        $languages = ilMDLanguageItem::_getLanguages();
+        $languages = [];
+        foreach ($this->lom_services->dataHelper()->getAllLanguages() as $language) {
+            $languages[$language->value()] = $language->presentableLabel();
+        }
         $this->tpl->setVariable(
             "LANG_SELECT",
             ilLegacyFormElementsUtil::formSelect(

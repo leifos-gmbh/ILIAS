@@ -65,7 +65,7 @@ class ilLPStatusCollectionTLT extends ilLPStatus
                 $status_info["in_progress"][$item_id] = array();
                 $status_info["completed"][$item_id] = array();
 
-                $status_info["tlt"][$item_id] = ilMDEducational::_getTypicalLearningTimeSeconds(
+                $status_info["tlt"][$item_id] = parent::_getTypicalLearningTime(
                     $a_obj_id,
                     $item_id
                 );

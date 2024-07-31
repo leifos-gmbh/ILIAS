@@ -23,6 +23,7 @@ use ILIAS\FileUpload\FileUpload;
 use ILIAS\FileUpload\DTO\UploadResult;
 use ILIAS\FileUpload\Location;
 use ILIAS\MediaObjects\InternalDomainService;
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
 
 define("IL_MODE_ALIAS", 1);
 define("IL_MODE_OUTPUT", 2);
@@ -36,6 +37,7 @@ class ilObjMediaObject extends ilObject
     private const DEFAULT_PREVIEW_SIZE = 80;
     protected InternalDomainService $domain;
     protected ilObjUser $user;
+    protected LOMServices $lom_services;
     public bool $is_alias;
     public string $origin_id;
     public array $media_items;
@@ -57,6 +59,7 @@ class ilObjMediaObject extends ilObject
         parent::__construct($a_id, false);
         $this->image_converter = $DIC->fileConverters()->legacyImages();
         $this->domain = $DIC->mediaObjects()->internal()->domain();
+        $this->lom_services = $DIC->learningObjectMetadata();
     }
 
     public static function _exists(
@@ -124,23 +127,21 @@ class ilObjMediaObject extends ilObject
     {
         switch ($a_element) {
             case 'General':
-
                 // Update Title and description
-                $md = new ilMD(0, $this->getId(), $this->getType());
-                $md_gen = $md->getGeneral();
+                $paths = $this->lom_services->paths();
+                $reader = $this->lom_services->read(
+                    0,
+                    $this->getId(),
+                    $this->getType(),
+                    $paths->custom()->withNextStep('general')->get()
+                );
 
-                if (is_object($md_gen)) {
-                    ilObject::_writeTitle($this->getId(), $md_gen->getTitle());
-                    $this->setTitle($md_gen->getTitle());
-
-                    foreach ($md_gen->getDescriptionIds() as $id) {
-                        $md_des = $md_gen->getDescription($id);
-                        ilObject::_writeDescription($this->getId(), $md_des->getDescription());
-                        $this->setDescription($md_des->getDescription());
-                        break;
-                    }
+                $title = $reader->firstData($paths->title())->value();
+                $description = $reader->firstData($paths->descriptions())->value();
+                if ($title !== '') {
+                    $this->setTitle($title);
                 }
-
+                $this->setDescription($description);
                 break;
         }
         return false;       // prevent parent from creating ilMD
@@ -150,40 +151,31 @@ class ilObjMediaObject extends ilObject
     {
         $ilUser = $this->user;
 
-        $md_creator = new ilMDCreator(0, $this->getId(), $this->getType());
-        $md_creator->setTitle($this->getTitle());
-        $md_creator->setTitleLanguage($ilUser->getPref('language'));
-        $md_creator->setDescription($this->getDescription());
-        $md_creator->setDescriptionLanguage($ilUser->getPref('language'));
-        $md_creator->setKeywordLanguage($ilUser->getPref('language'));
-        $md_creator->setLanguage($ilUser->getPref('language'));
-        $md_creator->create();
+        $this->lom_services->derive()->fromBasicProperties(
+            $this->getTitle(),
+            $this->getLongDescription(),
+            $ilUser->getPref('language')
+        )->forObject(0, $this->getId(), $this->getType());
 
         return false;   // avoid parent to create md
     }
 
     protected function beforeUpdateMetaData(): bool
     {
-        $md = new ilMD(0, $this->getId(), $this->getType());
-        $md_gen = $md->getGeneral();
-        $md_gen->setTitle($this->getTitle());
+        $paths = $this->lom_services->paths();
 
-        // sets first description (maybe not appropriate)
-        $md_des_ids = $md_gen->getDescriptionIds();
-        if (count($md_des_ids) > 0) {
-            $md_des = $md_gen->getDescription($md_des_ids[0]);
-            $md_des->setDescription($this->getDescription());
-            $md_des->update();
-        }
-        $md_gen->update();
+        $this->lom_services->manipulate(0, $this->getId(), $this->getType())
+                           ->prepareCreateOrUpdate($paths->title(), $this->getTitle())
+                           ->prepareCreateOrUpdate($paths->firstDescription(), $this->getDescription())
+                           ->execute();
+
         return false;
     }
 
     protected function beforeDeleteMetaData(): bool
     {
         // Delete meta data
-        $md = new ilMD(0, $this->getId(), $this->getType());
-        $md->deleteAll();
+        $this->lom_services->deleteAll(0, $this->getId(), $this->getType());
 
         return false;
     }
@@ -646,10 +638,15 @@ class ilObjMediaObject extends ilObject
                 $xml = "<MediaObject>";
 
                 // meta data
-                $md2xml = new ilMD2XML(0, $this->getId(), $this->getType());
+                /*
+                 * LOM of MediaObjects is exported as a tail dependency (see
+                 * ilMediaObjectsExporter::getXmlExportTailDependencies, so I
+                 * assume this code is unused.
+                 */
+                /*$md2xml = new ilMD2XML(0, $this->getId(), $this->getType());
                 $md2xml->setExportMode(true);
                 $md2xml->startExport();
-                $xml .= $md2xml->getXML();
+                $xml .= $md2xml->getXML();*/
 
                 $media_items = $this->getMediaItems();
                 for ($i = 0; $i < count($media_items); $i++) {
@@ -1597,8 +1594,9 @@ class ilObjMediaObject extends ilObject
         );
 
         // meta data
-        $md = new ilMD(0, $this->getId(), "mob");
-        $new_md = $md->cloneMD(0, $new_obj->getId(), "mob");
+        $this->lom_services->derive()
+                           ->fromObject(0, $this->getId(), "mob")
+                           ->forObject(0, $new_obj->getId(), "mob");
 
         return $new_obj;
     }
@@ -1775,7 +1773,10 @@ class ilObjMediaObject extends ilObject
     {
         $items = array();
 
-        $lang_codes = ilMDLanguageItem::_getPossibleLanguageCodes();
+        $lang_codes = [];
+        foreach ($this->lom_services->dataHelper()->getAllLanguages() as $language) {
+            $lang_codes[] = $language->value();
+        }
 
         $dir = $this->getMultiSrtUploadDir();
         $files = ilFileUtils::getDir($dir);

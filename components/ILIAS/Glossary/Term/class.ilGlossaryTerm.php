@@ -638,6 +638,10 @@ class ilGlossaryTerm
         int $a_term_id,
         int $a_glossary_id
     ): int {
+        global $DIC;
+
+        $lom_services = $DIC->learningObjectMetadata();
+
         $old_term = new ilGlossaryTerm($a_term_id);
 
         // copy the term
@@ -650,16 +654,17 @@ class ilGlossaryTerm
         $new_term->create();
 
         // copy meta data
-        $md = new ilMD(
-            $old_term->getGlossaryId(),
-            $old_term->getPageObject()->getId(),
-            $old_term->getPageObject()->getParentType()
-        );
-        $new_md = $md->cloneMD(
-            $a_glossary_id,
-            $new_term->getPageObject()->getId(),
-            $old_term->getPageObject()->getParentType()
-        );
+        $lom_services->derive()
+                     ->fromObject(
+                         $old_term->getGlossaryId(),
+                         $old_term->getPageObject()->getId(),
+                         $old_term->getPageObject()->getParentType()
+                     )
+                     ->forObject(
+                         $a_glossary_id,
+                         $new_term->getPageObject()->getId(),
+                         $old_term->getPageObject()->getParentType()
+                     );
 
         $new_page = $new_term->getPageObject();
         $old_term->getPageObject()->copy($new_page->getId(), $new_page->getParentType(), $new_page->getParentId(), true);

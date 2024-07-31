@@ -18,6 +18,8 @@ declare(strict_types=0);
  *
  *********************************************************************/
 
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
+
 /**
  * Class ilECSCourseSettings
  * @author  Stefan Meyer <smeyer.ilias@gmx.de>
@@ -26,6 +28,7 @@ declare(strict_types=0);
 class ilECSCourseSettings extends ilECSObjectSettings
 {
     protected ilLogger $logger;
+    protected LOMServices $lom_services;
 
     public function __construct(ilObject $a_content_object)
     {
@@ -45,11 +48,13 @@ class ilECSCourseSettings extends ilECSObjectSettings
         $json = $this->getJsonCore('application/ecs-course');
 
         // meta language
-        $lang = ilMDLanguage::_lookupFirstLanguage(
+        $lang = $this->lom_services->read(
             $this->content_obj->getId(),
             $this->content_obj->getId(),
-            $this->content_obj->getType()
-        );
+            $this->content_obj->getType(),
+            $this->lom_services->paths()->languages()
+        )->firstData($this->lom_services->paths()->languages())->value();
+
         if (strlen($lang) !== 0) {
             $json->lang = $lang . '_' . strtoupper($lang);
         }

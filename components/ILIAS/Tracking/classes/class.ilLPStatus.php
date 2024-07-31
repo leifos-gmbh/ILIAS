@@ -114,9 +114,21 @@ class ilLPStatus
         return array();
     }
 
-    public static function _getTypicalLearningTime(int $a_obj_id): int
+    public static function _getTypicalLearningTime(int $obj_id, int $sub_id = 0): int
     {
-        return ilMDEducational::_getTypicalLearningTimeSeconds($a_obj_id);
+        global $DIC;
+
+        $lom_services = $DIC->learningObjectMetadata();
+        $paths = $lom_services->paths();
+        $data_helper = $lom_services->dataHelper();
+
+        $type = ilObject::_lookupType($obj_id);
+
+        $value = $lom_services->read($obj_id, $sub_id, $type, $paths->firstTypicalLearningTime())
+                              ->firstData($paths->firstTypicalLearningTime())
+                              ->value();
+
+        return $data_helper->durationToSeconds($value);
     }
 
     /**

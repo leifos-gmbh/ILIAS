@@ -115,7 +115,7 @@ class ilTermDefinitionBulkCreationGUI
         $form->select(
             "term_language",
             $lng->txt("language"),
-            ilMDLanguageItem::_getLanguages(),
+            $this->domain->metadata()->getLOMLanguagesForSelectInputs(),
             "",
             $s_lang
         )

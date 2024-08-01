@@ -17,7 +17,7 @@
  *********************************************************************/
 
 use ILIAS\MediaObjects\SubTitles\SubtitlesGUIRequest;
-use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
+use ILIAS\MediaObjects\Metadata\MetadataManager;
 
 /**
  * Editing User Interface for MediaObjects within LMs (see ILIAS DTD)
@@ -37,7 +37,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
     protected ilErrorHandling $error;
     protected ilHelpGUI $help;
     protected ilTabsGUI $tabs;
-    protected LOMServices $lom_services;
+    protected MetadataManager $md;
 
     // $adv_ref_id - $adv_type - $adv_subtype:
     // Object, that defines the adv md records being used. Default is $this->object, but the
@@ -89,7 +89,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
         $lng->loadLanguageModule("mob");
         $this->file_service_settings = $DIC->fileServiceSettings();
         $this->video_gui = $DIC->mediaObjects()->internal()->gui()->video();
-        $this->lom_services = $DIC->learningObjectMetadata();
+        $this->md = $DIC->mediaObjects()->internal()->domain()->metadata();
     }
 
     /**
@@ -1639,10 +1639,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
             $ilToolbar->addInputItem($fi, true);
 
             // language
-            $options = [];
-            foreach ($this->lom_services->dataHelper()->getAllLanguages() as $language) {
-                $options[$language->value()] = $language->presentableLabel();
-            }
+            $options = $this->md->getLOMLanguagesForSelectInputs();
             $si = new ilSelectInputGUI($this->lng->txt("mob_language"), "language");
             $si->setOptions($options);
             $si->setValue($ilUser->getLanguage());

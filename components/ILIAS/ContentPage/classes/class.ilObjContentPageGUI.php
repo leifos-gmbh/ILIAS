@@ -24,6 +24,7 @@ use ILIAS\ContentPage\PageMetrics\PageMetricsRepositoryImp;
 use ILIAS\ContentPage\PageMetrics\Event\PageUpdatedEvent;
 use ILIAS\DI\Container;
 use ILIAS\HTTP\GlobalHttpState;
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
 
 /**
  * Class ilObjContentPageGUI
@@ -53,6 +54,7 @@ class ilObjContentPageGUI extends ilObject2GUI implements ilContentPageObjectCon
     private ilHelpGUI $help;
     private \ILIAS\DI\UIServices $uiServices;
     private readonly bool $in_page_editor_style_context;
+    private LOMServices $lom_services;
 
     public function __construct(int $a_id = 0, int $a_id_type = self::REPOSITORY_NODE_ID, int $a_parent_node_id = 0)
     {
@@ -66,6 +68,7 @@ class ilObjContentPageGUI extends ilObject2GUI implements ilContentPageObjectCon
         $this->navHistory = $this->dic['ilNavigationHistory'];
         $this->help = $DIC['ilHelp'];
         $this->uiServices = $DIC->ui();
+        $this->lom_services = $DIC->learningObjectMetadata();
 
         $this->lng->loadLanguageModule('copa');
         $this->lng->loadLanguageModule('style');
@@ -603,7 +606,10 @@ class ilObjContentPageGUI extends ilObject2GUI implements ilContentPageObjectCon
         );
 
         if ($this->getCreationMode() !== true && count($this->object->getObjectTranslation()->getLanguages()) > 1) {
-            $languages = ilMDLanguageItem::_getLanguages();
+            $languages = [];
+            foreach ($this->lom_services->dataHelper()->getAllLanguages() as $language) {
+                $languages[$language->value()] = $language->presentableLabel();
+            }
             $a_form->getItemByPostVar('title')
                    ->setInfo(
                        implode(

@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
+
 /**
  * Handles StructureObjects of ILIAS Learning Modules (see ILIAS DTD)
  *
@@ -24,6 +26,7 @@
 class ilStructureObject extends ilLMObject
 {
     protected \ILIAS\Help\Map\MapManager $help_map;
+    protected LOMServices $lom_services;
     public string $origin_id;
     public ilLMTree $tree;
 
@@ -37,6 +40,7 @@ class ilStructureObject extends ilLMObject
         parent::__construct($a_content_obj, $a_id);
         $this->tree = new ilLMTree($this->getLMId());
         $this->help_map = $DIC->help()->internal()->domain()->map();
+        $this->lom_services = $DIC->learningObjectMetadata();
     }
 
     public function delete(bool $a_delete_meta_data = true): void
@@ -90,8 +94,9 @@ class ilStructureObject extends ilLMObject
         $a_copied_nodes[$this->getId()] = $chap->getId();
 
         // copy meta data
-        $md = new ilMD($this->getLMId(), $this->getId(), $this->getType());
-        $new_md = $md->cloneMD($a_target_lm->getId(), $chap->getId(), $this->getType());
+        $this->lom_services->derive()
+                           ->fromObject($this->getLMId(), $this->getId(), $this->getType())
+                           ->forObject($a_target_lm->getId(), $chap->getId(), $this->getType());
 
         // copy translations
         ilLMObjTranslation::copy($this->getId(), $chap->getId());

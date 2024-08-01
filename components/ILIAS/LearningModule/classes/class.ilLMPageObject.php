@@ -113,8 +113,9 @@ class ilLMPageObject extends ilLMObject
         }
 
         // copy meta data
-        $md = new ilMD($this->getLMId(), $this->getId(), $this->getType());
-        $new_md = $md->cloneMD($a_target_lm->getId(), $lm_page->getId(), $this->getType());
+        $this->lom_services->derive()
+                           ->fromObject($this->getLMId(), $this->getId(), $this->getType())
+                           ->forObject($a_target_lm->getId(), $lm_page->getId(), $this->getType());
 
         // check whether export id already exists in the target lm
         if ($del_exp_id) {
@@ -157,8 +158,9 @@ class ilLMPageObject extends ilLMObject
         $a_copied_nodes[$this->getId()] = $lm_page->getId();
 
         // copy meta data
-        $md = new ilMD($this->getLMId(), $this->getId(), $this->getType());
-        $new_md = $md->cloneMD($a_cont_obj->getId(), $lm_page->getId(), $this->getType());
+        $this->lom_services->derive()
+                           ->fromObject($this->getLMId(), $this->getId(), $this->getType())
+                           ->forObject($a_cont_obj->getId(), $lm_page->getId(), $this->getType());
 
         // copy page content
         $page = $lm_page->getPageObject();

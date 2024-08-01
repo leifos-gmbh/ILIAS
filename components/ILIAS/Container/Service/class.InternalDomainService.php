@@ -24,6 +24,7 @@ use ILIAS\DI;
 use ILIAS\Repository;
 use ILIAS\Container\Page\PageManager;
 use ILIAS\Container\Classification\ClassificationManager;
+use ILIAS\Container\Metadata\MetadataManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -74,5 +75,10 @@ class InternalDomainService
             $this->repo_service->classification($base_ref_id),
             $base_ref_id
         );
+    }
+
+    public function metadata(): MetadataManager
+    {
+        return new MetadataManager($this->learningObjectMetadata());
     }
 }

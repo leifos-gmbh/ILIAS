@@ -1960,7 +1960,7 @@ class ilPCParagraph extends ilPageContent
             $meta_id = $a_page->getId();
 
             $lom_services->manipulate($meta_rep_id, $meta_id, $meta_type)
-                         ->prepareCreateOrUpdate(...$keywords)
+                         ->prepareCreateOrUpdate($lom_services->paths()->keywords(), ...$keywords)
                          ->execute();
         }
     }

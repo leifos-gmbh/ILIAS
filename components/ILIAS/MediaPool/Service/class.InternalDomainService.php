@@ -24,6 +24,7 @@ use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\MediaPool\Clipboard;
 use ILIAS\MediaPool\Tree\MediaPoolTree;
+use ILIAS\MediaPool\Metadata\MetadataManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -76,4 +77,8 @@ class InternalDomainService
         return new MediaPoolTree($mep_obj_id);
     }
 
+    public function metadata(): MetadataManager
+    {
+        return new MetadataManager($this->learningObjectMetadata());
+    }
 }

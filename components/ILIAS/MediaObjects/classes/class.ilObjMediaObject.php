@@ -23,7 +23,6 @@ use ILIAS\FileUpload\FileUpload;
 use ILIAS\FileUpload\DTO\UploadResult;
 use ILIAS\FileUpload\Location;
 use ILIAS\MediaObjects\InternalDomainService;
-use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
 
 define("IL_MODE_ALIAS", 1);
 define("IL_MODE_OUTPUT", 2);
@@ -37,7 +36,6 @@ class ilObjMediaObject extends ilObject
     private const DEFAULT_PREVIEW_SIZE = 80;
     protected InternalDomainService $domain;
     protected ilObjUser $user;
-    protected LOMServices $lom_services;
     public bool $is_alias;
     public string $origin_id;
     public array $media_items;
@@ -59,7 +57,6 @@ class ilObjMediaObject extends ilObject
         parent::__construct($a_id, false);
         $this->image_converter = $DIC->fileConverters()->legacyImages();
         $this->domain = $DIC->mediaObjects()->internal()->domain();
-        $this->lom_services = $DIC->learningObjectMetadata();
     }
 
     public static function _exists(
@@ -128,8 +125,8 @@ class ilObjMediaObject extends ilObject
         switch ($a_element) {
             case 'General':
                 // Update Title and description
-                $paths = $this->lom_services->paths();
-                $reader = $this->lom_services->read(
+                $paths = $this->domain->metadata()->learningObjectMetadata()->paths();
+                $reader = $this->domain->metadata()->learningObjectMetadata()->read(
                     0,
                     $this->getId(),
                     $this->getType(),
@@ -151,7 +148,7 @@ class ilObjMediaObject extends ilObject
     {
         $ilUser = $this->user;
 
-        $this->lom_services->derive()->fromBasicProperties(
+        $this->domain->metadata()->learningObjectMetadata()->derive()->fromBasicProperties(
             $this->getTitle(),
             $this->getLongDescription(),
             $ilUser->getPref('language')
@@ -162,12 +159,13 @@ class ilObjMediaObject extends ilObject
 
     protected function beforeUpdateMetaData(): bool
     {
-        $paths = $this->lom_services->paths();
+        $paths = $this->domain->metadata()->learningObjectMetadata()->paths();
 
-        $this->lom_services->manipulate(0, $this->getId(), $this->getType())
-                           ->prepareCreateOrUpdate($paths->title(), $this->getTitle())
-                           ->prepareCreateOrUpdate($paths->firstDescription(), $this->getDescription())
-                           ->execute();
+        $this->domain->metadata()->learningObjectMetadata()
+                                 ->manipulate(0, $this->getId(), $this->getType())
+                                 ->prepareCreateOrUpdate($paths->title(), $this->getTitle())
+                                 ->prepareCreateOrUpdate($paths->firstDescription(), $this->getDescription())
+                                 ->execute();
 
         return false;
     }
@@ -175,7 +173,8 @@ class ilObjMediaObject extends ilObject
     protected function beforeDeleteMetaData(): bool
     {
         // Delete meta data
-        $this->lom_services->deleteAll(0, $this->getId(), $this->getType());
+        $this->domain->metadata()->learningObjectMetadata()
+                                 ->deleteAll(0, $this->getId(), $this->getType());
 
         return false;
     }
@@ -638,15 +637,10 @@ class ilObjMediaObject extends ilObject
                 $xml = "<MediaObject>";
 
                 // meta data
-                /*
-                 * LOM of MediaObjects is exported as a tail dependency (see
-                 * ilMediaObjectsExporter::getXmlExportTailDependencies, so I
-                 * assume this code is unused.
-                 */
-                /*$md2xml = new ilMD2XML(0, $this->getId(), $this->getType());
+                $md2xml = new ilMD2XML(0, $this->getId(), $this->getType());
                 $md2xml->setExportMode(true);
                 $md2xml->startExport();
-                $xml .= $md2xml->getXML();*/
+                $xml .= $md2xml->getXML();
 
                 $media_items = $this->getMediaItems();
                 for ($i = 0; $i < count($media_items); $i++) {
@@ -1594,9 +1588,10 @@ class ilObjMediaObject extends ilObject
         );
 
         // meta data
-        $this->lom_services->derive()
-                           ->fromObject(0, $this->getId(), "mob")
-                           ->forObject(0, $new_obj->getId(), "mob");
+        $this->domain->metadata()->learningObjectMetadata()
+                                 ->derive()
+                                 ->fromObject(0, $this->getId(), "mob")
+                                 ->forObject(0, $new_obj->getId(), "mob");
 
         return $new_obj;
     }
@@ -1773,10 +1768,7 @@ class ilObjMediaObject extends ilObject
     {
         $items = array();
 
-        $lang_codes = [];
-        foreach ($this->lom_services->dataHelper()->getAllLanguages() as $language) {
-            $lang_codes[] = $language->value();
-        }
+        $lang_codes = $this->domain->metadata()->getLOMLanguageCodes();
 
         $dir = $this->getMultiSrtUploadDir();
         $files = ilFileUtils::getDir($dir);

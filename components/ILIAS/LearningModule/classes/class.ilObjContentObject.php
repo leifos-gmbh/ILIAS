@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
+
 /**
  * @author Alex Killing <alex.killing@gmx.de>
  * @author Sascha Hofmann <saschahofmann@gmx.de>
@@ -62,6 +64,7 @@ class ilObjContentObject extends ilObject
     protected ilObjLearningModule $lm;
     protected \ILIAS\Style\Content\DomainService $content_style_domain;
     private \ilGlobalTemplateInterface $main_tpl;
+    protected LOMServices $lom_services;
 
     public function __construct(
         int $a_id = 0,
@@ -78,7 +81,7 @@ class ilObjContentObject extends ilObject
         if (isset($DIC["ilLocator"])) {
             $this->locator = $DIC["ilLocator"];
         }
-
+        $this->lom_services = $DIC->learningObjectMetadata();
         $this->notes = $DIC->notes();
 
         // this also calls read() method! (if $a_id is set)
@@ -2176,24 +2179,22 @@ class ilObjContentObject extends ilObject
                 break;
 
             case 'General':
-
                 // Update Title and description
-                $md = new ilMD($this->getId(), 0, $this->getType());
-                if (!is_object($md_gen = $md->getGeneral())) {
+                $ot = ilObjectTranslation::getInstance($this->getId());
+                if (!$ot->getContentActivated()) {
                     return;
                 }
 
-                $ot = ilObjectTranslation::getInstance($this->getId());
-                if ($ot->getContentActivated()) {
-                    $ot->setDefaultTitle($md_gen->getTitle());
+                $paths = $this->lom_services->paths();
+                $reader = $this->lom_services->read(
+                    $this->getId(),
+                    0,
+                    $this->getType(),
+                    $paths->custom()->withNextStep('general')->get()
+                );
 
-                    foreach ($md_gen->getDescriptionIds() as $id) {
-                        $md_des = $md_gen->getDescription($id);
-                        $ot->setDefaultDescription($md_des->getDescription());
-                        break;
-                    }
-                    $ot->save();
-                }
+                $ot->setDefaultTitle($reader->firstData($paths->title())->value());
+                $ot->setDefaultDescription($reader->firstData($paths->firstDescription())->value());
                 break;
         }
     }

@@ -19,7 +19,6 @@
 namespace ILIAS\components\OrgUnit\ARHelper;
 
 use ILIAS\HTTP\RawHTTPServices;
-use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
 
 /**
  * Class DIC
@@ -90,11 +89,6 @@ trait DIC
     protected function database(): \ilDBInterface
     {
         return $this->dic()->database();
-    }
-
-    protected function learningObjectMetadata(): LOMServices
-    {
-        return $this->dic()->learningObjectMetadata();
     }
 
     //

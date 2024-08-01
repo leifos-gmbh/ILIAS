@@ -651,15 +651,10 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
     public function exportXMLMetaData(
         ilXmlWriter $a_xml_writer
     ): void {
-        /*
-         * This seems to be part of an old implementation of export, and
-         * not in use anymore. In the new implementation, LOM should be
-         * exported as a tail dependency.
-         */
-        /*$md2xml = new ilMD2XML($this->getId(), 0, $this->getType());
+        $md2xml = new ilMD2XML($this->getId(), 0, $this->getType());
         $md2xml->setExportMode(true);
         $md2xml->startExport();
-        $a_xml_writer->appendXML($md2xml->getXML());*/
+        $a_xml_writer->appendXML($md2xml->getXML());
     }
 
     public function exportXMLMediaObjects(

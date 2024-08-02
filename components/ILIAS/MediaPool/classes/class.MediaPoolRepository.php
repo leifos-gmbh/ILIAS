@@ -216,12 +216,10 @@ class MediaPoolRepository
                 $keyword
             );
         }
-        $search_clause = count($basic_clauses) === 1 ?
-            $basic_clauses[0] :
-            $searcher->getClauseFactory()->getJoinedClauses(
-                Operator::OR,
-                ...$basic_clauses
-            );
+        $search_clause = $searcher->getClauseFactory()->getJoinedClauses(
+            Operator::OR,
+            ...$basic_clauses
+        );
 
         $filters = [];
         foreach ($sub_ids as $sub_id) {

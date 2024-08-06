@@ -403,6 +403,9 @@ class ilCalendarEntry implements ilDatePeriod
 
         $fac = new ILIAS\Data\UUID\Factory();
         $uuid = $fac->uuid4AsString();
+        $settings = new ilSetting('caldav');
+        $settings->set($uuid, (string) $this->getEntryId());
+
 
         // calendarobjects
         $query = 'INSERT INTO calendarobjects (calendardata, uri, calendarid, lastmodified,etag,size,componenttype,firstoccurence,lastoccurence,uid) ' .

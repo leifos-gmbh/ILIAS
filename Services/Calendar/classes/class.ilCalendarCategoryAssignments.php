@@ -194,7 +194,7 @@ class ilCalendarCategoryAssignments
 
     public function addAssignment(int $a_cal_cat_id): void
     {
-        $query = "INSERT INTO cal_cat_assignments (cal_id,cat_id) " .
+        $query = "INSERT IGNORE INTO cal_cat_assignments (cal_id,cat_id) " .
             "VALUES ( " .
             $this->db->quote($this->cal_entry_id, 'integer') . ", " .
             $this->db->quote($a_cal_cat_id, 'integer') . " " .

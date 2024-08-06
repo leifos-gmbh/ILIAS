@@ -26,6 +26,8 @@ declare(strict_types=1);
  */
 class ilCalendarEntry implements ilDatePeriod
 {
+    public const DAV_CALENDAR_IDS = [222];
+
     public const TRANSLATION_NONE = 0;
     public const TRANSLATION_SYSTEM = 1;
 
@@ -83,6 +85,8 @@ class ilCalendarEntry implements ilDatePeriod
         $query = "DELETE FROM cal_entries " .
             "WHERE cal_id = " . $ilDB->quote($a_entry_id, 'integer') . " ";
         $res = $ilDB->manipulate($query);
+
+
     }
 
     public function setContextInfo(string $a_info): void
@@ -383,7 +387,114 @@ class ilCalendarEntry implements ilDatePeriod
         $res = $this->db->manipulate($query);
 
         $this->entry_id = $next_id;
+
     }
+
+    public function createDavEvent(int $calendar_id): void
+    {
+        if (!in_array($calendar_id, self::DAV_CALENDAR_IDS)) {
+            return;
+        }
+
+        $export = new ilCalendarExport();
+        $export->setExportType(ilCalendarExport::EXPORT_APPOINTMENTS);
+        $export->setAppointments([(int) $this->entry_id]);
+        $export->export();
+
+        $fac = new ILIAS\Data\UUID\Factory();
+        $uuid = $fac->uuid4AsString();
+
+        // calendarobjects
+        $query = 'INSERT INTO calendarobjects (calendardata, uri, calendarid, lastmodified,etag,size,componenttype,firstoccurence,lastoccurence,uid) ' .
+            'VALUES( ' .
+            $this->db->quote($export->getExportString(), ilDBConstants::T_TEXT) . ', ' .
+            $this->db->quote($uuid . '.ics', ilDBConstants::T_TEXT) . ', ' .
+            $this->db->quote(1, ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote(time(), ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote(md5($export->getExportString()), ilDBConstants::T_TEXT) . ', ' .
+            $this->db->quote(strlen($export->getExportString()), ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote('VEVENT', ilDBConstants::T_TEXT) . ', ' .
+            $this->db->quote(time(), ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote(time(), ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote($uuid, ilDBConstants::T_TEXT) . ' ' .
+            ')';
+        $this->db->manipulate($query);
+
+        // calendarchanges
+        $query = 'SELECT max(synctoken) s from calendarchanges ';
+        $res = $this->db->query($query);
+        $synctoken = 0;
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            $synctoken = (int) $row->s;
+        }
+        $synctoken++;
+
+        $query = 'INSERT INTO calendarchanges (uri, synctoken, calendarid, operation) VALUES ( ' .
+            $this->db->quote($uuid . '.ics', ilDBConstants::T_TEXT) . ', ' .
+            $this->db->quote($synctoken, ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote(1, ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote(1, ilDBConstants::T_INTEGER) . ' )';
+        $this->db->manipulate($query);
+
+        // calendar synctoken
+        $query = 'UPDATE calendars SET synctoken = ' . $this->db->quote($synctoken, ilDBConstants::T_INTEGER) . ' ' .
+            'WHERE id = ' . $this->db->quote(1, ilDBConstants::T_INTEGER);
+        $this->db->manipulate($query);
+
+        $settings = new ilSetting('caldav');
+        $settings->set($uuid, (string) $this->getEntryId());
+    }
+
+    public function updateDavEntry(int $calendar_id): void
+    {
+        if (!in_array($calendar_id, self::DAV_CALENDAR_IDS)) {
+            ilLoggerFactory::getLogger('cal')->warning('Not mapped calendar id');
+            return;
+        }
+        $uid = ilSetting::lookupKeywordByModuleAndValue('caldav', (string) $this->getEntryId());
+        if ($uid === '') {
+            ilLoggerFactory::getLogger('cal')->warning('No uid found');
+            return;
+        }
+
+        global $DIC;
+        $db = $DIC->database();
+
+        $export = new ilCalendarExport();
+        $export->setExportType(ilCalendarExport::EXPORT_APPOINTMENTS);
+        $export->setAppointments([(int) $this->getEntryId()]);
+        $export->export();
+
+        $query = 'UPDATE calendarobjects ' .
+            'SET calendardata = ' . $this->db->quote($export->getExportString(), ilDBConstants::T_TEXT) . ', ' .
+            'etag = ' . $this->db->quote(md5($export->getExportString()), ilDBConstants::T_TEXT) . ', ' .
+            'size = ' . $this->db->quote(strlen($export->getExportString()), ilDBConstants::T_TEXT) . ', ' .
+            'lastoccurence = ' . $this->db->quote(time(), ilDBConstants::T_INTEGER) . ' ' .
+            'WHERE uid = ' . $this->db->quote($uid, ilDBConstants::T_TEXT);
+        $db->manipulate($query);
+
+        // calendarchanges
+        $query = 'SELECT max(synctoken) s from calendarchanges ';
+        $res = $this->db->query($query);
+        $synctoken = 0;
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            $synctoken = (int) $row->s;
+        }
+        $synctoken++;
+
+        $query = 'INSERT INTO calendarchanges (uri, synctoken, calendarid, operation) VALUES ( ' .
+            $this->db->quote($uid . '.ics', ilDBConstants::T_TEXT) . ', ' .
+            $this->db->quote($synctoken, ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote(1, ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote(2, ilDBConstants::T_INTEGER) . ' )';
+        $this->db->manipulate($query);
+
+        // calendar synctoken
+        $query = 'UPDATE calendars SET synctoken = ' . $this->db->quote($synctoken, ilDBConstants::T_INTEGER) . ' ' .
+            'WHERE id = ' . $this->db->quote(1, ilDBConstants::T_INTEGER);
+        $this->db->manipulate($query);
+    }
+
 
     public function delete(): void
     {
@@ -394,6 +505,36 @@ class ilCalendarEntry implements ilDatePeriod
         $res = $this->db->manipulate($query);
 
         ilCalendarCategoryAssignments::_deleteByAppointmentId($this->getEntryId());
+        $uid = ilSetting::lookupKeywordByModuleAndValue('caldav', (string) $this->getEntryId());
+        if ($uid == '') {
+            ilLoggerFactory::getLogger('cal')->warning('Ignoring caldav actions for empty uid');
+            return;
+        }
+
+        // calendarchanges
+        $query = 'SELECT max(synctoken) s from calendarchanges ';
+        $res = $this->db->query($query);
+        $synctoken = 0;
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            $synctoken = (int) $row->s;
+        }
+        $synctoken++;
+        $query = 'INSERT INTO calendarchanges (uri, synctoken, calendarid, operation) VALUES ( ' .
+            $this->db->quote($uid . '.ics', ilDBConstants::T_TEXT) . ', ' .
+            $this->db->quote($synctoken, ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote(1, ilDBConstants::T_INTEGER) . ', ' .
+            $this->db->quote(3, ilDBConstants::T_INTEGER) . ' )';
+        $this->db->manipulate($query);
+
+        // calendar synctoken
+        $query = 'UPDATE calendars SET synctoken = ' . $this->db->quote($synctoken, ilDBConstants::T_INTEGER) . ' ' .
+            'WHERE id = ' . $this->db->quote(1, ilDBConstants::T_INTEGER);
+        $this->db->manipulate($query);
+
+        // calendarobject
+        $query = 'DELETE from calendarobjects ' . ' ' .
+            'WHERE uid = ' . $this->db->quote($uid, ilDBConstants::T_TEXT);
+        $this->db->manipulate($query);
     }
 
     public function validate(): bool

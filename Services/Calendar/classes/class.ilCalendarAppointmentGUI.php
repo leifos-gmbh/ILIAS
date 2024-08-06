@@ -403,6 +403,11 @@ class ilCalendarAppointmentGUI
             $ass = new ilCalendarCategoryAssignments($this->app->getEntryId());
             $ass->addAssignment($cat_id);
 
+            // begin-patch caldav
+            $this->app->createDavEvent($cat_id);
+            // begin-patch caldav
+
+
             // Send notifications
             if (
                 ilCalendarSettings::_getInstance()->isNotificationEnabled() &&
@@ -667,6 +672,10 @@ class ilCalendarAppointmentGUI
             $ass = new ilCalendarCategoryAssignments($this->app->getEntryId());
             $ass->deleteAssignments();
             $ass->addAssignment($cat_id);
+
+            // begin-patch caldav
+            $this->getAppointment()->updateDavEntry($cat_id);
+            // begin-patch caldav
 
             // Send notifications
             $notification = (bool) $form->getInput('not');

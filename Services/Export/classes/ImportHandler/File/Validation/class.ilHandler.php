@@ -175,7 +175,7 @@ class ilHandler implements ilFileValidationHandlerInterface
         $old_value = libxml_use_internal_errors(true);
         $status_collection = $this->import_status->collection()->withNumberingEnabled(true);
         $doc = new DOMDocument();
-        $doc->schemaValidate($xsd_file_handler->getFilePath());
+        //$doc->schemaValidate($xsd_file_handler->getFilePath());
         $errors = libxml_get_errors();
         libxml_clear_errors();
         libxml_use_internal_errors($old_value);

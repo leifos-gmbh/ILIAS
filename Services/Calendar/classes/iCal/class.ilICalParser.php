@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,7 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
 
 /**
  * @author  Stefan Meyer <smeyer.ilias@gmx.de>
@@ -410,6 +409,18 @@ class ilICalParser
             $this->entry->save();
         } else {
             $this->entry->update();
+        }
+
+        // Search exclusions
+        // Only possible after entry is saved, otherwise the id is not available
+        ilCalendarRecurrenceExclusions::delete($this->entry->getEntryId());
+        foreach ($this->getContainer()->getItemsByName('EXDATE', false) as $item) {
+            if (is_a($item, 'ilICalProperty')) {
+                $rec_exclusion = new ilCalendarRecurrenceExclusion();
+                $rec_exclusion->setEntryId($this->entry->getEntryId());
+                $rec_exclusion->setDate(new ilDate($item->getValue(), IL_CAL_DATE));
+                $rec_exclusion->save();
+            }
         }
 
         $ass = new ilCalendarCategoryAssignments($this->entry->getEntryId());

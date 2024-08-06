@@ -274,6 +274,12 @@ class ilMediaPoolDataSet extends ilDataSet
                 $this->current_obj = $newObj;
                 $a_mapping->addMapping("Modules/MediaPool", "mep", $a_rec["Id"], $newObj->getId());
                 $a_mapping->addMapping("Services/Object", "obj", $a_rec["Id"], $newObj->getId());
+                $a_mapping->addMapping(
+                    "Services/MetaData",
+                    "md",
+                    $a_rec["Id"] . ":0:mep",
+                    $newObj->getId() . ":0:mep"
+                );
                 break;
 
             case "mep_tree":

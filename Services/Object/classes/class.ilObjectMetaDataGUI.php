@@ -322,7 +322,8 @@ class ilObjectMetaDataGUI
                 'mep:mpg',
                 'blog',
                 'mcst',
-                'mep'
+                'mep',
+                'dcl'
             ])
         );
     }

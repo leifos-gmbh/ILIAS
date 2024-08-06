@@ -252,8 +252,20 @@ class ilCalendarExport
         $str_writer->addLine('BEGIN:VEVENT');
         $str_writer->addLine('DTSTAMP:'
             . $now->get(IL_CAL_FKT_DATE, 'Ymd\THis\Z', ilTimeZone::UTC));
+
+        // begin-patch caldav
+        $uid = ilSetting::lookupKeywordByModuleAndValue(
+            'caldav',
+            (string) $app->getEntryId()
+        );
+        if ($uid != '') {
+            $unique_id = $uid;
+        } else {
+            $unique_id = $app->getEntryId() . '_' . CLIENT_ID . '@' . ILIAS_HTTP_PATH;
+        }
+
         $str_writer->addLine('UID:' . ilICalWriter::escapeText(
-            $app->getEntryId() . '_' . CLIENT_ID . '@' . ILIAS_HTTP_PATH
+            $unique_id
         ));
 
         $last_mod = $app->getLastUpdate()->get(IL_CAL_FKT_DATE, 'Ymd\THis\Z', ilTimeZone::UTC);

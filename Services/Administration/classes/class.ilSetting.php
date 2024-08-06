@@ -193,6 +193,21 @@ class ilSetting implements \ILIAS\Administration\Setting
         return $data['value'] ?? null;
     }
 
+    public static function lookupKeywordByModuleAndValue(string $module, string $value): string
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+        $query = 'SELECT keyword from settings ' .
+            'WHERE value = ' . $db->quote($value, ilDBConstants::T_TEXT) . ' ' .
+            'AND module = ' . $db->quote($module, ilDBConstants::T_TEXT);
+        $res = $db->query($query);
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            return (string) $row->keyword;
+        }
+        return '';
+    }
+
     /**
      * Get the type of the value column in the database
      * @throws ilDatabaseException

@@ -56,6 +56,16 @@ class ilBlogImporter extends ilXmlImporter
             $this->ds,
             $a_mapping
         );
+
+        $blog_map = $a_mapping->getMappingsOfEntity("Modules/Blog", "blog");
+        if (isset($blog_map[$a_id])) {
+            $a_mapping->addMapping(
+                'Services/MetaData',
+                'md',
+                $a_id . ':0:blog',
+                $blog_map[$a_id] . ':0:blog'
+            );
+        }
     }
 
     public function finalProcessing(

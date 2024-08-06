@@ -117,6 +117,8 @@ class ilObjBlog extends ilObject2
     {
         $ilDB = $this->db;
 
+        $this->createMetaData();
+
         $ilDB->manipulate("INSERT INTO il_blog (id,ppic,rss_active,approval" .
             ",abs_shorten,abs_shorten_len,abs_image,abs_img_width,abs_img_height" .
             ",keywords,authors,nav_mode,nav_list_mon_with_post,ov_post) VALUES (" .
@@ -144,6 +146,8 @@ class ilObjBlog extends ilObject2
     {
         $ilDB = $this->db;
 
+        $this->deleteMetaData();
+
         $this->deleteImage();
 
         ilBlogPosting::deleteAllBlogPostings($this->id);
@@ -158,6 +162,8 @@ class ilObjBlog extends ilObject2
     protected function doUpdate(): void
     {
         $ilDB = $this->db;
+
+        $this->updateMetaData();
 
         if ($this->id) {
             $ilDB->manipulate("UPDATE il_blog" .
@@ -218,6 +224,8 @@ class ilObjBlog extends ilObject2
 
         // set/copy stylesheet
         $this->content_style_domain->styleForObjId($this->getId())->cloneTo($new_obj->getId());
+
+        $this->cloneMetaData($new_obj);
     }
 
     public function getNotesStatus(): bool

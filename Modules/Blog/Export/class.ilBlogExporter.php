@@ -84,6 +84,18 @@ class ilBlogExporter extends ilXmlExporter
             "ids" => $a_ids
         );
 
+        $md_ids = [];
+        foreach ($a_ids as $id) {
+            $md_ids[] = $id . ':0:blog';
+        }
+        if (!empty($md_ids)) {
+            $res[] = [
+                'component' => 'Services/MetaData',
+                'entity' => 'md',
+                'ids' => $md_ids,
+            ];
+        }
+
         return $res;
     }
 

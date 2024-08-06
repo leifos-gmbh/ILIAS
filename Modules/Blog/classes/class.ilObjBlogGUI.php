@@ -28,6 +28,7 @@ use ILIAS\Blog\StandardGUIRequest;
  * @ilCtrl_Calls ilObjBlogGUI: ilInfoScreenGUI, ilNoteGUI, ilCommonActionDispatcherGUI
  * @ilCtrl_Calls ilObjBlogGUI: ilPermissionGUI, ilObjectCopyGUI, ilRepositorySearchGUI
  * @ilCtrl_Calls ilObjBlogGUI: ilExportGUI, ilObjectContentStyleSettingsGUI, ilBlogExerciseGUI, ilObjNotificationSettingsGUI
+ * @ilCtrl_Calls ilObjBlogGUI: ilObjectMetaDataGUI
  */
 class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 {
@@ -534,22 +535,30 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                 $this->ctrl->getLinkTarget($this, "edit")
             );
 
-            if (!$this->prtf_embed) {
-                if ($this->id_type === self::REPOSITORY_NODE_ID) {
-                    $this->tabs_gui->addTab(
-                        "contributors",
-                        $lng->txt("blog_contributors"),
-                        $this->ctrl->getLinkTarget($this, "contributors")
-                    );
-                }
+            if (!$this->prtf_embed && $this->id_type === self::REPOSITORY_NODE_ID) {
+                $this->tabs_gui->addTab(
+                    "contributors",
+                    $lng->txt("blog_contributors"),
+                    $this->ctrl->getLinkTarget($this, "contributors")
+                );
+            }
 
-                if ($this->id_type === self::REPOSITORY_NODE_ID) {
-                    $this->tabs_gui->addTab(
-                        "export",
-                        $lng->txt("export"),
-                        $this->ctrl->getLinkTargetByClass("ilexportgui", "")
-                    );
-                }
+            $mdgui = new ilObjectMetaDataGUI($this->object, null, null, $this->call_by_reference);
+            $mdtab = $mdgui->getTab();
+            if ($mdtab) {
+                $this->tabs_gui->addTab(
+                    "meta_data",
+                    $this->lng->txt("meta_data"),
+                    $mdtab
+                );
+            }
+
+            if (!$this->prtf_embed && $this->id_type === self::REPOSITORY_NODE_ID) {
+                $this->tabs_gui->addTab(
+                    "export",
+                    $lng->txt("export"),
+                    $this->ctrl->getLinkTargetByClass("ilexportgui", "")
+                );
             }
         }
 
@@ -850,6 +859,14 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                 $ilTabs->activateTab("settings");
                 $this->setSettingsSubTabs("notifications");
                 $gui = new ilObjNotificationSettingsGUI($this->object->getRefId());
+                $this->ctrl->forwardCommand($gui);
+                break;
+
+            case 'ilobjectmetadatagui':
+                $this->checkPermission("write");
+                $this->prepareOutput();
+                $ilTabs->activateTab("meta_data");
+                $gui = new ilObjectMetaDataGUI($this->object, null, null, $this->call_by_reference);
                 $this->ctrl->forwardCommand($gui);
                 break;
 

@@ -319,7 +319,8 @@ class ilObjectMetaDataGUI
                 'exc',
                 'lti',
                 'cmix',
-                'mep:mpg'
+                'mep:mpg',
+                'blog'
             ])
         );
     }

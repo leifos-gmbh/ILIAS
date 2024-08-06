@@ -862,7 +862,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                 $this->ctrl->forwardCommand($gui);
                 break;
 
-            case 'ilobjectmetadatagui':
+            case strtolower(ilObjectMetaDataGUI::class):
                 $this->checkPermission("write");
                 $this->prepareOutput();
                 $ilTabs->activateTab("meta_data");

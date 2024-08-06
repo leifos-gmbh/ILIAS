@@ -396,15 +396,16 @@ class ilCalendarEntry implements ilDatePeriod
             return;
         }
 
+        $fac = new ILIAS\Data\UUID\Factory();
+        $uuid = $fac->uuid4AsString();
+        $settings = new ilSetting('caldav');
+        $settings->set($uuid, (string) $this->getEntryId());
+
         $export = new ilCalendarExport();
         $export->setExportType(ilCalendarExport::EXPORT_APPOINTMENTS);
         $export->setAppointments([(int) $this->entry_id]);
         $export->export();
 
-        $fac = new ILIAS\Data\UUID\Factory();
-        $uuid = $fac->uuid4AsString();
-        $settings = new ilSetting('caldav');
-        $settings->set($uuid, (string) $this->getEntryId());
 
 
         // calendarobjects

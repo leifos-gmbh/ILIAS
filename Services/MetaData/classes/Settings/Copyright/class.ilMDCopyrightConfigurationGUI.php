@@ -33,14 +33,13 @@ use ILIAS\FileUpload\MimeType;
 use ILIAS\ResourceStorage\Services as IRSS;
 
 /**
- * @ilCtrl_Calls ilMDCopyrightSelectionGUI: ilMDCopyrightUsageGUI
+ * @ilCtrl_Calls ilMDCopyrightConfigurationGUI: ilMDCopyrightUsageGUI, ilMDCopyrightImageUploadHandlerGUI
  */
-class ilMDCopyrightSelectionGUI
+class ilMDCopyrightConfigurationGUI
 {
     protected ilCtrl $ctrl;
     protected ilGlobalTemplateInterface $tpl;
     protected ilLanguage $lng;
-    protected ilTabsGUI $tabs_gui;
     protected ilToolbarGUI $toolbar_gui;
     protected GlobalHttpState $http;
     protected Factory $refinery;
@@ -48,22 +47,19 @@ class ilMDCopyrightSelectionGUI
     protected UIRenderer $ui_renderer;
     protected IRSS $irss;
 
-    protected ilObjMDSettingsGUI $parent_gui;
+    protected ilObjMDSettingsGUI $parent_obj_gui;
     protected ilMDSettingsAccessService $access_service;
     protected ilMDSettingsModalService $modal_service;
     protected RendererInterface $renderer;
     protected RepositoryInterface $repository;
 
-    protected ?ilMDSettings $md_settings = null;
-
-    public function __construct(ilObjMDSettingsGUI $parent_gui)
+    public function __construct(ilObjMDSettingsGUI $parent_obj_gui)
     {
         global $DIC;
 
         $this->ctrl = $DIC->ctrl();
         $this->lng = $DIC->language();
         $this->tpl = $DIC->ui()->mainTemplate();
-        $this->tabs_gui = $DIC->tabs();
         $this->toolbar_gui = $DIC->toolbar();
         $this->http = $DIC->http();
         $this->refinery = $DIC->refinery();
@@ -71,9 +67,9 @@ class ilMDCopyrightSelectionGUI
         $this->ui_renderer = $DIC->ui()->renderer();
         $this->irss = $DIC->resourceStorage();
 
-        $this->parent_gui = $parent_gui;
+        $this->parent_obj_gui = $parent_obj_gui;
         $this->access_service = new ilMDSettingsAccessService(
-            $this->parent_gui->getRefId(),
+            $this->parent_obj_gui->getRefId(),
             $DIC->access()
         );
         $this->modal_service = new ilMDSettingsModalService(
@@ -118,7 +114,7 @@ class ilMDCopyrightSelectionGUI
                 // no break
             default:
                 if (!$cmd || $cmd === 'view') {
-                    $cmd = 'showCopyrightSettings';
+                    $cmd = 'showCopyrightSelection';
                 }
 
                 $this->$cmd();
@@ -126,54 +122,10 @@ class ilMDCopyrightSelectionGUI
         }
     }
 
-    protected function setCopyrightTabs(string $active_subtab): void
-    {
-        if (
-            !$this->access_service->hasCurrentUserVisibleAccess() ||
-            !$this->access_service->hasCurrentUserReadAccess()
-        ) {
-            return;
-        }
-        $this->tabs_gui->setTabActive('md_copyright');
-
-        $this->tabs_gui->addSubTab(
-            'md_copyright_settings',
-            $this->lng->txt('settings'),
-            $this->ctrl->getLinkTarget($this, 'showCopyrightSettings')
-        );
-
-        $this->tabs_gui->addSubTab(
-            'md_copyright_selection',
-            $this->lng->txt('md_copyright_selection'),
-            $this->ctrl->getLinkTarget($this, 'showCopyrightSelection')
-        );
-
-        if (in_array($active_subtab, [
-            'md_copyright_settings',
-            'md_copyright_selection'
-        ])) {
-            $this->tabs_gui->activateSubTab($active_subtab);
-            return;
-        }
-        $this->tabs_gui->activateSubTab('md_copyright_settings');
-    }
-
-    public function showCopyrightSettings(?ilPropertyFormGUI $form = null): void
-    {
-        $this->setCopyrightTabs('md_copyright_settings');
-
-        if (!$form instanceof ilPropertyFormGUI) {
-            $form = $this->initSettingsForm();
-        }
-        $this->tpl->setContent($form->getHTML());
-    }
-
     public function showCopyrightSelection(
         int $current_id = 0,
         RoundTrip $current_modal = null
     ): void {
-        $this->setCopyrightTabs('md_copyright_selection');
-
         $has_write = $this->access_service->hasCurrentUserWriteAccess();
 
         $table_gui = new ilMDCopyrightTableGUI($this, 'showCopyrightSelection', $has_write);
@@ -210,26 +162,6 @@ class ilMDCopyrightSelectionGUI
             (isset($add_modal) ? $this->ui_renderer->render($add_modal) : '') .
             $this->ui_renderer->render($edit_modals)
         );
-    }
-
-    public function saveCopyrightSettings(): void
-    {
-        if (!$this->access_service->hasCurrentUserWriteAccess()) {
-            $this->ctrl->redirect($this, "showCopyrightSettings");
-        }
-        $form = $this->initSettingsForm();
-        if ($form->checkInput()) {
-            $this->MDSettings()->activateCopyrightSelection((bool) $form->getInput('active'));
-            $this->MDSettings()->activateOAIPMH((bool) $form->getInput('oai_active'));
-            $this->MDSettings()->saveOAIRepositoryName((string) $form->getInput('oai_repository_name'));
-            $this->MDSettings()->saveOAIIdentifierPrefix((string) $form->getInput('oai_identifier_prefix'));
-            $this->MDSettings()->saveOAIContactMail((string) $form->getInput('oai_contact_mail'));
-            $this->tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'), true);
-            $this->ctrl->redirect($this, 'showCopyrightSettings');
-        }
-        $this->tpl->setOnScreenMessage('failure', $this->lng->txt('err_check_input'), true);
-        $form->setValuesByPost();
-        $this->showCopyrightSettings($form);
     }
 
     public function saveEntry(): void
@@ -445,54 +377,6 @@ class ilMDCopyrightSelectionGUI
         return $modal;
     }
 
-    protected function initSettingsForm(): ilPropertyFormGUI
-    {
-        $form = new ilPropertyFormGUI();
-        $form->setFormAction($this->ctrl->getFormAction($this));
-        $form->setTitle($this->lng->txt('md_copyright_settings'));
-
-        if ($this->access_service->hasCurrentUserWriteAccess()) {
-            $form->addCommandButton('saveCopyrightSettings', $this->lng->txt('save'));
-        }
-
-        $check = new ilCheckboxInputGUI($this->lng->txt('md_copyright_enabled'), 'active');
-        $check->setChecked($this->MDSettings()->isCopyrightSelectionActive());
-        $check->setValue('1');
-        $check->setInfo($this->lng->txt('md_copyright_enable_info'));
-        $form->addItem($check);
-
-        ilAdministrationSettingsFormHandler::addFieldsToForm(
-            $this->getAdministrationFormId(),
-            $form,
-            $this->parent_gui
-        );
-
-        $oai_check = new ilCheckboxInputGUI($this->lng->txt('md_oai_pmh_enabled'), 'oai_active');
-        $oai_check->setChecked($this->MDSettings()->isOAIPMHActive());
-        $oai_check->setValue('1');
-        $oai_check->setInfo($this->lng->txt('md_oai_pmh_enabled_info'));
-        $form->addItem($oai_check);
-
-        $oai_repo_name = new ilTextInputGUI($this->lng->txt('md_oai_repository_name'), 'oai_repository_name');
-        $oai_repo_name->setValue($this->MDSettings()->getOAIRepositoryName());
-        $oai_repo_name->setInfo($this->lng->txt('md_oai_repository_name_info'));
-        $oai_repo_name->setRequired(true);
-        $oai_check->addSubItem($oai_repo_name);
-
-        $oai_id_prefix = new ilTextInputGUI($this->lng->txt('md_oai_identifier_prefix'), 'oai_identifier_prefix');
-        $oai_id_prefix->setValue($this->MDSettings()->getOAIIdentifierPrefix());
-        $oai_id_prefix->setInfo($this->lng->txt('md_oai_identifier_prefix_info'));
-        $oai_id_prefix->setRequired(true);
-        $oai_check->addSubItem($oai_id_prefix);
-
-        $oai_contact_mail = new ilTextInputGUI($this->lng->txt('md_oai_contact_mail'), 'oai_contact_mail');
-        $oai_contact_mail->setValue($this->MDSettings()->getOAIContactMail());
-        $oai_contact_mail->setRequired(true);
-        $oai_check->addSubItem($oai_contact_mail);
-
-        return $form;
-    }
-
     public function saveCopyrightPosition(): bool
     {
         if (!$this->http->wrapper()->post()->has('order')) {
@@ -555,14 +439,6 @@ class ilMDCopyrightSelectionGUI
         return '';
     }
 
-    protected function MDSettings(): ilMDSettings
-    {
-        if (!isset($this->md_settings)) {
-            $this->md_settings = ilMDSettings::_getInstance();
-        }
-        return $this->md_settings;
-    }
-
     protected function initEntryIdFromQuery(): int
     {
         $entry_id = 0;
@@ -587,10 +463,5 @@ class ilMDCopyrightSelectionGUI
             );
         }
         return [];
-    }
-
-    protected function getAdministrationFormId(): int
-    {
-        return ilAdministrationSettingsFormHandler::FORM_META_COPYRIGHT;
     }
 }

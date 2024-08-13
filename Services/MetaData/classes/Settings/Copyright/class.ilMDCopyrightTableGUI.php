@@ -41,7 +41,7 @@ class ilMDCopyrightTableGUI extends ilTable2GUI
     protected array $edit_modal_signals = [];
 
     public function __construct(
-        ilMDCopyrightSelectionGUI $parent_obj,
+        ilMDCopyrightConfigurationGUI $parent_obj,
         string $parent_cmd = '',
         bool $has_write = false
     ) {

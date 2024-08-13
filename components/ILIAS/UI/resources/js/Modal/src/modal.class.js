@@ -71,6 +71,7 @@ export default class Modal {
   /**
    * @param {string} id
    */
+  // eslint-disable-next-line class-methods-use-this
   closeModal(id) {
     document.getElementById(id).close();
   }
@@ -82,6 +83,7 @@ export default class Modal {
    * @param {string} id
    * @param {array} signalData
    */
+  // eslint-disable-next-line class-methods-use-this
   replaceFromSignal(id, signalData) {
     const { url } = signalData.options;
     il.UI.core.replaceContent(id, url, 'component');

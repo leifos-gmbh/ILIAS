@@ -20,19 +20,18 @@ declare(strict_types=1);
 
 namespace ILIAS\Exercise\InstructionFile;
 
-use ILIAS\Exercise\IRSS\CollectionWrapper;
+use ILIAS\Exercise\IRSS\IRSSWrapper;
 use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Exercise\IRSS\ResourceInformation;
 
 class InstructionFileRepository
 {
-    protected CollectionWrapper $wrapper;
-    protected CollectionWrapper $collection;
+    protected IRSSWrapper $wrapper;
     protected \ilDBInterface $db;
 
     public function __construct(
-        CollectionWrapper $wrapper,
+        IRSSWrapper $wrapper,
         \ilDBInterface $db
     ) {
         $this->db = $db;

@@ -1603,51 +1603,6 @@ class ilExAssignment
         return $this->member_status[$a_user_id];
     }
 
-    /**
-     * @throws ilDateTimeException
-     */
-    public function recalculateLateSubmissions(): void
-    {
-        $ilDB = $this->db;
-
-        // see JF, 2015-05-11
-
-        $ext_deadline = $this->getExtendedDeadline();
-
-        foreach (ilExSubmission::getAllAssignmentFiles($this->exc_id, $this->getId()) as $file) {
-            $id = $file["returned_id"];
-            $uploaded = new ilDateTime($file["ts"], IL_CAL_DATETIME);
-            $uploaded = $uploaded->get(IL_CAL_UNIX);
-
-            $deadline = $this->getPersonalDeadline($file["user_id"]);
-            $last_deadline = max($deadline, $this->getExtendedDeadline());
-
-            $late = null;
-
-            // upload is not late anymore
-            if ($file["late"] &&
-                (!$last_deadline ||
-                !$ext_deadline ||
-                $uploaded < $deadline)) {
-                $late = false;
-            }
-            // upload is now late
-            elseif (!$file["late"] &&
-                $ext_deadline &&
-                $deadline &&
-                $uploaded > $deadline) {
-                $late = true;
-            }
-
-            if ($late !== null) {
-                $ilDB->manipulate("UPDATE exc_returned" .
-                    " SET late = " . $ilDB->quote($late, "integer") .
-                    " WHERE returned_id = " . $ilDB->quote($id, "integer"));
-            }
-        }
-    }
-
-
     //
     // individual deadlines
     //

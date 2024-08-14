@@ -16,14 +16,10 @@
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 namespace ILIAS\Exercise\Submission;
 
-/**
- * Submission repository
- *
- * @author Jesús López <lopez@leifos.com>
- * @author Alexander Killing <killing@leifos.de>
- */
 class SubmissionDBRepository implements SubmissionRepositoryInterface
 {
     protected const TABLE_NAME = "exc_returned";
@@ -40,9 +36,23 @@ class SubmissionDBRepository implements SubmissionRepositoryInterface
             : $db;
     }
 
+    public function getAllEntriesOfAssignment(int $ass_id) : array
+    {
+        $recs = [];
+        $set = $this->db->queryF("SELECT * FROM exc_returned " .
+            " WHERE ass_id = %s ",
+            ["integer"],
+            [$ass_id]
+        );
+        while ($rec = $this->db->fetchAssoc($set)) {
+            $recs[] = $rec;
+        }
+        return $recs;
+    }
+
     public function getUserId(int $submission_id): int
     {
-        $q = "SELECT user_id FROM " . self::TABLE_NAME .
+        $q = "SELECT user_id FROM exc_returned " .
             " WHERE returned_id = " . $this->db->quote($submission_id, "integer");
         $usr_set = $this->db->query($q);
 
@@ -52,7 +62,7 @@ class SubmissionDBRepository implements SubmissionRepositoryInterface
 
     public function hasSubmissions(int $assignment_id): int
     {
-        $query = "SELECT * FROM " . self::TABLE_NAME .
+        $query = "SELECT * FROM exc_returned " .
             " WHERE ass_id = " . $this->db->quote($assignment_id, "integer") .
             " AND (filename IS NOT NULL OR atext IS NOT NULL)" .
             " AND ts IS NOT NULL";
@@ -63,7 +73,7 @@ class SubmissionDBRepository implements SubmissionRepositoryInterface
     // Update web_dir_access_time. It defines last HTML opening data.
     public function updateWebDirAccessTime(int $assignment_id, int $member_id): void
     {
-        $this->db->manipulate("UPDATE " . self::TABLE_NAME .
+        $this->db->manipulate("UPDATE exc_returned " .
             " SET web_dir_access_time = " . $this->db->quote(\ilUtil::now(), "timestamp") .
             " WHERE ass_id = " . $this->db->quote($assignment_id, "integer") .
             " AND user_id = " . $this->db->quote($member_id, "integer"));
@@ -85,7 +95,7 @@ class SubmissionDBRepository implements SubmissionRepositoryInterface
         }
 
         $set = $db->queryF(
-            "SELECT ass_id FROM  " . self::TABLE_NAME .
+            "SELECT ass_id FROM exc_returned " .
             " WHERE " . $db->in("ass_id", $assignment_ids, false, "integer") .
             " AND user_id = %s " .
             " AND (filename IS NOT NULL OR atext IS NOT NULL)" .
@@ -98,8 +108,8 @@ class SubmissionDBRepository implements SubmissionRepositoryInterface
         }
 
         $set = $db->queryF(
-            "SELECT ret.ass_id FROM  " . self::TABLE_NAME . " ret JOIN " .
-            self::TEAM_TABLE_NAME . " team ON (ret.team_id = team.id AND ret.ass_id = team.ass_id) " .
+            "SELECT ret.ass_id FROM exc_returned ret JOIN il_exc_team team " .
+            " ON (ret.team_id = team.id AND ret.ass_id = team.ass_id) " .
             " WHERE " . $db->in("ret.ass_id", $assignment_ids, false, "integer") .
             " AND team.user_id = %s " .
             " AND (ret.filename IS NOT NULL OR ret.atext IS NOT NULL)" .
@@ -112,5 +122,15 @@ class SubmissionDBRepository implements SubmissionRepositoryInterface
         }
 
         return $submitted;
+    }
+
+    public function updateLate(
+        int $return_id,
+        bool $late
+    ) : void
+    {
+        $this->db->manipulate("UPDATE exc_returned" .
+            " SET late = " . $this->db->quote((int) $late, "integer") .
+            " WHERE returned_id = " . $this->db->quote($return_id, "integer"));
     }
 }

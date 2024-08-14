@@ -467,42 +467,6 @@ class ilExSubmission
     /**
      * @throws ilExcUnknownAssignmentTypeException
      */
-    public static function getAllAssignmentFiles(
-        int $a_exc_id,
-        int $a_ass_id
-    ): array {
-        global $DIC;
-
-        $ilDB = $DIC->database();
-
-        $storage = new ilFSStorageExercise($a_exc_id, $a_ass_id);
-        $path = $storage->getAbsoluteSubmissionPath();
-
-        $ass_type = ilExAssignmentTypes::getInstance()->getById(ilExAssignment::lookupType($a_ass_id));
-
-        $query = "SELECT * FROM exc_returned WHERE ass_id = " .
-            $ilDB->quote($a_ass_id, "integer");
-
-        $res = $ilDB->query($query);
-        $delivered = [];
-        while ($row = $ilDB->fetchAssoc($res)) {
-            if ($ass_type->isSubmissionAssignedToTeam()) {
-                $storage_id = $row["team_id"];
-            } else {
-                $storage_id = $row["user_id"];
-            }
-
-            $row["timestamp"] = $row["ts"];
-            $row["filename"] = $path . "/" . $storage_id . "/" . basename($row["filename"] ?? "");
-            $delivered[] = $row;
-        }
-
-        return $delivered;
-    }
-
-    /**
-     * @throws ilExcUnknownAssignmentTypeException
-     */
     public static function getAssignmentFilesByUsers(
         int $a_exc_id,
         int $a_ass_id,

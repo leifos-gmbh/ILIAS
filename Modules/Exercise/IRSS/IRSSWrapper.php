@@ -30,7 +30,7 @@ use ILIAS\Filesystem\Stream\FileStream;
 use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\Filesystem\Util\LegacyPathHelper;
 
-class CollectionWrapper
+class IRSSWrapper
 {
     protected InternalDataService $data;
     protected \ILIAS\FileUpload\FileUpload $upload;

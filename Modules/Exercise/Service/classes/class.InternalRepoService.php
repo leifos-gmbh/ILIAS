@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Exercise;
 
-use ILIAS\Exercise\IRSS\CollectionWrapper;
+use ILIAS\Exercise\IRSS\IRSSWrapper;
 use ILIAS\Exercise\InstructionFile\InstructionFileRepository;
 use ILIAS\Exercise\SampleSolution\SampleSolutionRepository;
 use ILIAS\Exercise\Team\TeamDBRepository;
@@ -35,7 +35,7 @@ use ILIAS\Exercise\TutorFeedbackFile\TutorFeedbackZipRepository;
  */
 class InternalRepoService
 {
-    protected CollectionWrapper $collection_wrapper;
+    protected IRSSWrapper $irss_wrapper;
     protected InternalDataService $data;
     protected \ilDBInterface $db;
     protected Submission\SubmissionDBRepository $submission_repo;
@@ -45,7 +45,7 @@ class InternalRepoService
         $this->data = $data;
         $this->db = $db;
         $this->submission_repo = new Submission\SubmissionDBRepository($db);
-        $this->collection_wrapper = new CollectionWrapper($data);
+        $this->irss_wrapper = new IRSSWrapper($data);
     }
 
     public function assignment(): Assignment\RepoService
@@ -64,7 +64,7 @@ class InternalRepoService
     public function instructionFiles(): InstructionFileRepository
     {
         return new InstructionFileRepository(
-            $this->collection_wrapper,
+            $this->irss_wrapper,
             $this->db
         );
     }
@@ -72,7 +72,7 @@ class InternalRepoService
     public function sampleSolution(): SampleSolutionRepository
     {
         return new SampleSolutionRepository(
-            $this->collection_wrapper,
+            $this->irss_wrapper,
             $this->db
         );
     }
@@ -80,7 +80,7 @@ class InternalRepoService
     public function tutorFeedbackFile(): TutorFeedbackFileRepository
     {
         return new TutorFeedbackFileRepository(
-            $this->collection_wrapper,
+            $this->irss_wrapper,
             $this->db
         );
     }
@@ -88,7 +88,7 @@ class InternalRepoService
     public function tutorFeedbackFileTeam(): TutorFeedbackFileTeamRepository
     {
         return new TutorFeedbackFileTeamRepository(
-            $this->collection_wrapper,
+            $this->irss_wrapper,
             $this->db
         );
     }
@@ -96,7 +96,7 @@ class InternalRepoService
     public function tutorFeedbackZip(): TutorFeedbackZipRepository
     {
         return new TutorFeedbackZipRepository(
-            $this->collection_wrapper,
+            $this->irss_wrapper,
             $this->db
         );
     }

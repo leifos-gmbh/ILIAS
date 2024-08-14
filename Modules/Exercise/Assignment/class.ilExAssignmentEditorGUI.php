@@ -1219,7 +1219,8 @@ class ilExAssignmentEditorGUI
             // if deadlines were changed
             if ($old_deadline != $new_deadline ||
                 $old_ext_deadline != $new_ext_deadline) {
-                $this->assignment->recalculateLateSubmissions();
+                $subm = $this->domain->submission($this->assignment->getId());
+                $subm->recalculateLateSubmissions();
             }
 
             $this->tpl->setOnScreenMessage('success', $lng->txt("msg_obj_modified"), true);

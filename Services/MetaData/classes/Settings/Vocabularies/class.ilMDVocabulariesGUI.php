@@ -27,6 +27,7 @@ use ILIAS\UI\Component\Signal;
 use ILIAS\UI\Component\Modal\RoundTrip as RoundtripModal;
 use ILIAS\UI\URLBuilder;
 use ILIAS\Data\URI;
+use ILIAS\FileUpload\MimeType;
 
 /**
  * @ilCtrl_Calls ilMDVocabulariesGUI: ilMDVocabularyUploadHandlerGUI
@@ -77,6 +78,11 @@ class ilMDVocabulariesGUI
         }
 
         switch ($next_class) {
+            case strtolower(ilMDVocabularyUploadHandlerGUI::class):
+                $handler = new ilMDVocabularyUploadHandlerGUI();
+                $this->ctrl->forwardCommand($handler);
+
+                // no break
             default:
                 if (!$cmd || $cmd === 'view') {
                     $cmd = 'showVocabularies';
@@ -146,8 +152,6 @@ class ilMDVocabulariesGUI
             )->withIsSortable(false)
         ];
 
-        global $DIC;
-        $DIC->logger()->root()->dump('action: ' . $this->ctrl->getLinkTarget($this, 'tableAction'));
         $url_builder = new URLBuilder(new URI(
             rtrim(ILIAS_HTTP_PATH, '/') . $this->ctrl->getLinkTarget($this, 'tableAction')
         ));
@@ -193,7 +197,7 @@ class ilMDVocabulariesGUI
         $file_input = $this->ui_factory->input()->field()->file(
             new ilMDVocabularyUploadHandlerGUI(),
             $this->lng->txt('import_file_vocab')
-        );
+        )->withAcceptedMimeTypes([MimeType::TEXT__XML])->withMaxFiles(1);
 
         return $this->ui_factory->modal()->roundtrip(
             $this->lng->txt('import_vocab_modal'),

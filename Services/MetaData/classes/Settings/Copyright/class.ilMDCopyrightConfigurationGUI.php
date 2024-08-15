@@ -49,7 +49,6 @@ class ilMDCopyrightConfigurationGUI
 
     protected ilObjMDSettingsGUI $parent_obj_gui;
     protected ilMDSettingsAccessService $access_service;
-    protected ilMDSettingsModalService $modal_service;
     protected RendererInterface $renderer;
     protected RepositoryInterface $repository;
 
@@ -71,9 +70,6 @@ class ilMDCopyrightConfigurationGUI
         $this->access_service = new ilMDSettingsAccessService(
             $this->parent_obj_gui->getRefId(),
             $DIC->access()
-        );
-        $this->modal_service = new ilMDSettingsModalService(
-            $this->ui_factory
         );
         $this->renderer = new Renderer(
             $DIC->ui()->factory(),

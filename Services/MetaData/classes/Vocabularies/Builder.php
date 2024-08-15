@@ -55,6 +55,8 @@ class Builder implements BuilderInterface
         return new Vocabulary(
             $this->source,
             $this->condition,
+            true,
+            false,
             ...$this->values
         );
     }

@@ -43,4 +43,8 @@ interface VocabularyInterface
      * to have.
      */
     public function condition(): ?ConditionInterface;
+
+    public function isActive(): bool;
+
+    public function allowsCustomInputs(): bool;
 }

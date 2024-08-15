@@ -29,10 +29,6 @@ the old MD editor, but is not part of the LOM standard. It
 would be nice to get rid of it, should it not be used anywhere
 else in ILIAS.
 
-### Copyright in API
-
-Information about copyright entries should be available vai the API.
-
 ### Replace Generic Generators With Custom Iterators
 
 A lot of generic generators are used throughout the component, along
@@ -65,19 +61,6 @@ The `Derivator` in the API could be expanded to contain methods like
 `prepareOmit` and `prepareAddOrChange` to allow changes to the derived
 LOM set before it is persisted. The repository would need to take into
 account more types of markers/scaffolds in `transferMD`.
-
-### Vocabularies
-
-Allow adding other vocabularies than LOM. This could be implemented
-along similar lines as the 'copyright' tab in the administration
-settings for MD.
-
-To this end, 'source' fields have to be introduced for every
-vocabulary field in the database.
-
-Note that the usage of non-LOMv1.0 sources for
-vocabularies in a MD set means that also the element 'metadataSchema'
-has to be appendend, see the LOM standard.
 
 ### Abandon the old backend
 
@@ -115,6 +98,16 @@ can be stored in LOM.
 
 This would need expansive changes to the database structure, and a new
 input element for multilangual text input.
+
+### Clean up Dependency Management
+
+Most of the dependency management happens in the `Services` folders,
+but in some places `Initiators` are used in tandem with the `Services`.
+Either `Initiators` should be used consistently for every entry point
+into `MetaData` (and `Services` reserved for things used across
+'sub-components'), or everthing should be done in `Services`.
+
+Further, `Settings` should also be refactored to use `Services` properly.
 
 ### Improve Unit Test Coverage
 

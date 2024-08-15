@@ -18,23 +18,42 @@
 
 declare(strict_types=1);
 
+use ILIAS\HTTP\Services as HTTP;
+use ILIAS\UI\Factory as UIFactory;
+use ILIAS\UI\Renderer as UIRenderer;
+use ILIAS\UI\Component\Table\Data as DataTable;
+use ILIAS\UI\Component\Button\Standard as Button;
+use ILIAS\UI\Component\Signal;
+use ILIAS\UI\Component\Modal\RoundTrip as RoundtripModal;
+use ILIAS\UI\URLBuilder;
+use ILIAS\Data\URI;
+
+/**
+ * @ilCtrl_Calls ilMDVocabulariesGUI: ilMDVocabularyUploadHandlerGUI
+ */
 class ilMDVocabulariesGUI
 {
     protected ilCtrl $ctrl;
+    protected HTTP $http;
     protected ilGlobalTemplateInterface $tpl;
     protected ilLanguage $lng;
+    protected ilToolbarGUI $toolbar;
+    protected UIFactory $ui_factory;
+    protected UIRenderer $ui_renderer;
     protected ilObjMDSettingsGUI $parent_obj_gui;
     protected ilMDSettingsAccessService $access_service;
-
-    protected ?ilMDSettings $md_settings = null;
 
     public function __construct(ilObjMDSettingsGUI $parent_obj_gui)
     {
         global $DIC;
 
         $this->ctrl = $DIC->ctrl();
+        $this->http = $DIC->http();
         $this->lng = $DIC->language();
         $this->tpl = $DIC->ui()->mainTemplate();
+        $this->toolbar = $DIC->toolbar();
+        $this->ui_factory = $DIC->ui()->factory();
+        $this->ui_renderer = $DIC->ui()->renderer();
 
         $this->parent_obj_gui = $parent_obj_gui;
         $this->access_service = new ilMDSettingsAccessService(
@@ -68,7 +87,127 @@ class ilMDVocabulariesGUI
         }
     }
 
-    public function showVocabularies(?ilPropertyFormGUI $form = null): void
+    public function showVocabularies(): void
     {
+        $import_modal = $this->getImportModal();
+        $this->toolbar->addComponent($this->getImportButton($import_modal->getShowSignal()));
+
+        $table = $this->getTable();
+
+        $this->tpl->setContent(
+            $this->ui_renderer->render([
+                $import_modal,
+                $table
+            ])
+        );
+    }
+
+    public function tableAction(): void
+    {
+    }
+
+    protected function importVocabulary(): void
+    {
+    }
+
+    protected function confirmDeleteVocabulary(): void
+    {
+    }
+
+    protected function deleteVocabulary(): void
+    {
+    }
+
+    protected function toggleActiveForVocabulary(): void
+    {
+    }
+
+    protected function toggleCustomInputForVocabulary(): void
+    {
+    }
+
+    protected function getTable(): DataTable
+    {
+        $column_factory = $this->ui_factory->table()->column();
+        $columns = [
+            'element' => $column_factory->text($this->lng->txt('vocab_element_column'))->withIsSortable(false),
+            'type' => $column_factory->status($this->lng->txt('vocab_type_column'))->withIsSortable(false),
+            'source' => $column_factory->text($this->lng->txt('vocab_source_column'))->withIsSortable(false),
+            'preview' => $column_factory->text($this->lng->txt('vocab_preview_column'))->withIsSortable(false),
+            'active' => $column_factory->boolean(
+                $this->lng->txt('vocab_active_column'),
+                $this->lng->txt('yes'),
+                $this->lng->txt('no')
+            )->withIsSortable(false),
+            'custom_input' => $column_factory->boolean(
+                $this->lng->txt('vocab_custom_input_column'),
+                $this->lng->txt('yes'),
+                $this->lng->txt('no')
+            )->withIsSortable(false)
+        ];
+
+        global $DIC;
+        $DIC->logger()->root()->dump('action: ' . $this->ctrl->getLinkTarget($this, 'tableAction'));
+        $url_builder = new URLBuilder(new URI(
+            rtrim(ILIAS_HTTP_PATH, '/') . $this->ctrl->getLinkTarget($this, 'tableAction')
+        ));
+        list($url_builder, $action_parameter_token, $row_id_token) =
+            $url_builder->acquireParameters(
+                ['metadata', 'vocab'],
+                'table_action',
+                'vocab_ids'
+            );
+        $actions_factory = $this->ui_factory->table()->action();
+        $actions = [
+            'delete' => $actions_factory->single(
+                $this->lng->txt('vocab_delete_action'),
+                $url_builder->withParameter($action_parameter_token, 'delete'),
+                $row_id_token
+            )->withAsync(true),
+            'toggle_active' => $actions_factory->single(
+                $this->lng->txt('vocab_toggle_active_action'),
+                $url_builder->withParameter($action_parameter_token, 'toggle_active'),
+                $row_id_token
+            ),
+            'toggle_custom_input' => $actions_factory->single(
+                $this->lng->txt('vocab_toggle_custom_input_action'),
+                $url_builder->withParameter($action_parameter_token, 'toggle_custom_input'),
+                $row_id_token
+            ),
+            'show_all' => $actions_factory->single(
+                $this->lng->txt('vocab_show_all_action'),
+                $url_builder->withParameter($action_parameter_token, 'show_all'),
+                $row_id_token
+            )->withAsync(true)
+        ];
+
+        return $this->ui_factory->table()->data(
+            $this->lng->txt('vocab_table_title'),
+            $columns,
+            new ilMDVocabulariesDataRetrieval()
+        )->withActions($actions)->withRequest($this->http->request());
+    }
+
+    protected function getImportModal(): RoundtripModal
+    {
+        $file_input = $this->ui_factory->input()->field()->file(
+            new ilMDVocabularyUploadHandlerGUI(),
+            $this->lng->txt('import_file_vocab')
+        );
+
+        return $this->ui_factory->modal()->roundtrip(
+            $this->lng->txt('import_vocab_modal'),
+            null,
+            [$file_input],
+            $this->ctrl->getLinkTarget($this, 'importVocabulary')
+        );
+    }
+
+    protected function getImportButton(Signal $signal): Button
+    {
+        return $this->ui_factory->button()->standard(
+            $this->lng->txt('import_vocab'),
+            $signal
+        );
     }
 }

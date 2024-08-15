@@ -366,10 +366,11 @@ class ilMDCopyrightConfigurationGUI
             $this->ctrl->clearParameters($this);
         }
 
-        $modal = $this->modal_service->modalWithForm(
+        $modal = $this->ui_factory->modal()->roundtrip(
             $title,
-            $post_url,
-            ...$inputs
+            null,
+            $inputs,
+            $post_url
         );
         if ($open_on_load) {
             $modal = $modal->withOnLoad($modal->getShowSignal());

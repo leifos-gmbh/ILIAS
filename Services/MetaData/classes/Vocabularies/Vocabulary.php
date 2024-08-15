@@ -25,6 +25,8 @@ use ILIAS\MetaData\Vocabularies\Conditions\ConditionInterface;
 class Vocabulary implements VocabularyInterface
 {
     protected string $source;
+    protected bool $is_active;
+    protected bool $allows_custom_inputs;
 
     /**
      * @var string[]
@@ -35,11 +37,15 @@ class Vocabulary implements VocabularyInterface
     public function __construct(
         string $source,
         ?ConditionInterface $condition = null,
+        bool $is_active = true,
+        bool $allows_custom_inputs = false,
         string ...$values
     ) {
         $this->source = $source;
         $this->values = $values;
         $this->condition = $condition;
+        $this->is_active = $is_active;
+        $this->allows_custom_inputs = $allows_custom_inputs;
     }
 
     public function source(): string
@@ -65,5 +71,15 @@ class Vocabulary implements VocabularyInterface
     public function condition(): ?ConditionInterface
     {
         return $this->condition;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
+
+    public function allowsCustomInputs(): bool
+    {
+        return $this->allows_custom_inputs;
     }
 }

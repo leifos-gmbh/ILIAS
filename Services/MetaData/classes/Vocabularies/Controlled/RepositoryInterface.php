@@ -36,7 +36,12 @@ interface RepositoryInterface
         string ...$values
     ): int;
 
-    public function setLabelForValue(string $value, string $label): void;
+    public function setLabelForValue(
+        PathInterface $path_to_element,
+        string $source,
+        string $value,
+        string $label
+    ): void;
 
     /**
      * @return VocabularyInterface[]
@@ -55,9 +60,10 @@ interface RepositoryInterface
     /**
      * Should return a LabelledValue object. Are
      * values (at least those with a label) really unique across
-     * all controlled vocabularies?
+     * all controlled vocabularies of an element?
      */
     public function getLabelsForValues(
+        PathInterface $path_to_element,
         string ...$values
     ): \Generator;
 

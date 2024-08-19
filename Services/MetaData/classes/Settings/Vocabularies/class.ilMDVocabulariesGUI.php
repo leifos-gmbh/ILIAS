@@ -28,6 +28,8 @@ use ILIAS\UI\Component\Modal\RoundTrip as RoundtripModal;
 use ILIAS\UI\URLBuilder;
 use ILIAS\Data\URI;
 use ILIAS\FileUpload\MimeType;
+use ILIAS\Filesystem\Filesystem;
+use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledVocabsRepository;
 
 /**
  * @ilCtrl_Calls ilMDVocabulariesGUI: ilMDVocabularyUploadHandlerGUI
@@ -36,6 +38,8 @@ class ilMDVocabulariesGUI
 {
     protected ilCtrl $ctrl;
     protected HTTP $http;
+    protected Filesystem $temp_files;
+    protected ControlledVocabsRepository $controlled_vocab_repo;
     protected ilGlobalTemplateInterface $tpl;
     protected ilLanguage $lng;
     protected ilToolbarGUI $toolbar;
@@ -50,6 +54,7 @@ class ilMDVocabulariesGUI
 
         $this->ctrl = $DIC->ctrl();
         $this->http = $DIC->http();
+        $this->temp_files = $DIC->filesystem()->temp();
         $this->lng = $DIC->language();
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->toolbar = $DIC->toolbar();
@@ -114,10 +119,46 @@ class ilMDVocabulariesGUI
 
     protected function importVocabulary(): void
     {
-    }
+        $message_type = 'failure';
+        $message_text = $this->lng->txt('vocab_import_upload_failed');
 
-    protected function confirmDeleteVocabulary(): void
-    {
+        $modal = $this->getImportModal()->withRequest($this->http->request());
+
+        $upload_folder = null;
+        if ($modal->getData()) {
+            $upload_folder = (string) ($modal->getData()['file'][0] ?? null);
+            if (!$this->temp_files->hasDir($upload_folder)) {
+                $upload_folder = null;
+            }
+        }
+
+        $file_content = null;
+        if (!is_null($upload_folder)) {
+            $files = $files = $this->temp_files->listContents($upload_folder);
+            if (count($files) === 1 && ($files[0] ?? null)?->isFile()) {
+                $file_content = $this->temp_files->read($files[0]->getPath());
+            }
+            $this->temp_files->deleteDir($upload_folder);
+        }
+
+        if (!is_null($file_content)) {
+            $importer = new ilMDVocabulariesImporter($this->lng, $this->controlled_vocab_repo);
+            $result = $importer->import(new SimpleXMLElement($file_content));
+
+            if ($result->wasSuccessful()) {
+                $message_type = 'success';
+                $message_text = $this->lng->txt('vocab_import_successful');
+            } else {
+                $message_type = 'failure';
+                printf(
+                    $message_text = $this->lng->txt('vocab_import_invalid'),
+                    implode(', ', $result->getErrors())
+                );
+            }
+        }
+
+        $this->tpl->setOnScreenMessage($message_type, $message_text, true);
+        $this->ctrl->redirect($this, 'showVocabularies');
     }
 
     protected function deleteVocabulary(): void
@@ -202,7 +243,7 @@ class ilMDVocabulariesGUI
         return $this->ui_factory->modal()->roundtrip(
             $this->lng->txt('import_vocab_modal'),
             null,
-            [$file_input],
+            ['file' => $file_input],
             $this->ctrl->getLinkTarget($this, 'importVocabulary')
         );
     }

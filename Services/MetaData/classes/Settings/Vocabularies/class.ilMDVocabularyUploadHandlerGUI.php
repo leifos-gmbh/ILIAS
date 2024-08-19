@@ -95,6 +95,7 @@ class ilMDVocabularyUploadHandlerGUI extends AbstractCtrlAwareUploadHandler
             $title = $file->getFilename();
             $size = $file->getSize();
             $mime = $file->getMimeType();
+            break;
         }
 
         return new BasicFileInfoResult(

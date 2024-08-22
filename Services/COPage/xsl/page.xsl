@@ -2925,7 +2925,7 @@
 
 		<!-- svg -->
 		<xsl:when test="substring($type, 1, 9) = 'image/svg'">
-			<embed style="width:100%">
+			<embed style="width:100%; display:block;">
 				<xsl:attribute name="src"><xsl:value-of select="$data"/></xsl:attribute>
 				<xsl:attribute name="type"><xsl:value-of select="$type"/></xsl:attribute>
 				<xsl:if test="$width != ''">
@@ -3361,6 +3361,7 @@
 
 	<!-- Resources -->
 <xsl:template match="Resources">
+	<xsl:call-template name="EditLabel"><xsl:with-param name="text"><xsl:value-of select="//LVs/LV[@name='pc_res']/@value"/> <xsl:if test="@Template"> (<xsl:value-of select="@Template"/>)</xsl:if></xsl:with-param></xsl:call-template>
 	<div>
 		<xsl:if test="./ResourceList">
 			[list-<xsl:value-of select="./ResourceList/@Type"/>]

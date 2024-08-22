@@ -25,6 +25,7 @@ use ILIAS\UI\Component\Modal\Modal;
 use ILIAS\UI\Component\Card\RepositoryObject;
 use ILIAS\UI\Component\Item\Item;
 use ILIAS\Notes\Note;
+use ILIAS\Container\Content\ViewSessionRepository;
 
 /**
  * Important note:
@@ -2916,6 +2917,7 @@ class ilObjectListGUI
         if ($this->context === self::CONTEXT_REPOSITORY
             && ($this->requested_cmd === "view" || $this->requested_cmd === "" || $this->requested_cmd === "render")
             && $file_upload_dropzone->isUploadAllowed($this->type)
+             && !(new ViewSessionRepository())->isAdminView()
         ) {
             return $file_upload_dropzone->getDropzoneHtml();
         }
@@ -3160,7 +3162,7 @@ class ilObjectListGUI
             $modifySAHS = $this->modifySAHSlaunch($def_command['link'], $def_command['frame']);
             $def_command['link'] = $modifySAHS[0];
             $def_command['frame'] = $modifySAHS[1];
-            $new_viewport = !in_array($this->getDefaultCommand()['frame'], ['', '_top', '_self', '_parent'], true); // Cannot use $def_command['frame']. $this->default_command has been edited.
+            $new_viewport = !in_array($def_command['frame'], ['', '_top', '_self', '_parent'], true);
             $link = $this->ui->factory()
                              ->link()
                              ->standard($this->getTitle(), $def_command['link'])

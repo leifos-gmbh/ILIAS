@@ -23,6 +23,8 @@ namespace ILIAS\Exercise\Submission;
 use ILIAS\Exercise\IRSS\IRSSWrapper;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Filesystem\Stream\FileStream;
+use ILIAS\Data\Result;
+use ILIAS\FileUpload\DTO\UploadResult;
 
 class SubmissionRepository implements SubmissionRepositoryInterface
 {
@@ -198,6 +200,48 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         $rid = $this->irss->importLocalFile(
             $file,
             $filename,
+            $stakeholder
+        );
+        $filename = \ilFileUtils::getValidFilename($filename);
+
+        if ($rid !== "") {
+            $info = $this->irss->getResourceInfo($rid);
+            $next_id = $db->nextId("exc_returned");
+            $query = sprintf(
+                "INSERT INTO exc_returned " .
+                "(returned_id, obj_id, user_id, filename, filetitle, mimetype, ts, ass_id, late, team_id, rid) " .
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                $db->quote($next_id, "integer"),
+                $db->quote($obj_id, "integer"),
+                $db->quote($user_id, "integer"),
+                $db->quote($filename, "text"),
+                $db->quote($filename, "text"),
+                $db->quote($info->getMimeType(), "text"),
+                $db->quote(\ilUtil::now(), "timestamp"),
+                $db->quote($ass_id, "integer"),
+                $db->quote($is_late, "integer"),
+                $db->quote($team_id, "integer"),
+                $db->quote($rid, "text")
+            );
+            $db->manipulate($query);
+            return true;
+        }
+        return false;
+    }
+
+    public function addUpload(
+        int $obj_id,
+        int $ass_id,
+        int $user_id,
+        int $team_id,
+        UploadResult $result,
+        string $filename,
+        bool $is_late,
+        ResourceStakeholder $stakeholder
+    ): bool {
+        $db = $this->db;
+        $rid = $this->irss->importFileFromUploadResult(
+            $result,
             $stakeholder
         );
         $filename = \ilFileUtils::getValidFilename($filename);

@@ -22,6 +22,7 @@ namespace ILIAS\Exercise\Submission;
 
 use ILIAS\Exercise\InternalRepoService;
 use ILIAS\Exercise\InternalDomainService;
+use ILIAS\FileUpload\DTO\UploadResult;
 
 class SubmissionManager
 {
@@ -166,6 +167,55 @@ class SubmissionManager
             $user_id,
             $team_id,
             $file,
+            $filename,
+            $submission->isLate(),
+            $this->stakeholder
+        );
+
+        if ($success && $team_id > 0) {
+            $this->domain->team()->writeLog(
+                $team_id,
+                (string) \ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
+                $filename
+            );
+        }
+
+        return $success;
+    }
+
+    public function addUpload(
+        int $user_id,
+        UploadResult $result,
+        string $filename = ""
+    ): bool {
+
+        if ($filename === "") {
+            $filename = $result->getName();
+        }
+        $submission = new \ilExSubmission(
+            $this->assignment,
+            $user_id
+        );
+
+        if (!$submission->canAddFile()) {
+            return false;
+        }
+
+        if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
+            $team_id = $submission->getTeam()->getId();
+            $user_id = 0;
+            if ($team_id === 0) {
+                return false;
+            }
+        } else {
+            $team_id = 0;
+        }
+        $success = $this->repo->addUpload(
+            $this->assignment->getExerciseId(),
+            $this->ass_id,
+            $user_id,
+            $team_id,
+            $result,
             $filename,
             $submission->isLate(),
             $this->stakeholder

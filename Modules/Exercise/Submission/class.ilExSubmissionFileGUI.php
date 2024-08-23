@@ -189,7 +189,6 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         $ilHelp->setScreenId("upload_submission");
 
         if (!$a_form) {
-            $a_form = $this->initUploadForm();
             $a_form = $this->getUploadForm();
             $this->tpl->setContent($a_form->render());
             return;
@@ -270,7 +269,12 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
     ): \ILIAS\FileUpload\Handler\BasicHandlerResult {
         $title = $result->getName();
 
-        $this->submission->addFileUpload($result);
+        //$this->submission->addFileUpload($result);
+        $subm = $this->domain->submission($this->assignment->getId());
+        $subm->addUpload(
+            $this->user->getid(),
+            $result,
+            $title);
 
         return new \ILIAS\FileUpload\Handler\BasicHandlerResult(
             '',

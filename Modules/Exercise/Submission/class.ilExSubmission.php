@@ -375,59 +375,6 @@ class ilExSubmission
         return false;
     }
 
-    public function addFileUpload(
-        \ILIAS\FileUpload\DTO\UploadResult $result
-    ): bool {
-        $ilDB = $this->db;
-
-        if (!$this->canAddFile()) {
-            return false;
-        }
-        if ($this->ass_type->isSubmissionAssignedToTeam()) {
-            $team_id = $this->getTeam()->getId();
-            $user_id = 0;
-            if ($team_id == 0) {
-                return false;
-            }
-        } else {
-            $team_id = 0;
-            $user_id = $this->getUserId();
-        }
-        $storage_id = $this->getStorageId();
-
-        $deliver_result = $this->initStorage()->addFileUpload($result, $storage_id);
-
-        if ($deliver_result) {
-            $next_id = $ilDB->nextId("exc_returned");
-            $query = sprintf(
-                "INSERT INTO exc_returned " .
-                             "(returned_id, obj_id, user_id, filename, filetitle, mimetype, ts, ass_id, late, team_id) " .
-                             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                $ilDB->quote($next_id, "integer"),
-                $ilDB->quote($this->assignment->getExerciseId(), "integer"),
-                $ilDB->quote($user_id, "integer"),
-                $ilDB->quote($deliver_result["fullname"], "text"),
-                $ilDB->quote(ilFileUtils::getValidFilename($result->getName()), "text"),
-                $ilDB->quote($deliver_result["mimetype"], "text"),
-                $ilDB->quote(ilUtil::now(), "timestamp"),
-                $ilDB->quote($this->assignment->getId(), "integer"),
-                $ilDB->quote($this->isLate(), "integer"),
-                $ilDB->quote($team_id, "integer")
-            );
-            $ilDB->manipulate($query);
-
-            if ($this->team) {
-                $this->team->writeLog(
-                    ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
-                    $result->getName()
-                );
-            }
-
-            return true;
-        }
-        return false;
-    }
-
     /**
      * processes error handling etc for uploaded archive
      * @param string $fileTmp path and filename to uploaded file

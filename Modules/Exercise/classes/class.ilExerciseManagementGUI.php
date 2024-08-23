@@ -2226,27 +2226,42 @@ class ilExerciseManagementGUI
         $member_id = $this->requested_member_id;
 
         $submission = new ilExSubmission($this->assignment, $member_id);
+        $entry = $submission->getSubmittedEntry($print_version);
+        if (is_null($entry)) {
+            throw new ilExerciseException("No submission entry for " . $this->assignment->getId() . " / " .
+                $member_id . ".");
+        }
+        $rid = $entry["rid"];
 
         $last_opening = $submission->getLastOpeningHTMLView();
         $submission_time = $submission->getLastSubmission();
 
-        // e.g. /<datadir>/<clientid>/ilExercise/3/exc_367/subm_1/<ass_id>/20210628175716_368
-        $zip_original_full_path = $this->getSubmissionZipFilePath($submission, $print_version);
-        $this->log->debug("zip original full path: " . $zip_original_full_path);
+        if ($rid === "") {
+            // e.g. /<datadir>/<clientid>/ilExercise/3/exc_367/subm_1/<ass_id>/20210628175716_368
+            $zip_original_full_path = $this->getSubmissionZipFilePath($submission, $print_version);
+            $this->log->debug("zip original full path: " . $zip_original_full_path);
 
-        // e.g. ilExercise/3/exc_367/subm_1/<ass_id>/20210628175716_368
-        $zip_internal_path = $this->getWebFilePathFromExternalFilePath($zip_original_full_path);
-        $this->log->debug("zip internal path: " . $zip_internal_path);
+            // e.g. ilExercise/3/exc_367/subm_1/<ass_id>/20210628175716_368
+            $zip_internal_path = $this->getWebFilePathFromExternalFilePath($zip_original_full_path);
+            $this->log->debug("zip internal path: " . $zip_internal_path);
 
-        $arr = explode("_", basename($zip_original_full_path));
-        $obj_date = $arr[0];
-        $obj_id = (int) ($arr[1] ?? 0);
-        if ($obj_id === 0) {
-            throw new ilExerciseException("Cannot open HTML view for " . $zip_internal_path . " / " .
-                $submission->getSubmittedPrintFile() . ".");
+            $arr = explode("_", basename($zip_original_full_path));
+            $obj_date = $arr[0];
+            $obj_id = (int) ($arr[1] ?? 0);
+            if ($obj_id === 0) {
+                throw new ilExerciseException("Cannot open HTML view for " . $zip_internal_path . " / " .
+                    $submission->getSubmittedPrintFile() . ".");
+            }
+            $obj_id = $this->assignment->getAssignmentType()->getExportObjIdForResourceId($obj_id);
+        } else {
+            $zip_original_full_path = null;
+            $zip_internal_path = "ilExercise/" . \ilFileSystemAbstractionStorage::createPathFromId(
+                    $this->assignment->getExerciseId(),
+                    "exc"
+                ) . "/subm_" . $this->assignment->getId() . "/".$member_id."/resource.zip";
+            $obj_id = str_replace([".zip", "print"], "", $entry["filetitle"]);
+            $obj_id = $this->assignment->getAssignmentType()->getExportObjIdForResourceId($obj_id);
         }
-
-        $obj_id = $this->assignment->getAssignmentType()->getExportObjIdForResourceId($obj_id);
         if ($print_version) {
             $obj_id .= "print";
         }
@@ -2273,20 +2288,23 @@ class ilExerciseManagementGUI
         if ($zip_original_full_path) {
             $file_copied = $this->copyFileToWebDir($zip_internal_path);
             $this->log->debug("file copied: " . $file_copied);
-            // e.g. data/ilias/ilExercise/3/exc_327/subm_9/2/20231212085734_167.zip ?
-            if ($file_copied) {
-                $this->zip->unzipFile($file_copied);
-                $web_filesystem->delete($zip_internal_path);
-                $this->log->debug("deleting: " . $zip_internal_path);
-
-                $submission_repository = $this->service->repo()->submission();
-                $submission_repository->updateWebDirAccessTime($this->assignment->getId(), $member_id);
-                ilWACSignedPath::signFolderOfStartFile($index_html_file);
-                ilUtil::redirect($index_html_file . "?" . time());
-            }
-
-            $error_msg = $this->lng->txt("exc_copy_zip_error");
+        } else {
+            $file_copied = $this->domain->submission($this->ass_id)->copyRidToWebDir($rid, $zip_internal_path);
         }
+
+        // e.g. data/ilias/ilExercise/3/exc_327/subm_9/2/20231212085734_167.zip ?
+        if ($file_copied) {
+            $this->zip->unzipFile($file_copied);
+            $web_filesystem->delete($zip_internal_path);
+            $this->log->debug("deleting: " . $zip_internal_path);
+
+            $submission_repository = $this->service->repo()->submission();
+            $submission_repository->updateWebDirAccessTime($this->assignment->getId(), $member_id);
+            ilWACSignedPath::signFolderOfStartFile($index_html_file);
+            ilUtil::redirect($index_html_file . "?" . time());
+        }
+
+        $error_msg = $this->lng->txt("exc_copy_zip_error");
 
         if ($error_msg === '' || $error_msg === '0') {
             $error_msg = $this->lng->txt("exc_find_zip_error");

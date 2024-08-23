@@ -20,14 +20,19 @@ declare(strict_types=1);
 
 namespace ILIAS\Exercise\Submission;
 
-class SubmissionDBRepository implements SubmissionRepositoryInterface
+use ILIAS\Exercise\IRSS\IRSSWrapper;
+use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
+use ILIAS\Filesystem\Stream\FileStream;
+
+class SubmissionRepository implements SubmissionRepositoryInterface
 {
     protected const TABLE_NAME = "exc_returned";
-    protected const TEAM_TABLE_NAME = "il_exc_team";
-
     protected \ilDBInterface $db;
 
-    public function __construct(\ilDBInterface $db = null)
+    public function __construct(
+        protected IRSSWrapper $irss,
+        \ilDBInterface $db = null
+    )
     {
         global $DIC;
 
@@ -133,4 +138,112 @@ class SubmissionDBRepository implements SubmissionRepositoryInterface
             " SET late = " . $this->db->quote((int) $late, "integer") .
             " WHERE returned_id = " . $this->db->quote($return_id, "integer"));
     }
+
+    /**
+     * Get the number of max amount of files submitted by a single user in the assignment.
+     * Used to add columns to the excel.
+     */
+    public function getMaxAmountOfSubmittedFiles(
+        int $obj_id,
+        int $ass_id,
+        int $user_id = 0): int
+    {
+        $db = $this->db;
+
+        $and = "";
+        if ($user_id > 0) {
+            $and = " AND user_id = " . $db->quote($user_id, "integer");
+        }
+
+        $set = $db->queryF("SELECT MAX(max_num) AS max" .
+            " FROM (SELECT COUNT(user_id) AS max_num FROM exc_returned" .
+            " WHERE obj_id= %s AND ass_id= %s " . $and . " AND mimetype IS NOT NULL" .
+            " GROUP BY user_id) AS COUNTS",
+            ["integer", "integer"],
+            [$obj_id, $ass_id]
+        );
+        $row = $db->fetchAssoc($set);
+        return (int) $row['max'];
+    }
+
+    /**
+     * Get all user ids, that have submitted something
+     * @return int[]
+     */
+    public function getUsersWithSubmission(int $ass_id): array
+    {
+        $db = $this->db;
+        $user_ids = [];
+        $set = $db->query("SELECT DISTINCT(user_id)" .
+            " FROM exc_returned" .
+            " WHERE ass_id = " . $db->quote($ass_id, "integer") .
+            " AND (filename IS NOT NULL OR atext IS NOT NULL)");
+        while ($row = $db->fetchAssoc($set)) {
+            $user_ids[] = (int) $row["user_id"];
+        }
+        return $user_ids;
+    }
+
+    public function addLocalFile(
+        int $obj_id,
+        int $ass_id,
+        int $user_id,
+        int $team_id,
+        string $file,
+        string $filename,
+        bool $is_late,
+        ResourceStakeholder $stakeholder
+    ): bool {
+        $db = $this->db;
+        $rid = $this->irss->importLocalFile(
+            $file,
+            $filename,
+            $stakeholder
+        );
+        $filename = \ilFileUtils::getValidFilename($filename);
+
+        if ($rid !== "") {
+            $info = $this->irss->getResourceInfo($rid);
+            $next_id = $db->nextId("exc_returned");
+            $query = sprintf(
+                "INSERT INTO exc_returned " .
+                "(returned_id, obj_id, user_id, filename, filetitle, mimetype, ts, ass_id, late, team_id, rid) " .
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                $db->quote($next_id, "integer"),
+                $db->quote($obj_id, "integer"),
+                $db->quote($user_id, "integer"),
+                $db->quote($filename, "text"),
+                $db->quote($filename, "text"),
+                $db->quote($info->getMimeType(), "text"),
+                $db->quote(\ilUtil::now(), "timestamp"),
+                $db->quote($ass_id, "integer"),
+                $db->quote($is_late, "integer"),
+                $db->quote($team_id, "integer"),
+                $db->quote($rid, "text")
+            );
+            $db->manipulate($query);
+            return true;
+        }
+        return false;
+    }
+
+    public function deliverFile(
+        int $ass_id,
+        int $user_id,
+        string $rid,
+        string $filetitle = "") : void
+    {
+        if ($filetitle !== "") {
+            $this->irss->renameCurrentRevision($rid, $filetitle);
+        }
+        $this->irss->deliverFile($rid);
+    }
+
+    public function getStream(
+        int $ass_id,
+        string $rid) : ?FileStream
+    {
+        return $this->irss->stream($rid);
+    }
+
 }

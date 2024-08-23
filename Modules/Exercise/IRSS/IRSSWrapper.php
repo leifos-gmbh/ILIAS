@@ -29,6 +29,7 @@ use ILIAS\FileUpload\DTO\UploadResult;
 use ILIAS\Filesystem\Stream\FileStream;
 use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\Filesystem\Util\LegacyPathHelper;
+use ILIAS\DI\Exceptions\Exception;
 
 class IRSSWrapper
 {
@@ -211,6 +212,39 @@ class IRSSWrapper
         return $rid->serialize();
     }
 
+    public function importLocalFile(
+        string $file,
+        string $name,
+        ResourceStakeholder $stakeholder
+    ) : string {
+        $sourceFS = LegacyPathHelper::deriveFilesystemFrom($file);
+        $sourceFile = LegacyPathHelper::createRelativePath($file);
+
+        //try {
+            $stream = $sourceFS->readStream($sourceFile);
+            $rid = $this->irss->manage()->stream(
+                $stream,
+                $stakeholder,
+                $name
+            );
+            //} catch (\Exception $e) {
+            //    return "";
+        //}
+        return $rid->serialize();
+    }
+
+    public function renameCurrentRevision(
+        string $rid,
+        string $title
+    ) : void
+    {
+        $id = $this->getResourceIdForIdString($rid);
+        $rev = $this->irss->manage()->getCurrentRevision($id);
+        $info = $rev->getInformation();
+        $info->setTitle($title);
+        $rev->setInformation($info);
+        $this->irss->manage()->updateRevision($rev);
+    }
     public function deliverFile(string $rid): void
     {
         $id = $this->getResourceIdForIdString($rid);
@@ -245,6 +279,24 @@ class IRSSWrapper
                 $src
             );
         }
+    }
+
+    public function getResourceInfo(
+        string $rid
+    ): ResourceInformation {
+        $rid = $this->getResourceIdForIdString($rid);
+        $info = $this->irss->manage()->getResource($rid)
+                           ->getCurrentRevision()
+                           ->getInformation();
+        $src = $this->irss->consume()->src($rid)->getSrc();
+        return $this->data->resourceInformation(
+            $rid->serialize(),
+            $info->getTitle(),
+            $info->getSize(),
+            $info->getCreationDate()->getTimestamp(),
+            $info->getMimeType(),
+            $src
+        );
     }
 
     public function clone(

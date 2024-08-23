@@ -38,13 +38,12 @@ class InternalRepoService
     protected IRSSWrapper $irss_wrapper;
     protected InternalDataService $data;
     protected \ilDBInterface $db;
-    protected Submission\SubmissionDBRepository $submission_repo;
+    protected Submission\SubmissionRepository $submission_repo;
 
     public function __construct(InternalDataService $data, \ilDBInterface $db)
     {
         $this->data = $data;
         $this->db = $db;
-        $this->submission_repo = new Submission\SubmissionDBRepository($db);
         $this->irss_wrapper = new IRSSWrapper($data);
     }
 
@@ -58,7 +57,10 @@ class InternalRepoService
 
     public function submission(): Submission\SubmissionRepositoryInterface
     {
-        return $this->submission_repo;
+        return new Submission\SubmissionRepository(
+            $this->irss_wrapper,
+            $this->db
+        );
     }
 
     public function instructionFiles(): InstructionFileRepository

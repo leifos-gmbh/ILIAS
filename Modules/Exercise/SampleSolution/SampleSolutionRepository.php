@@ -21,13 +21,11 @@ declare(strict_types=1);
 namespace ILIAS\Exercise\SampleSolution;
 
 use ILIAS\Exercise\IRSS\IRSSWrapper;
-use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 
 class SampleSolutionRepository
 {
     protected IRSSWrapper $wrapper;
-    protected IRSSWrapper $collection;
     protected \ilDBInterface $db;
 
     public function __construct(

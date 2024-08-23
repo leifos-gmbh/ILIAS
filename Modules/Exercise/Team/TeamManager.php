@@ -68,4 +68,20 @@ class TeamManager
         return $this->repo->getAssignmentForTeam($team_id);
     }
 
+    protected function getTeam(int $team_id) : \ilExAssignmentTeam
+    {
+        return new \ilExAssignmentTeam($team_id);
+    }
+    public function writeLog(
+        int $team_id,
+        string $action,
+        string $content
+    ) : void
+    {
+        $team = $this->getTeam($team_id);
+        $team->writeLog(
+            $action,
+            $content
+        );
+    }
 }

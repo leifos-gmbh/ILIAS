@@ -171,12 +171,30 @@ class ilExSubmission
         if (count($submitted) > 0) {
             $submitted = array_pop($submitted);
 
-            if (is_file($submitted['filename'])) {
+            if ($submitted['rid'] !== "" || is_file($submitted['filename'])) {
                 return $submitted['filename'];
             }
         }
 
         return "";
+    }
+
+    public function getSubmittedEntry(bool $print = false): ?array
+    {
+        $submitted = $this->getFiles(
+            null,
+            false,
+            null,
+            $print
+        );
+
+        if (count($submitted) > 0) {
+            $submitted = array_pop($submitted);
+
+            return $submitted;
+        }
+
+        return null;
     }
 
     public function getSelectedObject(): ?array
@@ -275,7 +293,7 @@ class ilExSubmission
     // FILES
     //
 
-    protected function isLate(): bool
+    public function isLate(): bool
     {
         $dl = $this->state->getOfficialDeadline();
         //$dl = $this->assignment->getPersonalDeadline($this->getUserId());
@@ -555,12 +573,12 @@ class ilExSubmission
                     $storage_id = $row["user_id"];
                 }
 
-
+                $row["rid"] = (string) $row["rid"];
                 $row["filename"] = $path .
                     "/" . $storage_id . "/" . (($row["filename"]) ? basename($row["filename"]) : '');
 
                 // see 22301, 22719
-                if (is_file($row["filename"]) || (!$this->assignment->getAssignmentType()->usesFileUpload())) {
+                if (is_file($row["filename"]) || ($row["rid"] !== "") || (!$this->assignment->getAssignmentType()->usesFileUpload())) {
                     $delivered_files[] = $row;
                 }
             }
@@ -571,7 +589,7 @@ class ilExSubmission
             ilExAssignment::TYPE_BLOG,
             ilExAssignment::TYPE_PORTFOLIO,
             ilExAssignment::TYPE_WIKI_TEAM
-        ])) {
+        ], true)) {
             $delivered_files = array_filter($delivered_files, function ($i) use ($print_versions) {
                 $is_print_version = false;
                 if (substr($i["filetitle"], strlen($i["filetitle"]) - 5) == "print") {
@@ -852,7 +870,7 @@ class ilExSubmission
                         $file["filetitle"];
                 }
 
-                $this->downloadSingleFile($file["user_id"], $file["filename"], $file["filetitle"], $file["team_id"]);
+                $this->downloadSingleFile($file["user_id"], $file["filename"], $file["filetitle"], $file["team_id"], $file["rid"]);
             } else {
                 $array_files = array();
                 foreach ($files as $seq => $file) {
@@ -923,7 +941,8 @@ class ilExSubmission
         int $a_user_id,
         string $filename,
         string $filetitle,
-        int $a_team_id = 0
+        int $a_team_id = 0,
+        string $rid = ""
     ): void {
         if ($this->ass_type->isSubmissionAssignedToTeam()) {
             $storage_id = $a_team_id;
@@ -934,7 +953,11 @@ class ilExSubmission
         $filename = $this->initStorage()->getAbsoluteSubmissionPath() .
             "/" . $storage_id . "/" . basename($filename);
 
-        ilFileDelivery::deliverFileLegacy($filename, $filetitle);
+        if ($rid !== "") {
+            $this->domain->submission($this->assignment->getId())->deliverFile($a_user_id, $rid, $filetitle);
+        } else {
+            ilFileDelivery::deliverFileLegacy($filename, $filetitle);
+        }
     }
 
     protected function downloadMultipleFiles(

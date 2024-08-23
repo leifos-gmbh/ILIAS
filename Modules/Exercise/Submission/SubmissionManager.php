@@ -31,6 +31,7 @@ class SubmissionManager
     public function __construct(
         InternalRepoService $repo,
         protected InternalDomainService $domain,
+        protected \ilExcSubmissionStakeholder $stakeholder,
         protected int $ass_id
     )
     {
@@ -108,6 +109,136 @@ class SubmissionManager
         }
 
         return $delivered;
+    }
+
+    public function getMaxAmountOfSubmittedFiles(
+        int $user_id = 0): int
+    {
+        $ass = $this->assignment;
+        return $this->repo->getMaxAmountOfSubmittedFiles(
+            $ass->getExerciseId(),
+            $ass->getId(),
+            $user_id
+        );
+    }
+
+    /**
+     * Get all user ids, that have submitted something
+     * @return int[]
+     */
+    public function getUsersWithSubmission(): array
+    {
+        return $this->repo->getUsersWithSubmission(
+            $this->ass_id
+        );
+    }
+
+    public function addLocalFile(
+        int $user_id,
+        string $file,
+        string $filename = ""
+    ): bool {
+
+        if ($filename === "") {
+            $filename = basename($file);
+        }
+        $submission = new \ilExSubmission(
+            $this->assignment,
+            $user_id
+        );
+
+        if (!$submission->canAddFile()) {
+            return false;
+        }
+
+        if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
+            $team_id = $submission->getTeam()->getId();
+            $user_id = 0;
+            if ($team_id === 0) {
+                return false;
+            }
+        } else {
+            $team_id = 0;
+        }
+        $success = $this->repo->addLocalFile(
+            $this->assignment->getExerciseId(),
+            $this->ass_id,
+            $user_id,
+            $team_id,
+            $file,
+            $filename,
+            $submission->isLate(),
+            $this->stakeholder
+        );
+
+        if ($success && $team_id > 0) {
+            $this->domain->team()->writeLog(
+                $team_id,
+                (string) \ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
+                $filename
+            );
+        }
+
+        return $success;
+    }
+
+    public function deliverFile(
+        int $user_id,
+        string $rid,
+        string $filetitle = ""
+    ): void
+    {
+        $this->repo->deliverFile(
+            $this->ass_id,
+            $user_id,
+            $rid,
+            $filetitle
+        );
+    }
+
+    public function copyRidToWebDir(
+        string $rid, string $internal_file_path
+    ): ?string {
+        global $DIC;
+
+        $web_filesystem = $DIC->filesystem()->web();
+
+        $internal_dirs = dirname($internal_file_path);
+        $zip_file = basename($internal_file_path);
+
+        if ($rid !== "") {
+            //$this->log->debug("internal file path: " . $internal_file_path);
+            if ($web_filesystem->hasDir($internal_dirs)) {
+                $web_filesystem->deleteDir($internal_dirs);
+            }
+            $web_filesystem->createDir($internal_dirs);
+
+            if ($web_filesystem->has($internal_file_path)) {
+                $web_filesystem->delete($internal_file_path);
+            }
+            if (!$web_filesystem->has($internal_file_path)) {
+                //$this->log->debug("writing: " . $internal_file_path);
+                $stream = $this->repo->getStream(
+                    $this->ass_id,
+                    $rid
+                );
+                if (!is_null($stream)) {
+                    $web_filesystem->writeStream($internal_file_path, $stream);
+
+                    return ILIAS_ABSOLUTE_PATH .
+                        DIRECTORY_SEPARATOR .
+                        ILIAS_WEB_DIR .
+                        DIRECTORY_SEPARATOR .
+                        CLIENT_ID .
+                        DIRECTORY_SEPARATOR .
+                        $internal_dirs .
+                        DIRECTORY_SEPARATOR .
+                        $zip_file;
+                }
+            }
+        }
+
+        return null;
     }
 
 }

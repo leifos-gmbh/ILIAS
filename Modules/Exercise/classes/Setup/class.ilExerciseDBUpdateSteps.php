@@ -244,4 +244,20 @@ class ilExerciseDBUpdateSteps implements \ilDatabaseUpdateSteps
         $this->db->addPrimaryKey('exc_multi_feedback', ["tutor_id", "ass_id"]);
     }
 
+    public function step_18(): void
+    {
+        if (!$this->db->tableColumnExists('exc_returned', 'rid')) {
+            $this->db->addTableColumn(
+                'exc_returned',
+                'rid',
+                [
+                    'type' => 'text',
+                    'notnull' => false,
+                    'length' => 64,
+                    'default' => ''
+                ]
+            );
+        }
+    }
+
 }

@@ -74,6 +74,7 @@ class InternalDomainService
             $this->instance["subm"][$ass_id] = new SubmissionManager(
                 $this->repo,
                 $this,
+                new \ilExcSubmissionStakeholder(),
                 $ass_id
             );
     }

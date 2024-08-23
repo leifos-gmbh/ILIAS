@@ -23,6 +23,7 @@ use ILIAS\BackgroundTasks\Implementation\Values\ScalarValues\StringValue;
 use ILIAS\BackgroundTasks\Implementation\Values\ScalarValues\IntegerValue;
 use ILIAS\BackgroundTasks\Types\Type;
 use ILIAS\BackgroundTasks\Value;
+use ILIAS\Exercise\InternalDomainService;
 
 /**
  * @author Jesús López <lopez@leifos.com>
@@ -39,6 +40,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
     public const SUBMISSION_DATE_COLUMN = 3;
     public const FIRST_DEFAULT_SUBMIT_COLUMN = 4;
     public const FIRST_DEFAULT_REVIEW_COLUMN = 5;
+    protected InternalDomainService $domain;
 
     protected ilLogger $logger;
     protected string $target_directory = "";
@@ -74,6 +76,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
         );
         /** @noinspection PhpUndefinedMethodInspection */
         $this->logger = $DIC->logger()->exc();
+        $this->domain = $DIC->exercise()->internal()->domain();
     }
 
     /**
@@ -393,22 +396,10 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
      */
     public function getExtraColumnsForSubmissionFiles(int $a_obj_id, int $a_ass_id): int
     {
-        global $DIC;
-        $ilDB = $DIC->database();
-
-        $and = "";
-        if ($this->participant_id > 0) {
-            $and = " AND user_id = " . $this->participant_id;
-        }
-
-        $query = "SELECT MAX(max_num) AS max" .
-            " FROM (SELECT COUNT(user_id) AS max_num FROM exc_returned" .
-            " WHERE obj_id=" . $a_obj_id . ". AND ass_id=" . $a_ass_id . $and . " AND mimetype IS NOT NULL" .
-            " GROUP BY user_id) AS COUNTS";
-
-        $set = $ilDB->query($query);
-        $row = $ilDB->fetchAssoc($set);
-        return (int) $row['max'];
+        $subm = $this->domain->submission($a_ass_id);
+        return $subm->getMaxAmountOfSubmittedFiles(
+            $this->participant_id
+        );
     }
 
     // Mapping the links to use them on the excel.

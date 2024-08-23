@@ -28,6 +28,7 @@ use ILIAS\Portfolio\Export\PortfolioHtmlExport;
  */
 class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
 {
+    protected int $user_id;
     protected $selected_wsp_obj_id;
 
     /**
@@ -37,6 +38,10 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
         ilObjExercise $a_exercise,
         ilExSubmission $a_submission
     ) {
+        global $DIC;
+
+        $this->user_id = $DIC->user()->getId();
+
         parent::__construct($a_exercise, $a_submission);
         $this->selected_wsp_obj_id = $this->request->getSelectedWspObjId();
     }
@@ -753,6 +758,8 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
             return false;
         }
 
+        $subm = $this->domain->submission($this->submission->getAssignment()->getId());
+
         $blog_id = $a_blog_id;
 
         $blog_gui = new ilObjBlogGUI($blog_id, ilObject2GUI::WORKSPACE_NODE_ID);
@@ -762,23 +769,23 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
             if ($size) {
                 $this->submission->deleteAllFiles();
 
-                $meta = array(
-                    "name" => $blog_id . ".zip",
-                    "tmp_name" => $file,
-                    "size" => $size
-                    );
-                $this->submission->uploadFile($meta, true);
+                $subm->addLocalFile(
+                    $this->user_id,
+                    $file,
+                    $blog_id . ".zip"
+                );
+                unlink($file);
 
                 // print version
-                $file = $file = $blog_gui->buildExportFile(false, true);
+                $file = $blog_gui->buildExportFile(false, true);
                 $size = filesize($file);
                 if ($size) {
-                    $meta = array(
-                        "name" => $blog_id . "print.zip",
-                        "tmp_name" => $file,
-                        "size" => $size
+                    $subm->addLocalFile(
+                        $this->user_id,
+                        $file,
+                        $blog_id . "print.zip"
                     );
-                    $this->submission->uploadFile($meta, true);
+                    unlink($file);
                 }
 
                 $this->handleNewUpload();
@@ -800,6 +807,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
         }
 
         $prtf_id = $a_portfolio_id;
+        $subm = $this->domain->submission($this->submission->getAssignment()->getId());
 
         $prtf = new ilObjPortfolio($prtf_id, false);
         if ($prtf->getTitle()) {
@@ -811,24 +819,25 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
             if ($size) {
                 $this->submission->deleteAllFiles();
 
-                $meta = array(
-                    "name" => $prtf_id . ".zip",
-                    "tmp_name" => $file,
-                    "size" => $size
-                    );
-                $this->submission->uploadFile($meta, true);
+                $subm->addLocalFile(
+                    $this->user_id,
+                    $file,
+                    $prtf_id . ".zip"
+                );
+                unlink($file);
 
                 // print version
                 $port_export->setPrintVersion(true);
                 $file = $port_export->exportHtml();
                 $size = filesize($file);
+
                 if ($size) {
-                    $meta = array(
-                        "name" => $prtf_id . "print.zip",
-                        "tmp_name" => $file,
-                        "size" => $size
+                    $subm->addLocalFile(
+                        $this->user_id,
+                        $file,
+                        $prtf_id . "print.zip"
                     );
-                    $this->submission->uploadFile($meta, true);
+                    unlink($file);
                 }
 
                 $this->handleNewUpload();

@@ -508,9 +508,12 @@ class ilExport
 
         // get exporter object
         if (!class_exists($a_class)) {
-            $export_class_file = "./" . $a_comp . "/classes/class." . $a_class . ".php";
-            if (!is_file($export_class_file)) {
-                throw new ilExportException('Export class file "' . $export_class_file . '" not found.');
+            $a_class = substr($a_class, 0, 2) . "ILIAS" . substr($a_class, 2);
+            if (!class_exists($a_class)) {
+                $export_class_file = "./" . $a_comp . "/classes/class." . $a_class . ".php";
+                if (!is_file($export_class_file)) {
+                    throw new ilExportException('Export class file "' . $export_class_file . '" not found.');
+                }
             }
         }
 
@@ -587,7 +590,6 @@ class ilExport
                 $set_dir_absolute . "/expDir_" . $dir_cnt
             );
             $export_writer->xmlStartTag('exp:ExportItem', array("Id" => $id));
-            //$xml = $exp->getXmlRepresentation($a_entity, $a_target_release, $id);
             $xml = $exp->getXmlRepresentation($a_entity, $sv["schema_version"], (string) $id);
             $export_writer->appendXML($xml);
             $export_writer->xmlEndTag('exp:ExportItem');

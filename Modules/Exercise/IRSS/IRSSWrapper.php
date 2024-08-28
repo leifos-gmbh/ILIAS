@@ -30,6 +30,7 @@ use ILIAS\Filesystem\Stream\FileStream;
 use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\Filesystem\Util\LegacyPathHelper;
 use ILIAS\DI\Exceptions\Exception;
+use ILIAS\Filesystem\Stream\Stream;
 
 class IRSSWrapper
 {
@@ -233,6 +234,18 @@ class IRSSWrapper
         return $rid->serialize();
     }
 
+    public function importStream(
+        Stream $stream,
+        ResourceStakeholder $stakeholder
+    ) : string
+    {
+        $rid = $this->irss->manage()->stream(
+            $stream,
+            $stakeholder
+        );
+        return $rid->serialize();
+    }
+
     public function renameCurrentRevision(
         string $rid,
         string $title
@@ -347,4 +360,38 @@ class IRSSWrapper
             $this->irss->collection()->store($target_collection);
         }
     }
+
+    // this currently does not work due to issues in the irss
+    public function importContainerFromZipUploadResult(
+        UploadResult $result,
+        ResourceStakeholder $stakeholder
+    ): string {
+        // if the result is not OK, we skip it
+        if (!$result->isOK()) {
+            return "";
+        }
+
+        // we store the file in the IRSS
+        $container_id = $this->irss->manage()->containerFromUpload(
+            $result,
+            $stakeholder
+        );
+        return $container_id->serialize();
+    }
+
+    /**
+     * @return \Generator<Stream>
+     */
+    public function getContainerStreams(
+        string $container_id,
+        ResourceStakeholder $stakeholder
+    ) : \Generator
+    {
+        foreach ($this->irss->consume()->containerZIP(
+                $this->getResourceIdForIdString($container_id)
+            )->getZIP()->getFileStreams() as $stream) {
+            yield $stream;
+        }
+    }
+
 }

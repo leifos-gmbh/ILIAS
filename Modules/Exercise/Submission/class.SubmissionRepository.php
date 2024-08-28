@@ -29,6 +29,7 @@ use ILIAS\FileUpload\DTO\UploadResult;
 class SubmissionRepository implements SubmissionRepositoryInterface
 {
     protected const TABLE_NAME = "exc_returned";
+    protected $log;
     protected \ilDBInterface $db;
 
     public function __construct(
@@ -37,7 +38,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
     )
     {
         global $DIC;
-
+        $this->log = $DIC->logger()->exc();
         $this->db = (is_null($db))
             ? $DIC->database()
             : $db;
@@ -269,6 +270,63 @@ class SubmissionRepository implements SubmissionRepositoryInterface
             return true;
         }
         return false;
+    }
+
+    public function addZipUpload(
+        int $obj_id,
+        int $ass_id,
+        int $user_id,
+        int $team_id,
+        UploadResult $result,
+        bool $is_late,
+        ResourceStakeholder $stakeholder
+    ): array {
+        global $DIC;
+
+        $db = $this->db;
+        $filenames = [];
+        $this->log->debug("5");
+        $rid = $this->irss->importFileFromUploadResult(
+            $result,
+            $stakeholder
+        );
+        $this->log->debug("6");
+        $stream = $this->irss->stream($rid);
+
+        foreach ($DIC->archives()->unzip($stream)->getFileStreams() as $stream) {
+            $this->log->debug("7");
+            $rid = $this->irss->importStream(
+                $stream,
+                $stakeholder
+            );
+            $info = $this->irss->getResourceInfo($rid);
+            $filename = $info->getTitle();
+            $this->log->debug("8");
+            if ($rid !== "") {
+                $this->log->debug("9");
+                $info = $this->irss->getResourceInfo($rid);
+                $next_id = $db->nextId("exc_returned");
+                $query = sprintf(
+                    "INSERT INTO exc_returned " .
+                    "(returned_id, obj_id, user_id, filename, filetitle, mimetype, ts, ass_id, late, team_id, rid) " .
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    $db->quote($next_id, "integer"),
+                    $db->quote($obj_id, "integer"),
+                    $db->quote($user_id, "integer"),
+                    $db->quote($filename, "text"),
+                    $db->quote($filename, "text"),
+                    $db->quote($info->getMimeType(), "text"),
+                    $db->quote(\ilUtil::now(), "timestamp"),
+                    $db->quote($ass_id, "integer"),
+                    $db->quote($is_late, "integer"),
+                    $db->quote($team_id, "integer"),
+                    $db->quote($rid, "text")
+                );
+                $db->manipulate($query);
+                $filenames[] = $filename;
+            }
+        }
+        return $filenames;
     }
 
     public function deliverFile(

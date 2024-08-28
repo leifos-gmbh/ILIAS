@@ -26,6 +26,7 @@ use ILIAS\FileUpload\DTO\UploadResult;
 
 class SubmissionManager
 {
+    protected \ilLogger $log;
     protected SubmissionRepositoryInterface $repo;
     protected \ilExAssignment $assignment;
 
@@ -38,6 +39,7 @@ class SubmissionManager
     {
         $this->assignment = $domain->assignment()->getAssignment($ass_id);
         $this->repo = $repo->submission();
+        $this->log = $this->domain->logger()->exc();
     }
 
     public function recalculateLateSubmissions(): void
@@ -230,6 +232,53 @@ class SubmissionManager
         }
 
         return $success;
+    }
+
+    public function addZipUploads(
+        int $user_id,
+        UploadResult $result
+    ): bool {
+        $this->log->debug("1");
+        $submission = new \ilExSubmission(
+            $this->assignment,
+            $user_id
+        );
+        $this->log->debug("2");
+        if (!$submission->canAddFile()) {
+            return false;
+        }
+        $this->log->debug("3");
+        if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
+            $team_id = $submission->getTeam()->getId();
+            $user_id = 0;
+            if ($team_id === 0) {
+                return false;
+            }
+        } else {
+            $team_id = 0;
+        }
+        $this->log->debug("4");
+        $filenames = $this->repo->addZipUpload(
+            $this->assignment->getExerciseId(),
+            $this->ass_id,
+            $user_id,
+            $team_id,
+            $result,
+            $submission->isLate(),
+            $this->stakeholder
+        );
+        $this->log->debug("99");
+        if ($team_id > 0) {
+            foreach ($filenames as $filename) {
+                $this->domain->team()->writeLog(
+                    $team_id,
+                    (string) \ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
+                    $filename
+                );
+            }
+        }
+
+        return count($filenames) > 0;
     }
 
     public function deliverFile(

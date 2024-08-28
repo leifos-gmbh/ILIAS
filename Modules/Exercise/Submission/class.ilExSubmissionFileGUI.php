@@ -28,6 +28,7 @@ use ILIAS\DI\UIServices;
  */
 class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 {
+    protected $log;
     protected ilToolbarGUI $toolbar;
     protected ilHelpGUI $help;
     protected ilObjUser $user;
@@ -45,6 +46,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         $this->help = $DIC["ilHelp"];
         $this->user = $DIC->user();
         $this->ui = $DIC->ui();
+        $this->log = $DIC->logger()->exc();
     }
 
     public function executeCommand(): void
@@ -60,7 +62,11 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 
         switch ($class) {
             case strtolower(ilRepoStandardUploadHandlerGUI::class):
-                $form = $this->getUploadForm();
+                if ($this->request->getZip()) {
+                    $form = $this->getZipUploadForm();
+                } else {
+                    $form = $this->getUploadForm();
+                }
                 $gui = $form->getRepoStandardUploadHandlerGUI("deliver");
                 $this->ctrl->forwardCommand($gui);
                 break;
@@ -197,7 +203,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
     }
 
     public function uploadZipFormObject(
-        ilPropertyFormGUI $a_form = null
+        \ILIAS\Repository\Form\FormAdapterGUI $a_form = null
     ): void {
         if (!$this->submission->canSubmit()) {
             $this->ctrl->redirect($this, "submissionScreen");
@@ -210,9 +216,9 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         );
 
         if (!$a_form) {
-            $a_form = $this->initZipUploadForm();
+            $a_form = $this->getZipUploadForm();
         }
-        $this->tpl->setContent($a_form->getHTML());
+        $this->tpl->setContent($a_form->render());
     }
 
     /**
@@ -287,7 +293,6 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
     public function addUploadObject(): void
     {
         $ilCtrl = $this->ctrl;
-
         $this->tpl->setOnScreenMessage('success', $this->lng->txt("file_added"), true);
         $this->handleNewUpload();
 
@@ -298,6 +303,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
     /**
      * Init upload form form.
      */
+    /*
     protected function initZipUploadForm(): ilPropertyFormGUI
     {
         $lng = $this->lng;
@@ -317,7 +323,33 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         $form->setFormAction($ilCtrl->getFormAction($this, "uploadZip"));
 
         return $form;
+    }*/
+
+    protected function getZipUploadForm(): \ILIAS\Repository\Form\FormAdapterGUI
+    {
+        /*
+        $max_file = $this->submission->getAssignment()->getMaxFile();
+        if ($max_file > 0) {
+            $max_file = $this->submission->getAssignment()->getMaxFile() - count($this->submission->getFiles());
+        } else {
+            $max_file = 20;
+        }*/
+        $this->ctrl->setParameterByClass(self::class, "zip", "1");
+        $form_adapter = $this->gui
+            ->form(self::class, 'addUpload')
+            ->section("props", $this->lng->txt('file_add'))
+            ->file(
+                "deliver",
+                $this->lng->txt("files"),
+                \Closure::fromCallable([$this, 'handleZipUploadResult']),
+                "mep_id",
+                "",
+                1,
+                ["application/zip"]
+            );
+        return $form_adapter;
     }
+
 
     /**
      * Upload files
@@ -361,10 +393,32 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         $ilCtrl->redirect($this, "submissionScreen");
     }
 
+    protected function handleZipUploadResult(
+        \ILIAS\FileUpload\FileUpload $upload,
+        \ILIAS\FileUpload\DTO\UploadResult $result
+    ): \ILIAS\FileUpload\Handler\BasicHandlerResult {
+        $title = $result->getName();
+        //$this->submission->addFileUpload($result);
+        $subm = $this->domain->submission($this->assignment->getId());
+        if ($this->submission->canSubmit()) {
+            $this->log->debug("-------------------------------------");
+            $subm->addZipUploads(
+                $this->user->getid(),
+                $result);
+        }
+
+        return new \ILIAS\FileUpload\Handler\BasicHandlerResult(
+            '',
+            \ILIAS\FileUpload\Handler\HandlerResult::STATUS_OK,
+            $title,
+            ''
+        );
+    }
+
     /**
      * Upload zip file
      */
-    public function uploadZipObject(): void
+    /*public function uploadZipObject(): void
     {
         $ilCtrl = $this->ctrl;
 
@@ -387,7 +441,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         }
 
         $ilCtrl->redirect($this, "submissionScreen");
-    }
+    }*/
 
     /**
      * Confirm deletion of delivered files

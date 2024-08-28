@@ -378,6 +378,8 @@ class ilExSubmission
     /**
      * processes error handling etc for uploaded archive
      * @param string $fileTmp path and filename to uploaded file
+     *
+     *                        Alternative: containerFromUpload?
      */
     public function processUploadedZipFile(
         string $fileTmp

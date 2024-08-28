@@ -9717,6 +9717,14 @@ exp#:#exp_show_print_view#:#Druckansicht anzeigen
 exp#:#exp_xml#:#XML
 exp#:#export_created#:#Eine neue Exportdatei wurde erstellt.
 exp#:#export_files_deleted#:#Die ausgewählten Exportdateien wurden gelöscht.
+export#:#exp_export_dropdown#:#Export
+export#:#exp_file#:#Dateiname
+export#:#exp_public_access#:#Öffentlicher Zugriff aktiv
+export#:#exp_public_access_possible#:#Öffentlicher Zugriff kann aktiviert werden
+export#:#exp_size#:#Dateigröße (MB)
+export#:#exp_timestamp#:#Erstellungsdatum
+export#:#exp_toggle_public_access#:#Öffentlichen Zugriff aktivieren
+export#:#exp_type#:#Type
 export#:#export_create#:#Neu erstellen
 export#:#export_create_new_file#:#Neue Exportdatei erstellen
 export#:#export_existing#:#Wiederverwenden

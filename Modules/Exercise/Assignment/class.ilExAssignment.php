@@ -830,8 +830,6 @@ class ilExAssignment
     {
         $ilDB = $this->db;
 
-        $this->deleteGlobalFeedbackFile();
-
         $ilDB->manipulate(
             "DELETE FROM exc_assignment WHERE " .
             " id = " . $ilDB->quote($this->getId(), "integer")
@@ -1551,17 +1549,6 @@ class ilExAssignment
     // FEEDBACK FILES
     //
 
-    public function getGlobalFeedbackFileStoragePath(): string
-    {
-        $storage = new ilFSStorageExercise($this->getExerciseId(), $this->getId());
-        return $storage->getGlobalFeedbackPath();
-    }
-
-    public function deleteGlobalFeedbackFile(): void
-    {
-        ilFileUtils::delDir($this->getGlobalFeedbackFileStoragePath());
-    }
-
     /**
      * @throws ilException
      */
@@ -1570,25 +1557,8 @@ class ilExAssignment
         $rcid = $this->domain->assignment()->sampleSolution($ass_id)->importFromLegacyUpload($a_file);
         $this->setFeedbackFile($a_file["name"]);
         return ($rcid !== "");
-        /*
-        $path = $this->getGlobalFeedbackFileStoragePath();
-        ilFileUtils::delDir($path, true);
-        if (ilFileUtils::moveUploadedFile($a_file["tmp_name"], $a_file["name"], $path . "/" . $a_file["name"])) {
-            $this->setFeedbackFile($a_file["name"]);
-            return true;
-        }
-        return false;*/
     }
 
-    public function getGlobalFeedbackFilePath(): string
-    {
-        $file = $this->getFeedbackFile();
-        if ($file) {
-            $path = $this->getGlobalFeedbackFileStoragePath();
-            return $path . "/" . $file;
-        }
-        return "";
-    }
 
     public function getMemberStatus(?int $a_user_id = null): ilExAssignmentMemberStatus
     {

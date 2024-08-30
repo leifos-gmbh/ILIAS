@@ -26,6 +26,8 @@ use ILIAS\FileUpload\DTO\UploadResult;
 
 class SubmissionManager
 {
+    protected \ilExAssignmentTypeInterface $type;
+    protected \ILIAS\Exercise\Team\TeamManager $team;
     protected \ilLogger $log;
     protected SubmissionRepositoryInterface $repo;
     protected \ilExAssignment $assignment;
@@ -38,8 +40,60 @@ class SubmissionManager
     )
     {
         $this->assignment = $domain->assignment()->getAssignment($ass_id);
+        $this->type = $this->assignment->getAssignmentType();
         $this->repo = $repo->submission();
         $this->log = $this->domain->logger()->exc();
+        $this->team = $domain->team();
+    }
+
+    /**
+     * Note: this includes submissions of other team members, if user is in a team
+     */
+    public function getSubmissionsOfUser(
+        int $user_id,
+        ?array $submit_ids = null,
+        bool $only_valid = false,
+        string $min_timestamp = null,
+        bool $print_versions = false
+    ) : array
+    {
+        $type_uses_print_versions = in_array($this->assignment->getType(), [
+            \ilExAssignment::TYPE_BLOG,
+            \ilExAssignment::TYPE_PORTFOLIO,
+            \ilExAssignment::TYPE_WIKI_TEAM
+        ], true);
+        $type_uses_uploads = $this->type->usesFileUpload();
+        if ($this->type->isSubmissionAssignedToTeam()) {
+            $team_id = $this->team->getTeamForMember($this->ass_id, $user_id);
+            if (((int) $team_id) === 0) {
+                return [];
+            }
+            return $this->repo->getSubmissionsOfTeam(
+                $this->ass_id,
+                $type_uses_uploads,
+                $type_uses_print_versions,
+                $team_id,
+                $submit_ids,
+                $only_valid,
+                $min_timestamp,
+                $print_versions
+            );
+        } else {
+            $user_ids = $this->team->getTeamMemberIdsOrUserId(
+                $this->ass_id,
+                $user_id
+            );
+            return $this->repo->getSubmissionsOfUsers(
+                $this->ass_id,
+                $type_uses_uploads,
+                $type_uses_print_versions,
+                $user_ids,
+                $submit_ids,
+                $only_valid,
+                $min_timestamp,
+                $print_versions
+            );
+        }
     }
 
     public function recalculateLateSubmissions(): void
@@ -96,11 +150,9 @@ class SubmissionManager
         );
         $path = $storage->getAbsoluteSubmissionPath();
 
-        $ass_type = $assignment->getAssignmentType();
-
         $delivered = [];
         foreach ($this->repo->getAllEntriesOfAssignment($assignment->getId()) as $row) {
-            if ($ass_type->isSubmissionAssignedToTeam()) {
+            if ($this->type->isSubmissionAssignedToTeam()) {
                 $storage_id = $row["team_id"];
             } else {
                 $storage_id = $row["user_id"];
@@ -154,7 +206,7 @@ class SubmissionManager
             return false;
         }
 
-        if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
+        if ($this->type->isSubmissionAssignedToTeam()) {
             $team_id = $submission->getTeam()->getId();
             $user_id = 0;
             if ($team_id === 0) {
@@ -203,7 +255,7 @@ class SubmissionManager
             return false;
         }
 
-        if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
+        if ($this->type->isSubmissionAssignedToTeam()) {
             $team_id = $submission->getTeam()->getId();
             $user_id = 0;
             if ($team_id === 0) {
@@ -238,17 +290,14 @@ class SubmissionManager
         int $user_id,
         UploadResult $result
     ): bool {
-        $this->log->debug("1");
         $submission = new \ilExSubmission(
             $this->assignment,
             $user_id
         );
-        $this->log->debug("2");
         if (!$submission->canAddFile()) {
             return false;
         }
-        $this->log->debug("3");
-        if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
+        if ($this->type->isSubmissionAssignedToTeam()) {
             $team_id = $submission->getTeam()->getId();
             $user_id = 0;
             if ($team_id === 0) {
@@ -257,7 +306,6 @@ class SubmissionManager
         } else {
             $team_id = 0;
         }
-        $this->log->debug("4");
         $filenames = $this->repo->addZipUpload(
             $this->assignment->getExerciseId(),
             $this->ass_id,
@@ -339,5 +387,89 @@ class SubmissionManager
 
         return null;
     }
+
+    public function getTableUserWhere(
+        bool $a_team_mode = false
+    ): string {
+        $ilDB = $this->db;
+
+        if ($this->type->isSubmissionAssignedToTeam()) {
+            $team_id = $this->getTeam()->getId();
+            $where = " team_id = " . $ilDB->quote($team_id, "integer") . " ";
+        } else {
+            $where = " " . $ilDB->in("user_id", $this->getUserIds(), "", "integer") . " ";
+        }
+        return $where;
+    }
+
+    /**
+     * Check if user can delete submissions of others
+     */
+    public function deleteSubmissions(int $user_id, array $ids): void {
+
+        if (count($ids) == 0) {
+            return;
+        }
+
+        if ($this->type->isSubmissionAssignedToTeam()) {
+            $team_id = $this->team->getTeamForMember($this->ass_id, $user_id);
+            if (is_null($team_id)) {
+                return;
+            }
+        } else {
+            $team_id = $this->team->getTeamForMember($this->ass_id, $user_id);
+            if (!is_null($team_id)) {
+                $user_ids = $this->team->getMemberIds($team_id);
+            } else {
+                $user_ids = [$user_id];
+            }
+        }
+
+        $ilDB = $this->db;
+
+        $where = " AND " . $this->getTableUserWhere(true);
+
+        $result = $ilDB->query("SELECT * FROM exc_returned" .
+            " WHERE " . $ilDB->in("returned_id", $file_id_array, false, "integer") .
+            $where);
+
+        if ($ilDB->numRows($result)) {
+            $result_array = array();
+            while ($row = $ilDB->fetchAssoc($result)) {
+                $row["timestamp"] = $row["ts"];
+                $result_array[] = $row;
+            }
+
+            // delete the entries in the database
+            $ilDB->manipulate("DELETE FROM exc_returned" .
+                " WHERE " . $ilDB->in("returned_id", $file_id_array, false, "integer") .
+                $where);
+
+            // delete the files
+            $path = $this->initStorage()->getAbsoluteSubmissionPath();
+            foreach ($result_array as $value) {
+                if ($value["filename"]) {
+                    if ($this->team) {
+                        $this->team->writeLog(
+                            ilExAssignmentTeam::TEAM_LOG_REMOVE_FILE,
+                            $value["filetitle"]
+                        );
+                    }
+
+                    if ($this->getAssignment()->getAssignmentType()->isSubmissionAssignedToTeam()) {
+                        $storage_id = $value["team_id"];
+                    } else {
+                        $storage_id = $value["user_id"];
+                    }
+
+                    $filename = $path . "/" . $storage_id . "/" . basename($value["filename"]);
+                    if (file_exists($filename)) {
+                        unlink($filename);
+                    }
+                }
+            }
+        }
+    }
+
 
 }

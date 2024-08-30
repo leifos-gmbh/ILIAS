@@ -60,6 +60,17 @@ class SampleSolutionRepository
         $this->wrapper->deliverFile($rid);
     }
 
+    public function getFilename(int $ass_id): string
+    {
+        $rid = $this->getIdStringForAssId($ass_id);
+        if ($rid !== "") {
+            $info = $this->wrapper->getResourceInfo($rid);
+            return $info->getTitle();
+        }
+        return "";
+    }
+
+
     public function importFromLegacyUpload(
         int $ass_id,
         array $file_input,

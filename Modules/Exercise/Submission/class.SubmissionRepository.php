@@ -58,6 +58,121 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         return $recs;
     }
 
+    public function getSubmissionsOfTeam(
+        int $ass_id,
+        bool $type_uses_uploads,
+        bool $type_uses_print_versions,
+        int $team_id,
+        ?array $submit_ids = null,
+        bool $only_valid = false,
+        string $min_timestamp = null,
+        bool $print_versions = false
+    ) : array
+    {
+        $where = " team_id = " . $this->db->quote($team_id, "integer") . " ";
+        return $this->getSubmissions(
+            $where,
+            $ass_id,
+            $type_uses_uploads,
+            $type_uses_print_versions,
+            $submit_ids,
+            $only_valid,
+            $min_timestamp,
+            $print_versions
+        );
+    }
+
+    public function getSubmissionsOfUsers(
+        int $ass_id,
+        bool $type_uses_uploads,
+        bool $type_uses_print_versions,
+        array $user_ids,
+        ?array $submit_ids = null,
+        bool $only_valid = false,
+        string $min_timestamp = null,
+        bool $print_versions = false
+    ) : array
+    {
+        $where = " " . $this->db->in("user_id", $user_ids, false, "integer") . " ";
+        return $this->getSubmissions(
+            $where,
+            $ass_id,
+            $type_uses_uploads,
+            $type_uses_print_versions,
+            $submit_ids,
+            $only_valid,
+            $min_timestamp,
+            $print_versions
+        );
+    }
+
+    protected function getSubmissions(
+        string $where,
+        int $ass_id,
+        bool $type_uses_uploads,
+        bool $type_uses_print_versions,
+        ?array $submit_ids = null,
+        bool $only_valid = false,
+        string $min_timestamp = null,
+        bool $print_versions = false
+    ) : array
+    {
+        $sql = "SELECT * FROM exc_returned" .
+            " WHERE ass_id = " . $this->db->quote($ass_id, "integer");
+        $sql .= " AND " . $where;
+
+
+        if ($submit_ids) {
+            $sql .= " AND " . $this->db->in("returned_id", $submit_ids, false, "integer");
+        }
+
+        if ($min_timestamp) {
+            $sql .= " AND ts > " . $this->db->quote($min_timestamp, "timestamp");
+        }
+
+        $result = $this->db->query($sql);
+
+        $delivered_files = array();
+        while ($row = $this->db->fetchAssoc($result)) {
+            // blog/portfolio/text submissions
+            if ($only_valid &&
+                !$row["filename"] &&
+                !(trim((string) $row["atext"]))) {
+                continue;
+            }
+
+            $row["owner_id"] = $row["user_id"];
+            $row["timestamp"] = $row["ts"];
+            $row["timestamp14"] = substr($row["ts"], 0, 4) .
+                substr($row["ts"], 5, 2) . substr($row["ts"], 8, 2) .
+                substr($row["ts"], 11, 2) . substr($row["ts"], 14, 2) .
+                substr($row["ts"], 17, 2);
+
+            $row["rid"] = (string) $row["rid"];
+
+            // see 22301, 22719
+            if ($row["rid"] !== "" || (!$type_uses_uploads)) {
+                $delivered_files[] = $row;
+            }
+        }
+
+        // filter print versions
+        if ($type_uses_print_versions) {
+            $delivered_files = array_filter($delivered_files, function ($i) use ($print_versions) {
+                $is_print_version = false;
+                if (substr($i["filetitle"], strlen($i["filetitle"]) - 5) == "print") {
+                    $is_print_version = true;
+                }
+                if (substr($i["filetitle"], strlen($i["filetitle"]) - 9) == "print.zip") {
+                    $is_print_version = true;
+                }
+                return ($is_print_version == $print_versions);
+            });
+        }
+
+        return $delivered_files;
+    }
+
     public function getUserId(int $submission_id): int
     {
         $q = "SELECT user_id FROM exc_returned " .

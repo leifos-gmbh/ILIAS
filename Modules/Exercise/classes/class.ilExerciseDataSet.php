@@ -499,13 +499,6 @@ class ilExerciseDataSet extends ilDataSet
             $if = $this->ass_domain->instructionFiles((int) $a_set["Id"]);
             $a_set["InstructionCollection"] = $if->getCollectionIdString();
 
-
-            $fstorage = new ilFSStorageExercise($a_set["ExerciseId"], $a_set["Id"]);
-            $a_set["FeedbackDir"] = $fstorage->getGlobalFeedbackPath();
-
-            //now the instruction files inside the root directory
-            $fswebstorage = new ilFSWebStorageExercise($a_set['ExerciseId'], $a_set['Id']);
-            $a_set['WebDataDir'] = $fswebstorage->getAbsolutePath();
         }
 
         //Discuss if necessary when working with timestamps.

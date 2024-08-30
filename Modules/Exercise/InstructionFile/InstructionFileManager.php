@@ -105,10 +105,6 @@ class InstructionFileManager
                     'order' => 0 // sorting is currently not supported
                 ];
             }, iterator_to_array($this->repo->getCollectionResourcesInfo($this->ass_id)));
-        } else {
-            $exc_id = \ilExAssignment::lookupExerciseId($this->ass_id);
-            $storage = new \ilFSWebStorageExercise($exc_id, $this->ass_id);
-            return $storage->getFiles();
         }
     }
 

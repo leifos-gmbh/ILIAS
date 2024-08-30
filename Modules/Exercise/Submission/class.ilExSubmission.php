@@ -49,7 +49,7 @@ class ilExSubmission
     public function __construct(
         ilExAssignment $a_ass,
         int $a_user_id,
-        ilExAssignmentTeam $a_team = null,
+        ilExAssignmentTeam $a_team = null,      // did not find any place that sets this....
         bool $a_is_tutor = false,
         bool $a_public_submissions = false
     ) {
@@ -71,8 +71,9 @@ class ilExSubmission
 
         $this->state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $a_user_id);
 
-        if ($a_ass->hasTeam()) {
+        if ($a_ass->hasTeam()) {        // ass type uses teams...
             if (!$a_team) {
+                // this might be a team with no id (since the create on demand parameter is not set)
                 $this->team = ilExAssignmentTeam::getInstanceByUserId($this->assignment->getId(), $this->user_id);
             } else {
                 $this->team = $a_team;
@@ -484,7 +485,7 @@ class ilExSubmission
         $sql = "SELECT * FROM exc_returned" .
             " WHERE ass_id = " . $ilDB->quote($this->getAssignment()->getId(), "integer");
 
-        $sql .= " AND " . $this->getTableUserWhere(true);
+        $sql .= " AND " . $this->getTableUserWhere();
 
 
         if ($a_file_ids) {
@@ -567,7 +568,7 @@ class ilExSubmission
         $tutor = ($a_tutor)
             ?: $ilUser->getId();
 
-        $where = " AND " . $this->getTableUserWhere(true);
+        $where = " AND " . $this->getTableUserWhere();
 
         $q = "SELECT exc_returned.returned_id AS id " .
             "FROM exc_usr_tutor, exc_returned " .
@@ -648,6 +649,7 @@ class ilExSubmission
     * Deletes already delivered files
     * @param array $file_id_array An array containing database ids of the delivered files
     */
+    /*           --> use manager deleteSubmissions()
     public function deleteSelectedFiles(
         array $file_id_array
     ): void {
@@ -703,7 +705,7 @@ class ilExSubmission
                 }
             }
         }
-    }
+    }*/
 
     /**
      * Delete all delivered files of user
@@ -1191,20 +1193,14 @@ class ilExSubmission
 
 
     // Get user/team where clause
-    public function getTableUserWhere(
-        bool $a_team_mode = false
-    ): string {
+    public function getTableUserWhere(): string {
         $ilDB = $this->db;
 
         if ($this->getAssignment()->getAssignmentType()->isSubmissionAssignedToTeam()) {
             $team_id = $this->getTeam()->getId();
             $where = " team_id = " . $ilDB->quote($team_id, "integer") . " ";
         } else {
-            if ($a_team_mode) {
-                $where = " " . $ilDB->in("user_id", $this->getUserIds(), "", "integer") . " ";
-            } else {
-                $where = " user_id = " . $ilDB->quote($this->getUserId(), "integer");
-            }
+            $where = " " . $ilDB->in("user_id", $this->getUserIds(), "", "integer") . " ";
         }
         return $where;
     }
@@ -1222,7 +1218,7 @@ class ilExSubmission
 
         $q = "SELECT obj_id,user_id,ts FROM exc_returned" .
             " WHERE ass_id = " . $ilDB->quote($this->assignment->getId(), "integer") .
-            " AND " . $this->getTableUserWhere(true) .
+            " AND " . $this->getTableUserWhere() .
             " AND (filename IS NOT NULL OR atext IS NOT NULL)" .
             " AND ts IS NOT NULL" .
             " ORDER BY ts DESC";
@@ -1243,7 +1239,7 @@ class ilExSubmission
             " WHERE ass_id = " . $this->db->quote($this->assignment->getId(), "integer") .
             " AND (filename IS NOT NULL OR atext IS NOT NULL)" .
             " AND web_dir_access_time IS NOT NULL" .
-            " AND " . $this->getTableUserWhere(true) .
+            " AND " . $this->getTableUserWhere() .
             " ORDER BY web_dir_access_time DESC";
 
         $res = $this->db->query($q);

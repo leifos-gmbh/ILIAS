@@ -277,13 +277,6 @@ class ilExSubmissionGUI
             $ilCtrl->redirect($this, "returnToParent");
         }
 
-        // this is due to temporary bug in handleGlobalFeedbackFileUpload that missed the last "/"
-        /*
-        $file = (is_file($this->assignment->getGlobalFeedbackFilePath()))
-            ? $this->assignment->getGlobalFeedbackFilePath()
-            : $this->assignment->getGlobalFeedbackFileStoragePath() . $this->assignment->getFeedbackFile();
-
-        ilFileDelivery::deliverFileLegacy($file, $this->assignment->getFeedbackFile());*/
         $this->domain->assignment()->sampleSolution($this->assignment->getId())->deliver();
     }
 

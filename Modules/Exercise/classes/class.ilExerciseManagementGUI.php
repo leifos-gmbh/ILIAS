@@ -1343,16 +1343,9 @@ class ilExerciseManagementGUI
 
         foreach ($member_ids as $usr_id) {
             $this->exercise->members_obj->deassignMember((int) $usr_id);
-            $this->removeUserSubmissionFilesFromWebDir((int) $usr_id);
         }
         $this->tpl->setOnScreenMessage('success', $lng->txt("exc_msg_participants_removed"), true);
         $ilCtrl->redirect($this, "members");
-    }
-
-    public function removeUserSubmissionFilesFromWebDir(int $user_id): void
-    {
-        $storage = new ilFSWebStorageExercise($this->exercise->getId(), $this->ass_id);
-        $storage->deleteUserSubmissionDirectory($user_id);
     }
 
     /**

@@ -22,8 +22,6 @@ namespace ILIAS\Exercise\TutorFeedbackFile;
 
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Exercise\IRSS\ResourceInformation;
-use ILIAS\Exercise\InstructionFile\ilFSWebStorageExercise;
-use ILIAS\Exercise\InstructionFile\InstructionFileRepository;
 use ILIAS\Exercise\InternalRepoService;
 use ILIAS\Exercise\InternalDomainService;
 use ILIAS\ResourceStorage\Events\Event;

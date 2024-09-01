@@ -25,6 +25,7 @@ use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Filesystem\Stream\FileStream;
 use ILIAS\Data\Result;
 use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\Exercise\InternalDataService;
 
 class SubmissionRepository implements SubmissionRepositoryInterface
 {
@@ -34,9 +35,9 @@ class SubmissionRepository implements SubmissionRepositoryInterface
 
     public function __construct(
         protected IRSSWrapper $irss,
+        protected InternalDataService $data,
         \ilDBInterface $db = null
-    )
-    {
+    ) {
         global $DIC;
         $this->log = $DIC->logger()->exc();
         $this->db = (is_null($db))
@@ -58,6 +59,9 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         return $recs;
     }
 
+    /**
+     * @return \Generator<Submission>
+     */
     public function getSubmissionsOfTeam(
         int $ass_id,
         bool $type_uses_uploads,
@@ -67,8 +71,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         bool $only_valid = false,
         string $min_timestamp = null,
         bool $print_versions = false
-    ) : array
-    {
+    ) : \Generator {
         $where = " team_id = " . $this->db->quote($team_id, "integer") . " ";
         return $this->getSubmissions(
             $where,
@@ -82,6 +85,9 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         );
     }
 
+    /**
+     * @return \Generator<Submission>
+     */
     public function getSubmissionsOfUsers(
         int $ass_id,
         bool $type_uses_uploads,
@@ -91,8 +97,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         bool $only_valid = false,
         string $min_timestamp = null,
         bool $print_versions = false
-    ) : array
-    {
+    ) : \Generator {
         $where = " " . $this->db->in("user_id", $user_ids, false, "integer") . " ";
         return $this->getSubmissions(
             $where,
@@ -106,6 +111,9 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         );
     }
 
+    /**
+     * @return \Generator<Submission>
+     */
     protected function getSubmissions(
         string $where,
         int $ass_id,
@@ -115,12 +123,10 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         bool $only_valid = false,
         string $min_timestamp = null,
         bool $print_versions = false
-    ) : array
-    {
+    ) : \Generator {
         $sql = "SELECT * FROM exc_returned" .
             " WHERE ass_id = " . $this->db->quote($ass_id, "integer");
         $sql .= " AND " . $where;
-
 
         if ($submit_ids) {
             $sql .= " AND " . $this->db->in("returned_id", $submit_ids, false, "integer");
@@ -141,39 +147,40 @@ class SubmissionRepository implements SubmissionRepositoryInterface
                 continue;
             }
 
-            $row["owner_id"] = $row["user_id"];
+            //$row["owner_id"] = $row["user_id"];
             $row["timestamp"] = $row["ts"];
+            /*
             $row["timestamp14"] = substr($row["ts"], 0, 4) .
                 substr($row["ts"], 5, 2) . substr($row["ts"], 8, 2) .
                 substr($row["ts"], 11, 2) . substr($row["ts"], 14, 2) .
-                substr($row["ts"], 17, 2);
+                substr($row["ts"], 17, 2);*/
 
             $row["rid"] = (string) $row["rid"];
 
             // see 22301, 22719
             if ($row["rid"] !== "" || (!$type_uses_uploads)) {
-                $delivered_files[] = $row;
+                $ok = true;
+
+                if ($type_uses_print_versions) {
+                    $is_print_version = false;
+                    if (str_ends_with($row["filetitle"], "print")) {
+                        $is_print_version = true;
+                    }
+                    if (str_ends_with($row["filetitle"], "print.zip")) {
+                        $is_print_version = true;
+                    }
+                    if ($is_print_version != $print_versions) {
+                        $ok = false;
+                    }
+                }
+                if ($ok) {
+                    yield $this->getSubmissionFromRecord($row);
+                }
             }
         }
-
-        // filter print versions
-        if ($type_uses_print_versions) {
-            $delivered_files = array_filter($delivered_files, function ($i) use ($print_versions) {
-                $is_print_version = false;
-                if (substr($i["filetitle"], strlen($i["filetitle"]) - 5) == "print") {
-                    $is_print_version = true;
-                }
-                if (substr($i["filetitle"], strlen($i["filetitle"]) - 9) == "print.zip") {
-                    $is_print_version = true;
-                }
-                return ($is_print_version == $print_versions);
-            });
-        }
-
-        return $delivered_files;
     }
 
-    public function getUserId(int $submission_id): int
+    public function getUserId(int $submission_id) : int
     {
         $q = "SELECT user_id FROM exc_returned " .
             " WHERE returned_id = " . $this->db->quote($submission_id, "integer");
@@ -183,7 +190,22 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         return (int) ($rec["user_id"] ?? 0);
     }
 
-    public function hasSubmissions(int $assignment_id): int
+    public function getAllSubmissionIdsOfOwner(int $ass_id, int $user_id) : array
+    {
+        $set = $this->db->queryF("SELECT id FROM exc_returned " .
+            " WHERE ass_id = %s AND user_id = %s",
+            ["integer", "integer"],
+            [$ass_id, $user_id]
+        );
+        $user_ids = [];
+        while ($rec = $this->db->fetchAssoc($set)) {
+            $user_ids = (int) $rec["id"];
+        }
+        return $user_ids;
+    }
+
+
+    public function hasSubmissions(int $assignment_id) : int
     {
         $query = "SELECT * FROM exc_returned " .
             " WHERE ass_id = " . $this->db->quote($assignment_id, "integer") .
@@ -194,7 +216,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
     }
 
     // Update web_dir_access_time. It defines last HTML opening data.
-    public function updateWebDirAccessTime(int $assignment_id, int $member_id): void
+    public function updateWebDirAccessTime(int $assignment_id, int $member_id) : void
     {
         $this->db->manipulate("UPDATE exc_returned " .
             " SET web_dir_access_time = " . $this->db->quote(\ilUtil::now(), "timestamp") .
@@ -208,7 +230,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
      * determination. It assumes, that team db entries only exist for team
      * assignment types and thus does not read the assignment types at all.
      */
-    public function getUserSubmissionState(int $user_id, array $assignment_ids): array
+    public function getUserSubmissionState(int $user_id, array $assignment_ids) : array
     {
         $db = $this->db;
 
@@ -250,8 +272,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
     public function updateLate(
         int $return_id,
         bool $late
-    ) : void
-    {
+    ) : void {
         $this->db->manipulate("UPDATE exc_returned" .
             " SET late = " . $this->db->quote((int) $late, "integer") .
             " WHERE returned_id = " . $this->db->quote($return_id, "integer"));
@@ -264,8 +285,8 @@ class SubmissionRepository implements SubmissionRepositoryInterface
     public function getMaxAmountOfSubmittedFiles(
         int $obj_id,
         int $ass_id,
-        int $user_id = 0): int
-    {
+        int $user_id = 0
+    ) : int {
         $db = $this->db;
 
         $and = "";
@@ -288,7 +309,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
      * Get all user ids, that have submitted something
      * @return int[]
      */
-    public function getUsersWithSubmission(int $ass_id): array
+    public function getUsersWithSubmission(int $ass_id) : array
     {
         $db = $this->db;
         $user_ids = [];
@@ -311,7 +332,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         string $filename,
         bool $is_late,
         ResourceStakeholder $stakeholder
-    ): bool {
+    ) : bool {
         $db = $this->db;
         $rid = $this->irss->importLocalFile(
             $file,
@@ -345,6 +366,22 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         return false;
     }
 
+    protected function getSubmissionFromRecord(array $rec) : Submission
+    {
+        return $this->data->submission(
+            (int) $rec["returned_id"],
+            (int) $rec["ass_id"],
+            (int) $rec["user_id"],
+            (int) $rec["team_id"],
+            (string) $rec["filetitle"],
+            (string) $rec["atext"],
+            (string) $rec["rid"],
+            (string) $rec["mimetype"],
+            (string) $rec["ts"],
+            (bool) $rec["late"]
+        );
+    }
+
     public function addUpload(
         int $obj_id,
         int $ass_id,
@@ -354,7 +391,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         string $filename,
         bool $is_late,
         ResourceStakeholder $stakeholder
-    ): bool {
+    ) : bool {
         $db = $this->db;
         $rid = $this->irss->importFileFromUploadResult(
             $result,
@@ -395,7 +432,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         UploadResult $result,
         bool $is_late,
         ResourceStakeholder $stakeholder
-    ): array {
+    ) : array {
         global $DIC;
 
         $db = $this->db;
@@ -444,12 +481,38 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         return $filenames;
     }
 
+    public function delete(
+        int $id,
+        ResourceStakeholder $stakeholder
+    ) : void
+    {
+        $set = $this->db->queryF("SELECT rid FROM exc_returned " .
+            " WHERE returned_id = %s ",
+            ["integer"],
+            [$id]
+        );
+        if ($rec = $this->db->fetchAssoc($set)) {
+            $rid = (string) ($rec["rid"] ?? "");
+            if ($rid !== "") {
+                $this->irss->deleteResource(
+                    $rid,
+                    $stakeholder
+                );
+            }
+            $this->db->manipulateF("DELETE FROM exc_returned WHERE " .
+                " returned_id = %s",
+                ["integer"],
+                [$id]
+            );
+        }
+    }
+
     public function deliverFile(
         int $ass_id,
         int $user_id,
         string $rid,
-        string $filetitle = "") : void
-    {
+        string $filetitle = ""
+    ) : void {
         if ($filetitle !== "") {
             $this->irss->renameCurrentRevision($rid, $filetitle);
         }
@@ -458,8 +521,8 @@ class SubmissionRepository implements SubmissionRepositoryInterface
 
     public function getStream(
         int $ass_id,
-        string $rid) : ?FileStream
-    {
+        string $rid
+    ) : ?FileStream {
         return $this->irss->stream($rid);
     }
 

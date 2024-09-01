@@ -25,22 +25,16 @@ class ilExAssTypeTextGUI implements ilExAssignmentTypeGUIInterface
 {
     use ilExAssignmentTypeGUIBase;
 
-    /**
-     * @var ilLanguage
-     */
-    protected $lng;
+    protected ilLanguage $lng;
     protected int $requested_min_char_limit = 0;
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        /** @var \ILIAS\DI\Container $DIC */
-        global $DIC;
+    public function __construct(
+        protected \ILIAS\Exercise\InternalDomainService $domain,
+        protected \ILIAS\Exercise\InternalGUIService $gui)
 
-        $this->lng = $DIC->language();
-        $request = $DIC->exercise()->internal()->gui()->request();
+    {
+        $this->lng = $domain->lng();
+        $request = $gui->request();
         $this->requested_min_char_limit = $request->getMinCharLimit();
     }
 

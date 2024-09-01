@@ -92,7 +92,7 @@ class TeamManager
     }
     public function writeLog(
         int $team_id,
-        string $action,
+        int $action,
         string $content
     ) : void
     {

@@ -26,6 +26,7 @@
  */
 class ilExPeerReviewGUI
 {
+    protected \ILIAS\Exercise\Submission\SubmissionManager $subm;
     protected int $requested_giver_id;
     protected \ILIAS\Exercise\Notification\NotificationManager $notification;
     protected ilFSStorageExercise $fstorage;
@@ -74,6 +75,7 @@ class ilExPeerReviewGUI
         $this->notes = $DIC->notes();
         $this->ctrl->saveParameter($this, array("peer_id"));
         $this->notification = $this->domain->notification($request->getRefId());
+        $this->subm = $this->domain->submission($a_ass->getId());
     }
 
     /**
@@ -700,8 +702,8 @@ class ilExPeerReviewGUI
         $lng = $this->lng;
 
         // #18966 - late files info
-        foreach ($a_submission->getFiles() as $file) {
-            if ($file["late"]) {
+        foreach ($this->subm->getSubmissionsOfUser($a_submission->getUserId()) as $sub) {
+            if ($sub->getLate()) {
                 return '<div class="warning">' . $lng->txt("exc_late_submission") . '</div>';
             }
         }
@@ -975,12 +977,11 @@ class ilExPeerReviewGUI
             return "";
         }
 
-        $text = $a_submission->getFiles();
-        if ($text !== []) {
-            $text = array_shift($text);
-            if (trim($text["atext"]) !== '' && trim($text["atext"]) !== '0') {
+        $sub = $this->subm->getSubmissionsOfUser($a_submission->getUserId())->current();
+        if ($sub) {
+            if (trim($sub->getText()) !== '' && trim($sub->getText()) !== '0') {
                 // mob id to mob src
-                return nl2br(ilRTE::_replaceMediaObjectImageSrc($text["atext"], 1));
+                return nl2br(ilRTE::_replaceMediaObjectImageSrc($sub->getText(), 1));
             }
         }
         return "";

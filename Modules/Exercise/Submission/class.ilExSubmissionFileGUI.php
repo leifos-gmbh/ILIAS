@@ -28,6 +28,7 @@ use ILIAS\DI\UIServices;
  */
 class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 {
+    protected \ILIAS\Exercise\Submission\SubmissionManager $subm;
     protected $log;
     protected ilToolbarGUI $toolbar;
     protected ilHelpGUI $help;
@@ -47,6 +48,9 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         $this->user = $DIC->user();
         $this->ui = $DIC->ui();
         $this->log = $DIC->logger()->exc();
+        $this->subm = $DIC->exercise()->internal()->domain()->submission(
+            $a_submission->getAssignment()->getId()
+        );
     }
 
     public function executeCommand(): void
@@ -86,10 +90,13 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         $lng = $DIC->language();
         $ilCtrl = $DIC->ctrl();
         $gui = $DIC->exercise()->internal()->gui();
+        $subm = $DIC->exercise()->internal()->domain()->submission(
+            $a_submission->getAssignment()->getId()
+        );
 
         $titles = array();
-        foreach ($a_submission->getFiles() as $file) {
-            $titles[] = htmlentities($file["filetitle"]);
+        foreach ($subm->getSubmissionsOfUser($a_submission->getUserId()) as $sub) {
+            $titles[] = htmlentities($sub->getTitle());
         }
         $files_str = implode("<br>", $titles);
         if ($files_str == "") {
@@ -249,8 +256,9 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
     protected function getUploadForm(): \ILIAS\Repository\Form\FormAdapterGUI
     {
         $max_file = $this->submission->getAssignment()->getMaxFile();
+        $cnt_sub = $this->subm->countSubmissionsOfUser($this->submission->getUserId());
         if ($max_file > 0) {
-            $max_file = $this->submission->getAssignment()->getMaxFile() - count($this->submission->getFiles());
+            $max_file = $this->submission->getAssignment()->getMaxFile() - $cnt_sub;
         } else {
             $max_file = 20;
         }
@@ -474,17 +482,13 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
             $cgui->setCancel($lng->txt("cancel"), "submissionScreen");
             $cgui->setConfirm($lng->txt("delete"), "deleteDelivered");
 
-            $files = $this->submission->getFiles();
+            $subs = $this->subm->getSubmissionsOfUser(
+                $this->submission->getUserId(),
+                $file_ids
+            );
 
-            foreach ($file_ids as $i) {
-                reset($files);
-                $title = "";
-                foreach ($files as $f) {
-                    if ($f["returned_id"] == $i) {
-                        $title = $f["filetitle"];
-                    }
-                }
-                $cgui->addItem("delivered[]", $i, $title);
+            foreach ($subs as $sub) {
+                $cgui->addItem("delivered[]", $sub->getId(), $sub->getTitle());
             }
 
             $tpl->setContent($cgui->getHTML());
@@ -505,7 +509,10 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         } elseif (count($file_ids) == 0) {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt("please_select_a_delivered_file_to_delete"), true);
         } else {
-            $this->submission->deleteSelectedFiles($file_ids);
+            $this->subm->deleteSubmissions(
+                $this->submission->getUserId(),
+                $file_ids
+            );
             $this->handleRemovedUpload();
 
             $this->tpl->setOnScreenMessage('success', $this->lng->txt("exc_submitted_files_deleted"), true);

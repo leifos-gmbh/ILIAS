@@ -46,8 +46,16 @@ class SubmissionManager
         $this->team = $domain->team();
     }
 
+    public function countSubmissionsOfUser(int $user_id) : int
+    {
+        return count(iterator_to_array(
+            $this->getSubmissionsOfUser($user_id)
+        ));
+    }
+
     /**
      * Note: this includes submissions of other team members, if user is in a team
+     * @return \Generator<Submission>
      */
     public function getSubmissionsOfUser(
         int $user_id,
@@ -55,7 +63,7 @@ class SubmissionManager
         bool $only_valid = false,
         string $min_timestamp = null,
         bool $print_versions = false
-    ) : array
+    ) : \Generator
     {
         $type_uses_print_versions = in_array($this->assignment->getType(), [
             \ilExAssignment::TYPE_BLOG,
@@ -403,73 +411,211 @@ class SubmissionManager
     }
 
     /**
-     * Check if user can delete submissions of others
+     * Delete submissions
      */
     public function deleteSubmissions(int $user_id, array $ids): void {
 
         if (count($ids) == 0) {
             return;
         }
-
-        if ($this->type->isSubmissionAssignedToTeam()) {
+        // this ensures, the ids belong to user submissions at all
+        foreach ($this->getSubmissionsOfUser($user_id, $ids) as $s) {
+            $this->repo->delete(
+                $s->getId(),
+                $this->stakeholder
+            );
             $team_id = $this->team->getTeamForMember($this->ass_id, $user_id);
-            if (is_null($team_id)) {
-                return;
-            }
-        } else {
-            $team_id = $this->team->getTeamForMember($this->ass_id, $user_id);
-            if (!is_null($team_id)) {
-                $user_ids = $this->team->getMemberIds($team_id);
-            } else {
-                $user_ids = [$user_id];
-            }
-        }
-
-        $ilDB = $this->db;
-
-        $where = " AND " . $this->getTableUserWhere(true);
-
-        $result = $ilDB->query("SELECT * FROM exc_returned" .
-            " WHERE " . $ilDB->in("returned_id", $file_id_array, false, "integer") .
-            $where);
-
-        if ($ilDB->numRows($result)) {
-            $result_array = array();
-            while ($row = $ilDB->fetchAssoc($result)) {
-                $row["timestamp"] = $row["ts"];
-                $result_array[] = $row;
-            }
-
-            // delete the entries in the database
-            $ilDB->manipulate("DELETE FROM exc_returned" .
-                " WHERE " . $ilDB->in("returned_id", $file_id_array, false, "integer") .
-                $where);
-
-            // delete the files
-            $path = $this->initStorage()->getAbsoluteSubmissionPath();
-            foreach ($result_array as $value) {
-                if ($value["filename"]) {
-                    if ($this->team) {
-                        $this->team->writeLog(
-                            ilExAssignmentTeam::TEAM_LOG_REMOVE_FILE,
-                            $value["filetitle"]
-                        );
-                    }
-
-                    if ($this->getAssignment()->getAssignmentType()->isSubmissionAssignedToTeam()) {
-                        $storage_id = $value["team_id"];
-                    } else {
-                        $storage_id = $value["user_id"];
-                    }
-
-                    $filename = $path . "/" . $storage_id . "/" . basename($value["filename"]);
-                    if (file_exists($filename)) {
-                        unlink($filename);
-                    }
-                }
+            if ($team_id && $team_id > 0) {
+                $this->team->writeLog(
+                    $team_id,
+                    \ilExAssignmentTeam::TEAM_LOG_REMOVE_FILE,
+                    $s->getTitle()
+                );
             }
         }
     }
 
+    public function deleteAllSubmissionsOfUser(int $user_id): void
+    {
+        $this->deleteSubmissions(
+            $user_id,
+            $this->repo->getAllSubmissionIdsOfOwner(
+                $this->ass_id,
+                $user_id
+            )
+        );
+    }
+
+    /**
+     * Should be replaced by writing into a zip directly in the future
+     */
+    public function copySubmissionsToDir(
+        array $user_ids,
+        string $directory
+    )
+    {
+        $members = [];
+        foreach ($user_ids as $member_id) {
+            $submission = new \ilExSubmission($this->assignment, $member_id);
+            $submission->updateTutorDownloadTime();
+
+            // get member object (ilObjUser)
+            if ($this->domain->profile()->exists($member_id)) {
+                // adding file metadata
+                foreach ($this->getSubmissionsOfUser($member_id) as $sub) {
+                    $members[$sub->getUserId()]["files"][$sub->getId()] = $sub;
+                }
+
+                $name = \ilObjUser::_lookupName($member_id);
+                $members[$member_id]["name"] = $name["firstname"] . " " . $name["lastname"];
+            }
+        }
+        $this->copySubmissionFilesToDir($members, $directory);
+    }
+
+    protected function copySubmissionFilesToDir(
+        array $members,
+        string $to_path
+    ): void
+    {
+        global $DIC;
+
+        $zip_archive = $DIC->archives()->zip([]);
+        $ass = $this->assignment;
+
+        $lng = $this->domain->lng();
+        $log = $this->log;
+
+
+        ksort($members);
+        //$savepath = $storage->getAbsoluteSubmissionPath();
+        //$cdir = getcwd();
+
+        // important check: if the directory does not exist
+        // ILIAS stays in the current directory (echoing only a warning)
+        // and the zip command below archives the whole ILIAS directory
+        // (including the data directory) and sends a mega file to the user :-o
+//        if (!is_dir($savepath)) {
+//            return;
+//        }
+        // Safe mode fix
+        //		chdir($this->getExercisePath());
+
+//        $tmpdir = $storage->getTempPath();
+//        chdir($tmpdir);
+//        $zip = PATH_TO_ZIP;
+
+        //$ass_type = $a_ass->getType();
+
+        // copy all member directories to the temporary folder
+        // switch from id to member name and append the login if the member name is double
+        // ensure that no illegal filenames will be created
+        // remove timestamp from filename
+        $team_map = null;
+        $team_dirs = null;
+        if ($ass->hasTeam()) {
+            $team_dirs = array();
+            $team_map = \ilExAssignmentTeam::getAssignmentTeamMap($ass->getId());
+        }
+        foreach ($members as $id => $item) {
+            $user_files = $item["files"] ?? null;
+
+            // group by teams
+            $team_dir = "";
+            if (is_array($team_map) &&
+                array_key_exists($id, $team_map)) {
+                $team_id = $team_map[$id];
+                if (!array_key_exists($team_id, $team_dirs)) {
+                    $team_dir = $lng->txt("exc_team") . " " . $team_id;
+                    $team_dirs[$team_id] = $team_dir;
+                }
+                $team_dir = $team_dirs[$team_id] . DIRECTORY_SEPARATOR;
+            }
+
+            if ($ass->getAssignmentType()->isSubmissionAssignedToTeam()) {
+                $targetdir = $team_dir . \ilFileUtils::getASCIIFilename(
+                        $item["name"]
+                    );
+                if ($targetdir == "") {
+                    continue;
+                }
+            } else {
+                $targetdir = $this->getDirectoryNameFromUserData($id);
+                if ($ass->getAssignmentType()->usesTeams()) {
+                    $targetdir = $team_dir . $targetdir;
+                }
+            }
+
+            $log->debug("Creation target directory: " . $targetdir);
+
+            $duplicates = [];
+
+            /** @var Submission $sub */
+            foreach ($user_files as $sub) {
+                $targetfile = $sub->getTitle();
+
+                // rename repo objects
+                if ($this->type->getSubmissionType() === \ilExSubmission::TYPE_REPO_OBJECT) {
+                    $obj_id = \ilObject::_lookupObjId((int) $targetfile);
+                    $obj_type = \ilObject::_lookupType($obj_id);
+                    $targetfile = $obj_type . "_" . $obj_id . ".zip";
+                }
+
+                // handle duplicates
+                if (array_key_exists($targetfile, $duplicates)) {
+                    $suffix = strrpos($targetfile, ".");
+                    $targetfile = substr($targetfile, 0, $suffix) .
+                        " (" . (++$duplicates[$targetfile]) . ")" .
+                        substr($targetfile, $suffix);
+                } else {
+                    $duplicates[$targetfile] = 1;
+                }
+
+                // add late submission info
+                if ($sub->getLate()) {    // see #23900
+                    $targetfile = $lng->txt("exc_late_submission") . " - " .
+                        $targetfile;
+                }
+
+                // normalize and add directory
+                $targetfile = \ilFileUtils::getASCIIFilename($targetfile);
+                //$targetfile = $targetdir . DIRECTORY_SEPARATOR . $targetfile;
+
+                /*
+                $zip_archive->addStream(
+                    $this->repo->getStream($ass->getId(), $sub->getRid()),
+                    $targetfile
+                );*/
+
+                $stream = $this->repo->getStream($ass->getId(), $sub->getRid());
+
+                // add file to directory (no zip see end of the function)
+                $dir = $to_path . DIRECTORY_SEPARATOR . $targetdir;
+                \ilFileUtils::makeDir($dir);
+                $file = $dir . DIRECTORY_SEPARATOR . $targetfile;
+                file_put_contents(
+                    $file,
+                    $stream->getContents()
+                );
+
+                // unzip blog/portfolio
+
+            }
+        }
+    }
+
+    /**
+     * there is still a version in ilExSubmission that needs to be replaced
+     */
+    protected function getDirectoryNameFromUserData(int $user_id): string
+    {
+        $userName = \ilObjUser::_lookupName($user_id);
+        return \ilFileUtils::getASCIIFilename(
+            trim($userName["lastname"]) . "_" .
+            trim($userName["firstname"]) . "_" .
+            trim($userName["login"]) . "_" .
+            $userName["user_id"]
+        );
+    }
 
 }

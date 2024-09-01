@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\Exercise\Submission\Submission;
+
 /**
  * Exercise submission
  * //TODO: This class has many static methods related to delivered "files". Extract them to classes.
@@ -29,6 +31,7 @@ class ilExSubmission
     public const TYPE_OBJECT = "Object";	// Blogs in WSP/Portfolio
     public const TYPE_TEXT = "Text";
     public const TYPE_REPO_OBJECT = "RepoObject";	// Wikis
+    protected \ILIAS\Exercise\Submission\SubmissionManager $sub_manager;
     protected \ILIAS\Exercise\InternalDomainService $domain;
 
     protected ilObjUser $user;
@@ -84,6 +87,9 @@ class ilExSubmission
             $this->peer_review = new ilExPeerReview($this->assignment);
         }
         $this->domain = $DIC->exercise()->internal()->domain();
+        $this->sub_manager = $DIC->exercise()->internal()->domain()->submission(
+            $a_ass->getId()
+        );
     }
 
     public function getSubmissionType(): string
@@ -152,59 +158,32 @@ class ilExSubmission
 
     public function hasSubmitted(): bool
     {
-        return (bool) count($this->getFiles(null, true));
+        return (bool) $this->sub_manager->getSubmissionsOfUser(
+            $this->getUserId(),
+            null,
+            true
+        )->current();
     }
 
     public function hasSubmittedPrintVersion(): bool
     {
-        return $this->getSubmittedPrintFile() !== "";
+        return ($this->getSubmittedEntry(true)?->getRid() != "");
     }
 
-    public function getSubmittedPrintFile(): string
+    public function getSubmittedEntry(bool $print = false): ?Submission
     {
-        $submitted = $this->getFiles(
-            null,
-            false,
-            null,
-            true
-        );
-
-        if (count($submitted) > 0) {
-            $submitted = array_pop($submitted);
-
-            if ($submitted['rid'] !== "" || is_file($submitted['filename'])) {
-                return $submitted['filename'];
-            }
-        }
-
-        return "";
-    }
-
-    public function getSubmittedEntry(bool $print = false): ?array
-    {
-        $submitted = $this->getFiles(
+        return $this->sub_manager->getSubmissionsOfUser(
+            $this->getUserId(),
             null,
             false,
             null,
             $print
-        );
-
-        if (count($submitted) > 0) {
-            $submitted = array_pop($submitted);
-
-            return $submitted;
-        }
-
-        return null;
+        )->current();
     }
 
-    public function getSelectedObject(): ?array
+    public function getSelectedObject(): ?Submission
     {
-        $files = $this->getFiles();
-        if ($files !== []) {
-            return array_pop($files);
-        }
-        return null;
+        return $this->sub_manager->getSubmissionsOfUser($this->getUserId())->current();
     }
 
     public function canSubmit(): bool
@@ -281,8 +260,11 @@ class ilExSubmission
         }
 
         $max = $this->getAssignment()->getMaxFile();
+        $cnt_sub = $this->sub_manager->countSubmissionsOfUser(
+            $this->getUserId()
+        );
         if ($max &&
-            $max <= sizeof($this->getFiles())) {
+            $max <= $cnt_sub) {
             return false;
         }
 
@@ -401,7 +383,7 @@ class ilExSubmission
             // #18441 - check number of files in zip
             $max_num = $this->assignment->getMaxFile();
             if ($max_num) {
-                $current_num = count($this->getFiles());
+                $current_num = $this->sub_manager->countSubmissionsOfUser($this->getUserId());
                 $zip_num = count($filearray["file"]);
                 if ($current_num + $zip_num > $max_num) {
                     $success = false;
@@ -468,91 +450,6 @@ class ilExSubmission
         }
 
         return $delivered;
-    }
-
-    /**
-     * Get submission items (not only files)
-     * @todo this also returns non-file entries, rename this, see dev.txt.php
-     */
-    public function getFiles(
-        array $a_file_ids = null,
-        bool $a_only_valid = false,
-        string $a_min_timestamp = null,
-        bool $print_versions = false
-    ): array {
-        $ilDB = $this->db;
-
-        $sql = "SELECT * FROM exc_returned" .
-            " WHERE ass_id = " . $ilDB->quote($this->getAssignment()->getId(), "integer");
-
-        $sql .= " AND " . $this->getTableUserWhere();
-
-
-        if ($a_file_ids) {
-            $sql .= " AND " . $ilDB->in("returned_id", $a_file_ids, false, "integer");
-        }
-
-        if ($a_min_timestamp) {
-            $sql .= " AND ts > " . $ilDB->quote($a_min_timestamp, "timestamp");
-        }
-
-        $result = $ilDB->query($sql);
-
-        $delivered_files = array();
-        if ($ilDB->numRows($result)) {
-            $path = $this->initStorage()->getAbsoluteSubmissionPath();
-
-            while ($row = $ilDB->fetchAssoc($result)) {
-                // blog/portfolio/text submissions
-                if ($a_only_valid &&
-                    !$row["filename"] &&
-                    !(trim((string) $row["atext"]))) {
-                    continue;
-                }
-
-                $row["owner_id"] = $row["user_id"];
-                $row["timestamp"] = $row["ts"];
-                $row["timestamp14"] = substr($row["ts"], 0, 4) .
-                    substr($row["ts"], 5, 2) . substr($row["ts"], 8, 2) .
-                    substr($row["ts"], 11, 2) . substr($row["ts"], 14, 2) .
-                    substr($row["ts"], 17, 2);
-
-                if ($this->getAssignment()->getAssignmentType()->isSubmissionAssignedToTeam()) {
-                    $storage_id = $row["team_id"];
-                } else {
-                    $storage_id = $row["user_id"];
-                }
-
-                $row["rid"] = (string) $row["rid"];
-                $row["filename"] = $path .
-                    "/" . $storage_id . "/" . (($row["filename"]) ? basename($row["filename"]) : '');
-
-                // see 22301, 22719
-                if (is_file($row["filename"]) || ($row["rid"] !== "") || (!$this->assignment->getAssignmentType()->usesFileUpload())) {
-                    $delivered_files[] = $row;
-                }
-            }
-        }
-
-        // filter print versions
-        if (in_array($this->assignment->getType(), [
-            ilExAssignment::TYPE_BLOG,
-            ilExAssignment::TYPE_PORTFOLIO,
-            ilExAssignment::TYPE_WIKI_TEAM
-        ], true)) {
-            $delivered_files = array_filter($delivered_files, function ($i) use ($print_versions) {
-                $is_print_version = false;
-                if (substr($i["filetitle"], strlen($i["filetitle"]) - 5) == "print") {
-                    $is_print_version = true;
-                }
-                if (substr($i["filetitle"], strlen($i["filetitle"]) - 9) == "print.zip") {
-                    $is_print_version = true;
-                }
-                return ($is_print_version == $print_versions);
-            });
-        }
-
-        return $delivered_files;
     }
 
     /**
@@ -631,18 +528,7 @@ class ilExSubmission
 
     public function deleteAllFiles(): void
     {
-        $files = array();
-        // normal files
-        foreach ($this->getFiles() as $item) {
-            $files[] = $item["returned_id"];
-        }
-        // print versions
-        foreach ($this->getFiles(null, false, null, true) as $item) {
-            $files[] = $item["returned_id"];
-        }
-        if ($files !== []) {
-            $this->deleteSelectedFiles($files);
-        }
+        $this->sub_manager->deleteAllSubmissionsOfUser($this->getUserId());
     }
 
     /**
@@ -785,26 +671,34 @@ class ilExSubmission
             $is_team = true;
         }
 
-        $files = $this->getFiles($a_file_ids, false, $download_time);
+        $subs = iterator_to_array($this->sub_manager->getSubmissionsOfUser(
+            $this->getUserId(),
+            $a_file_ids,
+            false,
+            $download_time
+        ));
 
-        if ($files !== []) {
-            if (count($files) == 1) {
-                $file = array_pop($files);
+        if (count($subs) > 0) {
+            if (count($subs) == 1) {
+                /** @var Submission $sub */
+                $sub = current($subs);
+
+                $title = $sub->getTitle();
 
                 switch ($this->assignment->getType()) {
                     case ilExAssignment::TYPE_BLOG:
                     case ilExAssignment::TYPE_PORTFOLIO:
-                        $file["filetitle"] = ilObjUser::_lookupName($file["user_id"]);
-                        $file["filetitle"] = ilObject::_lookupTitle($this->assignment->getExerciseId()) . " - " .
+                        $name = ilObjUser::_lookupName($sub->getUserId());
+                        $title = ilObject::_lookupTitle($this->assignment->getExerciseId()) . " - " .
                             $this->assignment->getTitle() . " - " .
-                            $file["filetitle"]["firstname"] . " " .
-                            $file["filetitle"]["lastname"] . " (" .
-                            $file["filetitle"]["login"] . ").zip";
+                            $name["firstname"] . " " .
+                            $name["lastname"] . " (" .
+                            $name["login"] . ").zip";
                         break;
 
                         // @todo: generalize
                     case ilExAssignment::TYPE_WIKI_TEAM:
-                        $file["filetitle"] = ilObject::_lookupTitle($this->assignment->getExerciseId()) . " - " .
+                        $title = ilObject::_lookupTitle($this->assignment->getExerciseId()) . " - " .
                             $this->assignment->getTitle() . " (Team " . $this->getTeam()->getId() . ").zip";
                         break;
 
@@ -813,15 +707,15 @@ class ilExSubmission
                 }
 
                 if ($a_peer_review_mask_filename) {
-                    $title_a = explode(".", $file["filetitle"]);
+                    $title_a = explode(".", $sub->getTitle());
                     $suffix = array_pop($title_a);
-                    $file["filetitle"] = $this->assignment->getTitle() . "_peer" . $peer_id . "." . $suffix;
-                } elseif ($file["late"]) {
-                    $file["filetitle"] = $lng->txt("exc_late_submission") . " - " .
-                        $file["filetitle"];
+                    $title = $this->assignment->getTitle() . "_peer" . $peer_id . "." . $suffix;
+                } elseif ($sub->getLate()) {
+                    $title = $lng->txt("exc_late_submission") . " - " .
+                        $title;
                 }
 
-                $this->downloadSingleFile($file["user_id"], $file["filename"], $file["filetitle"], $file["team_id"], $file["rid"]);
+                $this->downloadSingleFile($sub, $title);
             } else {
                 $array_files = array();
                 foreach ($files as $seq => $file) {
@@ -889,26 +783,14 @@ class ilExSubmission
     }
 
     protected function downloadSingleFile(
-        int $a_user_id,
-        string $filename,
-        string $filetitle,
-        int $a_team_id = 0,
-        string $rid = ""
+        Submission $sub,
+        string $title
     ): void {
-        if ($this->ass_type->isSubmissionAssignedToTeam()) {
-            $storage_id = $a_team_id;
-        } else {
-            $storage_id = $a_user_id;
-        }
-
-        $filename = $this->initStorage()->getAbsoluteSubmissionPath() .
-            "/" . $storage_id . "/" . basename($filename);
-
-        if ($rid !== "") {
-            $this->domain->submission($this->assignment->getId())->deliverFile($a_user_id, $rid, $filetitle);
-        } else {
-            ilFileDelivery::deliverFileLegacy($filename, $filetitle);
-        }
+        $this->domain->submission($this->assignment->getId())->deliverFile(
+            $sub->getUserId(),
+            $sub->getRid(),
+            $title
+        );
     }
 
     protected function downloadMultipleFiles(
@@ -1005,192 +887,6 @@ class ilExSubmission
         ilFileDelivery::deliverFileLegacy($tmpzipfile, $orgDeliverFilename . ".zip", "", false, true);
         exit;
     }
-
-    /**
-     * Download all submitted files of an assignment (all user)
-     * @throws ilExerciseException
-     */
-    public static function downloadAllAssignmentFiles(
-        ilExAssignment $a_ass,
-        array $members,
-        string $to_path
-    ): void {
-        global $DIC;
-
-        $lng = $DIC->language();
-        $log = ilLoggerFactory::getLogger("exc");
-        $domain = $DIC->exercise()->internal()->domain();
-
-        $storage = new ilFSStorageExercise($a_ass->getExerciseId(), $a_ass->getId());
-        $storage->create();
-
-        ksort($members);
-        //$savepath = $this->getExercisePath() . "/" . $this->obj_id . "/";
-        $savepath = $storage->getAbsoluteSubmissionPath();
-        $cdir = getcwd();
-
-
-        // important check: if the directory does not exist
-        // ILIAS stays in the current directory (echoing only a warning)
-        // and the zip command below archives the whole ILIAS directory
-        // (including the data directory) and sends a mega file to the user :-o
-        if (!is_dir($savepath)) {
-            return;
-        }
-        // Safe mode fix
-        //		chdir($this->getExercisePath());
-
-        $tmpdir = $storage->getTempPath();
-        chdir($tmpdir);
-        $zip = PATH_TO_ZIP;
-
-        // check free diskspace
-        $dirsize = 0;
-        foreach (array_keys($members) as $id) {
-            $directory = $savepath . DIRECTORY_SEPARATOR . $id;
-            $dirsize += ilFileUtils::dirsize($directory);
-        }
-        if ($dirsize > disk_free_space($tmpdir)) {
-            return;
-        }
-
-        $ass_type = $a_ass->getType();
-
-        // copy all member directories to the temporary folder
-        // switch from id to member name and append the login if the member name is double
-        // ensure that no illegal filenames will be created
-        // remove timestamp from filename
-        $team_map = null;
-        $team_dirs = null;
-        if ($a_ass->hasTeam()) {
-            $team_dirs = array();
-            $team_map = ilExAssignmentTeam::getAssignmentTeamMap($a_ass->getId());
-        }
-        foreach ($members as $id => $item) {
-            $user_files = $item["files"] ?? null;
-            $sourcedir = $savepath . DIRECTORY_SEPARATOR . $id;
-            if (!is_dir($sourcedir)) {
-                continue;
-            }
-
-            // group by teams
-            $team_dir = "";
-            if (is_array($team_map) &&
-                array_key_exists($id, $team_map)) {
-                $team_id = $team_map[$id];
-                if (!array_key_exists($team_id, $team_dirs)) {
-                    $team_dir = $lng->txt("exc_team") . " " . $team_id;
-                    ilFileUtils::makeDir($team_dir);
-                    $team_dirs[$team_id] = $team_dir;
-                }
-                $team_dir = $team_dirs[$team_id] . DIRECTORY_SEPARATOR;
-            }
-
-            if ($a_ass->getAssignmentType()->isSubmissionAssignedToTeam()) {
-                $targetdir = $team_dir . ilFileUtils::getASCIIFilename(
-                    $item["name"]
-                );
-                if ($targetdir == "") {
-                    continue;
-                }
-            } else {
-                $targetdir = self::getDirectoryNameFromUserData($id);
-                if ($a_ass->getAssignmentType()->usesTeams()) {
-                    $targetdir = $team_dir . $targetdir;
-                }
-            }
-
-            $log->debug("Creation target directory: " . $targetdir);
-            ilFileUtils::makeDir($targetdir);
-
-            $log->debug("Scanning source directory: " . $sourcedir);
-            $sourcefiles = scandir($sourcedir);
-            $duplicates = array();
-            foreach ($sourcefiles as $sourcefile) {
-                if ($sourcefile == "." || $sourcefile == "..") {
-                    continue;
-                }
-
-                $targetfile = trim(basename($sourcefile));
-                $pos = strpos($targetfile, "_");
-                if ($pos !== false) {
-                    $targetfile = substr($targetfile, $pos + 1);
-                }
-
-                if ($a_ass->getAssignmentType()->getSubmissionType() == self::TYPE_REPO_OBJECT) {
-                    $obj_id = ilObject::_lookupObjId($targetfile);
-                    $obj_type = ilObject::_lookupType($obj_id);
-                    $targetfile = $obj_type . "_" . $obj_id . ".zip";
-                }
-
-
-                // #14536
-                if (array_key_exists($targetfile, $duplicates)) {
-                    $suffix = strrpos($targetfile, ".");
-                    $targetfile = substr($targetfile, 0, $suffix) .
-                        " (" . (++$duplicates[$targetfile]) . ")" .
-                        substr($targetfile, $suffix);
-                } else {
-                    $duplicates[$targetfile] = 1;
-                }
-
-                // late submission?
-                if (isset($user_files)) {	// see #23900
-                    foreach ($user_files as $file) {
-                        if (basename($file["filename"]) == $sourcefile) {
-                            if ($file["late"]) {
-                                $targetfile = $lng->txt("exc_late_submission") . " - " .
-                                    $targetfile;
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                $targetfile = ilFileUtils::getASCIIFilename($targetfile);
-                $targetfile = $targetdir . DIRECTORY_SEPARATOR . $targetfile;
-                $sourcefile = $sourcedir . DIRECTORY_SEPARATOR . $sourcefile;
-
-                $log->debug("Copying: " . $sourcefile . " -> " . $targetfile);
-
-                if (!copy($sourcefile, $targetfile)) {
-                    throw new ilExerciseException("Could not copy " . basename($sourcefile) . " to '" . $targetfile . "'.");
-                } else {
-                    // preserve time stamp
-                    touch($targetfile, filectime($sourcefile));
-
-                    // blogs and portfolios are stored as zip and have to be unzipped
-                    if ($ass_type == ilExAssignment::TYPE_PORTFOLIO ||
-                        $ass_type == ilExAssignment::TYPE_BLOG) {
-                        $log->debug("Unzipping: " . $targetfile);
-                        $log->debug("Current directory is: " . getcwd());
-
-                        $domain->resources()->zip()->unzipFile($targetfile);
-                        unlink($targetfile);
-                    }
-                }
-            }
-        }
-        $tmpzipfile = ilFileUtils::getASCIIFilename($lng->txt("exc_ass_submission_zip")) . ".zip";
-        // Safe mode fix
-        $zipcmd = $zip . " -r " . ilShellUtil::escapeShellArg($tmpzipfile) . " .";
-        exec($zipcmd);
-        //$path_final_zip_file = $to_path.DIRECTORY_SEPARATOR."Submissions/".$tmpzipfile;
-        $path_final_zip_file = $to_path . DIRECTORY_SEPARATOR . $tmpzipfile;
-
-        if (file_exists($tmpdir . DIRECTORY_SEPARATOR . $tmpzipfile)) {
-            copy($tmpzipfile, $path_final_zip_file);
-            ilFileUtils::delDir($tmpdir);
-
-            //unzip the submissions zip file.(decided to unzip to allow the excel link the files more obvious when blog/portfolio)
-            chdir($to_path);
-            $domain->resources()->zip()->unzipFile($path_final_zip_file);
-            unlink($path_final_zip_file);
-        }
-
-        chdir($cdir);
-    }
-
 
     // Get user/team where clause
     public function getTableUserWhere(): string {
@@ -1323,19 +1019,18 @@ class ilExSubmission
     {
         $ilDB = $this->db;
 
-        $files = $this->getFiles();
-
         // no text = remove submission
         if (!trim($a_text)) {
-            $this->deleteAllFiles();
+            $this->sub_manager->deleteAllSubmissionsOfUser($this->getUserId());
             return null;
         }
 
-        if (!$files) {
+        $sub = $this->sub_manager->getSubmissionsOfUser($this->getUserId())->current();
+
+        if (!$sub) {
             return $this->addResourceObject("TEXT", $a_text);
         } else {
-            $files = array_shift($files);
-            $id = $files["returned_id"];
+            $id = $sub->getId();
             if ($id) {
                 $ilDB->manipulate("UPDATE exc_returned" .
                     " SET atext = " . $ilDB->quote($a_text, "text") .
@@ -1384,12 +1079,14 @@ class ilExSubmission
                 // fallthrough
 
             case ilExAssignment::TYPE_UPLOAD:
-                $all_files = $this->getFiles();
+                $subs = $this->sub_manager->getSubmissionsOfUser($this->getUserId());
                 $late_files = 0;
-                foreach ($all_files as $file) {
-                    if ($file["late"]) {
+                $cnt_all = 0;
+                foreach ($subs as $sub) {
+                    if ($sub->getLate()) {
                         $late_files++;
                     }
+                    $cnt_all++;
                 }
 
                 // nr of submitted files
@@ -1397,7 +1094,7 @@ class ilExSubmission
                 if ($late_files !== 0) {
                     $result["files"]["txt"] .= ' - <span class="warning">' . $lng->txt("exc_late_submission") . " (" . $late_files . ")</span>";
                 }
-                $sub_cnt = count($all_files);
+                $sub_cnt = $cnt_all;
                 $new = $this->lookupNewFiles();
                 if ($new !== []) {
                     $sub_cnt .= " " . sprintf($lng->txt("cnt_new"), count($new));
@@ -1428,11 +1125,11 @@ class ilExSubmission
 
             case ilExAssignment::TYPE_BLOG:
                 $result["files"]["txt"] = $lng->txt("exc_blog_returned");
-                $blogs = $this->getFiles();
-                if ($blogs !== []) {
-                    $blogs = array_pop($blogs);
-                    if ($blogs && substr($blogs["filename"], -1) != "/") {
-                        if ($blogs["late"]) {
+                /** @var Submission $sub */
+                $sub = $this->sub_manager->getSubmissionsOfUser($this->getUserId())->current();
+                if ($sub) {
+                    if ($sub->getRid() != "") {
+                        if ($sub->getLate()) {
                             $result["files"]["txt"] .= ' - <span class="warning">' . $lng->txt("exc_late_submission") . "</span>";
                         }
 
@@ -1448,11 +1145,11 @@ class ilExSubmission
 
             case ilExAssignment::TYPE_PORTFOLIO:
                 $result["files"]["txt"] = $lng->txt("exc_portfolio_returned");
-                $portfolios = $this->getFiles();
-                if ($portfolios !== []) {
-                    $portfolios = array_pop($portfolios);
-                    if ($portfolios && substr($portfolios["filename"], -1) != "/") {
-                        if ($portfolios["late"]) {
+                /** @var Submission $sub */
+                $sub = $this->sub_manager->getSubmissionsOfUser($this->getUserId())->current();
+                if ($sub) {
+                    if ($sub->getRid() != "") {
+                        if ($sub->getLate()) {
                             $result["files"]["txt"] .= ' - <span class="warning">' . $lng->txt("exc_late_submission") . "</span>";
                         }
 
@@ -1468,13 +1165,12 @@ class ilExSubmission
 
             case ilExAssignment::TYPE_TEXT:
                 $result["files"]["txt"] = $lng->txt("exc_files_returned_text");
-                $files = $this->getFiles();
-                if ($files !== []) {
+                $sub = $this->sub_manager->getSubmissionsOfUser($this->getUserId())->current();
+                if ($sub) {
                     $result["files"]["count"] = 1;
 
-                    $files = array_shift($files);
-                    if (trim($files["atext"]) !== '' && trim($files["atext"]) !== '0') {
-                        if ($files["late"]) {
+                    if (trim($sub->getText()) !== '' && trim($sub->getText()) !== '0') {
+                        if ($sub->getLate()) {
                             $result["files"]["txt"] .= ' - <span class="warning">' . $lng->txt("exc_late_submission") . "</span>";
                         }
 
@@ -1488,11 +1184,10 @@ class ilExSubmission
 
             case ilExAssignment::TYPE_WIKI_TEAM:
                 $result["files"]["txt"] = $lng->txt("exc_wiki_returned");
-                $objs = $this->getFiles();
-                if ($objs !== []) {
-                    $objs = array_pop($objs);
-                    if ($objs && substr($objs["filename"], -1) != "/") {
-                        if ($objs["late"]) {
+                $sub = $this->sub_manager->getSubmissionsOfUser($this->getUserId())->current();
+                if ($sub) {
+                    if ($sub->getRid() != "") {
+                        if ($sub->getLate()) {
                             $result["files"]["txt"] .= ' - <span class="warning">' . $lng->txt("exc_late_submission") . "</span>";
                         }
 
@@ -1541,6 +1236,9 @@ class ilExSubmission
         return $rets;
     }
 
+    /**
+     * @deprecated see getDirectoryNameFromUserData in SubmissionManager
+     */
     public static function getDirectoryNameFromUserData(int $a_user_id): string
     {
         $userName = ilObjUser::_lookupName($a_user_id);

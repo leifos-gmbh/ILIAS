@@ -16,6 +16,9 @@
  *
  *********************************************************************/
 
+use ILIAS\Exercise\InternalDomainService;
+use ILIAS\Exercise\InternalGUIService;
+
 /**
  * Team wiki type gui implementations
  *
@@ -27,25 +30,21 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
     use ilExAssignmentTypeGUIBase;
 
     public const MODE_OVERVIEW = "overview";
-    protected \ILIAS\Exercise\InternalGUIService $gui;
     protected ilLanguage $lng;
     protected ilCtrl $ctrl;
     protected ilTree $tree;
     protected ilAccessHandler $access;
     private \ilGlobalTemplateInterface $main_tpl;
 
-    public function __construct()
+    public function __construct(
+        protected InternalDomainService $domain,
+        protected InternalGUIService $gui)
     {
-        global $DIC;
-        $this->main_tpl = $DIC->ui()->mainTemplate();
-
-        $this->lng = $DIC->language();
-        $this->ctrl = $DIC->ctrl();
-        $this->tree = $DIC->repositoryTree();
-        $this->access = $DIC->access();
-        $this->gui = $DIC->exercise()
-            ->internal()
-            ->gui();
+        $this->main_tpl = $gui->ui()->mainTemplate();
+        $this->lng = $domain->lng();
+        $this->ctrl = $gui->ctrl();
+        $this->tree = $domain->repositoryTree();
+        $this->access = $domain->access();
     }
 
     /**
@@ -169,7 +168,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 
         $selected_wiki = $a_submission->getSelectedObject();
         if ($selected_wiki) {
-            $wiki_ref_id = (int) $selected_wiki["filetitle"];
+            $wiki_ref_id = (int) $selected_wiki->getTitle();
 
             // #11746
             if (ilObject::_exists($wiki_ref_id, true, "wiki") && $this->tree->isInTree($wiki_ref_id)) {
@@ -301,7 +300,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 
         $selected_wiki = $submission->getSelectedObject();
         if ($selected_wiki) {
-            $wiki_ref_id = (int) $selected_wiki["filetitle"];
+            $wiki_ref_id = (int) $selected_wiki->getTitle();
 
             // #11746
             if (\ilObject::_exists($wiki_ref_id, true, "wiki") && $this->tree->isInTree($wiki_ref_id)) {
@@ -340,10 +339,10 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
                 }
             }
             // remove invalid resource if no upload yet (see download below)
-            elseif (substr($selected_wiki["filename"], -1) == "/") {
+            /*elseif (substr($selected_wiki["filename"], -1) == "/") {
                 // #16887
                 $submission->deleteResourceObject();
-            }
+            }*/
         }
         if ($submission->canSubmit()) {
             if (!$valid_wiki && $team_available) {

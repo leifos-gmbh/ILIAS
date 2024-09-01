@@ -24,6 +24,7 @@ use ILIAS\BackgroundTasks\Implementation\Values\ScalarValues\IntegerValue;
 use ILIAS\BackgroundTasks\Types\Type;
 use ILIAS\BackgroundTasks\Value;
 use ILIAS\Exercise\InternalDomainService;
+use ILIAS\Exercise\Submission\Submission;
 
 /**
  * @author Jesús López <lopez@leifos.com>
@@ -246,27 +247,19 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
         $filter = new ilExerciseMembersFilter($this->exercise_ref_id, $exc_members_id, $this->user_id);
         $exc_members_id = $filter->filterParticipantsByAccess();
 
+        $user_ids = [];
         foreach ($exc_members_id as $member_id) {
             if (!is_null($this->selected_participants) && !in_array($member_id, $this->selected_participants)) {
                 continue;
             }
-            $submission = new ilExSubmission($this->assignment, $member_id);
-            $submission->updateTutorDownloadTime();
-
-            // get member object (ilObjUser)
-            if (ilObject::_exists($member_id)) {
-                // adding file metadata
-                foreach ($submission->getFiles() as $file) {
-                    $members[$file["user_id"]]["files"][$file["returned_id"]] = $file;
-                }
-
-                /** @var $tmp_obj ilObjUser */
-                $tmp_obj = ilObjectFactory::getInstanceByObjId($member_id);
-                $members[$member_id]["name"] = $tmp_obj->getFirstname() . " " . $tmp_obj->getLastname();
-                unset($tmp_obj);
-            }
+            $user_ids[] = $member_id;
         }
-        ilExSubmission::downloadAllAssignmentFiles($this->assignment, $members, $this->submissions_directory);
+
+        $this->domain->submission($this->assignment->getId())
+            ->copySubmissionsToDir(
+                $user_ids,
+                $this->submissions_directory
+            );
     }
 
     protected function isExcelNeeded(int $a_ass_type, bool $a_has_fbk): bool
@@ -406,15 +399,15 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
     public function addLink(
         int $a_row,
         int $a_col,
-        array $a_submission_file
+        Submission $sub
     ): void {
-        $user_id = $a_submission_file['user_id'];
+        $user_id = $sub->getUserId();
         $targetdir = ilExSubmission::getDirectoryNameFromUserData($user_id);
 
         $filepath = './' . $this->lng->txt("exc_ass_submission_zip") . DIRECTORY_SEPARATOR . $targetdir . DIRECTORY_SEPARATOR;
         switch ($this->assignment->getType()) {
             case ilExAssignment::TYPE_UPLOAD:
-                $filepath .= $a_submission_file['filetitle'];
+                $filepath .= $sub->getTitle();
                 break;
 
             case ilExAssignment::TYPE_BLOG:
@@ -423,12 +416,12 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
                 if (!$wsp_tree->getRootId()) {
                     $wsp_tree->createTreeForUser($user_id);
                 }
-                $node = $wsp_tree->getNodeData((int) $a_submission_file['filetitle']);
+                $node = $wsp_tree->getNodeData((int) $sub->getTitle());
                 $filepath .= "blog_" . $node['obj_id'] . DIRECTORY_SEPARATOR . "index.html";
                 break;
 
             case ilExAssignment::TYPE_PORTFOLIO:
-                $filepath .= "prt_" . $a_submission_file['filetitle'] . DIRECTORY_SEPARATOR . "index.html";
+                $filepath .= "prt_" . $sub->getTitle() . DIRECTORY_SEPARATOR . "index.html";
                 break;
 
             default:
@@ -542,10 +535,11 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
                 if (!is_null($this->selected_participants) && !in_array($participant_id, $this->selected_participants)) {
                     continue;
                 }
-                $submission = new ilExSubmission($this->assignment, $participant_id);
-                $submission_files = $submission->getFiles();
 
-                if ($submission_files !== []) {
+                $submissions = $this->domain->submission($this->assignment->getId())
+                    ->getSubmissionsOfUser($participant_id);
+
+                if ($submissions->current()) {
                     $participant_name = ilObjUser::_lookupName($participant_id);
                     $this->excel->setCell($row, self::PARTICIPANT_LASTNAME_COLUMN, $participant_name['lastname']);
                     $this->excel->setCell($row, self::PARTICIPANT_FIRSTNAME_COLUMN, $participant_name['firstname']);
@@ -553,22 +547,22 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 
                     //Get the submission Text
                     if (!in_array($assignment_type, $this->ass_types_with_files)) {
-                        foreach ($submission_files as $submission_file) {
-                            $this->excel->setCell($row, self::SUBMISSION_DATE_COLUMN, $submission_file['timestamp']);
-                            $this->excel->setCell($row, self::FIRST_DEFAULT_SUBMIT_COLUMN, $submission_file['atext']);
+                        foreach ($submissions as $sub) {
+                            $this->excel->setCell($row, self::SUBMISSION_DATE_COLUMN, $sub->getTimestamp());
+                            $this->excel->setCell($row, self::FIRST_DEFAULT_SUBMIT_COLUMN, $sub->getText());
                         }
                     } else {
                         $col = self::FIRST_DEFAULT_SUBMIT_COLUMN;
-                        foreach ($submission_files as $submission_file) {
-                            $this->excel->setCell($row, self::SUBMISSION_DATE_COLUMN, $submission_file['timestamp']);
+                        foreach ($submissions as $sub) {
+                            $this->excel->setCell($row, self::SUBMISSION_DATE_COLUMN, $sub->getTimestamp());
 
                             if ($assignment_type == ilExAssignment::TYPE_PORTFOLIO || $assignment_type == ilExAssignment::TYPE_BLOG) {
                                 $this->excel->setCell($row, $col, $this->lng->txt("open"));
                             } else {
-                                $this->excel->setCell($row, $col, $submission_file['filetitle']);
+                                $this->excel->setCell($row, $col, $sub->getTitle());
                             }
                             $this->excel->setColors($this->excel->getCoordByColumnAndRow($col, $row), self::BG_COLOR, self::LINK_COLOR);
-                            $this->addLink($row, $col, $submission_file);
+                            $this->addLink($row, $col, $sub);
                             $col++; //does not affect blogs and portfolios.
                         }
                     }

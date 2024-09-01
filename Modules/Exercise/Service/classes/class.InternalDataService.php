@@ -23,6 +23,7 @@ namespace ILIAS\Exercise;
 use ILIAS\Exercise\Assignment\Assignment;
 use ILIAS\Exercise\IRSS\ResourceInformation;
 use ILIAS\Exercise\Team\TeamMember;
+use ILIAS\Exercise\Submission\Submission;
 
 /**
  * Internal factory for data objects
@@ -93,4 +94,29 @@ class InternalDataService
         );
     }
 
+    public function submission(
+        int $id,
+        int $ass_id,
+        int $user_id,
+        int $team_id = 0,
+        string $title = "",
+        string $text = "",
+        string $rid = "",
+        string $mimetype = "",
+        string $timestamp = "",
+        bool $late = false
+    ): Submission {
+        return new Submission(
+            $id,
+            $ass_id,
+            $user_id,
+            $team_id,
+            $title,
+            $text,
+            $rid,
+            $mimetype,
+            $timestamp,
+            $late
+        );
+    }
 }

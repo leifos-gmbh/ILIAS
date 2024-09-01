@@ -101,7 +101,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
         $valid_blog = false;
         $selected_blog = $a_submission->getSelectedObject();
         if ($selected_blog) {
-            $blog_id = (int) $selected_blog["filetitle"];
+            $blog_id = (int) $selected_blog?->getTitle();
             $node = $wsp_tree->getNodeData($blog_id);
             if ($node["title"]) {
                 // #10116
@@ -182,7 +182,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
         $valid_prtf = false;
         $selected_prtf = $a_submission->getSelectedObject();
         if ($selected_prtf) {
-            $portfolio_id = (int) $selected_prtf["filetitle"];
+            $portfolio_id = (int) $selected_prtf?->getTitle();
 
             // #11746
             if (ilObject::_exists($portfolio_id, false, "prtf")) {
@@ -630,7 +630,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
         $conf->setCancel($this->lng->txt("cancel"), "returnToParent");
 
         $submission = $this->submission->getSelectedObject();
-        $port = new ilObjPortfolio((int) $submission["filetitle"], false);
+        $port = new ilObjPortfolio((int) $submission?->getTitle(), false);
 
         $conf->addItem("id[]", "", $port->getTitle(), ilUtil::getImagePath("standard/icon_prtf.svg"));
 
@@ -666,7 +666,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
 
         $submission = $this->submission->getSelectedObject();
         $wstree = new ilWorkspaceTree($this->submission->getUserId());
-        $object_id = $wstree->lookupObjectId((int) $submission["filetitle"]);
+        $object_id = $wstree->lookupObjectId((int) $submission?->getTitle());
         $port = new ilObjBlog($object_id, false);
 
         $conf->addItem("id[]", "", $port->getTitle(), ilUtil::getImagePath("standard/icon_blog.svg"));

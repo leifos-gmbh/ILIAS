@@ -85,7 +85,7 @@ class ilExAssignmentEditorGUI
             ->gui();
         $this->enable_peer_review_completion = $a_enable_peer_review_completion_settings;
         $this->types = ilExAssignmentTypes::getInstance();
-        $this->type_guis = ilExAssignmentTypesGUI::getInstance();
+        $this->type_guis = $this->gui->assignment()->types();
         $request = $DIC->exercise()->internal()->gui()->request();
         $this->exc = $request->getExercise();
         $this->requested_ass_type = $request->getAssType();

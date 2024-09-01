@@ -59,6 +59,7 @@ class InternalRepoService
     {
         return new Submission\SubmissionRepository(
             $this->irss_wrapper,
+            $this->data,
             $this->db
         );
     }

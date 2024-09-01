@@ -70,7 +70,7 @@ class ilExSubmissionGUI
         $this->exercise = $a_exercise;
         $this->user_id = $a_user_id;
 
-        $this->type_guis = ilExAssignmentTypesGUI::getInstance();
+        $this->type_guis = $gui->assignment()->types();
 
         // #12337
         if (!$this->exercise->members_obj->isAssigned($a_user_id)) {

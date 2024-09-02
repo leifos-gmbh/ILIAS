@@ -55,6 +55,16 @@ class InternalRepoService
         );
     }
 
+    public function peerReview(): PeerReview\RepoService
+    {
+        return new PeerReview\RepoService(
+            $this->irss_wrapper,
+            $this->data,
+            $this->db
+        );
+    }
+
+
     public function submission(): Submission\SubmissionRepositoryInterface
     {
         return new Submission\SubmissionRepository(

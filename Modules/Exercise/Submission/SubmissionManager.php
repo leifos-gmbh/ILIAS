@@ -23,6 +23,7 @@ namespace ILIAS\Exercise\Submission;
 use ILIAS\Exercise\InternalRepoService;
 use ILIAS\Exercise\InternalDomainService;
 use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\Filesystem\Stream\FileStream;
 
 class SubmissionManager
 {
@@ -73,25 +74,24 @@ class SubmissionManager
         $type_uses_uploads = $this->type->usesFileUpload();
         if ($this->type->isSubmissionAssignedToTeam()) {
             $team_id = $this->team->getTeamForMember($this->ass_id, $user_id);
-            if (((int) $team_id) === 0) {
-                return [];
+            if (((int) $team_id) !== 0) {
+                yield from $this->repo->getSubmissionsOfTeam(
+                    $this->ass_id,
+                    $type_uses_uploads,
+                    $type_uses_print_versions,
+                    $team_id,
+                    $submit_ids,
+                    $only_valid,
+                    $min_timestamp,
+                    $print_versions
+                );
             }
-            return $this->repo->getSubmissionsOfTeam(
-                $this->ass_id,
-                $type_uses_uploads,
-                $type_uses_print_versions,
-                $team_id,
-                $submit_ids,
-                $only_valid,
-                $min_timestamp,
-                $print_versions
-            );
         } else {
             $user_ids = $this->team->getTeamMemberIdsOrUserId(
                 $this->ass_id,
                 $user_id
             );
-            return $this->repo->getSubmissionsOfUsers(
+            yield from $this->repo->getSubmissionsOfUsers(
                 $this->ass_id,
                 $type_uses_uploads,
                 $type_uses_print_versions,
@@ -102,6 +102,27 @@ class SubmissionManager
                 $print_versions
             );
         }
+        yield from [];
+    }
+
+    /**
+     * This is only suitable for types like text or single upload, where no teams are used
+     * @return \Generator<Submission>
+     */
+    public function getSubmissionsOfOwners(array $user_ids): \Generator
+    {
+        $type_uses_uploads = $this->type->usesFileUpload();
+        $type_uses_print_versions = in_array($this->assignment->getType(), [
+            \ilExAssignment::TYPE_BLOG,
+            \ilExAssignment::TYPE_PORTFOLIO,
+            \ilExAssignment::TYPE_WIKI_TEAM
+        ], true);
+        yield from $this->repo->getSubmissionsOfUsers(
+            $this->ass_id,
+            $type_uses_uploads,
+            $type_uses_print_versions,
+            $user_ids
+        );
     }
 
     public function recalculateLateSubmissions(): void
@@ -152,22 +173,9 @@ class SubmissionManager
     {
         $assignment = $this->assignment;
 
-        $storage = new \ilFSStorageExercise(
-            $assignment->getExerciseId(),
-            $assignment->getId()
-        );
-        $path = $storage->getAbsoluteSubmissionPath();
-
         $delivered = [];
         foreach ($this->repo->getAllEntriesOfAssignment($assignment->getId()) as $row) {
-            if ($this->type->isSubmissionAssignedToTeam()) {
-                $storage_id = $row["team_id"];
-            } else {
-                $storage_id = $row["user_id"];
-            }
-
             $row["timestamp"] = $row["ts"];
-            $row["filename"] = $path . "/" . $storage_id . "/" . basename($row["filename"] ?? "");
             $delivered[] = $row;
         }
 
@@ -237,7 +245,7 @@ class SubmissionManager
         if ($success && $team_id > 0) {
             $this->domain->team()->writeLog(
                 $team_id,
-                (string) \ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
+                \ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
                 $filename
             );
         }
@@ -286,7 +294,7 @@ class SubmissionManager
         if ($success && $team_id > 0) {
             $this->domain->team()->writeLog(
                 $team_id,
-                (string) \ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
+                \ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
                 $filename
             );
         }
@@ -328,7 +336,7 @@ class SubmissionManager
             foreach ($filenames as $filename) {
                 $this->domain->team()->writeLog(
                     $team_id,
-                    (string) \ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
+                    \ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
                     $filename
                 );
             }
@@ -394,20 +402,6 @@ class SubmissionManager
         }
 
         return null;
-    }
-
-    public function getTableUserWhere(
-        bool $a_team_mode = false
-    ): string {
-        $ilDB = $this->db;
-
-        if ($this->type->isSubmissionAssignedToTeam()) {
-            $team_id = $this->getTeam()->getId();
-            $where = " team_id = " . $ilDB->quote($team_id, "integer") . " ";
-        } else {
-            $where = " " . $ilDB->in("user_id", $this->getUserIds(), "", "integer") . " ";
-        }
-        return $where;
     }
 
     /**
@@ -615,6 +609,133 @@ class SubmissionManager
             trim($userName["firstname"]) . "_" .
             trim($userName["login"]) . "_" .
             $userName["user_id"]
+        );
+    }
+
+    public function deliverSubmissions(
+        array $subs,
+        int $user_id,
+        bool $peer_review_mask_filename = false,
+        int $peer_id = 0
+    ) : void {
+        global $DIC;
+
+        $filenames = array();
+        $seq = 0;
+        $is_team = $this->type->usesTeams() || $peer_review_mask_filename;
+        /** @var Submission $sub */
+        foreach ($subs as $sub) {
+            if ($this->type->isSubmissionAssignedToTeam()) {
+                $storage_id = $sub->getTeamId();
+            } else {
+                $storage_id = $sub->getUserId();
+            }
+
+            $src = $sub->getTitle();
+            if ($peer_review_mask_filename) {
+                $src_a = explode(".", $src);
+                $suffix = array_pop($src_a);
+                $tgt = $this->assignment->getTitle() . "_peer" . $peer_id .
+                    "_" . (++$seq) . "." . $suffix;
+
+                $filenames[$storage_id][] = array(
+                    "src" => $src,
+                    "tgt" => $tgt,
+                    "rid" => $sub->getRid()
+                );
+            } else {
+                $filenames[$storage_id][] = array(
+                    "src" => $src,
+                    "late" => $sub->getLate(),
+                    "rid" => $sub->getRid()
+                );
+            }
+        }
+
+        if ($is_team) {
+            $multi_user = true;
+            $user_id = null;
+        } else {
+            $multi_user = false;
+        }
+
+        $lng = $this->domain->lng();
+
+        $zip = $DIC->archives()->zip([]);
+        $zip->get();
+
+
+        $assTitle = \ilExAssignment::lookupTitle($this->assignment->getId());
+        $deliverFilename = str_replace(" ", "_", $assTitle);
+        if ($user_id > 0 && !$multi_user) {
+            $userName = \ilObjUser::_lookupName($user_id);
+            $deliverFilename .= "_" . $userName["lastname"] . "_" . $userName["firstname"];
+        } else {
+            $deliverFilename .= "_files";
+        }
+        $orgDeliverFilename = trim($deliverFilename);
+        $deliverFilename = \ilFileUtils::getASCIIFilename($orgDeliverFilename);
+
+        //copy all files to a temporary directory and remove them afterwards
+        $parsed_files = $duplicates = array();
+        foreach ($filenames as $files) {
+
+            foreach ($files as $filename) {
+                // peer review masked filenames, see deliverReturnedFiles()
+                if (isset($filename["tgt"])) {
+                    $newFilename = $filename["tgt"];
+                    $filename = $filename["src"];
+                } else {
+                    $late = $filename["late"];
+                    $filename = $filename["src"];
+
+                    // remove timestamp
+                    $newFilename = trim($filename);
+                    $pos = strpos($newFilename, "_");
+                    if ($pos !== false) {
+                        $newFilename = substr($newFilename, $pos + 1);
+                    }
+                    // #11070
+                    $chkName = strtolower($newFilename);
+                    if (array_key_exists($chkName, $duplicates)) {
+                        $suffix = strrpos($newFilename, ".");
+                        $newFilename = substr($newFilename, 0, $suffix) .
+                            " (" . (++$duplicates[$chkName]) . ")" .
+                            substr($newFilename, $suffix);
+                    } else {
+                        $duplicates[$chkName] = 1;
+                    }
+
+                    if ($late) {
+                        $newFilename = $lng->txt("exc_late_submission") . " - " .
+                            $newFilename;
+                    }
+                }
+
+                $newFilename = \ilFileUtils::getASCIIFilename($newFilename);
+                $newFilename = $deliverFilename . DIRECTORY_SEPARATOR . $newFilename;
+
+                $zip->addStream(
+                    $this->repo->getStream(
+                        $this->ass_id,
+                        $filename["rid"]
+                    ),
+                    $newFilename
+                );
+
+                /*
+                $parsed_files[] = ilShellUtil::escapeShellArg(
+                    $deliverFilename . DIRECTORY_SEPARATOR . basename($newFilename)
+                );*/
+            }
+        }
+
+        // todo: move to gui
+        $http_util = $DIC->exercise()->internal()->gui()->httpUtil();
+        $http_util->deliverStream(
+            $zip->get(),
+            $orgDeliverFilename . ".zip",
+            "application/zip"
         );
     }
 

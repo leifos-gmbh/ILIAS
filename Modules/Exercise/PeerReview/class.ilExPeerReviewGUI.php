@@ -896,7 +896,7 @@ class ilExPeerReviewGUI
     {
         $this->ctrl->setParameter($this, "giver_id", $giver_id);
         $this->ctrl->setParameter($this, "peer_id", $peer_id);
-        $pr = $this->domain->peerReview($this->ass);
+        $pr = $this->domain->peerReview()->exPeerReview($this->ass);
         $gui = $this->notes->gui()->getMessagesGUI(
             $peer_id,
             $this->ass->getExerciseId(),
@@ -1051,6 +1051,7 @@ class ilExPeerReviewGUI
         $form->addItem($input);
 
         $values = $this->submission->getPeerReview()->getPeerReviewValues($this->submission->getUserId(), $a_peer_id);
+        // the values only contain text/selection values not files
 
         foreach ($this->ass->getPeerReviewCriteriaCatalogueItems() as $item) {
             $crit_id = $item->getId()

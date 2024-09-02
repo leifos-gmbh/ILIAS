@@ -260,4 +260,46 @@ class ilExerciseDBUpdateSteps implements \ilDatabaseUpdateSteps
         }
     }
 
+    public function step_19(): void
+    {
+        if (!$this->db->tableExists('exc_crit_file')) {
+            $this->db->createTable(
+                'exc_crit_file',
+                [
+                    "ass_id" => [
+                        'type' => 'integer',
+                        'notnull' => true,
+                        'length' => 4,
+                        'default' => 0
+                    ],
+                    "giver_id" => [
+                        'type' => 'integer',
+                        'notnull' => true,
+                        'length' => 4,
+                        'default' => 0
+                    ],
+                    "peer_id" => [
+                        'type' => 'integer',
+                        'notnull' => true,
+                        'length' => 4,
+                        'default' => 0
+                    ],
+                    "criteria_id" => [
+                        'type' => 'integer',
+                        'notnull' => true,
+                        'length' => 4,
+                        'default' => 0
+                    ],
+                    "rid" => [
+                        'type' => 'text',
+                        'notnull' => true,
+                        'length' => 64,
+                        'default' => ""
+                    ],
+                ]
+            );
+            $this->db->addPrimaryKey('exc_crit_file', ['ass_id', 'giver_id','peer_id','criteria_id']);
+        }
+    }
+
 }

@@ -200,7 +200,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
             $a_info->addProperty($lng->txt("exc_ass_team_wiki"), $files_str);
         }
         if ($a_submission->hasSubmitted()) {
-            $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", $selected_wiki["returned_id"]);
+            $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", $selected_wiki->getId());
             $dl_link = $ctrl->getLinkTargetByClass([
                 ilAssignmentPresentationGUI::class,
                 ilExSubmissionGUI::class,
@@ -357,7 +357,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
             }
         }
         if ($submission->hasSubmitted()) {
-            $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", $selected_wiki["returned_id"]);
+            $ctrl->setParameterByClass("ilExSubmissionFileGUI", "delivered", $selected_wiki->getId());
             $dl_link = $ctrl->getLinkTargetByClass([
                 ilAssignmentPresentationGUI::class,
                 ilExSubmissionGUI::class,

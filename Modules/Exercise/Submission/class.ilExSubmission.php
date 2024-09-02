@@ -283,11 +283,6 @@ class ilExSubmission
         return ($dl && $dl < time());
     }
 
-    protected function initStorage(): ilFSStorageExercise
-    {
-        return new ilFSStorageExercise($this->assignment->getExerciseId(), $this->assignment->getId());
-    }
-
     protected function getStorageId(): int
     {
         if ($this->ass_type->isSubmissionAssignedToTeam()) {
@@ -296,160 +291,6 @@ class ilExSubmission
             $storage_id = $this->getUserId();
         }
         return $storage_id;
-    }
-
-
-    /**
-     * Save submitted file of user
-     * @throws ilFileUtilsException
-     * @deprecated use addFileUpload instead
-     */
-    public function uploadFile(
-        array $a_http_post_files,
-        bool $unzip = false
-    ): bool {
-        $ilDB = $this->db;
-        if (!$this->canAddFile()) {
-            return false;
-        }
-
-        if ($this->ass_type->isSubmissionAssignedToTeam()) {
-            $team_id = $this->getTeam()->getId();
-            $user_id = 0;
-            if ($team_id == 0) {
-                return false;
-            }
-        } else {
-            $team_id = 0;
-            $user_id = $this->getUserId();
-        }
-        $storage_id = $this->getStorageId();
-
-        $deliver_result = $this->initStorage()->uploadFile($a_http_post_files, $storage_id, $unzip);
-
-        if ($deliver_result) {
-            $next_id = $ilDB->nextId("exc_returned");
-            $query = sprintf(
-                "INSERT INTO exc_returned " .
-                             "(returned_id, obj_id, user_id, filename, filetitle, mimetype, ts, ass_id, late, team_id) " .
-                             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                $ilDB->quote($next_id, "integer"),
-                $ilDB->quote($this->assignment->getExerciseId(), "integer"),
-                $ilDB->quote($user_id, "integer"),
-                $ilDB->quote($deliver_result["fullname"], "text"),
-                $ilDB->quote(ilFileUtils::getValidFilename($a_http_post_files["name"]), "text"),
-                $ilDB->quote($deliver_result["mimetype"], "text"),
-                $ilDB->quote(ilUtil::now(), "timestamp"),
-                $ilDB->quote($this->assignment->getId(), "integer"),
-                $ilDB->quote($this->isLate(), "integer"),
-                $ilDB->quote($team_id, "integer")
-            );
-            $ilDB->manipulate($query);
-
-            if ($this->team) {
-                $this->team->writeLog(
-                    ilExAssignmentTeam::TEAM_LOG_ADD_FILE,
-                    $a_http_post_files["name"]
-                );
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * processes error handling etc for uploaded archive
-     * @param string $fileTmp path and filename to uploaded file
-     *
-     *                        Alternative: containerFromUpload?
-     */
-    public function processUploadedZipFile(
-        string $fileTmp
-    ): bool {
-        $lng = $this->lng;
-
-        // Create unzip-directory
-        $newDir = ilFileUtils::ilTempnam();
-        ilFileUtils::makeDir($newDir);
-
-        $success = true;
-
-        try {
-            $filearray = [];
-            self::processZipFile($newDir, $fileTmp, false);
-            ilFileUtils::recursive_dirscan($newDir, $filearray);
-
-            // #18441 - check number of files in zip
-            $max_num = $this->assignment->getMaxFile();
-            if ($max_num) {
-                $current_num = $this->sub_manager->countSubmissionsOfUser($this->getUserId());
-                $zip_num = count($filearray["file"]);
-                if ($current_num + $zip_num > $max_num) {
-                    $success = false;
-                    $this->main_tpl->setOnScreenMessage('failure', $lng->txt("exc_upload_error") . " [Zip1]", true);
-                }
-            }
-
-            if ($success) {
-                foreach ($filearray["file"] as $key => $filename) {
-                    $a_http_post_files["name"] = ilFileUtils::utf8_encode($filename);
-                    $a_http_post_files["type"] = "other";
-                    $a_http_post_files["tmp_name"] = $filearray["path"][$key] . "/" . $filename;
-                    $a_http_post_files["error"] = 0;
-                    $a_http_post_files["size"] = filesize($filearray["path"][$key] . "/" . $filename);
-
-                    if (!$this->uploadFile($a_http_post_files, true)) {
-                        $success = false;
-                        $this->main_tpl->setOnScreenMessage('failure', $lng->txt("exc_upload_error") . " [Zip2]", true);
-                    }
-                }
-            }
-        } catch (ilFileUtilsException $e) {
-            $success = false;
-            $this->main_tpl->setOnScreenMessage('failure', $e->getMessage());
-        }
-
-        ilFileUtils::delDir($newDir);
-        return $success;
-    }
-
-    /**
-     * @throws ilExcUnknownAssignmentTypeException
-     */
-    public static function getAssignmentFilesByUsers(
-        int $a_exc_id,
-        int $a_ass_id,
-        array $a_users
-    ): array {
-        global $DIC;
-
-        $ilDB = $DIC->database();
-
-        $storage = new ilFSStorageExercise($a_exc_id, $a_ass_id);
-        $path = $storage->getAbsoluteSubmissionPath();
-
-        $ass_type = ilExAssignmentTypes::getInstance()->getById(ilExAssignment::lookupType($a_ass_id));
-
-        $query = "SELECT * FROM exc_returned WHERE ass_id = " .
-            $ilDB->quote($a_ass_id, "integer") .
-            " AND user_id IN (" . implode(',', $a_users) . ")";
-
-        $res = $ilDB->query($query);
-        $delivered = [];
-        while ($row = $ilDB->fetchAssoc($res)) {
-            if ($ass_type->isSubmissionAssignedToTeam()) {
-                $storage_id = $row["team_id"];
-            } else {
-                $storage_id = $row["user_id"];
-            }
-
-            $row["timestamp"] = $row["ts"];
-            $row["filename"] = $path . "/" . $storage_id . "/" . basename($row["filename"] ?? "");
-            $delivered[] = $row;
-        }
-
-        return $delivered;
     }
 
     /**
@@ -717,36 +558,11 @@ class ilExSubmission
 
                 $this->downloadSingleFile($sub, $title);
             } else {
-                $array_files = array();
-                foreach ($files as $seq => $file) {
-                    if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
-                        $storage_id = $file["team_id"];
-                    } else {
-                        $storage_id = $file["user_id"];
-                    }
-
-                    $src = basename($file["filename"]);
-                    if ($a_peer_review_mask_filename) {
-                        $src_a = explode(".", $src);
-                        $suffix = array_pop($src_a);
-                        $tgt = $this->assignment->getTitle() . "_peer" . $peer_id .
-                            "_" . (++$seq) . "." . $suffix;
-
-                        $array_files[$storage_id][] = array(
-                            "src" => $src,
-                            "tgt" => $tgt
-                        );
-                    } else {
-                        $array_files[$storage_id][] = array(
-                            "src" => $src,
-                            "late" => $file["late"]
-                        );
-                    }
-                }
-                $this->downloadMultipleFiles(
-                    $array_files,
-                    ($is_team ? null : $this->getUserId()),
-                    $is_team
+                $this->sub_manager->deliverSubmissions(
+                    $subs,
+                    $this->getUserId(),
+                    $a_peer_review_mask_filename,
+                    $peer_id ?? 0
                 );
             }
         } else {
@@ -791,101 +607,6 @@ class ilExSubmission
             $sub->getRid(),
             $title
         );
-    }
-
-    protected function downloadMultipleFiles(
-        array $a_filenames,
-        ?int $a_user_id,
-        bool $a_multi_user = false
-    ): void {
-        $lng = $this->lng;
-        $a_user_id = (int) $a_user_id;
-
-        $path = $this->initStorage()->getAbsoluteSubmissionPath();
-
-        $cdir = getcwd();
-
-        $zip = PATH_TO_ZIP;
-        $tmpdir = ilFileUtils::ilTempnam();
-        $tmpfile = ilFileUtils::ilTempnam();
-        $tmpzipfile = $tmpfile . ".zip";
-
-        ilFileUtils::makeDir($tmpdir);
-        chdir($tmpdir);
-
-        $assTitle = ilExAssignment::lookupTitle($this->assignment->getId());
-        $deliverFilename = str_replace(" ", "_", $assTitle);
-        if ($a_user_id > 0 && !$a_multi_user) {
-            $userName = ilObjUser::_lookupName($a_user_id);
-            $deliverFilename .= "_" . $userName["lastname"] . "_" . $userName["firstname"];
-        } else {
-            $deliverFilename .= "_files";
-        }
-        $orgDeliverFilename = trim($deliverFilename);
-        $deliverFilename = ilFileUtils::getASCIIFilename($orgDeliverFilename);
-        ilFileUtils::makeDir($tmpdir . "/" . $deliverFilename);
-        chdir($tmpdir . "/" . $deliverFilename);
-
-        //copy all files to a temporary directory and remove them afterwards
-        $parsed_files = $duplicates = array();
-        foreach ($a_filenames as $storage_id => $files) {
-            $pathname = $path . "/" . $storage_id;
-
-            foreach ($files as $filename) {
-                // peer review masked filenames, see deliverReturnedFiles()
-                if (isset($filename["tgt"])) {
-                    $newFilename = $filename["tgt"];
-                    $filename = $filename["src"];
-                } else {
-                    $late = $filename["late"];
-                    $filename = $filename["src"];
-
-                    // remove timestamp
-                    $newFilename = trim($filename);
-                    $pos = strpos($newFilename, "_");
-                    if ($pos !== false) {
-                        $newFilename = substr($newFilename, $pos + 1);
-                    }
-                    // #11070
-                    $chkName = strtolower($newFilename);
-                    if (array_key_exists($chkName, $duplicates)) {
-                        $suffix = strrpos($newFilename, ".");
-                        $newFilename = substr($newFilename, 0, $suffix) .
-                            " (" . (++$duplicates[$chkName]) . ")" .
-                            substr($newFilename, $suffix);
-                    } else {
-                        $duplicates[$chkName] = 1;
-                    }
-
-                    if ($late) {
-                        $newFilename = $lng->txt("exc_late_submission") . " - " .
-                            $newFilename;
-                    }
-                }
-
-                $newFilename = ilFileUtils::getASCIIFilename($newFilename);
-                $newFilename = $tmpdir . DIRECTORY_SEPARATOR . $deliverFilename . DIRECTORY_SEPARATOR . $newFilename;
-                // copy to temporal directory
-                $oldFilename = $pathname . DIRECTORY_SEPARATOR . $filename;
-                if (!copy($oldFilename, $newFilename)) {
-                    echo 'Could not copy ' . $oldFilename . ' to ' . $newFilename;
-                }
-                touch($newFilename, filectime($oldFilename));
-                $parsed_files[] = ilShellUtil::escapeShellArg(
-                    $deliverFilename . DIRECTORY_SEPARATOR . basename($newFilename)
-                );
-            }
-        }
-
-        chdir($tmpdir);
-        $zipcmd = $zip . " " . ilShellUtil::escapeShellArg($tmpzipfile) . " " . implode(" ", $parsed_files);
-
-        exec($zipcmd);
-        ilFileUtils::delDir($tmpdir);
-
-        chdir($cdir);
-        ilFileDelivery::deliverFileLegacy($tmpzipfile, $orgDeliverFilename . ".zip", "", false, true);
-        exit;
     }
 
     // Get user/team where clause

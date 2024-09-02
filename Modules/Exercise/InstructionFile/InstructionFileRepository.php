@@ -24,6 +24,7 @@ use ILIAS\Exercise\IRSS\IRSSWrapper;
 use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Exercise\IRSS\ResourceInformation;
+use ILIAS\Filesystem\Stream\FileStream;
 
 class InstructionFileRepository
 {
@@ -118,6 +119,19 @@ class InstructionFileRepository
             }
         }
         throw new \ilExerciseException("Resource $file not found.");
+    }
+
+    public function getStream(
+        int $ass_id,
+        string $rid): ?FileStream
+    {
+        /** @var ResourceInformation $info */
+        foreach ($this->getCollectionResourcesInfo($ass_id) as $info) {
+            if ($rid === $info->getRid()) {
+                return $this->wrapper->stream($info->getRid());
+            }
+        }
+        return null;
     }
 
     public function getCollectionResourcesInfo(

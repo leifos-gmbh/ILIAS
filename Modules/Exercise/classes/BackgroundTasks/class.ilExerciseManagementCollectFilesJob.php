@@ -78,6 +78,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
         /** @noinspection PhpUndefinedMethodInspection */
         $this->logger = $DIC->logger()->exc();
         $this->domain = $DIC->exercise()->internal()->domain();
+        $this->crit_file_manager = $this->domain->peerReview()->criteriaFile($this->assignment->getId());
     }
 
     /**
@@ -156,7 +157,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
      * Copy a file in the Feedback_files directory
      * TODO use the new filesystem.
      */
-    public function copyFileToSubDirectory(string $a_directory, string $a_file): void
+    public function copyFileToSubDirectory(string $a_directory, \ILIAS\Exercise\PeerReview\Criteria\CriteriaFile $file): void
     {
         $dir = $this->target_directory . "/" . $a_directory;
 
@@ -164,7 +165,9 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
             ilFileUtils::makeDirParents($dir);
         }
 
-        copy($a_file, $dir . "/" . basename($a_file));
+        $f = fopen($dir . "/" . basename($file->getTitle()), 'wb');
+        fwrite($f, $this->crit_file_manager->getStream($file->getRid())->getContents());
+        fclose($f);
 
         /*global $DIC;
         $fs = $DIC->filesystem();
@@ -363,8 +366,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
                         $extra_crit_column++;
                         $dir = $this->getFeedbackDirectory($participant_id, $feedback_giver);
                         $this->copyFileToSubDirectory($dir, $file);
-                        $this->excel->setCell($row, $col, "./" . $dir . DIRECTORY_SEPARATOR . basename($file));
-                        $this->excel->addLink($row, $col, './' . $dir . DIRECTORY_SEPARATOR . basename($file));
+                        $this->excel->setCell($row, $col, "./" . $dir . DIRECTORY_SEPARATOR . basename($file->getTitle()));
+                        $this->excel->addLink($row, $col, './' . $dir . DIRECTORY_SEPARATOR . basename($file->getTitle()));
                         $this->excel->setColors($this->excel->getCoordByColumnAndRow($col, $row), self::BG_COLOR, self::LINK_COLOR);
                     }
                     break;

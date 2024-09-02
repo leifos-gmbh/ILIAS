@@ -24,6 +24,7 @@ use ILIAS\Exercise\Assignment\Assignment;
 use ILIAS\Exercise\IRSS\ResourceInformation;
 use ILIAS\Exercise\Team\TeamMember;
 use ILIAS\Exercise\Submission\Submission;
+use ILIAS\Exercise\PeerReview\Criteria\CriteriaFile;
 
 /**
  * Internal factory for data objects
@@ -117,6 +118,24 @@ class InternalDataService
             $mimetype,
             $timestamp,
             $late
+        );
+    }
+
+    public function criteriaFile(
+        int $ass_id,
+        int $giver_id,
+        int $peer_id,
+        int $criteria_id,
+        string $rid,
+        string $title
+    ): CriteriaFile {
+        return new CriteriaFile(
+            $ass_id,
+            $giver_id,
+            $peer_id,
+            $criteria_id,
+            $rid,
+            $title
         );
     }
 }

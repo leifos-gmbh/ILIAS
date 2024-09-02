@@ -29,6 +29,7 @@ use ILIAS\Exercise\InstructionFile\InstructionFileManager;
 use ILIAS\Exercise\Team\TeamManager;
 use ILIAS\Exercise\IndividualDeadline\IndividualDeadlineManager;
 use ILIAS\Exercise\Submission\SubmissionManager;
+use ILIAS\Exercise\PeerReview\DomainService;
 
 class InternalDomainService
 {
@@ -79,12 +80,12 @@ class InternalDomainService
             );
     }
 
-    public function peerReview(\ilExAssignment $ass): ?\ilExPeerReview
+    public function peerReview(): DomainService
     {
-        if ($ass->getPeerReview()) {
-            return new \ilExPeerReview($ass);
-        }
-        return null;
+        return new DomainService(
+            $this->repo,
+            $this
+        );
     }
 
     public function notification(int $ref_id): NotificationManager

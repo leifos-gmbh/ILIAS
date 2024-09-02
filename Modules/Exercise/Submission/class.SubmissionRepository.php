@@ -73,7 +73,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         bool $print_versions = false
     ) : \Generator {
         $where = " team_id = " . $this->db->quote($team_id, "integer") . " ";
-        return $this->getSubmissions(
+        yield from $this->getSubmissions(
             $where,
             $ass_id,
             $type_uses_uploads,
@@ -99,7 +99,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         bool $print_versions = false
     ) : \Generator {
         $where = " " . $this->db->in("user_id", $user_ids, false, "integer") . " ";
-        return $this->getSubmissions(
+        yield from $this->getSubmissions(
             $where,
             $ass_id,
             $type_uses_uploads,
@@ -137,7 +137,6 @@ class SubmissionRepository implements SubmissionRepositoryInterface
         }
 
         $result = $this->db->query($sql);
-
         $delivered_files = array();
         while ($row = $this->db->fetchAssoc($result)) {
             // blog/portfolio/text submissions

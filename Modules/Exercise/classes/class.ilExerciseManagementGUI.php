@@ -190,52 +190,6 @@ class ilExerciseManagementGUI
                 $this->ctrl->forwardCommand($gui);
                 break;
 
-                // feedback files LEGACY
-            case "ilfilesystemgui":
-                $ilTabs->clearTargets();
-                $ilTabs->setBackTarget(
-                    $lng->txt("back"),
-                    $ilCtrl->getLinkTarget($this, $this->getViewBack())
-                );
-
-                $this->tpl->setOnScreenMessage('info', $lng->txt("exc_fb_tutor_info"));
-
-                $fstorage = new ilFSStorageExercise($this->exercise->getId(), $this->assignment->getId());
-                $fstorage->create();
-
-                $submission = new ilExSubmission($this->assignment, $this->requested_member_id);
-                $feedback_id = $submission->getFeedbackId();
-                $noti_rec_ids = $submission->getUserIds();
-
-                $fs_title = array();
-                foreach ($noti_rec_ids as $rec_id) {
-                    $fs_title[] = ilUserUtil::getNamePresentation($rec_id, false, false, "", true);
-                }
-                $fs_title = implode(" / ", $fs_title);
-
-                $fs_gui = new ilFileSystemGUI($fstorage->getFeedbackPath($feedback_id));
-                $fs_gui->setTableId("excfbfil" . $this->assignment->getId() . "_" . $feedback_id);
-                $fs_gui->setAllowDirectories(false);
-                $fs_gui->setTitle($lng->txt("exc_fb_files") . " - " .
-                    $this->assignment->getTitle() . " - " .
-                    $fs_title);
-                $pcommand = $fs_gui->getLastPerformedCommand();
-                if (is_array($pcommand) && ($pcommand["cmd"] ?? "") == "create_file") {
-                    foreach ($noti_rec_ids as $user_id) {
-                        $member_status = $this->assignment->getMemberStatus($user_id);
-                        $member_status->setFeedback(true);
-                        $member_status->update();
-                    }
-
-                    $this->notification->sendFeedbackNotification(
-                        $this->assignment->getId(),
-                        $noti_rec_ids,
-                        $pcommand["name"] ?? ""
-                    );
-                }
-                $this->ctrl->forwardCommand($fs_gui);
-                break;
-
             case 'ilrepositorysearchgui':
                 $rep_search = new ilRepositorySearchGUI();
                 $ref_id = $this->exercise->getRefId();
@@ -623,14 +577,15 @@ class ilExerciseManagementGUI
         $members_filter = new ilExerciseMembersFilter($this->exercise->getRefId(), $members, $this->user->getId());
         $members = $members_filter->filterParticipantsByAccess();
 
-        foreach (ilExSubmission::getAssignmentFilesByUsers($this->exercise->getId(), $this->assignment->getId(), $members) as $file) {
-            if (trim($file["atext"]) && ilObjUser::_exists($file["user_id"])) {
+        $sm = $this->domain->submission($this->assignment->getId());
+        foreach ($sm->getSubmissionsOfOwners($members) as $sub) {
+            if (trim($sub->getText()) && $this->domain->profile()->exists($sub->getUserId())) {
                 $feedback_data = $this->collectFeedbackDataFromPeer(
-                    $file["user_id"],
-                    $file["ts"],
-                    $file["atext"]
+                    $sub->getUserId(),
+                    $sub->getTimestamp(),
+                    $sub->getText()
                 );
-                $submission_data = $this->assignment->getExerciseMemberAssignmentData((int) $file["user_id"], $this->filter["status"] ?? "");
+                $submission_data = $this->assignment->getExerciseMemberAssignmentData($sub->getUserId(), $this->filter["status"] ?? "");
 
                 if (is_array($submission_data)) {
                     $data = array_merge($feedback_data, $submission_data);

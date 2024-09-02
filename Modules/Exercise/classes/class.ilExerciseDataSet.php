@@ -683,9 +683,6 @@ class ilExerciseDataSet extends ilDataSet
 
                     $ass->save();
 
-                    $fstorage = new ilFSStorageExercise($exc_id, $ass->getId());
-                    $fstorage->create();
-
                     // instruction files
                     $dir = str_replace("..", "", ($a_rec["InstructionCollection"] ?? ""));
                     if ($dir != "" && $this->getImportDirectory() != "") {
@@ -702,14 +699,6 @@ class ilExerciseDataSet extends ilDataSet
                             $if = $this->ass_domain->instructionFiles($ass->getId());
                             $if->importFromDirectory($this->getImportDirectory() . "/" . $dir);
                         }
-                    }
-
-                    // (4.4) global feedback file
-                    $dir = str_replace("..", "", $a_rec["FeedbackDir"]);
-                    if ($dir != "" && $this->getImportDirectory() != "") {
-                        $source_dir = $this->getImportDirectory() . "/" . $dir;
-                        $target_dir = $fstorage->getGlobalFeedbackPath();
-                        ilFileUtils::rCopy($source_dir, $target_dir);
                     }
 
                     // 5.4 Team wiki assignment AR

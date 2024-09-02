@@ -359,47 +359,6 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
     }
 
 
-    /**
-     * Upload files
-     */
-    public function uploadFileObject(): void
-    {
-        $ilCtrl = $this->ctrl;
-
-        // #15322
-        if (!$this->submission->canSubmit()) {
-            $this->tpl->setOnScreenMessage('info', $this->lng->txt("exercise_time_over"), true);
-        } else {
-            $form = $this->initUploadForm();
-            if (!$form->checkInput()) {
-                $this->uploadFormObject($form);
-                return;
-            }
-
-            $success = false;
-            foreach ($_FILES["deliver"]["name"] as $k => $v) {
-                $file = array(
-                    "name" => $_FILES["deliver"]["name"][$k],
-                    "type" => $_FILES["deliver"]["type"][$k],
-                    "tmp_name" => $_FILES["deliver"]["tmp_name"][$k],
-                    "error" => $_FILES["deliver"]["error"][$k],
-                    "size" => $_FILES["deliver"]["size"][$k],
-                    );
-                if (!$this->submission->uploadFile($file)) {
-                    $this->tpl->setOnScreenMessage('failure', $this->lng->txt("exc_upload_error") . " [Single File]", true);
-                } else {
-                    $success = true;
-                }
-            }
-
-            if ($success) {
-                $this->tpl->setOnScreenMessage('success', $this->lng->txt("file_added"), true);
-                $this->handleNewUpload();
-            }
-        }
-
-        $ilCtrl->redirect($this, "submissionScreen");
-    }
 
     protected function handleZipUploadResult(
         \ILIAS\FileUpload\FileUpload $upload,
@@ -422,34 +381,6 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
             ''
         );
     }
-
-    /**
-     * Upload zip file
-     */
-    /*public function uploadZipObject(): void
-    {
-        $ilCtrl = $this->ctrl;
-
-        // #15322
-        if (!$this->submission->canSubmit()) {
-            $this->tpl->setOnScreenMessage('info', $this->lng->txt("exercise_time_over"), true);
-        } else {
-            $form = $this->initZipUploadForm();
-            if (!$form->checkInput()) {
-                $this->uploadZipFormObject($form);
-                return;
-            }
-
-            if (preg_match("/zip/", $_FILES["deliver"]["type"]) == 1) {
-                if ($this->submission->processUploadedZipFile($_FILES["deliver"]["tmp_name"])) {
-                    $this->tpl->setOnScreenMessage('success', $this->lng->txt("file_added"), true);
-                    $this->handleNewUpload();
-                }
-            }
-        }
-
-        $ilCtrl->redirect($this, "submissionScreen");
-    }*/
 
     /**
      * Confirm deletion of delivered files

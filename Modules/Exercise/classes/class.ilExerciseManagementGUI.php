@@ -31,7 +31,7 @@ use ILIAS\FileUpload\DTO\UploadResult;
 use ILIAS\FileUpload\Handler\BasicHandlerResult;
 
 /**
- * @ilCtrl_Calls ilExerciseManagementGUI: ilFileSystemGUI, ilRepositorySearchGUI
+ * @ilCtrl_Calls ilExerciseManagementGUI: ilRepositorySearchGUI
  * @ilCtrl_Calls ilExerciseManagementGUI: ilExSubmissionTeamGUI, ilExSubmissionFileGUI
  * @ilCtrl_Calls ilExerciseManagementGUI: ilExSubmissionTextGUI, ilExPeerReviewGUI
  * @ilCtrl_Calls ilExerciseManagementGUI: ilParticipantsPerAssignmentTableGUI

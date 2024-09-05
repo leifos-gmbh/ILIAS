@@ -26,7 +26,7 @@ use ILIAS\Services\ResourceStorage\Collections\View\Mode;
  *
  * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
  *
- * @ilCtrl_Calls ilExAssignmentEditorGUI: ilExAssignmentFileSystemGUI, ilExPeerReviewGUI, ilPropertyFormGUI
+ * @ilCtrl_Calls ilExAssignmentEditorGUI: ilExPeerReviewGUI, ilPropertyFormGUI
  * @ilCtrl_Calls ilExAssignmentEditorGUI: ilResourceCollectionGUI
  */
 class ilExAssignmentEditorGUI

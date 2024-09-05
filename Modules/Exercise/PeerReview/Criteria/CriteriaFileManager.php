@@ -55,7 +55,7 @@ class CriteriaFileManager
         int $giver_id,
         int $peer_id,
         int $citeria_id
-    ) : CriteriaFile
+    ) : ?CriteriaFile
     {
         return $this->repo->getFile(
             $this->ass_id,

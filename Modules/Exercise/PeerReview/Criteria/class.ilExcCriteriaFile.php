@@ -26,7 +26,7 @@ use ILIAS\Exercise\PeerReview\Criteria\CriteriaFileManager;
  */
 class ilExcCriteriaFile extends ilExcCriteria
 {
-    protected CriteriaFileManager $file_manager;
+    protected \ILIAS\Exercise\PeerReview\DomainService $peer_review;
     protected string $requested_file_hash = "";
 
     public function __construct()
@@ -38,10 +38,10 @@ class ilExcCriteriaFile extends ilExcCriteria
 
         $request = $DIC->exercise()->internal()->gui()->request();
         $this->requested_file_hash = $request->getFileHash();
-        $this->file_manager = $DIC->exercise()->internal()->domain()->peerReview()->criteriaFile($this->ass->getId());
+        $this->peer_review = $DIC->exercise()->internal()->domain()->peerReview();
     }
 
-    public function getType(): string
+    public function getType() : string
     {
         return "file";
     }
@@ -49,22 +49,24 @@ class ilExcCriteriaFile extends ilExcCriteria
     /**
      * @return \ILIAS\Exercise\PeerReview\Criteria\CriteriaFile[]
      */
-    public function getFiles(): array
+    public function getFiles() : array
     {
-        return [$this->file_manager->getFile($this->ass->getId(), $this->giver_id, $this->peer_id, $this->getId())];
+        $file_manager = $this->peer_review->criteriaFile($this->ass->getId());
+        $file = $file_manager->getFile($this->giver_id, $this->peer_id, $this->getId());
+        $files = $file ? [$file]
+            : [];
+        return $files;
     }
 
-
-    public function resetReview(): void
+    public function resetReview() : void
     {
-        $storage = new ilFSStorageExercise($this->ass->getExerciseId(), $this->ass->getId());
-        $storage->deleteDirectory($storage->getPeerReviewUploadPath($this->peer_id, $this->giver_id, $this->getId()));
+        $this->peer_review->criteriaFile($this->ass->getId())
+            ->delete($this->giver_id, $this->peer_id, $this->getId());
     }
-
 
     // PEER REVIEW
 
-    public function addToPeerReviewForm($a_value = null): void
+    public function addToPeerReviewForm($a_value = null) : void
     {
         $existing = array();
         foreach ($this->getFiles() as $file) {
@@ -81,18 +83,18 @@ class ilExcCriteriaFile extends ilExcCriteria
     /**
      * @throws ilException
      */
-    public function importFromPeerReviewForm(): void
+    public function importFromPeerReviewForm() : void
     {
+        $file_manager = $this->peer_review->criteriaFile($this->ass->getId());
         if ($this->form->getItemByPostVar("prccc_file_" . $this->getId())->getDeletionFlag()) {
-            $this->file_manager->delete($this->giver_id, $this->peer_id, $this->getId());
+            $file_manager->delete($this->giver_id, $this->peer_id, $this->getId());
             $this->form->getItemByPostVar("prccc_file_" . $this->getId())->setValue("");
         }
 
         $incoming = $_FILES["prccc_file_" . $this->getId()];
         if ($incoming["tmp_name"]) {
             $org_name = basename($incoming["name"]);
-
-            $this->file_manager->addFromLegacyUpload(
+            $file_manager->addFromLegacyUpload(
                 $incoming,
                 $this->giver_id,
                 $this->peer_id,
@@ -101,12 +103,12 @@ class ilExcCriteriaFile extends ilExcCriteria
         }
     }
 
-    public function hasValue($a_value): bool
+    public function hasValue($a_value) : bool
     {
         return count($this->getFiles()) > 0;
     }
 
-    public function validate($a_value): bool
+    public function validate($a_value) : bool
     {
         $lng = $this->lng;
 
@@ -138,13 +140,14 @@ class ilExcCriteriaFile extends ilExcCriteria
         return false;
     }
 
-    public function getHTML($a_value): string
+    public function getHTML($a_value) : string
     {
         $ilCtrl = $this->ctrl;
 
         $crit_id = $this->getId()
             ?: "file";
-        $ilCtrl->setParameterByClass("ilExPeerReviewGUI", "fu", $this->giver_id . "__" . $this->peer_id . "__" . $crit_id);
+        $ilCtrl->setParameterByClass("ilExPeerReviewGUI", "fu",
+            $this->giver_id . "__" . $this->peer_id . "__" . $crit_id);
 
         $files = array();
         foreach ($this->getFiles() as $file) {

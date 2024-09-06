@@ -52,7 +52,7 @@ class ilExercisePeerFeedbackMigration implements Migration
     {
         $db = $this->helper->getDatabase();
         $r = $db->query(
-            "SELECT pe.ass_id, pe.giver_id, pe.ass_id, pe.peer_id, od.owner FROM exc_assignment_peer pe JOIN ex_assignment ass ON pe.ass_id = ass.id JOIN object_data od ON ass.exc_id = od.obj_id WHERE pe.migrated = 0 LIMIT 1;"
+            "SELECT pe.ass_id, pe.giver_id, pe.ass_id, pe.peer_id, od.owner, od.obj_id FROM exc_assignment_peer pe JOIN exc_assignment ass ON pe.ass_id = ass.id JOIN object_data od ON ass.exc_id = od.obj_id WHERE pe.migrated = 0 LIMIT 1;"
         );
         $d = $this->helper->getDatabase()->fetchObject($r);
         $exec_id = (int)$d->obj_id;
@@ -78,13 +78,15 @@ class ilExercisePeerFeedbackMigration implements Migration
                                     $pattern,
                                     $resource_owner_id
                                 );
-                                $db->insert("exc_crit_file", [
-                                    "ass_id" => ["integer", $assignment_id],
-                                    "giver_id" => ["integer", $giver_id],
-                                    "peer_id" => ["integer", $peer_id],
-                                    "criteria_id" => ["integer", $crit_id],
-                                    "rid" => ["text", $rid]
-                                ]);
+                                if (!is_null($rid)) {
+                                    $db->insert("exc_crit_file", [
+                                        "ass_id" => ["integer", $assignment_id],
+                                        "giver_id" => ["integer", $giver_id],
+                                        "peer_id" => ["integer", $peer_id],
+                                        "criteria_id" => ["integer", $crit_id],
+                                        "rid" => ["text", $rid]
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -109,7 +111,7 @@ class ilExercisePeerFeedbackMigration implements Migration
     public function getRemainingAmountOfSteps(): int
     {
         $r = $this->helper->getDatabase()->query(
-            "SELECT count(pe.id) as amount FROM exc_assignment_peer pe JOIN ex_assignment ass ON pe.ass_id = ass.id JOIN object_data od ON ass.exc_id = od.obj_id WHERE pe.migrated = 0"
+            "SELECT count(pe.id) as amount FROM exc_assignment_peer pe JOIN exc_assignment ass ON pe.ass_id = ass.id JOIN object_data od ON ass.exc_id = od.obj_id WHERE pe.migrated = 0"
         );
         $d = $this->helper->getDatabase()->fetchObject($r);
 

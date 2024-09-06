@@ -302,4 +302,9 @@ class ilExerciseDBUpdateSteps implements \ilDatabaseUpdateSteps
         }
     }
 
+    public function step_20(): void
+    {
+        $this->db->manipulate("UPDATE exc_returned SET rid = NULL WHERE rid = " . $this->db->quote("", "text"));
+    }
+
 }

@@ -307,4 +307,20 @@ class ilExerciseDBUpdateSteps implements \ilDatabaseUpdateSteps
         $this->db->manipulate("UPDATE exc_returned SET rid = NULL WHERE rid = " . $this->db->quote("", "text"));
     }
 
+    public function step_21(): void
+    {
+        if (!$this->db->tableColumnExists('exc_assignment_peer', 'migrated')) {
+            $this->db->addTableColumn(
+                'exc_assignment_peer',
+                'migrated',
+                [
+                    'type' => 'integer',
+                    'notnull' => true,
+                    'length' => 1,
+                    'default' => 0
+                ]
+            );
+        }
+    }
+
 }

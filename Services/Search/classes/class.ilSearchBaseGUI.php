@@ -457,4 +457,19 @@ class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandH
         $this->search_filter = new ilSearchFilterGUI($this, $mode);
         $this->search_filter_data = $this->search_filter->getData();
     }
+
+    protected function getStringArrayTransformation(): ILIAS\Refinery\Transformation
+    {
+        return $this->refinery->custom()->transformation(
+            static function (array $arr): array {
+                // keep keys(!), transform all values to string
+                return array_map(
+                    static function ($v): string {
+                        return \ilUtil::stripSlashes((string) $v);
+                    },
+                    $arr
+                );
+            }
+        );
+    }
 }

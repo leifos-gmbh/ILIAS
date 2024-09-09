@@ -76,7 +76,7 @@ class ilSearchFilterGUI
 
         $this->filter = $this->filter_service->standard(
             "search_filter",
-            $DIC->ctrl()->getLinkTarget($parent_gui, "performSearch"),
+            $DIC->ctrl()->getLinkTarget($parent_gui, "performSearchFilter"),
             $inputs,
             $inputs_activated,
             false,

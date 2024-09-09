@@ -70,6 +70,7 @@ class ilSearchGUI extends ilSearchBaseGUI
             $requested_cmd = [];
         }
         $new_search = (bool) ($requested_cmd["performSearch"] ?? false);
+        $new_filter = (bool) ($requested_cmd["performSearchFilter"] ?? false);
 
         $requested_filter_type = (array) ($this->search_filter_data["search_type"] ?? []);
         $requested_filter_type = array_flip($requested_filter_type);
@@ -94,7 +95,7 @@ class ilSearchGUI extends ilSearchBaseGUI
             : self::SEARCH_DETAILS;
         $filter_scope = $this->search_filter_data["search_scope"] ?? ROOT_FOLDER_ID;
 
-        if ($new_search) {
+        if ($new_filter) {
             ilSession::set('search_root', $filter_scope);
         }
 
@@ -334,10 +335,15 @@ class ilSearchGUI extends ilSearchBaseGUI
         }
     }
 
+    public function performSearchFilter(): void
+    {
+        $this->performSearch();
+    }
+
     /**
      * Perform search
      */
-    public function performSearch(): bool
+    public function performSearch(): void
     {
         $page_number = $this->initPageNumberFromQuery();
         if (!$page_number and $this->search_mode != 'in_results') {
@@ -348,7 +354,7 @@ class ilSearchGUI extends ilSearchBaseGUI
         if ($this->getType() == self::SEARCH_DETAILS and !$this->getDetails()) {
             $this->tpl->setOnScreenMessage('info', $this->lng->txt('search_choose_object_type'));
             $this->showSearch();
-            return false;
+            return;
         }
 
         // Step 1: parse query string
@@ -356,7 +362,7 @@ class ilSearchGUI extends ilSearchBaseGUI
             $this->tpl->setOnScreenMessage('info', $query_parser);
             $this->showSearch();
 
-            return false;
+            return;
         }
         // Step 2: perform object search. Get an ObjectSearch object via factory. Depends on fulltext or like search type.
         $result = $this->__searchObjects($query_parser);
@@ -417,7 +423,6 @@ class ilSearchGUI extends ilSearchBaseGUI
         if ($presentation->render()) {
             $this->tpl->setVariable('SEARCH_RESULTS', $presentation->getHTML());
         }
-        return true;
     }
 
 
@@ -688,20 +693,5 @@ class ilSearchGUI extends ilSearchBaseGUI
             }
         }
         return $filter;
-    }
-
-    protected function getStringArrayTransformation(): ILIAS\Refinery\Transformation
-    {
-        return $this->refinery->custom()->transformation(
-            static function (array $arr): array {
-                // keep keys(!), transform all values to string
-                return array_map(
-                    static function ($v): string {
-                        return \ilUtil::stripSlashes((string) $v);
-                    },
-                    $arr
-                );
-            }
-        );
     }
 }

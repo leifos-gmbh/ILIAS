@@ -210,6 +210,11 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
         $this->performSearch();
     }
 
+    protected function performSearchFilter(): void
+    {
+        $this->performSearch();
+    }
+
     /**
      * Perform search
      */
@@ -329,12 +334,25 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
         $this->search_cache->switchSearchType(ilUserSearchCache::LUCENE_DEFAULT);
         $page_number = $this->initPageNumberFromQuery();
 
+        if ($this->http->wrapper()->post()->has('cmd')) {
+            $requested_cmd = (array) $this->http->wrapper()->post()->retrieve('cmd', $this->getStringArrayTransformation());
+        } elseif ($this->http->wrapper()->query()->has('cmd')) {
+            $requested_cmd = (array) $this->http->wrapper()->query()->retrieve(
+                'cmd',
+                $this->refinery->kindlyTo()->string()
+            );
+            $requested_cmd = [$requested_cmd[0] => "Search"];
+        } else {
+            $requested_cmd = [];
+        }
+        $new_search = (bool) ($requested_cmd["performSearch"] ?? false);
+        $new_filter = (bool) ($requested_cmd["performSearchFilter"] ?? false);
+
         if ($this->http->wrapper()->post()->has('root_id')) {
             $filter_scope = $this->http->wrapper()->post()->retrieve(
                 'root_id',
                 $this->refinery->kindlyTo()->int()
             );
-            $this->search_filter_data["search_scope"] = $filter_scope;
         } else {
             $filter_scope = (int) ($this->search_filter_data["search_scope"] ?? ROOT_FOLDER_ID);
         }
@@ -388,7 +406,9 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
             $this->search_cache->setCreationFilter([]);
         }
 
-        $this->search_cache->setRoot($filter_scope);
+        if ($new_filter) {
+            $this->search_cache->setRoot($filter_scope);
+        }
     }
 
     /**

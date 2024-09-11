@@ -532,7 +532,10 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
         if ($a_mode === "auto") {
             $mode = $this->lng->txt("cont_cach_mode_automatic");
             $groups = null;
-        } else {
+        }
+        // begin-abandon ch_groups
+        /*
+        else {
             $mode = $this->lng->txt("cont_cach_mode_manual");
 
             $groups = array();
@@ -541,6 +544,8 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
             }
             $groups = " (" . implode(", ", $groups) . ")";
         }
+        */
+        // end-abandon ch_groups
 
         $this->lng->loadLanguageModule("dateplaner");
         return $this->renderTeaser(
@@ -604,7 +609,7 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
         $month_gui->setConsulationHoursUserId($user_id);
 
         // custom schedule filter: handle booking group ids
-        $filter = new ilCalendarScheduleFilterBookings($user_id, $a_group_ids);
+        $filter = new ilCalendarScheduleFilterBookings($user_id);
         $month_gui->addScheduleFilter($filter);
 
         $this->tpl->addCss(ilUtil::getStyleSheetLocation('filesystem', 'delos.css'));

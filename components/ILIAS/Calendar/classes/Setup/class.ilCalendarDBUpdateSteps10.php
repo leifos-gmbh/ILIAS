@@ -1,7 +1,4 @@
 <?php
-
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,21 +15,17 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-use ILIAS\Setup;
-use ILIAS\Setup\Config;
+declare(strict_types=1);
 
 /**
  * @author  Tim Schmitz <schmitz@leifos.de>
  */
-class ilCalendarSetupAgent extends Setup\Agent\NullAgent
+class ilCalendarDBUpdateSteps10 implements ilDatabaseUpdateSteps
 {
-    public function getUpdateObjective(Setup\Config $config = null): Setup\Objective
-    {
-        return new ilDatabaseUpdateStepsExecutedObjective(new ilCalendarDBUpdateSteps10());
-    }
+    protected \ilDBInterface $db;
 
-    public function getStatusObjective(Setup\Metrics\Storage $storage): Setup\Objective
+    public function prepare(\ilDBInterface $db): void
     {
-        return new ilDatabaseUpdateStepsMetricsCollectedObjective($storage, new ilCalendarDBUpdateSteps10());
+        $this->db = $db;
     }
 }

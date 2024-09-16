@@ -1348,6 +1348,14 @@ class ilObjStyleSheet extends ilObject
     ): void {
         $style = $this->getStyle();
 
+
+        $this->domain->cssBuilder($this)->getCss();
+        $this->setUpToDate();
+        $this->_writeUpToDate($this->getId(), true);
+
+
+        return;
+
         if (!is_dir(ilFileUtils::getWebspaceDir() . "/css")) {
             ilFileUtils::makeDirParents(ilFileUtils::getWebspaceDir() . "/css");
         }

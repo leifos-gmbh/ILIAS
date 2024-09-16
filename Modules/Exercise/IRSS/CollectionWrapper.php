@@ -295,4 +295,19 @@ class CollectionWrapper
             $this->irss->collection()->store($target_collection);
         }
     }
+
+    public function ()
+    {
+        $empty_zip = $this->archives->zip(
+            []
+        );
+
+        $rid = $this->irss->manageContainer()->containerFromStream(
+            $empty_zip->get(),
+            new ilHTLMStakeholder(),
+            $this->getTitle()
+        );
+        $this->setRID($rid->serialize());
+
+    }
 }

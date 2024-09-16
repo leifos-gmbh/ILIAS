@@ -26,6 +26,7 @@ use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\Style\Content\Container\ContainerManager;
 use ILIAS\Style\Content\Object\ObjectManager;
 use ilRbacSystem;
+use ILIAS\Style\Content\Style\CSSBuilder;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -129,4 +130,17 @@ class InternalDomainService
         }
         return $this->log;
     }
+
+
+    public function cssBuilder(
+        \ilObjStyleSheet $style,
+        string $image_dir = ""
+    ): CSSBuilder
+    {
+        return new CSSBuilder(
+            $style,
+            $image_dir
+        );
+    }
+
 }

@@ -31,12 +31,14 @@ use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\Filesystem\Util\LegacyPathHelper;
 use ILIAS\DI\Exceptions\Exception;
 use ILIAS\Filesystem\Stream\Stream;
+use ILIAS\Filesystem\Util\Archive\Archives;
 
 class IRSSWrapper
 {
     protected InternalDataService $data;
     protected \ILIAS\FileUpload\FileUpload $upload;
     protected \ILIAS\ResourceStorage\Services $irss;
+    protected Archives $archives;
 
     public function __construct(
         InternalDataService $data
@@ -44,6 +46,7 @@ class IRSSWrapper
         global $DIC;
 
         $this->irss = $DIC->resourceStorage();
+        $this->archives = $DIC->archives();
         $this->upload = $DIC->upload();
         $this->data = $data;
     }
@@ -390,5 +393,39 @@ class IRSSWrapper
             yield $stream;
         }
     }
+
+    public function createContainer(
+        ResourceStakeholder $stakeholder
+    ) : string
+    {
+        $empty_zip = $this->archives->zip(
+            []
+        );
+        $rid = $this->irss->manageContainer()->containerFromStream(
+            $empty_zip->get(),
+            $stakeholder
+        );
+        return $rid->serialize();
+    }
+
+    public function addStringToContainer(
+        string $rid,
+        string $content,
+        string $path,
+        ResourceStakeholder $stakeholder
+    ) : void
+    {
+        $id = $this->getResourceIdForIdString($rid);
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $content);
+        rewind($stream);
+        $fs = new Stream($stream);
+        $this->irss->manageContainer()->addStreamToContainer(
+            $id,
+            $fs,
+            $path
+        );
+    }
+
 
 }

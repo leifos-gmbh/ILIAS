@@ -27,21 +27,28 @@ interface RepositoryInterface
 {
     /**
      * Returns ID of the created vocabulary
+     * @throws \ilMDVocabulariesException if the values are invalid (in which case nothing is persisted)
      */
     public function create(
         PathInterface $path_to_element,
         ?PathInterface $path_to_condition,
         ?string $condition_value,
-        string $source,
-        string ...$values
-    ): int;
+        string $source
+    ): string;
 
-    public function setLabelForValue(
-        PathInterface $path_to_element,
-        string $source,
+    public function addValueToVocabulary(
+        string $vocab_id,
         string $value,
-        string $label
+        ?string $label
     ): void;
+
+    /**
+     * @return string[]
+     */
+    public function findAlreadyExistingValues(
+        PathInterface $path_to_element,
+        string ...$values
+    ): \Generator;
 
     /**
      * @return VocabularyInterface[]
@@ -58,24 +65,22 @@ interface RepositoryInterface
     public function isCustomInputAllowedForElement(PathInterface $path_to_element): bool;
 
     /**
-     * Should return a LabelledValue object. Are
-     * values (at least those with a label) really unique across
-     * all controlled vocabularies of an element?
+     * Values without labels are not returned at all.
      */
     public function getLabelsForValues(
         PathInterface $path_to_element,
         string ...$values
-    ): \Generator;
+    ): LabelledValuesInterface;
 
     public function setActiveForVocabulary(
-        int $vocab_id,
+        string $vocab_id,
         bool $active
     ): void;
 
     public function setCustomInputsAllowedForVocabulary(
-        int $vocab_id,
+        string $vocab_id,
         bool $custom_inputs
     ): void;
 
-    public function deleteVocabulary(int $vocab_id): void;
+    public function deleteVocabulary(string $vocab_id): void;
 }

@@ -18,9 +18,11 @@
 
 declare(strict_types=1);
 
+namespace ILIAS\MetaData\Settings\Vocabularies\Import;
+
 use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledVocabsRepository;
 
-class ilMDVocabularyImportResult
+class Result
 {
     /**
      * @var string[]

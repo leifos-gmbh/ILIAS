@@ -18,22 +18,19 @@
 
 declare(strict_types=1);
 
-use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledVocabsRepository;
+namespace ILIAS\MetaData\Vocabularies\Controlled;
 
-class ilMDVocabulariesImporter
+interface LabelledValuesInterface
 {
-    protected ilLanguage $lng;
-    protected ControlledVocabsRepository $vocab_repo;
+    public function labelForValue(string $value): string;
 
-    public function __construct(
-        ilLanguage $lng,
-        ControlledVocabsRepository $vocab_repo
-    ) {
-        $this->lng = $lng;
-        $this->vocab_repo = $vocab_repo;
-    }
+    /**
+     * @return string[]
+     */
+    public function values(): \Generator;
 
-    public function import(SimpleXMLElement $xml): ilMDVocabularyImportResult
-    {
-    }
+    /**
+     * @return string[]
+     */
+    public function labels(): \Generator;
 }

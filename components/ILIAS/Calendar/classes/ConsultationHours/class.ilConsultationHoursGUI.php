@@ -721,6 +721,11 @@ class ilConsultationHoursGUI
             $this->ctrl->getLinkTarget($this, 'appointmentList')
         );
         $this->tabs->addSubTab(
+            'cal_ch_app_list_new',
+            'Sprechstundenbuchungen',
+            $this->ctrl->getLinkTarget($this, 'appointments')
+        );
+        $this->tabs->addSubTab(
             'cal_ch_app_bookings',
             $this->lng->txt('cal_ch_app_bookings'),
             $this->ctrl->getLinkTarget($this, 'bookingList')
@@ -1033,5 +1038,10 @@ class ilConsultationHoursGUI
                 return;
             }
         }
+    }
+
+    protected function appointments(): void
+    {
+
     }
 }

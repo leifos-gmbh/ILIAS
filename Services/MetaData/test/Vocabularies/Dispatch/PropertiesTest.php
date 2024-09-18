@@ -18,15 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies;
+namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
-interface FactoryInterface
+use PHPUnit\Framework\TestCase;
+
+class PropertiesTest extends TestCase
 {
-    public function standard(string ...$values): BuilderInterface;
-
-    public function controlledString(string $id, string $source, string ...$values): BuilderInterface;
-
-    public function controlledVocabValue(string $id, string $source, string ...$values): BuilderInterface;
-
-    public function copyright(string ...$values): BuilderInterface;
 }

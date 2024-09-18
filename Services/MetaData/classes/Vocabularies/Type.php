@@ -20,13 +20,10 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies;
 
-interface FactoryInterface
+enum Type: string
 {
-    public function standard(string ...$values): BuilderInterface;
-
-    public function controlledString(string $id, string $source, string ...$values): BuilderInterface;
-
-    public function controlledVocabValue(string $id, string $source, string ...$values): BuilderInterface;
-
-    public function copyright(string ...$values): BuilderInterface;
+    case STANDARD = 'standard';
+    case CONTROLLED_STRING = 'controlled string';
+    case CONTROLLED_VOCAB_VALUE = 'controlled vocab value';
+    case COPYRIGHT = 'copyright';
 }

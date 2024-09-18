@@ -24,6 +24,8 @@ use ILIAS\MetaData\Vocabularies\Conditions\ConditionInterface;
 
 class Vocabulary implements VocabularyInterface
 {
+    protected Type $type;
+    protected string $id;
     protected string $source;
     protected bool $is_active;
     protected bool $allows_custom_inputs;
@@ -35,17 +37,31 @@ class Vocabulary implements VocabularyInterface
     protected ?ConditionInterface $condition;
 
     public function __construct(
+        Type $type,
+        string $id,
         string $source,
         ?ConditionInterface $condition = null,
         bool $is_active = true,
         bool $allows_custom_inputs = false,
         string ...$values
     ) {
+        $this->type = $type;
+        $this->id = $id;
         $this->source = $source;
         $this->values = $values;
         $this->condition = $condition;
         $this->is_active = $is_active;
         $this->allows_custom_inputs = $allows_custom_inputs;
+    }
+
+    public function type(): Type
+    {
+        return $this->type;
+    }
+
+    public function id(): string
+    {
+        return $this->id;
     }
 
     public function source(): string

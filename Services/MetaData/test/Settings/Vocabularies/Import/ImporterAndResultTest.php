@@ -124,6 +124,21 @@ class ImporterAndResultTest extends TestCase
         };
     }
 
+    public function testImportMalformedXMLError(): void
+    {
+        $repo = $this->getRepo();
+        $importer = new Importer($this->getPathFactory(), $repo);
+
+        $xml_string = 'asbduafduhsbdjfbsjfbjdbgfd532t7hubfjxd';
+
+        $result = $importer->import($xml_string);
+
+        $this->assertFalse($result->wasSuccessful());
+        $this->assertNotEmpty($result->getErrors());
+        $this->assertEmpty($repo->created_vocabs);
+        $this->assertEmpty($repo->created_values);
+    }
+
     public function testImportInvalidXMLStructureError(): void
     {
         $repo = $this->getRepo();

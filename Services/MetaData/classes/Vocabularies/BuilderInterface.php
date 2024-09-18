@@ -29,5 +29,9 @@ interface BuilderInterface
         PathInterface $path
     ): BuilderInterface;
 
+    public function withIsDeactivated(bool $deactivated): BuilderInterface;
+
+    public function withDisallowsCustomInputs(bool $no_custom_inputs): BuilderInterface;
+
     public function get(): VocabularyInterface;
 }

@@ -18,12 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Copyright;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Structure\Dictionaries\Tags\TagInterface as BaseTagInterface;
+use ILIAS\MetaData\Elements\Base\BaseElementInterface;
 
-interface TagInterface extends BaseTagInterface
+interface BridgeInterface
 {
-    public function vocabulary(): VocabularyInterface;
+    public function vocabularyForElement(
+        BaseElementInterface $element
+    ): ?VocabularyInterface;
 }

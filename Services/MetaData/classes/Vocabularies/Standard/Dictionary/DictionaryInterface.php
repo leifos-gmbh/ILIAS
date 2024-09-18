@@ -18,15 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies;
+namespace ILIAS\MetaData\Vocabularies\Standard\Dictionary;
 
-interface FactoryInterface
+use ILIAS\MetaData\Elements\Base\BaseElementInterface;
+
+interface DictionaryInterface
 {
-    public function standard(string ...$values): BuilderInterface;
-
-    public function controlledString(string $id, string $source, string ...$values): BuilderInterface;
-
-    public function controlledVocabValue(string $id, string $source, string ...$values): BuilderInterface;
-
-    public function copyright(string ...$values): BuilderInterface;
+    /**
+     * @return TagInterface[]
+     */
+    public function tagsForElement(
+        BaseElementInterface $element
+    ): \Generator;
 }

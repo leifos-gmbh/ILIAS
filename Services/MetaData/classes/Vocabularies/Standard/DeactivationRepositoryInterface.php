@@ -18,25 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Standard;
 
-use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Structure\Dictionaries\Tags\Tag as BaseTag;
+use ILIAS\MetaData\Elements\Base\BaseElementInterface;
 
-class Tag extends BaseTag implements TagInterface
+interface DeactivationRepositoryInterface
 {
-    protected VocabularyInterface $vocabulary;
+    public function deactivateStandardVocabulary(BaseElementInterface $element): void;
 
-    public function __construct(
-        VocabularyInterface $vocabulary,
-        int ...$indices
-    ) {
-        $this->vocabulary = $vocabulary;
-        parent::__construct(...$indices);
-    }
-
-    public function vocabulary(): VocabularyInterface
-    {
-        return $this->vocabulary;
-    }
+    public function isStandardVocabularyDeactivated(BaseElementInterface $element): bool;
 }

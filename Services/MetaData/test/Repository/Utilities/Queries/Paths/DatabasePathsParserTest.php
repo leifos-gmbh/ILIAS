@@ -31,7 +31,7 @@ use ILIAS\MetaData\Paths\Steps\StepInterface;
 use ILIAS\MetaData\Elements\Data\Type as DataType;
 use ILIAS\MetaData\Paths\Filters\FilterType;
 use ILIAS\MetaData\Repository\Dictionary\NullTag;
-use ILIAS\MetaData\Vocabularies\Dictionary\LOMDictionaryInitiator as LOMVocabInitiator;
+use ILIAS\MetaData\Vocabularies\Factory as LOMVocabInitiator;
 use ILIAS\MetaData\Paths\Steps\StepToken;
 use ILIAS\MetaData\Paths\Filters\FilterInterface as PathFilter;
 use ILIAS\MetaData\Paths\Filters\NullFilter as NullPathFilter;
@@ -360,7 +360,7 @@ class DatabasePathsParserTest extends TestCase
         ));
 
         $this->assertSame(
-            '~text:' . LOMVocabInitiator::SOURCE . '~',
+            '~text:' . LOMVocabInitiator::STANDARD_SOURCE . '~',
             $data_column
         );
         $this->assertSame(
@@ -606,7 +606,7 @@ class DatabasePathsParserTest extends TestCase
             'SELECT p1t1.rbac_id, p1t1.obj_id, p1t1.obj_type ' . 'FROM ' .
             '~identifier:table1_name~ AS ~identifier:p1t1~ JOIN ' .
             '~identifier:table2_name~ AS ~identifier:p1t2~ ON ' .
-            '~text:' . LOMVocabInitiator::SOURCE . '~ IN (~text:some data~) AND ' .
+            '~text:' . LOMVocabInitiator::STANDARD_SOURCE . '~ IN (~text:some data~) AND ' .
             '~identifier:p1t1~.rbac_id = ~identifier:p1t2~.rbac_id AND ' .
             '~identifier:p1t1~.obj_id = ~identifier:p1t2~.obj_id AND ' .
             '~identifier:p1t1~.obj_type = ~identifier:p1t2~.obj_type AND ' .

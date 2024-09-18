@@ -18,13 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Conditions;
 
 use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Elements\ElementInterface;
 
-interface DictionaryInitiatorInterface
+interface CheckerInterface
 {
-    public function get(): DictionaryInterface;
-
-    public function pathFromValueToSource(): PathInterface;
+    public function isConditionFulfilled(
+        ElementInterface $element,
+        ConditionInterface $condition
+    ): bool;
 }

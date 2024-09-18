@@ -22,7 +22,8 @@ namespace ILIAS\MetaData\Editor\Full\Services\Inputs\WithoutConditions;
 
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
 use ILIAS\MetaData\Elements\ElementInterface;
-use ILIAS\MetaData\Vocabularies\Dictionary\LOMDictionaryInitiator;
+use ILIAS\MetaData\Vocabularies\Standard\Dictionary\LOMDictionaryInitiator;
+use ILIAS\MetaData\Vocabularies\Factory;
 
 class VocabSourceFactory extends BaseFactory
 {
@@ -31,6 +32,6 @@ class VocabSourceFactory extends BaseFactory
         ElementInterface $context_element,
         string $condition_value = ''
     ): FormInput {
-        return $this->ui_factory->hidden()->withValue(LOMDictionaryInitiator::SOURCE);
+        return $this->ui_factory->hidden()->withValue(Factory::STANDARD_SOURCE);
     }
 }

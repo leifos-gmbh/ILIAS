@@ -118,10 +118,17 @@ class ilMDVocabulariesGUI
 
     public function tableAction(): void
     {
+        if (!$this->access_service->hasCurrentUserWriteAccess()) {
+            $this->ctrl->redirect($this, 'showVocabularies');
+        }
     }
 
-    protected function importVocabulary(): void
+    public function importVocabulary(): void
     {
+        if (!$this->access_service->hasCurrentUserWriteAccess()) {
+            $this->ctrl->redirect($this, 'showVocabularies');
+        }
+
         $message_type = 'failure';
         $message_text = $this->lng->txt('vocab_import_upload_failed');
 

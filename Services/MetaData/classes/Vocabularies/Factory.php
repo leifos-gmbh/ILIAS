@@ -22,10 +22,26 @@ namespace ILIAS\MetaData\Vocabularies;
 
 class Factory implements FactoryInterface
 {
-    public function vocabulary(
-        string $source,
-        string ...$values
-    ): BuilderInterface {
-        return new Builder($source, ...$values);
+    public const STANDARD_SOURCE = 'LOMv1.0';
+    protected const COPYRIGHT_SOURCE = 'ILIAS';
+
+    public function standard(string ...$values): BuilderInterface
+    {
+        return new Builder(Type::STANDARD, '', self::STANDARD_SOURCE, ...$values);
+    }
+
+    public function controlledString(string $id, string $source, string ...$values): BuilderInterface
+    {
+        return new Builder(Type::CONTROLLED_STRING, $id, $source, ...$values);
+    }
+
+    public function controlledVocabValue(string $id, string $source, string ...$values): BuilderInterface
+    {
+        return new Builder(Type::CONTROLLED_VOCAB_VALUE, $id, $source, ...$values);
+    }
+
+    public function copyright(string ...$values): BuilderInterface
+    {
+        return new Builder(Type::COPYRIGHT, '', self::COPYRIGHT_SOURCE, ...$values);
     }
 }

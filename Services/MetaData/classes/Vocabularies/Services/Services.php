@@ -21,12 +21,12 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies\Services;
 
 use ILIAS\MetaData\Vocabularies\VocabulariesInterface;
-use ILIAS\MetaData\Vocabularies\LOMVocabularies;
+use ILIAS\MetaData\Vocabularies\Vocabularies;
 use ILIAS\MetaData\Paths\Services\Services as PathServices;
 use ILIAS\MetaData\Structure\Services\Services as StructureServices;
-use ILIAS\MetaData\Vocabularies\Dictionary\LOMDictionaryInitiator;
+use ILIAS\MetaData\Vocabularies\Standard\Dictionary\LOMDictionaryInitiator;
 use ILIAS\MetaData\Vocabularies\Factory;
-use ILIAS\MetaData\Vocabularies\Dictionary\TagFactory;
+use ILIAS\MetaData\Vocabularies\Standard\Dictionary\TagFactory;
 
 class Services
 {
@@ -49,7 +49,7 @@ class Services
         if (isset($this->vocabularies)) {
             return $this->vocabularies;
         }
-        return $this->vocabularies = new LOMVocabularies(
+        return $this->vocabularies = new Vocabularies(
             new LOMDictionaryInitiator(
                 new Factory(),
                 new TagFactory(),

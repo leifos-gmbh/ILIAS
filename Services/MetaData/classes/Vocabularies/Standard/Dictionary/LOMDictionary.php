@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Standard\Dictionary;
 
 use ILIAS\MetaData\Elements\Base\BaseElementInterface;
 use ILIAS\MetaData\Structure\Dictionaries\Dictionary as BaseDictionary;

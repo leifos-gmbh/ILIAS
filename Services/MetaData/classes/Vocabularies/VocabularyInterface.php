@@ -24,6 +24,11 @@ use ILIAS\MetaData\Vocabularies\Conditions\ConditionInterface;
 
 interface VocabularyInterface
 {
+    public function type(): Type;
+
+    public function id(): string;
+
+
     public function source(): string;
 
     /**

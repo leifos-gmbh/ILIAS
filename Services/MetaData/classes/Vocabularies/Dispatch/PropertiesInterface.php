@@ -18,15 +18,19 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies;
+namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
-interface FactoryInterface
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+
+interface PropertiesInterface
 {
-    public function standard(string ...$values): BuilderInterface;
+    public function canBeDeactivated(VocabularyInterface $vocabulary): bool;
 
-    public function controlledString(string $id, string $source, string ...$values): BuilderInterface;
+    public function canDisallowCustomInput(VocabularyInterface $vocabulary): bool;
 
-    public function controlledVocabValue(string $id, string $source, string ...$values): BuilderInterface;
+    public function isCustomInputApplicable(VocabularyInterface $vocabulary): bool;
 
-    public function copyright(string ...$values): BuilderInterface;
+    public function toggleActive(VocabularyInterface $vocabulary): void;
+
+    public function toggleCustomInputAllowed(VocabularyInterface $vocabulary): void;
 }

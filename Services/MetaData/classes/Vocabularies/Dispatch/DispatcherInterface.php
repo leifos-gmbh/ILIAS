@@ -18,16 +18,28 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Elements\Base\BaseElementInterface;
 
-interface DictionaryInterface
+interface DispatcherInterface
 {
     /**
-     * @return TagInterface[]
+     * @return VocabularyInterface[]
      */
-    public function tagsForElement(
+    public function vocabulariesForElement(
         BaseElementInterface $element
     ): \Generator;
+
+    /**
+     * @return VocabularyInterface[]
+     */
+    public function activeVocabulariesForElement(
+        BaseElementInterface $element
+    ): \Generator;
+
+    public function canBeDeleted(VocabularyInterface $vocabulary): bool;
+
+    public function delete(VocabularyInterface $vocabulary): void;
 }

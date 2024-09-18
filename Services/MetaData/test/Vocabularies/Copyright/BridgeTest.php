@@ -18,15 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Copyright;
 
-use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Structure\Dictionaries\Tags\Tag as BaseTag;
+use PHPUnit\Framework\TestCase;
 
-class TagFactory
+class BridgeTest extends TestCase
 {
-    public function tag(VocabularyInterface $vocabulary): TagInterface
-    {
-        return new Tag($vocabulary);
-    }
 }

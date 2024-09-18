@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Standard\Dictionary;
 
 use ILIAS\MetaData\Structure\Dictionaries\DictionaryInitiator as BaseDictionaryInitiator;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactoryInterface;
@@ -26,11 +26,10 @@ use ILIAS\MetaData\Vocabularies\FactoryInterface as VocabularyFactoryInterface;
 use ILIAS\MetaData\Elements\Structure\StructureSetInterface;
 use ILIAS\MetaData\Elements\Structure\StructureElementInterface;
 use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\Factory;
 
 class LOMDictionaryInitiator extends BaseDictionaryInitiator implements DictionaryInitiatorInterface
 {
-    public const SOURCE = 'LOMv1.0';
-
     protected VocabularyFactoryInterface $vocab_factory;
     protected TagFactory $tag_factory;
 
@@ -304,7 +303,7 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator implements Dictiona
         string ...$values
     ): void {
         $tag = $this->tag_factory->tag(
-            $this->vocab_factory->vocabulary(self::SOURCE, ...$values)->get()
+            $this->vocab_factory->standard(...$values)->get()
         );
         $this->addTagToSourceAndValue($tag, $element);
     }
@@ -328,12 +327,12 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator implements Dictiona
             true
         );
         $tag_source = $this->tag_factory->tag(
-            $this->vocab_factory->vocabulary(self::SOURCE, ...$values)
+            $this->vocab_factory->standard(...$values)
                                 ->withCondition($condition_value, $path_source)
                                 ->get()
         );
         $tag_value = $this->tag_factory->tag(
-            $this->vocab_factory->vocabulary(self::SOURCE, ...$values)
+            $this->vocab_factory->standard(...$values)
                                 ->withCondition($condition_value, $path_value)
                                 ->get()
         );

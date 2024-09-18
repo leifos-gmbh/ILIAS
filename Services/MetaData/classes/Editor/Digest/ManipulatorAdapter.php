@@ -25,7 +25,8 @@ use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Editor\Manipulator\ManipulatorInterface;
-use ILIAS\MetaData\Vocabularies\Dictionary\LOMDictionaryInitiator;
+use ILIAS\MetaData\Vocabularies\Standard\Dictionary\LOMDictionaryInitiator;
+use ILIAS\MetaData\Vocabularies\Factory;
 
 class ManipulatorAdapter
 {
@@ -181,7 +182,7 @@ class ManipulatorAdapter
             $set = $this->manipulator->prepareCreateOrUpdate(
                 $set,
                 $this->path_collection->sourceForHasCopyright(),
-                LOMDictionaryInitiator::SOURCE
+                Factory::STANDARD_SOURCE
             );
             return $this->manipulator->prepareDelete($set, $this->path_collection->copyright());
         }
@@ -194,7 +195,7 @@ class ManipulatorAdapter
         $set = $this->manipulator->prepareCreateOrUpdate(
             $set,
             $this->path_collection->sourceForHasCopyright(),
-            LOMDictionaryInitiator::SOURCE
+            Factory::STANDARD_SOURCE
         );
         $set = $this->manipulator->prepareCreateOrUpdate(
             $set,

@@ -21,15 +21,16 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies;
 
 use ILIAS\MetaData\Elements\Base\BaseElementInterface;
-use ILIAS\MetaData\Vocabularies\Dictionary\DictionaryInterface;
-use ILIAS\MetaData\Vocabularies\Dictionary\DictionaryInitiatorInterface;
+use ILIAS\MetaData\Vocabularies\Standard\Dictionary\DictionaryInterface;
+use ILIAS\MetaData\Vocabularies\Standard\Dictionary\DictionaryInitiatorInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
-use ILIAS\MetaData\Elements\Data\Type;
+use ILIAS\MetaData\Elements\Data\Type as DataType;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Elements\Markers\MarkableInterface;
+use ILIAS\MetaData\Vocabularies\Type;
 
-class LOMVocabularies implements VocabulariesInterface
+class Vocabularies implements VocabulariesInterface
 {
     protected DictionaryInitiatorInterface $initiator;
     protected NavigatorFactoryInterface $navigator_factory;
@@ -67,7 +68,7 @@ class LOMVocabularies implements VocabulariesInterface
     ): \Generator {
         $is_vocab_value = false;
         $source = null;
-        if ($element->getDefinition()->dataType() === Type::VOCAB_VALUE) {
+        if ($element->getDefinition()->dataType() === DataType::VOCAB_VALUE) {
             $is_vocab_value = true;
             $source = $this->getDataValueFromRelativePath(
                 $element,

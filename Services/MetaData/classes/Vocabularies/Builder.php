@@ -25,6 +25,8 @@ use ILIAS\MetaData\Vocabularies\Conditions\Condition;
 
 class Builder implements BuilderInterface
 {
+    protected Type $type;
+    protected string $id;
     protected string $source;
 
     /**
@@ -32,11 +34,17 @@ class Builder implements BuilderInterface
      */
     protected array $values;
     protected ?Condition $condition = null;
+    protected bool $is_active = true;
+    protected bool $allows_custom_inputs = true;
 
     public function __construct(
+        Type $type,
+        string $id,
         string $source,
         string ...$values
     ) {
+        $this->type = $type;
+        $this->id = $id;
         $this->source = $source;
         $this->values = $values;
     }
@@ -50,13 +58,29 @@ class Builder implements BuilderInterface
         return $clone;
     }
 
+    public function withIsDeactivated(bool $deactivated = true): BuilderInterface
+    {
+        $clone = clone $this;
+        $clone->is_active = !$deactivated;
+        return $clone;
+    }
+
+    public function withDisallowsCustomInputs(bool $no_custom_inputs = true): BuilderInterface
+    {
+        $clone = clone $this;
+        $clone->allows_custom_inputs = !$no_custom_inputs;
+        return $clone;
+    }
+
     public function get(): VocabularyInterface
     {
         return new Vocabulary(
+            $this->type,
+            $this->id,
             $this->source,
             $this->condition,
-            true,
-            false,
+            $this->is_active,
+            $this->allows_custom_inputs,
             ...$this->values
         );
     }

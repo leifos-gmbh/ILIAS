@@ -18,15 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies;
+namespace ILIAS\MetaData\Vocabularies\Standard\Dictionary;
 
-interface FactoryInterface
+use ILIAS\MetaData\Paths\PathInterface;
+
+interface DictionaryInitiatorInterface
 {
-    public function standard(string ...$values): BuilderInterface;
+    public function get(): DictionaryInterface;
 
-    public function controlledString(string $id, string $source, string ...$values): BuilderInterface;
-
-    public function controlledVocabValue(string $id, string $source, string ...$values): BuilderInterface;
-
-    public function copyright(string ...$values): BuilderInterface;
+    public function pathFromValueToSource(): PathInterface;
 }

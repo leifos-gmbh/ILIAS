@@ -26,7 +26,7 @@ use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 
 class Importer
 {
-    protected const PATH_TO_SCHEMA = '../../../VocabValidation/controlled_vocabulary.xsd';
+    protected const PATH_TO_SCHEMA = __DIR__ . '/../../../../VocabValidation/controlled_vocabulary.xsd';
 
     protected PathFactory $path_factory;
     protected ControlledVocabsRepository $vocab_repo;
@@ -39,20 +39,21 @@ class Importer
         $this->vocab_repo = $vocab_repo;
     }
 
-    public function import(\DOMDocument $xml): Result
+    public function import(string $xml_string): Result
     {
-        $errors = $this->validateXML($xml);
-        if (!empty($errors)) {
-            return new Result(...$errors);
+        $errors_or_xml = $this->loadXML($xml_string);
+        if (is_array($errors_or_xml)) {
+            return new Result(...$errors_or_xml);
         }
-
-        $xml_path = new \DOMXPath($xml);
+        $xml_path = new \DOMXPath($errors_or_xml);
+        $errors = [];
 
         try {
             $path_to_element = $this->extractPathToElement($xml_path);
         } catch (\ilMDPathException $e) {
             $errors[] = $e->getMessage();
         }
+        $path_to_condition = null;
         try {
             $path_to_condition = $this->extractPathToCondition($xml_path);
         } catch (\ilMDPathException $e) {
@@ -71,7 +72,10 @@ class Importer
             }
         }
 
-        if (empty($errors) && isset($path_to_element) && isset($path_to_condition)) {
+        if (
+            empty($errors) &&
+            isset($path_to_element)
+        ) {
             try {
                 $vocab_id = $this->createVocabulary($xml_path, $path_to_element, $path_to_condition);
             } catch (\ilMDVocabulariesException $e) {
@@ -86,20 +90,27 @@ class Importer
     }
 
     /**
-     * Returns validation errors.
-     * @return string[]
+     * Returns the xml or errors
+     * @return \DOMDocument|string[]
      */
-    protected function validateXML(\DOMDocument $xml): array
+    protected function loadXML(string $xml_string): \DOMDocument|array
     {
-        if ($xml->schemaValidate(self::PATH_TO_SCHEMA)) {
-            return [];
+        $use_internal_errors = libxml_use_internal_errors(true);
+
+        $xml = new \DOMDocument('1.0', 'utf-8');
+        $xml->loadXML($xml_string);
+
+        if (!$xml->schemaValidate(self::PATH_TO_SCHEMA)) {
+            $errors = [];
+            foreach (libxml_get_errors() as $error) {
+                $errors[] = $error->message;
+            }
         }
-        $errors = [];
-        foreach (libxml_get_errors() as $error) {
-            $errors[] = $error->message;
-        }
+
         libxml_clear_errors();
-        return $errors;
+        libxml_use_internal_errors($use_internal_errors);
+
+        return empty($errors) ? $xml : $errors;
     }
 
     protected function extractPathToElement(\DOMXPath $xml_path): PathInterface
@@ -111,7 +122,7 @@ class Importer
     protected function extractPathToCondition(\DOMXPath $xml_path): ?PathInterface
     {
         $node = $xml_path->query('//vocabulary/appliesTo/condition/pathToElement')->item(0);
-        return $this->writeToPath($node);
+        return is_null($node) ? null : $this->writeToPath($node);
     }
 
     protected function extractConditionValue(\DOMXPath $xml_path): ?string
@@ -167,10 +178,10 @@ class Importer
         foreach ($this->extractValuesAndLabels($xml_path) as $value => $label) {
             $values[] = $value;
         }
-        return $this->vocab_repo->findAlreadyExistingValues(
+        return iterator_to_array($this->vocab_repo->findAlreadyExistingValues(
             $path_to_element,
             ...$values
-        );
+        ));
     }
 
     /**
@@ -179,7 +190,7 @@ class Importer
     protected function createVocabulary(
         \DOMXPath $xml_path,
         PathInterface $path_to_element,
-        PathInterface $path_to_condition
+        ?PathInterface $path_to_condition
     ): string {
         return $this->vocab_repo->create(
             $path_to_element,
@@ -206,6 +217,9 @@ class Importer
     {
         $builder = $this->path_factory->custom();
         foreach ($path_in_xml->childNodes as $step) {
+            if (!($step instanceof \DOMElement)) {
+                continue;
+            }
             $builder = $builder->withNextStep($step->nodeValue);
         }
         return $builder->get();

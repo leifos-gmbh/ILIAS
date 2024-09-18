@@ -149,9 +149,7 @@ class ilMDVocabulariesGUI
                 $this->path_factory,
                 $this->controlled_vocab_repo
             );
-            $xml = new DOMDocument('1.0', 'utf-8');
-            $xml->loadXML($file_content);
-            $result = $importer->import($xml);
+            $result = $importer->import($file_content);
 
             if ($result->wasSuccessful()) {
                 $message_type = 'success';

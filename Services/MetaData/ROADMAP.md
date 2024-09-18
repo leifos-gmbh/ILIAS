@@ -114,7 +114,7 @@ Further, `Settings` should also be refactored to use `Services` properly.
 The following classes are not yet covered by unit tests:
 
 - everything in `Editor`
-- everything in `Settings`
+- everything in `Settings` except `Vocabularies\Import`
 - `GlobalScreen/ilMDKeywordExposer`
 - `Manipulator/ScaffoldProvider`
 - everything in `Paths`

@@ -23,6 +23,7 @@ namespace ILIAS\Style\Content\Style;
 use ilDBInterface;
 use ILIAS\Style\Content\InternalDataService;
 use ILIAS\Exercise\IRSS\IRSSWrapper;
+use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 
 class StyleRepo
 {
@@ -44,7 +45,7 @@ class StyleRepo
     public function readRid(int $style_id) : string
     {
         $set = $this->db->queryF("SELECT rid FROM style_data " .
-            " WHERE obj_id = %s ",
+            " WHERE id = %s ",
             ["integer"],
             [$style_id]
         );
@@ -54,33 +55,75 @@ class StyleRepo
         return "";
     }
 
-    protected function createRid(int $style_id) : string
+    protected function createRid(
+        int $style_id,
+        ResourceStakeholder $stakeholder
+    ) : string
     {
-        $rid = $this->irss->createContainer();
+        $rid = $this->irss->createContainer($stakeholder);
         $this->db->update("style_data", [
             "rid" => ["string", $rid]
         ], [    // where
-                "obj_id" => ["integer", $style_id]
+                "id" => ["integer", $style_id]
             ]
         );
         return $rid;
     }
 
-    protected function getOrCreateRid(int $style_id) : string
+    public function getOrCreateRid(
+        int $style_id,
+        ResourceStakeholder $stakeholder
+    ) : string
     {
         $rid = $this->readRid($style_id);
         if ($rid === "") {
-            $rid = $this->createRid($style_id);
+            $rid = $this->createRid(
+                $style_id,
+                $stakeholder
+            );
         }
         return $rid;
     }
 
     public function writeCss(
-        string $style_id,
-        string $css
-    )
+        int $style_id,
+        string $css,
+        ResourceStakeholder $stakeholder
+    ) : void
     {
-        $rid = $this->getOrCreateRid($style_id);
-        $this->irss->
+        $rid = $this->getOrCreateRid($style_id, $stakeholder);
+        $this->irss->addStringToContainer($rid, $css, "style.css");
+    }
+
+    public function getPath(
+        int $style_id,
+        bool $add_random = true,
+        bool $add_token = true
+    ) : string
+    {
+        $rid = $this->readRid($style_id);
+
+        if ($rid !== "") {
+            $path = $this->irss->getContainerUri(
+                $rid,
+                "style.css"
+            );
+            if ($add_random) {
+                $random = new \ilRandom();
+                $rand = $random->int(1, 999999);
+                $path .= "?dummy=$rand";
+            }
+        } else {
+            $path = \ilFileUtils::getWebspaceDir("output") . "/css/style_" . $style_id . ".css";
+            if ($add_random) {
+                $random = new \ilRandom();
+                $rand = $random->int(1, 999999);
+                $path .= "?dummy=$rand";
+            }
+            if ($add_token) {
+                $path = \ilWACSignedPath::signFile($path);
+            }
+        }
+        return $path;
     }
 }

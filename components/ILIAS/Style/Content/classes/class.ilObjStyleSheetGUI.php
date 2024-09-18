@@ -190,7 +190,7 @@ class ilObjStyleSheetGUI extends ilObjectGUI
         $forms[] = $this->getImportForm();
         $forms[] = $this->getCloneForm();
 
-        $tpl->setContent($this->getCreationFormsHTML($forms));
+        $tpl->setContent($this->getCreationFormsHTML($this->getCreateForm()));
     }
 
     protected function getCreateForm(): ilPropertyFormGUI

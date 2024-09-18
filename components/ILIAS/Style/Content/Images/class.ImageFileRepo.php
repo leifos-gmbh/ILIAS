@@ -26,6 +26,9 @@ use ILIAS\FileUpload\FileUpload;
 use Generator;
 use ILIAS\FileUpload\DTO\ProcessingStatus;
 use ILIAS\FileUpload\Location;
+use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
+use ILIAS\Exercise\IRSS\IRSSWrapper;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -33,6 +36,7 @@ use ILIAS\FileUpload\Location;
 class ImageFileRepo
 {
     protected const DIR_PATH = "sty/sty_%id%/images";
+    protected IRSSWrapper $irss;
 
     protected InternalDataService $factory;
     protected Filesystem\Filesystem $web_files;
@@ -46,10 +50,13 @@ class ImageFileRepo
         $this->web_files = $web_files;
         $this->factory = $factory;
         $this->upload = $upload;
+        // to do: migrate this on merge
+        $data = new \ILIAS\Exercise\InternalDataService();
+        $this->irss = new IRSSWrapper($data);
     }
 
     // get image directory
-    protected function dir(int $style_id): string
+    protected function dir(int $style_id) : string
     {
         return str_replace("%id%", (string) $style_id, self::DIR_PATH);
     }
@@ -61,8 +68,41 @@ class ImageFileRepo
      * @throws Filesystem\Exception\DirectoryNotFoundException
      */
     public function getImages(
-        int $style_id
-    ): Generator {
+        int $style_id,
+        string $rid
+    ) : Generator {
+
+        if ($rid !== "") {
+            $unzip = $this->irss->getContainerZip($rid);
+            $uri = $this->irss->stream($rid)->getMetadata("uri");
+            $zip_archive = new \ZipArchive();
+            $zip_archive->open($uri, \ZipArchive::RDONLY);
+
+            foreach ($unzip->getPaths() as $path) {
+                if (str_starts_with($path, ".")) {
+                    continue;
+                }
+                if (!str_starts_with($path, "images")) {
+                    continue;
+                }
+                if (!in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), ["jpg", "png", "gif", "svg"])) {
+                    continue;
+                }
+                $att = $zip_archive->statName($path);
+                $full_path = $this->irss->getContainerUri($rid, $path);
+                $image_size = getimagesize($full_path);
+                $width = $image_size[0] ?? 0;
+                $height = $image_size[1] ?? 0;
+                yield $this->factory->image(
+                    $this->irss->getContainerUri($rid, $path),
+                    new DataSize($att["size"], DataSize::KB),
+                    $width,
+                    $height
+                );
+            }
+        }
+
+
         $dir = $this->dir($style_id);
         if ($this->web_files->hasDir($dir)) {
             foreach ($this->web_files->listContents($dir) as $meta) {
@@ -86,13 +126,16 @@ class ImageFileRepo
     }
 
     // get full web path for relative file path
-    public function getWebPath(string $path): string
+    public function getWebPath(string $path) : string
     {
+        if (str_starts_with($path, "http")) {
+            return $path;
+        }
         return ILIAS_WEB_DIR . "/" . CLIENT_ID . "/" . $path;
     }
 
     // get image data object by filename
-    public function getByFilename(int $style_id, string $filename): ?Image
+    public function getByFilename(int $style_id, string $filename) : ?Image
     {
         /** @var Image $i */
         foreach ($this->getImages($style_id) as $i) {
@@ -104,11 +147,11 @@ class ImageFileRepo
     }
 
     /**
-     * @param int    $style_id
+     * @param int $style_id
      * @throws Filesystem\Exception\IOException
      * @throws \ILIAS\FileUpload\Exception\IllegalStateException
      */
-    public function uploadImage(int $style_id): void
+    public function uploadImage(int $style_id) : void
     {
         $upload = $this->upload;
         $dir = $this->dir($style_id);
@@ -116,7 +159,7 @@ class ImageFileRepo
             $this->web_files->createDir($dir);
         }
         if ($upload->hasUploads()) {
-            if  (!$upload->hasBeenProcessed()) {
+            if (!$upload->hasBeenProcessed()) {
                 $upload->process();
             }
             $result = array_values($upload->getResults())[0];
@@ -127,9 +170,19 @@ class ImageFileRepo
     }
 
     // delete image
-    public function deleteImageByFilename(int $style_id, string $filename): void
+    public function deleteImageByFilename(int $style_id, string $filename) : void
     {
         $dir = $this->dir($style_id);
         $this->web_files->delete($dir . "/" . $filename);
+    }
+
+    public function importFromUploadResult(
+        string $rid,
+        UploadResult $result,
+    ) : void {
+        $this->irss->addUploadToContainer(
+            $rid,
+            $result
+        );
     }
 }

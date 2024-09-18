@@ -27,6 +27,7 @@ use ILIAS\Style\Content\Container\ContainerManager;
 use ILIAS\Style\Content\Object\ObjectManager;
 use ilRbacSystem;
 use ILIAS\Style\Content\Style\CSSBuilder;
+use ILIAS\Style\Content\Style\StyleManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -38,13 +39,12 @@ class InternalDomainService
     protected ?\ilLogger $log = null;
     protected Container $dic;
     protected InternalRepoService $repo_service;
-    protected InternalDataService $data_service;
     protected ilRbacSystem $rbacsystem;
 
     public function __construct(
         Container $DIC,
         InternalRepoService $repo_service,
-        InternalDataService $data_service
+        protected InternalDataService $data_service
     ) {
         $this->rbacsystem = $DIC->rbac()->system();
         $this->repo_service = $repo_service;
@@ -97,7 +97,8 @@ class InternalDomainService
         return new ImageManager(
             $style_id,
             $access_manager,
-            $this->repo_service->image()
+            $this->repo_service,
+            new \ilContentStyleStakeholder()
         );
     }
 
@@ -131,7 +132,6 @@ class InternalDomainService
         return $this->log;
     }
 
-
     public function cssBuilder(
         \ilObjStyleSheet $style,
         string $image_dir = ""
@@ -140,6 +140,17 @@ class InternalDomainService
         return new CSSBuilder(
             $style,
             $image_dir
+        );
+    }
+
+    public function style($style_id) : StyleManager
+    {
+        return new StyleManager(
+            $this->data_service,
+            $this->repo_service,
+            $this,
+            new \ilContentStyleStakeholder(),
+            $style_id
         );
     }
 

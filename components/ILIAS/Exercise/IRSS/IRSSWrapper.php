@@ -32,6 +32,7 @@ use ILIAS\Filesystem\Util\LegacyPathHelper;
 use ILIAS\DI\Exceptions\Exception;
 use ILIAS\Filesystem\Stream\Stream;
 use ILIAS\Filesystem\Util\Archive\Archives;
+use ILIAS\Filesystem\Util\Archive\Unzip;
 
 class IRSSWrapper
 {
@@ -411,8 +412,7 @@ class IRSSWrapper
     public function addStringToContainer(
         string $rid,
         string $content,
-        string $path,
-        ResourceStakeholder $stakeholder
+        string $path
     ) : void
     {
         $id = $this->getResourceIdForIdString($rid);
@@ -420,12 +420,52 @@ class IRSSWrapper
         fwrite($stream, $content);
         rewind($stream);
         $fs = new Stream($stream);
+        $this->irss->manageContainer()->removePathInsideContainer($id, $path);
         $this->irss->manageContainer()->addStreamToContainer(
             $id,
             $fs,
             $path
         );
+        fclose($stream);
     }
+
+    public function addUploadToContainer(
+        string $rid,
+        UploadResult $result
+    ) : void
+    {
+        $id = $this->getResourceIdForIdString($rid);
+        $this->irss->manageContainer()->addUploadToContainer(
+            $id,
+            $result,
+            "images"
+        );
+    }
+
+    public function getContainerUri(
+        string $rid,
+        string $path
+    ) : string
+    {
+        $id = $this->getResourceIdForIdString($rid);
+        $uri = $this->irss->consume()->containerURI(
+            $id,
+            $path,
+            8 * 60
+        )->getURI();
+        return (string) $uri;
+    }
+
+    public function getContainerZip(
+        string $rid
+    ) : Unzip
+    {
+        $id = $this->getResourceIdForIdString($rid);
+        return $this->irss->consume()->containerZIP(
+            $id
+        )->getZIP();
+    }
+
 
 
 }

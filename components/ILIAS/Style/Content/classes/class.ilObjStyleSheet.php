@@ -1346,15 +1346,18 @@ class ilObjStyleSheet extends ilObject
         string $a_target_file = "",
         string $a_image_dir = ""
     ): void {
+
+        if (true) {
+            $style_manager = $this->domain->style($this->getId());
+            $style_manager->writeCss();
+
+            $this->setUpToDate();
+            $this->_writeUpToDate($this->getId(), true);
+
+            return;
+        }
+
         $style = $this->getStyle();
-
-
-        $css = $this->domain->cssBuilder($this)->getCss();
-        $this->setUpToDate();
-        $this->_writeUpToDate($this->getId(), true);
-
-
-        return;
 
         if (!is_dir(ilFileUtils::getWebspaceDir() . "/css")) {
             ilFileUtils::makeDirParents(ilFileUtils::getWebspaceDir() . "/css");
@@ -1614,14 +1617,8 @@ class ilObjStyleSheet extends ilObject
                 $style->writeCSSFile();
             }
 
-            $path = ilFileUtils::getWebspaceDir("output") . "/css/style_" . $a_style_id . ".css";
-            if ($add_random) {
-                $path .= "?dummy=$rand";
-            }
-            if ($add_token) {
-                $path = ilWACSignedPath::signFile($path);
-            }
-
+            $style_manager = $DIC->contentStyle()->internal()->domain()->style($a_style_id);
+            $path = $style_manager->getPath();
             return $path;
         } else {		// todo: work this out
             return "./components/ILIAS/COPage/css/content.css";

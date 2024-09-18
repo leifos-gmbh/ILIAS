@@ -120,7 +120,7 @@ class CSSBuilder
                             $cur_val = "url(" . $cur_val . ")";
                         } else {		// internal
                             if ($this->image_dir == "") {
-                                $cur_val = "url(../sty/sty_" . $this->style->getId() . "/images/" . $cur_val . ")";
+                                $cur_val = "url(images/" . $cur_val . ")";
                             } else {
                                 $cur_val = "url(" . $this->image_dir . "/" . $cur_val . ")";
                             }

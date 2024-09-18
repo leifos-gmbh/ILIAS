@@ -166,7 +166,10 @@ final class StreamDelivery extends BaseDelivery
             $sub_request = urldecode($sub_request);
             // remove query
             $sub_request = explode('?', $sub_request)[0];
-            $file_inside_zip_uri = "zip://$requested_zip#$sub_request";
+            $slash = (str_contains($sub_request, "/"))
+                ? ""
+                : "/";
+            $file_inside_zip_uri = "zip://$requested_zip#$slash$sub_request";
             $file_inside_zip_stream = fopen($file_inside_zip_uri, 'rb');
 
             if ($file_inside_zip_stream === false) {

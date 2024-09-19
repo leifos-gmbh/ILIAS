@@ -22,6 +22,7 @@ namespace ILIAS\MetaData\Vocabularies\Controlled;
 
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValueInterface;
 
 interface RepositoryInterface
 {
@@ -57,6 +58,8 @@ interface RepositoryInterface
         PathInterface $path_to_element
     ): \Generator;
 
+    public function countActiveVocabulariesForElement(PathInterface $path_to_element): int;
+
     /**
      * @return VocabularyInterface[]
      */
@@ -65,12 +68,12 @@ interface RepositoryInterface
     public function isCustomInputAllowedForElement(PathInterface $path_to_element): bool;
 
     /**
-     * Values without labels are not returned at all.
+     * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(
         PathInterface $path_to_element,
         string ...$values
-    ): LabelledValuesInterface;
+    ): \Generator;
 
     public function setActiveForVocabulary(
         string $vocab_id,

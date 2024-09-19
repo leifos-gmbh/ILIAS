@@ -25,6 +25,7 @@ use ILIAS\MetaData\Vocabularies\Conditions\Condition;
 
 class Builder implements BuilderInterface
 {
+    protected PathInterface $applicable_to;
     protected Type $type;
     protected string $id;
     protected string $source;
@@ -38,11 +39,13 @@ class Builder implements BuilderInterface
     protected bool $allows_custom_inputs = true;
 
     public function __construct(
+        PathInterface $applicable_to,
         Type $type,
         string $id,
         string $source,
         string ...$values
     ) {
+        $this->applicable_to = $applicable_to;
         $this->type = $type;
         $this->id = $id;
         $this->source = $source;
@@ -75,6 +78,7 @@ class Builder implements BuilderInterface
     public function get(): VocabularyInterface
     {
         return new Vocabulary(
+            $this->applicable_to,
             $this->type,
             $this->id,
             $this->source,

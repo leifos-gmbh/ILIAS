@@ -24,21 +24,23 @@ use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Elements\Base\BaseElementInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
-use ILIAS\MetaData\Vocabularies\Factory;
 use ILIAS\MetaData\Copyright\RepositoryInterface as CopyrightRepository;
 use ILIAS\MetaData\Settings\SettingsInterface;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface as IdentifierHandler;
+use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValueInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValue;
+use ILIAS\MetaData\Vocabularies\FactoryInterface;
 
 class Bridge implements BridgeInterface
 {
-    protected Factory $factory;
+    protected FactoryInterface $factory;
     protected PathFactory $path_factory;
     protected SettingsInterface $settings;
     protected CopyrightRepository $copyright_repository;
     protected IdentifierHandler $identifier_handler;
 
     public function __construct(
-        Factory $factory,
+        FactoryInterface $factory,
         PathFactory $path_factory,
         SettingsInterface $settings,
         CopyrightRepository $copyright_repository,
@@ -52,39 +54,58 @@ class Bridge implements BridgeInterface
     }
 
     public function vocabularyForElement(
-        BaseElementInterface $element
+        PathInterface $path_to_element
     ): ?VocabularyInterface {
-        $path = $this->path_factory->toElement($element);
         if (
             !$this->settings->isCopyrightSelectionActive() ||
-            $path->toString() !== $this->copyrightPath()->toString()
+            $path_to_element->toString() !== $this->copyrightPath()->toString()
         ) {
             return null;
         }
 
         $values = [];
-        foreach ($this->copyright_repository->getActiveEntries() as $copyright) {
+        foreach ($this->copyright_repository->getAllEntries() as $copyright) {
             $values[] = $this->identifier_handler->buildIdentifierFromEntryID($copyright->id());
         }
 
         if (empty($values)) {
             return null;
         }
-        return $this->factory->copyright(...$values)->get();
+        return $this->factory->copyright($this->copyrightPath(), ...$values)->get();
     }
 
-    public function labelForValue(string $value): string
-    {
+    /**
+     * @return LabelledValueInterface[]
+     */
+    public function labelsForValues(
+        PathInterface $path_to_element,
+        string ...$values
+    ): \Generator {
+        $labelled_values = [];
         if (
-            !$this->settings->isCopyrightSelectionActive() ||
-            !$this->identifier_handler->isIdentifierValid($value)
+            $this->settings->isCopyrightSelectionActive() &&
+            $path_to_element->toString() === $this->copyrightPath()->toString()
         ) {
-            return '';
+            foreach ($this->copyright_repository->getAllEntries() as $copyright) {
+                $identifier = $this->identifier_handler->buildIdentifierFromEntryID($copyright->id());
+                if (!in_array($identifier, $values)) {
+                    continue;
+                }
+                $labelled_values[$identifier] = new LabelledValue(
+                    $identifier,
+                    $copyright->title(),
+                    true
+                );
+            }
         }
 
-        return $this->copyright_repository->getEntry(
-            $this->identifier_handler->parseEntryIDFromIdentifier($value)
-        )->title();
+        foreach ($values as $value) {
+            if (array_key_exists($value, $labelled_values)) {
+                yield $labelled_values[$value];
+                continue;
+            }
+            yield new LabelledValue($value, '', false);
+        }
     }
 
     protected function copyrightPath(): PathInterface

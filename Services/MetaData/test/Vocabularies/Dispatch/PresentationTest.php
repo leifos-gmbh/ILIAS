@@ -18,10 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Controlled;
+namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
 use PHPUnit\Framework\TestCase;
 
-class RepositoryAndLabelledValuesTest extends TestCase
+class PresentationTest extends TestCase
 {
 }

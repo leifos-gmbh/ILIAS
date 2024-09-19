@@ -18,15 +18,20 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard;
+namespace ILIAS\MetaData\Vocabularies\Conditions;
 
 use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Paths\NullPath;
 
-interface DeactivationRepositoryInterface
+class NullCondition implements ConditionInterface
 {
-    public function deactivateStandardVocabulary(PathInterface $applicable_to): void;
+    public function value(): string
+    {
+        return '';
+    }
 
-    public function activateStandardVocabulary(PathInterface $applicable_to): void;
-
-    public function isStandardVocabularyDeactivated(PathInterface $applicable_to): bool;
+    public function path(): PathInterface
+    {
+        return new NullPath();
+    }
 }

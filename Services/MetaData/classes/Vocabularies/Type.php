@@ -22,6 +22,7 @@ namespace ILIAS\MetaData\Vocabularies;
 
 enum Type: string
 {
+    case NULL = 'null';
     case STANDARD = 'standard';
     case CONTROLLED_STRING = 'controlled string';
     case CONTROLLED_VOCAB_VALUE = 'controlled vocab value';

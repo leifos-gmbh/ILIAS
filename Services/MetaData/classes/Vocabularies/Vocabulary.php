@@ -21,9 +21,11 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies;
 
 use ILIAS\MetaData\Vocabularies\Conditions\ConditionInterface;
+use ILIAS\MetaData\Paths\PathInterface;
 
 class Vocabulary implements VocabularyInterface
 {
+    protected PathInterface $applicable_to;
     protected Type $type;
     protected string $id;
     protected string $source;
@@ -37,6 +39,7 @@ class Vocabulary implements VocabularyInterface
     protected ?ConditionInterface $condition;
 
     public function __construct(
+        PathInterface $applicable_to,
         Type $type,
         string $id,
         string $source,
@@ -45,6 +48,7 @@ class Vocabulary implements VocabularyInterface
         bool $allows_custom_inputs = false,
         string ...$values
     ) {
+        $this->applicable_to = $applicable_to;
         $this->type = $type;
         $this->id = $id;
         $this->source = $source;
@@ -52,6 +56,11 @@ class Vocabulary implements VocabularyInterface
         $this->condition = $condition;
         $this->is_active = $is_active;
         $this->allows_custom_inputs = $allows_custom_inputs;
+    }
+
+    public function applicableTo(): PathInterface
+    {
+        return $this->applicable_to;
     }
 
     public function type(): Type

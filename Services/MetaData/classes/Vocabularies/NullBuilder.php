@@ -18,15 +18,31 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard;
+namespace ILIAS\MetaData\Vocabularies;
 
 use ILIAS\MetaData\Paths\PathInterface;
 
-interface DeactivationRepositoryInterface
+class NullBuilder implements BuilderInterface
 {
-    public function deactivateStandardVocabulary(PathInterface $applicable_to): void;
+    public function withCondition(
+        string $value,
+        PathInterface $path
+    ): BuilderInterface {
+        return new NullBuilder();
+    }
 
-    public function activateStandardVocabulary(PathInterface $applicable_to): void;
+    public function withIsDeactivated(bool $deactivated): BuilderInterface
+    {
+        return new NullBuilder();
+    }
 
-    public function isStandardVocabularyDeactivated(PathInterface $applicable_to): bool;
+    public function withDisallowsCustomInputs(bool $no_custom_inputs): BuilderInterface
+    {
+        return new NullBuilder();
+    }
+
+    public function get(): VocabularyInterface
+    {
+        return new NullVocabulary();
+    }
 }

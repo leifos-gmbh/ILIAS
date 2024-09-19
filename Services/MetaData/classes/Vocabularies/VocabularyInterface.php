@@ -21,9 +21,12 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies;
 
 use ILIAS\MetaData\Vocabularies\Conditions\ConditionInterface;
+use ILIAS\MetaData\Paths\PathInterface;
 
 interface VocabularyInterface
 {
+    public function applicableTo(): PathInterface;
+
     public function type(): Type;
 
     public function id(): string;

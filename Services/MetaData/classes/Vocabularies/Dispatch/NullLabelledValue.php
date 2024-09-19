@@ -18,28 +18,22 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Controlled;
+namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
-class NullLabelledValues implements LabelledValuesInterface
+class NullLabelledValue implements LabelledValueInterface
 {
-    public function labelForValue(string $value): string
+    public function value(): string
     {
         return '';
     }
 
-    /**
-     * @return string[]
-     */
-    public function values(): \Generator
+    public function label(): string
     {
-        yield from [];
+        return '';
     }
 
-    /**
-     * @return string[]
-     */
-    public function labels(): \Generator
+    public function isFromVocabulary(): bool
     {
-        yield from [];
+        return false;
     }
 }

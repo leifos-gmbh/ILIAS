@@ -22,6 +22,8 @@ namespace ILIAS\MetaData\Vocabularies\Controlled;
 
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValueInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\NullLabelledValue;
 
 class NullRepository implements RepositoryInterface
 {
@@ -64,6 +66,11 @@ class NullRepository implements RepositoryInterface
         yield from [];
     }
 
+    public function countActiveVocabulariesForElement(PathInterface $path_to_element): int
+    {
+        return 0;
+    }
+
     /**
      * @return VocabularyInterface[]
      */
@@ -78,13 +85,13 @@ class NullRepository implements RepositoryInterface
     }
 
     /**
-     * Values without labels are not returned at all.
+     * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(
         PathInterface $path_to_element,
         string ...$values
-    ): LabelledValuesInterface {
-        return new NullLabelledValues();
+    ): \Generator {
+        yield from [];
     }
 
     public function setActiveForVocabulary(

@@ -22,23 +22,33 @@ namespace ILIAS\MetaData\Vocabularies;
 
 use ILIAS\MetaData\Paths\PathInterface;
 
-interface FactoryInterface
+class NullFactory implements FactoryInterface
 {
-    public function standard(PathInterface $applicable_to, string ...$values): BuilderInterface;
+    public function standard(PathInterface $applicable_to, string ...$values): BuilderInterface
+    {
+        return new NullBuilder();
+    }
 
     public function controlledString(
         PathInterface $applicable_to,
         string $id,
         string $source,
         string ...$values
-    ): BuilderInterface;
+    ): BuilderInterface {
+        return new NullBuilder();
+    }
 
     public function controlledVocabValue(
         PathInterface $applicable_to,
         string $id,
         string $source,
         string ...$values
-    ): BuilderInterface;
+    ): BuilderInterface {
+        return new NullBuilder();
+    }
 
-    public function copyright(PathInterface $applicable_to, string ...$values): BuilderInterface;
+    public function copyright(PathInterface $applicable_to, string ...$values): BuilderInterface
+    {
+        return new NullBuilder();
+    }
 }

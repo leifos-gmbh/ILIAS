@@ -18,19 +18,20 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Controlled;
+namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
-interface LabelledValuesInterface
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+use ILIAS\MetaData\Elements\Base\BaseElementInterface;
+use ILIAS\MetaData\Paths\PathInterface;
+
+interface PresentationInterface
 {
-    public function labelForValue(string $value): string;
-
     /**
-     * @return string[]
+     * Values without labels or with empty labels
+     * are not included in the returned object.
      */
-    public function values(): \Generator;
-
-    /**
-     * @return string[]
-     */
-    public function labels(): \Generator;
+    public function labelsForValues(
+        PathInterface $path_to_element,
+        string ...$values
+    ): LabelledValueInterface;
 }

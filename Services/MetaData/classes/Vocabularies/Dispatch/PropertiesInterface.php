@@ -30,7 +30,11 @@ interface PropertiesInterface
 
     public function isCustomInputApplicable(VocabularyInterface $vocabulary): bool;
 
-    public function toggleActive(VocabularyInterface $vocabulary): void;
+    public function activate(VocabularyInterface $vocabulary): void;
 
-    public function toggleCustomInputAllowed(VocabularyInterface $vocabulary): void;
+    public function deactivate(VocabularyInterface $vocabulary): void;
+
+    public function allowCustomInput(VocabularyInterface $vocabulary): void;
+
+    public function disallowCustomInput(VocabularyInterface $vocabulary): void;
 }

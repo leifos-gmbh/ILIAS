@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
 use PHPUnit\Framework\TestCase;
+use ILIAS\MetaData\Vocabularies\Type;
 
 class PropertiesTest extends TestCase
 {

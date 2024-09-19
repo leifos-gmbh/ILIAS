@@ -18,15 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard;
+namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
-use ILIAS\MetaData\Paths\PathInterface;
-
-interface DeactivationRepositoryInterface
+interface LabelledValueInterface
 {
-    public function deactivateStandardVocabulary(PathInterface $applicable_to): void;
+    public function value(): string;
 
-    public function activateStandardVocabulary(PathInterface $applicable_to): void;
+    public function label(): string;
 
-    public function isStandardVocabularyDeactivated(PathInterface $applicable_to): bool;
+    public function isFromVocabulary(): bool;
 }

@@ -22,10 +22,20 @@ namespace ILIAS\MetaData\Vocabularies\Copyright;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Elements\Base\BaseElementInterface;
+use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValueInterface;
 
 interface BridgeInterface
 {
     public function vocabularyForElement(
-        BaseElementInterface $element
+        PathInterface $path_to_element
     ): ?VocabularyInterface;
+
+    /**
+     * @return LabelledValueInterface[]
+     */
+    public function labelsForValues(
+        PathInterface $path_to_element,
+        string ...$values
+    ): \Generator;
 }

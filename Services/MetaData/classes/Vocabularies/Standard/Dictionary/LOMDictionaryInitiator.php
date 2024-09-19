@@ -302,8 +302,9 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator implements Dictiona
         StructureElementInterface $element,
         string ...$values
     ): void {
+        $element_path = $this->path_factory->toElement($element);
         $tag = $this->tag_factory->tag(
-            $this->vocab_factory->standard(...$values)->get()
+            $this->vocab_factory->standard($element_path, ...$values)->get()
         );
         $this->addTagToSourceAndValue($tag, $element);
     }
@@ -316,6 +317,7 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator implements Dictiona
     ): void {
         $source = $element->getSubElement('source');
         $value = $element->getSubElement('value');
+        $element_path = $this->path_factory->toElement($element);
         $path_source = $this->path_factory->betweenElements(
             $source,
             $conditional_on,
@@ -327,12 +329,12 @@ class LOMDictionaryInitiator extends BaseDictionaryInitiator implements Dictiona
             true
         );
         $tag_source = $this->tag_factory->tag(
-            $this->vocab_factory->standard(...$values)
+            $this->vocab_factory->standard($element_path, ...$values)
                                 ->withCondition($condition_value, $path_source)
                                 ->get()
         );
         $tag_value = $this->tag_factory->tag(
-            $this->vocab_factory->standard(...$values)
+            $this->vocab_factory->standard($element_path, ...$values)
                                 ->withCondition($condition_value, $path_value)
                                 ->get()
         );

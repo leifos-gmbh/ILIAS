@@ -18,15 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard;
+namespace ILIAS\MetaData\Vocabularies\Controlled;
 
-use ILIAS\MetaData\Paths\PathInterface;
+use PHPUnit\Framework\TestCase;
 
-interface DeactivationRepositoryInterface
+class RepositoryTest extends TestCase
 {
-    public function deactivateStandardVocabulary(PathInterface $applicable_to): void;
-
-    public function activateStandardVocabulary(PathInterface $applicable_to): void;
-
-    public function isStandardVocabularyDeactivated(PathInterface $applicable_to): bool;
 }

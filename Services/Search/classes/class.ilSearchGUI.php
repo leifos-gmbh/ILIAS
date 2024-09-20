@@ -71,6 +71,7 @@ class ilSearchGUI extends ilSearchBaseGUI
         }
         $new_search = (bool) ($requested_cmd["performSearch"] ?? false);
         $new_filter = (bool) ($requested_cmd["performSearchFilter"] ?? false);
+        $new_search_or_filter = $new_search || $new_filter;
 
         $requested_filter_type = (array) ($this->search_filter_data["search_type"] ?? []);
         $requested_filter_type = array_flip($requested_filter_type);
@@ -114,12 +115,12 @@ class ilSearchGUI extends ilSearchBaseGUI
         );
         $this->setString((string) ($requested_search['string'] ?? ($session_search['string'] ?? '')));
         $this->setDetails(
-            $new_search ?
+            $new_search_or_filter ?
                 ($requested_search['details'] ?? []) :
                 ($session_search['details'] ?? [])
         );
 
-        if ($new_search) {
+        if ($new_search_or_filter) {
             $this->getSearchCache()->setQuery(ilUtil::stripSlashes(
                 $requested_search['string'] ?? ($session_search['string'] ?? '')
             ));

@@ -347,6 +347,7 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
         }
         $new_search = (bool) ($requested_cmd["performSearch"] ?? false);
         $new_filter = (bool) ($requested_cmd["performSearchFilter"] ?? false);
+        $new_search_or_filter = $new_search || $new_filter;
 
         if ($this->http->wrapper()->post()->has('root_id')) {
             $filter_scope = $this->http->wrapper()->post()->retrieve(

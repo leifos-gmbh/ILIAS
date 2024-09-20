@@ -21,9 +21,8 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies\Copyright;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Elements\Base\BaseElementInterface;
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValueInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 
 interface BridgeInterface
 {
@@ -32,6 +31,7 @@ interface BridgeInterface
     ): ?VocabularyInterface;
 
     /**
+     * Values not from copyrights will not be returned at all.
      * @return LabelledValueInterface[]
      */
     public function labelsForValues(

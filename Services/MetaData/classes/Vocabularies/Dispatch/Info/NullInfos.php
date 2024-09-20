@@ -18,20 +18,29 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dispatch;
+namespace ILIAS\MetaData\Vocabularies\Dispatch\Info;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Elements\Base\BaseElementInterface;
-use ILIAS\MetaData\Paths\PathInterface;
 
-interface PresentationInterface
+class NullInfos implements InfosInterface
 {
-    /**
-     * Values without labels or with empty labels
-     * are not included in the returned object.
-     */
-    public function labelsForValues(
-        PathInterface $path_to_element,
-        string ...$values
-    ): LabelledValueInterface;
+    public function isDeactivatable(VocabularyInterface $vocabulary): bool
+    {
+        return false;
+    }
+
+    public function canDisallowCustomInput(VocabularyInterface $vocabulary): bool
+    {
+        return false;
+    }
+
+    public function isCustomInputApplicable(VocabularyInterface $vocabulary): bool
+    {
+        return false;
+    }
+
+    public function canBeDeleted(VocabularyInterface $vocabulary): bool
+    {
+        return false;
+    }
 }

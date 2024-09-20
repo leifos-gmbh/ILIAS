@@ -39,7 +39,5 @@ interface DispatcherInterface
         BaseElementInterface $element
     ): \Generator;
 
-    public function canBeDeleted(VocabularyInterface $vocabulary): bool;
-
     public function delete(VocabularyInterface $vocabulary): void;
 }

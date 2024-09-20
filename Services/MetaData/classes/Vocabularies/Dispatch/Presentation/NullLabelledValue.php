@@ -18,10 +18,17 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard;
+namespace ILIAS\MetaData\Vocabularies\Dispatch\Presentation;
 
-use PHPUnit\Framework\TestCase;
-
-class DeactivationRepositoryTest extends TestCase
+class NullLabelledValue implements LabelledValueInterface
 {
+    public function value(): string
+    {
+        return '';
+    }
+
+    public function label(): string
+    {
+        return '';
+    }
 }

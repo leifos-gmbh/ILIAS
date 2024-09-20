@@ -130,7 +130,7 @@ class ilMDVocabulariesGUI
         }
 
         $message_type = 'failure';
-        $message_text = $this->lng->txt('vocab_import_upload_failed');
+        $message_text = $this->lng->txt('md_vocab_import_upload_failed');
 
         $modal = $this->getImportModal()->withRequest($this->http->request());
 
@@ -160,11 +160,11 @@ class ilMDVocabulariesGUI
 
             if ($result->wasSuccessful()) {
                 $message_type = 'success';
-                $message_text = $this->lng->txt('vocab_import_successful');
+                $message_text = $this->lng->txt('md_vocab_import_successful');
             } else {
                 $message_type = 'failure';
                 printf(
-                    $message_text = $this->lng->txt('vocab_import_invalid'),
+                    $message_text = $this->lng->txt('md_vocab_import_invalid'),
                     implode("\n\r", $result->getErrors())
                 );
             }
@@ -190,17 +190,17 @@ class ilMDVocabulariesGUI
     {
         $column_factory = $this->ui_factory->table()->column();
         $columns = [
-            'element' => $column_factory->text($this->lng->txt('vocab_element_column'))->withIsSortable(false),
-            'type' => $column_factory->status($this->lng->txt('vocab_type_column'))->withIsSortable(false),
-            'source' => $column_factory->text($this->lng->txt('vocab_source_column'))->withIsSortable(false),
-            'preview' => $column_factory->text($this->lng->txt('vocab_preview_column'))->withIsSortable(false),
+            'element' => $column_factory->text($this->lng->txt('md_vocab_element_column'))->withIsSortable(false),
+            'type' => $column_factory->status($this->lng->txt('md_vocab_type_column'))->withIsSortable(false),
+            'source' => $column_factory->text($this->lng->txt('md_vocab_source_column'))->withIsSortable(false),
+            'preview' => $column_factory->text($this->lng->txt('md_vocab_preview_column'))->withIsSortable(false),
             'active' => $column_factory->boolean(
-                $this->lng->txt('vocab_active_column'),
+                $this->lng->txt('md_vocab_active_column'),
                 $this->lng->txt('yes'),
                 $this->lng->txt('no')
             )->withIsSortable(false),
             'custom_input' => $column_factory->boolean(
-                $this->lng->txt('vocab_custom_input_column'),
+                $this->lng->txt('md_vocab_custom_input_column'),
                 $this->lng->txt('yes'),
                 $this->lng->txt('no')
             )->withIsSortable(false)
@@ -218,29 +218,29 @@ class ilMDVocabulariesGUI
         $actions_factory = $this->ui_factory->table()->action();
         $actions = [
             'delete' => $actions_factory->single(
-                $this->lng->txt('vocab_delete_action'),
+                $this->lng->txt('md_vocab_delete_action'),
                 $url_builder->withParameter($action_parameter_token, 'delete'),
                 $row_id_token
             )->withAsync(true),
             'toggle_active' => $actions_factory->single(
-                $this->lng->txt('vocab_toggle_active_action'),
+                $this->lng->txt('md_vocab_toggle_active_action'),
                 $url_builder->withParameter($action_parameter_token, 'toggle_active'),
                 $row_id_token
             ),
             'toggle_custom_input' => $actions_factory->single(
-                $this->lng->txt('vocab_toggle_custom_input_action'),
+                $this->lng->txt('md_vocab_toggle_custom_input_action'),
                 $url_builder->withParameter($action_parameter_token, 'toggle_custom_input'),
                 $row_id_token
             ),
             'show_all' => $actions_factory->single(
-                $this->lng->txt('vocab_show_all_action'),
+                $this->lng->txt('md_vocab_show_all_action'),
                 $url_builder->withParameter($action_parameter_token, 'show_all'),
                 $row_id_token
             )->withAsync(true)
         ];
 
         return $this->ui_factory->table()->data(
-            $this->lng->txt('vocab_table_title'),
+            $this->lng->txt('md_vocab_table_title'),
             $columns,
             new ilMDVocabulariesDataRetrieval()
         )->withActions($actions)->withRequest($this->http->request());
@@ -250,11 +250,11 @@ class ilMDVocabulariesGUI
     {
         $file_input = $this->ui_factory->input()->field()->file(
             new ilMDVocabularyUploadHandlerGUI(),
-            $this->lng->txt('import_file_vocab')
+            $this->lng->txt('md_import_file_vocab')
         )->withAcceptedMimeTypes([MimeType::TEXT__XML])->withMaxFiles(1);
 
         return $this->ui_factory->modal()->roundtrip(
-            $this->lng->txt('import_vocab_modal'),
+            $this->lng->txt('md_import_vocab_modal'),
             null,
             ['file' => $file_input],
             $this->ctrl->getLinkTarget($this, 'importVocabulary')
@@ -264,7 +264,7 @@ class ilMDVocabulariesGUI
     protected function getImportButton(Signal $signal): Button
     {
         return $this->ui_factory->button()->standard(
-            $this->lng->txt('import_vocab'),
+            $this->lng->txt('md_import_vocab'),
             $signal
         );
     }

@@ -18,10 +18,28 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dispatch;
+namespace ILIAS\MetaData\Vocabularies\Dispatch\Presentation;
 
-use PHPUnit\Framework\TestCase;
-
-class PresentationTest extends TestCase
+class LabelledValue implements LabelledValueInterface
 {
+    protected string $value;
+    protected string $label;
+
+    public function __construct(
+        string $value,
+        string $label = ''
+    ) {
+        $this->value = $value;
+        $this->label = $label;
+    }
+
+    public function value(): string
+    {
+        return $this->value;
+    }
+
+    public function label(): string
+    {
+        return $this->label;
+    }
 }

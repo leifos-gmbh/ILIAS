@@ -18,17 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dispatch;
+namespace ILIAS\MetaData\Vocabularies\Dispatch\Presentation;
 
-use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-
-interface PropertiesInterface
+interface LabelledValueInterface
 {
-    public function activate(VocabularyInterface $vocabulary): void;
+    public function value(): string;
 
-    public function deactivate(VocabularyInterface $vocabulary): void;
-
-    public function allowCustomInput(VocabularyInterface $vocabulary): void;
-
-    public function disallowCustomInput(VocabularyInterface $vocabulary): void;
+    public function label(): string;
 }

@@ -22,7 +22,7 @@ namespace ILIAS\MetaData\Vocabularies\Controlled;
 
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValueInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 
 interface RepositoryInterface
 {
@@ -68,6 +68,7 @@ interface RepositoryInterface
     public function isCustomInputAllowedForElement(PathInterface $path_to_element): bool;
 
     /**
+     * Values not from controlled vocabularies will not be returned at all.
      * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(

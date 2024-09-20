@@ -18,22 +18,17 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dispatch;
+namespace ILIAS\MetaData\Vocabularies\Dispatch\Info;
 
-class NullLabelledValue implements LabelledValueInterface
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+
+interface InfosInterface
 {
-    public function value(): string
-    {
-        return '';
-    }
+    public function isDeactivatable(VocabularyInterface $vocabulary): bool;
 
-    public function label(): string
-    {
-        return '';
-    }
+    public function canDisallowCustomInput(VocabularyInterface $vocabulary): bool;
 
-    public function isFromVocabulary(): bool
-    {
-        return false;
-    }
+    public function isCustomInputApplicable(VocabularyInterface $vocabulary): bool;
+
+    public function canBeDeleted(VocabularyInterface $vocabulary): bool;
 }

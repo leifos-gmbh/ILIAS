@@ -21,14 +21,13 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies\Copyright;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Elements\Base\BaseElementInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Copyright\RepositoryInterface as CopyrightRepository;
 use ILIAS\MetaData\Settings\SettingsInterface;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface as IdentifierHandler;
-use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValueInterface;
-use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValue;
+use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValue;
 use ILIAS\MetaData\Vocabularies\FactoryInterface;
 
 class Bridge implements BridgeInterface
@@ -81,30 +80,22 @@ class Bridge implements BridgeInterface
         PathInterface $path_to_element,
         string ...$values
     ): \Generator {
-        $labelled_values = [];
         if (
-            $this->settings->isCopyrightSelectionActive() &&
-            $path_to_element->toString() === $this->copyrightPath()->toString()
+            !$this->settings->isCopyrightSelectionActive() ||
+            $path_to_element->toString() !== $this->copyrightPath()->toString()
         ) {
-            foreach ($this->copyright_repository->getAllEntries() as $copyright) {
-                $identifier = $this->identifier_handler->buildIdentifierFromEntryID($copyright->id());
-                if (!in_array($identifier, $values)) {
-                    continue;
-                }
-                $labelled_values[$identifier] = new LabelledValue(
-                    $identifier,
-                    $copyright->title(),
-                    true
-                );
-            }
+            return;
         }
 
-        foreach ($values as $value) {
-            if (array_key_exists($value, $labelled_values)) {
-                yield $labelled_values[$value];
+        foreach ($this->copyright_repository->getAllEntries() as $copyright) {
+            $identifier = $this->identifier_handler->buildIdentifierFromEntryID($copyright->id());
+            if (!in_array($identifier, $values)) {
                 continue;
             }
-            yield new LabelledValue($value, '', false);
+            yield new LabelledValue(
+                $identifier,
+                $copyright->title()
+            );
         }
     }
 

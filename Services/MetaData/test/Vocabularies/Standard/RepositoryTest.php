@@ -18,13 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dispatch;
+namespace ILIAS\MetaData\Vocabularies\Standard;
 
-interface LabelledValueInterface
+use PHPUnit\Framework\TestCase;
+
+class RepositoryTest extends TestCase
 {
-    public function value(): string;
-
-    public function label(): string;
-
-    public function isFromVocabulary(): bool;
 }

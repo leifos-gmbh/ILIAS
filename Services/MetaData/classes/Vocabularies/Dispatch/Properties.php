@@ -23,76 +23,32 @@ namespace ILIAS\MetaData\Vocabularies\Dispatch;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Type;
 use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledRepo;
-use ILIAS\MetaData\Vocabularies\Standard\DeactivationRepositoryInterface;
+use ILIAS\MetaData\Vocabularies\Standard\RepositoryInterface as StandardRepo;
+use ILIAS\MetaData\Vocabularies\Dispatch\Info\InfosInterface;
 
 class Properties implements PropertiesInterface
 {
+    protected InfosInterface $infos;
     protected ControlledRepo $controlled_repo;
-    protected DeactivationRepositoryInterface $deactivation_repo;
+    protected StandardRepo $standard_repo;
 
     public function __construct(
+        InfosInterface $infos,
         ControlledRepo $controlled_repo,
-        DeactivationRepositoryInterface $deactivation_repo
+        StandardRepo $standard_repo
     ) {
+        $this->infos = $infos;
         $this->controlled_repo = $controlled_repo;
-        $this->deactivation_repo = $deactivation_repo;
-    }
-
-    public function canBeDeactivated(VocabularyInterface $vocabulary): bool
-    {
-        switch ($vocabulary->type()) {
-            case Type::STANDARD:
-            case Type::CONTROLLED_VOCAB_VALUE:
-                $path = $vocabulary->applicableTo();
-                $other_active_repositories_count =
-                    ((int) $this->deactivation_repo->isStandardVocabularyDeactivated($path)) +
-                    $this->controlled_repo->countActiveVocabulariesForElement($path) -
-                    ((int) $vocabulary->isActive());
-                return $other_active_repositories_count > 0;
-
-            case Type::CONTROLLED_STRING:
-                return true;
-
-            default:
-            case Type::COPYRIGHT:
-                return false;
-        }
-    }
-
-    public function canDisallowCustomInput(VocabularyInterface $vocabulary): bool
-    {
-        switch ($vocabulary->type()) {
-            case Type::CONTROLLED_STRING:
-                return true;
-
-            default:
-            case Type::CONTROLLED_VOCAB_VALUE:
-            case Type::STANDARD:
-            case Type::COPYRIGHT:
-                return false;
-        }
-    }
-
-    public function isCustomInputApplicable(VocabularyInterface $vocabulary): bool
-    {
-        switch ($vocabulary->type()) {
-            case Type::CONTROLLED_STRING:
-            case Type::COPYRIGHT:
-                return true;
-
-            default:
-            case Type::CONTROLLED_VOCAB_VALUE:
-            case Type::STANDARD:
-                return false;
-        }
+        $this->standard_repo = $standard_repo;
     }
 
     public function activate(VocabularyInterface $vocabulary): void
     {
         switch ($vocabulary->type()) {
             case Type::STANDARD:
-                $this->deactivation_repo->activateStandardVocabulary(
-                    $vocabulary->applicableTo()
+                $this->standard_repo->activateVocabulary(
+                    $vocabulary->applicableTo(),
+                    $vocabulary->condition()?->value()
                 );
                 break;
 
@@ -112,14 +68,15 @@ class Properties implements PropertiesInterface
 
     public function deactivate(VocabularyInterface $vocabulary): void
     {
-        if (!$this->canBeDeactivated($vocabulary)) {
+        if (!$this->infos->isDeactivatable($vocabulary)) {
             throw new \ilMDVocabulariesException('Vocabulary cannot be deactivated.');
         }
 
         switch ($vocabulary->type()) {
             case Type::STANDARD:
-                $this->deactivation_repo->deactivateStandardVocabulary(
-                    $vocabulary->applicableTo()
+                $this->standard_repo->deactivateVocabulary(
+                    $vocabulary->applicableTo(),
+                    $vocabulary->condition()?->value()
                 );
                 break;
 
@@ -139,7 +96,7 @@ class Properties implements PropertiesInterface
 
     public function allowCustomInput(VocabularyInterface $vocabulary): void
     {
-        if (!$this->isCustomInputApplicable($vocabulary)) {
+        if (!$this->infos->isCustomInputApplicable($vocabulary)) {
             throw new \ilMDVocabulariesException('Custom input is not applicable for vocabulary.');
         }
 
@@ -162,8 +119,8 @@ class Properties implements PropertiesInterface
     public function disallowCustomInput(VocabularyInterface $vocabulary): void
     {
         if (
-            !$this->isCustomInputApplicable($vocabulary) ||
-            $this->canDisallowCustomInput($vocabulary)
+            !$this->infos->isCustomInputApplicable($vocabulary) ||
+            !$this->infos->canDisallowCustomInput($vocabulary)
         ) {
             throw new \ilMDVocabulariesException('Custom input cannot be disallowed for vocabulary.');
         }

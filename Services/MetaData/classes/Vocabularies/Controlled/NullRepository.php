@@ -22,8 +22,8 @@ namespace ILIAS\MetaData\Vocabularies\Controlled;
 
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Vocabularies\Dispatch\LabelledValueInterface;
-use ILIAS\MetaData\Vocabularies\Dispatch\NullLabelledValue;
+use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\NullLabelledValue;
 
 class NullRepository implements RepositoryInterface
 {

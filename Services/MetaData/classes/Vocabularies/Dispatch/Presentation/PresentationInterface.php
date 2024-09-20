@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
+declare(strict_types=1);
+
+namespace ILIAS\MetaData\Vocabularies\Dispatch\Presentation;
+
+use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
+
+interface PresentationInterface
+{
+    /**
+     * For values not from any active vocabulary, returns the
+     * value itself as label, optionally with 'unknown vocabulary' suffix.
+     * @return LabelledValue[]
+     */
+    public function presentableLabels(
+        PresentationUtilities $presentation_utilities,
+        PathInterface $path_to_element,
+        bool $with_unknown_vocab_flag,
+        string ...$values
+    ): \Generator;
+
+    /**
+     * @return LabelledValue[]
+     */
+    public function labelsForVocabulary(
+        PresentationUtilities $presentation_utilities,
+        VocabularyInterface $vocabulary
+    ): \Generator;
+}

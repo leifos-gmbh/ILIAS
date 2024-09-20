@@ -18,15 +18,24 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard;
+namespace ILIAS\MetaData\Vocabularies\Copyright;
 
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 
-interface DeactivationRepositoryInterface
+class NullBridge implements BridgeInterface
 {
-    public function deactivateStandardVocabulary(PathInterface $applicable_to): void;
+    public function vocabularyForElement(
+        PathInterface $path_to_element
+    ): ?VocabularyInterface {
+        return null;
+    }
 
-    public function activateStandardVocabulary(PathInterface $applicable_to): void;
-
-    public function isStandardVocabularyDeactivated(PathInterface $applicable_to): bool;
+    public function labelsForValues(
+        PathInterface $path_to_element,
+        string ...$values
+    ): \Generator {
+        yield from [];
+    }
 }

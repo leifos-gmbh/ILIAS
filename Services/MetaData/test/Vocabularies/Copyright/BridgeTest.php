@@ -264,20 +264,7 @@ class BridgeTest extends TestCase
             'something'
         );
 
-        $label_1 = $labelled_values->current();
-        $this->assertSame('id_1', $label_1->value());
-        $this->assertSame('', $label_1->label());
-        $this->assertFalse($label_1->isFromVocabulary());
-        $labelled_values->next();
-        $label_3 = $labelled_values->current();
-        $this->assertSame('id_3', $label_3->value());
-        $this->assertSame('', $label_3->label());
-        $this->assertFalse($label_3->isFromVocabulary());
-        $labelled_values->next();
-        $label_something = $labelled_values->current();
-        $this->assertSame('something', $label_something->value());
-        $this->assertSame('', $label_something->label());
-        $this->assertFalse($label_something->isFromVocabulary());
+        $this->assertNull($labelled_values->current());
     }
 
     public function testLabelsForValuesSelectionDisabled(): void
@@ -297,20 +284,7 @@ class BridgeTest extends TestCase
             'something'
         );
 
-        $label_1 = $labelled_values->current();
-        $this->assertSame('id_1', $label_1->value());
-        $this->assertSame('', $label_1->label());
-        $this->assertFalse($label_1->isFromVocabulary());
-        $labelled_values->next();
-        $label_3 = $labelled_values->current();
-        $this->assertSame('id_3', $label_3->value());
-        $this->assertSame('', $label_3->label());
-        $this->assertFalse($label_3->isFromVocabulary());
-        $labelled_values->next();
-        $label_something = $labelled_values->current();
-        $this->assertSame('something', $label_something->value());
-        $this->assertSame('', $label_something->label());
-        $this->assertFalse($label_something->isFromVocabulary());
+        $this->assertNull($labelled_values->current());
     }
 
     public function testLabelsForValues(): void
@@ -333,16 +307,11 @@ class BridgeTest extends TestCase
         $label_1 = $labelled_values->current();
         $this->assertSame('id_1', $label_1->value());
         $this->assertSame('title cp 1', $label_1->label());
-        $this->assertTrue($label_1->isFromVocabulary());
         $labelled_values->next();
         $label_3 = $labelled_values->current();
         $this->assertSame('id_3', $label_3->value());
         $this->assertSame('title cp 3', $label_3->label());
-        $this->assertTrue($label_3->isFromVocabulary());
         $labelled_values->next();
-        $label_something = $labelled_values->current();
-        $this->assertSame('something', $label_something->value());
-        $this->assertSame('', $label_something->label());
-        $this->assertFalse($label_something->isFromVocabulary());
+        $this->assertNull($labelled_values->current());
     }
 }

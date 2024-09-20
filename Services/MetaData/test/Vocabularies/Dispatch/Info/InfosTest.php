@@ -18,17 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dispatch;
+namespace ILIAS\MetaData\Vocabularies\Dispatch\Info;
 
-use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+use PHPUnit\Framework\TestCase;
 
-interface PropertiesInterface
+class InfosTest extends TestCase
 {
-    public function activate(VocabularyInterface $vocabulary): void;
-
-    public function deactivate(VocabularyInterface $vocabulary): void;
-
-    public function allowCustomInput(VocabularyInterface $vocabulary): void;
-
-    public function disallowCustomInput(VocabularyInterface $vocabulary): void;
 }

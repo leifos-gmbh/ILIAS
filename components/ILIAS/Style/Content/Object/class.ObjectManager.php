@@ -66,7 +66,7 @@ class ObjectManager
      * this returns an empty array. If a ref id is provided for the manager,
      * upper container will be searched for shared local content styles.
      */
-    public function getSelectableStyles(): array
+    public function getSelectableStyles() : array
     {
         $settings = $this->settings;
         $tree = $this->domain_service->repositoryTree();
@@ -99,7 +99,7 @@ class ObjectManager
         return $st_styles;
     }
 
-    protected function isSelectable(int $style_id): bool
+    protected function isSelectable(int $style_id) : bool
     {
         $sel_types = $this->getSelectableStyles();
         if (isset($sel_types[$style_id])) {
@@ -108,17 +108,17 @@ class ObjectManager
         return false;
     }
 
-    public function updateStyleId(int $style_id): void
+    public function updateStyleId(int $style_id) : void
     {
         ilObjStyleSheet::writeStyleUsage($this->obj_id, $style_id);
     }
 
-    public function setOwnerOfStyle(int $style_id): void
+    public function setOwnerOfStyle(int $style_id) : void
     {
         ilObjStyleSheet::writeOwner($this->obj_id, $style_id);
     }
 
-    public function getStyleId(): int
+    public function getStyleId() : int
     {
         return ilObjStyleSheet::lookupObjectStyle($this->obj_id);
     }
@@ -126,7 +126,7 @@ class ObjectManager
     /**
      * Clones a style to a new object (or references the same standard style)
      */
-    public function cloneTo(int $obj_id): void
+    public function cloneTo(int $obj_id) : void
     {
         $this->log->debug("Cloning style from ref id: " . $this->ref_id .
             ", obj id: " . $this->obj_id . ", style id: " . $this->getStyleId() . ", to new obj id: " .
@@ -145,7 +145,7 @@ class ObjectManager
     /**
      * Inherits a non local style from the parent container
      */
-    public function inheritFromParent(): void
+    public function inheritFromParent() : void
     {
         if ($this->ref_id > 0) {
             $tree = $this->domain_service->repositoryTree();
@@ -161,7 +161,7 @@ class ObjectManager
         }
     }
 
-    public function getEffectiveStyleId(): int
+    public function getEffectiveStyleId() : int
     {
         $settings = $this->settings;
 
@@ -191,12 +191,12 @@ class ObjectManager
     }
 
     // is a style owned by an object?
-    public function isOwned(int $style_id): bool
+    public function isOwned(int $style_id) : bool
     {
         return $this->object_repo->isOwned($this->obj_id, $style_id);
     }
 
-    public function globalFixed(): bool
+    public function globalFixed() : bool
     {
         $fixed_style = (int) $this->settings->get("fixed_content_style_id");
         if ($fixed_style > 0) {
@@ -205,7 +205,7 @@ class ObjectManager
         return false;
     }
 
-    public function getGlobalFixedTitle(): string
+    public function getGlobalFixedTitle() : string
     {
         if ($this->globalFixed()) {
             $fixed_style = (int) $this->settings->get("fixed_content_style_id");
@@ -214,7 +214,16 @@ class ObjectManager
         return "";
     }
 
-    public function hasEffectiveIndividualStyle(int $current_style): bool
+    public function getGlobalDefaultTitle() : string
+    {
+        $style_id = (int) $this->settings->get("default_content_style_id");
+        if ($style_id > 0) {
+            return ilObject::_lookupTitle($style_id);
+        }
+        return "";
+    }
+
+    public function hasEffectiveIndividualStyle(int $current_style) : bool
     {
         if ($this->globalFixed()) {
             return false;
@@ -225,7 +234,7 @@ class ObjectManager
         return false;
     }
 
-    public function canSelectStyle(int $current_style): bool
+    public function canSelectStyle(int $current_style) : bool
     {
         if ($this->globalFixed() || $this->hasEffectiveIndividualStyle($current_style)) {
             return false;

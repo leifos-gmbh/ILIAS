@@ -111,22 +111,14 @@ class ilClassificationBlockGUI extends ilBlockGUI
 
     public function getHTML(): string
     {
-        $tpl = $this->main_tpl;
-        $ilCtrl = $this->ctrl;
-
-        if (!$ilCtrl->isAsynch()) {
-            //            $this->repo->unsetAll();
-        }
-
         $this->initProviders();
 
         if (!$this->validate()) {
             return "";
         }
+        $module = '<script type="module" src="./assets/js/ilClassification.js"></script>';
 
-        $tpl->addJavaScript("assets/js/ilClassification.js");
-
-        return parent::getHTML();
+        return parent::getHTML() . $module;
     }
 
     public function getAjax(): void

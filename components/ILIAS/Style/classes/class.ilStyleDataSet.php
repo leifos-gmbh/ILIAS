@@ -41,6 +41,7 @@ use ILIAS\ResourceStorage\Identification\ResourceIdentification;
  */
 class ilStyleDataSet extends ilDataSet
 {
+    protected Content\DomainService $content_style_domain;
     protected Content\InternalDomainService $style_domain;
     protected ?ilObjStyleSheet $current_obj = null;
     /**
@@ -69,6 +70,7 @@ class ilStyleDataSet extends ilDataSet
         $this->rbacsystem = $DIC->rbac()->system();
         $this->user = $DIC->user();
         $this->style_domain = $DIC->contentStyle()->internal()->domain();
+        $this->content_style_domain = $DIC->contentStyle()->domain();
     }
 
 
@@ -398,7 +400,7 @@ class ilStyleDataSet extends ilDataSet
         switch ($a_entity) {
             case "object_style":
                 $this->ds_log->debug("object id: " . ($a_rec["ObjectId"] ?? null));
-                $style_id = ilObjStyleSheet::lookupObjectStyle($a_rec["ObjectId"] ?? 0);
+                $style_id = $this->content_style_domain->styleForObjId($a_rec["ObjectId"] ?? 0)->getExportStyleId();
                 $this->ds_log->debug("style id: " . $style_id);
                 //if ($style_id > 0 && !ilObjStyleSheet::_lookupStandard($style_id))
                 if ($style_id > 0 && ilObject::_lookupType($style_id) == "sty") {			// #0019337 always export style, if valid

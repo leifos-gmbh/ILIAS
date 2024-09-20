@@ -164,7 +164,7 @@ class IRSSWrapper
         $this->irss->collection()->store($collection);
     }
 
-    protected function getResourceIdForIdString(string $rid): ?ResourceIdentification
+    public function getResourceIdForIdString(string $rid): ?ResourceIdentification
     {
         return $this->irss->manage()->find($rid);
     }
@@ -407,6 +407,67 @@ class IRSSWrapper
             $stakeholder
         );
         return $rid->serialize();
+    }
+
+    public function createContainerFromLocalZip(
+        string $local_zip_path,
+        ResourceStakeholder $stakeholder
+    ) : string
+    {
+        $stream = fopen($local_zip_path, 'r');
+        $fs = new Stream($stream);
+
+        $rid = $this->irss->manageContainer()->containerFromStream(
+            $fs,
+            $stakeholder
+        );
+        return $rid->serialize();
+    }
+
+    public function createContainerFromLocalDir(
+        string $local_dir_path,
+        ResourceStakeholder $stakeholder
+    ) : string
+    {
+        $real_dir_path = realpath($local_dir_path);
+        $rid = $this->createContainer($stakeholder);
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($local_dir_path, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($iterator as $file) {
+            if (!$file->isDir()) {
+                $file->getRealPath();
+                var_dump($rid);
+                var_dump($file->getRealPath());
+                var_dump(substr($file->getRealPath(), strlen($real_dir_path) + 1));
+                exit;
+                $this->addLocalFileToContainer(
+                    $rid,
+                    $file->getRealPath(),
+                    substr($file->getRealPath(), strlen($real_dir_path) + 1)
+                );
+            }
+        }
+        return $rid;
+    }
+
+    public function addLocalFileToContainer(
+        string $rid,
+        string $fullpath,
+        string $path
+    ) : void
+    {
+        $id = $this->getResourceIdForIdString($rid);
+        $stream = fopen($fullpath, 'r');
+        $fs = new Stream($stream);
+        $this->irss->manageContainer()->removePathInsideContainer($id, $path);
+        $this->irss->manageContainer()->addStreamToContainer(
+            $id,
+            $fs,
+            $path
+        );
+        fclose($stream);
     }
 
     public function addStringToContainer(

@@ -24,6 +24,8 @@ use ilDBInterface;
 use ILIAS\Style\Content\InternalDataService;
 use ILIAS\Exercise\IRSS\IRSSWrapper;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
+use ILIAS\ResourceStorage\Identification\ResourceIdentification;
+use ILIAS\Filesystem\Stream\Stream;
 
 class StyleRepo
 {
@@ -61,6 +63,38 @@ class StyleRepo
     ) : string
     {
         $rid = $this->irss->createContainer($stakeholder);
+        $this->db->update("style_data", [
+            "rid" => ["string", $rid]
+        ], [    // where
+                "id" => ["integer", $style_id]
+            ]
+        );
+        return $rid;
+    }
+
+    public function createContainerFromLocalZip(
+        int $style_id,
+        string $local_zip_path,
+        ResourceStakeholder $stakeholder
+    ) : string
+    {
+        $rid = $this->irss->createContainerFromLocalZip($local_zip_path, $stakeholder);
+        $this->db->update("style_data", [
+            "rid" => ["string", $rid]
+        ], [    // where
+                "id" => ["integer", $style_id]
+            ]
+        );
+        return $rid;
+    }
+
+    public function createContainerFromLocalDir(
+        int $style_id,
+        string $local_dir_path,
+        ResourceStakeholder $stakeholder
+    ) : string
+    {
+        $rid = $this->irss->createContainerFromLocalDir($local_dir_path, $stakeholder);
         $this->db->update("style_data", [
             "rid" => ["string", $rid]
         ], [    // where
@@ -125,5 +159,14 @@ class StyleRepo
             }
         }
         return $path;
+    }
+
+    public function getResourceIdentification(int $style_id) : ?ResourceIdentification
+    {
+        $rid = $this->readRid($style_id);
+        if ($rid !== "") {
+            return $this->irss->getResourceIdForIdString($rid);
+        }
+        return null;
     }
 }

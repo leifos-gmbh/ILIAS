@@ -24,6 +24,8 @@ use ILIAS\Style\Content\InternalDataService;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Style\Content\InternalRepoService;
 use ILIAS\Style\Content\InternalDomainService;
+use ILIAS\ResourceStorage\Identification\ResourceIdentification;
+use ILIAS\FileUpload\DTO\UploadResult;
 
 class StyleManager
 {
@@ -58,6 +60,47 @@ class StyleManager
             $this->style_id,
             $add_random,
             $add_token
+        );
+    }
+
+    public function getResourceIdentification() : ?ResourceIdentification
+    {
+        return $this->repo->getResourceIdentification($this->style_id);
+    }
+
+    public function createContainerFromLocalZip(
+        string $local_zip_path
+    ) : string
+    {
+        return $this->repo->createContainerFromLocalZip(
+            $this->style_id,
+            $local_zip_path,
+            $this->stakeholder
+        );
+    }
+
+    public function createContainerFromLocalDir(
+        string $local_dir_path
+    ) : string
+    {
+        return $this->repo->createContainerFromLocalDir(
+            $this->style_id,
+            $local_dir_path,
+            $this->stakeholder
+        );
+    }
+
+    public function importFromUploadResult(
+        UploadResult $result,
+    ) : int {
+        $imp = new \ilImport();
+        return $imp->importObject(
+            null,
+            $result->getPath(),
+            $result->getName(),
+            "sty",
+            "",
+            true
         );
     }
 }

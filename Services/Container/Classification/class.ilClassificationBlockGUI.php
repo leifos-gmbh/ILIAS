@@ -111,22 +111,14 @@ class ilClassificationBlockGUI extends ilBlockGUI
 
     public function getHTML(): string
     {
-        $tpl = $this->main_tpl;
-        $ilCtrl = $this->ctrl;
-
-        if (!$ilCtrl->isAsynch()) {
-            //            $this->repo->unsetAll();
-        }
-
         $this->initProviders();
 
         if (!$this->validate()) {
             return "";
         }
+        $module = '<script type="module" src="./Services/Container/Classification/js/ilClassification.js"></script>';
 
-        $tpl->addJavaScript("Services/Container/Classification/js/ilClassification.js");
-
-        return parent::getHTML();
+        return parent::getHTML() . $module;
     }
 
     public function getAjax(): void
@@ -166,8 +158,8 @@ class ilClassificationBlockGUI extends ilBlockGUI
 
 
         // #15008 - always load regardless of content (because of redraw)
-        $tpl->addOnLoadCode('il.Classification.setAjax("' . $ajax_block_id . '", "' .
-            $ajax_block_url . '", "' . $ajax_content_id . '", "' . $ajax_content_url . '", ' . json_encode($tabs_html) . ');');
+        /*$tpl->addOnLoadCode('il.Classification.setAjax("' . $ajax_block_id . '", "' .
+            $ajax_block_url . '", "' . $ajax_content_id . '", "' . $ajax_content_url . '", ' . json_encode($tabs_html) . ');');*/
 
         $overall_html = "";
         if (sizeof($html)) {
@@ -179,6 +171,12 @@ class ilClassificationBlockGUI extends ilBlockGUI
                 $btpl->setVariable("CHUNK", $item["html"]);
                 $btpl->parseCurrentBlock();
             }
+
+            $btpl->setVariable("AJAX_BLOCK_ID", $ajax_block_id);
+            $btpl->setVariable("AJAX_BLOCK_URL", $ajax_block_url);
+            $btpl->setVariable("AJAX_CONTENT_ID", $ajax_content_id);
+            $btpl->setVariable("AJAX_CONTENT_URL", $ajax_content_url);
+            $btpl->setVariable("TABS_HTML", json_encode($tabs_html));
 
             $overall_html .= $btpl->get();
             //$this->tpl->setVariable("DATA", $btpl->get());
@@ -344,7 +342,9 @@ class ilClassificationBlockGUI extends ilBlockGUI
         // if nothing has been selected reload to category page
         if ($no_provider) {
             echo "<span id='block_" . $this->getBlockType() . "_0_loader'></span>";
-            echo "<script>il.Classification.returnToParent();</script>";
+            //echo "<script>il.Classification.returnToParent();</script>";
+            echo "<script>document.location.reload();</script>";
+            //$this->ctrl->redirect($this->returnToParent());
             exit();
         }
 

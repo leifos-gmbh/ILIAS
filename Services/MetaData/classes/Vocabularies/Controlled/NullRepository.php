@@ -72,7 +72,7 @@ class NullRepository implements RepositoryInterface
     /**
      * @return VocabularyInterface[]
      */
-    public function getActiveVocabulariesForSlot(SlotIdentifier ...$slots): \Generator
+    public function getActiveVocabulariesForSlots(SlotIdentifier ...$slots): \Generator
     {
         yield from [];
     }

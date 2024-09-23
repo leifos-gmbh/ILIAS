@@ -75,8 +75,7 @@ class Dispatcher implements DispatcherInterface
                 yield $from_copyright;
             }
         }
-
-        yield from $this->controlled_repo->getActiveVocabulariesForSlot(...$slots);
+        yield from $this->controlled_repo->getActiveVocabulariesForSlots(...$slots);
         yield from $this->standard_repo->getActiveVocabularies(...$slots);
     }
 

@@ -60,7 +60,7 @@ interface RepositoryInterface
     /**
      * @return VocabularyInterface[]
      */
-    public function getActiveVocabulariesForSlot(SlotIdentifier ...$slots): \Generator;
+    public function getActiveVocabulariesForSlots(SlotIdentifier ...$slots): \Generator;
 
     public function isCustomInputAllowedForSlot(SlotIdentifier $slot): bool;
 

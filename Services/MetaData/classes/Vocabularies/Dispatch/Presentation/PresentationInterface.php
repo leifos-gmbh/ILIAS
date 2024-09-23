@@ -23,6 +23,7 @@ namespace ILIAS\MetaData\Vocabularies\Dispatch\Presentation;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 interface PresentationInterface
 {
@@ -33,7 +34,7 @@ interface PresentationInterface
      */
     public function presentableLabels(
         PresentationUtilities $presentation_utilities,
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         bool $with_unknown_vocab_flag,
         string ...$values
     ): \Generator;

@@ -27,6 +27,7 @@ use ILIAS\MetaData\Vocabularies\Standard\RepositoryInterface as StandardReposito
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Type;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class Presentation implements PresentationInterface
 {
@@ -49,26 +50,20 @@ class Presentation implements PresentationInterface
      */
     public function presentableLabels(
         PresentationUtilities $presentation_utilities,
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         bool $with_unknown_vocab_flag,
         string ...$values
     ): \Generator {
         $labelled_values = array_fill_keys($values, null);
 
-        foreach ($this->copyright->labelsForValues(
-            $path_to_element,
-            ...$values
-        ) as $label) {
+        foreach ($this->copyright->labelsForValues($slot, ...$values) as $label) {
             if (!array_key_exists($label->value(), $labelled_values)) {
                 continue;
             }
             $labelled_values[$label->value()] = $label;
         }
 
-        foreach ($this->controlled->getLabelsForValues(
-            $path_to_element,
-            ...$values
-        ) as $label) {
+        foreach ($this->controlled->getLabelsForValues($slot, ...$values) as $label) {
             if (
                 !array_key_exists($label->value(), $labelled_values) ||
                 !is_null($labelled_values[$label->value()])
@@ -80,7 +75,7 @@ class Presentation implements PresentationInterface
 
         foreach ($this->standard->getLabelsForValues(
             $presentation_utilities,
-            $path_to_element,
+            $slot,
             ...$values
         ) as $label) {
             if (
@@ -116,7 +111,7 @@ class Presentation implements PresentationInterface
             case Type::STANDARD:
                 yield from $this->standard->getLabelsForValues(
                     $presentation_utilities,
-                    $vocabulary->applicableTo(),
+                    $vocabulary->slot(),
                     ...$vocabulary->values()
                 );
                 break;
@@ -124,14 +119,14 @@ class Presentation implements PresentationInterface
             case Type::CONTROLLED_STRING:
             case Type::CONTROLLED_VOCAB_VALUE:
                 yield from $this->controlled->getLabelsForValues(
-                    $vocabulary->applicableTo(),
+                    $vocabulary->slot(),
                     ...$vocabulary->values()
                 );
                 break;
 
             case Type::COPYRIGHT:
                 yield from $this->copyright->labelsForValues(
-                    $vocabulary->applicableTo(),
+                    $vocabulary->slot(),
                     ...$vocabulary->values()
                 );
                 break;

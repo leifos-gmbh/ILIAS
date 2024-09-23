@@ -18,13 +18,20 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Conditions;
+namespace ILIAS\MetaData\Vocabularies\Slots\Conditions;
 
 use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Paths\NullPath;
 
-interface ConditionInterface
+class NullCondition implements ConditionInterface
 {
-    public function value(): string;
+    public function value(): string
+    {
+        return '';
+    }
 
-    public function path(): PathInterface;
+    public function path(): PathInterface
+    {
+        return new NullPath();
+    }
 }

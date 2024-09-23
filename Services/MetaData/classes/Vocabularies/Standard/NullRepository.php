@@ -22,46 +22,41 @@ namespace ILIAS\MetaData\Vocabularies\Standard;
 
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class NullRepository implements RepositoryInterface
 {
-    public function deactivateVocabulary(
-        PathInterface $applicable_to,
-        ?string $condition_value
-    ): void {
+    public function deactivateVocabulary(SlotIdentifier $slot): void
+    {
     }
 
-    public function activateVocabulary(
-        PathInterface $applicable_to,
-        ?string $condition_value
-    ): void {
+    public function activateVocabulary(SlotIdentifier $slot): void
+    {
     }
 
-    public function isVocabularyDeactivated(
-        PathInterface $applicable_to,
-        ?string $condition_value
-    ): bool {
+    public function isVocabularyDeactivated(SlotIdentifier $slot): bool
+    {
         return false;
     }
 
-    public function countActiveVocabularies(PathInterface $applicable_to): int
+    public function countActiveVocabularies(SlotIdentifier $slot): int
     {
         return 0;
     }
 
-    public function getVocabularies(PathInterface $applicable_to): \Generator
+    public function getVocabularies(SlotIdentifier ...$slots): \Generator
     {
         yield from [];
     }
 
-    public function getActiveVocabularies(PathInterface $applicable_to): \Generator
+    public function getActiveVocabularies(SlotIdentifier ...$slots): \Generator
     {
         yield from [];
     }
 
     public function getLabelsForValues(
         PresentationUtilities $presentation_utilities,
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         string ...$values
     ): \Generator {
         yield from [];

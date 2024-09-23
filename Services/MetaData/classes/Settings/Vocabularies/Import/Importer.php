@@ -23,6 +23,8 @@ namespace ILIAS\MetaData\Settings\Vocabularies\Import;
 use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledVocabsRepository;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\Slots\HandlerInterface as SlotHandler;
 
 class Importer
 {
@@ -30,13 +32,16 @@ class Importer
 
     protected PathFactory $path_factory;
     protected ControlledVocabsRepository $vocab_repo;
+    protected SlotHandler $slot_handler;
 
     public function __construct(
         PathFactory $path_factory,
-        ControlledVocabsRepository $vocab_repo
+        ControlledVocabsRepository $vocab_repo,
+        SlotHandler $slot_handler
     ) {
         $this->path_factory = $path_factory;
         $this->vocab_repo = $vocab_repo;
+        $this->slot_handler = $slot_handler;
     }
 
     public function import(string $xml_string): Result
@@ -49,13 +54,7 @@ class Importer
         $errors = [];
 
         try {
-            $path_to_element = $this->extractPathToElement($xml_path);
-        } catch (\ilMDPathException $e) {
-            $errors[] = $e->getMessage();
-        }
-        $path_to_condition = null;
-        try {
-            $path_to_condition = $this->extractPathToCondition($xml_path);
+            $slot = $this->extractVocabularySlot($xml_path);
         } catch (\ilMDPathException $e) {
             $errors[] = $e->getMessage();
         }
@@ -64,20 +63,20 @@ class Importer
         if (!empty($duplicates)) {
             $errors[] = 'The following values are not unique: ' . implode(', ', $duplicates);
         }
-        if (isset($path_to_element)) {
-            $already_exist = $this->findAlreadyExistingValues($xml_path, $path_to_element);
+        if (isset($slot)) {
+            $already_exist = $this->findAlreadyExistingValues($xml_path, $slot);
             if (!empty($already_exist)) {
                 $errors[] = 'The following values already exist in other vocabularies of the element: ' .
                     implode(', ', $already_exist);
             }
         }
 
-        if (
-            empty($errors) &&
-            isset($path_to_element)
-        ) {
+        if (empty($errors) && isset($slot)) {
             try {
-                $vocab_id = $this->createVocabulary($xml_path, $path_to_element, $path_to_condition);
+                $vocab_id = $this->createVocabulary(
+                    $slot,
+                    $this->extractSource($xml_path)
+                );
             } catch (\ilMDVocabulariesException $e) {
                 $errors[] = $e->getMessage();
             }
@@ -131,6 +130,19 @@ class Importer
         return $node?->nodeValue;
     }
 
+    protected function extractVocabularySlot(\DOMXPath $xml_path): SlotIdentifier
+    {
+        $path_to_element = $this->extractPathToElement($xml_path);
+        $path_to_condition = $this->extractPathToCondition($xml_path);
+        $condition_value = $this->extractConditionValue($xml_path);
+
+        return $this->slot_handler->identiferFromPathAndCondition(
+            $path_to_element,
+            $path_to_condition,
+            $condition_value
+        );
+    }
+
     protected function extractSource(\DOMXPath $xml_path): string
     {
         $node = $xml_path->query('//vocabulary/source')->item(0);
@@ -172,14 +184,14 @@ class Importer
      */
     protected function findAlreadyExistingValues(
         \DOMXPath $xml_path,
-        PathInterface $path_to_element
+        SlotIdentifier $slot
     ): array {
         $values = [];
         foreach ($this->extractValuesAndLabels($xml_path) as $value => $label) {
             $values[] = $value;
         }
         return iterator_to_array($this->vocab_repo->findAlreadyExistingValues(
-            $path_to_element,
+            $slot,
             ...$values
         ));
     }
@@ -188,16 +200,10 @@ class Importer
      * Returns vocab ID
      */
     protected function createVocabulary(
-        \DOMXPath $xml_path,
-        PathInterface $path_to_element,
-        ?PathInterface $path_to_condition
+        SlotIdentifier $slot,
+        string $source
     ): string {
-        return $this->vocab_repo->create(
-            $path_to_element,
-            $path_to_condition,
-            $this->extractConditionValue($xml_path),
-            $this->extractSource($xml_path)
-        );
+        return $this->vocab_repo->create($slot, $source);
     }
 
     protected function addValuesToVocabulary(

@@ -43,7 +43,7 @@ class Infos implements InfosInterface
         switch ($vocabulary->type()) {
             case Type::STANDARD:
             case Type::CONTROLLED_VOCAB_VALUE:
-                return $this->hasElementOfVocabularyAnotherActiveVocabulary($vocabulary);
+                return $this->hasSlotOfVocabularyAnotherActiveVocabulary($vocabulary);
 
             case Type::CONTROLLED_STRING:
                 return true;
@@ -89,7 +89,7 @@ class Infos implements InfosInterface
                 return true;
 
             case Type::CONTROLLED_VOCAB_VALUE:
-                return $this->hasElementOfVocabularyAnotherActiveVocabulary($vocabulary);
+                return $this->hasSlotOfVocabularyAnotherActiveVocabulary($vocabulary);
 
             default:
             case Type::STANDARD:
@@ -101,12 +101,12 @@ class Infos implements InfosInterface
     /**
      * Whether the given vocabulary is active or not is irrelevant.
      */
-    protected function hasElementOfVocabularyAnotherActiveVocabulary(VocabularyInterface $vocabulary): bool
+    protected function hasSlotOfVocabularyAnotherActiveVocabulary(VocabularyInterface $vocabulary): bool
     {
-        $path = $vocabulary->applicableTo();
+        $slot = $vocabulary->slot();
         $other_active_repositories_count =
-            $this->standard_repo->countActiveVocabularies($path) +
-            $this->controlled_repo->countActiveVocabulariesForElement($path) -
+            $this->standard_repo->countActiveVocabularies($slot) +
+            $this->controlled_repo->countActiveVocabulariesForSlot($slot) -
             ((int) $vocabulary->isActive());
         return $other_active_repositories_count > 0;
     }

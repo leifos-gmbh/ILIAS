@@ -46,10 +46,7 @@ class Properties implements PropertiesInterface
     {
         switch ($vocabulary->type()) {
             case Type::STANDARD:
-                $this->standard_repo->activateVocabulary(
-                    $vocabulary->applicableTo(),
-                    $vocabulary->condition()?->value()
-                );
+                $this->standard_repo->activateVocabulary($vocabulary->slot());
                 break;
 
             case Type::CONTROLLED_STRING:
@@ -74,10 +71,7 @@ class Properties implements PropertiesInterface
 
         switch ($vocabulary->type()) {
             case Type::STANDARD:
-                $this->standard_repo->deactivateVocabulary(
-                    $vocabulary->applicableTo(),
-                    $vocabulary->condition()?->value()
-                );
+                $this->standard_repo->deactivateVocabulary($vocabulary->slot());
                 break;
 
             case Type::CONTROLLED_STRING:

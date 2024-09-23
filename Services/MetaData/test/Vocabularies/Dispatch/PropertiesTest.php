@@ -29,28 +29,23 @@ use ILIAS\MetaData\Vocabularies\Standard\RepositoryInterface as StandardRepo;
 use ILIAS\MetaData\Vocabularies\Dispatch\Info\NullInfos;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Standard\NullRepository as NullStandardRepo;
-use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Vocabularies\Vocabulary;
 use ILIAS\MetaData\Vocabularies\NullVocabulary;
-use ILIAS\MetaData\Paths\NullPath;
-use ilMDVocabulariesException;
-use ILIAS\MetaData\Vocabularies\Conditions\ConditionInterface;
-use ILIAS\MetaData\Vocabularies\Conditions\NullCondition;
+use ILIAS\MetaData\Vocabularies\Slots\Conditions\ConditionInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Conditions\NullCondition;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class PropertiesTest extends TestCase
 {
     public function getVocabulary(
         Type $type,
         string $id,
-        string $applicable_to,
-        ?string $condition_value = null
+        SlotIdentifier $slot = SlotIdentifier::NULL
     ): VocabularyInterface {
-        return new class ($type, $id, $applicable_to, $condition_value) extends NullVocabulary {
+        return new class ($type, $id, $slot) extends NullVocabulary {
             public function __construct(
                 protected Type $type,
                 protected string $id,
-                protected string $applicable_to,
-                protected ?string $condition_value
+                protected SlotIdentifier $slot
             ) {
             }
 
@@ -64,35 +59,9 @@ class PropertiesTest extends TestCase
                 return $this->id;
             }
 
-            public function condition(): ?ConditionInterface
+            public function slot(): SlotIdentifier
             {
-                if (is_null($this->condition_value)) {
-                    return null;
-                }
-                return new class ($this->condition_value) extends NullCondition {
-                    public function __construct(protected string $value)
-                    {
-                    }
-
-                    public function value(): string
-                    {
-                        return $this->value;
-                    }
-                };
-            }
-
-            public function applicableTo(): PathInterface
-            {
-                return new class ($this->applicable_to) extends NullPath {
-                    public function __construct(protected string $path_string)
-                    {
-                    }
-
-                    public function toString(): string
-                    {
-                        return $this->path_string;
-                    }
-                };
+                return $this->slot;
             }
         };
     }
@@ -158,24 +127,18 @@ class PropertiesTest extends TestCase
         return new class () extends NullStandardRepo {
             public array $changes_to_active = [];
 
-            public function activateVocabulary(
-                PathInterface $applicable_to,
-                ?string $condition_value
-            ): void {
+            public function activateVocabulary(SlotIdentifier $slot): void
+            {
                 $this->changes_to_active[] = [
-                    'applicable_to' => $applicable_to->toString(),
-                    'condition_value' => $condition_value,
+                    'slot' => $slot,
                     'active' => true
                 ];
             }
 
-            public function deactivateVocabulary(
-                PathInterface $applicable_to,
-                ?string $condition_value
-            ): void {
+            public function deactivateVocabulary(SlotIdentifier $slot): void
+            {
                 $this->changes_to_active[] = [
-                    'applicable_to' => $applicable_to->toString(),
-                    'condition_value' => $condition_value,
+                    'slot' => $slot,
                     'active' => false
                 ];
             }
@@ -189,31 +152,12 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element');
+        $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->activate($vocab);
 
         $this->assertSame(
-            [['applicable_to' => 'some element', 'condition_value' => null, 'active' => true]],
-            $standard_repo->changes_to_active
-        );
-        $this->assertEmpty($controlled_repo->changes_to_active);
-        $this->assertEmpty($controlled_repo->changes_to_custom_input);
-    }
-
-    public function testActivateStandardWithCondition(): void
-    {
-        $properties = new Properties(
-            $this->getInfos(true, false, false),
-            $controlled_repo = $this->getControlledRepo(),
-            $standard_repo = $this->getStandardRepo(),
-        );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element', 'cond value');
-
-        $properties->activate($vocab);
-
-        $this->assertSame(
-            [['applicable_to' => 'some element', 'condition_value' => 'cond value', 'active' => true]],
+            [['slot' => SlotIdentifier::LIFECYCLE_STATUS, 'active' => true]],
             $standard_repo->changes_to_active
         );
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -227,7 +171,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->activate($vocab);
 
@@ -246,7 +190,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->activate($vocab);
 
@@ -265,7 +209,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->activate($vocab);
 
@@ -281,7 +225,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element');
+        $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
         $this->expectException(\ilMDVocabulariesException::class);
         $properties->deactivate($vocab);
@@ -294,31 +238,12 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element');
+        $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->deactivate($vocab);
 
         $this->assertSame(
-            [['applicable_to' => 'some element', 'condition_value' => null, 'active' => false]],
-            $standard_repo->changes_to_active
-        );
-        $this->assertEmpty($controlled_repo->changes_to_active);
-        $this->assertEmpty($controlled_repo->changes_to_custom_input);
-    }
-
-    public function testDeactivateStandardWithCondition(): void
-    {
-        $properties = new Properties(
-            $this->getInfos(true, false, false),
-            $controlled_repo = $this->getControlledRepo(),
-            $standard_repo = $this->getStandardRepo(),
-        );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element', 'cond value');
-
-        $properties->deactivate($vocab);
-
-        $this->assertSame(
-            [['applicable_to' => 'some element', 'condition_value' => 'cond value', 'active' => false]],
+            [['slot' => SlotIdentifier::LIFECYCLE_STATUS, 'active' => false]],
             $standard_repo->changes_to_active
         );
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -332,7 +257,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->deactivate($vocab);
 
@@ -351,7 +276,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->deactivate($vocab);
 
@@ -370,7 +295,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->deactivate($vocab);
 
@@ -386,9 +311,9 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element');
+        $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $this->expectException(ilMDVocabulariesException::class);
+        $this->expectException(\ilMDVocabulariesException::class);
         $properties->allowCustomInput($vocab);
     }
 
@@ -399,7 +324,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element');
+        $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->allowCustomInput($vocab);
 
@@ -415,7 +340,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->allowCustomInput($vocab);
 
@@ -434,7 +359,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->allowCustomInput($vocab);
 
@@ -450,7 +375,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->allowCustomInput($vocab);
 
@@ -466,9 +391,9 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element');
+        $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $this->expectException(ilMDVocabulariesException::class);
+        $this->expectException(\ilMDVocabulariesException::class);
         $properties->disallowCustomInput($vocab);
     }
 
@@ -479,9 +404,9 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element');
+        $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $this->expectException(ilMDVocabulariesException::class);
+        $this->expectException(\ilMDVocabulariesException::class);
         $properties->disallowCustomInput($vocab);
     }
 
@@ -492,7 +417,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::STANDARD, '', 'some element');
+        $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->disallowCustomInput($vocab);
 
@@ -508,7 +433,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->disallowCustomInput($vocab);
 
@@ -527,7 +452,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->disallowCustomInput($vocab);
 
@@ -543,7 +468,7 @@ class PropertiesTest extends TestCase
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
-        $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', 'some element');
+        $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
         $properties->disallowCustomInput($vocab);
 

@@ -20,25 +20,25 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies;
 
-use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 interface FactoryInterface
 {
-    public function standard(PathInterface $applicable_to, string ...$values): BuilderInterface;
+    public function standard(SlotIdentifier $slot, string ...$values): BuilderInterface;
 
     public function controlledString(
-        PathInterface $applicable_to,
+        SlotIdentifier $slot,
         string $id,
         string $source,
         string ...$values
     ): BuilderInterface;
 
     public function controlledVocabValue(
-        PathInterface $applicable_to,
+        SlotIdentifier $slot,
         string $id,
         string $source,
         string ...$values
     ): BuilderInterface;
 
-    public function copyright(PathInterface $applicable_to, string ...$values): BuilderInterface;
+    public function copyright(string ...$values): BuilderInterface;
 }

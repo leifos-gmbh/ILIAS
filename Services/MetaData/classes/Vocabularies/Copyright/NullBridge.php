@@ -23,17 +23,17 @@ namespace ILIAS\MetaData\Vocabularies\Copyright;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class NullBridge implements BridgeInterface
 {
-    public function vocabularyForElement(
-        PathInterface $path_to_element
-    ): ?VocabularyInterface {
+    public function vocabulary(SlotIdentifier $slot): ?VocabularyInterface
+    {
         return null;
     }
 
     public function labelsForValues(
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         string ...$values
     ): \Generator {
         yield from [];

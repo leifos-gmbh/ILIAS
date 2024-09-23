@@ -18,20 +18,28 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Conditions;
+namespace ILIAS\MetaData\Vocabularies\Slots\Conditions;
 
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Paths\NullPath;
 
-class NullCondition implements ConditionInterface
+class Condition implements ConditionInterface
 {
+    protected string $value;
+    protected PathInterface $path;
+
+    public function __construct(string $value, PathInterface $path)
+    {
+        $this->value = $value;
+        $this->path = $path;
+    }
+
     public function value(): string
     {
-        return '';
+        return $this->value;
     }
 
     public function path(): PathInterface
     {
-        return new NullPath();
+        return $this->path;
     }
 }

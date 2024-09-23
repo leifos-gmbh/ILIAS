@@ -26,43 +26,26 @@ use ILIAS\MetaData\Presentation\NullUtilities;
 use ILIAS\MetaData\Vocabularies\Type;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\NullVocabulary;
-use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Paths\NullPath;
 use ILIAS\MetaData\Vocabularies\Copyright\BridgeInterface as CopyrightBridge;
 use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledRepository;
 use ILIAS\MetaData\Vocabularies\Standard\RepositoryInterface as StandardRepository;
 use ILIAS\MetaData\Vocabularies\Copyright\NullBridge as NullCopyrightBridge;
 use ILIAS\MetaData\Vocabularies\Controlled\NullRepository as NullControlledRepository;
 use ILIAS\MetaData\Vocabularies\Standard\NullRepository as NullStandardRepository;
-use ILIAS\MetaData\Paths\Path;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 
 class PresentationTest extends TestCase
 {
-    public function getPath(string $path_string): PathInterface
-    {
-        return new class ($path_string) extends NullPath {
-            public function __construct(protected string $path_string)
-            {
-            }
-
-            public function toString(): string
-            {
-                return $this->path_string;
-            }
-        };
-    }
-
     public function getVocabulary(
         Type $type,
-        string $applicable_to,
+        SlotIdentifier $slot,
         string ...$values
     ): VocabularyInterface {
-        $applicable_to_path = $this->getPath($applicable_to);
-
-        return new class ($type, $applicable_to_path, $values) extends NullVocabulary {
+        return new class ($type, $slot, $values) extends NullVocabulary {
             public function __construct(
                 protected Type $type,
-                protected PathInterface $applicable_to,
+                protected SlotIdentifier $slot,
                 protected array $values
             ) {
             }
@@ -72,9 +55,9 @@ class PresentationTest extends TestCase
                 return $this->type;
             }
 
-            public function applicableTo(): PathInterface
+            public function slot(): SlotIdentifier
             {
-                return $this->applicable_to;
+                return $this->slot;
             }
 
             public function values(): \Generator
@@ -94,19 +77,23 @@ class PresentationTest extends TestCase
         };
     }
 
-    public function getCopyrightBridge(string ...$values_from_vocab): CopyrightBridge
-    {
-        return new class ($values_from_vocab) extends NullCopyrightBridge {
-            public function __construct(protected array $values_from_vocab)
-            {
+    public function getCopyrightBridge(
+        SlotIdentifier $slot_with_vocab,
+        string ...$values_from_vocab
+    ): CopyrightBridge {
+        return new class ($slot_with_vocab, $values_from_vocab) extends NullCopyrightBridge {
+            public function __construct(
+                protected SlotIdentifier $slot_with_vocab,
+                protected array $values_from_vocab
+            ) {
             }
 
             public function labelsForValues(
-                PathInterface $path_to_element,
+                SlotIdentifier $slot,
                 string ...$values
             ): \Generator {
                 foreach ($values as $value) {
-                    if ($path_to_element->toString() !== 'valid path') {
+                    if ($slot !== $this->slot_with_vocab) {
                         return;
                     }
                     if (!in_array($value, $this->values_from_vocab)) {
@@ -132,18 +119,22 @@ class PresentationTest extends TestCase
         };
     }
 
-    public function getControlledRepository(string ...$values_from_vocab): ControlledRepository
-    {
-        return new class ($values_from_vocab) extends NullControlledRepository {
-            public function __construct(protected array $values_from_vocab)
-            {
+    public function getControlledRepository(
+        SlotIdentifier $slot_with_vocab,
+        string ...$values_from_vocab
+    ): ControlledRepository {
+        return new class ($slot_with_vocab, $values_from_vocab) extends NullControlledRepository {
+            public function __construct(
+                protected SlotIdentifier $slot_with_vocab,
+                protected array $values_from_vocab
+            ) {
             }
 
             public function getLabelsForValues(
-                PathInterface $path_to_element,
+                SlotIdentifier $slot,
                 string ...$values
             ): \Generator {
-                if ($path_to_element->toString() !== 'valid path') {
+                if ($slot !== $this->slot_with_vocab) {
                     return;
                 }
                 foreach ($values as $value) {
@@ -170,19 +161,23 @@ class PresentationTest extends TestCase
         };
     }
 
-    public function getStandardRepository(string ...$values_from_vocab): StandardRepository
-    {
-        return new class ($values_from_vocab) extends NullStandardRepository {
-            public function __construct(protected array $values_from_vocab)
-            {
+    public function getStandardRepository(
+        SlotIdentifier $slot_with_vocab,
+        string ...$values_from_vocab
+    ): StandardRepository {
+        return new class ($slot_with_vocab, $values_from_vocab) extends NullStandardRepository {
+            public function __construct(
+                protected SlotIdentifier $slot_with_vocab,
+                protected array $values_from_vocab
+            ) {
             }
 
             public function getLabelsForValues(
                 PresentationUtilities $presentation_utilities,
-                PathInterface $path_to_element,
+                SlotIdentifier $slot,
                 string ...$values
             ): \Generator {
-                if ($path_to_element->toString() !== 'valid path') {
+                if ($slot !== $this->slot_with_vocab) {
                     return;
                 }
                 foreach ($values as $value) {
@@ -276,14 +271,23 @@ class PresentationTest extends TestCase
         string $expected_label
     ): void {
         $presentation = new Presentation(
-            $this->getCopyrightBridge(...($is_in_copyright ? [$value] : [])),
-            $this->getControlledRepository(...($is_in_controlled ? [$value] : [])),
-            $this->getStandardRepository(...($is_in_standard ? [$value] : []))
+            $this->getCopyrightBridge(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                ...($is_in_copyright ? [$value] : [])
+            ),
+            $this->getControlledRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                ...($is_in_controlled ? [$value] : [])
+            ),
+            $this->getStandardRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                ...($is_in_standard ? [$value] : [])
+            )
         );
 
         $labels = $presentation->presentableLabels(
             $this->getPresentationUtilities(),
-            $this->getPath('valid path'),
+            SlotIdentifier::EDUCATIONAL_DIFFICULTY,
             false,
             $value
         );
@@ -305,14 +309,23 @@ class PresentationTest extends TestCase
         string $expected_label_without_suffix
     ): void {
         $presentation = new Presentation(
-            $this->getCopyrightBridge(...($is_in_copyright ? [$value] : [])),
-            $this->getControlledRepository(...($is_in_controlled ? [$value] : [])),
-            $this->getStandardRepository(...($is_in_standard ? [$value] : []))
+            $this->getCopyrightBridge(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                ...($is_in_copyright ? [$value] : [])
+            ),
+            $this->getControlledRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                ...($is_in_controlled ? [$value] : [])
+            ),
+            $this->getStandardRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                ...($is_in_standard ? [$value] : [])
+            )
         );
 
         $labels = $presentation->presentableLabels(
             $this->getPresentationUtilities(),
-            $this->getPath('valid path'),
+            SlotIdentifier::EDUCATIONAL_DIFFICULTY,
             true,
             $value
         );
@@ -327,14 +340,27 @@ class PresentationTest extends TestCase
     public function testPresentableLabelsMultipleValues(): void
     {
         $presentation = new Presentation(
-            $this->getCopyrightBridge('cp 1', 'cp 2'),
-            $this->getControlledRepository('contr 1', 'contr 2', 'contr 3'),
-            $this->getStandardRepository('stand 1', 'stand 2')
+            $this->getCopyrightBridge(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'cp 1',
+                'cp 2'
+            ),
+            $this->getControlledRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'contr 1',
+                'contr 2',
+                'contr 3'
+            ),
+            $this->getStandardRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'stand 1',
+                'stand 2'
+            )
         );
 
         $labels = $presentation->presentableLabels(
             $this->getPresentationUtilities(),
-            $this->getPath('valid path'),
+            SlotIdentifier::EDUCATIONAL_DIFFICULTY,
             false,
             'contr 2',
             'cp 1',
@@ -358,16 +384,31 @@ class PresentationTest extends TestCase
     public function testLabelsForVocabularyStandard(): void
     {
         $presentation = new Presentation(
-            $this->getCopyrightBridge('v1', 'v2', 'v3'),
-            $this->getControlledRepository('v1', 'v2', 'v3'),
-            $this->getStandardRepository('v1', 'v2', 'v3')
+            $this->getCopyrightBridge(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            ),
+            $this->getControlledRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            ),
+            $this->getStandardRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            )
         );
 
         $labels = $presentation->labelsForVocabulary(
             $this->getPresentationUtilities(),
             $this->getVocabulary(
                 Type::STANDARD,
-                'valid path',
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
                 'v1',
                 'v2',
                 'v3'
@@ -387,16 +428,31 @@ class PresentationTest extends TestCase
     public function testLabelsForVocabularyControlledString(): void
     {
         $presentation = new Presentation(
-            $this->getCopyrightBridge('v1', 'v2', 'v3'),
-            $this->getControlledRepository('v1', 'v2', 'v3'),
-            $this->getStandardRepository('v1', 'v2', 'v3')
+            $this->getCopyrightBridge(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            ),
+            $this->getControlledRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            ),
+            $this->getStandardRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            )
         );
 
         $labels = $presentation->labelsForVocabulary(
             $this->getPresentationUtilities(),
             $this->getVocabulary(
                 Type::CONTROLLED_STRING,
-                'valid path',
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
                 'v1',
                 'v2',
                 'v3'
@@ -416,16 +472,31 @@ class PresentationTest extends TestCase
     public function testLabelsForVocabularyControlledVocabValue(): void
     {
         $presentation = new Presentation(
-            $this->getCopyrightBridge('v1', 'v2', 'v3'),
-            $this->getControlledRepository('v1', 'v2', 'v3'),
-            $this->getStandardRepository('v1', 'v2', 'v3')
+            $this->getCopyrightBridge(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            ),
+            $this->getControlledRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            ),
+            $this->getStandardRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            )
         );
 
         $labels = $presentation->labelsForVocabulary(
             $this->getPresentationUtilities(),
             $this->getVocabulary(
                 Type::CONTROLLED_VOCAB_VALUE,
-                'valid path',
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
                 'v1',
                 'v2',
                 'v3'
@@ -445,16 +516,31 @@ class PresentationTest extends TestCase
     public function testLabelsForVocabularyCopyright(): void
     {
         $presentation = new Presentation(
-            $this->getCopyrightBridge('v1', 'v2', 'v3'),
-            $this->getControlledRepository('v1', 'v2', 'v3'),
-            $this->getStandardRepository('v1', 'v2', 'v3')
+            $this->getCopyrightBridge(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            ),
+            $this->getControlledRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            ),
+            $this->getStandardRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                'v1',
+                'v2',
+                'v3'
+            )
         );
 
         $labels = $presentation->labelsForVocabulary(
             $this->getPresentationUtilities(),
             $this->getVocabulary(
                 Type::COPYRIGHT,
-                'valid path',
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
                 'v1',
                 'v2',
                 'v3'

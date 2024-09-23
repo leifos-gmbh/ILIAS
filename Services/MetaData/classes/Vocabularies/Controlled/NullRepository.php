@@ -24,6 +24,7 @@ use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\NullLabelledValue;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class NullRepository implements RepositoryInterface
 {
@@ -32,9 +33,7 @@ class NullRepository implements RepositoryInterface
      * @throws \ilMDVocabulariesException if the values are invalid (in which case nothing is persisted)
      */
     public function create(
-        PathInterface $path_to_element,
-        ?PathInterface $path_to_condition,
-        ?string $condition_value,
+        SlotIdentifier $slot,
         string $source
     ): string {
         return '';
@@ -51,7 +50,7 @@ class NullRepository implements RepositoryInterface
      * @return string[]
      */
     public function findAlreadyExistingValues(
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         string ...$values
     ): \Generator {
         yield from [];
@@ -60,13 +59,12 @@ class NullRepository implements RepositoryInterface
     /**
      * @return VocabularyInterface[]
      */
-    public function getVocabulariesForElement(
-        PathInterface $path_to_element
-    ): \Generator {
+    public function getVocabulariesForSlots(SlotIdentifier ...$slots): \Generator
+    {
         yield from [];
     }
 
-    public function countActiveVocabulariesForElement(PathInterface $path_to_element): int
+    public function countActiveVocabulariesForSlot(SlotIdentifier $slot): int
     {
         return 0;
     }
@@ -74,12 +72,12 @@ class NullRepository implements RepositoryInterface
     /**
      * @return VocabularyInterface[]
      */
-    public function getActiveVocabulariesForElement(PathInterface $path_to_element): \Generator
+    public function getActiveVocabulariesForSlot(SlotIdentifier ...$slots): \Generator
     {
         yield from [];
     }
 
-    public function isCustomInputAllowedForElement(PathInterface $path_to_element): bool
+    public function isCustomInputAllowedForSlot(SlotIdentifier $slot): bool
     {
         return false;
     }
@@ -88,7 +86,7 @@ class NullRepository implements RepositoryInterface
      * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         string ...$values
     ): \Generator {
         yield from [];

@@ -20,38 +20,45 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies;
 
-use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 
 class Factory implements FactoryInterface
 {
     public const STANDARD_SOURCE = 'LOMv1.0';
     protected const COPYRIGHT_SOURCE = 'ILIAS';
 
-    public function standard(PathInterface $applicable_to, string ...$values): BuilderInterface
+    public function standard(SlotIdentifier $slot, string ...$values): BuilderInterface
     {
-        return new Builder($applicable_to, Type::STANDARD, '', self::STANDARD_SOURCE, ...$values);
+        return new Builder($slot, Type::STANDARD, '', self::STANDARD_SOURCE, ...$values);
     }
 
     public function controlledString(
-        PathInterface $applicable_to,
+        SlotIdentifier $slot,
         string $id,
         string $source,
         string ...$values
     ): BuilderInterface {
-        return new Builder($applicable_to, Type::CONTROLLED_STRING, $id, $source, ...$values);
+        return new Builder($slot, Type::CONTROLLED_STRING, $id, $source, ...$values);
     }
 
     public function controlledVocabValue(
-        PathInterface $applicable_to,
+        SlotIdentifier $slot,
         string $id,
         string $source,
         string ...$values
     ): BuilderInterface {
-        return new Builder($applicable_to, Type::CONTROLLED_VOCAB_VALUE, $id, $source, ...$values);
+        return new Builder($slot, Type::CONTROLLED_VOCAB_VALUE, $id, $source, ...$values);
     }
 
-    public function copyright(PathInterface $applicable_to, string ...$values): BuilderInterface
+    public function copyright(string ...$values): BuilderInterface
     {
-        return new Builder($applicable_to, Type::COPYRIGHT, '', self::COPYRIGHT_SOURCE, ...$values);
+        return new Builder(
+            SlotIdentifier::RIGHTS_DESCRIPTION,
+            Type::COPYRIGHT,
+            '',
+            self::COPYRIGHT_SOURCE,
+            ...$values
+        );
     }
 }

@@ -21,43 +21,38 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies\Copyright;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Copyright\RepositoryInterface as CopyrightRepository;
 use ILIAS\MetaData\Settings\SettingsInterface;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface as IdentifierHandler;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValue;
 use ILIAS\MetaData\Vocabularies\FactoryInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class Bridge implements BridgeInterface
 {
     protected FactoryInterface $factory;
-    protected PathFactory $path_factory;
     protected SettingsInterface $settings;
     protected CopyrightRepository $copyright_repository;
     protected IdentifierHandler $identifier_handler;
 
     public function __construct(
         FactoryInterface $factory,
-        PathFactory $path_factory,
         SettingsInterface $settings,
         CopyrightRepository $copyright_repository,
         IdentifierHandler $identifier_handler
     ) {
         $this->factory = $factory;
-        $this->path_factory = $path_factory;
         $this->settings = $settings;
         $this->copyright_repository = $copyright_repository;
         $this->identifier_handler = $identifier_handler;
     }
 
-    public function vocabularyForElement(
-        PathInterface $path_to_element
-    ): ?VocabularyInterface {
+    public function vocabulary(SlotIdentifier $slot): ?VocabularyInterface
+    {
         if (
             !$this->settings->isCopyrightSelectionActive() ||
-            $path_to_element->toString() !== $this->copyrightPath()->toString()
+            $slot !== SlotIdentifier::RIGHTS_DESCRIPTION
         ) {
             return null;
         }
@@ -70,19 +65,19 @@ class Bridge implements BridgeInterface
         if (empty($values)) {
             return null;
         }
-        return $this->factory->copyright($this->copyrightPath(), ...$values)->get();
+        return $this->factory->copyright(...$values)->get();
     }
 
     /**
      * @return LabelledValueInterface[]
      */
     public function labelsForValues(
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         string ...$values
     ): \Generator {
         if (
             !$this->settings->isCopyrightSelectionActive() ||
-            $path_to_element->toString() !== $this->copyrightPath()->toString()
+            $slot !== SlotIdentifier::RIGHTS_DESCRIPTION
         ) {
             return;
         }
@@ -97,15 +92,5 @@ class Bridge implements BridgeInterface
                 $copyright->title()
             );
         }
-    }
-
-    protected function copyrightPath(): PathInterface
-    {
-        return $this->path_factory
-                    ->custom()
-                    ->withNextStep('rights')
-                    ->withNextStep('description')
-                    ->withNextStep('string')
-                    ->get();
     }
 }

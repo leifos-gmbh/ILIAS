@@ -21,31 +21,27 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Elements\Base\BaseElementInterface;
 use ILIAS\MetaData\Vocabularies\Type;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 use ILIAS\MetaData\Vocabularies\Dispatch\Info\InfosInterface;
 use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledRepo;
 use ILIAS\MetaData\Vocabularies\Standard\RepositoryInterface as StandardRepo;
 use ILIAS\MetaData\Vocabularies\Copyright\BridgeInterface as CopyrightBridge;
-use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 
 class Dispatcher implements DispatcherInterface
 {
     protected InfosInterface $infos;
-    protected PathFactory $path_factory;
     protected CopyrightBridge $copyright_bridge;
     protected ControlledRepo $controlled_repo;
     protected StandardRepo $standard_repo;
 
     public function __construct(
         InfosInterface $infos,
-        PathFactory $path_factory,
         CopyrightBridge $copyright_bridge,
         ControlledRepo $controlled_repo,
         StandardRepo $standard_repo
     ) {
         $this->infos = $infos;
-        $this->path_factory = $path_factory;
         $this->copyright_bridge = $copyright_bridge;
         $this->controlled_repo = $controlled_repo;
         $this->standard_repo = $standard_repo;
@@ -54,33 +50,34 @@ class Dispatcher implements DispatcherInterface
     /**
      * @return VocabularyInterface[]
      */
-    public function vocabulariesForElement(
-        BaseElementInterface $element
+    public function vocabulariesForSlots(
+        SlotIdentifier ...$slots
     ): \Generator {
-        $path_to_element = $this->path_factory->toElement($element);
-
-        $from_copyright = $this->copyright_bridge->vocabularyForElement($path_to_element);
-        if (!is_null($from_copyright)) {
-            yield $from_copyright;
+        foreach ($slots as $slot) {
+            $from_copyright = $this->copyright_bridge->vocabulary($slot);
+            if (!is_null($from_copyright)) {
+                yield $from_copyright;
+            }
         }
-        yield from $this->controlled_repo->getVocabulariesForElement($path_to_element);
-        yield from $this->standard_repo->getVocabularies($path_to_element);
+        yield from $this->controlled_repo->getVocabulariesForSlots(...$slots);
+        yield from $this->standard_repo->getVocabularies(...$slots);
     }
 
     /**
      * @return VocabularyInterface[]
      */
-    public function activeVocabulariesForElement(
-        BaseElementInterface $element
+    public function activeVocabulariesForSlots(
+        SlotIdentifier ...$slots
     ): \Generator {
-        $path_to_element = $this->path_factory->toElement($element);
-
-        $from_copyright = $this->copyright_bridge->vocabularyForElement($path_to_element);
-        if (!is_null($from_copyright) && $from_copyright->isActive()) {
-            yield $from_copyright;
+        foreach ($slots as $slot) {
+            $from_copyright = $this->copyright_bridge->vocabulary($slot);
+            if (!is_null($from_copyright) && $from_copyright->isActive()) {
+                yield $from_copyright;
+            }
         }
-        yield from $this->controlled_repo->getActiveVocabulariesForElement($path_to_element);
-        yield from $this->standard_repo->getActiveVocabularies($path_to_element);
+
+        yield from $this->controlled_repo->getActiveVocabulariesForSlot(...$slots);
+        yield from $this->standard_repo->getActiveVocabularies(...$slots);
     }
 
     public function delete(VocabularyInterface $vocabulary): void

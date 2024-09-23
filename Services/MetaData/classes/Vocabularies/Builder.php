@@ -20,12 +20,11 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies;
 
-use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Vocabularies\Conditions\Condition;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class Builder implements BuilderInterface
 {
-    protected PathInterface $applicable_to;
+    protected SlotIdentifier $slot;
     protected Type $type;
     protected string $id;
     protected string $source;
@@ -34,31 +33,21 @@ class Builder implements BuilderInterface
      * @var string[]
      */
     protected array $values;
-    protected ?Condition $condition = null;
     protected bool $is_active = true;
     protected bool $allows_custom_inputs = true;
 
     public function __construct(
-        PathInterface $applicable_to,
+        SlotIdentifier $slot,
         Type $type,
         string $id,
         string $source,
         string ...$values
     ) {
-        $this->applicable_to = $applicable_to;
+        $this->slot = $slot;
         $this->type = $type;
         $this->id = $id;
         $this->source = $source;
         $this->values = $values;
-    }
-
-    public function withCondition(
-        string $value,
-        PathInterface $path
-    ): BuilderInterface {
-        $clone = clone $this;
-        $clone->condition = new Condition($value, $path);
-        return $clone;
     }
 
     public function withIsDeactivated(bool $deactivated = true): BuilderInterface
@@ -78,11 +67,10 @@ class Builder implements BuilderInterface
     public function get(): VocabularyInterface
     {
         return new Vocabulary(
-            $this->applicable_to,
+            $this->slot,
             $this->type,
             $this->id,
             $this->source,
-            $this->condition,
             $this->is_active,
             $this->allows_custom_inputs,
             ...$this->values

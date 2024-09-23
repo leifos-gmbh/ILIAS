@@ -29,7 +29,10 @@ use ILIAS\MetaData\Paths\NullFactory;
 use ILIAS\MetaData\Paths\BuilderInterface;
 use ILIAS\MetaData\Paths\NullBuilder;
 use ILIAS\MetaData\Paths\NullPath;
-use DOMDocument;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\Slots\HandlerInterface as SlotHandler;
+use ILIAS\MetaData\Vocabularies\Slots\NullHandler as NullSlotHandler;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 
 class ImporterAndResultTest extends TestCase
 {
@@ -48,9 +51,7 @@ class ImporterAndResultTest extends TestCase
             }
 
             public function create(
-                PathInterface $path_to_element,
-                ?PathInterface $path_to_condition,
-                ?string $condition_value,
+                SlotIdentifier $slot,
                 string $source
             ): string {
                 if ($this->config_error) {
@@ -59,16 +60,14 @@ class ImporterAndResultTest extends TestCase
                 $new_id = 'new id ' . count($this->created_vocabs);
                 $this->created_vocabs[] = [
                     'id' => $new_id,
-                    'path' => $path_to_element->toString(),
-                    'condition path' => $path_to_condition?->toString(),
-                    'condition value' => $condition_value,
+                    'slot' => $slot,
                     'source' => $source
                 ];
                 return $new_id;
             }
 
             public function findAlreadyExistingValues(
-                PathInterface $path_to_element,
+                SlotIdentifier $slot,
                 string ...$values
             ): \Generator {
                 yield from array_intersect($this->already_existing_values, $values);
@@ -124,10 +123,33 @@ class ImporterAndResultTest extends TestCase
         };
     }
 
+    protected function getSlotHandler(): SlotHandler
+    {
+        return new class () extends NullSlotHandler {
+            public array $exposed_paths_and_conditions = [];
+
+            public function identiferFromPathAndCondition(
+                PathInterface $path_to_element,
+                ?PathInterface $path_to_condition,
+                ?string $condition_value
+            ): SlotIdentifier {
+                $this->exposed_paths_and_conditions[] = [
+                    'path' => $path_to_element->toString(),
+                    'condition path' => $path_to_condition?->toString(),
+                    'condition value' => $condition_value
+                ];
+                return SlotIdentifier::EDUCATIONAL_CONTEXT;
+            }
+        };
+    }
+
     public function testImportMalformedXMLError(): void
     {
-        $repo = $this->getRepo();
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(),
+            $this->getSlotHandler()
+        );
 
         $xml_string = 'asbduafduhsbdjfbsjfbjdbgfd532t7hubfjxd';
 
@@ -141,8 +163,11 @@ class ImporterAndResultTest extends TestCase
 
     public function testImportInvalidXMLStructureError(): void
     {
-        $repo = $this->getRepo();
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(),
+            $this->getSlotHandler()
+        );
 
         $xml_string = <<<XML
 <?xml version="1.0"?>
@@ -161,8 +186,11 @@ XML;
 
     public function testImportInvalidPathToElementError(): void
     {
-        $repo = $this->getRepo();
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(),
+            $this->getSlotHandler()
+        );
 
         $xml_string = <<<XML
 <?xml version="1.0"?>
@@ -193,8 +221,11 @@ XML;
 
     public function testImportInvalidPathToConditionError(): void
     {
-        $repo = $this->getRepo();
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(),
+            $this->getSlotHandler()
+        );
 
         $xml_string = <<<XML
 <?xml version="1.0"?>
@@ -231,8 +262,11 @@ XML;
 
     public function testImportDuplicateValuesError(): void
     {
-        $repo = $this->getRepo();
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(),
+            $this->getSlotHandler()
+        );
 
         $xml_string = <<<XML
 <?xml version="1.0"?>
@@ -262,8 +296,11 @@ XML;
 
     public function testImportAlreadyExistingValuesError(): void
     {
-        $repo = $this->getRepo(false, 'already exists', 'also already exists');
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(false, 'already exists', 'also already exists'),
+            $this->getSlotHandler()
+        );
 
         $xml_string = <<<XML
 <?xml version="1.0"?>
@@ -293,8 +330,11 @@ XML;
 
     public function testImportInvalidVocabConfigurationError(): void
     {
-        $repo = $this->getRepo(true);
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(true),
+            $this->getSlotHandler()
+        );
 
         $xml_string = <<<XML
 <?xml version="1.0"?>
@@ -325,8 +365,11 @@ XML;
 
     public function testImport(): void
     {
-        $repo = $this->getRepo();
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(),
+            $slots = $this->getSlotHandler()
+        );
 
         $xml_string = <<<XML
 <?xml version="1.0"?>
@@ -354,12 +397,18 @@ XML;
         $this->assertSame(
             [[
                 'id' => 'new id 0',
-                'path' => 'step1;step2;step3;',
-                'condition path' => null,
-                'condition value' => null,
+                'slot' => SlotIdentifier::EDUCATIONAL_CONTEXT,
                 'source' => 'some source',
             ]],
             $repo->created_vocabs
+        );
+        $this->assertSame(
+            [[
+                'path' => 'step1;step2;step3;',
+                'condition path' => null,
+                'condition value' => null
+            ]],
+            $slots->exposed_paths_and_conditions
         );
         $this->assertSame(
             [
@@ -373,8 +422,11 @@ XML;
 
     public function testImportWithLabels(): void
     {
-        $repo = $this->getRepo();
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(),
+            $slots = $this->getSlotHandler()
+        );
 
         $xml_string = <<<XML
 <?xml version="1.0"?>
@@ -402,12 +454,18 @@ XML;
         $this->assertSame(
             [[
                  'id' => 'new id 0',
-                 'path' => 'step1;step2;step3;',
-                 'condition path' => null,
-                 'condition value' => null,
+                 'slot' => SlotIdentifier::EDUCATIONAL_CONTEXT,
                  'source' => 'some source',
              ]],
             $repo->created_vocabs
+        );
+        $this->assertSame(
+            [[
+                 'path' => 'step1;step2;step3;',
+                 'condition path' => null,
+                 'condition value' => null
+             ]],
+            $slots->exposed_paths_and_conditions
         );
         $this->assertSame(
             [
@@ -421,8 +479,11 @@ XML;
 
     public function testImportWithCondition(): void
     {
-        $repo = $this->getRepo();
-        $importer = new Importer($this->getPathFactory(), $repo);
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(),
+            $slots = $this->getSlotHandler()
+        );
 
         $xml_string = <<<XML
 <?xml version="1.0"?>
@@ -456,12 +517,18 @@ XML;
         $this->assertSame(
             [[
                  'id' => 'new id 0',
-                 'path' => 'step1;step2;step3;',
-                 'condition path' => 'condstep1;condstep2;',
-                 'condition value' => 'condition value',
+                 'slot' => SlotIdentifier::EDUCATIONAL_CONTEXT,
                  'source' => 'some source',
              ]],
             $repo->created_vocabs
+        );
+        $this->assertSame(
+            [[
+                 'path' => 'step1;step2;step3;',
+                 'condition path' => 'condstep1;condstep2;',
+                 'condition value' => 'condition value'
+             ]],
+            $slots->exposed_paths_and_conditions
         );
         $this->assertSame(
             [

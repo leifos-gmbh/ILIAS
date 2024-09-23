@@ -23,19 +23,18 @@ namespace ILIAS\MetaData\Vocabularies\Copyright;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 interface BridgeInterface
 {
-    public function vocabularyForElement(
-        PathInterface $path_to_element
-    ): ?VocabularyInterface;
+    public function vocabulary(SlotIdentifier $slot): ?VocabularyInterface;
 
     /**
      * Values not from copyrights will not be returned at all.
      * @return LabelledValueInterface[]
      */
     public function labelsForValues(
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         string ...$values
     ): \Generator;
 }

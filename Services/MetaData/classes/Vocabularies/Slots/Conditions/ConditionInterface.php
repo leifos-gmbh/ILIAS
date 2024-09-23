@@ -18,15 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Conditions;
+namespace ILIAS\MetaData\Vocabularies\Slots\Conditions;
 
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Elements\ElementInterface;
 
-interface CheckerInterface
+interface ConditionInterface
 {
-    public function isConditionFulfilled(
-        ElementInterface $element,
-        ConditionInterface $condition
-    ): bool;
+    public function value(): string;
+
+    public function path(): PathInterface;
 }

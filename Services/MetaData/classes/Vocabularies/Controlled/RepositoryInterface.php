@@ -23,6 +23,7 @@ namespace ILIAS\MetaData\Vocabularies\Controlled;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 interface RepositoryInterface
 {
@@ -31,9 +32,7 @@ interface RepositoryInterface
      * @throws \ilMDVocabulariesException if the values are invalid (in which case nothing is persisted)
      */
     public function create(
-        PathInterface $path_to_element,
-        ?PathInterface $path_to_condition,
-        ?string $condition_value,
+        SlotIdentifier $slot,
         string $source
     ): string;
 
@@ -47,32 +46,30 @@ interface RepositoryInterface
      * @return string[]
      */
     public function findAlreadyExistingValues(
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         string ...$values
     ): \Generator;
 
     /**
      * @return VocabularyInterface[]
      */
-    public function getVocabulariesForElement(
-        PathInterface $path_to_element
-    ): \Generator;
+    public function getVocabulariesForSlots(SlotIdentifier ...$slots): \Generator;
 
-    public function countActiveVocabulariesForElement(PathInterface $path_to_element): int;
+    public function countActiveVocabulariesForSlot(SlotIdentifier $slot): int;
 
     /**
      * @return VocabularyInterface[]
      */
-    public function getActiveVocabulariesForElement(PathInterface $path_to_element): \Generator;
+    public function getActiveVocabulariesForSlot(SlotIdentifier ...$slots): \Generator;
 
-    public function isCustomInputAllowedForElement(PathInterface $path_to_element): bool;
+    public function isCustomInputAllowedForSlot(SlotIdentifier $slot): bool;
 
     /**
      * Values not from controlled vocabularies will not be returned at all.
      * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(
-        PathInterface $path_to_element,
+        SlotIdentifier $slot,
         string ...$values
     ): \Generator;
 

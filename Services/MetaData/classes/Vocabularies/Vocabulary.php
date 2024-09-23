@@ -20,12 +20,11 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies;
 
-use ILIAS\MetaData\Vocabularies\Conditions\ConditionInterface;
-use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class Vocabulary implements VocabularyInterface
 {
-    protected PathInterface $applicable_to;
+    protected SlotIdentifier $slot;
     protected Type $type;
     protected string $id;
     protected string $source;
@@ -36,31 +35,28 @@ class Vocabulary implements VocabularyInterface
      * @var string[]
      */
     protected array $values;
-    protected ?ConditionInterface $condition;
 
     public function __construct(
-        PathInterface $applicable_to,
+        SlotIdentifier $slot,
         Type $type,
         string $id,
         string $source,
-        ?ConditionInterface $condition = null,
         bool $is_active = true,
         bool $allows_custom_inputs = false,
         string ...$values
     ) {
-        $this->applicable_to = $applicable_to;
+        $this->slot = $slot;
         $this->type = $type;
         $this->id = $id;
         $this->source = $source;
         $this->values = $values;
-        $this->condition = $condition;
         $this->is_active = $is_active;
         $this->allows_custom_inputs = $allows_custom_inputs;
     }
 
-    public function applicableTo(): PathInterface
+    public function slot(): SlotIdentifier
     {
-        return $this->applicable_to;
+        return $this->slot;
     }
 
     public function type(): Type
@@ -86,16 +82,6 @@ class Vocabulary implements VocabularyInterface
         foreach ($this->values as $value) {
             yield $value;
         }
-    }
-
-    public function isConditional(): bool
-    {
-        return isset($this->condition);
-    }
-
-    public function condition(): ?ConditionInterface
-    {
-        return $this->condition;
     }
 
     public function isActive(): bool

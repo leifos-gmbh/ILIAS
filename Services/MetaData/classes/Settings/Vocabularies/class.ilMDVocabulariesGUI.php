@@ -32,6 +32,7 @@ use ILIAS\Filesystem\Filesystem;
 use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledVocabsRepository;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Settings\Vocabularies\Import\Importer;
+use ILIAS\MetaData\Vocabularies\Slots\HandlerInterface as SlotHandler;
 
 /**
  * @ilCtrl_Calls ilMDVocabulariesGUI: ilMDVocabularyUploadHandlerGUI
@@ -43,6 +44,7 @@ class ilMDVocabulariesGUI
     protected Filesystem $temp_files;
     protected ControlledVocabsRepository $controlled_vocab_repo;
     protected PathFactory $path_factory;
+    protected SlotHandler $slot_handler;
     protected ilGlobalTemplateInterface $tpl;
     protected ilLanguage $lng;
     protected ilToolbarGUI $toolbar;
@@ -154,7 +156,8 @@ class ilMDVocabulariesGUI
         if (!is_null($file_content)) {
             $importer = new Importer(
                 $this->path_factory,
-                $this->controlled_vocab_repo
+                $this->controlled_vocab_repo,
+                $this->slot_handler
             );
             $result = $importer->import($file_content);
 

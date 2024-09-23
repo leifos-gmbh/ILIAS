@@ -20,12 +20,11 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies;
 
-use ILIAS\MetaData\Vocabularies\Conditions\ConditionInterface;
-use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 interface VocabularyInterface
 {
-    public function applicableTo(): PathInterface;
+    public function slot(): SlotIdentifier;
 
     public function type(): Type;
 
@@ -38,19 +37,6 @@ interface VocabularyInterface
      * @return string[]
      */
     public function values(): \Generator;
-
-    /**
-     * Some vocabularies are only available if a different
-     * MD element has a certain value.
-     */
-    public function isConditional(): bool;
-
-    /**
-     * Contains the path to the element this vocabulary
-     * is conditional on, and the value the element needs
-     * to have.
-     */
-    public function condition(): ?ConditionInterface;
 
     public function isActive(): bool;
 

@@ -23,12 +23,6 @@ namespace ILIAS\MetaData\Vocabularies\Copyright;
 use PHPUnit\Framework\TestCase;
 use ILIAS\MetaData\Settings\SettingsInterface;
 use ILIAS\MetaData\Settings\NullSettings;
-use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
-use ILIAS\MetaData\Paths\NullFactory as NullPathFactory;
-use ILIAS\MetaData\Paths\BuilderInterface as PathBuilderInterface;
-use ILIAS\MetaData\Paths\NullBuilder as NullPathBuilder;
-use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Paths\NullPath;
 use ILIAS\MetaData\Copyright\RepositoryInterface as CopyrightRepository;
 use ILIAS\MetaData\Copyright\NullRepository;
 use ILIAS\MetaData\Copyright\EntryInterface;
@@ -41,87 +35,31 @@ use ILIAS\MetaData\Vocabularies\BuilderInterface;
 use ILIAS\MetaData\Vocabularies\NullVocabulary;
 use ILIAS\MetaData\Vocabularies\NullBuilder;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Paths\Path;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 
 class BridgeTest extends TestCase
 {
-    protected function getPath(string ...$steps): PathInterface
-    {
-        $path_string = implode(';', $steps) . ';';
-        return new class ($path_string) extends NullPath {
-            public function __construct(protected string $path_string)
-            {
-            }
-
-            public function toString(): string
-            {
-                return $this->path_string;
-            }
-        };
-    }
-
     protected function getVocabFactory(): FactoryInterface
     {
         return new class () extends NullFactory {
-            public function copyright(PathInterface $applicable_to, string ...$values): BuilderInterface
+            public function copyright(string ...$values): BuilderInterface
             {
-                return new class ($applicable_to, $values) extends NullBuilder {
-                    public function __construct(
-                        protected PathInterface $applicable_to,
-                        protected array $values
-                    ) {
+                return new class ($values) extends NullBuilder {
+                    public function __construct(protected array $values)
+                    {
                     }
 
                     public function get(): VocabularyInterface
                     {
-                        return new class ($this->applicable_to, $this->values) extends NullVocabulary {
-                            public function __construct(
-                                protected PathInterface $applicable_to,
-                                protected array $values
-                            ) {
-                            }
-
-                            public function applicableTo(): PathInterface
+                        return new class ($this->values) extends NullVocabulary {
+                            public function __construct(protected array $values)
                             {
-                                return $this->applicable_to;
                             }
 
                             public function values(): \Generator
                             {
                                 yield from $this->values;
-                            }
-                        };
-                    }
-                };
-            }
-        };
-    }
-
-    protected function getPathFactory(): PathFactory
-    {
-        return new class () extends NullPathFactory {
-            public function custom(): PathBuilderInterface
-            {
-                return new class () extends NullPathBuilder {
-                    protected $path_string = '';
-
-                    public function withNextStep(string $name, bool $add_as_first = false): PathBuilderInterface
-                    {
-                        $clone = clone $this;
-                        $clone->path_string .= $name . ';';
-                        return $clone;
-                    }
-
-                    public function get(): PathInterface
-                    {
-                        return new class ($this->path_string) extends NullPath {
-                            public function __construct(protected string $path_string)
-                            {
-                            }
-
-                            public function toString(): string
-                            {
-                                return $this->path_string;
                             }
                         };
                     }
@@ -194,71 +132,63 @@ class BridgeTest extends TestCase
         };
     }
 
-    public function testVocabularyForElementWrongElement(): void
+    public function testVocabularyWrongSlot(): void
     {
         $bridge = new Bridge(
             $this->getVocabFactory(),
-            $this->getPathFactory(),
             $this->getSettings(),
             $this->getCopyrightRepository(),
             $this->getIdentifierHandler()
         );
 
-        $vocab = $bridge->vocabularyForElement($this->getPath('some', 'thing', 'else'));
+        $vocab = $bridge->vocabulary(SlotIdentifier::CLASSIFICATION_PURPOSE);
 
         $this->assertNull($vocab);
     }
 
-    public function testVocabularyForElementSelectionDisabled(): void
+    public function testVocabularySelectionDisabled(): void
     {
         $bridge = new Bridge(
             $this->getVocabFactory(),
-            $this->getPathFactory(),
             $this->getSettings(false),
             $this->getCopyrightRepository(),
             $this->getIdentifierHandler()
         );
 
-        $vocab = $bridge->vocabularyForElement($this->getPath('rights', 'description', 'string'));
+        $vocab = $bridge->vocabulary(SlotIdentifier::RIGHTS_DESCRIPTION);
 
         $this->assertNull($vocab);
     }
 
-    public function testVocabularyForElement(): void
+    public function testVocabulary(): void
     {
         $bridge = new Bridge(
             $this->getVocabFactory(),
-            $this->getPathFactory(),
             $this->getSettings(),
             $this->getCopyrightRepository(),
             $this->getIdentifierHandler()
         );
 
-        $vocab = $bridge->vocabularyForElement($this->getPath('rights', 'description', 'string'));
+        $vocab = $bridge->vocabulary(SlotIdentifier::RIGHTS_DESCRIPTION);
 
         $this->assertNotNull($vocab);
         $this->assertSame(
             ['id_1', 'id_2', 'id_3'],
             iterator_to_array($vocab->values())
         );
-        $this->assertSame(
-            'rights;description;string;',
-            $vocab->applicableTo()->toString()
-        );
     }
 
-    public function testLabelsForValuesWrongElement(): void
+    public function testLabelsForValuesWrongSlot(): void
     {
         $bridge = new Bridge(
             $this->getVocabFactory(),
-            $this->getPathFactory(),
             $this->getSettings(),
             $this->getCopyrightRepository(),
             $this->getIdentifierHandler()
         );
 
         $labelled_values = $bridge->labelsForValues(
-            $this->getPath('some', 'thing', 'else'),
+            SlotIdentifier::CLASSIFICATION_PURPOSE,
             'id_1',
             'id_3',
             'something'
@@ -271,14 +201,13 @@ class BridgeTest extends TestCase
     {
         $bridge = new Bridge(
             $this->getVocabFactory(),
-            $this->getPathFactory(),
             $this->getSettings(false),
             $this->getCopyrightRepository(),
             $this->getIdentifierHandler()
         );
 
         $labelled_values = $bridge->labelsForValues(
-            $this->getPath('rights', 'description', 'string'),
+            SlotIdentifier::RIGHTS_DESCRIPTION,
             'id_1',
             'id_3',
             'something'
@@ -291,14 +220,13 @@ class BridgeTest extends TestCase
     {
         $bridge = new Bridge(
             $this->getVocabFactory(),
-            $this->getPathFactory(),
             $this->getSettings(),
             $this->getCopyrightRepository(),
             $this->getIdentifierHandler()
         );
 
         $labelled_values = $bridge->labelsForValues(
-            $this->getPath('rights', 'description', 'string'),
+            SlotIdentifier::RIGHTS_DESCRIPTION,
             'id_1',
             'id_3',
             'something'

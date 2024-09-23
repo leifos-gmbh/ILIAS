@@ -20,15 +20,14 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies;
 
-use ILIAS\MetaData\Vocabularies\Conditions\ConditionInterface;
-use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Paths\NullPath;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 
 class NullVocabulary implements VocabularyInterface
 {
-    public function applicableTo(): PathInterface
+    public function slot(): SlotIdentifier
     {
-        return new NullPath();
+        return SlotIdentifier::NULL;
     }
 
     public function type(): Type
@@ -53,16 +52,6 @@ class NullVocabulary implements VocabularyInterface
     public function values(): \Generator
     {
         yield from [];
-    }
-
-    public function isConditional(): bool
-    {
-        return false;
-    }
-
-    public function condition(): ?ConditionInterface
-    {
-        return null;
     }
 
     public function isActive(): bool

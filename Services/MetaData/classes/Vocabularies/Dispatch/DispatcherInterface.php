@@ -21,22 +21,22 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Elements\Base\BaseElementInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 interface DispatcherInterface
 {
     /**
      * @return VocabularyInterface[]
      */
-    public function vocabulariesForElement(
-        BaseElementInterface $element
+    public function vocabulariesForSlots(
+        SlotIdentifier ...$slots
     ): \Generator;
 
     /**
      * @return VocabularyInterface[]
      */
-    public function activeVocabulariesForElement(
-        BaseElementInterface $element
+    public function activeVocabulariesForSlots(
+        SlotIdentifier ...$slots
     ): \Generator;
 
     public function delete(VocabularyInterface $vocabulary): void;

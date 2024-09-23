@@ -35,7 +35,7 @@ class ilTaxonomyClassificationProvider extends ilClassificationProvider
     {
         $params = $this->request->getQueryParams();
         $body = $this->request->getParsedBody();
-        $this->incoming_id = (int) ($body["tax_node"] ?? ($params["tax_node"] ?? null));
+        $this->incoming_id = (int) ($body["taxNode"] ?? ($params["taxNode"] ?? null));
     }
 
     public function render(array &$a_html, object $a_parent_gui): void
@@ -158,14 +158,20 @@ class ilTaxonomyClassificationProvider extends ilClassificationProvider
         foreach ($tax_map as $tax_id => $node_ids) {
             $tax_tree = new ilTaxonomyTree((int) $tax_id);
 
-            // combine taxonomy nodes OR
-            $tax_nodes = array();
+            // combine taxonomy nodes AND
             foreach ($node_ids as $node_id) {
+                $tax_nodes = array();
                 $tax_nodes = array_merge($tax_nodes, $tax_tree->getSubTreeIds((int) $node_id));
                 $tax_nodes[] = (int) $node_id;
+                if (!isset($tax_obj_ids[$tax_id])) {
+                    $tax_obj_ids[$tax_id] = ilTaxNodeAssignment::findObjectsByNode((int) $tax_id, $tax_nodes, "obj");
+                } else {
+                    $tax_obj_ids[$tax_id] = array_intersect(
+                        $tax_obj_ids[$tax_id],
+                        ilTaxNodeAssignment::findObjectsByNode((int) $tax_id, $tax_nodes, "obj")
+                    );
+                }
             }
-
-            $tax_obj_ids[$tax_id] = ilTaxNodeAssignment::findObjectsByNode((int) $tax_id, $tax_nodes, "obj");
         }
 
         // combine taxonomies AND

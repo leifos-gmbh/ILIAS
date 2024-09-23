@@ -117,7 +117,7 @@ class Classification {
         if (hashValue) {
           el.addEventListener('click', (e) => {
             e.preventDefault();
-            this.toggle({ taxNode: hashValue });
+            this.toggle({ taxNode: hashValue.substring(9) });
           });
         }
       }

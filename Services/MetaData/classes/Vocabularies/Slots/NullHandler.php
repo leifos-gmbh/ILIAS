@@ -22,8 +22,9 @@ namespace ILIAS\MetaData\Vocabularies\Slots;
 
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Conditions\ConditionInterface;
-use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 use ILIAS\MetaData\Paths\NullPath;
+use ILIAS\MetaData\Elements\Data\Type as DataType;
+use ILIAS\MetaData\Elements\Data\Type;
 
 class NullHandler implements HandlerInterface
 {
@@ -50,9 +51,9 @@ class NullHandler implements HandlerInterface
         return Identifier::NULL;
     }
 
-    public function allSlotsForElement(PathInterface $path_to_element): array
+    public function allSlotsForElement(PathInterface $path_to_element): \Generator
     {
-        return [];
+        yield from [];
     }
 
     public function doesSlotExist(
@@ -61,5 +62,10 @@ class NullHandler implements HandlerInterface
         ?string $condition_value
     ): bool {
         return false;
+    }
+
+    public function dataTypeForSlot(Identifier $identifier): DataType
+    {
+        return DataType::NULL;
     }
 }

@@ -18,15 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Standard\Assignment;
 
-use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Structure\Dictionaries\Tags\Tag as BaseTag;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
-class TagFactory
+interface AssignmentsInterface
 {
-    public function tag(VocabularyInterface $vocabulary): TagInterface
-    {
-        return new Tag($vocabulary);
-    }
+    public function doesSlotHaveValues(SlotIdentifier $slot): bool;
+
+    public function valuesForSlot(SlotIdentifier $slot): \Generator;
 }

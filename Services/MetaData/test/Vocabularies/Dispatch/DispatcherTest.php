@@ -175,6 +175,10 @@ class DispatcherTest extends TestCase
         $this->assertSame($ids, $actual_ids);
     }
 
+    public function testVocabulary(): void
+    {
+    }
+
     public function testVocabulariesForSlots(): void
     {
         $cp_vocab = $this->getVocabulary(true, 'cp');

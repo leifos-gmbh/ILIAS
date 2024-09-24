@@ -28,9 +28,12 @@ enum Identifier: string
     case GENERAL_COVERAGE = 'general_coverage';
     case GENERAL_IDENTIFIER_CATALOG = 'general_identifier_catalog';
     case LIFECYCLE_STATUS = 'lifecycle_status';
+    case LIFECYCLE_CONTRIBUTE_ROLE = 'lifecycle_contribution_role';
     case LIFECYCLE_CONTRIBUTE_PUBLISHER = 'lifecycle_contribution_publisher';
     case METAMETADATA_IDENTIFIER_CATALOG = 'metametadata_identifier_catalog';
+    case METAMETADATA_CONTRIBUTE_ROLE = 'metametadata_contribution_role';
     case METAMETADATA_SCHEMA = 'metametadata_schema';
+    case TECHNICAL_REQUIREMENT_TYPE = 'technical_requiment_type';
     case TECHNICAL_REQUIREMENT_BROWSER = 'technical_requiment_browser';
     case TECHNICAL_REQUIREMENT_OS = 'technical_requiment_os';
     case TECHNICAL_OTHER_PLATFORM_REQUIREMENTS = 'technical_other_platform_requiments';

@@ -18,12 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Standard;
 
-use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Structure\Dictionaries\Tags\TagInterface as BaseTagInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
-interface TagInterface extends BaseTagInterface
+interface GatewayInterface
 {
-    public function vocabulary(): VocabularyInterface;
+    public function createDeactivationEntry(SlotIdentifier $slot): void;
+
+    public function deleteDeactivationEntry(SlotIdentifier $slot): void;
+
+    public function doesDeactivationEntryExistForSlot(SlotIdentifier $slot): bool;
 }

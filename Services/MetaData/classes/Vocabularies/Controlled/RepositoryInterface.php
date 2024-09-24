@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies\Controlled;
 
-use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
@@ -36,10 +35,14 @@ interface RepositoryInterface
         string $source
     ): string;
 
+    /**
+     * The value, vocab_id tuple must be unique! Before using this,
+     * check with findAlreadyExistingValues.
+     */
     public function addValueToVocabulary(
         string $vocab_id,
         string $value,
-        ?string $label
+        string $label = ''
     ): void;
 
     /**
@@ -49,6 +52,8 @@ interface RepositoryInterface
         SlotIdentifier $slot,
         string ...$values
     ): \Generator;
+
+    public function getVocabulary(string $vocab_id): VocabularyInterface;
 
     /**
      * @return VocabularyInterface[]
@@ -65,7 +70,7 @@ interface RepositoryInterface
     public function isCustomInputAllowedForSlot(SlotIdentifier $slot): bool;
 
     /**
-     * Values not from controlled vocabularies will not be returned at all.
+     * Values not from active controlled vocabularies will not be returned at all.
      * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(

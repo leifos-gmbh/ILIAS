@@ -86,21 +86,21 @@ class InfosTest extends TestCase
 
     protected function getStandardRepo(
         SlotIdentifier $slot = SlotIdentifier::NULL,
-        int $active_count = 0
+        bool $active = false
     ): StandardRepository {
-        return new class ($slot, $active_count) extends NullStandardRepository {
+        return new class ($slot, $active) extends NullStandardRepository {
             public function __construct(
                 protected SlotIdentifier $slot,
-                protected int $active_count
+                protected bool $active
             ) {
             }
 
-            public function countActiveVocabularies(SlotIdentifier $slot): int
+            public function isVocabularyActive(SlotIdentifier $slot): bool
             {
                 if ($slot === $this->slot) {
-                    return $this->active_count;
+                    return $this->active;
                 }
-                return 0;
+                return false;
             }
         };
     }
@@ -108,13 +108,13 @@ class InfosTest extends TestCase
     public function activeCountProvider(): array
     {
         return [
-            [5, 2, true, true],
-            [5, 2, false, true],
-            [1, 0, true, false],
-            [1, 0, false, true],
-            [0, 1, true, false],
-            [0, 1, false, true],
-            [0, 0, false, false]
+            [5, true, true, true],
+            [5, true, false, true],
+            [1, false, true, false],
+            [1, false, false, true],
+            [0, true, true, false],
+            [0, true, false, true],
+            [0, false, false, false]
         ];
     }
 
@@ -123,13 +123,13 @@ class InfosTest extends TestCase
      */
     public function testIsDeactivatableStandard(
         int $active_controlled_vocabs,
-        int $active_standard_vocabs,
+        bool $is_standard_vocab_active,
         bool $is_vocab_active,
         bool $are_other_vocabs_active
     ): void {
         $infos = new Infos(
             $this->getControlledRepo(SlotIdentifier::TECHNICAL_FORMAT, $active_controlled_vocabs),
-            $this->getStandardRepo(SlotIdentifier::TECHNICAL_FORMAT, $active_standard_vocabs)
+            $this->getStandardRepo(SlotIdentifier::TECHNICAL_FORMAT, $is_standard_vocab_active)
         );
         $vocab = $this->getVocabulary(
             Type::STANDARD,
@@ -156,13 +156,13 @@ class InfosTest extends TestCase
      */
     public function testIsDeactivatableControlledVocabValue(
         int $active_controlled_vocabs,
-        int $active_standard_vocabs,
+        bool $is_standard_vocab_active,
         bool $is_vocab_active,
         bool $are_other_vocabs_active
     ): void {
         $infos = new Infos(
             $this->getControlledRepo(SlotIdentifier::TECHNICAL_FORMAT, $active_controlled_vocabs),
-            $this->getStandardRepo(SlotIdentifier::TECHNICAL_FORMAT, $active_standard_vocabs)
+            $this->getStandardRepo(SlotIdentifier::TECHNICAL_FORMAT, $is_standard_vocab_active)
         );
         $vocab = $this->getVocabulary(
             Type::CONTROLLED_VOCAB_VALUE,
@@ -269,13 +269,13 @@ class InfosTest extends TestCase
      */
     public function testCanBeDeletedControlledVocabValue(
         int $active_controlled_vocabs,
-        int $active_standard_vocabs,
+        bool $is_standard_vocab_active,
         bool $is_vocab_active,
         bool $are_other_vocabs_active
     ): void {
         $infos = new Infos(
             $this->getControlledRepo(SlotIdentifier::TECHNICAL_FORMAT, $active_controlled_vocabs),
-            $this->getStandardRepo(SlotIdentifier::TECHNICAL_FORMAT, $active_standard_vocabs)
+            $this->getStandardRepo(SlotIdentifier::TECHNICAL_FORMAT, $is_standard_vocab_active)
         );
         $vocab = $this->getVocabulary(
             Type::CONTROLLED_VOCAB_VALUE,

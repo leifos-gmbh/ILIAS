@@ -105,7 +105,7 @@ class Infos implements InfosInterface
     {
         $slot = $vocabulary->slot();
         $other_active_repositories_count =
-            $this->standard_repo->countActiveVocabularies($slot) +
+            ((int) $this->standard_repo->isVocabularyActive($slot)) +
             $this->controlled_repo->countActiveVocabulariesForSlot($slot) -
             ((int) $vocabulary->isActive());
         return $other_active_repositories_count > 0;

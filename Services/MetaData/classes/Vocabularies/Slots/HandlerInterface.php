@@ -22,7 +22,7 @@ namespace ILIAS\MetaData\Vocabularies\Slots;
 
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Conditions\ConditionInterface;
-use ILIAS\MetaData\Vocabularies\Slots\Identifier;
+use ILIAS\MetaData\Elements\Data\Type as DataType;
 
 interface HandlerInterface
 {
@@ -41,11 +41,13 @@ interface HandlerInterface
     /**
      * @return Identifier[]
      */
-    public function allSlotsForElement(PathInterface $path_to_element): array;
+    public function allSlotsForElement(PathInterface $path_to_element): \Generator;
 
     public function doesSlotExist(
         PathInterface $path_to_element,
         ?PathInterface $path_to_condition,
         ?string $condition_value
     ): bool;
+
+    public function dataTypeForSlot(Identifier $identifier): DataType;
 }

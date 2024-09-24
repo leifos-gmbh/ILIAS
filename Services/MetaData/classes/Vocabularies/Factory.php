@@ -25,12 +25,17 @@ use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 
 class Factory implements FactoryInterface
 {
-    public const STANDARD_SOURCE = 'LOMv1.0';
     protected const COPYRIGHT_SOURCE = 'ILIAS';
 
     public function standard(SlotIdentifier $slot, string ...$values): BuilderInterface
     {
-        return new Builder($slot, Type::STANDARD, '', self::STANDARD_SOURCE, ...$values);
+        return new Builder(
+            $slot,
+            Type::STANDARD,
+            $slot->value,
+            FactoryInterface::STANDARD_SOURCE,
+            ...$values
+        );
     }
 
     public function controlledString(
@@ -56,9 +61,14 @@ class Factory implements FactoryInterface
         return new Builder(
             SlotIdentifier::RIGHTS_DESCRIPTION,
             Type::COPYRIGHT,
-            '',
+            SlotIdentifier::RIGHTS_DESCRIPTION->value,
             self::COPYRIGHT_SOURCE,
             ...$values
         );
+    }
+
+    public function null(): VocabularyInterface
+    {
+        return new NullVocabulary();
     }
 }

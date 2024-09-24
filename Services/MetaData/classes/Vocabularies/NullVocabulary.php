@@ -61,6 +61,6 @@ class NullVocabulary implements VocabularyInterface
 
     public function allowsCustomInputs(): bool
     {
-        return false;
+        return true;
     }
 }

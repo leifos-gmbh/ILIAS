@@ -150,13 +150,13 @@ class Importer
     }
 
     /**
-     * Yields value => label as strings, label can be null.
+     * Yields value => label as strings.
      */
     protected function extractValuesAndLabels(\DOMXPath $xml_path): \Generator
     {
         $nodes = $xml_path->query('//vocabulary/values/value');
         foreach ($nodes as $node) {
-            $label = $node->hasAttribute('label') ? $node->getAttribute('label') : null;
+            $label = $node->hasAttribute('label') ? $node->getAttribute('label') : '';
             $value = $node->nodeValue;
             yield $value => $label;
         }

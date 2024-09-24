@@ -18,16 +18,22 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Standard;
 
-use ILIAS\MetaData\Elements\Base\BaseElementInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
-interface DictionaryInterface
+class NullGateway implements GatewayInterface
 {
-    /**
-     * @return TagInterface[]
-     */
-    public function tagsForElement(
-        BaseElementInterface $element
-    ): \Generator;
+    public function createDeactivationEntry(SlotIdentifier $slot): void
+    {
+    }
+
+    public function deleteDeactivationEntry(SlotIdentifier $slot): void
+    {
+    }
+
+    public function doesDeactivationEntryExistForSlot(SlotIdentifier $slot): bool
+    {
+        return false;
+    }
 }

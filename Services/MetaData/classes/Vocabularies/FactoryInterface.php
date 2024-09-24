@@ -24,6 +24,8 @@ use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 interface FactoryInterface
 {
+    public const STANDARD_SOURCE = 'LOMv1.0';
+
     public function standard(SlotIdentifier $slot, string ...$values): BuilderInterface;
 
     public function controlledString(
@@ -41,4 +43,6 @@ interface FactoryInterface
     ): BuilderInterface;
 
     public function copyright(string ...$values): BuilderInterface;
+
+    public function null(): VocabularyInterface;
 }

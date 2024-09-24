@@ -47,6 +47,19 @@ class Dispatcher implements DispatcherInterface
         $this->standard_repo = $standard_repo;
     }
 
+    public function vocabulary(string $vocab_id): VocabularyInterface
+    {
+        $slot = SlotIdentifier::tryFrom($vocab_id);
+        if ($slot === null) {
+            return $this->controlled_repo->getVocabulary($vocab_id);
+        } elseif ($slot === SlotIdentifier::RIGHTS_DESCRIPTION) {
+            return $this->copyright_bridge->vocabulary($slot);
+        } else {
+            return $this->standard_repo->getVocabulary($slot);
+        }
+
+    }
+
     /**
      * @return VocabularyInterface[]
      */

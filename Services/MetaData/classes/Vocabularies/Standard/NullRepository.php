@@ -20,9 +20,10 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies\Standard;
 
-use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+use ILIAS\MetaData\Vocabularies\NullVocabulary;
 
 class NullRepository implements RepositoryInterface
 {
@@ -34,14 +35,14 @@ class NullRepository implements RepositoryInterface
     {
     }
 
-    public function isVocabularyDeactivated(SlotIdentifier $slot): bool
+    public function isVocabularyActive(SlotIdentifier $slot): bool
     {
         return false;
     }
 
-    public function countActiveVocabularies(SlotIdentifier $slot): int
+    public function getVocabulary(SlotIdentifier $slot): VocabularyInterface
     {
-        return 0;
+        return new NullVocabulary();
     }
 
     public function getVocabularies(SlotIdentifier ...$slots): \Generator

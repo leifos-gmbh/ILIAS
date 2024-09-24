@@ -76,7 +76,7 @@ class ImporterAndResultTest extends TestCase
             public function addValueToVocabulary(
                 string $vocab_id,
                 string $value,
-                ?string $label
+                string $label = ''
             ): void {
                 $this->created_values[] = [
                     'vocab id' => $vocab_id,
@@ -412,9 +412,9 @@ XML;
         );
         $this->assertSame(
             [
-                ['vocab id' => 'new id 0', 'value' => 'value', 'label' => null],
-                ['vocab id' => 'new id 0', 'value' => 'different value', 'label' => null],
-                ['vocab id' => 'new id 0', 'value' => 'third value', 'label' => null]
+                ['vocab id' => 'new id 0', 'value' => 'value', 'label' => ''],
+                ['vocab id' => 'new id 0', 'value' => 'different value', 'label' => ''],
+                ['vocab id' => 'new id 0', 'value' => 'third value', 'label' => '']
             ],
             $repo->created_values
         );
@@ -532,9 +532,9 @@ XML;
         );
         $this->assertSame(
             [
-                ['vocab id' => 'new id 0', 'value' => 'value', 'label' => null],
-                ['vocab id' => 'new id 0', 'value' => 'different value', 'label' => null],
-                ['vocab id' => 'new id 0', 'value' => 'third value', 'label' => null]
+                ['vocab id' => 'new id 0', 'value' => 'value', 'label' => ''],
+                ['vocab id' => 'new id 0', 'value' => 'different value', 'label' => ''],
+                ['vocab id' => 'new id 0', 'value' => 'third value', 'label' => '']
             ],
             $repo->created_values
         );

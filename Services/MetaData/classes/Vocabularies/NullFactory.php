@@ -51,4 +51,9 @@ class NullFactory implements FactoryInterface
     {
         return new NullBuilder();
     }
+
+    public function null(): VocabularyInterface
+    {
+        return new NullVocabulary();
+    }
 }

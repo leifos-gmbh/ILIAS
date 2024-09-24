@@ -25,6 +25,8 @@ use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 interface DispatcherInterface
 {
+    public function vocabulary(string $vocab_id): VocabularyInterface;
+
     /**
      * @return VocabularyInterface[]
      */

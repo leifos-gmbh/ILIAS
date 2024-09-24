@@ -20,11 +20,10 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies\Controlled;
 
-use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
-use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\NullLabelledValue;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\NullVocabulary;
 
 class NullRepository implements RepositoryInterface
 {
@@ -42,7 +41,7 @@ class NullRepository implements RepositoryInterface
     public function addValueToVocabulary(
         string $vocab_id,
         string $value,
-        ?string $label
+        string $label = ''
     ): void {
     }
 
@@ -54,6 +53,11 @@ class NullRepository implements RepositoryInterface
         string ...$values
     ): \Generator {
         yield from [];
+    }
+
+    public function getVocabulary(string $vocab_id): VocabularyInterface
+    {
+        return new NullVocabulary();
     }
 
     /**

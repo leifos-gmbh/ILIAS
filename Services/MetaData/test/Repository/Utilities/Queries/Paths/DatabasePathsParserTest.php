@@ -31,7 +31,7 @@ use ILIAS\MetaData\Paths\Steps\StepInterface;
 use ILIAS\MetaData\Elements\Data\Type as DataType;
 use ILIAS\MetaData\Paths\Filters\FilterType;
 use ILIAS\MetaData\Repository\Dictionary\NullTag;
-use ILIAS\MetaData\Vocabularies\Factory as LOMVocabInitiator;
+use ILIAS\MetaData\Vocabularies\FactoryInterface as LOMVocabInitiator;
 use ILIAS\MetaData\Paths\Steps\StepToken;
 use ILIAS\MetaData\Paths\Filters\FilterInterface as PathFilter;
 use ILIAS\MetaData\Paths\Filters\NullFilter as NullPathFilter;

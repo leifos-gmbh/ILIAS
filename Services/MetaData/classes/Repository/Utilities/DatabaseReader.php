@@ -33,7 +33,7 @@ use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Paths\Navigator\StructureNavigatorInterface;
 use ILIAS\MetaData\Structure\Definitions\DefinitionInterface;
 use ILIAS\MetaData\Elements\Data\Type;
-use ILIAS\MetaData\Vocabularies\Factory as LOMVocabInitiator;
+use ILIAS\MetaData\Vocabularies\FactoryInterface as LOMVocabInitiator;
 use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseQuerierInterface;
 use ILIAS\MetaData\Repository\Utilities\Queries\Results\RowInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactoryInterface;

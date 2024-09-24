@@ -20,10 +20,8 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies\Standard;
 
-use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
-use ILIAS\Blog\Presentation\Util;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
@@ -33,12 +31,9 @@ interface RepositoryInterface
 
     public function activateVocabulary(SlotIdentifier $slot): void;
 
-    public function isVocabularyDeactivated(SlotIdentifier $slot): bool;
+    public function isVocabularyActive(SlotIdentifier $slot): bool;
 
-    /**
-     * ignores conditions
-     */
-    public function countActiveVocabularies(SlotIdentifier $slot): int;
+    public function getVocabulary(SlotIdentifier $slot): VocabularyInterface;
 
     /**
      * @return VocabularyInterface[]

@@ -18,13 +18,19 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Standard\Dictionary;
+namespace ILIAS\MetaData\Vocabularies\Standard\Assignment;
 
-use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
-interface DictionaryInitiatorInterface
+class NullAssignments implements AssignmentsInterface
 {
-    public function get(): DictionaryInterface;
+    public function doesSlotHaveValues(SlotIdentifier $slot): bool
+    {
+        return false;
+    }
 
-    public function pathFromValueToSource(): PathInterface;
+    public function valuesForSlot(SlotIdentifier $slot): \Generator
+    {
+        yield from [];
+    }
 }

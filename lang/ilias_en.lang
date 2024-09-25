@@ -8047,6 +8047,7 @@ crs#:#timings_usr_edit#:#Edit Timings
 crs#:#tutor_email#:#E-Mail
 crs#:#tutor_name#:#Name
 crs#:#tutor_phone#:#Phone
+crs#:#tutorial_support_block_byline#:#The 'Tutorial Support' block is displayed in the 'Contents' tab. The user selected as "Contact Person" in the "Members" Tab is shown.
 crs#:#tutorial_support_block_contact#:#Contact
 crs#:#tutorial_support_block_send_mail#:#send email
 crs#:#tutorial_support_block_setting_desc#:#The 'Tutorial Support' block is displayed in the 'Contents' tab.

@@ -1365,7 +1365,7 @@ class ilObjCourseGUI extends ilContainerGUI
         );
         //$tutorial_support_panel_checkbox->setValue($this->object->getTutorialSupportBlockSettingValue());
         $tutorial_support_panel_checkbox->setChecked((bool) $this->object->getTutorialSupportBlockSettingValue());
-        $tutorial_support_panel_checkbox->setInfo($this->lng->txt('tutorial_support_block_setting_desc'));
+        $tutorial_support_panel_checkbox->setInfo($this->lng->txt('tutorial_support_block_byline'));
         $form->addItem($tutorial_support_panel_checkbox);
 
         // lp vs. course status

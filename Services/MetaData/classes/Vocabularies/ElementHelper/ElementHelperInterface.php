@@ -18,15 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies;
+namespace ILIAS\MetaData\Vocabularies\Manager;
 
-use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+use ILIAS\MetaData\Elements\ElementInterface;
 
-interface BuilderInterface
+interface ElementHelperInterface
 {
-    public function withIsDeactivated(bool $deactivated): BuilderInterface;
-
-    public function withDisallowsCustomInputs(bool $no_custom_inputs): BuilderInterface;
-
-    public function get(): VocabularyInterface;
 }

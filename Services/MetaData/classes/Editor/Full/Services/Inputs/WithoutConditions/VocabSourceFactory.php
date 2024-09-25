@@ -23,8 +23,8 @@ namespace ILIAS\MetaData\Editor\Full\Services\Inputs\WithoutConditions;
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Vocabularies\Standard\Dictionary\LOMDictionaryInitiator;
-use ILIAS\MetaData\Vocabularies\Factory;
-use ILIAS\MetaData\Vocabularies\FactoryInterface;
+use ILIAS\MetaData\Vocabularies\Factory\Factory;
+use ILIAS\MetaData\Vocabularies\Factory\FactoryInterface;
 
 class VocabSourceFactory extends BaseFactory
 {

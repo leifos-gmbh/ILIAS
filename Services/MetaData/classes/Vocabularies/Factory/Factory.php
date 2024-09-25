@@ -18,15 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies;
+namespace ILIAS\MetaData\Vocabularies\Factory;
 
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
-use ILIAS\MetaData\Vocabularies\Slots\Identifier;
+use ILIAS\MetaData\Vocabularies\Type;
+use ILIAS\MetaData\Vocabularies\NullVocabulary;
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 
 class Factory implements FactoryInterface
 {
-    protected const COPYRIGHT_SOURCE = 'ILIAS';
-
     public function standard(SlotIdentifier $slot, string ...$values): BuilderInterface
     {
         return new Builder(
@@ -62,7 +62,7 @@ class Factory implements FactoryInterface
             SlotIdentifier::RIGHTS_DESCRIPTION,
             Type::COPYRIGHT,
             SlotIdentifier::RIGHTS_DESCRIPTION->value,
-            self::COPYRIGHT_SOURCE,
+            FactoryInterface::COPYRIGHT_SOURCE,
             ...$values
         );
     }

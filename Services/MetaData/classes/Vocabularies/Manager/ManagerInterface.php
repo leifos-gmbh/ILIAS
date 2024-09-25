@@ -18,28 +18,25 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Dispatch;
+namespace ILIAS\MetaData\Vocabularies\Manager;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\Dispatch\Info\InfosInterface;
+use ILIAS\MetaData\Vocabularies\Controlled\CreationRepositoryInterface;
+use ILIAS\MetaData\Vocabularies\Dispatch\ActionsInterface;
 
-interface DispatcherInterface
+interface ManagerInterface
 {
-    public function vocabulary(string $vocab_id): VocabularyInterface;
-
     /**
      * @return VocabularyInterface[]
      */
-    public function vocabulariesForSlots(
-        SlotIdentifier ...$slots
-    ): \Generator;
+    public function getAllVocabularies(): \Generator;
 
-    /**
-     * @return VocabularyInterface[]
-     */
-    public function activeVocabulariesForSlots(
-        SlotIdentifier ...$slots
-    ): \Generator;
+    public function getVocabulary(string $vocab_id): VocabularyInterface;
 
-    public function delete(VocabularyInterface $vocabulary): void;
+    public function infos(): InfosInterface;
+
+    public function actions(): ActionsInterface;
+
+    public function createControlledVocabulary(): CreationRepositoryInterface;
 }

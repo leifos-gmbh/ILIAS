@@ -18,9 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies;
+namespace ILIAS\MetaData\Vocabularies\Factory;
 
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\Vocabulary;
+use ILIAS\MetaData\Vocabularies\Type;
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 
 class Builder implements BuilderInterface
 {

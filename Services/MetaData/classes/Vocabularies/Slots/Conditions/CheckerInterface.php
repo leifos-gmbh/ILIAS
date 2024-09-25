@@ -20,13 +20,14 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Vocabularies\Slots\Conditions;
 
-use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 interface CheckerInterface
 {
-    public function isConditionFulfilled(
+    public function doesElementFitSlot(
         ElementInterface $element,
-        ConditionInterface $condition
+        SlotIdentifier $slot,
+        bool $ignore_markers = true
     ): bool;
 }

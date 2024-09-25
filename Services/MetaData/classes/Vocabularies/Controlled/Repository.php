@@ -23,7 +23,7 @@ namespace ILIAS\MetaData\Vocabularies\Controlled;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
-use ILIAS\MetaData\Vocabularies\FactoryInterface;
+use ILIAS\MetaData\Vocabularies\Factory\FactoryInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValue;
 use ILIAS\MetaData\Vocabularies\Slots\HandlerInterface as SlotHandler;
 use ILIAS\MetaData\Elements\Data\Type as DataType;
@@ -152,19 +152,6 @@ class Repository implements RepositoryInterface
     public function getActiveVocabulariesForSlots(SlotIdentifier ...$slots): \Generator
     {
         yield from $this->readVocabularies(true, ...$slots);
-    }
-
-    public function isCustomInputAllowedForSlot(SlotIdentifier $slot): bool
-    {
-        $result = $this->db->query(
-            'SELECT COUNT(*) AS count FROM il_md_vocab_contr WHERE custom_input = 0 ' .
-            'AND active = 1 AND slot = ' . $this->db->quoteAsString($slot->value)
-        );
-
-        foreach ($result as $row) {
-            return ((int) $row['count']) === 0;
-        }
-        return true;
     }
 
     /**

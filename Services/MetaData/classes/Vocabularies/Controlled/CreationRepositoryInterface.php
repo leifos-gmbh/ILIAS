@@ -24,40 +24,32 @@ use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
-interface RepositoryInterface extends CreationRepositoryInterface
+interface CreationRepositoryInterface
 {
-    public function getVocabulary(string $vocab_id): VocabularyInterface;
+    /**
+     * Returns ID of the created vocabulary
+     * @throws \ilMDVocabulariesException if the values are invalid (in which case nothing is persisted)
+     */
+    public function create(
+        SlotIdentifier $slot,
+        string $source
+    ): string;
 
     /**
-     * @return VocabularyInterface[]
+     * The value, vocab_id tuple must be unique! Before using this,
+     * check with findAlreadyExistingValues.
      */
-    public function getVocabulariesForSlots(SlotIdentifier ...$slots): \Generator;
-
-    public function countActiveVocabulariesForSlot(SlotIdentifier $slot): int;
-
-    /**
-     * @return VocabularyInterface[]
-     */
-    public function getActiveVocabulariesForSlots(SlotIdentifier ...$slots): \Generator;
+    public function addValueToVocabulary(
+        string $vocab_id,
+        string $value,
+        string $label = ''
+    ): void;
 
     /**
-     * Values not from active controlled vocabularies will not be returned at all.
-     * @return LabelledValueInterface[]
+     * @return string[]
      */
-    public function getLabelsForValues(
+    public function findAlreadyExistingValues(
         SlotIdentifier $slot,
         string ...$values
     ): \Generator;
-
-    public function setActiveForVocabulary(
-        string $vocab_id,
-        bool $active
-    ): void;
-
-    public function setCustomInputsAllowedForVocabulary(
-        string $vocab_id,
-        bool $custom_inputs
-    ): void;
-
-    public function deleteVocabulary(string $vocab_id): void;
 }

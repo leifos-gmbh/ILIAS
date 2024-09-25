@@ -18,10 +18,19 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Controlled;
+namespace ILIAS\MetaData\Vocabularies\Dispatch;
 
-use PHPUnit\Framework\TestCase;
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 
-class RepositoryTest extends TestCase
+interface ActionsInterface
 {
+    public function activate(VocabularyInterface $vocabulary): void;
+
+    public function deactivate(VocabularyInterface $vocabulary): void;
+
+    public function allowCustomInput(VocabularyInterface $vocabulary): void;
+
+    public function disallowCustomInput(VocabularyInterface $vocabulary): void;
+
+    public function delete(VocabularyInterface $vocabulary): void;
 }

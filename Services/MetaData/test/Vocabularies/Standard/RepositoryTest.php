@@ -21,10 +21,10 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Vocabularies\Standard;
 
 use PHPUnit\Framework\TestCase;
-use ILIAS\MetaData\Vocabularies\FactoryInterface;
-use ILIAS\MetaData\Vocabularies\NullFactory;
-use ILIAS\MetaData\Vocabularies\BuilderInterface;
-use ILIAS\MetaData\Vocabularies\NullBuilder;
+use ILIAS\MetaData\Vocabularies\Factory\FactoryInterface;
+use ILIAS\MetaData\Vocabularies\Factory\NullFactory;
+use ILIAS\MetaData\Vocabularies\Factory\BuilderInterface;
+use ILIAS\MetaData\Vocabularies\Factory\NullBuilder;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\NullVocabulary;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
@@ -67,6 +67,11 @@ class RepositoryTest extends TestCase
     protected function getVocabFactory(): FactoryInterface
     {
         return new class () extends NullFactory {
+            public function null(): VocabularyInterface
+            {
+                return new NullVocabulary();
+            }
+
             public function standard(SlotIdentifier $slot, string ...$values): BuilderInterface
             {
                 return new class ($slot, $values) extends NullBuilder {
@@ -335,8 +340,54 @@ class RepositoryTest extends TestCase
         $this->assertFalse($repo->isVocabularyActive(SlotIdentifier::EDUCATIONAL_DIFFICULTY));
     }
 
+    public function testGetVocabularyInvalidSlot(): void
+    {
+        $repo = new Repository(
+            $gateway = $this->getGateway(),
+            $this->getVocabFactory(),
+            $this->getAssignments([
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY->value => ['value 1', 'value 2'],
+                SlotIdentifier::CLASSIFICATION_PURPOSE->value => ['value 3', 'value 4']
+            ])
+        );
+
+        $vocab = $repo->getVocabulary(SlotIdentifier::LIFECYCLE_STATUS);
+        $this->assertSame(SlotIdentifier::NULL, $vocab->slot());
+        $this->assertEmpty(iterator_to_array($vocab->values()));
+    }
+
     public function testGetVocabulary(): void
     {
+        $repo = new Repository(
+            $gateway = $this->getGateway(),
+            $this->getVocabFactory(),
+            $this->getAssignments([
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY->value => ['value 1', 'value 2'],
+                SlotIdentifier::CLASSIFICATION_PURPOSE->value => ['value 3', 'value 4']
+            ])
+        );
+
+        $vocab = $repo->getVocabulary(SlotIdentifier::EDUCATIONAL_DIFFICULTY);
+        $this->assertSame(SlotIdentifier::EDUCATIONAL_DIFFICULTY, $vocab->slot());
+        $this->assertSame(['value 1', 'value 2'], iterator_to_array($vocab->values()));
+        $this->assertTrue($vocab->isActive());
+    }
+
+    public function testGetVocabularyInactive(): void
+    {
+        $repo = new Repository(
+            $gateway = $this->getGateway(SlotIdentifier::EDUCATIONAL_DIFFICULTY),
+            $this->getVocabFactory(),
+            $this->getAssignments([
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY->value => ['value 1', 'value 2'],
+                SlotIdentifier::CLASSIFICATION_PURPOSE->value => ['value 3', 'value 4']
+            ])
+        );
+
+        $vocab = $repo->getVocabulary(SlotIdentifier::EDUCATIONAL_DIFFICULTY);
+        $this->assertSame(SlotIdentifier::EDUCATIONAL_DIFFICULTY, $vocab->slot());
+        $this->assertSame(['value 1', 'value 2'], iterator_to_array($vocab->values()));
+        $this->assertFalse($vocab->isActive());
     }
 
     public function testGetVocabulariesEmpty(): void

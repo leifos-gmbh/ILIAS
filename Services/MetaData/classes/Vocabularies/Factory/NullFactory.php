@@ -18,9 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies;
+namespace ILIAS\MetaData\Vocabularies\Factory;
 
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\Factory\NullBuilder;
+use ILIAS\MetaData\Vocabularies\NullVocabulary;
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 
 class NullFactory implements FactoryInterface
 {

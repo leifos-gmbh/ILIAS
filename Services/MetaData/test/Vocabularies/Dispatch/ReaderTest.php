@@ -35,7 +35,7 @@ use ILIAS\MetaData\Vocabularies\NullVocabulary;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 use ILIAS\MetaData\Vocabularies\Type;
 
-class DispatcherTest extends TestCase
+class ReaderTest extends TestCase
 {
     protected function getVocabulary(
         bool $active,
@@ -79,20 +79,6 @@ class DispatcherTest extends TestCase
         return $result;
     }
 
-    protected function getInfos(bool $can_be_deleted = true): InfosInterface
-    {
-        return new class ($can_be_deleted) extends NullInfos {
-            public function __construct(protected bool $can_be_deleted)
-            {
-            }
-
-            public function canBeDeleted(VocabularyInterface $vocabulary): bool
-            {
-                return $this->can_be_deleted;
-            }
-        };
-    }
-
     protected function getCopyrightBridge(?VocabularyInterface $vocabulary = null): CopyrightBridge
     {
         return new class ($vocabulary) extends NullCopyrightBridge {
@@ -110,10 +96,18 @@ class DispatcherTest extends TestCase
     protected function getControlledRepo(VocabularyInterface ...$vocabularies): ControlledRepo
     {
         return new class ($vocabularies) extends NullControlledRepo {
-            public array $exposed_deletions = [];
-
             public function __construct(protected array $vocabularies)
             {
+            }
+
+            public function getVocabulary(string $vocab_id): VocabularyInterface
+            {
+                foreach ($this->vocabularies as $vocabulary) {
+                    if ($vocab_id === $vocabulary->id()) {
+                        return $vocabulary;
+                    }
+                }
+                return new NullVocabulary();
             }
 
             public function getVocabulariesForSlots(SlotIdentifier ...$slots): \Generator
@@ -130,11 +124,6 @@ class DispatcherTest extends TestCase
                     yield $vocabulary;
                 }
             }
-
-            public function deleteVocabulary(string $vocab_id): void
-            {
-                $this->exposed_deletions[] = $vocab_id;
-            }
         };
     }
 
@@ -143,6 +132,16 @@ class DispatcherTest extends TestCase
         return new class ($vocabularies) extends NullStandardRepo {
             public function __construct(protected array $vocabularies)
             {
+            }
+
+            public function getVocabulary(SlotIdentifier $slot): VocabularyInterface
+            {
+                foreach ($this->vocabularies as $vocabulary) {
+                    if ($slot->value === $vocabulary->id()) {
+                        return $vocabulary;
+                    }
+                }
+                return new NullVocabulary();
             }
 
             public function getVocabularies(SlotIdentifier ...$slots): \Generator
@@ -175,8 +174,76 @@ class DispatcherTest extends TestCase
         $this->assertSame($ids, $actual_ids);
     }
 
-    public function testVocabulary(): void
+    public function testVocabularyInvalidVocabID(): void
     {
+        $active_controlled_vocabs = $this->getVocabsWithIDs(true, 'contr active 1', 'contr active 2');
+        $inactive_controlled_vocabs = $this->getVocabsWithIDs(false, 'contr inactive 1', 'contr inactive 2');
+        $active_standard_vocabs = $this->getVocabsWithIDs(true, SlotIdentifier::GENERAL_COVERAGE->value);
+        $inactive_standard_vocabs = $this->getVocabsWithIDs(false, SlotIdentifier::RIGHTS_COST->value);
+
+        $reader = new Reader(
+            $this->getCopyrightBridge(),
+            $this->getControlledRepo(...$active_controlled_vocabs, ...$inactive_controlled_vocabs),
+            $this->getStandardRepo(...$active_standard_vocabs, ...$inactive_standard_vocabs)
+        );
+
+        $vocab = $reader->vocabulary('something entirely different');
+
+        $this->assertInstanceOf(NullVocabulary::class, $vocab);
+    }
+
+    public function testVocabularyInvalidVocabIDFromStandardSlot(): void
+    {
+        $active_controlled_vocabs = $this->getVocabsWithIDs(true, 'contr active 1', 'contr active 2');
+        $inactive_controlled_vocabs = $this->getVocabsWithIDs(false, 'contr inactive 1', 'contr inactive 2');
+        $active_standard_vocabs = $this->getVocabsWithIDs(true, SlotIdentifier::GENERAL_COVERAGE->value);
+        $inactive_standard_vocabs = $this->getVocabsWithIDs(false, SlotIdentifier::RIGHTS_COST->value);
+
+        $reader = new Reader(
+            $this->getCopyrightBridge(),
+            $this->getControlledRepo(...$active_controlled_vocabs, ...$inactive_controlled_vocabs),
+            $this->getStandardRepo(...$active_standard_vocabs, ...$inactive_standard_vocabs)
+        );
+
+        $vocab = $reader->vocabulary(SlotIdentifier::RIGHTS_COST->value);
+
+        $this->assertSame(SlotIdentifier::RIGHTS_COST->value, $vocab->id());
+    }
+    public function testVocabularyInvalidVocabIDFromCopyrightSlot(): void
+    {
+        $cp_vocab = $this->getVocabulary(true, SlotIdentifier::RIGHTS_DESCRIPTION->value);
+        $active_controlled_vocabs = $this->getVocabsWithIDs(true, 'contr active 1', 'contr active 2');
+        $inactive_controlled_vocabs = $this->getVocabsWithIDs(false, 'contr inactive 1', 'contr inactive 2');
+        $active_standard_vocabs = $this->getVocabsWithIDs(true, SlotIdentifier::GENERAL_COVERAGE->value);
+        $inactive_standard_vocabs = $this->getVocabsWithIDs(false, SlotIdentifier::RIGHTS_COST->value);
+
+        $reader = new Reader(
+            $this->getCopyrightBridge($cp_vocab),
+            $this->getControlledRepo(...$active_controlled_vocabs, ...$inactive_controlled_vocabs),
+            $this->getStandardRepo(...$active_standard_vocabs, ...$inactive_standard_vocabs)
+        );
+
+        $vocab = $reader->vocabulary(SlotIdentifier::RIGHTS_DESCRIPTION->value);
+
+        $this->assertSame(SlotIdentifier::RIGHTS_DESCRIPTION->value, $vocab->id());
+    }
+
+    public function testVocabularyInvalidVocabIDFromControlledVocabulary(): void
+    {
+        $active_controlled_vocabs = $this->getVocabsWithIDs(true, 'contr active 1', 'contr active 2');
+        $inactive_controlled_vocabs = $this->getVocabsWithIDs(false, 'contr inactive 1', 'contr inactive 2');
+        $active_standard_vocabs = $this->getVocabsWithIDs(true, SlotIdentifier::GENERAL_COVERAGE->value);
+        $inactive_standard_vocabs = $this->getVocabsWithIDs(false, SlotIdentifier::RIGHTS_COST->value);
+
+        $reader = new Reader(
+            $this->getCopyrightBridge(),
+            $this->getControlledRepo(...$active_controlled_vocabs, ...$inactive_controlled_vocabs),
+            $this->getStandardRepo(...$active_standard_vocabs, ...$inactive_standard_vocabs)
+        );
+
+        $vocab = $reader->vocabulary('contr active 1');
+
+        $this->assertSame('contr active 1', $vocab->id());
     }
 
     public function testVocabulariesForSlots(): void
@@ -187,8 +254,7 @@ class DispatcherTest extends TestCase
         $active_standard_vocabs = $this->getVocabsWithIDs(true, 'stand active 1', 'stand active 2');
         $inactive_standard_vocabs = $this->getVocabsWithIDs(false, 'stand inactive 1', 'stand inactive 2');
 
-        $dispatcher = new Dispatcher(
-            $this->getInfos(),
+        $reader = new Reader(
             $this->getCopyrightBridge($cp_vocab),
             $this->getControlledRepo(...$active_controlled_vocabs, ...$inactive_controlled_vocabs),
             $this->getStandardRepo(...$active_standard_vocabs, ...$inactive_standard_vocabs)
@@ -206,7 +272,7 @@ class DispatcherTest extends TestCase
                 'stand inactive 1',
                 'stand inactive 2'
             ],
-            $dispatcher->vocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
+            $reader->vocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
         );
     }
 
@@ -217,8 +283,7 @@ class DispatcherTest extends TestCase
         $active_standard_vocabs = $this->getVocabsWithIDs(true, 'stand active 1', 'stand active 2');
         $inactive_standard_vocabs = $this->getVocabsWithIDs(false, 'stand inactive 1', 'stand inactive 2');
 
-        $dispatcher = new Dispatcher(
-            $this->getInfos(),
+        $reader = new Reader(
             $this->getCopyrightBridge(),
             $this->getControlledRepo(...$active_controlled_vocabs, ...$inactive_controlled_vocabs),
             $this->getStandardRepo(...$active_standard_vocabs, ...$inactive_standard_vocabs)
@@ -235,7 +300,7 @@ class DispatcherTest extends TestCase
                 'stand inactive 1',
                 'stand inactive 2'
             ],
-            $dispatcher->vocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
+            $reader->vocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
         );
     }
 
@@ -247,8 +312,7 @@ class DispatcherTest extends TestCase
         $active_standard_vocabs = $this->getVocabsWithIDs(true, 'stand active 1', 'stand active 2');
         $inactive_standard_vocabs = $this->getVocabsWithIDs(false, 'stand inactive 1', 'stand inactive 2');
 
-        $dispatcher = new Dispatcher(
-            $this->getInfos(),
+        $reader = new Reader(
             $this->getCopyrightBridge($cp_vocab),
             $this->getControlledRepo(...$active_controlled_vocabs, ...$inactive_controlled_vocabs),
             $this->getStandardRepo(...$active_standard_vocabs, ...$inactive_standard_vocabs)
@@ -262,7 +326,7 @@ class DispatcherTest extends TestCase
                 'stand active 1',
                 'stand active 2'
             ],
-            $dispatcher->activeVocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
+            $reader->activeVocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
         );
     }
 
@@ -273,8 +337,7 @@ class DispatcherTest extends TestCase
         $active_standard_vocabs = $this->getVocabsWithIDs(true, 'stand active 1', 'stand active 2');
         $inactive_standard_vocabs = $this->getVocabsWithIDs(false, 'stand inactive 1', 'stand inactive 2');
 
-        $dispatcher = new Dispatcher(
-            $this->getInfos(),
+        $reader = new Reader(
             $this->getCopyrightBridge(),
             $this->getControlledRepo(...$active_controlled_vocabs, ...$inactive_controlled_vocabs),
             $this->getStandardRepo(...$active_standard_vocabs, ...$inactive_standard_vocabs)
@@ -287,7 +350,7 @@ class DispatcherTest extends TestCase
                 'stand active 1',
                 'stand active 2'
             ],
-            $dispatcher->activeVocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
+            $reader->activeVocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
         );
     }
 
@@ -299,8 +362,7 @@ class DispatcherTest extends TestCase
         $active_standard_vocabs = $this->getVocabsWithIDs(true, 'stand active 1', 'stand active 2');
         $inactive_standard_vocabs = $this->getVocabsWithIDs(false, 'stand inactive 1', 'stand inactive 2');
 
-        $dispatcher = new Dispatcher(
-            $this->getInfos(),
+        $reader = new Reader(
             $this->getCopyrightBridge($cp_vocab),
             $this->getControlledRepo(...$active_controlled_vocabs, ...$inactive_controlled_vocabs),
             $this->getStandardRepo(...$active_standard_vocabs, ...$inactive_standard_vocabs)
@@ -313,82 +375,7 @@ class DispatcherTest extends TestCase
                 'stand active 1',
                 'stand active 2'
             ],
-            $dispatcher->activeVocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
+            $reader->activeVocabulariesForSlots(SlotIdentifier::RIGHTS_COST)
         );
-    }
-
-    public function testDeleteCannotBeDeletedException(): void
-    {
-        $dispatcher = new Dispatcher(
-            $this->getInfos(false),
-            $this->getCopyrightBridge(),
-            $this->getControlledRepo(),
-            $this->getStandardRepo()
-        );
-
-        $this->expectException(\ilMDVocabulariesException::class);
-        $dispatcher->delete($this->getVocabulary(true));
-    }
-
-    public function testDeleteStandard(): void
-    {
-        $dispatcher = new Dispatcher(
-            $this->getInfos(),
-            $this->getCopyrightBridge(),
-            $controlled = $this->getControlledRepo(),
-            $this->getStandardRepo()
-        );
-
-        $dispatcher->delete($this->getVocabulary(true, 'some id', Type::STANDARD, ));
-
-        $this->assertEmpty($controlled->exposed_deletions);
-    }
-
-    public function testDeleteControlledString(): void
-    {
-        $dispatcher = new Dispatcher(
-            $this->getInfos(),
-            $this->getCopyrightBridge(),
-            $controlled = $this->getControlledRepo(),
-            $this->getStandardRepo()
-        );
-
-        $dispatcher->delete($this->getVocabulary(true, 'some id', Type::CONTROLLED_STRING));
-
-        $this->assertSame(
-            ['some id'],
-            $controlled->exposed_deletions
-        );
-    }
-
-    public function testDeleteControlledVocabValue(): void
-    {
-        $dispatcher = new Dispatcher(
-            $this->getInfos(),
-            $this->getCopyrightBridge(),
-            $controlled = $this->getControlledRepo(),
-            $this->getStandardRepo()
-        );
-
-        $dispatcher->delete($this->getVocabulary(true, 'some id', Type::CONTROLLED_VOCAB_VALUE));
-
-        $this->assertSame(
-            ['some id'],
-            $controlled->exposed_deletions
-        );
-    }
-
-    public function testDeleteCopyright(): void
-    {
-        $dispatcher = new Dispatcher(
-            $this->getInfos(),
-            $this->getCopyrightBridge(),
-            $controlled = $this->getControlledRepo(),
-            $this->getStandardRepo()
-        );
-
-        $dispatcher->delete($this->getVocabulary(true, 'some id', Type::COPYRIGHT));
-
-        $this->assertEmpty($controlled->exposed_deletions);
     }
 }

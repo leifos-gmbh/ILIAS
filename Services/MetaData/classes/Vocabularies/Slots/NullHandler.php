@@ -51,7 +51,7 @@ class NullHandler implements HandlerInterface
         return Identifier::NULL;
     }
 
-    public function allSlotsForElement(PathInterface $path_to_element): \Generator
+    public function allSlotsForPath(PathInterface $path_to_element): \Generator
     {
         yield from [];
     }

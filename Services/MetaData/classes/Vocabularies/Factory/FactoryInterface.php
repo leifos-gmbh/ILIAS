@@ -18,13 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies;
+namespace ILIAS\MetaData\Vocabularies\Factory;
 
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 
 interface FactoryInterface
 {
     public const STANDARD_SOURCE = 'LOMv1.0';
+    public const COPYRIGHT_SOURCE = 'ILIAS';
 
     public function standard(SlotIdentifier $slot, string ...$values): BuilderInterface;
 

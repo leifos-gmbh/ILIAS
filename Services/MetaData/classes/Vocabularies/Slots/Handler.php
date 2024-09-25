@@ -138,7 +138,7 @@ class Handler implements HandlerInterface
         return Identifier::NULL;
     }
 
-    public function allSlotsForElement(PathInterface $path_to_element): \Generator
+    public function allSlotsForPath(PathInterface $path_to_element): \Generator
     {
         foreach (Identifier::cases() as $identifier) {
             if ($this->pathForSlot($identifier)->toString() === $path_to_element->toString()) {

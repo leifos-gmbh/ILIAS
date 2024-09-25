@@ -41,7 +41,7 @@ interface HandlerInterface
     /**
      * @return Identifier[]
      */
-    public function allSlotsForElement(PathInterface $path_to_element): \Generator;
+    public function allSlotsForPath(PathInterface $path_to_element): \Generator;
 
     public function doesSlotExist(
         PathInterface $path_to_element,

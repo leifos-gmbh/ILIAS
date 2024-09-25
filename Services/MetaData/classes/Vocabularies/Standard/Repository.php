@@ -25,7 +25,7 @@ use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValue;
-use ILIAS\MetaData\Vocabularies\FactoryInterface;
+use ILIAS\MetaData\Vocabularies\Factory\FactoryInterface;
 use ILIAS\MetaData\Vocabularies\Standard\Assignment\AssignmentsInterface;
 
 class Repository implements RepositoryInterface

@@ -26,7 +26,7 @@ use ILIAS\MetaData\Settings\SettingsInterface;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface as IdentifierHandler;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValue;
-use ILIAS\MetaData\Vocabularies\FactoryInterface;
+use ILIAS\MetaData\Vocabularies\Factory\FactoryInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class Bridge implements BridgeInterface

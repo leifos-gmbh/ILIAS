@@ -34,7 +34,7 @@ use ILIAS\MetaData\Vocabularies\Slots\Conditions\ConditionInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Conditions\NullCondition;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
-class PropertiesTest extends TestCase
+class ActionsTest extends TestCase
 {
     public function getVocabulary(
         Type $type,
@@ -69,17 +69,20 @@ class PropertiesTest extends TestCase
     public function getInfos(
         bool $is_deactivatable = true,
         bool $can_disallow_custom_input = true,
-        bool $is_custom_input_applicable = true
+        bool $is_custom_input_applicable = true,
+        bool $can_be_deleted = true
     ): InfosInterface {
         return new class (
             $is_deactivatable,
             $can_disallow_custom_input,
-            $is_custom_input_applicable
+            $is_custom_input_applicable,
+            $can_be_deleted
         ) extends NullInfos {
             public function __construct(
                 protected bool $is_deactivatable,
                 protected bool $can_disallow_custom_input,
-                protected bool $is_custom_input_applicable
+                protected bool $is_custom_input_applicable,
+                protected bool $can_be_deleted
             ) {
             }
 
@@ -97,6 +100,11 @@ class PropertiesTest extends TestCase
             {
                 return $this->is_custom_input_applicable;
             }
+
+            public function canBeDeleted(VocabularyInterface $vocabulary): bool
+            {
+                return $this->can_be_deleted;
+            }
         };
     }
 
@@ -105,6 +113,7 @@ class PropertiesTest extends TestCase
         return new class () extends NullControlledRepo {
             public array $changes_to_active = [];
             public array $changes_to_custom_input = [];
+            public array $exposed_deletions = [];
 
             public function setActiveForVocabulary(
                 string $vocab_id,
@@ -118,6 +127,11 @@ class PropertiesTest extends TestCase
                 bool $custom_inputs
             ): void {
                 $this->changes_to_custom_input[] = ['id' => $vocab_id, 'custom_inputs' => $custom_inputs];
+            }
+
+            public function deleteVocabulary(string $vocab_id): void
+            {
+                $this->exposed_deletions[] = $vocab_id;
             }
         };
     }
@@ -147,14 +161,14 @@ class PropertiesTest extends TestCase
 
     public function testActivateStandard(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, false, false),
+        $actions = new Actions(
+            $this->getInfos(true, false, false, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->activate($vocab);
+        $actions->activate($vocab);
 
         $this->assertSame(
             [['slot' => SlotIdentifier::LIFECYCLE_STATUS, 'active' => true]],
@@ -166,14 +180,14 @@ class PropertiesTest extends TestCase
 
     public function testActivateControlledString(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, true, true),
+        $actions = new Actions(
+            $this->getInfos(true, true, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->activate($vocab);
+        $actions->activate($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertSame(
@@ -185,14 +199,14 @@ class PropertiesTest extends TestCase
 
     public function testActivateControlledVocabValue(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, false, false),
+        $actions = new Actions(
+            $this->getInfos(true, false, false, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->activate($vocab);
+        $actions->activate($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertSame(
@@ -204,14 +218,14 @@ class PropertiesTest extends TestCase
 
     public function testActivateCopyright(): void
     {
-        $properties = new Properties(
-            $this->getInfos(false, false, true),
+        $actions = new Actions(
+            $this->getInfos(false, false, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->activate($vocab);
+        $actions->activate($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -220,27 +234,27 @@ class PropertiesTest extends TestCase
 
     public function testDeactivateNotDeactivatableException(): void
     {
-        $properties = new Properties(
-            $this->getInfos(false, false, false),
+        $actions = new Actions(
+            $this->getInfos(false, false, false, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
         $this->expectException(\ilMDVocabulariesException::class);
-        $properties->deactivate($vocab);
+        $actions->deactivate($vocab);
     }
 
     public function testDeactivateStandard(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, false, false),
+        $actions = new Actions(
+            $this->getInfos(true, false, false, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->deactivate($vocab);
+        $actions->deactivate($vocab);
 
         $this->assertSame(
             [['slot' => SlotIdentifier::LIFECYCLE_STATUS, 'active' => false]],
@@ -252,14 +266,14 @@ class PropertiesTest extends TestCase
 
     public function testDeactivateControlledString(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, true, true),
+        $actions = new Actions(
+            $this->getInfos(true, true, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->deactivate($vocab);
+        $actions->deactivate($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertSame(
@@ -271,14 +285,14 @@ class PropertiesTest extends TestCase
 
     public function testDeactivateControlledVocabValue(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, false, false),
+        $actions = new Actions(
+            $this->getInfos(true, false, false, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->deactivate($vocab);
+        $actions->deactivate($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertSame(
@@ -290,14 +304,14 @@ class PropertiesTest extends TestCase
 
     public function testDeactivateCopyright(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, false, true),
+        $actions = new Actions(
+            $this->getInfos(true, false, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->deactivate($vocab);
+        $actions->deactivate($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -306,27 +320,27 @@ class PropertiesTest extends TestCase
 
     public function testAllowCustomInputNotApplicableException(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, false, false),
+        $actions = new Actions(
+            $this->getInfos(true, false, false, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
         $this->expectException(\ilMDVocabulariesException::class);
-        $properties->allowCustomInput($vocab);
+        $actions->allowCustomInput($vocab);
     }
 
     public function testAllowCustomInputStandard(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, false, true),
+        $actions = new Actions(
+            $this->getInfos(true, false, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->allowCustomInput($vocab);
+        $actions->allowCustomInput($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -335,14 +349,14 @@ class PropertiesTest extends TestCase
 
     public function testAllowCustomInputControlledString(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, true, true),
+        $actions = new Actions(
+            $this->getInfos(true, true, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->allowCustomInput($vocab);
+        $actions->allowCustomInput($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -354,14 +368,14 @@ class PropertiesTest extends TestCase
 
     public function testAllowCustomInputControlledVocabValue(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, false, true),
+        $actions = new Actions(
+            $this->getInfos(true, false, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->allowCustomInput($vocab);
+        $actions->allowCustomInput($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -370,14 +384,14 @@ class PropertiesTest extends TestCase
 
     public function testAllowCustomInputCopyright(): void
     {
-        $properties = new Properties(
-            $this->getInfos(false, false, true),
+        $actions = new Actions(
+            $this->getInfos(false, false, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->allowCustomInput($vocab);
+        $actions->allowCustomInput($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -386,40 +400,40 @@ class PropertiesTest extends TestCase
 
     public function testDisallowCustomInputNotApplicableException(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, true, false),
+        $actions = new Actions(
+            $this->getInfos(true, true, false, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
         $this->expectException(\ilMDVocabulariesException::class);
-        $properties->disallowCustomInput($vocab);
+        $actions->disallowCustomInput($vocab);
     }
 
     public function testDisallowCustomInputCannotDisallowException(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, false, true),
+        $actions = new Actions(
+            $this->getInfos(true, false, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
         $this->expectException(\ilMDVocabulariesException::class);
-        $properties->disallowCustomInput($vocab);
+        $actions->disallowCustomInput($vocab);
     }
 
     public function testDisallowCustomInputStandard(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, true, true),
+        $actions = new Actions(
+            $this->getInfos(true, true, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::STANDARD, '', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->disallowCustomInput($vocab);
+        $actions->disallowCustomInput($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -428,14 +442,14 @@ class PropertiesTest extends TestCase
 
     public function testDisallowCustomInputControlledString(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, true, true),
+        $actions = new Actions(
+            $this->getInfos(true, true, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::CONTROLLED_STRING, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->disallowCustomInput($vocab);
+        $actions->disallowCustomInput($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -447,14 +461,14 @@ class PropertiesTest extends TestCase
 
     public function testDisallowCustomInputControlledVocabValue(): void
     {
-        $properties = new Properties(
-            $this->getInfos(true, true, true),
+        $actions = new Actions(
+            $this->getInfos(true, true, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->disallowCustomInput($vocab);
+        $actions->disallowCustomInput($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
@@ -463,17 +477,87 @@ class PropertiesTest extends TestCase
 
     public function testDisallowCustomInputCopyright(): void
     {
-        $properties = new Properties(
-            $this->getInfos(false, true, true),
+        $actions = new Actions(
+            $this->getInfos(false, true, true, true),
             $controlled_repo = $this->getControlledRepo(),
             $standard_repo = $this->getStandardRepo(),
         );
         $vocab = $this->getVocabulary(Type::COPYRIGHT, 'vocab id', SlotIdentifier::LIFECYCLE_STATUS);
 
-        $properties->disallowCustomInput($vocab);
+        $actions->disallowCustomInput($vocab);
 
         $this->assertEmpty($standard_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_active);
         $this->assertEmpty($controlled_repo->changes_to_custom_input);
+    }
+
+    public function testDeleteCannotBeDeletedException(): void
+    {
+        $actions = new Actions(
+            $this->getInfos(false, true, true, false),
+            $controlled_repo = $this->getControlledRepo(),
+            $standard_repo = $this->getStandardRepo(),
+        );
+
+        $this->expectException(\ilMDVocabulariesException::class);
+        $actions->delete($this->getVocabulary(Type::STANDARD, 'some id'));
+    }
+
+    public function testDeleteStandard(): void
+    {
+        $actions = new Actions(
+            $this->getInfos(false, true, true, true),
+            $controlled_repo = $this->getControlledRepo(),
+            $standard_repo = $this->getStandardRepo(),
+        );
+
+        $actions->delete($this->getVocabulary(Type::STANDARD, 'some id'));
+
+        $this->assertEmpty($controlled_repo->exposed_deletions);
+    }
+
+    public function testDeleteControlledString(): void
+    {
+        $actions = new Actions(
+            $this->getInfos(true, true, true, true),
+            $controlled_repo = $this->getControlledRepo(),
+            $standard_repo = $this->getStandardRepo(),
+        );
+
+        $actions->delete($this->getVocabulary(Type::CONTROLLED_STRING, 'some id'));
+
+        $this->assertSame(
+            ['some id'],
+            $controlled_repo->exposed_deletions
+        );
+    }
+
+    public function testDeleteControlledVocabValue(): void
+    {
+        $actions = new Actions(
+            $this->getInfos(true, true, true, true),
+            $controlled_repo = $this->getControlledRepo(),
+            $standard_repo = $this->getStandardRepo(),
+        );
+
+        $actions->delete($this->getVocabulary(Type::CONTROLLED_VOCAB_VALUE, 'some id'));
+
+        $this->assertSame(
+            ['some id'],
+            $controlled_repo->exposed_deletions
+        );
+    }
+
+    public function testDeleteCopyright(): void
+    {
+        $actions = new Actions(
+            $this->getInfos(true, true, true, true),
+            $controlled_repo = $this->getControlledRepo(),
+            $standard_repo = $this->getStandardRepo(),
+        );
+
+        $actions->delete($this->getVocabulary(Type::COPYRIGHT, 'some id'));
+
+        $this->assertEmpty($controlled_repo->exposed_deletions);
     }
 }

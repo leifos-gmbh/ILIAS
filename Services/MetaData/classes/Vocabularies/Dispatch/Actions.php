@@ -26,7 +26,7 @@ use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledRepo
 use ILIAS\MetaData\Vocabularies\Standard\RepositoryInterface as StandardRepo;
 use ILIAS\MetaData\Vocabularies\Dispatch\Info\InfosInterface;
 
-class Properties implements PropertiesInterface
+class Actions implements ActionsInterface
 {
     protected InfosInterface $infos;
     protected ControlledRepo $controlled_repo;
@@ -129,6 +129,25 @@ class Properties implements PropertiesInterface
 
             default:
             case Type::CONTROLLED_VOCAB_VALUE:
+            case Type::STANDARD:
+            case Type::COPYRIGHT:
+                break;
+        }
+    }
+
+    public function delete(VocabularyInterface $vocabulary): void
+    {
+        if (!$this->infos->canBeDeleted($vocabulary)) {
+            throw new \ilMDVocabulariesException('Vocabulary cannot be deleted.');
+        }
+
+        switch ($vocabulary->type()) {
+            case Type::CONTROLLED_STRING:
+            case Type::CONTROLLED_VOCAB_VALUE:
+                $this->controlled_repo->deleteVocabulary($vocabulary->id());
+                break;
+
+            default:
             case Type::STANDARD:
             case Type::COPYRIGHT:
                 break;

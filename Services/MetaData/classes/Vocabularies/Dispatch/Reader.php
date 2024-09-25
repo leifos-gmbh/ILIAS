@@ -23,25 +23,21 @@ namespace ILIAS\MetaData\Vocabularies\Dispatch;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Type;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
-use ILIAS\MetaData\Vocabularies\Dispatch\Info\InfosInterface;
 use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledRepo;
 use ILIAS\MetaData\Vocabularies\Standard\RepositoryInterface as StandardRepo;
 use ILIAS\MetaData\Vocabularies\Copyright\BridgeInterface as CopyrightBridge;
 
-class Dispatcher implements DispatcherInterface
+class Reader implements ReaderInterface
 {
-    protected InfosInterface $infos;
     protected CopyrightBridge $copyright_bridge;
     protected ControlledRepo $controlled_repo;
     protected StandardRepo $standard_repo;
 
     public function __construct(
-        InfosInterface $infos,
         CopyrightBridge $copyright_bridge,
         ControlledRepo $controlled_repo,
         StandardRepo $standard_repo
     ) {
-        $this->infos = $infos;
         $this->copyright_bridge = $copyright_bridge;
         $this->controlled_repo = $controlled_repo;
         $this->standard_repo = $standard_repo;
@@ -52,12 +48,14 @@ class Dispatcher implements DispatcherInterface
         $slot = SlotIdentifier::tryFrom($vocab_id);
         if ($slot === null) {
             return $this->controlled_repo->getVocabulary($vocab_id);
-        } elseif ($slot === SlotIdentifier::RIGHTS_DESCRIPTION) {
-            return $this->copyright_bridge->vocabulary($slot);
-        } else {
-            return $this->standard_repo->getVocabulary($slot);
         }
 
+        $from_copyright = $this->copyright_bridge->vocabulary($slot);
+        if ($from_copyright !== null) {
+            return $from_copyright;
+        }
+
+        return $this->standard_repo->getVocabulary($slot);
     }
 
     /**
@@ -90,24 +88,5 @@ class Dispatcher implements DispatcherInterface
         }
         yield from $this->controlled_repo->getActiveVocabulariesForSlots(...$slots);
         yield from $this->standard_repo->getActiveVocabularies(...$slots);
-    }
-
-    public function delete(VocabularyInterface $vocabulary): void
-    {
-        if (!$this->infos->canBeDeleted($vocabulary)) {
-            throw new \ilMDVocabulariesException('Vocabulary cannot be deleted.');
-        }
-
-        switch ($vocabulary->type()) {
-            case Type::CONTROLLED_STRING:
-            case Type::CONTROLLED_VOCAB_VALUE:
-                $this->controlled_repo->deleteVocabulary($vocabulary->id());
-                break;
-
-            default:
-            case Type::STANDARD:
-            case Type::COPYRIGHT:
-                break;
-        }
     }
 }

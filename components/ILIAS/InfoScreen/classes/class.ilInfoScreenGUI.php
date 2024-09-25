@@ -412,7 +412,7 @@ class ilInfoScreenGUI
         if ($public_access_export !== '') {		// public access export
             $this->addProperty(
                 $lng->txt('export_info_public_access'),
-                $copyright
+                $public_access_export
             );
         }
     }

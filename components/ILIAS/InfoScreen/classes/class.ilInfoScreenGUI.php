@@ -437,7 +437,7 @@ class ilInfoScreenGUI
             return '';
         }
 
-        if (!$public_access->hasPublicAccessFile($rep_obj_id)) {
+        if (!$public_access->hasPublicAccessFile($this->data_factory->objId($rep_obj_id))) {
             return '';
         }
 

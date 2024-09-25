@@ -8047,7 +8047,7 @@ crs#:#timings_usr_edit#:#Persönliche Lernplanung
 crs#:#tutor_email#:#E-Mail
 crs#:#tutor_name#:#Name
 crs#:#tutor_phone#:#Telefon
-crs#:#tutorial_support_block_byline#:#Der 'Kontaktperson' Block wird im 'Inhalte' Tab dargestellt. User die als "Kontaktperson" im "Mitglieder" Tab markiert sind werden dargestellt.
+crs#:#tutorial_support_block_byline#:#Der Block „Kontaktperson“ wird im Reiter „Inhalt“ angezeigt. Das ILIAS-Konto, das als „Kontaktperson“ in dem Reiter „Mitglieder“ ausgewählt wurde, wird angezeigt.
 crs#:#tutorial_support_block_contact#:#Kontakt
 crs#:#tutorial_support_block_send_mail#:#E-Mail senden
 crs#:#tutorial_support_block_setting_desc#:#Der 'Kontaktperson' Block wird im 'Inhalt' Tab dargestellt.

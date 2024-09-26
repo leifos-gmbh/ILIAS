@@ -149,10 +149,7 @@ class Services
                 new MarkerFactory(),
                 $this->structure_services->structure(),
                 new DataValidator(
-                    new DataValidatorService(
-                        $this->vocabularies_services->vocabularies(),
-                        $this->data_helper_services->dataHelper()
-                    )
+                    new DataValidatorService($this->data_helper_services->dataHelper())
                 ),
                 $this->constraintDictionary(),
                 $logger

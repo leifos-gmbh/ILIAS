@@ -25,14 +25,12 @@ use ILIAS\MetaData\Copyright\Identifiers\NullHandler;
 use ILIAS\MetaData\Paths\NullFactory as NullPathFactory;
 use ILIAS\MetaData\Search\Clauses\NullFactory as NullClauseFactory;
 use ILIAS\MetaData\Search\Filters\NullFactory as NullFilterFactory;
-use ILIAS\MetaData\Repository\NullRepository;
 
 class FactoryTest extends TestCase
 {
     public function testGet(): void
     {
         $factory = new Factory(
-            new NullRepository(),
             new NullFilterFactory(),
             new NullClauseFactory(),
             new NullPathFactory(),

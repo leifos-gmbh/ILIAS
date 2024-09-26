@@ -41,7 +41,8 @@ use ILIAS\MetaData\OERHarvester\ExposedRecords\RecordInfosInterface;
 use ILIAS\MetaData\OERHarvester\ExposedRecords\NullRecordInfos;
 use ILIAS\MetaData\OERHarvester\Results\WrapperInterface;
 use ILIAS\MetaData\OERHarvester\Results\NullWrapper;
-use ilMDOERHarvesterException;
+use ILIAS\MetaData\Repository\RepositoryInterface as LOMRepository;
+use ILIAS\MetaData\Repository\NullRepository as NullLOMRepository;
 
 class HarvesterTest extends TestCase
 {
@@ -120,7 +121,7 @@ class HarvesterTest extends TestCase
             public function referenceObjectInTargetContainer(int $obj_id, int $container_ref_id): int
             {
                 if ($obj_id === $this->throw_error_on_ref_creation_obj_id) {
-                    throw new ilMDOERHarvesterException('error');
+                    throw new \ilMDOERHarvesterException('error');
                 }
                 $new_ref_id = (int) ($container_ref_id . $obj_id);
                 $this->exposed_ref_creations[] = [
@@ -147,7 +148,7 @@ class HarvesterTest extends TestCase
             public function deleteReference(int $ref_id): void
             {
                 if ($ref_id === $this->throw_error_on_deletion_ref_id) {
-                    throw new ilMDOERHarvesterException('error');
+                    throw new \ilMDOERHarvesterException('error');
                 }
                 $this->exposed_ref_deletions[] = $ref_id;
             }
@@ -181,7 +182,7 @@ class HarvesterTest extends TestCase
             public function getAllHarvestedObjIDs(): \Generator
             {
                 if ($this->throw_error === true) {
-                    throw new ilMDOERHarvesterException('error');
+                    throw new \ilMDOERHarvesterException('error');
                 }
                 yield from array_keys($this->currently_harvested);
             }
@@ -324,8 +325,11 @@ class HarvesterTest extends TestCase
                         return $clone;
                     }
 
-                    public function search(int $first_entry_id, int ...$further_entry_ids): \Generator
-                    {
+                    public function search(
+                        LOMRepository $lom_repository,
+                        int $first_entry_id,
+                        int ...$further_entry_ids
+                    ): \Generator {
                         $this->factory->exposed_search_params[] = [
                             'restricted' => $this->restricted_to_repository,
                             'types' => $this->types,
@@ -411,6 +415,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([32 => 12332, 45 => 12345]),
             $this->getExposedRecordRepository(),
             $search_factory = $this->getSearchFactory(45),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -440,6 +445,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([32 => 12332, 45 => 12345], [32]),
             $this->getExposedRecordRepository(),
             $this->getSearchFactory(45, 32),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -465,6 +471,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([32 => 12332, 45 => 12345]),
             $this->getExposedRecordRepository(),
             $this->getSearchFactory(45, 32),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -490,6 +497,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([32 => 12332, 45 => 12345, 67 => 12367]),
             $this->getExposedRecordRepository(),
             $this->getSearchFactory(),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -515,6 +523,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([32 => 12332]),
             $this->getExposedRecordRepository(),
             $search_factory = $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -554,6 +563,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([32 => 12332], [45]),
             $this->getExposedRecordRepository(),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -579,6 +589,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([32 => 12332]),
             $this->getExposedRecordRepository(),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -604,6 +615,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([32 => 12332, 45 => 12345]),
             $this->getExposedRecordRepository(),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -629,6 +641,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([32 => 12332]),
             $this->getExposedRecordRepository(),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -654,6 +667,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository(),
             $this->getExposedRecordRepository(),
             $this->getSearchFactory(32, 45, 67),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );
@@ -691,6 +705,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
             $search_factory = $this->getSearchFactory(32),
+            new NullLOMRepository(),
             $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
             $this->getNullLogger()
         );
@@ -728,6 +743,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332], [45]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
             $this->getNullLogger()
         );
@@ -757,6 +773,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
             $this->getNullLogger()
         );
@@ -786,6 +803,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332, 45 => 12345]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
             $this->getNullLogger()
         );
@@ -815,6 +833,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332, 45 => 12345]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 changed</el>']),
             $this->getNullLogger()
         );
@@ -853,6 +872,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332, 45 => 12345]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
             $this->getNullLogger()
         );
@@ -892,6 +912,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332], [45]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
             $this->getNullLogger()
         );
@@ -918,6 +939,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
             $this->getNullLogger()
         );
@@ -944,6 +966,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332, 45 => 12345]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
             $this->getNullLogger()
         );
@@ -970,6 +993,7 @@ class HarvesterTest extends TestCase
             $this->getStatusRepository([32 => 12332, 45 => 12345]),
             $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>']),
             $this->getSearchFactory(32, 45),
+            new NullLOMRepository(),
             $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 new</el>']),
             $this->getNullLogger()
         );
@@ -996,6 +1020,7 @@ class HarvesterTest extends TestCase
             $status_repo = $this->getStatusRepository([], [], true),
             $this->getExposedRecordRepository(),
             $search_factory = $this->getSearchFactory(),
+            new NullLOMRepository(),
             $this->getXMLWriter(),
             $this->getNullLogger()
         );

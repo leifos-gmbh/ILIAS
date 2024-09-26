@@ -5,6 +5,11 @@
 Reused constants should be collected into bespoke classes as 
 appropriate, instead of being scattered across the component.
 
+### Get URI from Data Factory
+
+Get URI from the data factory, instead of instantiating it
+directly.
+
 ### Clean up Remains of Migrations for Ilias 10
 
 With ILIAS 10, the migrations `ilMDLOMConformanceMigration` and

@@ -18,11 +18,8 @@
 
 declare(strict_types=1);
 
-use ILIAS\UI\Component\Table\DataRetrieval;
-use ILIAS\UI\Component\Table\DataRowBuilder;
-use ILIAS\Data\Range;
-use ILIAS\Data\Order;
-use ILIAS\MetaData\Vocabularies\Manager\Manager as VocabManager;
+namespace ILIAS\MetaData\Settings\Vocabularies;
+
 use ILIAS\MetaData\Presentation\ElementsInterface as ElementsPresentation;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\PresentationInterface as VocabPresentation;
@@ -36,18 +33,19 @@ use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Elements\Structure\StructureElementInterface;
 use ILIAS\MetaData\Elements\Data\Type as DataType;
 use ILIAS\MetaData\Vocabularies\Slots\Conditions\ConditionInterface;
+use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 
-class ilMDVocabulariesDataRetrieval implements DataRetrieval
+class Presentation
 {
     protected const MAX_PREVIEW_VALUES = 5;
 
-    protected VocabManager $vocab_manager;
     protected ElementsPresentation $elements_presentation;
     protected PresentationUtilities $presentation_utils;
     protected VocabPresentation $vocab_presentation;
     protected SlotHandler $slot_handler;
     protected Structure $structure;
     protected NavigatorFactory $navigator_factory;
+    protected PathFactory $path_factory;
 
     /**
      * @var VocabularyInterface[]
@@ -55,66 +53,34 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
     protected array $vocabs;
 
     public function __construct(
-        VocabManager $vocab_manager,
         ElementsPresentation $elements_presentation,
         PresentationUtilities $presentation_utils,
         VocabPresentation $vocab_presentation,
         SlotHandler $slot_handler,
         Structure $structure,
-        NavigatorFactory $navigator_factory
+        NavigatorFactory $navigator_factory,
+        PathFactory $path_factory
     ) {
-        $this->vocab_manager = $vocab_manager;
         $this->elements_presentation = $elements_presentation;
         $this->presentation_utils = $presentation_utils;
         $this->vocab_presentation = $vocab_presentation;
         $this->slot_handler = $slot_handler;
         $this->structure = $structure;
         $this->navigator_factory = $navigator_factory;
+        $this->path_factory = $path_factory;
     }
 
-    public function getRows(
-        DataRowBuilder $row_builder,
-        array $visible_column_ids,
-        Range $range,
-        Order $order,
-        ?array $filter_data,
-        ?array $additional_parameters
-    ): Generator {
-        $infos = $this->vocab_manager->infos();
-        foreach ($this->getVocabs($range) as $vocab) {
-            $record = [];
-
-            $record['element'] = $this->translateSlot($vocab->slot());
-            $record['type'] = $this->translateType($vocab->type());
-            $record['source'] = $vocab->source();
-            $record['preview'] = $this->buildValuesPreview($vocab);
-            $record['active'] = $vocab->isActive();
-            if ($infos->isCustomInputApplicable($vocab)) {
-                $record['custom_input'] = $vocab->allowsCustomInputs();
-            }
-
-            yield $row_builder->buildDataRow(
-                $vocab->id(),
-                $record
-            )->withDisabledAction(
-                'delete',
-                !$infos->canBeDeleted($vocab)
-            )->withDisabledAction(
-                'toggle_active',
-                $vocab->isActive() && !$infos->isDeactivatable($vocab)
-            )->withDisabledAction(
-                'toggle_custom_input',
-                !$infos->canDisallowCustomInput($vocab)
-            );
-        };
-    }
-
-    public function getTotalRowCount(?array $filter_data, ?array $additional_parameters): ?int
+    public function txt(string $key): string
     {
-        return count($this->getVocabs());
+        return $this->presentation_utils->txt($key);
     }
 
-    protected function translateType(VocabType $type): string
+    public function txtFill(string $key, string ...$values): string
+    {
+        return $this->presentation_utils->txtFill($key, ...$values);
+    }
+
+    public function makeTypePresentable(VocabType $type): string
     {
         return match ($type) {
             VocabType::STANDARD => $this->presentation_utils->txt('md_vocab_type_standard'),
@@ -125,7 +91,7 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
         };
     }
 
-    protected function translateSlot(SlotIdentifier $slot): string
+    public function makeSlotPresentable(SlotIdentifier $slot): string
     {
         //skip the name of the element if it does not add any information
         $skip_data = [DataType::VOCAB_VALUE, DataType::STRING];
@@ -162,13 +128,57 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
             'md_vocab_element_with_condition',
             $element_name,
             $condition_element_name,
-            $this->translateConditionValue($condition)
+            $this->translateConditionValue($condition, $element)
         );
     }
 
-    protected function translateConditionValue(ConditionInterface $condition): string
-    {
-        $slot = $this->slot_handler->identiferFromPathAndCondition($condition->path(), null, null);
+    /**
+     * @return string[]
+     */
+    public function makeValuesPresentable(
+        VocabularyInterface $vocabulary,
+        int $limit = null
+    ): array {
+        $presentable_values = [];
+        $i = 0;
+
+        $labelled_values = $this->vocab_presentation->labelsForVocabulary(
+            $this->presentation_utils,
+            $vocabulary
+        );
+        foreach ($labelled_values as $labelled_value) {
+            if ($limit !== null && $i >= $limit) {
+                $presentable_values[] = '...';
+                break;
+            }
+            $i++;
+
+            if (
+                $vocabulary->type() === VocabType::STANDARD ||
+                $vocabulary->type() === VocabType::COPYRIGHT
+            ) {
+                $presentable_values[] = $labelled_value->label();
+                continue;
+            }
+
+            $presentable_value = $labelled_value->value();
+            if ($labelled_value->label() !== '') {
+                $presentable_value = $labelled_value->label() . ' (' . $presentable_value . ')';
+            }
+            $presentable_values[] = $presentable_value;
+        }
+
+        return $presentable_values;
+    }
+
+    protected function translateConditionValue(
+        ConditionInterface $condition,
+        StructureElementInterface $element
+    ): string {
+        $path_from_root = $this->path_factory->toElement(
+            $this->getStructureElementFromPath($condition->path(), $element),
+        );
+        $slot = $this->slot_handler->identiferFromPathAndCondition($path_from_root, null, null);
         return (string) $this->vocab_presentation->presentableLabels(
             $this->presentation_utils,
             $slot,
@@ -196,52 +206,5 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
             $path,
             $start
         )->elementAtFinalStep();
-    }
-
-    protected function buildValuesPreview(VocabularyInterface $vocabulary): string
-    {
-        $presentable_values = [];
-        $i = 0;
-
-        $labelled_values = $this->vocab_presentation->labelsForVocabulary(
-            $this->presentation_utils,
-            $vocabulary
-        );
-        foreach ($labelled_values as $labelled_value) {
-            if ($i >= self::MAX_PREVIEW_VALUES) {
-                $presentable_values[] = '...';
-                break;
-            }
-
-            if (
-                $vocabulary->type() === VocabType::STANDARD ||
-                $vocabulary->type() === VocabType::COPYRIGHT
-            ) {
-                $presentable_values[] = $labelled_value->label();
-                continue;
-            }
-
-            $presentable_value = $labelled_value->value();
-            if ($labelled_value->label() !== '') {
-                $presentable_value = $labelled_value->label() . ' (' . $presentable_value . ')';
-            }
-            $presentable_values[] = $presentable_value;
-        }
-
-        return implode(', ', $presentable_values);
-    }
-
-    protected function getVocabs(Range $range = null): array
-    {
-        if (isset($this->vocabs)) {
-            return $this->vocabs;
-        }
-
-        $vocabs = iterator_to_array($this->vocab_manager->getAllVocabularies(), false);
-        if ($range) {
-            $vocabs = array_slice($vocabs, $range->getStart(), $range->getLength());
-        }
-
-        return $this->vocabs = $vocabs;
     }
 }

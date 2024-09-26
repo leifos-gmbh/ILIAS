@@ -30,32 +30,23 @@ use ILIAS\Data\URI;
 use ILIAS\FileUpload\MimeType;
 use ILIAS\Filesystem\Filesystem;
 use ILIAS\MetaData\Vocabularies\Manager\ManagerInterface as VocabManager;
-use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
+use ILIAS\MetaData\Settings\Vocabularies\Presentation;
 use ILIAS\MetaData\Settings\Vocabularies\Import\Importer;
-use ILIAS\MetaData\Vocabularies\Slots\HandlerInterface as SlotHandler;
-use ILIAS\MetaData\Presentation\ElementsInterface as ElementsPresentation;
-use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
-use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\PresentationInterface as VocabPresentation;
-use ILIAS\MetaData\Elements\Structure\StructureSetInterface as Structure;
-use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface as NavigatorFactory;
 use ILIAS\MetaData\Services\InternalServices;
+use ILIAS\Refinery\Factory as Refinery;
+use ILIAS\MetaData\Settings\Vocabularies\DataRetrieval;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * @ilCtrl_Calls ilMDVocabulariesGUI: ilMDVocabularyUploadHandlerGUI
  */
 class ilMDVocabulariesGUI
 {
+    protected const MAX_CONFIRMATION_VALUES = 5;
+
     protected ilCtrl $ctrl;
     protected HTTP $http;
     protected Filesystem $temp_files;
-    protected VocabManager $vocab_manager;
-    protected PathFactory $path_factory;
-    protected NavigatorFactory $navigator_factory;
-    protected Structure $structure;
-    protected SlotHandler $slot_handler;
-    protected ElementsPresentation $elements_presentation;
-    protected PresentationUtilities $presentation_utils;
-    protected VocabPresentation $vocab_presentation;
     protected ilGlobalTemplateInterface $tpl;
     protected ilLanguage $lng;
     protected ilToolbarGUI $toolbar;
@@ -63,6 +54,11 @@ class ilMDVocabulariesGUI
     protected UIRenderer $ui_renderer;
     protected ilObjMDSettingsGUI $parent_obj_gui;
     protected ilMDSettingsAccessService $access_service;
+    protected Refinery $refinery;
+
+    protected VocabManager $vocab_manager;
+    protected Presentation $presentation;
+    protected Importer $importer;
 
     public function __construct(ilObjMDSettingsGUI $parent_obj_gui)
     {
@@ -71,13 +67,20 @@ class ilMDVocabulariesGUI
         $services = new InternalServices($DIC);
 
         $this->vocab_manager = $services->vocabularies()->manager();
-        $this->elements_presentation = $services->presentation()->elements();
-        $this->presentation_utils = $services->presentation()->utilities();
-        $this->vocab_presentation = $services->vocabularies()->presentation();
-        $this->slot_handler = $services->vocabularies()->slotHandler();
-        $this->structure = $services->structure()->structure();
-        $this->path_factory = $services->paths()->pathFactory();
-        $this->navigator_factory = $services->paths()->navigatorFactory();
+        $this->presentation = new Presentation(
+            $services->presentation()->elements(),
+            $services->presentation()->utilities(),
+            $services->vocabularies()->presentation(),
+            $services->vocabularies()->slotHandler(),
+            $services->structure()->structure(),
+            $services->paths()->navigatorFactory(),
+            $services->paths()->pathFactory()
+        );
+        $this->importer = new Importer(
+            $services->paths()->pathFactory(),
+            $this->vocab_manager->controlledVocabularyCreator(),
+            $services->vocabularies()->slotHandler()
+        );
 
         $this->ctrl = $DIC->ctrl();
         $this->http = $DIC->http();
@@ -87,6 +90,7 @@ class ilMDVocabulariesGUI
         $this->toolbar = $DIC->toolbar();
         $this->ui_factory = $DIC->ui()->factory();
         $this->ui_renderer = $DIC->ui()->renderer();
+        $this->refinery = $DIC->refinery();
 
         $this->parent_obj_gui = $parent_obj_gui;
         $this->access_service = new ilMDSettingsAccessService(
@@ -142,8 +146,43 @@ class ilMDVocabulariesGUI
 
     public function tableAction(): void
     {
-        if (!$this->access_service->hasCurrentUserWriteAccess()) {
+        $action = $this->fetchTableAction();
+        $vocab_id = $this->fetchVocabID();
+
+        if (
+            $vocab_id === '' ||
+            ($action !== 'show_all' && !$this->access_service->hasCurrentUserWriteAccess())
+        ) {
             $this->ctrl->redirect($this, 'showVocabularies');
+        }
+
+        switch ($action) {
+            case 'delete':
+                $this->confirmDeleteVocabulary($vocab_id);
+                return;
+
+            case 'activate':
+                $this->activateVocabulary($vocab_id);
+                return;
+
+            case 'deactivate':
+                $this->deactivateVocabulary($vocab_id);
+                return;
+
+            case 'allow_custom_input':
+                $this->allowCustomInputForVocabulary($vocab_id);
+                return;
+
+            case 'disallow_custom_input':
+                $this->disallowCustomInputForVocabulary($vocab_id);
+                return;
+
+            case 'show_all':
+                $this->showAllValuesModalForVocabulary($vocab_id);
+                return;
+
+            default:
+                $this->ctrl->redirect($this, 'showVocabularies');
         }
     }
 
@@ -176,21 +215,16 @@ class ilMDVocabulariesGUI
         }
 
         if (!is_null($file_content)) {
-            $importer = new Importer(
-                $this->path_factory,
-                $this->vocab_manager->controlledVocabularyCreator(),
-                $this->slot_handler
-            );
-            $result = $importer->import($file_content);
+            $result = $this->importer->import($file_content);
 
             if ($result->wasSuccessful()) {
                 $message_type = 'success';
                 $message_text = $this->lng->txt('md_vocab_import_successful');
             } else {
                 $message_type = 'failure';
-                printf(
-                    $message_text = $this->lng->txt('md_vocab_import_invalid'),
-                    implode("\n\r", $result->getErrors())
+                $message_text = sprintf(
+                    $this->lng->txt('md_vocab_import_invalid'),
+                    implode("<br/>", $result->getErrors())
                 );
             }
         }
@@ -199,16 +233,124 @@ class ilMDVocabulariesGUI
         $this->ctrl->redirect($this, 'showVocabularies');
     }
 
+    #[NoReturn] protected function confirmDeleteVocabulary(string $vocab_id): void
+    {
+        list($url_builder, $action_parameter_token, $vocabs_id_token) = $this->getTableURLBuilderAndParameters();
+        $key = $vocabs_id_token->getName();
+
+        $vocab = $this->vocab_manager->getVocabulary($vocab_id);
+        $value_items = [];
+        foreach ($this->presentation->makeValuesPresentable(
+            $vocab,
+            self::MAX_CONFIRMATION_VALUES
+        ) as $value) {
+            $value_items[] = $this->ui_factory->modal()->interruptiveItem()->standard(
+                '',
+                $value,
+            );
+        }
+
+        $this->ctrl->setParameter($this, $key, $vocab_id);
+        $link = $this->ctrl->getLinkTarget($this, 'deleteVocabulary');
+        $this->ctrl->clearParameters($this);
+
+        $modal = $this->ui_factory->modal()->interruptive(
+            $this->presentation->txt('md_vocab_delete_confirmation_title'),
+            $this->presentation->txtFill(
+                'md_vocab_delete_confirmation_text',
+                $this->presentation->makeSlotPresentable($vocab->slot()),
+                $vocab->source()
+            ),
+            $link
+        )->withAffectedItems($value_items);
+        echo $this->ui_renderer->renderAsync($modal);
+        exit;
+    }
+
     protected function deleteVocabulary(): void
     {
+        $vocab_id = $this->fetchVocabID();
+        if ($vocab_id !== '') {
+            $this->vocab_manager->actions()->delete(
+                $this->vocab_manager->getVocabulary($vocab_id)
+            );
+        }
+        $this->tpl->setOnScreenMessage(
+            ilGlobalTemplateInterface::MESSAGE_TYPE_SUCCESS,
+            $this->lng->txt('md_vocab_deletion_successful'),
+            true
+        );
+        $this->ctrl->redirect($this, 'showVocabularies');
     }
 
-    protected function toggleActiveForVocabulary(): void
+    protected function activateVocabulary(string $vocab_id): void
     {
+        $this->vocab_manager->actions()->activate(
+            $this->vocab_manager->getVocabulary($vocab_id)
+        );
+        $this->tpl->setOnScreenMessage(
+            ilGlobalTemplateInterface::MESSAGE_TYPE_SUCCESS,
+            $this->lng->txt('md_vocab_update_successful'),
+            true
+        );
+        $this->ctrl->redirect($this, 'showVocabularies');
     }
 
-    protected function toggleCustomInputForVocabulary(): void
+    protected function deactivateVocabulary(string $vocab_id): void
     {
+        $this->vocab_manager->actions()->deactivate(
+            $this->vocab_manager->getVocabulary($vocab_id)
+        );
+        $this->tpl->setOnScreenMessage(
+            ilGlobalTemplateInterface::MESSAGE_TYPE_SUCCESS,
+            $this->lng->txt('md_vocab_update_successful'),
+            true
+        );
+        $this->ctrl->redirect($this, 'showVocabularies');
+    }
+
+    protected function allowCustomInputForVocabulary(string $vocab_id): void
+    {
+        $this->vocab_manager->actions()->allowCustomInput(
+            $this->vocab_manager->getVocabulary($vocab_id)
+        );
+        $this->tpl->setOnScreenMessage(
+            ilGlobalTemplateInterface::MESSAGE_TYPE_SUCCESS,
+            $this->lng->txt('md_vocab_update_successful'),
+            true
+        );
+        $this->ctrl->redirect($this, 'showVocabularies');
+    }
+
+    protected function disallowCustomInputForVocabulary(string $vocab_id): void
+    {
+        $this->vocab_manager->actions()->allowCustomInput(
+            $this->vocab_manager->getVocabulary($vocab_id)
+        );
+        $this->tpl->setOnScreenMessage(
+            ilGlobalTemplateInterface::MESSAGE_TYPE_SUCCESS,
+            $this->lng->txt('md_vocab_update_successful'),
+            true
+        );
+        $this->ctrl->redirect($this, 'showVocabularies');
+    }
+
+    #[NoReturn] protected function showAllValuesModalForVocabulary(string $vocab_id): void
+    {
+        $vocab = $this->vocab_manager->getVocabulary($vocab_id);
+        $values = $this->ui_factory->listing()->unordered(
+            $this->presentation->makeValuesPresentable($vocab)
+        );
+        $modal = $this->ui_factory->modal()->roundtrip(
+            $this->presentation->txtFill(
+                'md_vocab_all_values_title',
+                $this->presentation->makeSlotPresentable($vocab->slot()),
+                $vocab->source()
+            ),
+            [$values]
+        );
+        echo $this->ui_renderer->renderAsync($modal);
+        exit;
     }
 
     protected function getTable(): DataTable
@@ -231,15 +373,7 @@ class ilMDVocabulariesGUI
             )->withIsSortable(false)
         ];
 
-        $url_builder = new URLBuilder(new URI(
-            rtrim(ILIAS_HTTP_PATH, '/') . $this->ctrl->getLinkTarget($this, 'tableAction')
-        ));
-        list($url_builder, $action_parameter_token, $row_id_token) =
-            $url_builder->acquireParameters(
-                ['metadata', 'vocab'],
-                'table_action',
-                'vocab_ids'
-            );
+        list($url_builder, $action_parameter_token, $row_id_token) = $this->getTableURLBuilderAndParameters();
         $actions_factory = $this->ui_factory->table()->action();
         $actions = [
             'delete' => $actions_factory->single(
@@ -247,14 +381,24 @@ class ilMDVocabulariesGUI
                 $url_builder->withParameter($action_parameter_token, 'delete'),
                 $row_id_token
             )->withAsync(true),
-            'toggle_active' => $actions_factory->single(
-                $this->lng->txt('md_vocab_toggle_active_action'),
-                $url_builder->withParameter($action_parameter_token, 'toggle_active'),
+            'activate' => $actions_factory->single(
+                $this->lng->txt('md_vocab_activate_action'),
+                $url_builder->withParameter($action_parameter_token, 'activate'),
                 $row_id_token
             ),
-            'toggle_custom_input' => $actions_factory->single(
-                $this->lng->txt('md_vocab_toggle_custom_input_action'),
-                $url_builder->withParameter($action_parameter_token, 'toggle_custom_input'),
+            'deactivate' => $actions_factory->single(
+                $this->lng->txt('md_vocab_deactivate_action'),
+                $url_builder->withParameter($action_parameter_token, 'deactivate'),
+                $row_id_token
+            ),
+            'allow_custom_input' => $actions_factory->single(
+                $this->lng->txt('md_vocab_allow_custom_input_action'),
+                $url_builder->withParameter($action_parameter_token, 'allow_custom_input'),
+                $row_id_token
+            ),
+            'disallow_custom_input' => $actions_factory->single(
+                $this->lng->txt('md_vocab_disallow_custom_input_action'),
+                $url_builder->withParameter($action_parameter_token, 'disallow_custom_input'),
                 $row_id_token
             ),
             'show_all' => $actions_factory->single(
@@ -267,14 +411,9 @@ class ilMDVocabulariesGUI
         return $this->ui_factory->table()->data(
             $this->lng->txt('md_vocab_table_title'),
             $columns,
-            new ilMDVocabulariesDataRetrieval(
+            new DataRetrieval(
                 $this->vocab_manager,
-                $this->elements_presentation,
-                $this->presentation_utils,
-                $this->vocab_presentation,
-                $this->slot_handler,
-                $this->structure,
-                $this->navigator_factory
+                $this->presentation
             )
         )->withActions($actions)->withRequest($this->http->request());
     }
@@ -299,6 +438,44 @@ class ilMDVocabulariesGUI
         return $this->ui_factory->button()->standard(
             $this->lng->txt('md_import_vocab'),
             $signal
+        );
+    }
+
+    protected function fetchTableAction(): string
+    {
+        list($url_builder, $action_parameter_token, $vocabs_id_token) = $this->getTableURLBuilderAndParameters();
+        $key = $action_parameter_token->getName();
+        if ($this->http->wrapper()->query()->has($key)) {
+            return $this->http->wrapper()->query()->retrieve(
+                $key,
+                $this->refinery->identity()
+            );
+        }
+        return '';
+    }
+
+    protected function fetchVocabID(): string
+    {
+        list($url_builder, $action_parameter_token, $vocabs_id_token) = $this->getTableURLBuilderAndParameters();
+        $key = $vocabs_id_token->getName();
+        if ($this->http->wrapper()->query()->has($key)) {
+            return $this->http->wrapper()->query()->retrieve(
+                $key,
+                $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->string())
+            )[0] ?? '';
+        }
+        return '';
+    }
+
+    protected function getTableURLBuilderAndParameters(): array
+    {
+        $url_builder = new URLBuilder(new URI(
+            rtrim(ILIAS_HTTP_PATH, '/') . '/' . $this->ctrl->getLinkTarget($this, 'tableAction')
+        ));
+        return $url_builder->acquireParameters(
+            ['metadata', 'vocab'],
+            'table_action',
+            'ids'
         );
     }
 }

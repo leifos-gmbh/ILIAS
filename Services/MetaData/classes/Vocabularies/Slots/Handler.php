@@ -128,7 +128,7 @@ class Handler implements HandlerInterface
             $condition = $this->conditionForSlot($identifier);
             if (
                 $condition?->value() !== $condition_value ||
-                $condition?->path()?->toString() !== $path_to_element?->toString()
+                $condition?->path()?->toString() !== $path_to_condition?->toString()
             ) {
                 continue;
             }

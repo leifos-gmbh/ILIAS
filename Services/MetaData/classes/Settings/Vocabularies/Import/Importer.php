@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Settings\Vocabularies\Import;
 
-use ILIAS\MetaData\Vocabularies\Controlled\RepositoryInterface as ControlledVocabsRepository;
+use ILIAS\MetaData\Vocabularies\Controlled\CreationRepositoryInterface as ControlledVocabsRepository;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;

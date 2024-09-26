@@ -69,7 +69,7 @@ class Manager implements ManagerInterface
         return $this->actions;
     }
 
-    public function createControlledVocabulary(): CreationRepositoryInterface
+    public function controlledVocabularyCreator(): CreationRepositoryInterface
     {
         return $this->creation_repo;
     }

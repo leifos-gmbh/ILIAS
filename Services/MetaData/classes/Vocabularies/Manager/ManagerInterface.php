@@ -38,5 +38,5 @@ interface ManagerInterface
 
     public function actions(): ActionsInterface;
 
-    public function createControlledVocabulary(): CreationRepositoryInterface;
+    public function controlledVocabularyCreator(): CreationRepositoryInterface;
 }

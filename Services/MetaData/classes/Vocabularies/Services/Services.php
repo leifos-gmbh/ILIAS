@@ -49,11 +49,11 @@ class Services
 {
     protected PresentationInterface $presentation;
     protected ManagerInterface $manager;
+    protected SlotHandler $slot_handler;
 
     protected ReaderInterface $reader;
     protected CopyrightBridge $copyright_bridge;
     protected FactoryInterface $factory;
-    protected SlotHandler $slot_handler;
     protected ControlledRepositoryInterface $controlled_repository;
     protected StandardRepositoryInterface $standard_repository;
 
@@ -103,6 +103,18 @@ class Services
                 $this->controlledRepository(),
                 $this->standardRepository()
             )
+        );
+    }
+
+    public function slotHandler(): SlotHandler
+    {
+        if (isset($this->slot_handler)) {
+            return $this->slot_handler;
+        }
+        return $this->slot_handler = new SlotHandler(
+            $this->path_services->pathFactory(),
+            $this->path_services->navigatorFactory(),
+            $this->structure_services->structure(),
         );
     }
 
@@ -161,17 +173,5 @@ class Services
             return $this->factory;
         }
         return $this->factory = new Factory();
-    }
-
-    protected function slotHandler(): SlotHandler
-    {
-        if (isset($this->slot_handler)) {
-            return $this->slot_handler;
-        }
-        return $this->slot_handler = new SlotHandler(
-            $this->path_services->pathFactory(),
-            $this->path_services->navigatorFactory(),
-            $this->structure_services->structure(),
-        );
     }
 }

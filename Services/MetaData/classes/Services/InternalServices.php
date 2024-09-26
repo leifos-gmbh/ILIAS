@@ -61,6 +61,7 @@ class InternalServices
             $this->data_helper_services
         );
         $this->vocabularies_services = new VocabulariesServices(
+            $this->dic,
             $this->path_services,
             $this->structure_services
         );

@@ -58,7 +58,11 @@ class Repository implements RepositoryInterface
         if ($source === '') {
             throw new \ilMDVocabulariesException('Source cannot be empty.');
         }
-        $this->checkSlot($slot);
+        if (!$this->isSlotValid($slot)) {
+            throw new \ilMDVocabulariesException(
+                'Slot ' . $slot->value . ' is not available for controlled vocabularies.'
+            );
+        }
 
         $id = $this->db->nextId('il_md_vocab_contr');
 
@@ -162,6 +166,10 @@ class Repository implements RepositoryInterface
         SlotIdentifier $slot,
         string ...$values
     ): \Generator {
+        if (!$this->isSlotValid($slot)) {
+            return;
+        }
+
         $result = $this->db->query(
             'SELECT value, label FROM il_md_vocab_contr_values JOIN il_md_vocab_contr ON vocab_id
             WHERE slot = ' . $this->db->quoteAsString($slot->value) . ' AND ' .
@@ -274,7 +282,7 @@ class Repository implements RepositoryInterface
         }
     }
 
-    protected function checkSlot(SlotIdentifier $slot): void
+    protected function isSlotValid(SlotIdentifier $slot): bool
     {
         $valid_slots = [
              SlotIdentifier::NULL,
@@ -308,11 +316,6 @@ class Repository implements RepositoryInterface
              SlotIdentifier::CLASSIFICATION_TAXON_ENTRY
         ];
 
-        if (in_array($slot, $valid_slots, true)) {
-            return;
-        }
-        throw new \ilMDVocabulariesException(
-            'Slot ' . $slot->value . ' is not available for controlled vocabularies.'
-        );
+        return in_array($slot, $valid_slots, true);
     }
 }

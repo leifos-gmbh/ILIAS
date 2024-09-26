@@ -26,6 +26,7 @@ use ILIAS\Data\Range;
 use ILIAS\Data\Order;
 use ILIAS\MetaData\Vocabularies\Manager\Manager as VocabManager;
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
+use ILIAS\UI\Factory as UIFactory;
 
 class DataRetrieval implements BaseDataRetrieval
 {
@@ -33,6 +34,7 @@ class DataRetrieval implements BaseDataRetrieval
 
     protected VocabManager $vocab_manager;
     protected Presentation $presentation;
+    protected UIFactory $ui_factory;
 
     /**
      * @var VocabularyInterface[]
@@ -41,10 +43,12 @@ class DataRetrieval implements BaseDataRetrieval
 
     public function __construct(
         VocabManager $vocab_manager,
-        Presentation $presentation
+        Presentation $presentation,
+        UIFactory $ui_factory
     ) {
         $this->vocab_manager = $vocab_manager;
         $this->presentation = $presentation;
+        $this->ui_factory = $ui_factory;
     }
 
     public function getRows(
@@ -55,6 +59,17 @@ class DataRetrieval implements BaseDataRetrieval
         ?array $filter_data,
         ?array $additional_parameters
     ): \Generator {
+        $checked_icon = $this->ui_factory->symbol()->icon()->custom(
+            'templates/default/images/standard/icon_checked.svg',
+            $this->presentation->txt('yes'),
+            'small'
+        );
+        $unchecked_icon = $this->ui_factory->symbol()->icon()->custom(
+            'templates/default/images/standard/icon_unchecked.svg',
+            $this->presentation->txt('yes'),
+            'small'
+        );
+
         $infos = $this->vocab_manager->infos();
         foreach ($this->getVocabs($range) as $vocab) {
             $record = [];
@@ -66,9 +81,9 @@ class DataRetrieval implements BaseDataRetrieval
                 ', ',
                 $this->presentation->makeValuesPresentable($vocab, self::MAX_PREVIEW_VALUES)
             );
-            $record['active'] = $vocab->isActive();
+            $record['active'] = $vocab->isActive() ? $checked_icon : $unchecked_icon;
             if ($infos->isCustomInputApplicable($vocab)) {
-                $record['custom_input'] = $vocab->allowsCustomInputs();
+                $record['custom_input'] = $vocab->allowsCustomInputs() ? $checked_icon : $unchecked_icon;
             }
 
             yield $row_builder->buildDataRow(

@@ -361,16 +361,8 @@ class ilMDVocabulariesGUI
             'type' => $column_factory->status($this->lng->txt('md_vocab_type_column'))->withIsSortable(false),
             'source' => $column_factory->text($this->lng->txt('md_vocab_source_column'))->withIsSortable(false),
             'preview' => $column_factory->text($this->lng->txt('md_vocab_preview_column'))->withIsSortable(false),
-            'active' => $column_factory->boolean(
-                $this->lng->txt('md_vocab_active_column'),
-                $this->lng->txt('yes'),
-                $this->lng->txt('no')
-            )->withIsSortable(false),
-            'custom_input' => $column_factory->boolean(
-                $this->lng->txt('md_vocab_custom_input_column'),
-                $this->lng->txt('yes'),
-                $this->lng->txt('no')
-            )->withIsSortable(false)
+            'active' => $column_factory->statusIcon($this->lng->txt('md_vocab_active_column'))->withIsSortable(false),
+            'custom_input' => $column_factory->statusIcon($this->lng->txt('md_vocab_custom_input_column'))->withIsSortable(false)
         ];
 
         list($url_builder, $action_parameter_token, $row_id_token) = $this->getTableURLBuilderAndParameters();
@@ -413,7 +405,8 @@ class ilMDVocabulariesGUI
             $columns,
             new DataRetrieval(
                 $this->vocab_manager,
-                $this->presentation
+                $this->presentation,
+                $this->ui_factory
             )
         )->withActions($actions)->withRequest($this->http->request());
     }

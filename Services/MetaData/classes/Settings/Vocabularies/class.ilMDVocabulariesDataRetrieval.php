@@ -60,7 +60,8 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
         PresentationUtilities $presentation_utils,
         VocabPresentation $vocab_presentation,
         SlotHandler $slot_handler,
-        Structure $structure
+        Structure $structure,
+        NavigatorFactory $navigator_factory
     ) {
         $this->vocab_manager = $vocab_manager;
         $this->elements_presentation = $elements_presentation;
@@ -68,6 +69,7 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
         $this->vocab_presentation = $vocab_presentation;
         $this->slot_handler = $slot_handler;
         $this->structure = $structure;
+        $this->navigator_factory = $navigator_factory;
     }
 
     public function getRows(
@@ -102,7 +104,7 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
                 $vocab->isActive() && !$infos->isDeactivatable($vocab)
             )->withDisabledAction(
                 'toggle_custom_input',
-                $infos->canDisallowCustomInput($vocab)
+                !$infos->canDisallowCustomInput($vocab)
             );
         };
     }
@@ -150,7 +152,7 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
             $element
         );
         $condition_element_name = $this->elements_presentation->nameWithParents(
-            $element,
+            $condition_element,
             $this->findFirstCommonParent($element, $condition_element)->getSuperElement(),
             false,
             in_array($element->getDefinition()->dataType(), $skip_data),
@@ -211,6 +213,14 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
                 break;
             }
 
+            if (
+                $vocabulary->type() === VocabType::STANDARD ||
+                $vocabulary->type() === VocabType::COPYRIGHT
+            ) {
+                $presentable_values[] = $labelled_value->label();
+                continue;
+            }
+
             $presentable_value = $labelled_value->value();
             if ($labelled_value->label() !== '') {
                 $presentable_value = $labelled_value->label() . ' (' . $presentable_value . ')';
@@ -227,7 +237,7 @@ class ilMDVocabulariesDataRetrieval implements DataRetrieval
             return $this->vocabs;
         }
 
-        $vocabs = iterator_to_array($this->vocab_manager->getAllVocabularies());
+        $vocabs = iterator_to_array($this->vocab_manager->getAllVocabularies(), false);
         if ($range) {
             $vocabs = array_slice($vocabs, $range->getStart(), $range->getLength());
         }

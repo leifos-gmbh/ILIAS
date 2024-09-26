@@ -89,7 +89,7 @@ class Repository implements RepositoryInterface
             return;
         }
         $this->db->insert(
-            'il_md_vocab_contr_values',
+            'il_md_vocab_contr_vals',
             [
                 'vocab_id' => [\ilDBConstants::T_INTEGER, $vocab_id],
                 'value' => [\ilDBConstants::T_TEXT, $value],
@@ -106,7 +106,7 @@ class Repository implements RepositoryInterface
         string ...$values
     ): \Generator {
         $result = $this->db->query(
-            'SELECT value FROM il_md_vocab_contr_values JOIN il_md_vocab_contr ON vocab_id
+            'SELECT value FROM il_md_vocab_contr_vals JOIN il_md_vocab_contr ON vocab_id
             WHERE slot = ' . $this->db->quoteAsString($slot->value) . ' AND ' .
             $this->db->in('value', ...$values)
         );
@@ -171,7 +171,7 @@ class Repository implements RepositoryInterface
         }
 
         $result = $this->db->query(
-            'SELECT value, label FROM il_md_vocab_contr_values JOIN il_md_vocab_contr ON vocab_id
+            'SELECT value, label FROM il_md_vocab_contr_vals JOIN il_md_vocab_contr ON vocab_id
             WHERE slot = ' . $this->db->quoteAsString($slot->value) . ' AND ' .
             $this->db->in('value', ...$values)
         );
@@ -209,7 +209,7 @@ class Repository implements RepositoryInterface
     public function deleteVocabulary(string $vocab_id): void
     {
         $this->db->manipulate(
-            'DELETE FROM il_md_vocab_contr_values WHERE vocab_id = ' .
+            'DELETE FROM il_md_vocab_contr_vals WHERE vocab_id = ' .
             $this->db->quoteAsString($vocab_id)
         );
         $this->db->manipulate(
@@ -274,7 +274,7 @@ class Repository implements RepositoryInterface
     protected function readVocabularyValues(string $vocab_id): \Generator
     {
         $result = $this->db->query(
-            'SELECT value FROM il_md_vocab_contr_values WHERE vocab_id = ' .
+            'SELECT value FROM il_md_vocab_contr_vals WHERE vocab_id = ' .
             $this->db->quoteAsInteger($vocab_id)
         );
         foreach ($result as $row) {

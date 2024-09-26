@@ -61,7 +61,6 @@ class Bridge implements BridgeInterface
         foreach ($this->copyright_repository->getAllEntries() as $copyright) {
             $values[] = $this->identifier_handler->buildIdentifierFromEntryID($copyright->id());
         }
-
         if (empty($values)) {
             return null;
         }

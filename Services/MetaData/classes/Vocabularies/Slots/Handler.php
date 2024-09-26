@@ -85,7 +85,7 @@ class Handler implements HandlerInterface
 
     public function isSlotConditional(Identifier $identifier): bool
     {
-        return is_null($this->conditionForSlot($identifier));
+        return !is_null($this->conditionForSlot($identifier));
     }
 
     public function conditionForSlot(Identifier $identifier): ?ConditionInterface
@@ -177,6 +177,7 @@ class Handler implements HandlerInterface
         foreach ($steps_to_condition as $step) {
             if ($step === StepToken::SUPER) {
                 $builder = $builder->withNextStepToSuperElement();
+                continue;
             }
             $builder = $builder->withNextStep($step);
         }

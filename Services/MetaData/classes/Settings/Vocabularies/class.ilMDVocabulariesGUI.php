@@ -33,6 +33,12 @@ use ILIAS\MetaData\Vocabularies\Manager\ManagerInterface as VocabManager;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Settings\Vocabularies\Import\Importer;
 use ILIAS\MetaData\Vocabularies\Slots\HandlerInterface as SlotHandler;
+use ILIAS\MetaData\Presentation\ElementsInterface as ElementsPresentation;
+use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
+use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\PresentationInterface as VocabPresentation;
+use ILIAS\MetaData\Elements\Structure\StructureSetInterface as Structure;
+use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface as NavigatorFactory;
+use ILIAS\MetaData\Services\InternalServices;
 
 /**
  * @ilCtrl_Calls ilMDVocabulariesGUI: ilMDVocabularyUploadHandlerGUI
@@ -44,7 +50,12 @@ class ilMDVocabulariesGUI
     protected Filesystem $temp_files;
     protected VocabManager $vocab_manager;
     protected PathFactory $path_factory;
+    protected NavigatorFactory $navigator_factory;
+    protected Structure $structure;
     protected SlotHandler $slot_handler;
+    protected ElementsPresentation $elements_presentation;
+    protected PresentationUtilities $presentation_utils;
+    protected VocabPresentation $vocab_presentation;
     protected ilGlobalTemplateInterface $tpl;
     protected ilLanguage $lng;
     protected ilToolbarGUI $toolbar;
@@ -56,6 +67,17 @@ class ilMDVocabulariesGUI
     public function __construct(ilObjMDSettingsGUI $parent_obj_gui)
     {
         global $DIC;
+
+        $services = new InternalServices($DIC);
+
+        $this->vocab_manager = $services->vocabularies()->manager();
+        $this->elements_presentation = $services->presentation()->elements();
+        $this->presentation_utils = $services->presentation()->utilities();
+        $this->vocab_presentation = $services->vocabularies()->presentation();
+        $this->slot_handler = $services->vocabularies()->slotHandler();
+        $this->structure = $services->structure()->structure();
+        $this->path_factory = $services->paths()->pathFactory();
+        $this->navigator_factory = $services->paths()->navigatorFactory();
 
         $this->ctrl = $DIC->ctrl();
         $this->http = $DIC->http();
@@ -245,7 +267,15 @@ class ilMDVocabulariesGUI
         return $this->ui_factory->table()->data(
             $this->lng->txt('md_vocab_table_title'),
             $columns,
-            new ilMDVocabulariesDataRetrieval()
+            new ilMDVocabulariesDataRetrieval(
+                $this->vocab_manager,
+                $this->elements_presentation,
+                $this->presentation_utils,
+                $this->vocab_presentation,
+                $this->slot_handler,
+                $this->structure,
+                $this->navigator_factory
+            )
         )->withActions($actions)->withRequest($this->http->request());
     }
 

@@ -18,10 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses\Properties;
+namespace ILIAS\MetaData\Search\Clauses\Properties;
 
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Repository\Search\Clauses\Mode;
+use ILIAS\MetaData\Search\Clauses\Mode;
 
 interface BasicPropertiesInterface
 {

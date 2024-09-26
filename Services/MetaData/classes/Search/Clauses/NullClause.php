@@ -18,23 +18,30 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses\Properties;
+namespace ILIAS\MetaData\Search\Clauses;
 
-use ILIAS\MetaData\Repository\Search\Clauses\Operator;
-use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
+use ILIAS\MetaData\Search\Clauses\Properties\JoinPropertiesInterface;
+use ILIAS\MetaData\Search\Clauses\Properties\BasicPropertiesInterface;
 
-class NullJoinProperties implements JoinPropertiesInterface
+class NullClause implements ClauseInterface
 {
-    public function operator(): Operator
+    public function isNegated(): bool
     {
-        return Operator::OR;
+        return false;
     }
 
-    /**
-     * @return ClauseInterface[]
-     */
-    public function subClauses(): \Generator
+    public function isJoin(): bool
     {
-        yield from [];
+        return false;
+    }
+
+    public function joinProperties(): ?JoinPropertiesInterface
+    {
+        return null;
+    }
+
+    public function basicProperties(): ?BasicPropertiesInterface
+    {
+        return null;
     }
 }

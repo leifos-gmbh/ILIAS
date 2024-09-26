@@ -18,30 +18,31 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses;
+namespace ILIAS\MetaData\Search\Clauses\Properties;
 
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\JoinPropertiesInterface;
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicPropertiesInterface;
+use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Search\Clauses\Mode;
+use ILIAS\MetaData\Paths\NullPath;
 
-class NullClause implements ClauseInterface
+class NullBasicProperties implements BasicPropertiesInterface
 {
-    public function isNegated(): bool
+    public function path(): PathInterface
+    {
+        return new NullPath();
+    }
+
+    public function mode(): Mode
+    {
+        return Mode::EQUALS;
+    }
+
+    public function isModeNegated(): bool
     {
         return false;
     }
 
-    public function isJoin(): bool
+    public function value(): string
     {
-        return false;
-    }
-
-    public function joinProperties(): ?JoinPropertiesInterface
-    {
-        return null;
-    }
-
-    public function basicProperties(): ?BasicPropertiesInterface
-    {
-        return null;
+        return '';
     }
 }

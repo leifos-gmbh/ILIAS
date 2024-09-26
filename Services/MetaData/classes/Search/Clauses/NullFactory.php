@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses;
+namespace ILIAS\MetaData\Search\Clauses;
 
 use ILIAS\MetaData\Paths\PathInterface;
 

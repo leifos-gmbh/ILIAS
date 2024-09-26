@@ -18,22 +18,36 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Filters;
+namespace ILIAS\MetaData\Search\Filters;
 
-class NullFilter implements FilterInterface
+class Filter implements FilterInterface
 {
+    protected int|Placeholder $obj_id;
+    protected int|Placeholder $sub_id;
+    protected string|Placeholder $type;
+
+    public function __construct(
+        int|Placeholder $obj_id,
+        int|Placeholder $sub_id,
+        string|Placeholder $type
+    ) {
+        $this->obj_id = $obj_id;
+        $this->sub_id = $sub_id;
+        $this->type = $type;
+    }
+
     public function objID(): int|Placeholder
     {
-        return Placeholder::ANY;
+        return $this->obj_id;
     }
 
     public function subID(): int|Placeholder
     {
-        return Placeholder::ANY;
+        return $this->sub_id;
     }
 
     public function type(): string|Placeholder
     {
-        return Placeholder::ANY;
+        return $this->type;
     }
 }

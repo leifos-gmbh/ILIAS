@@ -18,18 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses;
+namespace ILIAS\MetaData\Search\Filters;
 
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\JoinPropertiesInterface;
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicPropertiesInterface;
-
-interface ClauseInterface
+class Factory implements FactoryInterface
 {
-    public function isNegated(): bool;
-
-    public function isJoin(): bool;
-
-    public function joinProperties(): ?JoinPropertiesInterface;
-
-    public function basicProperties(): ?BasicPropertiesInterface;
+    public function get(
+        int|Placeholder $obj_id = Placeholder::ANY,
+        int|Placeholder $sub_id = Placeholder::ANY,
+        string|Placeholder $type = Placeholder::ANY
+    ): FilterInterface {
+        return new Filter($obj_id, $sub_id, $type);
+    }
 }

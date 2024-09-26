@@ -18,13 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Filters;
+namespace ILIAS\MetaData\Search\Filters;
 
-interface FilterInterface
+interface FactoryInterface
 {
-    public function objID(): int|Placeholder;
-
-    public function subID(): int|Placeholder;
-
-    public function type(): string|Placeholder;
+    public function get(
+        int|Placeholder $obj_id = Placeholder::ANY,
+        int|Placeholder $sub_id = Placeholder::ANY,
+        string|Placeholder $type = Placeholder::ANY
+    ): FilterInterface;
 }

@@ -18,15 +18,23 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Filters;
+namespace ILIAS\MetaData\Search\Clauses\Properties;
 
-class Factory implements FactoryInterface
+use ILIAS\MetaData\Search\Clauses\Operator;
+use ILIAS\MetaData\Search\Clauses\ClauseInterface;
+
+class NullJoinProperties implements JoinPropertiesInterface
 {
-    public function get(
-        int|Placeholder $obj_id = Placeholder::ANY,
-        int|Placeholder $sub_id = Placeholder::ANY,
-        string|Placeholder $type = Placeholder::ANY
-    ): FilterInterface {
-        return new Filter($obj_id, $sub_id, $type);
+    public function operator(): Operator
+    {
+        return Operator::OR;
+    }
+
+    /**
+     * @return ClauseInterface[]
+     */
+    public function subClauses(): \Generator
+    {
+        yield from [];
     }
 }

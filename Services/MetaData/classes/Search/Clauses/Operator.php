@@ -18,17 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses\Properties;
+namespace ILIAS\MetaData\Search\Clauses;
 
-use ILIAS\MetaData\Repository\Search\Clauses\Operator;
-use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
-
-interface JoinPropertiesInterface
+enum Operator: string
 {
-    public function operator(): Operator;
-
-    /**
-     * @return ClauseInterface[]
-     */
-    public function subClauses(): \Generator;
+    case AND = 'and';
+    case OR = 'or';
 }

@@ -18,12 +18,18 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses;
+namespace ILIAS\MetaData\Search\Clauses;
 
-enum Mode: string
+use ILIAS\MetaData\Search\Clauses\Properties\JoinPropertiesInterface;
+use ILIAS\MetaData\Search\Clauses\Properties\BasicPropertiesInterface;
+
+interface ClauseInterface
 {
-    case EQUALS = 'equals';
-    case CONTAINS = 'contains';
-    case STARTS_WITH = 'starts_with';
-    case ENDS_WITH = 'ends_with';
+    public function isNegated(): bool;
+
+    public function isJoin(): bool;
+
+    public function joinProperties(): ?JoinPropertiesInterface;
+
+    public function basicProperties(): ?BasicPropertiesInterface;
 }

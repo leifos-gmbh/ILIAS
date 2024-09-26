@@ -18,10 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses\Properties;
+namespace ILIAS\MetaData\Search\Clauses\Properties;
 
-use ILIAS\MetaData\Repository\Search\Clauses\Operator;
-use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
+use ILIAS\MetaData\Search\Clauses\Operator;
+use ILIAS\MetaData\Search\Clauses\ClauseInterface;
 
 class JoinProperties implements JoinPropertiesInterface
 {

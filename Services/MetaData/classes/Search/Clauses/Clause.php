@@ -18,10 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses;
+namespace ILIAS\MetaData\Search\Clauses;
 
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\JoinPropertiesInterface;
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicPropertiesInterface;
+use ILIAS\MetaData\Search\Clauses\Properties\JoinPropertiesInterface;
+use ILIAS\MetaData\Search\Clauses\Properties\BasicPropertiesInterface;
 
 class Clause implements ClauseInterface
 {

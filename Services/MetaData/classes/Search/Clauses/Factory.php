@@ -18,11 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses;
+namespace ILIAS\MetaData\Search\Clauses;
 
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\JoinProperties;
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicProperties;
+use ILIAS\MetaData\Search\Clauses\Properties\JoinProperties;
+use ILIAS\MetaData\Search\Clauses\Properties\BasicProperties;
 
 class Factory implements FactoryInterface
 {

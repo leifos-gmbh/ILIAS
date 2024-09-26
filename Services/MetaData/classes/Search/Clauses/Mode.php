@@ -18,31 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses\Properties;
+namespace ILIAS\MetaData\Search\Clauses;
 
-use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Repository\Search\Clauses\Mode;
-use ILIAS\MetaData\Paths\NullPath;
-
-class NullBasicProperties implements BasicPropertiesInterface
+enum Mode: string
 {
-    public function path(): PathInterface
-    {
-        return new NullPath();
-    }
-
-    public function mode(): Mode
-    {
-        return Mode::EQUALS;
-    }
-
-    public function isModeNegated(): bool
-    {
-        return false;
-    }
-
-    public function value(): string
-    {
-        return '';
-    }
+    case EQUALS = 'equals';
+    case CONTAINS = 'contains';
+    case STARTS_WITH = 'starts_with';
+    case ENDS_WITH = 'ends_with';
 }

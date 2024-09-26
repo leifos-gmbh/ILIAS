@@ -18,12 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses;
+namespace ILIAS\MetaData\Search\Clauses;
 
 use PHPUnit\Framework\TestCase;
 use ILIAS\MetaData\Paths\NullPath;
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\JoinProperties;
-use ILIAS\MetaData\Repository\Search\Clauses\Properties\BasicProperties;
+use ILIAS\MetaData\Search\Clauses\Properties\JoinProperties;
+use ILIAS\MetaData\Search\Clauses\Properties\BasicProperties;
 use ILIAS\MetaData\Paths\Steps\NullStep;
 use ILIAS\MetaData\Paths\PathInterface;
 

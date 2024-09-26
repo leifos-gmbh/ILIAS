@@ -27,8 +27,8 @@ use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Repository\Utilities\DatabaseReaderInterface;
 use ILIAS\MetaData\Elements\RessourceID\RessourceIDFactoryInterface;
-use ILIAS\MetaData\Repository\Search\Clauses\ClauseInterface;
-use ILIAS\MetaData\Repository\Search\Filters\FilterInterface;
+use ILIAS\MetaData\Search\Clauses\ClauseInterface;
+use ILIAS\MetaData\Search\Filters\FilterInterface;
 use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseSearcherInterface;
 use ILIAS\MetaData\Repository\IdentifierHandler\IdentifierHandlerInterface;
 

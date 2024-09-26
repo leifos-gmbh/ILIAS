@@ -18,10 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Repository\Search\Clauses;
+namespace ILIAS\MetaData\Search\Filters;
 
-enum Operator: string
+interface FilterInterface
 {
-    case AND = 'and';
-    case OR = 'or';
+    public function objID(): int|Placeholder;
+
+    public function subID(): int|Placeholder;
+
+    public function type(): string|Placeholder;
 }

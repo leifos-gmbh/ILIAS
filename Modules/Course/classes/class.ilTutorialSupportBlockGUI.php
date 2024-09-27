@@ -174,7 +174,6 @@ class ilTutorialSupportBlockGUI extends ilBlockGUI
     protected function getMailUrlOfUser(ilObjUser $tutor): string
     {
         if (
-            $this->isTutorCurrentUser($tutor->getId()) ||
             !$this->isIliasInternalMailEnabled()
         ) {
             return (string) self::EMPTY_MAIL_URL_STRING;

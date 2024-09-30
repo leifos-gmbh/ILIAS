@@ -67,7 +67,6 @@ public function getSupportedRepositoryObjectTypes(): array
 This method returns an array of repository object types, for example \['crs', 'grp'].
 The export option is offered in the export tab of each repository object that matches one of the returned types. 
 
-
 ### isObjectSupported
 ```php
 public function isObjectSupported(

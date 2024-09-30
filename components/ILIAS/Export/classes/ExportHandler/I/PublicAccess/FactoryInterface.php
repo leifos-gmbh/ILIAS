@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\Export\ExportHandler\I\PublicAccess;
 
 use ILIAS\Export\ExportHandler\I\PublicAccess\HandlerInterface as ilExportHandlerPublicAccessInterface;
-use ILIAS\Export\ExportHandler\I\PublicAccess\Link\ilFactoryInterface as ilExportHandlerPublicAccessLinkFactoryInterface;
+use ILIAS\Export\ExportHandler\I\PublicAccess\Link\FactoryInterface as ilExportHandlerPublicAccessLinkFactoryInterface;
 use ILIAS\Export\ExportHandler\I\PublicAccess\Repository\FactoryInterface as ilExportHandlerPublicAccessRepositoryFactoryInterface;
 
 interface FactoryInterface

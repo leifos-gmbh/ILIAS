@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\Export\ExportHandler\I\PublicAccess\Link;
 
-use ILIAS\Export\ExportHandler\I\PublicAccess\Link\ilHandlerInterface as ilExportHandlerPublicAccessLinkInterface;
+use ILIAS\Export\ExportHandler\I\PublicAccess\Link\HandlerInterface as ilExportHandlerPublicAccessLinkInterface;
 
-interface ilFactoryInterface
+interface FactoryInterface
 {
     public function handler(): ilExportHandlerPublicAccessLinkInterface;
 }

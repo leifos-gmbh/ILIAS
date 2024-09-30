@@ -23,7 +23,7 @@ namespace ILIAS\Export\ExportHandler\PublicAccess;
 use ILIAS\Data\ObjectId;
 use ILIAS\Data\ReferenceId;
 use ILIAS\Export\ExportHandler\I\PublicAccess\HandlerInterface as ilExportHandlerPublicAccessInterface;
-use ILIAS\Export\ExportHandler\I\PublicAccess\Link\ilFactoryInterface as ilExportHandlerPublicAccessLinkFactoryInterface;
+use ILIAS\Export\ExportHandler\I\PublicAccess\Link\FactoryInterface as ilExportHandlerPublicAccessLinkFactoryInterface;
 use ILIAS\Export\ExportHandler\I\PublicAccess\Repository\Element\FactoryInterface as ilExportHandlerPublicAccessRepositoryElementFactoryInterface;
 use ILIAS\Export\ExportHandler\I\PublicAccess\Repository\HandlerInterface as ilExportHandlerPublicAccessRepositoryInterface;
 use ILIAS\Export\ExportHandler\I\PublicAccess\Repository\Key\FactoryInterface as ilExportHandlerPublicAccessRepositoryKeyFactoryInterface;

@@ -24,7 +24,7 @@ use ilDBInterface;
 use ILIAS\Export\ExportHandler\I\FactoryInterface as ilExportHandlerFactoryInterface;
 use ILIAS\Export\ExportHandler\I\PublicAccess\FactoryInterface as ilExportHandlerPublicAccessFactoryInterface;
 use ILIAS\Export\ExportHandler\I\PublicAccess\HandlerInterface as ilExportHandlerPublicAccessInterface;
-use ILIAS\Export\ExportHandler\I\PublicAccess\Link\ilFactoryInterface as ilExportHandlerPublicAccessLinkFactoryInterface;
+use ILIAS\Export\ExportHandler\I\PublicAccess\Link\FactoryInterface as ilExportHandlerPublicAccessLinkFactoryInterface;
 use ILIAS\Export\ExportHandler\I\PublicAccess\Repository\FactoryInterface as ilExportHandlerPublicAccessRepositoryFactoryInterface;
 use ILIAS\Export\ExportHandler\PublicAccess\Handler as ilExportHandlerPublicAccess;
 use ILIAS\Export\ExportHandler\PublicAccess\Link\Factory as ilExportHandlerPublicAccessLinkFactory;

@@ -23,9 +23,9 @@ namespace ILIAS\Export\ExportHandler\I\PublicAccess\Link;
 use ILIAS\Data\ReferenceId;
 use ILIAS\Data\URI;
 
-interface ilHandlerInterface
+interface HandlerInterface
 {
-    public function withReferenceId(ReferenceId $referenceId): ilHandlerInterface;
+    public function withReferenceId(ReferenceId $referenceId): HandlerInterface;
 
     public function getReferenceId(): ReferenceId;
 

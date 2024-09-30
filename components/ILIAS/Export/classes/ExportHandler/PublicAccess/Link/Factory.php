@@ -21,8 +21,8 @@ declare(strict_types=1);
 namespace ILIAS\Export\ExportHandler\PublicAccess\Link;
 
 use ILIAS\Export\ExportHandler\I\FactoryInterface as ilExportHandlerFactoryInterface;
-use ILIAS\Export\ExportHandler\I\PublicAccess\Link\ilFactoryInterface as ilExportHandlerPublicAccessLinkFactoryInterface;
-use ILIAS\Export\ExportHandler\I\PublicAccess\Link\ilHandlerInterface as ilExportHandlerPublicAccessLinkInterface;
+use ILIAS\Export\ExportHandler\I\PublicAccess\Link\FactoryInterface as ilExportHandlerPublicAccessLinkFactoryInterface;
+use ILIAS\Export\ExportHandler\I\PublicAccess\Link\HandlerInterface as ilExportHandlerPublicAccessLinkInterface;
 use ILIAS\Export\ExportHandler\PublicAccess\Link\Handler as ilExportHandlerPublicAccessLink;
 use ILIAS\StaticURL\Services as StaticUrl;
 

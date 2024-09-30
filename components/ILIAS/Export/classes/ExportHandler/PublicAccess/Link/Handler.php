@@ -22,7 +22,7 @@ namespace ILIAS\Export\ExportHandler\PublicAccess\Link;
 
 use ILIAS\Data\ReferenceId;
 use ILIAS\Data\URI;
-use ILIAS\Export\ExportHandler\I\PublicAccess\Link\ilHandlerInterface as ilExportHandlerPublicAccessLinkHandlerInterface;
+use ILIAS\Export\ExportHandler\I\PublicAccess\Link\HandlerInterface as ilExportHandlerPublicAccessLinkHandlerInterface;
 use ILIAS\Export\ExportHandler\StaticUrlHandler as ilExportHandlerStaticUrlHandler;
 use ILIAS\StaticURL\Context;
 use ILIAS\StaticURL\Handler\BaseHandler;

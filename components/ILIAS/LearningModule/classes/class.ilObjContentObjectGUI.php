@@ -28,6 +28,7 @@ use ILIAS\LearningModule\Editing\EditingGUIRequest;
  * @ilCtrl_Calls ilObjContentObjectGUI: ilLearningProgressGUI, ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI
  * @ilCtrl_Calls ilObjContentObjectGUI: ilExportGUI, ilCommonActionDispatcherGUI, ilPageMultiLangGUI, ilObjectTranslationGUI
  * @ilCtrl_Calls ilObjContentObjectGUI: ilMobMultiSrtUploadGUI, ilLMImportGUI, ilLMEditShortTitlesGUI, ilLTIProviderObjectSettingGUI
+ * @ilCtrl_IsCalledBy ilObjContentObjectGUI: ilExportGUI
  */
 class ilObjContentObjectGUI extends ilObjectGUI
 {
@@ -195,6 +196,13 @@ class ilObjContentObjectGUI extends ilObjectGUI
             $cmd = $this->ctrl->getCmd("chapters");
         }
 
+        switch ($cmd) {
+            case "doExportXML":
+            case "doExportHTML":
+            case "showExportOptionsXML":
+            case "showExportOptionsHTML":
+                $this->$cmd();
+        }
 
         switch ($next_class) {
             case 'illtiproviderobjectsettinggui':
@@ -342,32 +350,6 @@ class ilObjContentObjectGUI extends ilObjectGUI
                 $this->ctrl->setParameterByClass(ilObjLearningModuleGUI::class, "transl", "");
                 $this->ctrl->setParameterByClass(ilLMEditorGUI::class, "transl", "");
                 $exp_gui = new ilExportGUI($this);
-                $exp_gui->addFormat("xml");
-                $ot = ilObjectTranslation::getInstance($this->lm->getId());
-                if ($ot->getContentActivated()) {
-                    $exp_gui->addFormat("xml_master", "XML (" . $lng->txt("cont_master_language_only") . ")", $this, "export");
-                    $exp_gui->addFormat("xml_masternomedia", "XML (" . $lng->txt("cont_master_language_only_no_media") . ")", $this, "export");
-
-                    $lng->loadLanguageModule("meta");
-                    $langs = $ot->getLanguages();
-                    foreach ($langs as $l => $ldata) {
-                        $exp_gui->addFormat("html_" . $l, "HTML (" . $lng->txt("meta_l_" . $l) . ")", $this, "exportHTML");
-                    }
-                    $exp_gui->addFormat("html_all", "HTML (" . $lng->txt("cont_all_languages") . ")", $this, "exportHTML");
-                } else {
-                    $exp_gui->addFormat("html", "", $this, "exportHTML");
-                }
-
-                $exp_gui->addCustomColumn(
-                    $lng->txt("cont_public_access"),
-                    $this,
-                    "getPublicAccessColValue"
-                );
-                $exp_gui->addCustomMultiCommand(
-                    $lng->txt("cont_public_access"),
-                    $this,
-                    "publishExportFile"
-                );
                 $this->ctrl->forwardCommand($exp_gui);
                 $this->tpl->setOnScreenMessage('info', $this->lng->txt("lm_only_one_download_per_type"));
                 $this->addHeaderAction();
@@ -462,6 +444,106 @@ class ilObjContentObjectGUI extends ilObjectGUI
                 }
                 break;
         }
+    }
+
+    protected function buildExportOptionsFormHTML(): ILIAS\UI\Component\Input\Container\Form\Standard
+    {
+        $ot = ilObjectTranslation::getInstance($this->lm->getId());
+        $items = [];
+        if ($ot->getContentActivated()) {
+            $this->lng->loadLanguageModule("meta");
+            $langs = $ot->getLanguages();
+            foreach ($langs as $l => $ldata) {
+                $items["html_" . $l] = $this->lng->txt("meta_l_" . $l);
+            }
+            $items["html_all"] = $this->lng->txt("cont_all_languages");
+        }
+        if (!$ot->getContentActivated()) {
+            $items["exportHTML"] = "HTML";
+        }
+        $select = $this->ui->factory()->input()->field()->select($this->lng->txt("language"), $items)
+            ->withRequired(true);
+        $section = $this->ui->factory()->input()->field()->section(
+            [$select],
+            $this->lng->txt("export_options")
+        );
+        return $this->ui->factory()->input()->container()->form()->standard(
+            $this->ctrl->getLinkTargetByClass(ilObjContentObjectGUI::class, "doExportHTML"),
+            [$section]
+        )->withSubmitLabel($this->lng->txt("export"));
+    }
+
+    protected function buildExportOptionsFormXML(): ILIAS\UI\Component\Input\Container\Form\Standard
+    {
+        $ot = ilObjectTranslation::getInstance($this->lm->getId());
+        $items = [];
+        if ($ot->getContentActivated()) {
+            $items["xml_master"] = $this->lng->txt("cont_master_language_only");
+            $items["xml_masternomedia"] = $this->lng->txt("cont_master_language_only_no_media");
+            $this->lng->loadLanguageModule("meta");
+            $langs = $ot->getLanguages();
+        }
+        $select = $this->ui->factory()->input()->field()->select($this->lng->txt("export_type"), $items)
+            ->withRequired(true);
+        $section = $this->ui->factory()->input()->field()->section(
+            [$select],
+            $this->lng->txt("export_options")
+        );
+        return $this->ui->factory()->input()->container()->form()->standard(
+            $this->ctrl->getLinkTargetByClass(ilObjContentObjectGUI::class, "doExportXML"),
+            [$section]
+        )->withSubmitLabel($this->lng->txt("export"));
+    }
+
+    protected function showExportOptionsXML(): void
+    {
+        $this->ui->mainTemplate()->setContent($this->ui->renderer()->render($this->buildExportOptionsFormXML()));
+    }
+
+    protected function showExportOptionsHTML(): void
+    {
+        $ot = ilObjectTranslation::getInstance($this->lm->getId());
+        if ($ot->getContentActivated()) {
+            $this->ui->mainTemplate()->setContent($this->ui->renderer()->render($this->buildExportOptionsFormHTML()));
+        }
+        if (!$ot->getContentActivated()) {
+            $this->doExportHTML();
+        }
+    }
+
+    protected function doExportXML(): void
+    {
+        $form = $this->buildExportOptionsFormXML()->withRequest($this->request);
+        $format = "";
+        if (!is_null($form->getData())) {
+            $format = explode("_", $form->getData()[0][0]);
+        }
+        if (is_null($form->getData())) {
+            $this->ui->mainTemplate()->setContent($this->ui->renderer()->render($form));
+            return;
+        }
+        $opt = ilUtil::stripSlashes($format[1]);
+        $cont_exp = new ilContObjectExport($this->lm);
+        $cont_exp->buildExportFile($opt);
+        $this->ctrl->redirectToURL($this->ctrl->getLinkTargetByClass(ilExportGUI::class, "listExportFiles"));
+    }
+
+    protected function doExportHTML(): void
+    {
+        $ot = ilObjectTranslation::getInstance($this->lm->getId());
+        $form = $this->buildExportOptionsFormHTML()->withRequest($this->request);
+        $lang = "";
+        if ($ot->getContentActivated() and !is_null($form->getData())) {
+            $format = explode("_", $form->getData()[0][0]);
+            $lang = ilUtil::stripSlashes($format[1]);
+        }
+        if ($ot->getContentActivated() and is_null($form->getData())) {
+            $this->ui->mainTemplate()->setContent($this->ui->renderer()->render($form));
+            return;
+        }
+        $cont_exp = new ilContObjectExport($this->lm, "html", $lang);
+        $cont_exp->buildExportFile();
+        $this->ctrl->redirectToURL($this->ctrl->getLinkTargetByClass(ilExportGUI::class, "listExportFiles"));
     }
 
     /**

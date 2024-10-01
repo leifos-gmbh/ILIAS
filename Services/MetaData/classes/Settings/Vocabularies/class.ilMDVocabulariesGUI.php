@@ -324,7 +324,7 @@ class ilMDVocabulariesGUI
 
     protected function disallowCustomInputForVocabulary(string $vocab_id): void
     {
-        $this->vocab_manager->actions()->allowCustomInput(
+        $this->vocab_manager->actions()->disallowCustomInput(
             $this->vocab_manager->getVocabulary($vocab_id)
         );
         $this->tpl->setOnScreenMessage(

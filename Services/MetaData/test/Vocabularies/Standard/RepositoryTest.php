@@ -515,6 +515,7 @@ class RepositoryTest extends TestCase
         $labelled_values = $repo->getLabelsForValues(
             $this->getPresentationUtilities(),
             SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+            false,
             'ispartof',
             'value 2',
             'ProblemStatement',
@@ -539,7 +540,47 @@ class RepositoryTest extends TestCase
         $this->assertNull($labelled_values->current());
     }
 
-    public function testGetLabelsForValuesInactiveVocabulary(): void
+    public function testGetLabelsForValuesOnlyActiveActiveVocabulary(): void
+    {
+        $vocab_values = [
+            SlotIdentifier::EDUCATIONAL_DIFFICULTY->value => ['value 1', 'value 2', 'ProblemStatement', 'ispartof'],
+        ];
+
+        $repo = new Repository(
+            $gateway = $this->getGateway(),
+            $this->getVocabFactory(),
+            $this->getAssignments($vocab_values)
+        );
+
+        $labelled_values = $repo->getLabelsForValues(
+            $this->getPresentationUtilities(),
+            SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+            true,
+            'ispartof',
+            'value 2',
+            'ProblemStatement',
+            'something else'
+        );
+
+        $l1 = $labelled_values->current();
+        $this->assertSame('ispartof', $l1->value());
+        $this->assertSame('translated meta_is_part_of', $l1->label());
+        $labelled_values->next();
+
+        $l2 = $labelled_values->current();
+        $this->assertSame('value 2', $l2->value());
+        $this->assertSame('translated meta_value_2', $l2->label());
+        $labelled_values->next();
+
+        $l3 = $labelled_values->current();
+        $this->assertSame('ProblemStatement', $l3->value());
+        $this->assertSame('translated meta_problem_statement', $l3->label());
+        $labelled_values->next();
+
+        $this->assertNull($labelled_values->current());
+    }
+
+    public function testGetLabelsForValuesOnlyActiveInactiveVocabulary(): void
     {
         $vocab_values = [
             SlotIdentifier::EDUCATIONAL_DIFFICULTY->value => ['value 1', 'value 2', 'ProblemStatement', 'ispartof'],
@@ -554,6 +595,7 @@ class RepositoryTest extends TestCase
         $labelled_values = $repo->getLabelsForValues(
             $this->getPresentationUtilities(),
             SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+            true,
             'ispartof',
             'value 2',
             'ProblemStatement',

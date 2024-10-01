@@ -58,12 +58,15 @@ class Importer
         } catch (\ilMDPathException $e) {
             $errors[] = $e->getMessage();
         }
+        if (isset($slot) && $slot === SlotIdentifier::NULL) {
+            $errors[] = 'Cannot add vocabulary, invalid element or condition.';
+        }
 
         $duplicates = $this->findDuplicateValues($xml_path);
         if (!empty($duplicates)) {
             $errors[] = 'The following values are not unique: ' . implode(', ', $duplicates);
         }
-        if (isset($slot)) {
+        if (empty($errors) && isset($slot)) {
             $already_exist = $this->findAlreadyExistingValues($xml_path, $slot);
             if (!empty($already_exist)) {
                 $errors[] = 'The following values already exist in other vocabularies of the element: ' .
@@ -121,7 +124,7 @@ class Importer
     protected function extractPathToCondition(\DOMXPath $xml_path): ?PathInterface
     {
         $node = $xml_path->query('//vocabulary/appliesTo/condition/pathToElement')->item(0);
-        return is_null($node) ? null : $this->writeToPath($node);
+        return is_null($node) ? null : $this->writeToPath($node, true);
     }
 
     protected function extractConditionValue(\DOMXPath $xml_path): ?string
@@ -219,15 +222,19 @@ class Importer
         }
     }
 
-    protected function writeToPath(\DOMElement $path_in_xml): PathInterface
+    protected function writeToPath(\DOMElement $path_in_xml, bool $relative = false): PathInterface
     {
         $builder = $this->path_factory->custom();
         foreach ($path_in_xml->childNodes as $step) {
             if (!($step instanceof \DOMElement)) {
                 continue;
             }
-            $builder = $builder->withNextStep($step->nodeValue);
+            if ($step->nodeName === 'step') {
+                $builder = $builder->withNextStep($step->nodeValue);
+            } elseif ($step->nodeName === 'stepToSuper') {
+                $builder = $builder->withNextStepToSuperElement();
+            }
         }
-        return $builder->get();
+        return $builder->withRelative($relative)->get();
     }
 }

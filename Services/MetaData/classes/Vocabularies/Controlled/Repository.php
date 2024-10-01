@@ -85,7 +85,7 @@ class Repository implements RepositoryInterface
         string $value,
         string $label = ''
     ): void {
-        if ($value = '') {
+        if ($value === '') {
             return;
         }
         $this->db->insert(
@@ -159,20 +159,25 @@ class Repository implements RepositoryInterface
     }
 
     /**
-     * Values not from active controlled vocabularies will not be returned at all.
      * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(
         SlotIdentifier $slot,
+        bool $only_active,
         string ...$values
     ): \Generator {
         if (!$this->isSlotValid($slot)) {
             return;
         }
 
+        $active_where = '';
+        if ($only_active) {
+            $active_where = 'active = 1 AND ';
+        }
+
         $result = $this->db->query(
             'SELECT value, label FROM il_md_vocab_contr_vals JOIN il_md_vocab_contr ON vocab_id
-            WHERE slot = ' . $this->db->quoteAsString($slot->value) . ' AND ' .
+            WHERE slot = ' . $this->db->quoteAsString($slot->value) . ' AND ' . $active_where .
             $this->db->in('value', ...$values)
         );
 
@@ -213,7 +218,7 @@ class Repository implements RepositoryInterface
             $this->db->quoteAsString($vocab_id)
         );
         $this->db->manipulate(
-            'DELETE FROM il_md_vocab_contr WHERE vocab_id = ' .
+            'DELETE FROM il_md_vocab_contr WHERE id = ' .
             $this->db->quoteAsString($vocab_id)
         );
     }
@@ -255,13 +260,6 @@ class Repository implements RepositoryInterface
         } else {
             $builder = $this->factory->controlledString($slot, $id, $source, ...$values);
         }
-
-        $builder = $this->factory->controlledVocabValue(
-            SlotIdentifier::from((string) $row['slot']),
-            (string) $row['id'],
-            (string) $row['source'],
-            ...$this->readVocabularyValues((string) $row['id'])
-        );
 
         return $builder->withIsDeactivated(!$row['active'])
                        ->withDisallowsCustomInputs(!$row['custom_input'])

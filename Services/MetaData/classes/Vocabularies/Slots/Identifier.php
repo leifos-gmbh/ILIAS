@@ -33,9 +33,9 @@ enum Identifier: string
     case METAMETADATA_IDENTIFIER_CATALOG = 'metametadata_identifier_catalog';
     case METAMETADATA_CONTRIBUTE_ROLE = 'metametadata_contribute_role';
     case METAMETADATA_SCHEMA = 'metametadata_schema';
-    case TECHNICAL_REQUIREMENT_TYPE = 'technical_requiment_type';
-    case TECHNICAL_REQUIREMENT_BROWSER = 'technical_requiment_browser';
-    case TECHNICAL_REQUIREMENT_OS = 'technical_requiment_os';
+    case TECHNICAL_REQUIREMENT_TYPE = 'technical_requirement_type';
+    case TECHNICAL_REQUIREMENT_BROWSER = 'technical_requirement_browser';
+    case TECHNICAL_REQUIREMENT_OS = 'technical_requirement_os';
     case TECHNICAL_OTHER_PLATFORM_REQUIREMENTS = 'technical_other_platform_requirements';
     case TECHNICAL_FORMAT = 'technical_format';
     case EDUCATIONAL_INTERACTIVITY_TYPE = 'educational_interactivity_type';

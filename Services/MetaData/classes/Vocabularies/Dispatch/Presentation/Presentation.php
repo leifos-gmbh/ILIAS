@@ -63,7 +63,7 @@ class Presentation implements PresentationInterface
             $labelled_values[$label->value()] = $label;
         }
 
-        foreach ($this->controlled->getLabelsForValues($slot, ...$values) as $label) {
+        foreach ($this->controlled->getLabelsForValues($slot, true, ...$values) as $label) {
             if (
                 !array_key_exists($label->value(), $labelled_values) ||
                 !is_null($labelled_values[$label->value()])
@@ -76,6 +76,7 @@ class Presentation implements PresentationInterface
         foreach ($this->standard->getLabelsForValues(
             $presentation_utilities,
             $slot,
+            true,
             ...$values
         ) as $label) {
             if (
@@ -112,6 +113,7 @@ class Presentation implements PresentationInterface
                 yield from $this->standard->getLabelsForValues(
                     $presentation_utilities,
                     $vocabulary->slot(),
+                    false,
                     ...$vocabulary->values()
                 );
                 break;
@@ -120,6 +122,7 @@ class Presentation implements PresentationInterface
             case Type::CONTROLLED_VOCAB_VALUE:
                 yield from $this->controlled->getLabelsForValues(
                     $vocabulary->slot(),
+                    false,
                     ...$vocabulary->values()
                 );
                 break;

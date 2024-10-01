@@ -43,7 +43,7 @@ class DatabaseGateway implements GatewayInterface
     {
         $this->db->manipulate(
             'DELETE FROM il_md_vocab_inactive WHERE slot = ' .
-            $this->db->quote(\ilDBConstants::T_TEXT, $slot->value)
+            $this->db->quote($slot->value, \ilDBConstants::T_TEXT)
         );
     }
 
@@ -51,7 +51,7 @@ class DatabaseGateway implements GatewayInterface
     {
         $res = $this->db->query(
             'SELECT COUNT(*) AS count FROM il_md_vocab_inactive WHERE slot = ' .
-            $this->db->quote(\ilDBConstants::T_TEXT, $slot->value)
+            $this->db->quote($slot->value, \ilDBConstants::T_TEXT)
         );
         if ($row = $res->fetchAssoc()) {
             return $row['count'] > 0;

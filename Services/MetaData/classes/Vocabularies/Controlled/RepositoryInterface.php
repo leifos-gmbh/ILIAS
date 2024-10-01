@@ -41,11 +41,12 @@ interface RepositoryInterface extends CreationRepositoryInterface
     public function getActiveVocabulariesForSlots(SlotIdentifier ...$slots): \Generator;
 
     /**
-     * Values not from active controlled vocabularies will not be returned at all.
+     * Values not from (active) controlled vocabularies will not be returned at all.
      * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(
         SlotIdentifier $slot,
+        bool $only_active,
         string ...$values
     ): \Generator;
 

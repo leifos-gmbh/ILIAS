@@ -46,12 +46,13 @@ interface RepositoryInterface
     public function getActiveVocabularies(SlotIdentifier ...$slots): \Generator;
 
     /**
-     * Values not from standard vocabularies will not be returned at all.
+     * Values not from (active) standard vocabularies will not be returned at all.
      * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(
         PresentationUtilities $presentation_utilities,
         SlotIdentifier $slot,
+        bool $only_active,
         string ...$values
     ): \Generator;
 }

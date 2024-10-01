@@ -116,15 +116,19 @@ class Repository implements RepositoryInterface
     }
 
     /**
-     * Values not from active standard vocabularies will not be returned at all.
      * @return LabelledValueInterface[]
      */
     public function getLabelsForValues(
         PresentationUtilities $presentation_utilities,
         SlotIdentifier $slot,
+        bool $only_active,
         string ...$values
     ): \Generator {
-        $vocabularies = $this->getActiveVocabularies($slot);
+        if ($only_active) {
+            $vocabularies = $this->getActiveVocabularies($slot);
+        } else {
+            $vocabularies = $this->getVocabularies($slot);
+        }
 
         $vocab_values = [];
         foreach ($vocabularies as $vocabulary) {

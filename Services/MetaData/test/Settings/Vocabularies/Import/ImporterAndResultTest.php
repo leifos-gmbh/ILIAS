@@ -102,6 +102,22 @@ class ImporterAndResultTest extends TestCase
                         return $clone;
                     }
 
+                    public function withNextStepToSuperElement(bool $add_as_first = false): BuilderInterface
+                    {
+                        $clone = clone $this;
+                        $clone->path_string .= 'SUPER;';
+                        return $clone;
+                    }
+
+                    public function withRelative(bool $is_relative): BuilderInterface
+                    {
+                        $clone = clone $this;
+                        if ($is_relative) {
+                            $clone->path_string = 'RELATIVE!' . $this->path_string;
+                        }
+                        return $clone;
+                    }
+
                     public function get(): PathInterface
                     {
                         if (str_contains($this->path_string, 'INVALID')) {
@@ -123,9 +139,13 @@ class ImporterAndResultTest extends TestCase
         };
     }
 
-    protected function getSlotHandler(): SlotHandler
+    protected function getSlotHandler(bool $invalid_slot = false): SlotHandler
     {
-        return new class () extends NullSlotHandler {
+        return new class ($invalid_slot) extends NullSlotHandler {
+            public function __construct(protected bool $invalid_slot)
+            {
+            }
+
             public array $exposed_paths_and_conditions = [];
 
             public function identiferFromPathAndCondition(
@@ -133,6 +153,9 @@ class ImporterAndResultTest extends TestCase
                 ?PathInterface $path_to_condition,
                 ?string $condition_value
             ): SlotIdentifier {
+                if ($this->invalid_slot) {
+                    return SlotIdentifier::NULL;
+                }
                 $this->exposed_paths_and_conditions[] = [
                     'path' => $path_to_element->toString(),
                     'condition path' => $path_to_condition?->toString(),
@@ -237,9 +260,50 @@ XML;
         </pathToElement>
         <condition value="condition value">
             <pathToElement>
-                <step>step1</step>
+                <stepToSuper/>
                 <step>INVALID</step>
                 <step>step 3</step>
+            </pathToElement>
+        </condition>
+    </appliesTo>
+    <source>some source</source>
+    <values>
+        <value>value</value>
+        <value>different value</value>
+        <value>third value</value>
+    </values>
+</vocabulary>
+XML;
+
+        $result = $importer->import($xml_string);
+
+        $this->assertFalse($result->wasSuccessful());
+        $this->assertNotEmpty($result->getErrors());
+        $this->assertEmpty($repo->created_vocabs);
+        $this->assertEmpty($repo->created_values);
+    }
+
+    public function testImportInvalidSlotError(): void
+    {
+        $importer = new Importer(
+            $this->getPathFactory(),
+            $repo = $this->getRepo(),
+            $this->getSlotHandler(true)
+        );
+
+        $xml_string = <<<XML
+<?xml version="1.0"?>
+<vocabulary>
+    <appliesTo>
+        <pathToElement>
+            <step>step1</step>
+            <step>step2</step>
+        </pathToElement>
+        <condition value="condition value">
+            <pathToElement>
+                <stepToSuper/>
+                <step>step2</step>
+                <step>step3</step>
             </pathToElement>
         </condition>
     </appliesTo>
@@ -496,6 +560,7 @@ XML;
         </pathToElement>
          <condition value="condition value">
             <pathToElement>
+                <stepToSuper/>
                 <step>condstep1</step>
                 <step>condstep2</step>
             </pathToElement>
@@ -525,7 +590,7 @@ XML;
         $this->assertSame(
             [[
                  'path' => 'step1;step2;step3;',
-                 'condition path' => 'condstep1;condstep2;',
+                 'condition path' => 'RELATIVE!SUPER;condstep1;condstep2;',
                  'condition value' => 'condition value'
              ]],
             $slots->exposed_paths_and_conditions

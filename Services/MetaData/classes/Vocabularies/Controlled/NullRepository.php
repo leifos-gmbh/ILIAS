@@ -91,6 +91,7 @@ class NullRepository implements RepositoryInterface
      */
     public function getLabelsForValues(
         SlotIdentifier $slot,
+        bool $only_active,
         string ...$values
     ): \Generator {
         yield from [];

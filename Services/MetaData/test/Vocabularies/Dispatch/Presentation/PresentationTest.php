@@ -121,20 +121,23 @@ class PresentationTest extends TestCase
 
     public function getControlledRepository(
         SlotIdentifier $slot_with_vocab,
+        bool $only_active,
         string ...$values_from_vocab
     ): ControlledRepository {
-        return new class ($slot_with_vocab, $values_from_vocab) extends NullControlledRepository {
+        return new class ($slot_with_vocab, $only_active, $values_from_vocab) extends NullControlledRepository {
             public function __construct(
                 protected SlotIdentifier $slot_with_vocab,
+                protected bool $only_active,
                 protected array $values_from_vocab
             ) {
             }
 
             public function getLabelsForValues(
                 SlotIdentifier $slot,
+                bool $only_active,
                 string ...$values
             ): \Generator {
-                if ($slot !== $this->slot_with_vocab) {
+                if ($slot !== $this->slot_with_vocab || $only_active !== $this->only_active) {
                     return;
                 }
                 foreach ($values as $value) {
@@ -163,11 +166,13 @@ class PresentationTest extends TestCase
 
     public function getStandardRepository(
         SlotIdentifier $slot_with_vocab,
+        bool $only_active,
         string ...$values_from_vocab
     ): StandardRepository {
-        return new class ($slot_with_vocab, $values_from_vocab) extends NullStandardRepository {
+        return new class ($slot_with_vocab, $only_active, $values_from_vocab) extends NullStandardRepository {
             public function __construct(
                 protected SlotIdentifier $slot_with_vocab,
+                protected bool $only_active,
                 protected array $values_from_vocab
             ) {
             }
@@ -175,9 +180,10 @@ class PresentationTest extends TestCase
             public function getLabelsForValues(
                 PresentationUtilities $presentation_utilities,
                 SlotIdentifier $slot,
+                bool $only_active,
                 string ...$values
             ): \Generator {
-                if ($slot !== $this->slot_with_vocab) {
+                if ($slot !== $this->slot_with_vocab || $only_active !== $this->only_active) {
                     return;
                 }
                 foreach ($values as $value) {
@@ -277,10 +283,12 @@ class PresentationTest extends TestCase
             ),
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                true,
                 ...($is_in_controlled ? [$value] : [])
             ),
             $this->getStandardRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                true,
                 ...($is_in_standard ? [$value] : [])
             )
         );
@@ -315,10 +323,12 @@ class PresentationTest extends TestCase
             ),
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                true,
                 ...($is_in_controlled ? [$value] : [])
             ),
             $this->getStandardRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                true,
                 ...($is_in_standard ? [$value] : [])
             )
         );
@@ -347,12 +357,14 @@ class PresentationTest extends TestCase
             ),
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                true,
                 'contr 1',
                 'contr 2',
                 'contr 3'
             ),
             $this->getStandardRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                true,
                 'stand 1',
                 'stand 2'
             )
@@ -392,12 +404,14 @@ class PresentationTest extends TestCase
             ),
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 'v1',
                 'v2',
                 'v3'
             ),
             $this->getStandardRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 'v1',
                 'v2',
                 'v3'
@@ -436,12 +450,14 @@ class PresentationTest extends TestCase
             ),
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 'v1',
                 'v2',
                 'v3'
             ),
             $this->getStandardRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 'v1',
                 'v2',
                 'v3'
@@ -480,12 +496,14 @@ class PresentationTest extends TestCase
             ),
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 'v1',
                 'v2',
                 'v3'
             ),
             $this->getStandardRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 'v1',
                 'v2',
                 'v3'
@@ -524,12 +542,14 @@ class PresentationTest extends TestCase
             ),
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 'v1',
                 'v2',
                 'v3'
             ),
             $this->getStandardRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 'v1',
                 'v2',
                 'v3'

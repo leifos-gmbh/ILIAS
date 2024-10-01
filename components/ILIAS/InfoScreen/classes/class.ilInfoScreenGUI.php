@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 use ILIAS\InfoScreen\StandardGUIRequest;
 use ILIAS\MetaData\Services\ServicesInterface as Metadata;
-use ILIAS\Export\ExportHandler\ilFactory as ExportServices;
+use ILIAS\Export\ExportHandler\Factory as ExportServices;
 use ILIAS\Data\Factory as DataFactory;
 
 /**

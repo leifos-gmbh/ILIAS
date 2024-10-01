@@ -20,12 +20,14 @@ declare(strict_types=1);
 
 use ILIAS\Data\ObjectId;
 use ILIAS\Export\ExportHandler\Consumer\ExportOption\BasicLegacyHandler as ilLegacyExportOption;
+use ILIAS\Export\ExportHandler\I\Consumer\Context\HandlerInterface as ilExportHandlerConsumerContextInterface;
+use ILIAS\DI\Container;
 
 class ilHTLMExportOption extends ilLegacyExportOption
 {
     protected ilCtrl $ctrl;
 
-    public function init(\ILIAS\DI\Container $DIC): void
+    public function init(Container $DIC): void
     {
         $this->ctrl = $DIC->ctrl();
         parent::init($DIC);
@@ -41,6 +43,11 @@ class ilHTLMExportOption extends ilLegacyExportOption
         return "ilHTMLExportOption01";
     }
 
+    public function isPublicAccessPossible(): bool
+    {
+        return true;
+    }
+
     public function getSupportedRepositoryObjectTypes(): array
     {
         return ["htlm"];
@@ -51,8 +58,9 @@ class ilHTLMExportOption extends ilLegacyExportOption
         return "HTML export label";
     }
 
-    public function onExportOptionSelected(\ILIAS\Export\ExportHandler\I\Consumer\Context\HandlerInterface $context): void
-    {
+    public function onExportOptionSelected(
+        ilExportHandlerConsumerContextInterface $context
+    ): void {
         $object = $context->exportObject();
 
         ilExport::_createExportDirectory(

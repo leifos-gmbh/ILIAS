@@ -18,6 +18,7 @@
 
 declare(strict_types=1);
 
+use ILIAS\Data\ObjectId;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\Refinery\Factory as RefineryFactory;
 use ILIAS\UI\Renderer;
@@ -58,6 +59,7 @@ class ilAdvancedMDSettingsGUI
     protected Renderer $ui_renderer;
     protected ilToolbarGUI $toolbar;
     protected ilLogger $logger;
+    protected ilObjUser $user;
 
     protected ilAdvancedMDPermissionHelper $permissions;
     protected ?ilAdvancedMDRecord $record = null;
@@ -92,6 +94,7 @@ class ilAdvancedMDSettingsGUI
         $this->request = $DIC->http()->request();
         $this->http = $DIC->http();
         $this->db = $DIC->database();
+        $this->user = $DIC->user();
 
         /** @noinspection PhpUndefinedMethodInspection */
         $this->logger = $DIC->logger()->amet();
@@ -499,7 +502,8 @@ class ilAdvancedMDSettingsGUI
         $xml_writer->write();
 
         $export_files = new ilAdvancedMDRecordExportFiles(
-            $this->context === self::CONTEXT_ADMINISTRATION ? null : $this->obj_id
+            $this->user->getId(),
+            $this->context === self::CONTEXT_ADMINISTRATION ? null : new ObjectId($this->obj_id)
         );
         $export_files->create($xml_writer->xmlDumpMem());
 
@@ -516,7 +520,8 @@ class ilAdvancedMDSettingsGUI
         $this->tabs_gui->setSubTabActive('md_adv_file_list');
 
         $files = new ilAdvancedMDRecordExportFiles(
-            $this->context === self::CONTEXT_ADMINISTRATION ? null : $this->obj_id
+            $this->user->getId(),
+            $this->context === self::CONTEXT_ADMINISTRATION ? null : new ObjectId($this->obj_id)
         );
         $file_data = $files->readFilesInfo();
 
@@ -547,10 +552,10 @@ class ilAdvancedMDSettingsGUI
             return;
         }
         $files = new ilAdvancedMDRecordExportFiles(
-            $this->context === self::CONTEXT_ADMINISTRATION ? null : $this->obj_id
+            $this->user->getId(),
+            $this->context === self::CONTEXT_ADMINISTRATION ? null : new ObjectId($this->obj_id)
         );
-        $abs_path = $files->getAbsolutePathByFileId($file_ids[0]);
-        ilFileDelivery::deliverFileLegacy($abs_path, 'ilias_meta_data_record.xml', 'application/xml');
+        $files->download($file_ids[0], 'ilias_meta_data_record.xml');
     }
 
     /**
@@ -573,7 +578,8 @@ class ilAdvancedMDSettingsGUI
         $c_gui->setConfirm($this->lng->txt("confirm"), "deleteFiles");
 
         $files = new ilAdvancedMDRecordExportFiles(
-            $this->context === self::CONTEXT_ADMINISTRATION ? null : $this->obj_id
+            $this->user->getId(),
+            $this->context === self::CONTEXT_ADMINISTRATION ? null : new ObjectId($this->obj_id)
         );
         $file_data = $files->readFilesInfo();
 
@@ -609,7 +615,8 @@ class ilAdvancedMDSettingsGUI
         }
 
         $files = new ilAdvancedMDRecordExportFiles(
-            $this->context === self::CONTEXT_ADMINISTRATION ? null : $this->obj_id
+            $this->user->getId(),
+            $this->context === self::CONTEXT_ADMINISTRATION ? null : new ObjectId($this->obj_id)
         );
         foreach ($file_ids as $file_id) {
             $files->deleteByFileId((int) $file_id);

@@ -116,7 +116,7 @@ class ilLearningModuleExportOptionHTML extends ilBasicExportOption
                     continue;
                 }
                 ilFileDelivery::deliverFileLegacy(
-                    $target_dir . "/" . $file[1],
+                    $file_path,
                     $file[1]
                 );
                 break;
@@ -144,7 +144,7 @@ class ilLearningModuleExportOptionHTML extends ilBasicExportOption
                 continue;
             }
             ilFileDelivery::deliverFileLegacy(
-                $target_dir . "/" . $file[1],
+                $file_path,
                 $file[1]
             );
             break;

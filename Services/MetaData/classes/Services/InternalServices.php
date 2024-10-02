@@ -58,10 +58,6 @@ class InternalServices
             $this->structure_services
         );
         $this->data_helper_services = new DataHelperServices();
-        $this->presentation_services = new PresentationServices(
-            $this->dic,
-            $this->data_helper_services
-        );
         $this->search_services = new SearchServices();
         $this->manipulator_services = new ManipulatorServices(
             $this->path_services,
@@ -78,6 +74,11 @@ class InternalServices
             $this->structure_services,
             $this->copyright_services
         );
+        $this->presentation_services = new PresentationServices(
+            $this->dic,
+            $this->data_helper_services,
+            $this->vocabularies_services
+        );
         $this->repository_services = new RepositoryServices(
             $this->dic,
             $this->path_services,
@@ -92,7 +93,8 @@ class InternalServices
             $this->structure_services,
             $this->repository_services,
             $this->manipulator_services,
-            $this->presentation_services
+            $this->presentation_services,
+            $this->vocabularies_services
         );
         $this->xml_services = new XMLServices(
             $this->dic,

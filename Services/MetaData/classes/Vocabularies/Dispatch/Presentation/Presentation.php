@@ -46,7 +46,7 @@ class Presentation implements PresentationInterface
     }
 
     /**
-     * @return LabelledValue[]
+     * @return LabelledValueInterface[]
      */
     public function presentableLabels(
         PresentationUtilities $presentation_utilities,
@@ -69,6 +69,9 @@ class Presentation implements PresentationInterface
                 !is_null($labelled_values[$label->value()])
             ) {
                 continue;
+            }
+            if ($label->label() === '') {
+                $label = new LabelledValue($label->value(), $label->value());
             }
             $labelled_values[$label->value()] = $label;
         }
@@ -93,16 +96,16 @@ class Presentation implements PresentationInterface
                 yield $labelled_value;
                 continue;
             }
-            $label = $value;
+            $label = (string) $value;
             if ($with_unknown_vocab_flag) {
                 $label .= ' ' . $presentation_utilities->txt('md_unknown_vocabulary_flag');
             }
-            yield new LabelledValue($value, $label);
+            yield new LabelledValue((string) $value, $label);
         }
     }
 
     /**
-     * @return LabelledValue[]
+     * @return LabelledValueInterface[]
      */
     public function labelsForVocabulary(
         PresentationUtilities $presentation_utilities,

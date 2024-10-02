@@ -25,25 +25,27 @@ use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
-interface PresentationInterface
+class NullPresentation implements PresentationInterface
 {
     /**
-     * For values not from any active vocabulary, returns the
-     * value itself as label, optionally with 'unknown vocabulary' suffix.
-     * @return LabelledValueInterface[]
+     * @return LabelledValue[]
      */
     public function presentableLabels(
         PresentationUtilities $presentation_utilities,
         SlotIdentifier $slot,
         bool $with_unknown_vocab_flag,
         string ...$values
-    ): \Generator;
+    ): \Generator {
+        yield from [];
+    }
 
     /**
-     * @return LabelledValueInterface[]
+     * @return LabelledValue[]
      */
     public function labelsForVocabulary(
         PresentationUtilities $presentation_utilities,
         VocabularyInterface $vocabulary
-    ): \Generator;
+    ): \Generator {
+        yield from [];
+    }
 }

@@ -122,12 +122,14 @@ class PresentationTest extends TestCase
     public function getControlledRepository(
         SlotIdentifier $slot_with_vocab,
         bool $only_active,
+        bool $empty_labels,
         string ...$values_from_vocab
     ): ControlledRepository {
-        return new class ($slot_with_vocab, $only_active, $values_from_vocab) extends NullControlledRepository {
+        return new class ($slot_with_vocab, $only_active, $empty_labels, $values_from_vocab) extends NullControlledRepository {
             public function __construct(
                 protected SlotIdentifier $slot_with_vocab,
                 protected bool $only_active,
+                protected bool $empty_labels,
                 protected array $values_from_vocab
             ) {
             }
@@ -144,9 +146,11 @@ class PresentationTest extends TestCase
                     if (!in_array($value, $this->values_from_vocab)) {
                         continue;
                     }
-                    yield new class ($value) extends NullLabelledValue {
-                        public function __construct(protected string $value)
-                        {
+                    yield new class ($value, $this->empty_labels) extends NullLabelledValue {
+                        public function __construct(
+                            protected string $value,
+                            protected bool $empty_label
+                        ) {
                         }
 
                         public function value(): string
@@ -156,6 +160,9 @@ class PresentationTest extends TestCase
 
                         public function label(): string
                         {
+                            if ($this->empty_label) {
+                                return '';
+                            }
                             return 'controlled label for ' . $this->value;
                         }
                     };
@@ -284,6 +291,7 @@ class PresentationTest extends TestCase
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
                 true,
+                false,
                 ...($is_in_controlled ? [$value] : [])
             ),
             $this->getStandardRepository(
@@ -324,6 +332,7 @@ class PresentationTest extends TestCase
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
                 true,
+                false,
                 ...($is_in_controlled ? [$value] : [])
             ),
             $this->getStandardRepository(
@@ -347,6 +356,35 @@ class PresentationTest extends TestCase
         );
     }
 
+    public function testPresentableLabelsWithEmptyLabelFromControlledVocabulary(): void
+    {
+        $value = 'some value';
+        $presentation = new Presentation(
+            $this->getCopyrightBridge(SlotIdentifier::EDUCATIONAL_DIFFICULTY),
+            $this->getControlledRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                true,
+                true,
+            ),
+            $this->getStandardRepository(
+                SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                true
+            )
+        );
+
+        $labels = $presentation->presentableLabels(
+            $this->getPresentationUtilities(),
+            SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+            false,
+            $value
+        );
+
+        $this->assertLabelledValuesMatchInOrder(
+            $labels,
+            [['value' => $value, 'label' => $value]]
+        );
+    }
+
     public function testPresentableLabelsMultipleValues(): void
     {
         $presentation = new Presentation(
@@ -358,6 +396,7 @@ class PresentationTest extends TestCase
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
                 true,
+                false,
                 'contr 1',
                 'contr 2',
                 'contr 3'
@@ -405,6 +444,7 @@ class PresentationTest extends TestCase
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
                 false,
+                false,
                 'v1',
                 'v2',
                 'v3'
@@ -450,6 +490,7 @@ class PresentationTest extends TestCase
             ),
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 false,
                 'v1',
                 'v2',
@@ -497,6 +538,7 @@ class PresentationTest extends TestCase
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
                 false,
+                false,
                 'v1',
                 'v2',
                 'v3'
@@ -542,6 +584,7 @@ class PresentationTest extends TestCase
             ),
             $this->getControlledRepository(
                 SlotIdentifier::EDUCATIONAL_DIFFICULTY,
+                false,
                 false,
                 'v1',
                 'v2',

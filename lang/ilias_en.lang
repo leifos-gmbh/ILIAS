@@ -11808,6 +11808,9 @@ meta#:#md_days#:#Days:
 meta#:#md_delete_cp_sure#:#Are you sure you want to delete the following entries?
 meta#:#md_delimiter#:#Delimiter
 meta#:#md_delimiter_info#:#The delimiter is used in the quick editing screen to separate multiple keywords and/or authors. Default is ‘,’.
+meta#:#md_editor_custom_input#:#Custom
+meta#:#md_editor_from_vocab_input#:#From Vocabulary
+meta#:#md_editor_value#:#Value
 meta#:#md_fields#:#Fields
 meta#:#md_import_file_vocab#:#Import File
 meta#:#md_import_vocab#:#Import

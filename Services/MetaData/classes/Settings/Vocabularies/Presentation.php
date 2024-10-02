@@ -31,7 +31,6 @@ use ILIAS\MetaData\Elements\Structure\StructureSetInterface as Structure;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface as NavigatorFactory;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Elements\Structure\StructureElementInterface;
-use ILIAS\MetaData\Elements\Data\Type as DataType;
 use ILIAS\MetaData\Vocabularies\Slots\Conditions\ConditionInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 
@@ -94,7 +93,7 @@ class Presentation
     public function makeSlotPresentable(SlotIdentifier $slot): string
     {
         //skip the name of the element if it does not add any information
-        $skip_data = [DataType::VOCAB_VALUE, DataType::STRING];
+        $skip_data = ['string', 'value'];
 
         $element = $this->getStructureElementFromPath(
             $this->slot_handler->pathForSlot($slot),
@@ -104,7 +103,7 @@ class Presentation
             $element,
             null,
             false,
-            in_array($element->getDefinition()->dataType(), $skip_data),
+            in_array($element->getDefinition()->name(), $skip_data),
         );
 
         if (!$this->slot_handler->isSlotConditional($slot)) {
@@ -121,7 +120,7 @@ class Presentation
             $condition_element,
             $this->findFirstCommonParent($element, $condition_element)->getSuperElement(),
             false,
-            in_array($element->getDefinition()->dataType(), $skip_data),
+            in_array($element->getDefinition()->name(), $skip_data),
         );
 
         return $this->presentation_utils->txtFill(
@@ -191,8 +190,15 @@ class Presentation
         StructureElementInterface $a,
         StructureElementInterface $b
     ): StructureElementInterface {
-        while ($a !== $b) {
+        $a_supers = [];
+        while ($a) {
+            $a_supers[] = $a;
             $a = $a->getSuperElement();
+        }
+        while ($b) {
+            if (in_array($b, $a_supers, true)) {
+                return $b;
+            }
             $b = $b->getSuperElement();
         }
         return $a;

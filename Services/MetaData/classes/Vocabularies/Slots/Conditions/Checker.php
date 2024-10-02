@@ -52,11 +52,12 @@ class Checker implements CheckerInterface
     ): bool {
         $slot_path = $this->slots_handler->pathForSlot($slot);
         $path_to_element = $this->path_factory->toElement($element);
-        if ($slot_path !== $path_to_element) {
+
+        if ($slot_path->toString() !== $path_to_element->toString()) {
             return false;
         }
 
-        if ($this->slots_handler->isSlotConditional($slot)) {
+        if (!$this->slots_handler->isSlotConditional($slot)) {
             return true;
         }
 

@@ -44,11 +44,15 @@ use ILIAS\MetaData\Vocabularies\Dispatch\ReaderInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Reader;
 use ILIAS\MetaData\Vocabularies\Dispatch\Actions;
 use ILIAS\MetaData\Vocabularies\Dispatch\Info\Infos;
+use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelperInterface;
+use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelper;
+use ILIAS\MetaData\Vocabularies\Slots\Conditions\Checker;
 
 class Services
 {
     protected PresentationInterface $presentation;
     protected ManagerInterface $manager;
+    protected ElementHelperInterface $element_helper;
     protected SlotHandler $slot_handler;
 
     protected ReaderInterface $reader;
@@ -83,6 +87,24 @@ class Services
             $this->copyrightBridge(),
             $this->controlledRepository(),
             $this->standardRepository()
+        );
+    }
+
+    public function elementHelper(): ElementHelperInterface
+    {
+        if (isset($this->element_helper)) {
+            return $this->element_helper;
+        }
+        return $this->element_helper = new ElementHelper(
+            $this->slotHandler(),
+            $this->path_services->pathFactory(),
+            $this->path_services->navigatorFactory(),
+            new Checker(
+                $this->slotHandler(),
+                $this->path_services->pathFactory(),
+                $this->path_services->navigatorFactory()
+            ),
+            $this->reader()
         );
     }
 

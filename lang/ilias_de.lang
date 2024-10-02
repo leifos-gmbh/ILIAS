@@ -11807,6 +11807,9 @@ meta#:#md_days#:#Tage:
 meta#:#md_delete_cp_sure#:#Möchten Sie wirklich die ausgewählten Vorgaben entfernen?
 meta#:#md_delimiter#:#Trennzeichen
 meta#:#md_delimiter_info#:#Das Trennzeichen wird in der Schnellbearbeitung der Metadaten verwendet, um mehrere Angaben zu trennen. Standardzeichen ist ','.###Modified as part of gender mainstreaming activities for ILIAS 8
+meta#:#md_editor_custom_input#:#Eigene Angabe
+meta#:#md_editor_from_vocab_input#:#Aus Vokabular
+meta#:#md_editor_value#:#Begriff
 meta#:#md_fields#:#Felder
 meta#:#md_import_file_vocab#:#Importdatei
 meta#:#md_import_vocab#:#Import

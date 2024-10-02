@@ -36,6 +36,7 @@ use ILIAS\MetaData\XML\Version;
 use ILIAS\MetaData\XML\Dictionary\TagInterface;
 use ILIAS\MetaData\XML\Dictionary\NullTag;
 use ILIAS\MetaData\XML\SpecialCase;
+use ILIAS\MetaData\Elements\Data\NullData;
 
 class StandardTest extends TestCase
 {
@@ -69,7 +70,7 @@ class StandardTest extends TestCase
 
             public function getData(): DataInterface
             {
-                return new class ($this->element_as_array) implements DataInterface {
+                return new class ($this->element_as_array) extends NullData {
                     public function __construct(protected array $element_as_array)
                     {
                     }

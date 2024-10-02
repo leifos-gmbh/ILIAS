@@ -11510,7 +11510,7 @@ mail#:#nc_mail_unread_messages_number_s#:#1 unread mail
 mail#:#only_inbox_trash#:#Limit to Inbox / Trash
 mail#:#only_inbox_trash_info#:#Only delete e-mails that are located in the Inbox or Trash folders of users. Otherwise, all messages are deleted regardless of the folder they are in.
 mail#:#orphaned_mail_body#:#Your mailbox contains the following old or orphaned mails. Please note that these mails will soon be automatically deleted.
-mail#:#orphaned_mail_subject#:#Notification of orphaned mails
+mail#:#orphaned_mail_subject#:#Notification of old mails
 mail#:#placeholders_advise#:#Personal placeholders are only replaced with user-specific information for recipients listed in the ‘To’ field.%s Personal placeholders for recipients listed in the CC and BCC fields are NOT replaced with user-specific information and instead show up as placeholders.
 mail#:#search_content#:#Search Result
 mail#:#search_recipients#:#Look up Users
@@ -17087,6 +17087,12 @@ ui#:#ui_table_no_records#:#No records
 ui#:#ui_transcription#:#Transcript
 user#:#all_roles_has_starting_point#:#All the roles have starting points
 user#:#back_to_starting_points_list#:#Back to Starting Points
+user#:#change_email_email_confirmation_body#:#The email address for the account %s was changed. To confirm this change, please click on this link %s. The link is valid for %s minutes.
+user#:#change_email_email_confirmation_subject#:#Confirm Email Address
+user#:#change_email_email_information_body#:#The process to change the email address for the account %s to %s was started. An email with a link to confirm the change was sent to the new address. The link is valid for %s minutes.
+user#:#change_email_email_information_subject#:#Information about Change of Email Address
+user#:#change_email_email_sent#:#An email with a link to confirm your change has been sent. Please check your inbox and make sure to also look in the spam-folder if the email doesn't arrive within the next minutes.
+user#:#change_email_info_message#:#There is a pending request to change the email address for this account.
 user#:#clipboard_add_btn#:#Add to Clipboard
 user#:#clipboard_add_from_btn#:#Add from Clipboard
 user#:#clipboard_empty_btn#:#Empty Clipboard
@@ -17095,6 +17101,7 @@ user#:#clipboard_table_title#:#Clipboard (User Accounts)
 user#:#clipboard_user_added#:#Added selected users to clipboard.
 user#:#confirm_delete_starting_point#:#Are you sure you want to delete this rule?
 user#:#confirm_logout_for_email_change#:#You changed your email. To finalize this change, you will need to provide your password. The system is thus going to log you out and you will have 5 minutes to log in again. All other changes will be saved before logging you out.
+user#:#confirm_logout_for_email_change_with_confirmation#:#Additionally, a confirmation that you control the new email address will be required. After you have logged in again, an email will be sent to you. Please click on the link in the email to confirm that you contoll the address. The change of the email address will only take effect once this second step is also finalized.
 user#:#create_starting_point#:#Create Rule
 user#:#criteria#:#Criteria
 user#:#del_mail_body#:#Hello %1$s, %2$s You have not logged in to %3$s for a long time. Therefore, your ILIAS account is expected to be deleted on %4$s. In order to keep your ILIAS account, you must log in again before the aforementioned date.
@@ -17196,7 +17203,8 @@ user#:#user_profile_info_text_info#:#This text is presented on top of the form f
 user#:#user_profile_portfolio#:#If you would like to use a portfolio as your profile, go to the portfolio section and select ‘Set As My Profile’ from the drop-down menu to the right of the portfolio you wish to use.
 user#:#user_profile_portfolio_selected#:#You are currently using a portfolio as your profile. Activation can be set there using the ‘Share’ tab.
 user#:#user_profile_preview#:#Preview of Profile
-user#:#user_profile_prompt_text_info#:#This text will replace the default info text, if a user has been prompted to the profile.
+user#:#user_profile_prompt_text#:#Prompt Text
+user#:#user_profile_prompt_text_info#:#This texts replace the default info text shown when a user is prompted to complete the profile.
 user#:#user_prompt_incomplete#:#Only if profile is incomplete
 user#:#user_prompt_incomplete_info#:#If the user has to enter required fields, the profile will be shown after login.
 user#:#user_prompt_once_after_login#:#Once, a specific number of days after first login

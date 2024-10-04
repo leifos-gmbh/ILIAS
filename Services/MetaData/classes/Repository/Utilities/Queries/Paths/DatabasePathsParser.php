@@ -230,9 +230,6 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                     $table_aliases[$current_table],
                     $current_table,
                     $current_tag?->hasData() ? $current_tag->dataField() : '',
-                    $this->getDataTypeForCurrentStepOfNavigator($navigator) === Type::VOCAB_SOURCE ?
-                        LOMVocabInitiator::STANDARD_SOURCE :
-                        '',
                     $filter
                 );
             }
@@ -242,10 +239,7 @@ class DatabasePathsParser implements DatabasePathsParserInterface
 
         yield self::COLUMN_NAME => $this->getDataColumn(
             $this->quoteIdentifier($table_aliases[$current_table]),
-            $current_tag?->hasData() ? $current_tag->dataField() : '',
-            $this->getDataTypeForCurrentStepOfNavigator($navigator) === Type::VOCAB_SOURCE ?
-                LOMVocabInitiator::STANDARD_SOURCE :
-                '',
+            $current_tag?->hasData() ? $current_tag->dataField() : ''
         );
     }
 
@@ -283,7 +277,6 @@ class DatabasePathsParser implements DatabasePathsParserInterface
         string $table_alias,
         string $table,
         string $data_field,
-        string $direct_data,
         PathFilter $filter
     ): string {
         $table_alias = $this->quoteIdentifier($table_alias);
@@ -312,7 +305,7 @@ class DatabasePathsParser implements DatabasePathsParserInterface
                 return '';
 
             case FilterType::DATA:
-                $column = $this->getDataColumn($table_alias, $data_field, $direct_data);
+                $column = $this->getDataColumn($table_alias, $data_field);
                 return $column . ' IN (' . implode(', ', $quoted_values) . ')';
                 break;
 
@@ -327,10 +320,9 @@ class DatabasePathsParser implements DatabasePathsParserInterface
      */
     protected function getDataColumn(
         string $quoted_table_alias,
-        string $data_field,
-        string $direct_data,
+        string $data_field
     ): string {
-        $column = $this->quoteText($direct_data);
+        $column = $this->quoteText('');
         if ($data_field !== '') {
             $column = 'COALESCE(' . $quoted_table_alias . '.' . $this->quoteIdentifier($data_field) . ", '')";
         }

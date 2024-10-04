@@ -33,7 +33,6 @@ use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Paths\Navigator\StructureNavigatorInterface;
 use ILIAS\MetaData\Structure\Definitions\DefinitionInterface;
 use ILIAS\MetaData\Elements\Data\Type;
-use ILIAS\MetaData\Vocabularies\Factory\FactoryInterface as LOMVocabInitiator;
 use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseQuerierInterface;
 use ILIAS\MetaData\Repository\Utilities\Queries\Results\RowInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactoryInterface;
@@ -138,22 +137,14 @@ class DatabaseReader implements DatabaseReaderInterface
 
             foreach ($result_rows as $row) {
                 $value = $row->value($tag?->dataField() ?? '');
-                if ($definition->dataType() === Type::VOCAB_SOURCE) {
-                    $value = LOMVocabInitiator::STANDARD_SOURCE;
-                }
 
-                if (
-                    $definition->dataType() !== Type::NULL &&
-                    $value === ''
-                ) {
+                if ($definition->dataType() !== Type::NULL && $value === '') {
                     continue;
                 }
 
                 /**
                  * Container elements without their own tables are only created
-                 * of they have sub-elements, and if they have more than just a
-                 * single vocab source as sub-elements. The latter is necessary
-                 * because vocab sources are not (yet) persisted in the database.
+                 * of they have sub-elements.
                  */
                 $sub_elements = iterator_to_array($this->readSubElements(
                     $depth + 1,
@@ -162,12 +153,7 @@ class DatabaseReader implements DatabaseReaderInterface
                     $parent_id,
                     $row
                 ));
-                if (
-                    !isset($tag) &&
-                    $definition->dataType() !== Type::VOCAB_SOURCE &&
-                    count($sub_elements) <= 1 &&
-                    (($sub_elements[0] ?? null)?->getData()?->type() ?? Type::VOCAB_SOURCE) === Type::VOCAB_SOURCE
-                ) {
+                if (!isset($tag) && count($sub_elements) <= 0) {
                     continue;
                 }
 

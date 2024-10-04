@@ -22,14 +22,15 @@ namespace ILIAS\MetaData\Repository\Validation;
 
 use ILIAS\MetaData\Elements\SetInterface;
 
-interface CleanerInterface
+interface ProcessorInterface
 {
     /**
      * Returns a new metadata set, identical to the one given but
-     * with all invalid elements (invalid data, multiples of unique
-     * elements, ...) removed. Removes markers and scaffolds.
+     * with vocab slots in data filled out, andd all invalid elements
+     * (invalid data, multiples of unique elements, ...) removed.
+     * Removes markers and scaffolds.
      */
-    public function clean(SetInterface $set): SetInterface;
+    public function finishAndCleanData(SetInterface $set): SetInterface;
 
     /**
      * Checks whether the proposed manipulations on the set via markers

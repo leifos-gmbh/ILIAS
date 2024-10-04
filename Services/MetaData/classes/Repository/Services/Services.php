@@ -32,7 +32,7 @@ use ILIAS\MetaData\Structure\Services\Services as StructureServices;
 use ILIAS\MetaData\Repository\Dictionary\TagFactory as RepositoryTagFactory;
 use ILIAS\MetaData\Repository\Utilities\DatabaseReader;
 use ILIAS\MetaData\Elements\Factory as ElementFactory;
-use ILIAS\MetaData\Repository\Validation\Cleaner;
+use ILIAS\MetaData\Repository\Validation\Processor;
 use ILIAS\DI\Container as GlobalContainer;
 use ILIAS\MetaData\Repository\Validation\Data\DataValidator;
 use ILIAS\MetaData\Repository\Validation\Data\DataValidatorService;
@@ -144,7 +144,7 @@ class Services
                 ),
                 $this->dic->database()
             ),
-            new Cleaner(
+            new Processor(
                 $element_factory,
                 new MarkerFactory(),
                 $this->structure_services->structure(),
@@ -152,6 +152,7 @@ class Services
                     new DataValidatorService($this->data_helper_services->dataHelper())
                 ),
                 $this->constraintDictionary(),
+                $this->vocabularies_services->elementHelper(),
                 $logger
             ),
             new IdentifierHandler(

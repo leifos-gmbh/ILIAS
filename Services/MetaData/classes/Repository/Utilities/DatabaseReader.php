@@ -38,6 +38,7 @@ use ILIAS\MetaData\Repository\Utilities\Queries\DatabaseQuerierInterface;
 use ILIAS\MetaData\Repository\Utilities\Queries\Results\RowInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactoryInterface;
 use ILIAS\MetaData\Paths\Steps\StepToken;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class DatabaseReader implements DatabaseReaderInterface
 {
@@ -174,6 +175,7 @@ class DatabaseReader implements DatabaseReaderInterface
                     $row->id(),
                     $definition,
                     $value,
+                    SlotIdentifier::NULL,
                     ...$sub_elements
                 );
             }

@@ -79,20 +79,15 @@ class InputFactory
         ElementInterface $context_element,
         bool $with_title
     ): Section|Group {
-        $data_carriers = iterator_to_array($this->data_finder->getDataCarryingElements($element));
+        /**
+         * Vocab Sources don't have their own inputs, but are set implicitely with
+         * the corresponding Vocab Values (see VocabValueFactory).
+         */
+        $data_carriers = iterator_to_array($this->data_finder->getDataCarryingElements($element, true));
         $conditional_elements = [];
         $input_elements = [];
-        $vocab_sources = [];
         foreach ($data_carriers as $data_carrier) {
             $conditional_element = null;
-            /**
-             * Vocab Sources don't have their own inputs, but are set implicitely with
-             * the corresponding Vocab Values (see VocabValueFactory).
-             */
-            if ($data_carrier->getDefinition()->dataType() === Type::VOCAB_SOURCE) {
-                $vocab_sources[] = $data_carrier;
-                continue;
-            }
             foreach ($this->element_vocab_helper->slotsForElementWithoutCondition($data_carrier) as $slot) {
                 /**
                  * The conditions of multiple slots for the same element should point at the

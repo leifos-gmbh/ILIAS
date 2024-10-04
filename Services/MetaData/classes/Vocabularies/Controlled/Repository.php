@@ -230,6 +230,9 @@ class Repository implements RepositoryInterface
     {
         $slot_values = [];
         foreach ($slots as $slot) {
+            if (!$this->isSlotValid($slot)) {
+                continue;
+            }
             $slot_values[] = $slot->value;
         }
 

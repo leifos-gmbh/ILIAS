@@ -34,14 +34,19 @@ use ILIAS\MetaData\Elements\NoID;
 use ILIAS\MetaData\Elements\Markers\MarkerInterface;
 use ILIAS\MetaData\Repository\Validation\Dictionary\TagInterface;
 use ILIAS\MetaData\Elements\Markers\MarkerFactoryInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Elements\Data\Type;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier;
+use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelperInterface;
 
-class Cleaner implements CleanerInterface
+class Processor implements ProcessorInterface
 {
     protected ElementFactory $element_factory;
     protected MarkerFactoryInterface $marker_factory;
     protected StructureSetInterface $structure_set;
     protected DataValidatorInterface $data_validator;
     protected DictionaryInterface $dictionary;
+    protected ElementHelperInterface $element_vocab_helper;
     protected \ilLogger $logger;
 
     public function __construct(
@@ -50,6 +55,7 @@ class Cleaner implements CleanerInterface
         StructureSetInterface $structure_set,
         DataValidatorInterface $data_validator,
         DictionaryInterface $dictionary,
+        ElementHelperInterface $element_vocab_helper,
         \ilLogger $logger
     ) {
         $this->element_factory = $element_factory;
@@ -57,10 +63,11 @@ class Cleaner implements CleanerInterface
         $this->structure_set = $structure_set;
         $this->data_validator = $data_validator;
         $this->dictionary = $dictionary;
+        $this->element_vocab_helper = $element_vocab_helper;
         $this->logger = $logger;
     }
 
-    public function clean(SetInterface $set): SetInterface
+    public function finishAndCleanData(SetInterface $set): SetInterface
     {
         return $this->element_factory->set(
             $set->getRessourceID(),
@@ -77,14 +84,14 @@ class Cleaner implements CleanerInterface
         }
         return $this->element_factory->root(
             $root->getDefinition(),
-            ...$this->getCleanSubElements($root, 0)
+            ...$this->getFinishedAndCleanSubElements($root, 0)
         );
     }
 
     /**
      * @return Element[]
      */
-    protected function getCleanSubElements(
+    protected function getFinishedAndCleanSubElements(
         ElementInterface $element,
         int $depth
     ): \Generator {
@@ -107,7 +114,8 @@ class Cleaner implements CleanerInterface
                     $sub->getMDID(),
                     $sub->getDefinition(),
                     $sub->getData()->value(),
-                    ...$this->getCleanSubElements($sub, $depth + 1)
+                    $this->lookUpVocabSlotForElement($sub),
+                    ...$this->getFinishedAndCleanSubElements($sub, $depth + 1)
                 );
                 continue;
             }
@@ -115,6 +123,17 @@ class Cleaner implements CleanerInterface
                 $sub->getData()->type()->value . ' data.';
             $this->throwErrorOrLog($sub, $message);
         }
+    }
+
+    protected function lookUpVocabSlotForElement(ElementInterface $element): SlotIdentifier
+    {
+        if (
+            $element->getDefinition()->dataType() !== Type::VOCAB_VALUE &&
+            $element->getDefinition()->dataType() !== Type::STRING
+        ) {
+            return SlotIdentifier::NULL;
+        }
+        return $this->element_vocab_helper->slotForElement($element);
     }
 
     public function cleanMarkers(SetInterface $set): void

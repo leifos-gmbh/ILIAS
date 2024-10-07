@@ -88,8 +88,8 @@ class Services implements ServicesInterface
             return $this->searcher;
         }
         return $this->searcher = new Searcher(
-            $this->internal_services->repository()->SearchClauseFactory(),
-            $this->internal_services->repository()->SearchFilterFactory(),
+            $this->internal_services->search()->SearchClauseFactory(),
+            $this->internal_services->search()->SearchFilterFactory(),
             $this->internal_services->repository()->repository()
         );
     }
@@ -162,7 +162,7 @@ class Services implements ServicesInterface
             $this->internal_services->copyright()->repository(),
             $this->internal_services->copyright()->identifiersHandler(),
             $this->internal_services->copyright()->renderer(),
-            $this->internal_services->repository()->SearchClauseFactory()
+            $this->internal_services->search()->SearchClauseFactory()
         );
     }
 

@@ -212,6 +212,25 @@ class ilMDControlledVocabsUpdateSteps implements ilDatabaseUpdateSteps
         }
     }
 
+    public function step_8(): void
+    {
+        foreach ($this->getAllVocabSlots() as $slot) {
+            $table = $this->getTableForVocabSlot($slot);
+            $src_column = $this->getSourceColumnNameForVocabSlot($slot);
+
+            if (!$this->db->tableColumnExists($table, $src_column)) {
+                continue;
+            }
+            $this->db->modifyTableColumn(
+                $table,
+                $src_column,
+                [
+                    'default' => ""
+                ]
+            );
+        }
+    }
+
     /**
      * @return SlotIdentifier[]
      */

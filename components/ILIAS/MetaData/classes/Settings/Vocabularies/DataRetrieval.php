@@ -60,12 +60,12 @@ class DataRetrieval implements BaseDataRetrieval
         ?array $additional_parameters
     ): \Generator {
         $checked_icon = $this->ui_factory->symbol()->icon()->custom(
-            'templates/default/images/standard/icon_checked.svg',
+            'assets/images/standard/icon_checked.svg',
             $this->presentation->txt('yes'),
             'small'
         );
         $unchecked_icon = $this->ui_factory->symbol()->icon()->custom(
-            'templates/default/images/standard/icon_unchecked.svg',
+            'assets/images/standard/icon_unchecked.svg',
             $this->presentation->txt('yes'),
             'small'
         );

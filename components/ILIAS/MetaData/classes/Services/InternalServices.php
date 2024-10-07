@@ -167,4 +167,9 @@ class InternalServices
     {
         return $this->oer_harvester_services;
     }
+
+    public function search(): SearchServices
+    {
+        return $this->search_services;
+    }
 }

@@ -123,7 +123,7 @@ The following classes are not yet covered by unit tests:
 - `GlobalScreen/ilMDKeywordExposer`
 - `Manipulator/ScaffoldProvider`
 - everything in `Paths`
-- everything in `Repository` except `Repository/Search`,
+- everything in `Repository`,
 `Repository/Utilities/Queries/DatabaseSearcher`, and
 `Repository/Utilities/Queries/Paths`
 - `Services\InternalServices` (along with all `Services` used by it),

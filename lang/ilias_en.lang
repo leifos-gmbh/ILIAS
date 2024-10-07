@@ -9672,7 +9672,6 @@ exp#:#export_files_deleted#:#The selected export files have been deleted.
 export#:#exp_export_dropdown#:#Export
 export#:#exp_file#:#File Name
 export#:#exp_public_access#:#Public Access
-export#:#exp_public_access_possible#:#Public Access can be enabled
 export#:#exp_size#:#File Size (MB)
 export#:#exp_timestamp#:#Creation Date
 export#:#exp_toggle_public_access#:#Toggle Public Access

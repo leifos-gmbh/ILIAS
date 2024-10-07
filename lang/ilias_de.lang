@@ -9682,16 +9682,15 @@ exp#:#export_files_deleted#:#Die ausgewählten Exportdateien wurden gelöscht.
 export#:#exp_export_dropdown#:#Export
 export#:#exp_file#:#Dateiname
 export#:#exp_public_access#:#Öffentlicher Zugriff aktiv
-export#:#exp_public_access_possible#:#Öffentlicher Zugriff kann aktiviert werden
 export#:#exp_size#:#Dateigröße (MB)
 export#:#exp_timestamp#:#Erstellungsdatum
-export#:#exp_toggle_public_access#:#Öffentlichen Zugriff aktivieren
+export#:#exp_toggle_public_access#:#Öffentlichen Zugriff (de-)aktivieren
 export#:#exp_type#:#Type
 export#:#export_create#:#Neu erstellen
 export#:#export_create_new_file#:#Neue Exportdatei erstellen
 export#:#export_existing#:#Wiederverwenden
 export#:#export_export_date#:#Exportdatum
-export#:#export_info_public_access#:#Öffentlich zugänglicher Export
+export#:#export_info_public_access#:#Öffentlich zugängliche Exportdatei
 export#:#export_info_public_access_download#:#Download
 export#:#export_last_export#:#Letzter Export
 export#:#export_last_export_file#:#Letzte Exportdatei benutzen

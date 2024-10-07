@@ -59,8 +59,8 @@ class Handler implements ilExportHandlerPublicAccessInterface
         $key = $this->public_access_repository_key_factory->handler()
             ->withObjectId($object_id);
         $values = $this->public_access_repository_values_factory->handler()
-            ->withIdentification($export_option_id)
-            ->withExportOptionId($file_identifier);
+            ->withIdentification($file_identifier)
+            ->withExportOptionId($export_option_id);
         $element = $this->public_access_repository_element_factory->handler()
             ->withKey($key)
             ->withValues($values);

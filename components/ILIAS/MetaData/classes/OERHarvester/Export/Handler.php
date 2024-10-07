@@ -36,6 +36,7 @@ class Handler implements HandlerInterface
     ) {
         $this->export_service = $export_service;
         $this->data_factory = $data_factory;
+        $this->user = $user;
     }
 
     public function hasPublicAccessExport(int $obj_id): bool
@@ -50,9 +51,14 @@ class Handler implements HandlerInterface
             return;
         }
         $obj_id = $this->data_factory->objId($obj_id);
-        $this->export_service->consumer()->handler()->createStandardExport(
+        $export_result = $this->export_service->consumer()->handler()->createStandardExport(
             $this->user->getId(),
             $obj_id
+        );
+        $this->export_service->consumer()->handler()->publicAccess()->setPublicAccessFile(
+            $obj_id,
+            "expxml",
+            $export_result->getIRSS()->getResourceIdSerialized()
         );
     }
 }

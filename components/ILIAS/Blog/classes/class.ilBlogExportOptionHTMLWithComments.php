@@ -37,7 +37,7 @@ class ilBlogExportOptionHTMLWithComments extends ilBasicLegacyExportOption
     public function isObjectSupported(
         ObjectId $object_id
     ): bool {
-        return !ilObjBlogAccess::isCommentsExportPossible($object_id->toInt());
+        return ilObjBlogAccess::isCommentsExportPossible($object_id->toInt());
     }
 
     public function getExportType(): string

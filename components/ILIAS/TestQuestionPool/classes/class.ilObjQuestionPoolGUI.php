@@ -347,8 +347,6 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
 
             case 'ilquestionpoolexportgui':
                 $exp_gui = new ilQuestionPoolExportGUI($this);
-                $exp_gui->addFormat('xml', $this->lng->txt('qpl_export_xml'));
-                $exp_gui->addFormat('xlsx', $this->lng->txt('qpl_export_excel'), $this, 'createExportExcel');
                 $ret = $this->ctrl->forwardCommand($exp_gui);
                 break;
 

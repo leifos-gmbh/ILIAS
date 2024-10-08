@@ -60,10 +60,14 @@ class ilWikiExportOptionHTMLWithComments extends ilBasicLegacyExportOption
 
     public function isObjectSupported(ObjectId $object_id): bool
     {
-        return (
-            ilObjWiki::_exists($object_id->toInt()) and
-            (new ilObjWiki($object_id->toInt(), false))->isCommentsExportPossible()
-        );
+        try {
+            return (
+                ilObjWiki::_exists($object_id->toInt()) and
+                (new ilObjWiki($object_id->toInt(), false))->isCommentsExportPossible()
+            );
+        } catch (ilObjectTypeMismatchException $exception) {
+            return false;
+        }
     }
 
     public function onExportOptionSelected(ilExportHandlerConsumerContextInterface $context): void

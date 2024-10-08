@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 use ILIAS\Export\ExportHandler\Consumer\ExportOption\BasicLegacyHandler as ilBasicLegacyExportOption;
 use ILIAS\Export\ExportHandler\I\Consumer\Context\HandlerInterface as ilExportHandlerConsumerContextInterface;
+use ILIAS\Export\ExportHandler\I\Info\File\CollectionInterface as ilExportHandlerFileInfoCollectionInterface;
+use ILIAS\Export\ExportHandler\I\Consumer\File\Identifier\CollectionInterface as ilExportHandlerConsumerFileIdentifierCollectionInterface;
 use ILIAS\DI\Container;
 use ILIAS\Data\ObjectId;
 
@@ -53,9 +55,76 @@ class ilDataCollectionExportOptionsXLSX extends ilBasicLegacyExportOption
         return $this->lng->txt('dcl_xls_async_export');
     }
 
+    public function getFiles(
+        ilExportHandlerConsumerContextInterface $context
+    ): ilExportHandlerFileInfoCollectionInterface {
+        $collection_builder = $context->fileCollectionBuilder();
+        $dir = ilExport::_getExportDirectory(
+            $context->exportObject()->getId(),
+            $this->getExportType(),
+            $context->exportObject()->getType()
+        );
+        $file_infos = $this->getExportFiles($dir);
+        $object_id = new ObjectId($context->exportObject()->getId());
+        foreach ($file_infos as $file_name => $file_info) {
+            $collection_builder = $collection_builder->withSPLFileInfo(
+                new SplFileInfo($dir . DIRECTORY_SEPARATOR . $file_info["file"]),
+                $object_id,
+                $this
+            );
+        }
+        return $collection_builder->collection();
+    }
+
     public function onExportOptionSelected(
         ilExportHandlerConsumerContextInterface $context
     ): void {
         $this->ctrl->redirectByClass(ilObjDataCollectionGUI::class, "handleExportAsync");
+    }
+
+    public function onDeleteFiles(
+        ilExportHandlerConsumerContextInterface $context,
+        ilExportHandlerConsumerFileIdentifierCollectionInterface $file_identifiers
+    ): void {
+        foreach ($file_identifiers as $file_identifier) {
+            $file = explode(":", $file_identifier->getIdentifier());
+            $file[1] = basename($file[1]);
+            $export_dir = ilExport::_getExportDirectory(
+                $context->exportObject()->getId(),
+                str_replace("..", "", $file[0]),
+                $context->exportObject()->getType()
+            );
+            $exp_file = $export_dir . "/" . str_replace("..", "", $file[1]);
+            $exp_dir = $export_dir . "/" . substr($file[1], 0, strlen($file[1]) - 5);
+            if (is_file($exp_file)) {
+                unlink($exp_file);
+            }
+            if (is_dir($exp_dir)) {
+                ilFileUtils::delDir($exp_dir);
+            }
+        }
+    }
+
+    protected function getExportFiles(
+        string $directory
+    ): array {
+        $file = [];
+        $h_dir = dir($directory);
+        while ($entry = $h_dir->read()) {
+            if (
+                $entry !== "." &&
+                $entry !== ".." &&
+                substr($entry, -5) === "." . $this->getExportType()
+            ) {
+                $ts = substr($entry, 0, strpos($entry, "__"));
+                $file[$entry . $this->getExportType()] = [
+                    "type" => $this->getExportType(),
+                    "file" => $entry,
+                    "size" => (int) filesize($directory . "/" . $entry),
+                    "timestamp" => (int) $ts
+                ];
+            }
+        }
+        return $file;
     }
 }

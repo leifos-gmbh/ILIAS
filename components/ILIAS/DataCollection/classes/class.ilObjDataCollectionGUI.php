@@ -281,7 +281,7 @@ class ilObjDataCollectionGUI extends ilObject2GUI
         $exp_gui = new ilDclExportGUI($this);
         $exporter = new ilDclContentExporter($this->object->getRefId(), $this->table_id);
         $exporter->exportAsync();
-        $exp_gui->listExportFiles();
+        $this->ctrl->redirect($exp_gui);
     }
 
     protected function getTableViewId(): int

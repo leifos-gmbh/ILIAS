@@ -188,8 +188,8 @@ class ilExportGUI
         $export_options = $this->export_handler->consumer()->exportOption()->allExportOptions();
         foreach ($export_options as $export_option) {
             if (
-                $export_option->isObjectSupported(new ObjectId($this->obj->getId())) and
-                in_array($this->obj->getType(), $export_option->getSupportedRepositoryObjectTypes())
+                in_array($this->obj->getType(), $export_option->getSupportedRepositoryObjectTypes()) and
+                $export_option->isObjectSupported(new ObjectId($this->obj->getId()))
             ) {
                 $this->export_options = $this->export_options->withElement($export_option);
             }

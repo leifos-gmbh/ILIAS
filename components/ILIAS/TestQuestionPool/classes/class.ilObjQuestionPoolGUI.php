@@ -22,6 +22,8 @@ use ILIAS\TestQuestionPool\QuestionPoolDIC;
 use ILIAS\TestQuestionPool\RequestDataCollector;
 use ILIAS\TestQuestionPool\Presentation\QuestionTable;
 use ILIAS\TestQuestionPool\Questions\GeneralQuestionPropertiesRepository;
+
+use ILIAS\DI\RBACServices;
 use ILIAS\Taxonomy\Service;
 use ILIAS\UI\Component\Input\Container\Form\Form;
 use ILIAS\UI\Component\Input\Field\Select;
@@ -56,7 +58,6 @@ use ILIAS\HTTP\Services as HTTPServices;
  * @ilCtrl_Calls   ilObjQuestionPoolGUI: ilAssQuestionPreviewGUI
  * @ilCtrl_Calls   ilObjQuestionPoolGUI: assKprimChoiceGUI, assLongMenuGUI
  * @ilCtrl_Calls   ilObjQuestionPoolGUI: ilQuestionPoolSkillAdministrationGUI
- * @ilCtrl_Calls   ilObjQuestionPoolGUI: ilBulkEditQuestionsGUI
  *
  * @ingroup components\ILIASTestQuestionPool
  *
@@ -67,6 +68,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
 
     public const SUPPORTED_IMPORT_MIME_TYPES = [MimeType::APPLICATION__ZIP, MimeType::TEXT__XML];
     public const DEFAULT_CMD = 'questions';
+    public const CREATE_XLSX_EXPORT = 'createExportExcel';
 
     private HTTPServices $http;
     protected Service $taxonomy;
@@ -340,8 +342,6 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
 
             case 'ilquestionpoolexportgui':
                 $exp_gui = new ilQuestionPoolExportGUI($this);
-                $exp_gui->addFormat('xml', $this->lng->txt('qpl_export_xml'));
-                $exp_gui->addFormat('xlsx', $this->lng->txt('qpl_export_excel'), $this, 'createExportExcel');
                 $ret = $this->ctrl->forwardCommand($exp_gui);
                 break;
 
@@ -653,6 +653,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
 
                 if ($cmd == self::DEFAULT_CMD) {
                     $this->ctrl->setParameter($this, 'q_id', '');
+                }
+                if ($cmd == self::CREATE_XLSX_EXPORT) {
+                    $this->$cmd();
+                    break;
                 }
                 $cmd .= 'Object';
                 $ret = $this->$cmd();

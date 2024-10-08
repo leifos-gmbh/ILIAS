@@ -142,12 +142,9 @@ class ilExportGUI
 
     }
 
-    /**
-     * @depricated
-     */
     public function listExportFiles(): void
     {
-
+        $this->displayExportFiles();
     }
 
     /**

@@ -22,7 +22,6 @@ use ILIAS\TestQuestionPool\QuestionPoolDIC;
 use ILIAS\TestQuestionPool\RequestDataCollector;
 use ILIAS\TestQuestionPool\Presentation\QuestionTable;
 use ILIAS\TestQuestionPool\Questions\GeneralQuestionPropertiesRepository;
-
 use ILIAS\DI\RBACServices;
 use ILIAS\Taxonomy\Service;
 use Psr\Http\Message\ServerRequestInterface as HttpRequest;
@@ -69,6 +68,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
 
     public const SUPPORTED_IMPORT_MIME_TYPES = [MimeType::APPLICATION__ZIP, MimeType::TEXT__XML];
     public const DEFAULT_CMD = 'questions';
+    public const CREATE_XLSX_EXPORT = 'createExportExcel';
 
     private HTTPServices $http;
     private HttpRequest $http_request;
@@ -615,6 +615,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
 
                 if ($cmd == self::DEFAULT_CMD) {
                     $this->ctrl->setParameter($this, 'q_id', '');
+                }
+                if ($cmd == self::CREATE_XLSX_EXPORT) {
+                    $this->$cmd();
+                    break;
                 }
                 $cmd .= 'Object';
                 $ret = $this->$cmd();
@@ -1796,8 +1800,8 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             foreach (array_filter($filter_params) as $item => $value) {
                 switch ($item) {
                     case 'taxonomies':
-                        foreach($value as $tax_value) {
-                            if($tax_value === 'null') {
+                        foreach ($value as $tax_value) {
+                            if ($tax_value === 'null') {
                                 $table->addTaxonomyFilterNoTaxonomySet(true);
                             } else {
                                 $tax_nodes = explode('-', $tax_value);

@@ -106,14 +106,15 @@ class ilExportGUI
             }
         }
         switch ($cmd) {
-            case self::CMD_LIST_EXPORT_FILES:
-                $this->displayExportFiles();
-                break;
             case self::CMD_EXPORT_XML:
                 $this->createXMLExportFile();
                 break;
             case self::CMD_SAVE_ITEM_SELECTION:
                 $this->saveItemSelection();
+                break;
+            case self::CMD_LIST_EXPORT_FILES:
+            default:
+                $this->displayExportFiles();
                 break;
         }
     }

@@ -55,7 +55,8 @@ class ilBlogExportOptionHTML extends ilBasicLegacyExportOption
 
     public function getLabel(): string
     {
-        return $this->lng->txt("html");
+        $this->lng->loadLanguageModule('exp');
+        return $this->lng->txt("exp_html");
     }
 
     public function onExportOptionSelected(

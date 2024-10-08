@@ -157,9 +157,11 @@ class Handler implements ilExportHandlerTableDataRetrievalInterface
         ?array $filter_data,
         ?array $additional_parameters
     ): ?int {
-        $keys = $this->export_handler->repository()->key()->collection()->withElement(
-            $this->export_handler->repository()->key()->handler()->withObjectId(new ObjectId($this->export_object->getId()))
-        );
-        return  $this->export_handler->repository()->handler()->getElements($keys)->count();
+        $context = $this->export_handler->consumer()->context()->handler($this->export_gui, $this->export_object);
+        $count = 0;
+        foreach ($this->export_options as $export_option) {
+            $count += $export_option->getFiles($context)->count();
+        }
+        return $count;
     }
 }

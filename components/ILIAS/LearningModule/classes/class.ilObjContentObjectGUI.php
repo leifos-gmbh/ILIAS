@@ -202,6 +202,7 @@ class ilObjContentObjectGUI extends ilObjectGUI
             case "showExportOptionsXML":
             case "showExportOptionsHTML":
                 $this->$cmd();
+                return;
         }
 
         switch ($next_class) {
@@ -351,7 +352,6 @@ class ilObjContentObjectGUI extends ilObjectGUI
                 $this->ctrl->setParameterByClass(ilLMEditorGUI::class, "transl", "");
                 $exp_gui = new ilExportGUI($this);
                 $this->ctrl->forwardCommand($exp_gui);
-                $this->tpl->setOnScreenMessage('info', $this->lng->txt("lm_only_one_download_per_type"));
                 $this->addHeaderAction();
                 $this->addLocations(true);
                 $this->setTabs("export");
@@ -497,6 +497,9 @@ class ilObjContentObjectGUI extends ilObjectGUI
 
     protected function showExportOptionsXML(): void
     {
+        $this->addHeaderAction();
+        $this->addLocations(true);
+        $this->setTabs("export");
         $this->ui->mainTemplate()->setContent($this->ui->renderer()->render($this->buildExportOptionsFormXML()));
     }
 
@@ -504,6 +507,9 @@ class ilObjContentObjectGUI extends ilObjectGUI
     {
         $ot = ilObjectTranslation::getInstance($this->lm->getId());
         if ($ot->getContentActivated()) {
+            $this->addHeaderAction();
+            $this->addLocations(true);
+            $this->setTabs("export");
             $this->ui->mainTemplate()->setContent($this->ui->renderer()->render($this->buildExportOptionsFormHTML()));
         }
         if (!$ot->getContentActivated()) {
@@ -519,13 +525,16 @@ class ilObjContentObjectGUI extends ilObjectGUI
             $format = explode("_", $form->getData()[0][0]);
         }
         if (is_null($form->getData())) {
+            $this->addHeaderAction();
+            $this->addLocations(true);
+            $this->setTabs("export");
             $this->ui->mainTemplate()->setContent($this->ui->renderer()->render($form));
             return;
         }
         $opt = ilUtil::stripSlashes($format[1]);
         $cont_exp = new ilContObjectExport($this->lm);
         $cont_exp->buildExportFile($opt);
-        $this->ctrl->redirectToURL($this->ctrl->getLinkTargetByClass(ilExportGUI::class, "listExportFiles"));
+        $this->ctrl->redirectByClass(ilExportGUI::class, ilExportGUI::CMD_LIST_EXPORT_FILES);
     }
 
     protected function doExportHTML(): void
@@ -538,12 +547,15 @@ class ilObjContentObjectGUI extends ilObjectGUI
             $lang = ilUtil::stripSlashes($format[1]);
         }
         if ($ot->getContentActivated() and is_null($form->getData())) {
+            $this->addHeaderAction();
+            $this->addLocations(true);
+            $this->setTabs("export");
             $this->ui->mainTemplate()->setContent($this->ui->renderer()->render($form));
             return;
         }
         $cont_exp = new ilContObjectExport($this->lm, "html", $lang);
         $cont_exp->buildExportFile();
-        $this->ctrl->redirectToURL($this->ctrl->getLinkTargetByClass(ilExportGUI::class, "listExportFiles"));
+        $this->ctrl->redirectByClass(ilExportGUI::class, ilExportGUI::CMD_LIST_EXPORT_FILES);
     }
 
     /**

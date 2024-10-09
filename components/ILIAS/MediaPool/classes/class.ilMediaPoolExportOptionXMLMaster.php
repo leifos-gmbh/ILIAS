@@ -171,21 +171,25 @@ class ilMediaPoolExportOptionXMLMaster extends ilBasicLegacyExportOption
         string $directory
     ): array {
         $file = [];
-        $h_dir = dir($directory);
-        while ($entry = $h_dir->read()) {
-            if (
-                $entry !== "." &&
-                $entry !== ".." &&
-                substr($entry, - 4) === ".zip"
-            ) {
-                $ts = substr($entry, 0, strpos($entry, "__"));
-                $file[$entry . $this->getExportType()] = [
-                    "type" => $this->getExportType(),
-                    "file" => $entry,
-                    "size" => (int) filesize($directory . "/" . $entry),
-                    "timestamp" => (int) $ts
-                ];
+        try {
+            $h_dir = dir($directory);
+            while ($entry = $h_dir->read()) {
+                if (
+                    $entry !== "." &&
+                    $entry !== ".." &&
+                    substr($entry, - 4) === ".zip"
+                ) {
+                    $ts = substr($entry, 0, strpos($entry, "__"));
+                    $file[$entry . $this->getExportType()] = [
+                        "type" => $this->getExportType(),
+                        "file" => $entry,
+                        "size" => (int) filesize($directory . "/" . $entry),
+                        "timestamp" => (int) $ts
+                    ];
+                }
             }
+        } catch (Exception $e) {
+
         }
         return $file;
     }

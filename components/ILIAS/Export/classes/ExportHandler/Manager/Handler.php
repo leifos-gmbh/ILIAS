@@ -83,12 +83,18 @@ class Handler implements ilExportHandlerManagerInterface
     ): void {
         $manifest = $this->export_handler->part()->manifest()->handler()
             ->withInfo($export_info);
-        $element->getIRSS()->write(Streams::ofString($manifest->getXML()), $path_in_container . DIRECTORY_SEPARATOR . $export_info->getExportFolderName() . DIRECTORY_SEPARATOR . "manifest.xml");
+        $element->getIRSS()->write(
+            Streams::ofString($manifest->getXML()),
+            $path_in_container . DIRECTORY_SEPARATOR . $export_info->getExportFolderName() . DIRECTORY_SEPARATOR . "manifest.xml"
+        );
         foreach ($export_info->getComponentInfos() as $component_info) {
             $component = $this->export_handler->part()->component()->handler()
                 ->withExportInfo($export_info)
                 ->withComponentInfo($component_info);
-            $element->getIRSS()->write(Streams::ofString($component->getXML()), $path_in_container . DIRECTORY_SEPARATOR . $component_info->getExportFilePathInContainer());
+            $element->getIRSS()->write(
+                Streams::ofString($component->getXML()),
+                $path_in_container . DIRECTORY_SEPARATOR . $component_info->getExportFilePathInContainer()
+            );
         }
     }
 

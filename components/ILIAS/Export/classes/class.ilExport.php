@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-use ILIAS\Export\ExportHandler\I\Consumer\HandlerInterface as ilExportHandlerConsumerInterface;
+use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\HandlerInterface as ilExportHandlerConsumerExportWriterInterface;
 
 /**
  * Export
@@ -32,7 +32,8 @@ class ilExport
     public string $export_run_dir = '';
 
     protected ilLogger $log;
-    protected ilExportHandlerConsumerInterface $consumer;
+    protected ilExportHandlerConsumerExportWriterInterface $export_writer;
+    protected string $export_dir_in_container;
 
     private static array $new_file_structure = array('cat',
                                                'exc',
@@ -59,15 +60,26 @@ class ilExport
         $this->log = $DIC->logger()->exp();
     }
 
-    public function setConsumerHandler(
-        ilExportHandlerConsumerInterface $consumer
+    public function setExportDirInContainer(
+        string $export_dir_in_container
     ): void {
-        $this->consumer = $consumer;
+        $this->export_dir_in_container = $export_dir_in_container;
     }
 
-    public function getConsumerHandler(): ilExportHandlerConsumerInterface
+    public function getExportDirInContainer(): string
     {
-        return $this->consumer;
+        return $this->export_dir_in_container;
+    }
+
+    public function setExportWriter(
+        ilExportHandlerConsumerExportWriterInterface $export_writer,
+    ): void {
+        $this->export_writer = $export_writer;
+    }
+
+    public function getExportWriter(): ilExportHandlerConsumerExportWriterInterface
+    {
+        return $this->export_writer;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace ILIAS\Export\ExportHandler\Part\Component;
 
+use ILIAS\Export\ExportHandler\I\FactoryInterface as ilExportHandlerFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\Component\HandlerInterface as ilExportHanlderExportComponentInfoInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\HandlerInterface as ilExportHanlderExportInfoInterface;
 use ILIAS\Export\ExportHandler\I\Part\Component\HandlerInterface as ilExportHandlerPartComponentInterface;
@@ -11,6 +12,13 @@ class Handler implements ilExportHandlerPartComponentInterface
 {
     protected ilExportHanlderExportInfoInterface $export_info;
     protected ilExportHanlderExportComponentInfoInterface $component_info;
+    protected ilExportHandlerFactoryInterface $export_handler;
+
+    public function __construct(
+        ilExportHandlerFactoryInterface $export_handler
+    ) {
+        $this->export_handler = $export_handler;
+    }
 
     public function withExportInfo(
         ilExportHanlderExportInfoInterface $export_info
@@ -50,7 +58,8 @@ class Handler implements ilExportHandlerPartComponentInterface
         $export_writer->xmlStartTag('exp:Export', $attribs);
         foreach ($this->component_info->getTarget()->getObjectIds() as $id) {
             $export_writer->xmlStartTag('exp:ExportItem', array("Id" => $id));
-            $xml = $this->component_info->getComponentExporter()->getXmlRepresentation(
+            $comp_exporter = $this->component_info->getComponentExporter($this->export_info->getCurrentElement());
+            $xml = $comp_exporter->getXmlRepresentation(
                 $this->component_info->getTarget()->getComponent(),
                 $this->component_info->getSchemaVersion(),
                 (string) $id

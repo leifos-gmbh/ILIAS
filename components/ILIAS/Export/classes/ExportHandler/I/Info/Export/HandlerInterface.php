@@ -25,6 +25,7 @@ use ILIAS\Export\ExportHandler\I\Info\Export\Component\CollectionInterface as il
 use ILIAS\Export\ExportHandler\I\Info\Export\Component\HandlerInterface as ilExportHandlerExportComponentInfoInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\Container\HandlerInterface as ilExportHandlerContainerExportInfoInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\HandlerInterface as ilExportHandlerExportInfoInterface;
+use ILIAS\Export\ExportHandler\I\Repository\Element\HandlerInterface as ilExportHandlerRepositoryElementInterface;
 use ILIAS\Export\ExportHandler\I\Target\HandlerInterface as ilExportHandlerTargetInterface;
 
 interface HandlerInterface
@@ -41,6 +42,12 @@ interface HandlerInterface
     public function withReuseExport(
         bool $reuse_export
     ): ilExportHandlerExportInfoInterface;
+
+    public function withCurrentElement(
+        ilExportHandlerRepositoryElementInterface $element
+    ): ilExportHandlerExportInfoInterface;
+
+    public function getCurrentElement(): ilExportHandlerRepositoryElementInterface;
 
     public function getReuseExport(): bool;
 

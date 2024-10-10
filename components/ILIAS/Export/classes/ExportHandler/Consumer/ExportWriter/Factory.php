@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\Export\ExportHandler\Consumer\ExportWriter;
 
+use ILIAS\Export\ExportHandler\Consumer\ExportWriter\Handler as ilExportHandlerConsumerExportWriter;
 use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\FactoryInterface as ilExportHandlerConsumerExportWriterFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\HandlerInterface as ilExportHandlerConsumerExportWriterInterface;
-use ILIAS\Export\ExportHandler\Consumer\ExportWriter\Handler as ilExportHandlerConsumerExportWriter;
 use ILIAS\Export\ExportHandler\I\Repository\HandlerInterface as ilExportHandlerRepositoryInterface;
 use ILIAS\Export\ExportHandler\I\Repository\Key\FactoryInterface as ilExportHandlerRepositoryKeyFactoryInterface;
 

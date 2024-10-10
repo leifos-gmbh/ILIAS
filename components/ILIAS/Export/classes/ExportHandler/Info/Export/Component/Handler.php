@@ -25,17 +25,18 @@ use ilExportException;
 use ILIAS\Export\ExportHandler\I\FactoryInterface as ilExportHandlerFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\Component\CollectionInterface as ilExportHandlerExportComponentInfoCollectionInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\Component\HandlerInterface as ilExportHandlerExportComponentInfoInterface;
+use ILIAS\Export\ExportHandler\I\Repository\Element\HandlerInterface as ilExportHandlerRepositoryElementInterface;
 use ILIAS\Export\ExportHandler\I\Target\HandlerInterface as ilExportHandlerTargetInterface;
 use ilXmlExporter;
 
 class Handler implements ilExportHandlerExportComponentInfoInterface
 {
     protected ilExportHandlerFactoryInterface $export_handler;
-    protected ilXmlExporter $exporter;
     protected ilExportHandlerTargetInterface $export_target;
     protected array $sv;
     protected string $path_in_container;
     protected string $component_export_dir_path_in_container;
+    protected string $exporter_class_name;
 
     public function __construct(ilExportHandlerFactoryInterface $export_handler)
     {
@@ -46,17 +47,14 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
     protected function init(): void
     {
         $component = $this->getTarget()->getComponent() === "components/ILIAS/Object" ? "components/ILIAS/ILIASObject" : $this->getTarget()->getComponent();
-        $class_name = $this->getTarget()->getClassname() === "ilObjectExporter" ? "ilILIASObjectExporter" : $this->getTarget()->getClassname();
-        if (!class_exists($class_name)) {
-            $export_class_file = "./" . $component . "/classes/class." . $class_name . ".php";
+        $this->exporter_class_name = $this->getTarget()->getClassname() === "ilObjectExporter" ? "ilILIASObjectExporter" : $this->getTarget()->getClassname();
+        if (!class_exists($this->exporter_class_name)) {
+            $export_class_file = "./" . $component . "/classes/class." . $this->exporter_class_name . ".php";
             if (!is_file($export_class_file)) {
                 throw new ilExportException('Export class file "' . $export_class_file . '" not found.');
             }
         }
-        $this->exporter = new ($class_name)();
-        $this->exporter->setExport(new ilExport());
-        $this->exporter->init();
-        $this->sv = $this->exporter->determineSchemaVersion($component, $this->getTarget()->getTargetRelease());
+        $this->sv = $this->getMinimalComponentExporter()->determineSchemaVersion($component, $this->getTarget()->getTargetRelease());
         $this->sv["uses_dataset"] ??= false;
         $this->sv['xsd_file'] ??= '';
     }
@@ -112,10 +110,18 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
         return $schema_location;
     }
 
-    public function getComponentExporter(): ilXmlExporter
-    {
-        $this->exporter->setExportDirectories($this->getComponentExportDirPathInContainer(), "");
-        return $this->exporter;
+    public function getComponentExporter(
+        ilExportHandlerRepositoryElementInterface $element
+    ): ilXmlExporter {
+        /** @var ilXmlExporter $exporter */
+        $export_writer = $this->export_handler->consumer()->handler()->exportWriter($element);
+        $export = new ilExport();
+        $export->setExportDirInContainer($this->component_export_dir_path_in_container);
+        $export->setExportWriter($export_writer);
+        $exporter = new ($this->exporter_class_name)();
+        $exporter->setExport($export);
+        $exporter->init();
+        return $exporter;
     }
 
     protected function getComponentInfos(array $sequence): ilExportHandlerExportComponentInfoCollectionInterface
@@ -139,7 +145,7 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
 
     public function getHeadComponentInfos(): ilExportHandlerExportComponentInfoCollectionInterface
     {
-        return $this->getComponentInfos($this->getComponentExporter()->getXmlExportHeadDependencies(
+        return $this->getComponentInfos($this->getMinimalComponentExporter()->getXmlExportHeadDependencies(
             $this->getTarget()->getType(),
             $this->getTarget()->getTargetRelease(),
             $this->getTarget()->getObjectIds()
@@ -153,7 +159,7 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
 
     public function getTailComponentInfos(): ilExportHandlerExportComponentInfoCollectionInterface
     {
-        return $this->getComponentInfos($this->getComponentExporter()->getXmlExportTailDependencies(
+        return $this->getComponentInfos($this->getMinimalComponentExporter()->getXmlExportTailDependencies(
             $this->getTarget()->getType(),
             $this->getTarget()->getTargetRelease(),
             $this->getTarget()->getObjectIds()
@@ -178,5 +184,13 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
     public function usesCustomNamespace(): bool
     {
         return ($this->sv["namespace"] ?? "") !== "" && ($this->sv["xsd_file"] ?? "") !== "";
+    }
+
+    protected function getMinimalComponentExporter(): ilXmlExporter
+    {
+        $exporter = new ($this->exporter_class_name)();
+        $exporter->setExport(new ilExport());
+        $exporter->init();
+        return $exporter;
     }
 }

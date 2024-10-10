@@ -26,6 +26,7 @@ use ILIAS\Export\ExportHandler\I\Info\Export\Component\CollectionInterface as il
 use ILIAS\Export\ExportHandler\I\Info\Export\Component\HandlerInterface as ilExportHandlerExportComponentInfoInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\Container\HandlerInterface as ilExportHandlerContainerExportInfoInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\HandlerInterface as ilExportHandlerExportInfoInterface;
+use ILIAS\Export\ExportHandler\I\Repository\Element\HandlerInterface as ilExportHandlerRepositoryElementInterface;
 use ILIAS\Export\ExportHandler\I\Target\HandlerInterface as ilExportHandlerTargetInterface;
 
 class handler implements ilExportHandlerExportInfoInterface
@@ -34,6 +35,7 @@ class handler implements ilExportHandlerExportInfoInterface
     protected ilExportHandlerTargetInterface $export_target;
     protected ilExportHandlerExportComponentInfoCollectionInterface $component_export_infos;
     protected ilExportHandlerContainerExportInfoInterface $container_export_info;
+    protected ilExportHandlerRepositoryElementInterface $element;
     protected array $component_counts;
     protected bool $reuse_export;
     protected int $time_stamp;
@@ -51,6 +53,11 @@ class handler implements ilExportHandlerExportInfoInterface
         return $export_folder_name . DIRECTORY_SEPARATOR . $component . DIRECTORY_SEPARATOR . "set_" . $component_count . DIRECTORY_SEPARATOR . "export.xml";
     }
 
+    protected function getExportDirectoryPathInContainer(string $export_folder_name, string $component, int $component_count): string
+    {
+        return $export_folder_name . DIRECTORY_SEPARATOR . $component . DIRECTORY_SEPARATOR . "set_" . $component_count;
+    }
+
     protected function initComponentInfos(): void
     {
         $component_info = $this->export_handler->info()->export()->component()->handler()->withExportTarget($this->getTarget());
@@ -65,7 +72,11 @@ class handler implements ilExportHandlerExportInfoInterface
                 $component_info->getTarget()->getComponent(),
                 $this->component_counts[$component_info->getTarget()->getComponent()]
             );
-            $path_in_container_export_dir = "";
+            $path_in_container_export_dir = $this->getExportDirectoryPathInContainer(
+                $this->getExportFolderName(),
+                $component_info->getTarget()->getComponent(),
+                $this->component_counts[$component_info->getTarget()->getComponent()]
+            );
             $component_info = $component_info
                 ->withExportFilePathInContainer($path_in_container)
                 ->withComponentExportDirPathInContainer($path_in_container_export_dir);
@@ -120,6 +131,19 @@ class handler implements ilExportHandlerExportInfoInterface
         $clone = clone $this;
         $clone->reuse_export = $reuse_export;
         return $clone;
+    }
+
+    public function withCurrentElement(
+        ilExportHandlerRepositoryElementInterface $element
+    ): ilExportHandlerExportInfoInterface {
+        $clone = clone $this;
+        $clone->element = $element;
+        return $clone;
+    }
+
+    public function getCurrentElement(): ilExportHandlerRepositoryElementInterface
+    {
+        return $this->element;
     }
 
     public function getReuseExport(): bool

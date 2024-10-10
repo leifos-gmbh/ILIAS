@@ -22,7 +22,6 @@ namespace ILIAS\Export\ExportHandler\Table\DataRetrieval;
 
 use Generator;
 use ilExportGUI;
-use ILIAS\Data\ObjectId;
 use ILIAS\Data\Order as ilDataOrder;
 use ILIAS\Data\Range as ilDataRange;
 use ILIAS\DI\UIServices as ilUIServices;

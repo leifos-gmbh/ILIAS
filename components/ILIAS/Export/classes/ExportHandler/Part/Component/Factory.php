@@ -19,6 +19,8 @@ class Factory implements ilExportHanlderPartComponentFactoryInterface
 
     public function handler(): ilExportHandlerComponentInterface
     {
-        return new ilExportHandlerComponent();
+        return new ilExportHandlerComponent(
+            $this->export_handler
+        );
     }
 }

@@ -22,7 +22,6 @@ namespace ILIAS\Export\ExportHandler\I\Consumer\ExportWriter;
 
 use ILIAS\Data\ObjectId;
 use ILIAS\Filesystem\Stream\FileStream;
-use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\ResourceStorage\Collection\ResourceCollection;
 
 interface HandlerInterface

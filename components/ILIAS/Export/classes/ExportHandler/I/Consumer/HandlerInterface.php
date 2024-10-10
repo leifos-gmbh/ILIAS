@@ -21,9 +21,9 @@ declare(strict_types=1);
 namespace ILIAS\Export\ExportHandler\I\Consumer;
 
 use ILIAS\Data\ObjectId;
+use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\HandlerInterface as ilExportHandlerConsumerExportWriterInterface;
 use ILIAS\Export\ExportHandler\I\PublicAccess\HandlerInterface as ilExportHandlerPublicAccessInterface;
 use ILIAS\Export\ExportHandler\I\Repository\Element\HandlerInterface as ilExportHandlerRepositoryElementInterface;
-use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\HandlerInterface as ilExportHandlerConsumerExportWriterInterface;
 
 interface HandlerInterface
 {
@@ -34,5 +34,7 @@ interface HandlerInterface
         ObjectId $object_id
     ): ilExportHandlerRepositoryElementInterface;
 
-    public function exportWriter(): ilExportHandlerConsumerExportWriterInterface;
+    public function exportWriter(
+        ilExportHandlerRepositoryElementInterface $element
+    ): ilExportHandlerConsumerExportWriterInterface;
 }

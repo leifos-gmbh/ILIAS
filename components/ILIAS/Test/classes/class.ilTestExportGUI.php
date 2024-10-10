@@ -22,7 +22,6 @@ use ILIAS\Test\RequestDataCollector;
 use ILIAS\TestQuestionPool\Questions\GeneralQuestionPropertiesRepository;
 use ILIAS\Test\Logging\TestLogger;
 use ILIAS\Test\Scoring\Manual\TestScoring;
-
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\ResourceStorage\Services as IRSS;
@@ -38,6 +37,7 @@ use ILIAS\ResourceStorage\Services as IRSS;
  * @ingroup components\ILIASTest
  *
  * @ilCtrl_Calls ilTestExportGUI: ilParticipantsTestResultsGUI
+ * @ilCtrl_Calls ilTestExportGUI: ilExportGUI
  */
 class ilTestExportGUI extends ilExportGUI
 {
@@ -60,10 +60,6 @@ class ilTestExportGUI extends ilExportGUI
     ) {
         parent::__construct($parent_gui, null);
 
-        $this->addFormat('xml', $this->lng->txt('ass_create_export_file'));
-        $this->addFormat('xmlres', $this->lng->txt('ass_create_export_file_with_results'), $this, 'createTestExportWithResults');
-        $this->addFormat('csv', $this->lng->txt('ass_create_export_test_results'), $this, 'createTestResultsExport');
-        $this->addFormat('arc', $this->lng->txt('ass_create_export_test_archive'), $this, 'createTestArchiveExport');
         foreach ($active_export_plugins as $plugin) {
             $plugin->setTest($this->obj);
             $this->addFormat(

@@ -22,6 +22,8 @@ namespace ILIAS\Export\ExportHandler\I\Repository\Element\Wrapper\IRSS;
 
 use ILIAS\Export\ExportHandler\I\Repository\Element\HandlerInterface as ilExportHandlerRepositoryElementInterface;
 use ILIAS\Filesystem\Stream\FileStream;
+use ILIAS\ResourceStorage\Collection\ResourceCollection;
+use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 
 interface HandlerInterface
 {
@@ -35,6 +37,26 @@ interface HandlerInterface
         FileStream $stream,
         string $path_in_container
     ): bool;
+
+    public function addResourceToContainerByResourceId(
+        ResourceIdentification $resource_identification,
+        string $path_in_container
+    ): void;
+
+    public function addResourceToContainer(
+        string $resource_id_serialized,
+        string $path_in_container
+    ): void;
+
+    public function addResourceCollectionToContainerById(
+        string $resource_id_serialized,
+        string $dir_path_in_container
+    ): void;
+
+    public function addResourceCollectionToContaierByCollection(
+        ResourceCollection $collection,
+        string $dir_path_in_container
+    );
 
     public function writeZip(
         FileStream $zip_stream,

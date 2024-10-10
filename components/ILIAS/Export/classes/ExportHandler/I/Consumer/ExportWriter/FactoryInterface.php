@@ -18,21 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Export\ExportHandler\I\Consumer;
+namespace ILIAS\Export\ExportHandler\I\Consumer\ExportWriter;
 
-use ILIAS\Data\ObjectId;
-use ILIAS\Export\ExportHandler\I\PublicAccess\HandlerInterface as ilExportHandlerPublicAccessInterface;
-use ILIAS\Export\ExportHandler\I\Repository\Element\HandlerInterface as ilExportHandlerRepositoryElementInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\HandlerInterface as ilExportHandlerConsumerExportWriterInterface;
 
-interface HandlerInterface
+interface FactoryInterface
 {
-    public function publicAccess(): ilExportHandlerPublicAccessInterface;
-
-    public function createStandardExport(
-        int $user_id,
-        ObjectId $object_id
-    ): ilExportHandlerRepositoryElementInterface;
-
-    public function exportWriter(): ilExportHandlerConsumerExportWriterInterface;
+    public function handler(): ilExportHandlerConsumerExportWriterInterface;
 }

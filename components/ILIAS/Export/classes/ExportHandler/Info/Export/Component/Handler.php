@@ -35,6 +35,7 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
     protected ilExportHandlerTargetInterface $export_target;
     protected array $sv;
     protected string $path_in_container;
+    protected string $component_export_dir_path_in_container;
 
     public function __construct(ilExportHandlerFactoryInterface $export_handler)
     {
@@ -68,10 +69,19 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
         return $clone;
     }
 
-    public function withExportFilePathInContainer(string $path_in_container): ilExportHandlerExportComponentInfoInterface
-    {
+    public function withExportFilePathInContainer(
+        string $path_in_container
+    ): ilExportHandlerExportComponentInfoInterface {
         $clone = clone $this;
         $clone->path_in_container = $path_in_container;
+        return $clone;
+    }
+
+    public function withComponentExportDirPathInContainer(
+        string $component_export_dir_path_in_container
+    ): ilExportHandlerExportComponentInfoInterface {
+        $clone = clone $this;
+        $clone->component_export_dir_path_in_container = $component_export_dir_path_in_container;
         return $clone;
     }
 
@@ -83,6 +93,11 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
     public function getExportFilePathInContainer(): string
     {
         return $this->path_in_container;
+    }
+
+    public function getComponentExportDirPathInContainer(): string
+    {
+        return $this->component_export_dir_path_in_container;
     }
 
     public function getXSDSchemaLocation(): string
@@ -99,6 +114,7 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
 
     public function getComponentExporter(): ilXmlExporter
     {
+        $this->exporter->setExportDirectories($this->getComponentExportDirPathInContainer(), "");
         return $this->exporter;
     }
 

@@ -24,6 +24,7 @@ use ILIAS\components\ResourceStorage\Container\Wrapper\ZipReader;
 use ILIAS\Export\ExportHandler\I\Repository\Element\HandlerInterface as ilExportHandlerRepositoryElementInterface;
 use ILIAS\Export\ExportHandler\I\Repository\Element\Wrapper\IRSS\HandlerInterface as ilExportHandlerRepositoryElementIRSSWrapperInterface;
 use ILIAS\Filesystem\Stream\FileStream;
+use ILIAS\ResourceStorage\Collection\ResourceCollection;
 use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 use ILIAS\ResourceStorage\Services as ResourcesStorageService;
 
@@ -62,6 +63,63 @@ class Handler implements ilExportHandlerRepositoryElementIRSSWrapperInterface
             $this->removeTmpFile();
         }
         return $success;
+    }
+
+    public function addResourceToContainerByResourceId(
+        ResourceIdentification $resource_identification,
+        string $path_in_container
+    ): void {
+        $container_rid = $this->getResourceId();
+        if (is_null($container_rid)) {
+            return;
+        }
+        $file_stream = $this->irss->consume()->stream($resource_identification)->getStream();
+        $this->irss->manageContainer()->addStreamToContainer(
+            $container_rid,
+            $file_stream,
+            $path_in_container
+        );
+    }
+
+    public function addResourceToContainer(
+        string $resource_id_serialized,
+        string $path_in_container
+    ): void {
+        $resource_rid = $this->irss->manage()->find($resource_id_serialized);
+        if (is_null($resource_rid)) {
+            return;
+        }
+        $this->addResourceToContainerByResourceId(
+            $resource_rid,
+            $path_in_container
+        );
+    }
+
+    public function addResourceCollectionToContainerById(
+        string $resource_id_serialized,
+        string $dir_path_in_container
+    ): void {
+        $collection_rid = $this->irss->collection()->id($resource_id_serialized);
+        if (is_null($collection_rid)) {
+            return;
+        }
+        $collection = $this->irss->collection()->get($collection_rid);
+        $this->addResourceCollectionToContaierByCollection($collection, $dir_path_in_container);
+    }
+
+    public function addResourceCollectionToContaierByCollection(
+        ResourceCollection $collection,
+        string $dir_path_in_container
+    ) {
+        foreach ($collection->getResourceIdentifications() as $resource_identification) {
+            $resource = $this->irss->manage()->getResource($resource_identification);
+            $file_title = $resource->getCurrentRevision()->getInformation()->getTitle();
+            $path_in_container = $dir_path_in_container . DIRECTORY_SEPARATOR . $file_title;
+            $this->addResourceToContainerByResourceId(
+                $resource_identification,
+                $path_in_container
+            );
+        }
     }
 
     public function writeZip(

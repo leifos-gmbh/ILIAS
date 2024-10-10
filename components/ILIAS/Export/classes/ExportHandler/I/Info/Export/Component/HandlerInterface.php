@@ -30,9 +30,13 @@ interface HandlerInterface
 
     public function withExportFilePathInContainer(string $path_in_container): HandlerInterface;
 
+    public function withComponentExportDirPathInContainer(string $component_export_dir_path_in_container): HandlerInterface;
+
     public function getTarget(): ilExportHandlerTargetInterface;
 
     public function getExportFilePathInContainer(): string;
+
+    public function getComponentExportDirPathInContainer(): string;
 
     public function getXSDSchemaLocation(): string;
 

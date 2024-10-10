@@ -24,6 +24,7 @@ use ILIAS\Export\ExportHandler\I\Consumer\Context\FactoryInterface as ilExportHa
 use ILIAS\Export\ExportHandler\I\Consumer\ExportOption\FactoryInterface as ilExportHandlerConsumerExportOptionFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\File\FactoryInterface as ilExportHandlerConsumerFileFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\HandlerInterface as ilExportHandlerConsumerInterface;
+use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\FactoryInterface as ilExportHandlerConsumerExportWriterFactoryInterface;
 
 interface FactoryInterface
 {
@@ -32,6 +33,8 @@ interface FactoryInterface
     public function exportOption(): ilExportHandlerConsumerExportOptionFactoryInterface;
 
     public function context(): ilExportHandlerConsumerContextFactoryInterface;
+
+    public function exportWriter(): ilExportHandlerConsumerExportWriterFactoryInterface;
 
     public function file(): ilExportHandlerConsumerFileFactoryInterface;
 }

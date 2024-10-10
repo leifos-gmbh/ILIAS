@@ -18,6 +18,8 @@
 
 declare(strict_types=1);
 
+use ILIAS\Export\ExportHandler\I\Consumer\HandlerInterface as ilExportHandlerConsumerInterface;
+
 /**
  * Export
  * @author    Alex Killing <alex.killing@gmx.de>
@@ -30,6 +32,7 @@ class ilExport
     public string $export_run_dir = '';
 
     protected ilLogger $log;
+    protected ilExportHandlerConsumerInterface $consumer;
 
     private static array $new_file_structure = array('cat',
                                                'exc',
@@ -54,6 +57,17 @@ class ilExport
     {
         global $DIC;
         $this->log = $DIC->logger()->exp();
+    }
+
+    public function setConsumerHandler(
+        ilExportHandlerConsumerInterface $consumer
+    ): void {
+        $this->consumer = $consumer;
+    }
+
+    public function getConsumerHandler(): ilExportHandlerConsumerInterface
+    {
+        return $this->consumer;
     }
 
     /**

@@ -65,6 +65,10 @@ class handler implements ilExportHandlerExportInfoInterface
                 $component_info->getTarget()->getComponent(),
                 $this->component_counts[$component_info->getTarget()->getComponent()]
             );
+            $path_in_container_export_dir = "";
+            $component_info = $component_info
+                ->withExportFilePathInContainer($path_in_container)
+                ->withComponentExportDirPathInContainer($path_in_container_export_dir);
             $this->component_export_infos = $this->component_export_infos
                 ->withComponent($component_info->withExportFilePathInContainer($path_in_container));
         }
@@ -118,7 +122,7 @@ class handler implements ilExportHandlerExportInfoInterface
         return $clone;
     }
 
-    public function getResueExport(): bool
+    public function getReuseExport(): bool
     {
         return $this->reuse_export;
     }

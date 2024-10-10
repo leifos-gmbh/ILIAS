@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace ILIAS\Export\ExportHandler\Consumer;
 
 use ILIAS\Data\ObjectId;
+use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\HandlerInterface as ilExportHandlerConsumerExportWriterInterface;
+use ILIAS\Export\ExportHandler\Consumer\ExportWriter\Factory as ilExportHandlerConsumerExportWriterFactory;
 use ILIAS\Export\ExportHandler\I\Consumer\HandlerInterface as ilExportHandlerConsumerInterface;
 use ILIAS\Export\ExportHandler\I\FactoryInterface as ilExportHandlerFactoryInterface;
 use ILIAS\Export\ExportHandler\I\PublicAccess\HandlerInterface as ilExportHandlerPublicAccessInterface;
@@ -51,5 +53,10 @@ class Handler implements ilExportHandlerConsumerInterface
             $manager->getExportInfo($object_id, time()),
             ""
         );
+    }
+
+    public function exportWriter(): ilExportHandlerConsumerExportWriterInterface
+    {
+        return $this->export_handler->consumer()->exportWriter()->handler();
     }
 }

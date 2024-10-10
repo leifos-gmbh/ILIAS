@@ -101,7 +101,7 @@ class Handler implements ilExportHandlerManagerInterface
         $repository = $this->export_handler->repository();
         foreach ($container_export_info->getExportInfos() as $export_info) {
             $keys = $repository->key()->collection()->withElement($repository->key()->handler()->withObjectId($export_info->getTargetObjectId()));
-            $element = $export_info->getResueExport()
+            $element = $export_info->getReuseExport()
                 ? $this->export_handler->repository()->handler()->getElements($keys)->newest()
                 : $this->createExport($user_id, $export_info, "");
             $element = $element->getIRSS()->isContainerExport()

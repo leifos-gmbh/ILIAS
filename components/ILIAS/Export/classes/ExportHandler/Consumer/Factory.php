@@ -26,6 +26,8 @@ use ILIAS\Export\ExportHandler\Consumer\File\Factory as ilExportHandlerConsumerF
 use ILIAS\Export\ExportHandler\Consumer\Handler as ilExportHandlerConsumer;
 use ILIAS\Export\ExportHandler\I\Consumer\Context\FactoryInterface as ilExportHandlerConsumerContextFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\ExportOption\FactoryInterface as ilExportHandlerConsumerExportOptionFactoryInterface;
+use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\FactoryInterface as ilExportHandlerConsumerExportWriterFactoryInterface;
+use ILIAS\Export\ExportHandler\Consumer\ExportWriter\Factory as ilExportHandlerConsumerExportWriterFactory;
 use ILIAS\Export\ExportHandler\I\Consumer\FactoryInterface as ilExportHandlerConsumerFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\File\FactoryInterface as ilExportHandlerConsumerFileFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\HandlerInterface as ilExportHandlerConsumerInterface;
@@ -59,6 +61,14 @@ class Factory implements ilExportHandlerConsumerFactoryInterface
     {
         return new ilExportHandlerConsumerContextFactory(
             $this->export_handler
+        );
+    }
+
+    public function exportWriter(): ilExportHandlerConsumerExportWriterFactoryInterface
+    {
+        return new ilExportHandlerConsumerExportWriterFactory(
+            $this->export_handler->repository()->handler(),
+            $this->export_handler->repository()->key()
         );
     }
 

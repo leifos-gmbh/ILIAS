@@ -42,7 +42,7 @@ interface HandlerInterface
         bool $reuse_export
     ): ilExportHandlerExportInfoInterface;
 
-    public function getResueExport(): bool;
+    public function getReuseExport(): bool;
 
     public function getTarget(): ilExportHandlerTargetInterface;
 

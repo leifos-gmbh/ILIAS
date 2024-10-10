@@ -17,7 +17,6 @@
  *********************************************************************/
 
 use ILIAS\ResourceStorage\Collection\ResourceCollection;
-use ILIAS\Export\ExportHandler\I\Consumer\HandlerInterface as ilExportHandlerConsumerInterface;
 
 /**
  * A dataset contains in data in a common structure that can be
@@ -58,12 +57,11 @@ abstract class ilDataSet
     protected string $import_directory = "";
     protected string $entity = "";
     protected string $schema_version = "";
-    protected string $relative_export_dir = "";
-    protected string $absolute_export_dir = "";
+    protected string $component_export_dir = "";
     protected string $ds_prefix = "ds";
     protected string $version = "";
     protected ilSurveyImporter $import;
-    protected ilExportHandlerConsumerInterface $export_service;
+    protected ilExport $export;
 
     public function __construct()
     {
@@ -118,9 +116,7 @@ abstract class ilDataSet
 
     public function initByExporter(ilXmlExporter $xml_exporter): void
     {
-        $this->export_service = $xml_exporter->getExport()->getConsumerHandler();
-        $this->relative_export_dir = $xml_exporter->getRelativeExportDirectory();
-        $this->absolute_export_dir = $xml_exporter->getAbsoluteExportDirectory();
+        $this->export = $xml_exporter->getExport();
     }
 
     public function setImportDirectory(string $a_val): void
@@ -302,11 +298,11 @@ abstract class ilDataSet
                     #} catch (\ILIAS\Filesystem\Exception\FileNotFoundException $e) {
                     #    $this->ds_log->error($e->getMessage());
                     #}
-                    $this->export_service->exportWriter()->writeDirectory(
+                    $this->export->getExportWriter()->writeDirectory(
                         $sdir,
-                        $this->relative_export_dir . "/dsDir_" . $this->dircnt
+                        $this->export->getExportDirInContainer() . "/dsDir_" . $this->dircnt
                     );
-                    $c = $this->relative_export_dir . "/dsDir_" . $this->dircnt;
+                    $c = $this->export->getExportDirInContainer() . "/dsDir_" . $this->dircnt;
                     $this->dircnt++;
                 }
                 if (($types[$f] ?? "") === "rscollection") {
@@ -322,12 +318,12 @@ abstract class ilDataSet
                         #    $name = $tdir . "/" . $info->getTitle();
                         #    file_put_contents($name, $stream->getStream()->getContents());
                         #}
-                        $this->export_service->exportWriter()->writeFilesByResourceCollection(
+                        $this->export->getExportWriter()->writeFilesByResourceCollection(
                             $collection,
-                            $this->relative_export_dir . "/dsDir_" . $this->dircnt
+                            $this->export->getExportDirInContainer() . "/dsDir_" . $this->dircnt
                         );
                     }
-                    $c = $this->relative_export_dir . "/dsDir_" . $this->dircnt;
+                    $c = $this->export->getExportDirInContainer() . "/dsDir_" . $this->dircnt;
                     $this->dircnt++;
                 }
                 #}

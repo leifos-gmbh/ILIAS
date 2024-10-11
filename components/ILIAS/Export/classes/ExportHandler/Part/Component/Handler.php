@@ -60,7 +60,7 @@ class Handler implements ilExportHandlerPartComponentInterface
             $export_writer->xmlStartTag('exp:ExportItem', array("Id" => $id));
             $comp_exporter = $this->component_info->getComponentExporter($this->export_info->getCurrentElement());
             $xml = $comp_exporter->getXmlRepresentation(
-                $this->component_info->getTarget()->getComponent(),
+                $this->component_info->getTarget()->getType(),
                 $this->component_info->getSchemaVersion(),
                 (string) $id
             );

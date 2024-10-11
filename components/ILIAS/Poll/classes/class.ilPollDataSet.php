@@ -29,7 +29,7 @@ declare(strict_types=1);
  */
 class ilPollDataSet extends ilDataSet
 {
-    protected const ENTITY = "components/ILIAS/Poll";
+    protected const ENTITY = "poll";
     protected \ILIAS\Notes\Service $notes;
 
     public function __construct()

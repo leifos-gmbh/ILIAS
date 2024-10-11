@@ -11867,7 +11867,7 @@ meta#:#md_vocab_element_with_condition#:#%s where %s is %s
 meta#:#md_vocab_import_invalid#:#The import file is invalid:<br/>%s
 meta#:#md_vocab_import_successful#:#Vocabulary successfully imported.
 meta#:#md_vocab_import_upload_failed#:#Upload of the import file failed.
-meta#:#md_vocab_preview_column#:#Values (Preview)
+meta#:#md_vocab_preview_column#:#Preview
 meta#:#md_vocab_show_all_action#:#Show All Values
 meta#:#md_vocab_source_column#:#Source
 meta#:#md_vocab_table_title#:#Vocabularies

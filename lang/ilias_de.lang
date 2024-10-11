@@ -11879,7 +11879,7 @@ meta#:#md_vocab_element_with_condition#:#%s mit %s %s
 meta#:#md_vocab_import_invalid#:#Die Importdatei ist ungültig:<br/>%s
 meta#:#md_vocab_import_successful#:#Vokabular erfolgreich imported.
 meta#:#md_vocab_import_upload_failed#:#Das Hochladen der Importdatei ist fehlgeschlagen.
-meta#:#md_vocab_preview_column#:#Begriffe (Vorschau)
+meta#:#md_vocab_preview_column#:#Vorschau
 meta#:#md_vocab_show_all_action#:#Alle Begriffe anzeigen
 meta#:#md_vocab_source_column#:#Quelle
 meta#:#md_vocab_table_title#:#Vokabulare

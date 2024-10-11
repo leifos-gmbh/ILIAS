@@ -81,6 +81,7 @@ class Handler implements ilExportHandlerManagerInterface
         ilExportHandlerExportInfo $export_info,
         ilExportHandlerRepositoryElementInterface $element
     ): void {
+        $export_info = $export_info->withCurrentElement($element);
         $manifest = $this->export_handler->part()->manifest()->handler()
             ->withInfo($export_info);
         $element->getIRSS()->write(

@@ -9671,6 +9671,7 @@ exp#:#exp_error_disabled#:#Der Export von Container-Objekten ist deaktiviert. Be
 exp#:#exp_error_too_many_objects#:#Der Export überschreitet die maximal erlaubte Zahl an Objekten (%1). Bitte wählen Sie eine kleinere Anzahl an Objekten.
 exp#:#exp_export_files#:#Exportdateien
 exp#:#exp_file_created#:#Eine Exportdatei wurde erstellt.
+exp#:#exp_html#:#HTML
 exp#:#exp_import_validation_err_no_matching_xsd#:#Eine Schema Datei für Version %s existiert nicht.
 exp#:#exp_print_pdf#:#Drucken/PDF
 exp#:#exp_print_pdf_info#:#Um ein PDF zu erstellen, wählen Sie bitte anschließend in der Druckansicht "Als PDF speichern" als Ziel.

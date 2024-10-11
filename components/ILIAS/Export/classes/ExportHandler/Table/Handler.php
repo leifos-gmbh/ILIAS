@@ -161,9 +161,8 @@ class Handler implements ilExportHandlerTableInterface
                     ->withExportOptionId($export_option_id)
                     ->withFileIdentifier($file_info->getFileIdentifier());
                 $ids[] = $table_row_id->getCompositId();
-                $items[] = $this->ui_services->factory()->modal()->interruptiveItem()->keyValue(
+                $items[] = $this->ui_services->factory()->modal()->interruptiveItem()->standard(
                     $table_row_id->getCompositId(),
-                    $table_row_id->getFileIdentifier(),
                     $file_info->getFileName()
                 );
             }

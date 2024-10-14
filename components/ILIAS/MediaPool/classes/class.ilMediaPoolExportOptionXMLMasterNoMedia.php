@@ -44,7 +44,7 @@ class ilMediaPoolExportOptionXMLMasterNoMedia extends ilBasicLegacyExportOption
 
     public function getExportOptionId(): string
     {
-        return 'ilMediaPoolExportOptionXMLMasterNoMedia';
+        return 'mep_exp_option_xml_masternomedia';
     }
 
     public function getSupportedRepositoryObjectTypes(): array

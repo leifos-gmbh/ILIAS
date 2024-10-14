@@ -9680,6 +9680,8 @@ exp#:#exp_show_print_view#:#Druckansicht anzeigen
 exp#:#exp_xml#:#XML
 exp#:#export_created#:#Eine neue Exportdatei wurde erstellt.
 exp#:#export_files_deleted#:#Die ausgewählten Exportdateien wurden gelöscht.
+exp#:#export_options#:#Export Optionen
+exp#:#export_type#:#Export Typ
 export#:#exp_export_dropdown#:#Export
 export#:#exp_file#:#Dateiname
 export#:#exp_public_access#:#Öffentlicher Zugriff aktiv

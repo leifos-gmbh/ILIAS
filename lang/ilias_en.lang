@@ -9670,6 +9670,8 @@ exp#:#exp_show_print_view#:#Show Print View
 exp#:#exp_xml#:#XML
 exp#:#export_created#:#A new export file has been created.
 exp#:#export_files_deleted#:#The selected export files have been deleted.
+exp#:#export_options#:#Export Options
+exp#:#export_type#:#Export Type
 export#:#exp_export_dropdown#:#Export
 export#:#exp_file#:#File Name
 export#:#exp_public_access#:#Public Access

@@ -40,7 +40,7 @@ class ilLearningModuleExportOptionXML extends ilLegacyExportOption
 
     public function getExportOptionId(): string
     {
-        return 'ilLearningModuleExportOptionXML';
+        return 'lm_exp_option_xml';
     }
 
     public function getSupportedRepositoryObjectTypes(): array
@@ -62,7 +62,8 @@ class ilLearningModuleExportOptionXML extends ilLegacyExportOption
 
     public function getLabel(): string
     {
-        return $this->lng->txt("lm_xml_export");
+        $this->lng->loadLanguageModule('exp');
+        return $this->lng->txt("exp_xml");
     }
 
     public function onExportOptionSelected(\ILIAS\Export\ExportHandler\I\Consumer\Context\HandlerInterface $context): void

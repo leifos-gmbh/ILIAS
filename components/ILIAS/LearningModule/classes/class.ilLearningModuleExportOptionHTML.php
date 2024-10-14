@@ -53,7 +53,7 @@ class ilLearningModuleExportOptionHTML extends ilBasicExportOption
 
     public function getExportOptionId(): string
     {
-        return "ilLearningModuleExportOptionHTML";
+        return "lm_exp_option_html";
     }
 
     public function getSupportedRepositoryObjectTypes(): array
@@ -63,7 +63,8 @@ class ilLearningModuleExportOptionHTML extends ilBasicExportOption
 
     public function getLabel(): string
     {
-        return $this->lng->txt("lm_html_label");
+        $this->lng->loadLanguageModule('exp');
+        return $this->lng->txt("exp_html");
     }
 
     public function onDeleteFiles(

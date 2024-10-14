@@ -196,15 +196,6 @@ class ilObjContentObjectGUI extends ilObjectGUI
             $cmd = $this->ctrl->getCmd("chapters");
         }
 
-        switch ($cmd) {
-            case "doExportXML":
-            case "doExportHTML":
-            case "showExportOptionsXML":
-            case "showExportOptionsHTML":
-                $this->$cmd();
-                return;
-        }
-
         switch ($next_class) {
             case 'illtiproviderobjectsettinggui':
 
@@ -346,15 +337,24 @@ class ilObjContentObjectGUI extends ilObjectGUI
                 break;
 
             case "ilexportgui":
-                // it is important to reset the "transl" parameter here
-                // otherwise it will effect the HTML export and overwrite the selected language
-                $this->ctrl->setParameterByClass(ilObjLearningModuleGUI::class, "transl", "");
-                $this->ctrl->setParameterByClass(ilLMEditorGUI::class, "transl", "");
-                $exp_gui = new ilExportGUI($this);
-                $this->ctrl->forwardCommand($exp_gui);
-                $this->addHeaderAction();
-                $this->addLocations(true);
-                $this->setTabs("export");
+                switch ($cmd) {
+                    case "doExportXML":
+                    case "doExportHTML":
+                    case "showExportOptionsXML":
+                    case "showExportOptionsHTML":
+                        $this->$cmd();
+                        break;
+                    default:
+                        // it is important to reset the "transl" parameter here
+                        // otherwise it will effect the HTML export and overwrite the selected language
+                        $this->ctrl->setParameterByClass(ilObjLearningModuleGUI::class, "transl", "");
+                        $this->ctrl->setParameterByClass(ilLMEditorGUI::class, "transl", "");
+                        $exp_gui = new ilExportGUI($this);
+                        $this->ctrl->forwardCommand($exp_gui);
+                        $this->addHeaderAction();
+                        $this->addLocations(true);
+                        $this->setTabs("export");
+                }
                 break;
 
             case 'ilobjecttranslationgui':
@@ -448,6 +448,7 @@ class ilObjContentObjectGUI extends ilObjectGUI
 
     protected function buildExportOptionsFormHTML(): ILIAS\UI\Component\Input\Container\Form\Standard
     {
+        $this->lng->loadLanguageModule('exp');
         $ot = ilObjectTranslation::getInstance($this->lm->getId());
         $items = [];
         if ($ot->getContentActivated()) {
@@ -475,6 +476,7 @@ class ilObjContentObjectGUI extends ilObjectGUI
 
     protected function buildExportOptionsFormXML(): ILIAS\UI\Component\Input\Container\Form\Standard
     {
+        $this->lng->loadLanguageModule('exp');
         $ot = ilObjectTranslation::getInstance($this->lm->getId());
         $items = [];
         if ($ot->getContentActivated()) {

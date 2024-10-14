@@ -173,8 +173,8 @@ class Handler implements ilExportHandlerManagerInterface
         ilFileUtils::delDir($export_info->getLegacyExportRunDir());
 
         # Test special case
-        # Remove export if the component is Test
-        if ($export_info->getTarget()->getType() === "tst") {
+        # Remove export if the component is Test, TestQuestionPool
+        if (in_array($export_info->getTarget()->getType(), ["tst", "qpl"])) {
             $keys = $this->export_handler->repository()->key()->collection()
                 ->withElement($element->getKey());
             $this->export_handler->repository()->handler()->deleteElements(

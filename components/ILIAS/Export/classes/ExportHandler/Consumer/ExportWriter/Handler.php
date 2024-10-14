@@ -100,12 +100,33 @@ class Handler implements ilExportHandlerConsumerExportWriterInterface
             return;
         }
         foreach ($files as $file) {
-            if (in_array($file, ['.', '..'])) {
+            $file_path = $dir_path . DIRECTORY_SEPARATOR . $file;
+            if (in_array($file, ['.', '..']) || is_dir($file_path)) {
                 continue;
             }
-            $file_path = $dir_path . DIRECTORY_SEPARATOR . $file;
             $file_path_in_container = $dir_path_in_container . DIRECTORY_SEPARATOR . $file;
             $this->writeFileByFilePath($file_path, $file_path_in_container);
+        }
+    }
+
+    public function writeDirectoryRecursive(
+        string $dir_path,
+        string $dir_path_in_container
+    ): void {
+        $dirs = [[$dir_path, $dir_path_in_container]];
+        while (count($dirs) > 0) {
+            $cur_path = $dirs[0][0];
+            $cur_path_in_container = $dirs[0][1];
+            array_shift($dirs);
+            $this->writeDirectory($cur_path, $cur_path_in_container);
+            foreach (scandir($cur_path) as $file) {
+                $path = $cur_path . DIRECTORY_SEPARATOR . $file;
+                $path_in_container = $cur_path_in_container . DIRECTORY_SEPARATOR . $file;
+                if (in_array($file, ['.', '..']) || !is_dir($path)) {
+                    continue;
+                }
+                $dirs[] = [$path, $path_in_container];
+            }
         }
     }
 

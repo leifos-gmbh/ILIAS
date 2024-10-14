@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Export\ExportHandler\Info\Export;
 
+use ilExport;
 use ILIAS\Data\ObjectId;
 use ILIAS\Export\ExportHandler\I\FactoryInterface as ilExportHandlerFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\Component\CollectionInterface as ilExportHandlerExportComponentInfoCollectionInterface;
@@ -156,6 +157,11 @@ class handler implements ilExportHandlerExportInfoInterface
         return $this->export_target;
     }
 
+    public function getTimestamp(): int
+    {
+        return $this->time_stamp;
+    }
+
     public function getTargetObjectId(): ObjectId
     {
         return new ObjectId($this->export_target->getObjectIds()[0]);
@@ -185,6 +191,18 @@ class handler implements ilExportHandlerExportInfoInterface
     public function getHTTPPath(): string
     {
         return ILIAS_HTTP_PATH;
+    }
+
+    public function getLegacyExportRunDir(): string
+    {
+        $object_id = $this->getTargetObjectId()->toInt();
+        $type = $this->getTarget()->getType();
+        ilExport::_createExportDirectory($object_id, "xml", $type);
+        $export_dir = ilExport::_getExportDirectory($object_id, "xml", $type);
+        $ts = $this->getTimestamp();
+        $sub_dir = $this->getExportFolderName();
+        $export_run_dir = $export_dir . DIRECTORY_SEPARATOR . $sub_dir;
+        return $export_run_dir;
     }
 
     public function getInstallationId(): string

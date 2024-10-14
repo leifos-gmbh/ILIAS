@@ -53,6 +53,8 @@ interface HandlerInterface
 
     public function getTarget(): ilExportHandlerTargetInterface;
 
+    public function getTimeStamp(): int;
+
     public function getTargetObjectId(): ObjectId;
 
     public function withContainerExportInfo(
@@ -70,6 +72,8 @@ interface HandlerInterface
     public function getZipFileName(): string;
 
     public function getHTTPPath(): string;
+
+    public function getLegacyExportRunDir(): string;
 
     public function getInstallationId(): string;
 

@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\Export\ExportHandler\Manager;
 
 use ilAccessHandler;
+use ilFileUtils;
 use ILIAS\components\ResourceStorage\Container\Wrapper\ZipReader;
 use ILIAS\Data\ObjectId;
 use ILIAS\Data\ReferenceId;
@@ -136,6 +137,10 @@ class Handler implements ilExportHandlerManagerInterface
         ilExportHandlerExportInfoInterface $export_info,
         string $path_in_container
     ): ilExportHandlerRepositoryElementInterface {
+        # make legacy export run dir
+        # tmp solution, remove later if no longer needed
+        ilFileUtils::makeDirParents($export_info->getLegacyExportRunDir());
+
         $stakeholder = $this->export_handler->repository()->stakeholder()->handler()->withOwnerId($user_id);
         $object_id = new ObjectId($export_info->getTarget()->getObjectIds()[0]);
         $element = $this->export_handler->repository()->handler()->createElement(
@@ -144,6 +149,18 @@ class Handler implements ilExportHandlerManagerInterface
             $stakeholder
         );
         $this->writeToElement($path_in_container, $export_info, $element);
+
+        # write files from legacy export run dir to irss
+        # tmp solution, remove later if no longer needed
+        $writer = $this->export_handler->consumer()->handler()->exportWriter($element);
+        $writer->writeDirectoryRecursive(
+            $export_info->getLegacyExportRunDir(),
+            $export_info->getExportFolderName()
+        );
+
+        # delete legacy export run dir
+        # tmp solution, remove later if no longer needed
+        ilFileUtils::delDir($export_info->getLegacyExportRunDir());
         return $element;
     }
 

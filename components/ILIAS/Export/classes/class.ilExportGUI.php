@@ -317,9 +317,13 @@ class ilExportGUI
         }
         $manager = $this->export_handler->manager()->handler();
         if (count($ref_ids_all) === 1) {
+            $export_info = $manager->getExportInfo(
+                new ObjectId($this->obj->getId()),
+                time()
+            );
             $element = $manager->createExport(
                 $this->il_user->getId(),
-                $manager->getExportInfo(new ObjectId($this->obj->getId()), time()),
+                $export_info,
                 ""
             );
         }

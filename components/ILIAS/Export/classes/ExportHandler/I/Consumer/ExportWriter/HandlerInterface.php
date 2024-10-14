@@ -53,6 +53,11 @@ interface HandlerInterface
         string $dir_path_in_container
     ): void;
 
+    public function writeDirectoryRecursive(
+        string $dir_path,
+        string $dir_path_in_container
+    ): void;
+
     public function writeFilesByResourceCollectionId(
         string $resource_id_serialized,
         string $path_in_container

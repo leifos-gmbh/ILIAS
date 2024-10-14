@@ -2,6 +2,7 @@
 
 namespace ILIAS\Export\ExportHandler\Part\Component;
 
+use ilExport;
 use ILIAS\Export\ExportHandler\I\FactoryInterface as ilExportHandlerFactoryInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\Component\HandlerInterface as ilExportHanlderExportComponentInfoInterface;
 use ILIAS\Export\ExportHandler\I\Info\Export\HandlerInterface as ilExportHanlderExportInfoInterface;
@@ -53,21 +54,26 @@ class Handler implements ilExportHandlerPartComponentInterface
         if ($this->component_info->usesDataset()) {
             $attribs["xmlns:ds"] = $this->component_info->getDatasetNamespace();
         }
-        $export_writer = new ilXmlWriter();
-        $export_writer->xmlHeader();
-        $export_writer->xmlStartTag('exp:Export', $attribs);
+        $xml_writer = new ilXmlWriter();
+        $xml_writer->xmlHeader();
+        $xml_writer->xmlStartTag('exp:Export', $attribs);
         foreach ($this->component_info->getTarget()->getObjectIds() as $id) {
-            $export_writer->xmlStartTag('exp:ExportItem', array("Id" => $id));
-            $comp_exporter = $this->component_info->getComponentExporter($this->export_info->getCurrentElement());
+            $xml_writer->xmlStartTag('exp:ExportItem', array("Id" => $id));
+            $writer = $this->export_handler->consumer()->handler()->exportWriter($this->export_info->getCurrentElement());
+            $export = new ilExport();
+            $export->setExportDirInContainer($this->component_info->getComponentExportDirPathInContainer());
+            $export->setExportWriter($writer);
+            $export->export_run_dir = $this->export_info->getLegacyExportRunDir();
+            $comp_exporter = $this->component_info->getComponentExporter($export);
             $xml = $comp_exporter->getXmlRepresentation(
                 $this->component_info->getTarget()->getType(),
                 $this->component_info->getSchemaVersion(),
                 (string) $id
             );
-            $export_writer->appendXML($xml);
-            $export_writer->xmlEndTag('exp:ExportItem');
+            $xml_writer->appendXML($xml);
+            $xml_writer->xmlEndTag('exp:ExportItem');
         }
-        $export_writer->xmlEndTag('exp:Export');
-        return $export_writer->xmlDumpMem($formatted);
+        $xml_writer->xmlEndTag('exp:Export');
+        return $xml_writer->xmlDumpMem($formatted);
     }
 }

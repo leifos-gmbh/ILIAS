@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Export\ExportHandler\I\Info\Export\Component;
 
+use ilExport;
 use ILIAS\Export\ExportHandler\I\Info\Export\Component\CollectionInterface as ilExportHandlerExportComponentInfoCollectionInterface;
 use ILIAS\Export\ExportHandler\I\Repository\Element\HandlerInterface as ilExportHandlerRepositoryElementInterface;
 use ILIAS\Export\ExportHandler\I\Target\HandlerInterface as ilExportHandlerTargetInterface;
@@ -42,7 +43,7 @@ interface HandlerInterface
     public function getXSDSchemaLocation(): string;
 
     public function getComponentExporter(
-        ilExportHandlerRepositoryElementInterface $element
+        ilExport $il_export
     ): ilXmlExporter;
 
     public function getHeadComponentInfos(): ilExportHandlerExportComponentInfoCollectionInterface;

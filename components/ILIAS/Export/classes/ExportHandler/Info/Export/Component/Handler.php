@@ -111,15 +111,11 @@ class Handler implements ilExportHandlerExportComponentInfoInterface
     }
 
     public function getComponentExporter(
-        ilExportHandlerRepositoryElementInterface $element
+        ilExport $il_export
     ): ilXmlExporter {
         /** @var ilXmlExporter $exporter */
-        $export_writer = $this->export_handler->consumer()->handler()->exportWriter($element);
-        $export = new ilExport();
-        $export->setExportDirInContainer($this->component_export_dir_path_in_container);
-        $export->setExportWriter($export_writer);
         $exporter = new ($this->exporter_class_name)();
-        $exporter->setExport($export);
+        $exporter->setExport($il_export);
         $exporter->init();
         return $exporter;
     }

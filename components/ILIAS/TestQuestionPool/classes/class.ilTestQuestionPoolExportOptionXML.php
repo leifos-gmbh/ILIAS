@@ -27,7 +27,7 @@ use ILIAS\Export\ExportHandler\I\Info\File\CollectionInterface as ilExportHandle
 use ILIAS\Export\ExportHandler\I\Consumer\File\Identifier\CollectionInterface as ilExportHandlerConsumerFileIdentifierCollectionInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\File\Identifier\HandlerInterface as ilExportHandlerConsumerFileIdentifierInterface;
 
-class ilTestQuestionPoolExportOptionXLSX extends ilBasicLegacyExportOption
+class ilTestQuestionPoolExportOptionXML extends ilBasicLegacyExportOption
 {
     protected ilLanguage $lng;
     protected ilCtrl $ctrl;
@@ -40,12 +40,12 @@ class ilTestQuestionPoolExportOptionXLSX extends ilBasicLegacyExportOption
 
     public function getExportType(): string
     {
-        return 'xlsx';
+        return 'xml';
     }
 
     public function getExportOptionId(): string
     {
-        return 'qpl_exp_option_xlsx';
+        return 'qpl_exp_option_xml';
     }
 
     public function getSupportedRepositoryObjectTypes(): array
@@ -55,7 +55,7 @@ class ilTestQuestionPoolExportOptionXLSX extends ilBasicLegacyExportOption
 
     public function getLabel(): string
     {
-        return $this->lng->txt('qpl_export_excel');
+        return $this->lng->txt('exp_xml');
     }
 
     public function onDeleteFiles(
@@ -134,10 +134,11 @@ class ilTestQuestionPoolExportOptionXLSX extends ilBasicLegacyExportOption
         return $collection_builder->collection();
     }
 
+
     public function onExportOptionSelected(
         ilExportHandlerConsumerContextInterface $context
     ): void {
-        $this->ctrl->redirectByClass(ilObjQuestionPoolGUI::class, ilObjQuestionPoolGUI::CREATE_XLSX_EXPORT);
+        $this->ctrl->redirect($context->exportGUIObject(), ilExportGUI::CMD_EXPORT_XML);
     }
 
     protected function getExportFiles(
@@ -150,7 +151,7 @@ class ilTestQuestionPoolExportOptionXLSX extends ilBasicLegacyExportOption
                 if (
                     $entry !== "." &&
                     $entry !== ".." &&
-                    substr($entry, -5) === ".xlsx"
+                    substr($entry, -4) === ".zip"
                 ) {
                     $ts = substr($entry, 0, strpos($entry, "__"));
                     $file[$entry . $this->getExportType()] = [
@@ -176,7 +177,7 @@ class ilTestQuestionPoolExportOptionXLSX extends ilBasicLegacyExportOption
             "",
             $object_type
         );
-        $dir .= "xlsx";
+        $dir .= "zip";
         return $dir;
     }
 }

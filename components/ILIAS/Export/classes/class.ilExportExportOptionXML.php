@@ -59,9 +59,10 @@ class ilExportExportOptionXML extends ilBasicExportOption
 
     public function getSupportedRepositoryObjectTypes(): array
     {
-        // The standard xml export is a special case.
-        // It is by default always enabled, independend of the object types returned.
-        // Therefore no object types are returned.
+        # The standard xml export is a special case.
+        # It is by default always enabled, independend of the object types returned.
+        # Therefore no object types are returned.
+        # The only exception are the special cases: Test, TestQuestionPool
         return [];
     }
 

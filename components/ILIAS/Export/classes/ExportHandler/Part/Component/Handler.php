@@ -64,6 +64,10 @@ class Handler implements ilExportHandlerPartComponentInterface
             $export->setExportDirInContainer($this->component_info->getComponentExportDirPathInContainer());
             $export->setExportWriter($writer);
             $export->export_run_dir = $this->export_info->getLegacyExportRunDir();
+            $export->setExportDirectories(
+                $this->export_info->getExportFolderName(),
+                $this->export_info->getLegacyExportRunDir()
+            );
             $comp_exporter = $this->component_info->getComponentExporter($export);
             $xml = $comp_exporter->getXmlRepresentation(
                 $this->component_info->getTarget()->getType(),

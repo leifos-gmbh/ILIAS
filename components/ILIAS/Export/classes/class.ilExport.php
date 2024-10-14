@@ -30,6 +30,8 @@ class ilExport
      * @todo currently used in ilLeanringModuleExporter
      */
     public string $export_run_dir = '';
+    protected string $dir_relative = "";
+    protected string $dir_absolute = "";
 
     protected ilLogger $log;
     protected ilExportHandlerConsumerExportWriterInterface $export_writer;
@@ -69,6 +71,24 @@ class ilExport
     public function getExportDirInContainer(): string
     {
         return $this->export_dir_in_container;
+    }
+
+    public function setExportDirectories(
+        string $a_dir_relative,
+        string $a_dir_absolute
+    ): void {
+        $this->dir_relative = $a_dir_relative;
+        $this->dir_absolute = $a_dir_absolute;
+    }
+
+    public function getRelativeExportDirectory(): string
+    {
+        return $this->dir_relative;
+    }
+
+    public function getAbsoluteExportDirectory(): string
+    {
+        return $this->dir_absolute;
     }
 
     public function setExportWriter(

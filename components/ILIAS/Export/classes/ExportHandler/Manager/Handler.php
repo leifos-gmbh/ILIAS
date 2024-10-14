@@ -108,14 +108,24 @@ class Handler implements ilExportHandlerManagerInterface
         $main_element = $this->createExport($user_id, $main_export_info, "set_" . $main_export_info->getSetNumber());
         $repository = $this->export_handler->repository();
         foreach ($container_export_info->getExportInfos() as $export_info) {
-            $keys = $repository->key()->collection()->withElement($repository->key()->handler()->withObjectId($export_info->getTargetObjectId()));
-            $element = $export_info->getReuseExport()
-                ? $this->export_handler->repository()->handler()->getElements($keys)->newest()
-                : $this->createExport($user_id, $export_info, "");
-            $element = $element->getIRSS()->isContainerExport()
-                ? $this->createExport($user_id, $export_info, "")
-                : $element;
-            $zip_reader = new ZipReader($element->getIRSSInfo()->getStream());
+            # Test special case (Test does not return a xml export), does something different
+            $stream = null;
+            if ($export_info->getTarget()->getType() === "tst") {
+                $this->createExport($user_id, $export_info, "");
+                $stream = Streams::ofResource(fopen($export_info->getLegacyExportRunDir() . ".zip", 'r'));
+            }
+            if ($export_info->getTarget()->getType() !== "tst") {
+                $keys = $repository->key()->collection()
+                    ->withElement($repository->key()->handler()->withObjectId($export_info->getTargetObjectId()));
+                $element = $export_info->getReuseExport()
+                    ? $this->export_handler->repository()->handler()->getElements($keys)->newest()
+                    : $this->createExport($user_id, $export_info, "");
+                $element = $element->getIRSS()->isContainerExport()
+                    ? $this->createExport($user_id, $export_info, "")
+                    : $element;
+                $stream = $element->getIRSSInfo()->getStream();
+            }
+            $zip_reader = new ZipReader($stream);
             $zip_structure = $zip_reader->getStructure();
             foreach ($zip_structure as $path_inside_zip => $item) {
                 if ($item['is_dir']) {
@@ -162,6 +172,7 @@ class Handler implements ilExportHandlerManagerInterface
         # tmp solution, remove later if no longer needed
         ilFileUtils::delDir($export_info->getLegacyExportRunDir());
 
+        # Test special case
         # Remove export if the component is Test
         if ($export_info->getTarget()->getType() === "tst") {
             $keys = $this->export_handler->repository()->key()->collection()

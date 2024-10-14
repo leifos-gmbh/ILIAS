@@ -180,6 +180,10 @@ class ilExportGUI
 
     protected function enableStandardXMLExport(): void
     {
+        # Exception for Test
+        if ($this->obj->getType() === "tst") {
+            return;
+        }
         $this->export_options = $this->export_options->withElement(new ilExportExportOptionXML());
     }
 

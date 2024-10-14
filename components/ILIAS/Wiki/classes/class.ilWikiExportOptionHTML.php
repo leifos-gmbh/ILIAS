@@ -45,7 +45,7 @@ class ilWikiExportOptionHTML extends ilBasicLegacyExportOption
 
     public function getExportOptionId(): string
     {
-        return 'ilWikiExportOptionHTML';
+        return 'wiki_exp_option_html';
     }
 
     public function getSupportedRepositoryObjectTypes(): array

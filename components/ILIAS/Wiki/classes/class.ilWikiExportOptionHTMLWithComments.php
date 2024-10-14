@@ -45,7 +45,7 @@ class ilWikiExportOptionHTMLWithComments extends ilBasicLegacyExportOption
 
     public function getExportOptionId(): string
     {
-        return 'ilWikiExportOptionHTMLWithComments';
+        return 'wiki_exp_option_html_with_comments';
     }
 
     public function getSupportedRepositoryObjectTypes(): array

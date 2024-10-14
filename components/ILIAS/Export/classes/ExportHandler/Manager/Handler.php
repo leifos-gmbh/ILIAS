@@ -108,13 +108,14 @@ class Handler implements ilExportHandlerManagerInterface
         $main_element = $this->createExport($user_id, $main_export_info, "set_" . $main_export_info->getSetNumber());
         $repository = $this->export_handler->repository();
         foreach ($container_export_info->getExportInfos() as $export_info) {
-            # Test special case (Test does not return a xml export), does something different
             $stream = null;
-            if ($export_info->getTarget()->getType() === "tst") {
+            # Test, TestQuestionPool special case (Test does not return a xml export)
+            $special_case = in_array($export_info->getTarget()->getType(), ["tst", "qpl"]);
+            if ($special_case) {
                 $this->createExport($user_id, $export_info, "");
                 $stream = Streams::ofResource(fopen($export_info->getLegacyExportRunDir() . ".zip", 'r'));
             }
-            if ($export_info->getTarget()->getType() !== "tst") {
+            if (!$special_case) {
                 $keys = $repository->key()->collection()
                     ->withElement($repository->key()->handler()->withObjectId($export_info->getTargetObjectId()));
                 $element = $export_info->getReuseExport()
@@ -169,7 +170,7 @@ class Handler implements ilExportHandlerManagerInterface
         );
 
         # delete legacy export run dir
-        # tmp solution, remove later if no longer needed
+        # tmp solution, remove if no longer needed
         ilFileUtils::delDir($export_info->getLegacyExportRunDir());
 
         # Test special case

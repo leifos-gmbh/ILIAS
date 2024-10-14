@@ -27,27 +27,25 @@ use ILIAS\Export\ExportHandler\I\Info\File\CollectionInterface as ilExportHandle
 use ILIAS\Export\ExportHandler\I\Consumer\File\Identifier\CollectionInterface as ilExportHandlerConsumerFileIdentifierCollectionInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\File\Identifier\HandlerInterface as ilExportHandlerConsumerFileIdentifierInterface;
 
-class ilTestExportOptionARC extends ilBasicLegacyExportOption
+class ilTestExportOptionXML extends ilBasicLegacyExportOption
 {
     protected ilLanguage $lng;
-    protected ILIAS $ilias;
 
     public function init(
         Container $DIC
     ): void {
         $this->lng = $DIC->language();
-        $this->ilias = $DIC['ilias'];
         parent::init($DIC);
     }
 
     public function getExportType(): string
     {
-        return 'Archive';
+        return 'ZIP';
     }
 
     public function getExportOptionId(): string
     {
-        return 'test_exp_option_arc';
+        return 'test_exp_option_xml';
     }
 
     public function getSupportedRepositoryObjectTypes(): array
@@ -57,7 +55,7 @@ class ilTestExportOptionARC extends ilBasicLegacyExportOption
 
     public function getLabel(): string
     {
-        return $this->lng->txt('ass_create_export_test_archive');
+        return $this->lng->txt('ass_create_export_file');
     }
 
     public function onDeleteFiles(
@@ -131,7 +129,7 @@ class ilTestExportOptionARC extends ilBasicLegacyExportOption
     public function onExportOptionSelected(
         ilExportHandlerConsumerContextInterface $context
     ): void {
-        $context->exportGUIObject()->createTestArchiveExport();
+        $this->ctrl->redirect($context->exportGUIObject(), $context->exportGUIObject()::CMD_EXPORT_XML);
     }
 
     protected function getExportFiles(
@@ -142,18 +140,32 @@ class ilTestExportOptionARC extends ilBasicLegacyExportOption
             $h_dir = dir($directory);
             while ($entry = $h_dir->read()) {
                 if (
-                    $entry !== "." &&
-                    $entry !== ".." &&
-                    substr($entry, -4) === ".zip"
+                    $entry === "." ||
+                    $entry === ".." ||
+                    substr($entry, -4) !== ".zip"
                 ) {
-                    $ts = substr($entry, 0, strpos($entry, "__"));
-                    $file[$entry . $this->getExportType()] = [
-                        "type" => $this->getExportType(),
-                        "file" => $entry,
-                        "size" => (int) filesize($directory . "/" . $entry),
-                        "timestamp" => (int) $ts
-                    ];
+                    continue;
                 }
+                $zip_archive = new ZipArchive();
+                $zip_archive->open($directory . DIRECTORY_SEPARATOR . $entry);
+                $is_result = false;
+                for($i = 0; $i < $zip_archive->numFiles; $i++) {
+                    $stat = $zip_archive->statIndex($i);
+                    if (str_contains(basename($stat['name']), "results")) {
+                        $is_result = true;
+                        break;
+                    }
+                }
+                if ($is_result) {
+                    continue;
+                }
+                $ts = substr($entry, 0, strpos($entry, "__"));
+                $file[$entry . $this->getExportType()] = [
+                    "type" => $this->getExportType(),
+                    "file" => $entry,
+                    "size" => (int) filesize($directory . "/" . $entry),
+                    "timestamp" => (int) $ts
+                ];
             }
         } catch (Exception $e) {
 
@@ -165,8 +177,12 @@ class ilTestExportOptionARC extends ilBasicLegacyExportOption
         ObjectId $object_id,
         string $export_object_type
     ): string {
-        return $path = $this->ilias->ini_ilias->readVariable('clients', 'datadir')
-            . ilTestArchiver::DIR_SEP . CLIENT_ID . ilTestArchiver::DIR_SEP . 'tst_data' . ilTestArchiver::DIR_SEP
-            . ilTestArchiver::EXPORT_DIRECTORY . DIRECTORY_SEPARATOR . $export_object_type . "_" . $object_id->toInt();
+        $dir = ilExport::_getExportDirectory(
+            $object_id->toInt(),
+            "",
+            $export_object_type
+        );
+        $dir = substr($dir, 0, strlen($dir) - 1);
+        return $dir;
     }
 }

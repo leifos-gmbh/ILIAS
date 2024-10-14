@@ -40,12 +40,12 @@ class ilTestExportOptionXMLRES extends ilBasicLegacyExportOption
 
     public function getExportType(): string
     {
-        return 'ZIP';
+        return 'ZIP Results';
     }
 
     public function getExportOptionId(): string
     {
-        return 'ilTestExportOptionXMLRES';
+        return 'test_exp_option_xmlres';
     }
 
     public function getSupportedRepositoryObjectTypes(): array
@@ -140,18 +140,32 @@ class ilTestExportOptionXMLRES extends ilBasicLegacyExportOption
             $h_dir = dir($directory);
             while ($entry = $h_dir->read()) {
                 if (
-                    $entry !== "." &&
-                    $entry !== ".." &&
-                    substr($entry, -4) === ".zip"
+                    $entry === "." ||
+                    $entry === ".." ||
+                    substr($entry, -4) !== ".zip"
                 ) {
-                    $ts = substr($entry, 0, strpos($entry, "__"));
-                    $file[$entry . $this->getExportType()] = [
-                        "type" => $this->getExportType(),
-                        "file" => $entry,
-                        "size" => (int) filesize($directory . "/" . $entry),
-                        "timestamp" => (int) $ts
-                    ];
+                    continue;
                 }
+                $zip_archive = new ZipArchive();
+                $zip_archive->open($directory . DIRECTORY_SEPARATOR . $entry);
+                $is_result = false;
+                for($i = 0; $i < $zip_archive->numFiles; $i++) {
+                    $stat = $zip_archive->statIndex($i);
+                    if (str_contains(basename($stat['name']), "results")) {
+                        $is_result = true;
+                        break;
+                    }
+                }
+                if (!$is_result) {
+                    continue;
+                }
+                $ts = substr($entry, 0, strpos($entry, "__"));
+                $file[$entry . $this->getExportType()] = [
+                    "type" => $this->getExportType(),
+                    "file" => $entry,
+                    "size" => (int) filesize($directory . "/" . $entry),
+                    "timestamp" => (int) $ts
+                ];
             }
         } catch (Exception $e) {
 

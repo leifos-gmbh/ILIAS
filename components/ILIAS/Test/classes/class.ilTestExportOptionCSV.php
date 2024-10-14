@@ -45,7 +45,7 @@ class ilTestExportOptionCSV extends ilBasicLegacyExportOption
 
     public function getExportOptionId(): string
     {
-        return 'ilTestExportOptionCSV';
+        return 'test_exp_option_csv';
     }
 
     public function getSupportedRepositoryObjectTypes(): array

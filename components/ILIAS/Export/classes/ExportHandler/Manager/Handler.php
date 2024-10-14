@@ -161,6 +161,16 @@ class Handler implements ilExportHandlerManagerInterface
         # delete legacy export run dir
         # tmp solution, remove later if no longer needed
         ilFileUtils::delDir($export_info->getLegacyExportRunDir());
+
+        # Remove export if the component is Test
+        if ($export_info->getTarget()->getType() === "tst") {
+            $keys = $this->export_handler->repository()->key()->collection()
+                ->withElement($element->getKey());
+            $this->export_handler->repository()->handler()->deleteElements(
+                $keys,
+                $stakeholder
+            );
+        }
         return $element;
     }
 

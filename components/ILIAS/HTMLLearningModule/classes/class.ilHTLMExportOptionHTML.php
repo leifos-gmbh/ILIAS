@@ -45,11 +45,6 @@ class ilHTLMExportOptionHTML extends ilLegacyExportOption
         return "htlm_exp_option_html";
     }
 
-    public function isPublicAccessPossible(): bool
-    {
-        return true;
-    }
-
     public function getSupportedRepositoryObjectTypes(): array
     {
         return ["htlm"];

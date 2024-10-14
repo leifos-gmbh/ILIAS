@@ -45,7 +45,7 @@ class ilBlogExportOptionHTML extends ilBasicLegacyExportOption
 
     public function getExportOptionId(): string
     {
-        return 'ilBlogExportOptionHTML';
+        return 'blog_exp_option_html';
     }
 
     public function getSupportedRepositoryObjectTypes(): array

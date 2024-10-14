@@ -45,7 +45,7 @@ class ilGlossaryExportOptionHTML extends ilBasicLegacyExportOption
 
     public function getExportOptionId(): string
     {
-        return 'ilGlossaryExportOptionHTML';
+        return 'glo_exp_option_html';
     }
 
     public function getSupportedRepositoryObjectTypes(): array

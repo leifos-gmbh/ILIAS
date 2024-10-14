@@ -26,10 +26,12 @@ use ILIAS\DI\Container;
 class ilHTLMExportOption extends ilLegacyExportOption
 {
     protected ilCtrl $ctrl;
+    protected ilLanguage $lng;
 
     public function init(Container $DIC): void
     {
         $this->ctrl = $DIC->ctrl();
+        $this->lng = $DIC->language();
         parent::init($DIC);
     }
 
@@ -40,7 +42,7 @@ class ilHTLMExportOption extends ilLegacyExportOption
 
     public function getExportOptionId(): string
     {
-        return "ilHTMLExportOption01";
+        return "htlm_exp_option_html";
     }
 
     public function isPublicAccessPossible(): bool
@@ -55,7 +57,8 @@ class ilHTLMExportOption extends ilLegacyExportOption
 
     public function getLabel(): string
     {
-        return "HTML export label";
+        $this->lng->loadLanguageModule('exp');
+        return $this->lng->txt("exp_html");
     }
 
     public function onExportOptionSelected(

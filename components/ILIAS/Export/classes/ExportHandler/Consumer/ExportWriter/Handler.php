@@ -85,6 +85,9 @@ class Handler implements ilExportHandlerConsumerExportWriterInterface
         string $path_to_file,
         string $path_in_container
     ): void {
+        if ($path_to_file === "") {
+            return;
+        }
         $this->writeFileByStream(
             Streams::ofResource(fopen($path_to_file, 'r')),
             $path_in_container
@@ -95,6 +98,9 @@ class Handler implements ilExportHandlerConsumerExportWriterInterface
         string $dir_path,
         string $dir_path_in_container
     ): void {
+        if ($dir_path === "") {
+            return;
+        }
         $files = scandir($dir_path);
         if (!$files) {
             return;
@@ -113,6 +119,9 @@ class Handler implements ilExportHandlerConsumerExportWriterInterface
         string $dir_path,
         string $dir_path_in_container
     ): void {
+        if ($dir_path === "") {
+            return;
+        }
         $dirs = [[$dir_path, $dir_path_in_container]];
         while (count($dirs) > 0) {
             $cur_path = $dirs[0][0];

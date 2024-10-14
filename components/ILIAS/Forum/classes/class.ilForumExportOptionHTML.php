@@ -40,7 +40,7 @@ class ilForumExportOptionHTML extends ilBasicLegacyExportOption
 
     public function getExportOptionId(): string
     {
-        return 'ilForumExportOptionHTML';
+        return 'frm_exp_option_html';
     }
 
     public function getSupportedRepositoryObjectTypes(): array

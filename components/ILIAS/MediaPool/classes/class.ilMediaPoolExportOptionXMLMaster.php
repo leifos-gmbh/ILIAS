@@ -103,28 +103,24 @@ class ilMediaPoolExportOptionXMLMaster extends ilBasicLegacyExportOption
     ): void {
         foreach ($file_identifiers as $file_identifier) {
             $file = explode(":", $file_identifier->getIdentifier());
-
             $file[1] = basename($file[1]);
-
             $export_dir = ilExport::_getExportDirectory(
                 $context->exportObject()->getId(),
                 "",
                 $context->exportObject()->getType()
             );
             $export_dir = substr($export_dir, 0, strlen($export_dir) - 1);
-
             $exp_file = $export_dir . "/" . str_replace("..", "", $file[1]);
             $exp_dir = $export_dir . "/" . substr($file[1], 0, strlen($file[1]) - 4);
             if (is_file($exp_file)) {
                 unlink($exp_file);
             }
-            if (is_dir($exp_dir)) {
+            if (
+                is_dir($exp_dir) and
+                count(scandir($exp_dir)) === 2
+            ) {
                 ilFileUtils::delDir($exp_dir);
             }
-
-            // delete entry in database
-            $info = new ilExportFileInfo($context->exportObject()->getId(), $file[0], $file[1]);
-            $info->delete();
         }
     }
 

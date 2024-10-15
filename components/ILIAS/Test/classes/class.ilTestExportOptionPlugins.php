@@ -67,7 +67,7 @@ class ilTestExportOptionPlugins extends ilBasicLegacyExportOption
         foreach ($this->component_factory->getActivePluginsInSlot('texp') as $plugin) {
             $plugin_count++;
         }
-        return $plugin_count === 0;
+        return $plugin_count > 0;
     }
 
     public function onDeleteFiles(

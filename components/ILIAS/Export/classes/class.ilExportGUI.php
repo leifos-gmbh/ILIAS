@@ -157,7 +157,7 @@ class ilExportGUI
         return [];
     }
 
-    protected function initExportOptionsFromPost(): array
+    final protected function initExportOptionsFromPost(): array
     {
         $options = [];
         if ($this->http->wrapper()->post()->has('cp_options')) {
@@ -174,12 +174,12 @@ class ilExportGUI
         return $options;
     }
 
-    protected function builtExportOptionCommand(ilExportHandlerConsumerExportOptionInterface $export_option): string
+    final protected function builtExportOptionCommand(ilExportHandlerConsumerExportOptionInterface $export_option): string
     {
         return self::CMD_EXPORT_OPTION_PREFIX . $export_option->getExportOptionId();
     }
 
-    protected function enableStandardXMLExport(): void
+    final protected function enableStandardXMLExport(): void
     {
         # Exception for Test, TestQuestionPool, OrgUnit
         if (in_array($this->obj->getType(), ["tst", "qpl"])) {
@@ -188,7 +188,7 @@ class ilExportGUI
         $this->export_options = $this->export_options->withElement(new ilExportExportOptionXML());
     }
 
-    protected function initExportOptions(): void
+    final protected function initExportOptions(): void
     {
         $export_options = $this->export_handler->consumer()->exportOption()->allExportOptions();
         foreach ($export_options as $export_option) {
@@ -201,7 +201,7 @@ class ilExportGUI
         }
     }
 
-    protected function displayExportFiles(): void
+    final protected function displayExportFiles(): void
     {
         if ($this->export_options->count() === 0) {
             return;
@@ -233,7 +233,7 @@ class ilExportGUI
         $this->tpl->setContent($table->getHTML());
     }
 
-    protected function createXMLExportFile(): void
+    final protected function createXMLExportFile(): void
     {
         if ($this->parent_gui instanceof  ilContainerGUI) {
             $this->showItemSelection();
@@ -251,7 +251,7 @@ class ilExportGUI
     /**
      * Show container item selection table
      */
-    protected function showItemSelection(): void
+    final protected function showItemSelection(): void
     {
         $this->tpl->addJavaScript('assets/js/ilContainer.js');
         $this->tpl->setVariable('BODY_ATTRIBUTES', 'onload="ilDisableChilds(\'cmd\');"');
@@ -260,7 +260,7 @@ class ilExportGUI
         $this->tpl->setContent($table->getHTML());
     }
 
-    protected function saveItemSelection(): void
+    final protected function saveItemSelection(): void
     {
         // check export limitation
         $cp_options = $this->initExportOptionsFromPost();
@@ -281,7 +281,7 @@ class ilExportGUI
         $this->ctrl->redirect($this, self::CMD_LIST_EXPORT_FILES);
     }
 
-    protected function createXMLExport()
+    final protected function createXMLExport()
     {
         $tree_nodes = $this->tree->getSubTree($this->tree->getNodeData($this->parent_gui->getObject()->getRefId()));
         $post_export_options = $this->initExportOptionsFromPost();

@@ -68,10 +68,6 @@ abstract class BasicLegacyHandler extends ilExportHandlerConsumerBasicExportOpti
             if (is_dir($exp_dir)) {
                 ilFileUtils::delDir($exp_dir);
             }
-
-            // delete entry in database
-            $info = new ilExportFileInfo($context->exportObject()->getId(), $file[0], $file[1]);
-            $info->delete();
         }
     }
 

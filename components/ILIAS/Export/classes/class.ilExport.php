@@ -26,9 +26,6 @@ use ILIAS\Export\ExportHandler\I\Consumer\ExportWriter\HandlerInterface as ilExp
  */
 class ilExport
 {
-    /**
-     * @todo currently used in ilLeanringModuleExporter
-     */
     public string $export_run_dir = '';
     protected string $dir_relative = "";
     protected string $dir_absolute = "";
@@ -152,6 +149,7 @@ class ilExport
     }
 
     /**
+     * @depricated
      * Get date of last export file
      * @param int    $a_obj_id   object id
      * @param string $a_type     export type ("xml", "html", ...), default "xml"
@@ -168,6 +166,7 @@ class ilExport
     }
 
     /**
+     * @depricated
      * Get last export file information
      * @param int    $a_obj_id   object id
      * @param string $a_type     export type ("xml", "html", ...), default "xml"
@@ -188,6 +187,7 @@ class ilExport
     }
 
     /**
+     * @depricated
      * Get export directory for an repository object
      * @param int    $a_obj_id   object id
      * @param string $a_type     export type ("xml", "html", ...), default "xml"
@@ -236,6 +236,7 @@ class ilExport
     }
 
     /**
+     * @depricated
      * @param int          $a_obj_id
      * @param string|array $a_export_types
      * @param string       $a_obj_type
@@ -315,6 +316,7 @@ class ilExport
     }
 
     /**
+     * @depricated
      * Generates an index.html file including links to all xml files included
      * (for container exports)
      */
@@ -367,6 +369,7 @@ class ilExport
      */
 
     /**
+     * @depricated
      * Export an ILIAS object (the object type must be known by objDefinition)
      * @param string $a_type           repository object type
      * @param int    $a_id             id of object or entity that shoudl be exported
@@ -448,6 +451,7 @@ class ilExport
     }
 
     /**
+     * @depricated
      * Export an ILIAS entity
      * @param string $a_entity         entity type, e.g. "sty"
      * @param mixed  $a_id             entity id
@@ -525,6 +529,7 @@ class ilExport
     }
 
     /**
+     * @depricated
      * Process exporter
      * @param string $a_comp           e.g. "components/ILIAS/Forum"
      * @param string $a_class

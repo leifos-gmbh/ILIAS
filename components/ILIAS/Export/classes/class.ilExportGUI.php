@@ -41,7 +41,7 @@ class ilExportGUI
 
     protected ilExportHandlerConsumerExportOptionCollectionInterface $export_options;
     protected ilUIServices $ui_services;
-    protected ilHTTPServices $http_services;
+    protected ilHTTPServices $http;
     protected ilRefineryFactory $refinery;
     protected ilObjUser $il_user;
     protected ilLanguage $lng;
@@ -50,6 +50,7 @@ class ilExportGUI
     protected ilCtrlInterface $ctrl;
     protected ilAccessHandler $access;
     protected ilErrorHandling $error;
+
     protected ilToolbarGUI $toolbar;
     protected ilObjectDefinition $obj_definition;
     protected ilTree $tree;
@@ -61,7 +62,7 @@ class ilExportGUI
     {
         global $DIC;
         $this->ui_services = $DIC->ui();
-        $this->http_services = $DIC->http();
+        $this->http = $DIC->http();
         $this->refinery = $DIC->refinery();
         $this->il_user = $DIC->user();
         $this->lng = $DIC->language();
@@ -159,13 +160,13 @@ class ilExportGUI
     protected function initExportOptionsFromPost(): array
     {
         $options = [];
-        if ($this->http_services->wrapper()->post()->has('cp_options')) {
+        if ($this->http->wrapper()->post()->has('cp_options')) {
             $custom_transformer = $this->refinery->custom()->transformation(
                 function ($array) {
                     return $array;
                 }
             );
-            $options = $this->http_services->wrapper()->post()->retrieve(
+            $options = $this->http->wrapper()->post()->retrieve(
                 'cp_options',
                 $custom_transformer
             );
@@ -180,8 +181,8 @@ class ilExportGUI
 
     protected function enableStandardXMLExport(): void
     {
-        # Exception for Test, TestQuestionPool
-        if (in_array($this->obj->getType(), ["tst", "qpl"])) {
+        # Exception for Test, TestQuestionPool, OrgUnit
+        if (in_array($this->obj->getType(), ["tst", "qpl", "orgu"])) {
             return;
         }
         $this->export_options = $this->export_options->withElement(new ilExportExportOptionXML());

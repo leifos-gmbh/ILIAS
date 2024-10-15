@@ -72,7 +72,10 @@ class ilTestExportOptionXML extends ilBasicLegacyExportOption
             if (is_file($exp_file)) {
                 unlink($exp_file);
             }
-            if (is_dir($exp_dir)) {
+            if (
+                is_dir($exp_dir) and
+                count(scandir($exp_dir)) === 2
+            ) {
                 ilFileUtils::delDir($exp_dir);
             }
         }

@@ -27,25 +27,28 @@ use ILIAS\Export\ExportHandler\I\Info\File\CollectionInterface as ilExportHandle
 use ILIAS\Export\ExportHandler\I\Consumer\File\Identifier\CollectionInterface as ilExportHandlerConsumerFileIdentifierCollectionInterface;
 use ILIAS\Export\ExportHandler\I\Consumer\File\Identifier\HandlerInterface as ilExportHandlerConsumerFileIdentifierInterface;
 
-class ilTestExportOptionXMLRES extends ilBasicLegacyExportOption
+class ilTestExportOptionPlugins extends ilBasicLegacyExportOption
 {
     protected ilLanguage $lng;
+    protected ILIAS\DI\UIServices $ui;
+    protected ilComponentFactory $component_factory;
 
-    public function init(
-        Container $DIC
-    ): void {
+    public function init(Container $DIC): void
+    {
         $this->lng = $DIC->language();
+        $this->ui = $DIC->ui();
+        $this->component_factory = $DIC['component.factory'];
         parent::init($DIC);
     }
 
     public function getExportType(): string
     {
-        return 'ZIP Results';
+        return "Plugin";
     }
 
     public function getExportOptionId(): string
     {
-        return 'test_exp_option_xmlres';
+        return "tst_exp_option_plugin";
     }
 
     public function getSupportedRepositoryObjectTypes(): array
@@ -55,18 +58,29 @@ class ilTestExportOptionXMLRES extends ilBasicLegacyExportOption
 
     public function getLabel(): string
     {
-        return $this->lng->txt('ass_create_export_file_with_results');
+        return $this->lng->txt("obj_cmps");
+    }
+
+    public function isObjectSupported(ObjectId $object_id): bool
+    {
+        $plugin_count = 0;
+        foreach ($this->component_factory->getActivePluginsInSlot('texp') as $plugin) {
+            $plugin_count++;
+        }
+        return $plugin_count === 0;
     }
 
     public function onDeleteFiles(
         ilExportHandlerConsumerContextInterface $context,
         ilExportHandlerConsumerFileIdentifierCollectionInterface $file_identifiers
     ): void {
-        $object_id = new ObjectId($context->exportObject()->getId());
+        $export_dir = $this->getExportDirectory(
+            $context->exportObject()->getId(),
+            $context->exportObject()->getType()
+        );
         foreach ($file_identifiers as $file_identifier) {
             $file = explode(":", $file_identifier->getIdentifier());
             $file[1] = basename($file[1]);
-            $export_dir = $this->getDirectory($object_id, $context->exportObject()->getType());
             $exp_file = $export_dir . "/" . str_replace("..", "", $file[1]);
             $exp_dir = $export_dir . "/" . substr($file[1], 0, strlen($file[1]) - 4);
             if (is_file($exp_file)) {
@@ -85,11 +99,16 @@ class ilTestExportOptionXMLRES extends ilBasicLegacyExportOption
         ilExportHandlerConsumerContextInterface $context,
         ilExportHandlerConsumerFileIdentifierCollectionInterface $file_identifiers
     ): void {
-        $object_id = new ObjectId($context->exportObject()->getId());
+        $export_dir = $this->getExportDirectory(
+            $context->exportObject()->getId(),
+            $context->exportObject()->getType()
+        );
         foreach ($file_identifiers as $file_identifier) {
             $file = explode(":", trim($file_identifier->getIdentifier()));
-            $export_dir = $this->getDirectory($object_id, $context->exportObject()->getType());
             $file[1] = basename($file[1]);
+            if (!file_exists($export_dir . "/" . $file[1])) {
+                continue;
+            }
             ilFileDelivery::deliverFileLegacy(
                 $export_dir . "/" . $file[1],
                 $file[1]
@@ -101,11 +120,17 @@ class ilTestExportOptionXMLRES extends ilBasicLegacyExportOption
         ReferenceId $reference_id,
         ilExportHandlerConsumerFileIdentifierInterface $file_identifier
     ): void {
-        $object_id = $reference_id->toObjectId();
-        $type = ilObject::_lookupType($object_id->toInt());
+        $object_id = $reference_id->toObjectId()->toInt();
+        $type = ilObject::_lookupType($object_id);
         $file = explode(":", trim($file_identifier->getIdentifier()));
-        $export_dir = $this->getDirectory($object_id, $type);
+        $export_dir = $this->getExportDirectory(
+            $object_id,
+            $type
+        );
         $file[1] = basename($file[1]);
+        if (!file_exists($export_dir . "/" . $file[1])) {
+            return;
+        }
         ilFileDelivery::deliverFileLegacy(
             $export_dir . "/" . $file[1],
             $file[1]
@@ -116,15 +141,24 @@ class ilTestExportOptionXMLRES extends ilBasicLegacyExportOption
         ilExportHandlerConsumerContextInterface $context
     ): ilExportHandlerFileInfoCollectionInterface {
         $collection_builder = $context->fileCollectionBuilder();
-        $object_id = new ObjectId($context->exportObject()->getId());
-        $dir = $this->getDirectory($object_id, $context->exportObject()->getType());
-        $file_infos = $this->getExportFiles($dir);
-        foreach ($file_infos as $file_name => $file_info) {
-            $collection_builder = $collection_builder->withSPLFileInfo(
-                new SplFileInfo($dir . DIRECTORY_SEPARATOR . $file_info["file"]),
-                $object_id,
-                $this
+        $dir = $this->getExportDirectory(
+            $context->exportObject()->getId(),
+            $context->exportObject()->getType()
+        );
+        foreach ($this->component_factory->getActivePluginsInSlot('texp') as $plugin) {
+            /** @var ilTestExportPlugin $plugin */
+            $file_infos = $this->getFileInfoForPlugin(
+                $plugin,
+                $dir
             );
+            $object_id = new ObjectId($context->exportObject()->getId());
+            foreach ($file_infos as $file_name => $file_info) {
+                $collection_builder = $collection_builder->withSPLFileInfo(
+                    new SplFileInfo($dir . DIRECTORY_SEPARATOR . $file_info["file"]),
+                    $object_id,
+                    $this
+                );
+            }
         }
         return $collection_builder->collection();
     }
@@ -132,60 +166,43 @@ class ilTestExportOptionXMLRES extends ilBasicLegacyExportOption
     public function onExportOptionSelected(
         ilExportHandlerConsumerContextInterface $context
     ): void {
-        $context->exportGUIObject()->createTestExportWithResults();
+        $this->ctrl->redirectByClass(ilTestExportGUI::class, "showExportPluginMenu");
     }
 
-    protected function getExportFiles(
-        string $directory
-    ): array {
-        $file = [];
-        try {
-            $h_dir = dir($directory);
-            while ($entry = $h_dir->read()) {
-                if (
-                    $entry === "." ||
-                    $entry === ".." ||
-                    substr($entry, -4) !== ".zip"
-                ) {
-                    continue;
-                }
-                $zip_archive = new ZipArchive();
-                $zip_archive->open($directory . DIRECTORY_SEPARATOR . $entry);
-                $is_result = false;
-                for($i = 0; $i < $zip_archive->numFiles; $i++) {
-                    $stat = $zip_archive->statIndex($i);
-                    if (str_contains(basename($stat['name']), "results")) {
-                        $is_result = true;
-                        break;
-                    }
-                }
-                if (!$is_result) {
-                    continue;
-                }
-                $ts = substr($entry, 0, strpos($entry, "__"));
-                $file[$entry . $this->getExportType()] = [
-                    "type" => $this->getExportType(),
-                    "file" => $entry,
-                    "size" => (int) filesize($directory . "/" . $entry),
-                    "timestamp" => (int) $ts
-                ];
-            }
-        } catch (Exception $e) {
-
-        }
-        return $file;
-    }
-
-    protected function getDirectory(
-        ObjectId $object_id,
-        string $export_object_type
+    protected function getExportDirectory(
+        int $object_id,
+        string $object_type
     ): string {
         $dir = ilExport::_getExportDirectory(
-            $object_id->toInt(),
+            $object_id,
             "",
-            $export_object_type
+            $object_type
         );
         $dir = substr($dir, 0, strlen($dir) - 1);
         return $dir;
+    }
+
+    protected function getFileInfoForPlugin(
+        ilTestExportPlugin $plugin,
+        string $export_dir_path,
+    ): array {
+        $file_infos = [];
+        if (!is_dir($export_dir_path)) {
+            return $file_infos;
+        }
+        foreach (scandir($export_dir_path) as $file) {
+            $file_path = $export_dir_path . DIRECTORY_SEPARATOR . $file;
+            if (
+                in_array($file, ['.', '..']) or
+                is_dir($file_path) or
+                !str_contains($file, $plugin->getPluginName())
+            ) {
+                continue;
+            }
+            $file_infos[$file_path] = [
+                "file" => $file,
+            ];
+        }
+        return $file_infos;
     }
 }

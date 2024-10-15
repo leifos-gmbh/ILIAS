@@ -28,10 +28,12 @@ use ILIAS\Data\ObjectId;
 class ilDataCollectionExportOptionsXLSX extends ilBasicLegacyExportOption
 {
     protected ilLanguage $lng;
+    protected ilGlobalTemplateInterface $tpl;
 
     public function init(Container $DIC): void
     {
         $this->lng = $DIC->language();
+        $this->tpl = $DIC->ui()->mainTemplate();
         parent::init($DIC);
     }
 
@@ -79,6 +81,9 @@ class ilDataCollectionExportOptionsXLSX extends ilBasicLegacyExportOption
     public function onExportOptionSelected(
         ilExportHandlerConsumerContextInterface $context
     ): void {
+        if (!$this->checkForExportableFields($context)) {
+            return;
+        }
         $this->ctrl->redirectByClass(ilObjDataCollectionGUI::class, "handleExportAsync");
     }
 
@@ -99,7 +104,10 @@ class ilDataCollectionExportOptionsXLSX extends ilBasicLegacyExportOption
             if (is_file($exp_file)) {
                 unlink($exp_file);
             }
-            if (is_dir($exp_dir)) {
+            if (
+                is_dir($exp_dir) and
+                count(scandir($exp_dir)) === 2
+            ) {
                 ilFileUtils::delDir($exp_dir);
             }
         }
@@ -129,5 +137,25 @@ class ilDataCollectionExportOptionsXLSX extends ilBasicLegacyExportOption
         } catch (Exception $e) {
         }
         return $file;
+    }
+
+    protected function checkForExportableFields(
+        ilExportHandlerConsumerContextInterface $context
+    ): bool {
+        $obj = $context->exportObject();
+
+        foreach ($obj->getTables() as $tbl) {
+            /** @var $tbl ilDclTable */
+            foreach ($tbl->getFields() as $field) {
+                if ($field->getExportable()) {
+                    return true;
+                }
+            }
+        }
+
+        $this->tpl->setOnScreenMessage('failure', $this->lng->txt('dcl_no_export_data_available'), true);
+        $this->ctrl->redirect($this, "listExportFiles");
+
+        return false;
     }
 }

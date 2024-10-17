@@ -84,6 +84,8 @@ class ilConditionHandler
     public const OPERATOR_LP = 'learning_progress';
     public const OPERATOR_ACCREDITED_OR_PASSED = 'accredited_or_passed';
 
+    public const OPERATOR_RESULT_RANGE_PERCENTAGE = 'result_range_percentage';
+
     public const UNIQUE_CONDITIONS = 1;
 
     // conditions are used for all tree references of the target object.
@@ -999,6 +1001,7 @@ class ilConditionHandler
             'SET num_obligatory = ' . $ilDB->quote($a_num, 'integer') . ' ' .
             'WHERE target_ref_id = ' . $ilDB->quote($a_target_ref_id, 'integer') . ' ' .
             'AND target_obj_id = ' . $ilDB->quote($a_target_obj_id, 'integer');
+
         $ilDB->manipulate($query);
     }
 

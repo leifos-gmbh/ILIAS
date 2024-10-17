@@ -325,7 +325,8 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
             ilConditionHandler::OPERATOR_PASSED,
             ilConditionHandler::OPERATOR_FAILED,
             ilConditionHandler::OPERATOR_FINISHED,
-            ilConditionHandler::OPERATOR_NOT_FINISHED
+            ilConditionHandler::OPERATOR_NOT_FINISHED,
+            ilConditionHandler::OPERATOR_RESULT_RANGE_PERCENTAGE
         ];
     }
 

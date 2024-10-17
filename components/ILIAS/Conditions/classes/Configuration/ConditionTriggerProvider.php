@@ -10,6 +10,7 @@ use ILIAS\UI\Factory as UIFactory;
 use ilObject;
 use ILIAS\Data\ReferenceId;
 use ilLanguage;
+use ilConditionHandlerGUI as ilConditionHandlerGUI;
 
 class ConditionTriggerProvider
 {
@@ -60,7 +61,12 @@ class ConditionTriggerProvider
                 ilObject::_lookupTitle($condition['trigger_obj_id']),
                 $link
             );
-            $row['condition'] = $this->lng->txt('condition_' . $condition['operator']);
+            $row['condition'] = ilConditionHandlerGUI::translateOperator(
+                $condition['trigger_obj_id'],
+                $condition['operator'],
+                $condition['value']
+            );
+
             if ($condition['obligatory']) {
                 $row['obligatory'] = $this->ui_factory->symbol()->icon()->custom(
                     'assets/images/standard/icon_checked.svg',

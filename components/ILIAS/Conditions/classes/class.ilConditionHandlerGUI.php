@@ -1132,7 +1132,7 @@ class ilConditionHandlerGUI
         )->withAdditionalTransformation(
             $this->refinery->logical()->parallel(
                 [
-                    $this->refinery->int()->isGreaterThan(0),
+                    $this->refinery->int()->isGreaterThanOrEqual(0),
                     $this->refinery->int()->isLessThanOrEqual(100)
                 ]
             )

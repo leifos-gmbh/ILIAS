@@ -50,7 +50,8 @@ class ilObjCourseAccess extends ilObjectAccess implements ilConditionHandling
     public static function getConditionOperators(): array
     {
         return array(
-            ilConditionHandler::OPERATOR_PASSED
+            ilConditionHandler::OPERATOR_PASSED,
+            ilConditionHandler::OPERATOR_RESULT_RANGE_PERCENTAGE
         );
     }
 

@@ -1483,8 +1483,11 @@ class ilObjectListGUI
                 continue;
             }
 
-            $operator = ilConditionHandlerGUI::translateOperator($condition['trigger_obj_id'], $condition['operator']);
-            $cond_txt = $operator . ' ' . $condition['value'];
+            $cond_txt = ilConditionHandlerGUI::translateOperator(
+                $condition['trigger_obj_id'],
+                $condition['operator'],
+                $condition['value']
+            );
 
             // display trigger item
             $class = $this->obj_definition->getClassName($condition['trigger_type']);

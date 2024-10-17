@@ -209,6 +209,42 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
         }
     }
 
+    protected static function isRangeAchieved(int $user_id, int $a_obj_id, string $value): bool
+    {
+        global $DIC;
+
+        $value_arr = unserialize($value);
+        if ($value_arr === false) {
+            return false;
+        }
+        $min_percentage = $value_arr['min_percentage'] ?? 0;
+        $max_percentage = $value_arr['max_percentage'] ?? 0;
+        ilLoggerFactory::getLogger('root')->info("Requirements: " . $min_percentage . ' ' . $max_percentage . '%');
+
+        $db = $DIC->database();
+
+        $query = 'SELECT tst_result_cache.* FROM tst_result_cache, tst_active, tst_tests ' .
+            'WHERE tst_active.test_fi = tst_tests.test_id ' .
+            'AND tst_active.user_fi =  ' . $db->quote($user_id, ilDBConstants::T_INTEGER) . ' ' .
+            'AND tst_tests.obj_fi =  ' . $db->quote($a_obj_id, ilDBConstants::T_INTEGER) . ' ' .
+            'AND tst_result_cache.active_fi = tst_active.active_id';
+        $res = $db->query($query);
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            $max = $row->max_points;
+            $reached = $row->reached_points;
+            $reached_percentage = (!$max) ? 0 : ($reached / $max) * 100.0;
+            ilLoggerFactory::getLogger('root')->info('Reached: ' . $reached_percentage . '%');
+
+            if (
+                $reached_percentage >= $min_percentage &&
+                $reached_percentage <= $max_percentage
+            ) {
+                return true;
+            }
+            return false;
+        }
+    }
+
     /**
      * Returns TRUE if the user with the user id $user_id failed the test with the object id $a_obj_id
      *
@@ -351,6 +387,9 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 
             case ilConditionHandler::OPERATOR_NOT_FINISHED:
                 return !ilObjTestAccess::hasFinished($a_usr_id, $a_trigger_obj_id);
+
+            case ilConditionHandler::OPERATOR_RESULT_RANGE_PERCENTAGE:
+                return ilObjTestAccess::isRangeAchieved($a_usr_id, $a_trigger_obj_id, $a_value);
 
             default:
                 return true;

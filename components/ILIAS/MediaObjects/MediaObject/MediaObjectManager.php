@@ -22,9 +22,14 @@ namespace ILIAS\MediaObjects;
 
 use ilDBInterface;
 use ILIAS\Exercise\IRSS\IRSSWrapper;
+use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\Filesystem\Util\Convert\Images;
+use ILIAS\Filesystem\Util\Convert\ImageOutputOptions;
 
 class MediaObjectManager
 {
+    protected ImageOutputOptions $output_options;
+    protected Images $image_converters;
     protected MediaObjectRepository $repo;
 
     public function __construct(
@@ -35,6 +40,8 @@ class MediaObjectManager
     )
     {
         $this->repo = $repo->mediaObject();
+        $this->image_converters = new Images(false);
+        $this->output_options = new ImageOutputOptions();
     }
 
     public function create(
@@ -49,14 +56,37 @@ class MediaObjectManager
         );
     }
 
-    public function addFileFromLegacyUpload(int $mob_id, string $upload_name, string $location) : void
+    public function addFileFromLegacyUpload(int $mob_id, string $tmp_name) : void
     {
-        $this->repo->addFileFromLegacyUpload($mob_id, $upload_name, $location);
+        $this->repo->addFileFromLegacyUpload($mob_id, $tmp_name);
+    }
+
+    public function addFileFromUpload(int $mob_id, UploadResult $result) : void
+    {
+        $this->repo->addFileFromUpload($mob_id, $result);
     }
 
     public function getLocationSrc(int $mob_id, string $location):string
     {
         return $this->repo->getLocationSrc($mob_id, $location);
+    }
+
+    public function generatePreview(
+        int $mob_id,
+        string $std_location
+    )
+    {
+
+        $converter = $this->image_converters->resizeToFixedSize(
+            $this->buildStream($path_to_original),
+            $width,
+            $height,
+            $crop_if_true_and_resize_if_false,
+            $this->output_options
+                ->withQuality($image_quality)
+                ->withFormat(ImageOutputOptions::FORMAT_PNG)
+        );
+        return $this->storeStream($converter, $path_to_output);
     }
 
 }

@@ -412,38 +412,57 @@ class IRSSWrapper
 
     public function importFileFromLegacyUploadToContainer(
         string $rid,
-        array $file_input,
+        string $tmp_name,
         string $target_path
     ): void {
         $upload = $this->upload;
 
-        if (is_array($file_input)) {
-            if (!$upload->hasBeenProcessed()) {
-                $upload->process();
+        if (!$upload->hasBeenProcessed()) {
+            $upload->process();
+        }
+        foreach ($upload->getResults() as $name => $result) {
+            // we must check if these are files from this input
+            if ($name !== $tmp_name) {
+                continue;
             }
-            foreach ($upload->getResults() as $name => $result) {
-                // we must check if these are files from this input
-                /*
-                if (!in_array($name, $file_input["tmp_name"] ?? [], true)) {
-                    continue;
-                }*/
-                // if the result is not OK, we skip it
-                if (!$result->isOK()) {
-                    continue;
-                }
+            // if the result is not OK, we skip it
+            if (!$result->isOK()) {
+                continue;
+            }
 
-                $id = $this->getResourceIdForIdString($rid);
+            $id = $this->getResourceIdForIdString($rid);
 
-                if (!is_null($id)) {
-                    $this->irss->manageContainer()->addUploadToContainer(
-                        $id,
-                        $result,
-                        $target_path
-                    );
-                }
+            if (!is_null($id)) {
+                $this->irss->manageContainer()->addUploadToContainer(
+                    $id,
+                    $result,
+                    $target_path
+                );
             }
         }
     }
+
+    public function importFileFromUploadResultToContainer(
+        string $rid,
+        UploadResult $result,
+        string $target_path
+    ): void {
+        // if the result is not OK, we skip it
+        if (!$result->isOK()) {
+            return;
+        }
+
+        $id = $this->getResourceIdForIdString($rid);
+
+        if (!is_null($id)) {
+            $this->irss->manageContainer()->addUploadToContainer(
+                $id,
+                $result,
+                $target_path
+            );
+        }
+    }
+
 
     public function getContainerSrc(
         string $rid,

@@ -22,6 +22,7 @@ namespace ILIAS\MediaObjects;
 
 use ilDBInterface;
 use ILIAS\Exercise\IRSS\IRSSWrapper;
+use ILIAS\FileUpload\DTO\UploadResult;
 
 class MediaObjectRepository
 {
@@ -89,12 +90,23 @@ class MediaObjectRepository
         return "";
     }
 
-    public function addFileFromLegacyUpload(int $mob_id, string $upload_name, string $targetpath) : void
+    public function addFileFromLegacyUpload(int $mob_id, string $tmp_name) : void
     {
         if ($rid = $this->getRidForMobId($mob_id)) {
             $this->irss->importFileFromLegacyUploadToContainer(
                 $rid,
-                $_FILES[$upload_name],
+                $tmp_name,
+                "/"
+            );
+        }
+    }
+
+    public function addFileFromUpload(int $mob_id, UploadResult $result) : void
+    {
+        if ($rid = $this->getRidForMobId($mob_id)) {
+            $this->irss->importFileFromUploadResultToContainer(
+                $rid,
+                $result,
                 "/"
             );
         }

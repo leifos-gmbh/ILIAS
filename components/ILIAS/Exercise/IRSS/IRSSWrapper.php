@@ -349,16 +349,19 @@ class IRSSWrapper
         ResourceStakeholder $target_stakeholder
     ) {
         $entry_parts = explode("/", $entry);
-        $zip = new \ZipArchive();
-        if ($zip->open($this->stream($rid)->getMetadata()['uri'], \ZipArchive::RDONLY)) {
-            $feedback_rid = $this->irss->manage()->stream(
-                Streams::ofResource($zip->getStream($entry)),
-                $target_stakeholder,
-                $entry_parts[2]
-            );
-            $target_collection->add($feedback_rid);
-            $this->irss->collection()->store($target_collection);
-        }
+        $zip_path = $this->stream($rid)->getMetadata("uri");
+
+        $stream = Streams::ofFileInsideZIP(
+            $zip_path,
+            $entry
+        );
+        $feedback_rid = $this->irss->manage()->stream(
+            $stream,
+            $target_stakeholder,
+            $entry_parts[2]
+        );
+        $target_collection->add($feedback_rid);
+        $this->irss->collection()->store($target_collection);
     }
 
     // this currently does not work due to issues in the irss

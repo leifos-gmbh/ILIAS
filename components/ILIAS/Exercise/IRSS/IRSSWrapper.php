@@ -31,6 +31,8 @@ use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\Filesystem\Util\LegacyPathHelper;
 use ILIAS\Filesystem\Stream\Stream;
 use \ILIAS\Filesystem\Util\Archive\Archives;
+use ILIAS\Filesystem\Stream\ZIPStream;
+use _PHPStan_9815bbba4\Nette\Neon\Exception;
 
 class IRSSWrapper
 {
@@ -50,17 +52,17 @@ class IRSSWrapper
         $this->archives = $DIC->archives();
     }
 
-    protected function getNewCollectionId(): ResourceCollectionIdentification
+    protected function getNewCollectionId() : ResourceCollectionIdentification
     {
         return $this->irss->collection()->id();
     }
 
-    protected function getNewCollectionIdAsString(): string
+    protected function getNewCollectionIdAsString() : string
     {
         return $this->getNewCollectionId()->serialize();
     }
 
-    public function createEmptyCollection(): string
+    public function createEmptyCollection() : string
     {
         $new_id = $this->getNewCollectionId();
         $new_collection = $this->irss->collection()->get($new_id);
@@ -68,7 +70,7 @@ class IRSSWrapper
         return $new_id->serialize();
     }
 
-    public function getCollectionForIdString(string $rcid): ResourceCollection
+    public function getCollectionForIdString(string $rcid) : ResourceCollection
     {
         return $this->irss->collection()->get($this->irss->collection()->id($rcid));
     }
@@ -76,7 +78,7 @@ class IRSSWrapper
     public function deleteCollectionForIdString(
         string $rcid,
         ResourceStakeholder $stakeholder
-    ): void {
+    ) : void {
         $id = $this->irss->collection()->id($rcid);
         $this->irss->collection()->remove($id, $stakeholder, true);
     }
@@ -100,7 +102,7 @@ class IRSSWrapper
         ResourceCollection $collection,
         array $file_input,
         ResourceStakeholder $stakeholder
-    ): void {
+    ) : void {
         $upload = $this->upload;
 
         if (is_array($file_input)) {
@@ -134,7 +136,7 @@ class IRSSWrapper
         ResourceCollection $collection,
         string $directory,
         ResourceStakeholder $stakeholder
-    ): void {
+    ) : void {
         $sourceFS = LegacyPathHelper::deriveFilesystemFrom($directory);
         $sourceDir = LegacyPathHelper::createRelativePath($directory);
 
@@ -162,7 +164,7 @@ class IRSSWrapper
         $this->irss->collection()->store($collection);
     }
 
-    protected function getResourceIdForIdString(string $rid): ?ResourceIdentification
+    protected function getResourceIdForIdString(string $rid) : ?ResourceIdentification
     {
         return $this->irss->manage()->find($rid);
     }
@@ -170,7 +172,7 @@ class IRSSWrapper
     public function importFileFromLegacyUpload(
         array $file_input,
         ResourceStakeholder $stakeholder
-    ): string {
+    ) : string {
         $upload = $this->upload;
 
         if (is_array($file_input)) {
@@ -201,7 +203,7 @@ class IRSSWrapper
     public function importFileFromUploadResult(
         UploadResult $result,
         ResourceStakeholder $stakeholder
-    ): string {
+    ) : string {
         // if the result is not OK, we skip it
         if (!$result->isOK()) {
             return "";
@@ -219,7 +221,7 @@ class IRSSWrapper
         string $file,
         string $name,
         ResourceStakeholder $stakeholder
-    ): string {
+    ) : string {
         $sourceFS = LegacyPathHelper::deriveFilesystemFrom($file);
         $sourceFile = LegacyPathHelper::createRelativePath($file);
 
@@ -239,7 +241,7 @@ class IRSSWrapper
     public function importStream(
         Stream $stream,
         ResourceStakeholder $stakeholder
-    ): string {
+    ) : string {
         $rid = $this->irss->manage()->stream(
             $stream,
             $stakeholder
@@ -250,7 +252,7 @@ class IRSSWrapper
     public function renameCurrentRevision(
         string $rid,
         string $title
-    ): void {
+    ) : void {
         $id = $this->getResourceIdForIdString($rid);
         $rev = $this->irss->manage()->getCurrentRevision($id);
         $info = $rev->getInformation();
@@ -258,7 +260,8 @@ class IRSSWrapper
         $rev->setInformation($info);
         $this->irss->manage()->updateRevision($rev);
     }
-    public function deliverFile(string $rid): void
+
+    public function deliverFile(string $rid) : void
     {
         $id = $this->getResourceIdForIdString($rid);
         if ($id) {
@@ -266,7 +269,7 @@ class IRSSWrapper
         }
     }
 
-    public function stream(string $rid): ?FileStream
+    public function stream(string $rid) : ?FileStream
     {
         $id = $this->getResourceIdForIdString($rid);
         if ($id) {
@@ -275,9 +278,18 @@ class IRSSWrapper
         return null;
     }
 
+    public function getResourcePath(string $rid) : string
+    {
+        $stream = $this->stream($rid);
+        if ($stream) {
+            return $stream->getMetadata('uri') ?? '';
+        }
+        return "";
+    }
+
     public function getCollectionResourcesInfo(
         ResourceCollection $collection
-    ): \Generator {
+    ) : \Generator {
         foreach ($collection->getResourceIdentifications() as $rid) {
             $info = $this->irss->manage()->getResource($rid)
                                ->getCurrentRevision()
@@ -296,7 +308,7 @@ class IRSSWrapper
 
     public function getResourceInfo(
         string $rid
-    ): ResourceInformation {
+    ) : ResourceInformation {
         $rid = $this->getResourceIdForIdString($rid);
         $info = $this->irss->manage()->getResource($rid)
                            ->getCurrentRevision()
@@ -314,7 +326,7 @@ class IRSSWrapper
 
     public function clone(
         string $from_rc_id
-    ): string {
+    ) : string {
         if ($from_rc_id !== "") {
             $cloned_rcid = $this->irss->collection()->clone($this->irss->collection()->id($from_rc_id));
             return $cloned_rcid->serialize();
@@ -324,7 +336,7 @@ class IRSSWrapper
 
     public function cloneResource(
         string $from_rid
-    ): string {
+    ) : string {
         if ($from_rid !== "") {
             $cloned_rid = $this->irss->manage()->clone($this->getResourceIdForIdString($from_rid));
             return $cloned_rid->serialize();
@@ -332,7 +344,7 @@ class IRSSWrapper
         return "";
     }
 
-    public function deleteResource(string $rid, ResourceStakeholder $stakeholder): void
+    public function deleteResource(string $rid, ResourceStakeholder $stakeholder) : void
     {
         if ($rid !== "") {
             $res = $this->getResourceIdForIdString($rid);
@@ -349,12 +361,7 @@ class IRSSWrapper
         ResourceStakeholder $target_stakeholder
     ) {
         $entry_parts = explode("/", $entry);
-        $zip_path = $this->stream($rid)->getMetadata("uri");
-
-        $stream = Streams::ofFileInsideZIP(
-            $zip_path,
-            $entry
-        );
+        $stream = $this->getStreamOfContainerEntry($rid, $entry);
         $feedback_rid = $this->irss->manage()->stream(
             $stream,
             $target_stakeholder,
@@ -364,11 +371,22 @@ class IRSSWrapper
         $this->irss->collection()->store($target_collection);
     }
 
+    public function getStreamOfContainerEntry(
+        string $rid,
+        string $entry
+    ) : ZIPStream {
+        $zip_path = $this->stream($rid)->getMetadata("uri");
+        return Streams::ofFileInsideZIP(
+            $zip_path,
+            $entry
+        );
+    }
+
     // this currently does not work due to issues in the irss
     public function importContainerFromZipUploadResult(
         UploadResult $result,
         ResourceStakeholder $stakeholder
-    ): string {
+    ) : string {
         // if the result is not OK, we skip it
         if (!$result->isOK()) {
             return "";
@@ -388,7 +406,7 @@ class IRSSWrapper
     public function getContainerStreams(
         string $container_id,
         ResourceStakeholder $stakeholder
-    ): \Generator {
+    ) : \Generator {
         foreach ($this->irss->consume()->containerZIP(
             $this->getResourceIdForIdString($container_id)
         )->getZIP()->getFileStreams() as $stream) {
@@ -399,8 +417,7 @@ class IRSSWrapper
     public function createEmptyContainer(
         string $title,
         ResourceStakeholder $stakeholder
-    ): string
-    {
+    ) : string {
         // create empty container resource. empty zips are not allowed, we need at least one file which is hidden
         $empty_zip = $this->archives->zip(
             []
@@ -417,7 +434,7 @@ class IRSSWrapper
         string $rid,
         string $tmp_name,
         string $target_path
-    ): void {
+    ) : void {
         $upload = $this->upload;
 
         if (!$upload->hasBeenProcessed()) {
@@ -449,7 +466,7 @@ class IRSSWrapper
         string $rid,
         UploadResult $result,
         string $target_path
-    ): void {
+    ) : void {
         // if the result is not OK, we skip it
         if (!$result->isOK()) {
             return;
@@ -466,12 +483,10 @@ class IRSSWrapper
         }
     }
 
-
     public function getContainerSrc(
         string $rid,
         string $path
-    ):string
-    {
+    ) : string {
         if ($rid !== "") {
             $uri = $this->irss->consume()->containerURI(
                 $this->getResourceIdForIdString($rid),
@@ -482,4 +497,21 @@ class IRSSWrapper
         }
         return "";
     }
+
+    public function addStreamToContainer(
+        string $rid,
+        FileStream $stream,
+        string $path
+    ) : void {
+        $id = $this->getResourceIdForIdString($rid);
+
+        if (!is_null($id)) {
+            $this->irss->manageContainer()->addStreamToContainer(
+                $id,
+                $stream,
+                $path
+            );
+        }
+    }
+
 }

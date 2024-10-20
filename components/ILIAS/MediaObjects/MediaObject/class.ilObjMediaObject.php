@@ -33,7 +33,7 @@ define("IL_MODE_FULL", 3);
  */
 class ilObjMediaObject extends ilObject
 {
-    private const DEFAULT_PREVIEW_SIZE = 80;
+    public const DEFAULT_PREVIEW_SIZE = 80;
     protected \ILIAS\MediaObjects\MediaObjectManager $manager;
     protected InternalDomainService $domain;
     protected ilObjUser $user;
@@ -1725,69 +1725,26 @@ class ilObjMediaObject extends ilObject
         $logger->debug("Generate preview pic...");
         $logger->debug("..." . $item->getFormat());
 
-        if ($item->getLocationType() == "LocalFile") {
-            if (is_int(strpos($item->getFormat(), "image/"))) {
-                $a_width = $a_height = self::DEFAULT_PREVIEW_SIZE;
-
-                $dir = ilObjMediaObject::_getDirectory($this->getId());
-                $file = $dir . "/" .
-                    $item->getLocation();
-                if (is_file($file)) {
-                    $logger->debug("Calling image converter.");
-                    $this->image_converter->resizeToFixedSize(
-                        $file,
-                        $dir . "/mob_vpreview.png",
-                        $a_width,
-                        $a_height,
-                        true,
-                        ImageOutputOptions::FORMAT_PNG
-                    );
-                }
-            }
-        }
-
-        if (in_array($item->getFormat(), ["video/mp4", "video/webm"])) {
-            try {
-                if ($sec < 0) {
-                    $sec = 0;
-                }
-                if ($this->getVideoPreviewPic() != "") {
-                    $this->removeAdditionalFile($this->getVideoPreviewPic(true));
-                }
-                $med = $this->getMediaItem("Standard");
-                if ($med->getLocationType() == "LocalFile") {
-                    $mob_file = ilObjMediaObject::_getDirectory($this->getId()) . "/" . $med->getLocation();
-                } else {
-                    $mob_file = $med->getLocation();
-                }
-                $logger->debug(
-                    "...extract " . $mob_file . " in " .
-                    ilObjMediaObject::_getDirectory($this->getId())
-                );
-                $logger->debug("Call ffmpeg.");
-                ilFFmpeg::extractImage(
-                    $mob_file,
-                    "mob_vpreview.png",
-                    ilObjMediaObject::_getDirectory($this->getId()),
-                    $sec
-                );
-            } catch (ilException $e) {
-                $ret = ilFFmpeg::getLastReturnValues();
-
-                $message = '';
-                if (is_array($ret) && count($ret) > 0) {
-                    $message = "\n" . implode("\n", $ret);
-                }
-
-                $logger->warning($e->getMessage() . $message);
-                $logger->logStack(ilLogLevel::WARNING);
-            }
-        }
+        $this->manager->generatePreview(
+            $this->getId(),
+            $item->getLocation(),
+            $item->getLocationType() === "LocalFile",
+            $item->getFormat(),
+            $sec
+        );
     }
 
     public function getVideoPreviewPic(
         bool $a_filename_only = false
     ): string {
+
+        if (!$a_filename_only) {
+            $src = $this->manager->getLocationSrc($this->getId(), "mob_vpreview.png");
+            if ($src !== "") {
+                return $src;
+            }
+        }
+
         $dir = ilObjMediaObject::_getDirectory($this->getId());
         $ppics = array("mob_vpreview.jpg",
             "mob_vpreview.jpeg",
@@ -1963,7 +1920,29 @@ class ilObjMediaObject extends ilObject
                 $this->getId(),
                 $med->getLocation()
             );
+            if ($src !== "") {  // fallback: old source
+                $path_to_file = \ilObjMediaObject::_getURL($this->getId()) . "/" . $med->getLocation();
+                try {
+                    $src = ilWACSignedPath::signFile($path_to_file);
+                } catch (Exception $e) {
+                }
+            }
         }
         return $src;
     }
+
+    public function getPreviewSrc() : string
+    {
+        $med = $this->getMediaItem("Standard");
+        if (strcasecmp("Reference", $med->getLocationType()) === 0) {
+            $src = $med->getLocation();
+        } else {
+            $src = $this->manager->getLocationSrc(
+                $this->getId(),
+                "mob_vpreview.png"
+            );
+        }
+        return $src;
+    }
+
 }

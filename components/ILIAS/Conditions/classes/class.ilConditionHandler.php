@@ -1065,18 +1065,6 @@ class ilConditionHandler
         $target_obj = ilObjectFactory::getInstanceByRefId($this->getTargetRefId());
 
         if ($trigger_obj !== null && $target_obj !== null) {
-            $query = "SELECT * FROM conditions WHERE " .
-                "trigger_ref_id = " . $this->db->quote($trigger_obj->getRefId(), 'integer') . " " .
-                "AND target_ref_id = " . $this->db->quote($target_obj->getRefId(), 'integer');
-
-            $res = $this->db->query($query);
-
-            if ($res->numRows() > 1) {
-                $this->setErrorMessage($this->lng->txt('condition_already_assigned'));
-
-                unset($trigger_obj, $target_obj);
-                return false;
-            }
             // check for circle
             $this->target_obj_id = $target_obj->getId();
 

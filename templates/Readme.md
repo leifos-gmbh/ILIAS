@@ -18,18 +18,12 @@ soon.
 ### Tools
 
 To generate a customized System Style, first install the necessary tools to your
-server. These tools include nodejs and the node packet manager. After that you
-can install the sass compiler that is used to turn SCSS into CSS using:
+server. These tools include nodejs and the node packet manager. With ILIAS 10 the sass package
+is included in the package.json as devDependency and therefore does not have to get installed manually
+from the dart-sass website/github profile. Please make sure that the NPM packages were installed correctly 
+through the package.json.
 
-```
-npm install -g sass
-```
-
-or
-
-Download [Dart SASS from Github](https://github.com/sass/dart-sass/releases/) and add it to the machine's PATH.
-
-If you want to create system styles throught frontend, make sure, that your webserver
+If you want to create system styles through frontend, make sure, that your webserver
 has the permission to read and execute your newly installed sass compiler.
 
 ### How-To 1 (Through Frontend)
@@ -159,10 +153,10 @@ are located in src/UI. To overwrite those you need to add the respective tpl fil
 in your skins folder. 
 
 Examples:
-* `Module/Service` related template files must be stored in a similar
+* `components` related template files must be stored in a similar
 subdirectory structure (omit the `templates` subdirectory). E.g. to replace the
-template file `Services/XYZ/templates/tpl.xyz.html` create a new
-version at `Customizing/global/skin/myskin/Services/XYZ/tpl.xyz.html`. A template of a UI Component located in 
+template file `components/ILIAS/XYZ/templates/tpl.xyz.html` create a new
+version at `Customizing/global/skin/myskin/components/ILIAS/XYZ/tpl.xyz.html`. A template of a UI Component located in 
 `src/UI/templates/default/XYZ/tpl.xyz.html` can be customized by creating a 
 `Customizing/global/skin/myskin/UI/XYZ/tpl.xyz.html` file.
 
@@ -170,23 +164,23 @@ The following list contains some standard template files, that are often changed
 skins:
 
 - [Standard Layout](https://test6.ilias.de/goto_test6_stys_21_LayoutPageStandardStandard_default_delos.html?), 
-template file: src/UI/templates/default/Layout/tpl.standardpage.html, the frame of the DOM for the complete ILIAS page. 
+template file: components/ILIAS/UI/templates/default/Layout/tpl.standardpage.html, the frame of the DOM for the complete ILIAS page. 
 Also checkout the according scss variable under section Layout (UI Layout Page).
 - [Meta Bar](https://test6.ilias.de/goto_test6_stys_21_MainControlsMetaBarMetaBar_default_delos.html?) 
-template file: src/UI/templates/default/MainControls/tpl.metabar.html, the Bar on the top holding Notification, Search User Avatar, etc.
+template file: components/ILIAS/UI/templates/default/MainControls/tpl.metabar.html, the Bar on the top holding Notification, Search User Avatar, etc.
 Also checkout the according metabar scss variables.
 - [Main Bar](https://test6.ilias.de/goto_test6_stys_21_MainControlsMainBarMainBar_default_delos.html?) 
-template directory: src/UI/templates/default/MainControls/tpl.mainbar.html, the Bar on the left holding triggers for opening the slates for
+template directory: components/ILIAS/UI/templates/default/MainControls/tpl.mainbar.html, the Bar on the left holding triggers for opening the slates for
 accessing Repository, Dasbhoard etc. Content.
 Also checkout the according mainbar scss variables.
 - [Slate](https://test6.ilias.de/goto_test6_stys_21_MainControlsSlateFactorySlate_default_delos.html?) 
-template directory: src/UI/templates/default/MainControls/Slate/tpl.slate.html, the Slates triggered by opening items of the Main Bar.
+template directory: components/ILIAS/UI/templates/default/MainControls/Slate/tpl.slate.html, the Slates triggered by opening items of the Main Bar.
 Also checkout the according slate scss variables.
 - [Breadcrumbs](https://test6.ilias.de/goto_test6_stys_21_BreadcrumbsBreadcrumbsBreadcrumbs_default_delos.html?)
-template directory: src/UI/templates/default/Breadcrumbs/tpl.breadcrumbs.html, Breadcrumbs working as locator on the top of the page.
+template directory: components/ILIAS/UI/templates/default/Breadcrumbs/tpl.breadcrumbs.html, Breadcrumbs working as locator on the top of the page.
 Also checkout the breadcrumb scss variables.
 
-* Startup Screens (Login, Registration, ...): `Services/Init/templates/default/tpl .startup_screen.html`
+* Startup Screens (Login, Registration, ...): `components/ILIAS/Init/templates/default/tpl .startup_screen.html`
 
 
 #### Step 6: Change the ILIAS Icon
@@ -215,9 +209,10 @@ cd node
 ./configure
 make
 sudo make install
-Install Sass
-sudo npm install -g sass
 ```
+
+Make sure all NPM packages where installed through the package.json, as with ILIAS 10 sass is now part
+of the NPM packaging.
 
 Edit the File Applications/MAMP/Library/bin/envars.
 Add the line export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" to the envars file. 

@@ -22,10 +22,7 @@ use ILIAS\TestQuestionPool\QuestionPoolDIC;
 use ILIAS\TestQuestionPool\RequestDataCollector;
 use ILIAS\TestQuestionPool\Presentation\QuestionTable;
 use ILIAS\TestQuestionPool\Questions\GeneralQuestionPropertiesRepository;
-
-use ILIAS\DI\RBACServices;
 use ILIAS\Taxonomy\Service;
-use Psr\Http\Message\ServerRequestInterface as HttpRequest;
 use ILIAS\UI\Component\Input\Container\Form\Form;
 use ILIAS\UI\Component\Input\Field\Select;
 use ILIAS\UI\Component\Input\Input;
@@ -59,6 +56,7 @@ use ILIAS\HTTP\Services as HTTPServices;
  * @ilCtrl_Calls   ilObjQuestionPoolGUI: ilAssQuestionPreviewGUI
  * @ilCtrl_Calls   ilObjQuestionPoolGUI: assKprimChoiceGUI, assLongMenuGUI
  * @ilCtrl_Calls   ilObjQuestionPoolGUI: ilQuestionPoolSkillAdministrationGUI
+ * @ilCtrl_Calls   ilObjQuestionPoolGUI: ilBulkEditQuestionsGUI
  *
  * @ingroup components\ILIASTestQuestionPool
  *
@@ -71,11 +69,8 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
     public const DEFAULT_CMD = 'questions';
 
     private HTTPServices $http;
-    private HttpRequest $http_request;
     protected Service $taxonomy;
-    public ?ilObject $object;
     protected ilDBInterface $db;
-    protected RBACServices $rbac;
     protected ilComponentLogger $log;
     protected ilHelpGUI $help;
     protected GlobalScreen $global_screen;
@@ -99,7 +94,6 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
         $this->type = 'qpl';
 
         $this->db = $DIC['ilDB'];
-        $this->rbac = $DIC->rbac();
         $this->log = $DIC['ilLog'];
         $this->help = $DIC['ilHelp'];
         $this->global_screen = $DIC['global_screen'];
@@ -108,7 +102,6 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
         $this->navigation_history = $DIC['ilNavigationHistory'];
         $this->ui_service = $DIC->uiService();
         $this->taxonomy = $DIC->taxonomy();
-        $this->http_request = $DIC->http()->request();
         $this->http = $DIC->http();
         $this->archives = $DIC->archives();
 
@@ -472,7 +465,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                     $this->refinery,
                     $this->ui_factory,
                     $this->ui_renderer,
-                    $this->http_request,
+                    $this->request,
                 );
                 $this->ctrl->forwardCommand($gui);
                 break;
@@ -516,9 +509,38 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                 );
 
                 $this->ctrl->forwardCommand($gui);
-
                 break;
 
+            case 'ilbulkeditquestionsgui':
+                if (!$ilAccess->checkAccess('read', '', $this->object->getRefId())) {
+                    $this->redirectAfterMissingWrite();
+                }
+                $this->tabs_gui->setBackTarget(
+                    $this->lng->txt('backtocallingpool'),
+                    $this->ctrl->getLinkTargetByClass(self::class, self::DEFAULT_CMD)
+                );
+                $this->tabs_gui->addTarget(
+                    'edit_questions',
+                    '#',
+                    '',
+                    $this->ctrl->getCmdClass(),
+                    ''
+                );
+                $this->tabs_gui->setTabActive('edit_questions');
+
+                $gui = new \ilBulkEditQuestionsGUI(
+                    $this->tpl,
+                    $this->ctrl,
+                    $this->lng,
+                    $this->ui_factory,
+                    $this->ui_renderer,
+                    $this->refinery,
+                    $this->request,
+                    $this->request_wrapper,
+                    $this->object->getId(),
+                );
+                $this->ctrl->forwardCommand($gui);
+                break;
 
             case 'ilobjquestionpoolgui':
             case '':
@@ -605,6 +627,22 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                                 . '</script>'
                             ;
                             exit();
+
+                        case ilBulkEditQuestionsGUI::CMD_EDITTAUTHOR:
+                        case ilBulkEditQuestionsGUI::CMD_EDITLIFECYCLE:
+                        case ilBulkEditQuestionsGUI::CMD_EDITTAXONOMIES:
+                            $this->ctrl->clearParameters($this);
+                            $this->ctrl->setParameterByClass(
+                                ilBulkEditQuestionsGUI::class,
+                                ilBulkEditQuestionsGUI::PARAM_IDS,
+                                implode(',', $ids)
+                            );
+                            $url = $this->ctrl->getLinkTargetByClass(
+                                ilBulkEditQuestionsGUI::class,
+                                $action
+                            );
+                            $this->ctrl->redirectToURL($url);
+                            break;
 
                         default:
                             throw new \Exception("'$action'" . " not implemented");
@@ -1796,8 +1834,8 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             foreach (array_filter($filter_params) as $item => $value) {
                 switch ($item) {
                     case 'taxonomies':
-                        foreach($value as $tax_value) {
-                            if($tax_value === 'null') {
+                        foreach ($value as $tax_value) {
+                            if ($tax_value === 'null') {
                                 $table->addTaxonomyFilterNoTaxonomySet(true);
                             } else {
                                 $tax_nodes = explode('-', $tax_value);

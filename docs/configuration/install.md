@@ -202,8 +202,8 @@ systemctl restart httpd.service
 <a name="php-installation"></a>
 ### PHP Installation and Configuration
 
-Refer to the to documentation of your installation to install PHP 8.1
-to PHP 8.2 including packages for imagick, gd, mysql, mbstring, curl, dom, zip, intl, and xml.
+Refer to the to documentation of your installation to install PHP 8.2
+to PHP 8.3 including packages for imagick, gd, mysql, mbstring, curl, dom, zip, intl, and xml.
 
 To check if the installation was successfull create the file `/var/www/html/phpinfo.php`
 with the following contents:
@@ -484,7 +484,7 @@ according to your needs.
 
 The ILIAS Java RPC server is used for certain optional functions as Lucene Search
 or generating PDF Certificates. To enable the RPC server you need to place a
-configuration file in `<YOUR_ILIAS_DIR>/Services/WebServices/RPC/lib/ilServer.properties`:
+configuration file in `<YOUR_ILIAS_DIR>/components/ILIAS/WebServices/RPC/lib/ilServer.properties`:
 
 ```
 [Server]
@@ -511,7 +511,7 @@ file manually.
 
 You may use the following systemd service description to start the RPC server.
 If you still use SysV-Initscripts you can find one in the
-[Lucene RPC-Server](../../Services/WebServices/RPC/lib/README.md) documentation.
+[Lucene RPC-Server](../../components/ILIAS/WebServices/RPC/lib/README.md) documentation.
 
 ```
 [Unit]
@@ -520,8 +520,8 @@ After=network.target
 
 [Service]
 Environment=JAVA_OPTS="-Dfile.encoding=UTF-8"
-Environment=ILSERVER_JAR="/var/www/html/ilias/Services/WebServices/RPC/lib/ilServer.jar"
-Environment=ILSERVER_INI="/var/www/html/ilias/Services/WebServices/RPC/lib/ilServer.properties"
+Environment=ILSERVER_JAR="/var/www/html/ilias/components/ILIAS/WebServices/RPC/lib/ilServer.jar"
+Environment=ILSERVER_INI="/var/www/html/ilias/components/ILIAS/WebServices/RPC/lib/ilServer.properties"
 
 ExecStart=-/usr/bin/java $JAVA_OPTS -jar $ILSERVER_JAR $ILSERVER_INI start
 ExecStop=/usr/bin/java $JAVA_OPTS -jar $ILSERVER_JAR $ILSERVER_INI stop
@@ -532,7 +532,7 @@ WantedBy=multi-user.target
 
 At this point the RPC server will generate PDF certificates, but to use Lucence
 search further step are needed. See
-[Lucene RPC-Server](../../Services/WebServices/RPC/lib/README.md) for details.
+[Lucene RPC-Server](../../components/ILIAS/WebServices/RPC/lib/README.md) for details.
 
 <a name="e-mail-configuration"></a>
 ## Configure E-Mail (optional)
@@ -584,7 +584,7 @@ FromLineOverride=YES
 The recommended webserver configuration is either **Apache with mod_php** or
 **Nginx with PHP-FPM (> 1.3.8)**. Do NOT use **Apache with PHP-FPM** if you
 want to use WebDAV. Find more information about the configuration of WebDAV
-in the [WebDAV Readme](../../Services/WebDAV/README.md).
+in the [WebDAV Readme](../../components/ILIAS/WebDAV/README.md).
 
 
 <a name="install-plugins-and-styles"></a>
@@ -736,6 +736,7 @@ each ILIAS release.
 
 | ILIAS Version  | PHP Version                 |
 |----------------|-----------------------------|
+| 10.x           | 8.2.x, 8.3.x                |
 | 9.x            | 8.1.x, 8.2.x                |
 | 8.x            | 7.4.x, 8.0.x                |
 | 7.x            | 7.3.x, 7.4.x                |

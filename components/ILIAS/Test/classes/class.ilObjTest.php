@@ -23,10 +23,8 @@ use ILIAS\Test\RequestDataCollector;
 use ILIAS\Test\TestManScoringDoneHelper;
 use ILIAS\Test\Logging\TestLogger;
 use ILIAS\Test\Logging\TestLogViewer;
-
 use ILIAS\TestQuestionPool\Import\TestQuestionsImportTrait;
 use ILIAS\TestQuestionPool\Questions\GeneralQuestionPropertiesRepository;
-
 use ILIAS\Test\Logging\TestAdministrationInteractionTypes;
 use ILIAS\Test\Logging\TestScoringInteractionTypes;
 use ILIAS\Test\Logging\AdditionalInformationGenerator;
@@ -44,10 +42,10 @@ use ILIAS\Test\Settings\ScoreReporting\ScoreSettingsDatabaseRepository;
 use ILIAS\Test\Settings\ScoreReporting\SettingsResultSummary;
 use ILIAS\Test\Settings\ScoreReporting\ScoreSettings;
 use ILIAS\Test\Export\CSVExportTrait;
-
 use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\Filesystem\Filesystem;
 use ILIAS\Filesystem\Stream\Streams;
+use ILIAS\MetaData\Services\ServicesInterface as LOMetadata;
 
 /**
  * Class ilObjTest
@@ -147,6 +145,8 @@ class ilObjTest extends ilObject
 
     protected ?ilTestParticipantList $access_filtered_participant_list = null;
 
+    protected LOMetadata $lo_metadata;
+
     /**
      * Constructor
      *
@@ -166,6 +166,7 @@ class ilObjTest extends ilObject
         $this->component_repository = $DIC['component.repository'];
         $this->component_factory = $DIC['component.factory'];
         $this->filesystem_web = $DIC->filesystem()->web();
+        $this->lo_metadata = $DIC->learningObjectMetadata();
 
         $local_dic = $this->getLocalDIC();
         $this->participant_access_filter = $local_dic['participant.access_filter.factory'];
@@ -864,18 +865,6 @@ class ilObjTest extends ilObject
         $this->mark_schema = null;
     }
 
-    /**
-    * Gets the reporting date of the ilObjTest object
-    *
-    * @return string The reporting date of the test of an empty string (=FALSE) if no reporting date is set
-    * @access public
-    * @see $reporting_date
-    */
-    public function getReportingDate(): ?string
-    {
-        return $this->getScoreSettings()->getResultSummarySettings()->getReportingDate()?->format('YmdHis');
-    }
-
     public function getNrOfTries(): int
     {
         return $this->getMainSettings()->getTestBehaviourSettings()->getNumberOfTries();
@@ -1427,7 +1416,7 @@ class ilObjTest extends ilObject
      */
     public function getQuestionTitle($title, $nr = null, $points = null): string
     {
-        switch($this->getTitleOutput()) {
+        switch ($this->getTitleOutput()) {
             case '0':
             case '1':
                 return $title;
@@ -1444,7 +1433,7 @@ class ilObjTest extends ilObject
                 } else {
                     $txt = $this->lng->txt("ass_question");
                 }
-                if($points != '') {
+                if ($points != '') {
                     $lngv = $this->lng->txt('points');
                     if ($points == 1) {
                         $lngv = $this->lng->txt('point');
@@ -3747,7 +3736,7 @@ class ilObjTest extends ilObject
             $a_xml_writer->xmlStartTag("qtimetadatafield");
             $a_xml_writer->xmlElement("fieldlabel", null, "reporting_date");
             $reporting_date = $this->buildPeriodFromFormatedDateString(
-                $this->getScoreSettings()->getResultSummarySettings()->getReportingDate()->format('Y-m-d H:m:s')
+                $this->getScoreSettings()->getResultSummarySettings()->getReportingDate()->format('Y-m-d H:i:s')
             );
             $a_xml_writer->xmlElement("fieldentry", null, $reporting_date);
             $a_xml_writer->xmlEndTag("qtimetadatafield");
@@ -4111,7 +4100,8 @@ class ilObjTest extends ilObject
                     $matches[4],
                     $matches[5],
                     $matches[6]
-                )
+                ),
+                new \DateTimeZone('UTC')
             );
         }
         return null;
@@ -4303,21 +4293,9 @@ class ilObjTest extends ilObject
             return true;
         }
 
-        if ($this->getReportingDate() === null
-            || preg_match("/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/", $this->getReportingDate(), $matches) === false) {
-            return false;
-        }
-
-        $epoch_time = mktime(
-            (int) $matches[4],
-            (int) $matches[5],
-            (int) $matches[6],
-            (int) $matches[2],
-            (int) $matches[3],
-            (int) $matches[1]
-        );
-        if (time() < $epoch_time) {
-            return true;
+        $reporting_date = $this->getScoreSettings()->getResultSummarySettings()->getReportingDate();
+        if ($reporting_date !== null) {
+            return $reporting_date <= new DateTimeImmutable('now', new DateTimeZone('UTC'));
         }
         return false;
     }
@@ -4333,22 +4311,20 @@ class ilObjTest extends ilObject
     */
     public function saveAuthorToMetadata($author = "")
     {
-        $md = new ilMD($this->getId(), 0, $this->getType());
-        $md_life = $md->getLifecycle();
-        if (!$md_life) {
-            if (strlen($author) == 0) {
-                $author = $this->user->getFullname();
-            }
+        $path_to_lifecycle = $this->lo_metadata->paths()->custom()->withNextStep('lifeCycle')->get();
+        $path_to_authors = $this->lo_metadata->paths()->authors();
 
-            $md_life = $md->addLifecycle();
-            $md_life->save();
-            $con = $md_life->addContribute();
-            $con->setRole("Author");
-            $con->save();
-            $ent = $con->addEntity();
-            $ent->setEntity($author);
-            $ent->save();
+        $reader = $this->lo_metadata->read($this->getId(), 0, $this->getType(), $path_to_lifecycle);
+        if (!is_null($reader->allData($path_to_lifecycle)->current())) {
+            return;
         }
+
+        if ($author === '') {
+            $author = $this->user->getFullname();
+        }
+        $this->lo_metadata->manipulate($this->getId(), 0, $this->getType())
+                          ->prepareCreateOrUpdate($path_to_authors, $author)
+                          ->execute();
     }
 
     /**
@@ -4368,23 +4344,11 @@ class ilObjTest extends ilObject
     */
     public function getAuthor(): string
     {
-        $author = [];
-        $md = new ilMD($this->getId(), 0, $this->getType());
-        $md_life = $md->getLifecycle();
-        if ($md_life) {
-            $ids = $md_life->getContributeIds();
-            foreach ($ids as $id) {
-                $md_cont = $md_life->getContribute($id);
-                if (strcmp($md_cont->getRole(), "Author") == 0) {
-                    $entids = $md_cont->getEntityIds();
-                    foreach ($entids as $entid) {
-                        $md_ent = $md_cont->getEntity($entid);
-                        array_push($author, $md_ent->getEntity());
-                    }
-                }
-            }
-        }
-        return join(",", $author);
+        $path_to_authors = $this->lo_metadata->paths()->authors();
+        $author_data = $this->lo_metadata->read($this->getId(), 0, $this->getType(), $path_to_authors)
+                                         ->allData($path_to_authors);
+
+        return $this->lo_metadata->dataHelper()->makePresentableAsList(',', ...$author_data);
     }
 
     /**
@@ -4396,23 +4360,15 @@ class ilObjTest extends ilObject
     */
     public static function _lookupAuthor($obj_id): string
     {
-        $author = [];
-        $md = new ilMD($obj_id, 0, "tst");
-        $md_life = $md->getLifecycle();
-        if ($md_life) {
-            $ids = $md_life->getContributeIds();
-            foreach ($ids as $id) {
-                $md_cont = $md_life->getContribute($id);
-                if (strcmp($md_cont->getRole(), "Author") == 0) {
-                    $entids = $md_cont->getEntityIds();
-                    foreach ($entids as $entid) {
-                        $md_ent = $md_cont->getEntity($entid);
-                        array_push($author, $md_ent->getEntity());
-                    }
-                }
-            }
-        }
-        return join(",", $author);
+        global $DIC;
+
+        $lo_metadata = $DIC->learningObjectMetadata();
+
+        $path_to_authors = $lo_metadata->paths()->authors();
+        $author_data = $lo_metadata->read($obj_id, 0, "tst", $path_to_authors)
+                                    ->allData($path_to_authors);
+
+        return $lo_metadata->dataHelper()->makePresentableAsList(',', ...$author_data);
     }
 
     /**
@@ -6316,7 +6272,7 @@ class ilObjTest extends ilObject
 
         $reporting_date = $testsettings['ReportingDate'];
         if (is_string($reporting_date)) {
-            $reporting_date = new DateTimeImmutable($testsettings['ReportingDate']);
+            $reporting_date = new DateTimeImmutable($testsettings['ReportingDate'], new DateTimeZone('UTC'));
         }
 
         $score_settings = $this->getScoreSettings();

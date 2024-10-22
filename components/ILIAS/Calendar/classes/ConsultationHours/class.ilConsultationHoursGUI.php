@@ -18,7 +18,13 @@
 declare(strict_types=1);
 
 use ILIAS\Refinery\Factory as RefineryFactory;
-use ILIAS\HTTP\Services as HttpServices;
+use ILIAS\HTTP\GlobalHttpState;
+use ILIAS\Calendar\ConsultationHours\BookingTableGUI;
+use ILIAS\Calendar\ConsultationHours\BookingDataProvider;
+use ILIAS\UI\Factory as UIFactory;
+use ILIAS\UI\Renderer as UIRenderer;
+use ILIAS\Filesystem\Stream\Streams;
+
 
 /**
  * Consultation hours editor
@@ -41,7 +47,11 @@ class ilConsultationHoursGUI
     protected ilTabsGUI $tabs;
     protected ilToolbarGUI $toolbar;
     protected RefineryFactory $refinery;
-    protected HttpServices $http;
+    protected GlobalHttpState $http;
+    private UIFactory $ui_factory;
+    private UIRenderer $ui_renderer;
+
+
 
 
     private int $user_id;
@@ -85,6 +95,8 @@ class ilConsultationHoursGUI
         $this->tabs = $DIC->tabs();
         $this->toolbar = $DIC->toolbar();
         $this->global_user = $DIC->user();
+        $this->ui_factory = $DIC->ui()->factory();
+        $this->ui_renderer = $DIC->ui()->renderer();
     }
 
     protected function initSearchAssignmentToAppointments($a_default = false): bool
@@ -186,8 +198,7 @@ class ilConsultationHoursGUI
                         array()
                     );
                     $this->ctrl->setParameter($this, 'assignM', 1);
-                    $this->ctrl->setReturn($this, 'appointmentList');
-                    $this->tabs->activateSubTab('cal_ch_app_list');
+                    $this->ctrl->setReturn($this, 'appointments');
                 } elseif (count($this->initAppointmentIdsFromPost())) {
                     $rep_search->setCallback(
                         $this,
@@ -195,8 +206,7 @@ class ilConsultationHoursGUI
                         array()
                     );
                     $this->ctrl->saveParameter($this, 'apps');
-                    $this->ctrl->setReturn($this, 'appointmentList');
-                    $this->tabs->activateSubTab('cal_ch_app_list');
+                    $this->ctrl->setReturn($this, 'appointments');
                 } elseif ($this->initAppointmentIdsFromQuery()) {
                     $rep_search->setCallback(
                         $this,
@@ -204,8 +214,7 @@ class ilConsultationHoursGUI
                         array()
                     );
                     $this->ctrl->saveParameter($this, 'apps');
-                    $this->ctrl->setReturn($this, 'appointmentList');
-                    $this->tabs->activateSubTab('cal_ch_app_list');
+                    $this->ctrl->setReturn($this, 'appointments');
                 }
                 $this->ctrl->forwardCommand($rep_search);
                 break;
@@ -217,7 +226,7 @@ class ilConsultationHoursGUI
                 if ($this->global_user->getId() != $this->user_id) {
                     $this->ctrl->setParameter($this, 'user_id', $this->user_id);
                 }
-                $cmd = $this->ctrl->getCmd('appointmentList');
+                $cmd = $this->ctrl->getCmd('appointments');
                 $this->$cmd();
         }
     }
@@ -229,16 +238,18 @@ class ilConsultationHoursGUI
 
     protected function searchUsersForAppointments(): void
     {
-        $apps = [];
-        if ($this->initAppointmentIdsFromPost() !== []) {
-            $apps = $this->initAppointmentIdsFromPost();
-        } elseif ($this->initAppointmentIdsFromQuery() !== []) {
-            $apps = $this->initAppointmentIdsFromQuery();
-        }
-
+        $apps = $this->http->wrapper()->query()->retrieve(
+            BookingTableGUI::ID_TOKEN_NS,
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int()),
+                    $this->refinery->always([])
+                ]
+            )
+        );
         if ($apps === []) {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'), true);
-            $this->ctrl->redirect($this, 'appointmentList');
+            $this->ctrl->redirect($this, 'appointments');
         }
         ilSession::set('ch_apps', $apps);
         $this->ctrl->setParameterByClass(ilConsultationHoursGUI::class, 'assignM', 1);
@@ -278,7 +289,7 @@ class ilConsultationHoursGUI
         }
 
         $this->sendInfoAboutUnassignedUsers($unassigned_users);
-        $this->ctrl->redirect($this, 'appointmentList');
+        $this->ctrl->redirect($this, 'appointments');
     }
 
     /**
@@ -318,7 +329,7 @@ class ilConsultationHoursGUI
         $unassigned_users = array_diff($users, $assigned_users);
         if ($a_redirect) {
             $this->sendInfoAboutUnassignedUsers($unassigned_users);
-            $this->ctrl->redirect($this, 'appointmentList');
+            $this->ctrl->redirect($this, 'appointments');
         } else {
             return $unassigned_users;
         }
@@ -338,9 +349,6 @@ class ilConsultationHoursGUI
     protected function bookingList(): void
     {
         $this->help->setScreenId("consultation_hours");
-
-        $this->setSubTabs();
-        $this->tabs->activateSubTab('cal_ch_app_bookings');
 
         $btable = new ilConsultationHourBookingTableGUI($this, 'bookingList', $this->getUserId());
         $btable->parse(ilConsultationHourAppointments::getAppointmentIds($this->getUserId()));
@@ -372,8 +380,6 @@ class ilConsultationHoursGUI
             $this->bookingList();
             return;
         }
-        $this->setSubTabs();
-        $this->tabs->activateSubTab('cal_ch_app_bookings');
 
         $confirm = new ilConfirmationGUI();
         $confirm->setFormAction($this->ctrl->getFormAction($this));
@@ -433,28 +439,6 @@ class ilConsultationHoursGUI
     }
 
     /**
-     * Show settings of consultation hours
-     * @todo add list/filter of consultation hours if user is responsible for more than one other consultation hour series.
-     */
-    protected function appointmentList(): void
-    {
-        $this->help->setScreenId("consultation_hours");
-
-        $this->toolbar->setFormAction($this->ctrl->getFormAction($this));
-        $this->toolbar->addButton(
-            $this->lng->txt('cal_ch_add_sequence'),
-            $this->ctrl->getLinkTarget($this, 'createSequence')
-        );
-
-        $this->setSubTabs();
-        $this->tabs->activateSubTab('cal_ch_app_list');
-
-        $tbl = new ilConsultationHoursTableGUI($this, 'appointmentList', $this->getUserId());
-        $tbl->parse();
-        $this->tpl->setContent($tbl->getHTML());
-    }
-
-    /**
      * Create new sequence
      */
     protected function createSequence(): void
@@ -485,13 +469,13 @@ class ilConsultationHoursGUI
             case self::MODE_CREATE:
                 $this->form->setTitle($this->lng->txt('cal_ch_add_sequence'));
                 $this->form->addCommandButton('saveSequence', $this->lng->txt('save'));
-                $this->form->addCommandButton('appointmentList', $this->lng->txt('cancel'));
+                $this->form->addCommandButton('appointments', $this->lng->txt('cancel'));
                 break;
 
             case self::MODE_MULTI:
                 $this->form->setTitle($this->lng->txt('cal_ch_multi_edit_sequence'));
                 $this->form->addCommandButton('updateMulti', $this->lng->txt('save'));
-                $this->form->addCommandButton('appointmentList', $this->lng->txt('cancel'));
+                $this->form->addCommandButton('appointments', $this->lng->txt('cancel'));
                 break;
         }
 
@@ -612,7 +596,7 @@ class ilConsultationHoursGUI
             $booking->save();
             $this->createAppointments($booking);
             $this->tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'), true);
-            $this->ctrl->redirect($this, 'appointmentList');
+            $this->ctrl->redirect($this, 'appointments');
         } else {
             $this->form->setValuesByPost();
             $this->tpl->setContent($this->form->getHTML());
@@ -696,7 +680,7 @@ class ilConsultationHoursGUI
         $this->tabs->addTab(
             'consultation_hours_' . $this->user_id,
             $this->lng->txt('cal_ch_ch'),
-            $this->ctrl->getLinkTarget($this, 'appointmentList')
+            $this->ctrl->getLinkTarget($this, 'appointments')
         );
 
         foreach (ilConsultationHourAppointments::getManagedUsers() as $user_id => $login) {
@@ -704,7 +688,7 @@ class ilConsultationHoursGUI
             $this->tabs->addTab(
                 'consultation_hours_' . $user_id,
                 $this->lng->txt('cal_ch_ch') . ': ' . $login,
-                $this->ctrl->getLinkTarget($this, 'appointmentList')
+                $this->ctrl->getLinkTarget($this, 'appointments')
             );
         }
         $this->ctrl->setParameter($this, 'user_id', '');
@@ -712,43 +696,27 @@ class ilConsultationHoursGUI
         $this->tabs->activateTab('consultation_hours_' . $this->getUserId());
     }
 
-    protected function setSubTabs(): void
-    {
-        $this->ctrl->setParameter($this, 'user_id', $this->getUserId());
-        $this->tabs->addSubTab(
-            'cal_ch_app_list',
-            $this->lng->txt('cal_ch_app_list'),
-            $this->ctrl->getLinkTarget($this, 'appointmentList')
-        );
-        $this->tabs->addSubTab(
-            'cal_ch_app_list_new',
-            'Sprechstundenbuchungen',
-            $this->ctrl->getLinkTarget($this, 'appointments')
-        );
-        $this->tabs->addSubTab(
-            'cal_ch_app_bookings',
-            $this->lng->txt('cal_ch_app_bookings'),
-            $this->ctrl->getLinkTarget($this, 'bookingList')
-        );
-    }
-
-    /**
-     * Edit multiple sequence items
-     */
     public function edit(): void
     {
-        // first read from hidden input
-        $apps = [];
-        if ($this->initAppointmentIdsFromPostString() !== []) {
-            $apps = $this->initAppointmentIdsFromPostString();
-        } elseif ($this->initAppointmentIdsFromPost() !== []) {
-            $apps = $this->initAppointmentIdsFromPost();
-        } elseif ($this->initAppointmentIdsFromQuery()) {
-            $apps = $this->initAppointmentIdsFromQuery();
+        $apps = $this->http->wrapper()->query()->retrieve(
+            BookingTableGUI::ID_TOKEN_NS,
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int()),
+                    $this->refinery->always([])
+                ]
+            )
+        );
+        if (!count($apps)) {
+            if ($this->initAppointmentIdsFromPostString() !== []) {
+                $apps = $this->initAppointmentIdsFromPostString();
+            }
         }
+
+        // first read from hidden input
         if (!count($apps)) {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
-            $this->appointmentList();
+            $this->appointments();
             return;
         }
 
@@ -875,81 +843,6 @@ class ilConsultationHoursGUI
     }
 
     /**
-     * confirm delete for multiple entries
-     */
-    public function confirmDelete(): void
-    {
-        $apps = [];
-        if ($this->initAppointmentIdsFromPost() !== []) {
-            $apps = $this->initAppointmentIdsFromPost();
-        } elseif ($this->initAppointmentIdsFromQuery() !== []) {
-            $apps = $this->initAppointmentIdsFromQuery();
-        }
-        if ($apps === []) {
-            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
-            $this->appointmentList();
-            return;
-        }
-
-        $this->ctrl->saveParameter($this, array('seed', 'app_id', 'dt'));
-        $confirm = new ilConfirmationGUI();
-        $confirm->setFormAction($this->ctrl->getFormAction($this));
-        $confirm->setHeaderText($this->lng->txt('cal_delete_app_sure'));
-        $confirm->setCancel($this->lng->txt('cancel'), 'cancel');
-
-        $bookings_available = array();
-        foreach ($apps as $entry_id) {
-            $entry = new ilCalendarEntry($entry_id);
-            $confirm->addItem(
-                'apps[]',
-                (string) $entry_id,
-                ilDatePresentation::formatDate($entry->getStart()) . ', ' . $entry->getTitle()
-            );
-
-            if (ilBookingEntry::lookupBookingsForAppointment($entry_id)) {
-                $bookings_available[] = ilDatePresentation::formatDate($entry->getStart()) . ', ' . $entry->getTitle();
-            }
-        }
-        if ($bookings_available) {
-            $this->tpl->setOnScreenMessage('info', $this->lng->txt('cal_ch_delete_app_booking_info') . '<br />' . implode(
-                '<br />',
-                $bookings_available
-            ));
-        }
-        $confirm->setConfirm($this->lng->txt('delete'), 'delete');
-        $confirm->setCancel($this->lng->txt('cancel'), 'appointmentList');
-        $this->tpl->setContent($confirm->getHTML());
-    }
-
-    /**
-     * delete multiple entries
-     */
-    public function delete(): void
-    {
-        if (!count($this->initAppointmentIdsFromPost())) {
-            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
-            $this->appointmentList();
-            return;
-        }
-        foreach ($this->initAppointmentIdsFromPost() as $entry_id) {
-            // cancel booking for users
-            $booking = ilBookingEntry::getInstanceByCalendarEntryId($entry_id);
-            if ($booking) {
-                foreach ($booking->getCurrentBookings($entry_id) as $user_id) {
-                    ilConsultationHourUtils::cancelBooking($user_id, $entry_id, false);
-                }
-            }
-            // remove calendar entries
-            $entry = new ilCalendarEntry($entry_id);
-            $entry->delete();
-            ilCalendarCategoryAssignments::_deleteByAppointmentId($entry_id);
-        }
-        ilBookingEntry::removeObsoleteEntries();
-        $this->tpl->setOnScreenMessage('success', $this->lng->txt('cal_deleted_app'), true);
-        $this->ctrl->redirect($this, 'appointmentList');
-    }
-
-    /**
      * show public profile of given user
      */
     public function showProfile(): void
@@ -1042,6 +935,192 @@ class ilConsultationHoursGUI
 
     protected function appointments(): void
     {
-
+        $table = new BookingTableGUI(
+            new BookingDataProvider($this->getUserId())
+        );
+        $this->tpl->setContent(
+            $this->renderSequenceCreation() .
+            $table->render()
+        );
     }
+
+
+    protected function handleBookingTableActions(): void
+    {
+        $action = $this->http->wrapper()->query()->retrieve(
+            BookingTableGUI::ACTION_TOKEN_NS,
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->string(),
+                    $this->refinery->always('')
+                ]
+            )
+        );
+        match ($action) {
+            'edit' => $this->edit(),
+            'searchUsersForAppointments' => $this->searchUsersForAppointments(),
+            'confirmDeleteAppointments' => $this->confirmDeleteAppointments(),
+            'confirmCancelAppointments' => $this->confirmCancelAppointments(),
+            default => $this->ctrl->redirect($this, 'appointments')
+        };
+    }
+
+    protected function confirmCancelAppointments(): void
+    {
+        $appointment_ids = $this->http->wrapper()->query()->retrieve(
+            BookingTableGUI::ID_TOKEN_NS,
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int()),
+                    $this->refinery->always([])
+                ]
+            )
+        );
+        if ($appointment_ids === []) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
+            $this->appointments();
+            return;
+        }
+
+        foreach ($appointment_ids as $appointment) {
+            $entry = new ilCalendarEntry($appointment);
+            $booking = new ilBookingEntry($entry->getContextId());
+            $user_info = [];
+            foreach ($booking->getCurrentBookings($entry->getEntryId()) as $booking_user_id) {
+                $user_info[] = ilObjUser::_lookupFullname($booking_user_id);
+            }
+            $items[] = $this->ui_factory->modal()->interruptiveItem()->standard(
+                (string) $appointment,
+                ilDatePresentation::formatDate($entry->getStart()) . ', ' . $entry->getTitle() . ': ' . implode(', ', $user_info)
+            );
+        }
+
+        $output = $this->ui_renderer->renderAsync(
+            [
+                $this->ui_factory->modal()->interruptive(
+                    $this->lng->txt('confirm'),
+                    $this->lng->txt('cal_ch_cancel_booking_sure'),
+                    $this->ctrl->getFormAction($this, 'cancelAppointments')
+                )->withAffectedItems($items)
+            ]
+        );
+        $this->http->saveResponse($this->http->response()->withBody(
+            Streams::ofString($output)
+        ));
+        $this->http->sendResponse();
+        $this->http->close();
+    }
+
+    protected function cancelAppointments(): void
+    {
+        $appointment_ids = $this->http->wrapper()->post()->retrieve(
+            'interruptive_items',
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int()),
+                    $this->refinery->always([])
+                ]
+            )
+        );
+        if (!count($appointment_ids)) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
+            $this->appointments();
+            return;
+        }
+        foreach ($appointment_ids as $appointment) {
+            $entry = new ilCalendarEntry($appointment);
+            $booking = new ilBookingEntry($entry->getContextId());
+            foreach ($booking->getCurrentBookings($entry->getEntryId()) as $bookuser) {
+                ilConsultationHourUtils::cancelBooking(
+                    $bookuser,
+                    (int) $appointment,
+                    true
+                );
+            }
+        }
+        $this->tpl->setOnScreenMessage('success', $this->lng->txt('cal_ch_canceled_bookings'), true);
+        $this->ctrl->redirect($this, 'appointments');
+    }
+
+    protected function confirmDeleteAppointments(): void
+    {
+        $appointment_ids = $this->http->wrapper()->query()->retrieve(
+            BookingTableGUI::ID_TOKEN_NS,
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int()),
+                    $this->refinery->always([])
+                ]
+            )
+        );
+        $items = [];
+        foreach ($appointment_ids as $appointment) {
+            $entry = new ilCalendarEntry($appointment);
+            $items[] = $this->ui_factory->modal()->interruptiveItem()->standard(
+                (string) $appointment,
+                ilDatePresentation::formatDate($entry->getStart()) . ', ' . $entry->getTitle()
+            );
+        }
+
+        $output = $this->ui_renderer->renderAsync(
+            [
+                $this->ui_factory->modal()->interruptive(
+                    $this->lng->txt('confirm'),
+                    $this->lng->txt('cal_ch_delete_app_booking_info'),
+                    $this->ctrl->getFormAction($this, 'deleteAppointments')
+                )->withAffectedItems($items)
+            ]
+        );
+
+        $this->http->saveResponse($this->http->response()->withBody(
+            Streams::ofString($output)
+        ));
+        $this->http->sendResponse();
+        $this->http->close();
+    }
+
+    protected function deleteAppointments(): void
+    {
+        $appointment_ids = $this->http->wrapper()->post()->retrieve(
+            'interruptive_items',
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int()),
+                    $this->refinery->always([])
+                ]
+            )
+        );
+        if (!count($appointment_ids)) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
+            $this->appointments();
+            return;
+        }
+
+        foreach ($appointment_ids as $appointment_id) {
+            // cancel booking for users
+            $booking = ilBookingEntry::getInstanceByCalendarEntryId($appointment_id);
+            if ($booking) {
+                foreach ($booking->getCurrentBookings($appointment_id) as $user_id) {
+                    ilConsultationHourUtils::cancelBooking($user_id, $appointment_id, false);
+                }
+            }
+            // remove calendar entries
+            $entry = new ilCalendarEntry($appointment_id);
+            $entry->delete();
+            ilCalendarCategoryAssignments::_deleteByAppointmentId($appointment_id);
+        }
+        ilBookingEntry::removeObsoleteEntries();
+        $this->tpl->setOnScreenMessage('success', $this->lng->txt('cal_deleted_app'), true);
+        $this->ctrl->redirect($this, 'appointments');
+    }
+
+    protected function renderSequenceCreation(): string
+    {
+        $add_sequence_button = $this->ui_factory->button()->standard(
+            $this->lng->txt('cal_ch_add_sequence'),
+            $this->ctrl->getLinkTarget($this, 'createSequence')
+        );
+        return $this->ui_renderer->render($add_sequence_button);
+    }
+
 }

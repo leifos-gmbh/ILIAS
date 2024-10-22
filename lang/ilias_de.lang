@@ -17679,3 +17679,6 @@ wsp#:#wsp_type_scov#:#Zertifikat: SCORM
 wsp#:#wsp_type_tstv#:#Zertifikat: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Ordner
+dateplaner#:#cal_ch_booking_participants#:#Teilnehmer
+dateplaner#:#cal_ch_minutes#:#Dauer (min)
+dateplaner#:#cal_ch_booking_start#:#Start

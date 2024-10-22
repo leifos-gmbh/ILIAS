@@ -179,14 +179,6 @@ class ilConsultationHourUtils
             ilCalendarCategory::TYPE_CH,
             false
         );
-        foreach ($user_apps as $uapp_id) {
-            $uapp = new ilCalendarEntry($uapp_id);
-            $uapp->delete();
-
-            ilCalendarCategoryAssignments::_deleteByAppointmentId($uapp_id);
-
-            break;
-        }
 
         // Delete booking entries
         // Send notification
@@ -196,6 +188,16 @@ class ilConsultationHourUtils
         } else {
             $booking->deleteBooking($a_app_id, $a_usr_id);
         }
+
+        foreach ($user_apps as $uapp_id) {
+            $uapp = new ilCalendarEntry($uapp_id);
+            $uapp->delete();
+
+            ilCalendarCategoryAssignments::_deleteByAppointmentId($uapp_id);
+
+            break;
+        }
+
         return true;
     }
 

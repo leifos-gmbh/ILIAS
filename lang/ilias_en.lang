@@ -8202,6 +8202,9 @@ dateplaner#:#cal_ch_booking_owner#:#Owner
 dateplaner#:#cal_ch_booking_reminder_body#:#your appointment with "%s" starts soon.
 dateplaner#:#cal_ch_booking_reminder_subject#:#Reminder for "%s"
 dateplaner#:#cal_ch_bookings#:#Participants
+dateplaner#:#cal_ch_booking_participants#:#Participants
+dateplaner#:#cal_ch_minutes#:#Duration (min)
+dateplaner#:#cal_ch_booking_start#:#Start
 dateplaner#:#cal_ch_bookings_tbl#:#Booked Appointments
 dateplaner#:#cal_ch_cancel_booking#:#Cancel Booking
 dateplaner#:#cal_ch_cancel_booking_info#:#‘Cancel Booking’ sends notification mails to the users. If you do not want to notify the users, choose the option ‘Delete Booking’.

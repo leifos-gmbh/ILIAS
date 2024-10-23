@@ -33,6 +33,10 @@ use DateTimeImmutable;
 use ilArrayUtil;
 use ILIAS\StaticURL;
 use ILIAS\Data\ReferenceId;
+use ilConsultationHoursGUI;
+use ilCalendarEntry;
+use ilDate;
+use ilDateTime;
 
 class BookingDataProvider
 {
@@ -42,11 +46,16 @@ class BookingDataProvider
     private StaticURL\Services $static_url_service;
     private \ILIAS\UI\Factory $ui_factory;
 
-    public function __construct(int $user_id)
+    private string $vm_period = ilConsultationHoursGUI::VIEW_MODE_PERIOD_ALL;
+    private string $vm_status = ilConsultationHoursGUI::VIEW_MODE_STATUS_ALL;
+
+    public function __construct(int $user_id, string $vm_period, string $vm_status)
     {
         global $DIC;
 
         $this->user_id = $user_id;
+        $this->vm_status = $vm_status;
+        $this->vm_period = $vm_period;
         $this->static_url_service = $DIC['static_url'];
         $this->ui_factory = $DIC->ui()->factory();
         $this->read();
@@ -62,6 +71,12 @@ class BookingDataProvider
         $data = [];
         $counter = 0;
         foreach (ilConsultationHourAppointments::getAppointments($this->getUserId()) as $appointment) {
+            $booking = new ilBookingEntry($appointment->getContextId());
+            $booked_user_ids = $booking->getCurrentBookings($appointment->getEntryId());
+            if ($this->isFiltered($appointment, $booking, $booked_user_ids)) {
+                continue;
+            }
+
             $row = [];
             $row['id'] = (string) $appointment->getEntryId();
             $row['booking_start'] = DateTimeImmutable::createFromFormat(
@@ -71,7 +86,6 @@ class BookingDataProvider
                 (int) ($appointment->getEnd()->getUnixTime() - $appointment->getStart()->getUnixTime()) / 60;
             $row['booking_title'] = $appointment->getTitle();
 
-            $booking = new ilBookingEntry($appointment->getContextId());
             $obj_ids = array_map(
                 'intval',
                 ilUtil::_sortIds($booking->getTargetObjIds(), 'object_data', 'title', 'obj_id')
@@ -95,7 +109,6 @@ class BookingDataProvider
             $row['booking_location'] = $this->ui_factory->listing()->unordered($locations);
 
             // booking users
-            $booked_user_ids = $booking->getCurrentBookings($appointment->getEntryId());
             $booked_user_ids = array_map('intval', ilUtil::_sortIds($booked_user_ids, 'usr_data', 'lastname', 'usr_id'));
             $bookings = [];
             foreach ($booked_user_ids as $booked_user_id) {
@@ -113,6 +126,38 @@ class BookingDataProvider
             $data[$counter++] = $row;
         }
         $this->data = $data;
+    }
+
+    public function isFiltered(ilCalendarEntry $entry, ilBookingEntry $booking, array $booked_users): bool
+    {
+        if (
+            $this->vm_status == ilConsultationHoursGUI::VIEW_MODE_STATUS_ALL &&
+            $this->vm_period == ilConsultationHoursGUI::VIEW_MODE_PERIOD_ALL
+        ) {
+            return false;
+        }
+        $now = new ilDate(time(), IL_CAL_UNIX);
+        if ($this->vm_period === ilConsultationHoursGUI::VIEW_MODE_PERIOD_UPCOMING) {
+            if (ilDateTime::_before($entry->getStart(), $now, IL_CAL_DAY)) {
+                return true;
+            }
+        }
+        if ($this->vm_period === ilConsultationHoursGUI::VIEW_MODE_PERIOD_PAST) {
+            if (ilDateTime::_after($entry->getStart(), $now, IL_CAL_DAY)) {
+                return true;
+            }
+        }
+        if ($this->vm_status === ilConsultationHoursGUI::VIEW_MODE_STATUS_OPEN) {
+            if (count($booked_users) >= $booking->getNumberOfBookings()) {
+                return true;
+            }
+        }
+        if ($this->vm_status === ilConsultationHoursGUI::VIEW_MODE_STATUS_BOOKED) {
+            if (count($booked_users) < $booking->getNumberOfBookings()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function getData(): array

@@ -33,6 +33,14 @@ use ILIAS\Filesystem\Stream\Streams;
  */
 class ilConsultationHoursGUI
 {
+    public const VIEW_MODE_PERIOD_UPCOMING = 'upcoming';
+    public const VIEW_MODE_PERIOD_PAST = 'past';
+    public const VIEW_MODE_PERIOD_ALL = 'all';
+
+    public const VIEW_MODE_STATUS_BOOKED = 'booked';
+    public const VIEW_MODE_STATUS_OPEN = 'open';
+    public const VIEW_MODE_STATUS_ALL = 'all';
+
     protected const MODE_CREATE = 1;
     protected const MODE_UPDATE = 2;
     protected const MODE_MULTI = 3;
@@ -59,6 +67,9 @@ class ilConsultationHoursGUI
     private ?ilBookingEntry $booking = null;
 
     private ?ilPropertyFormGUI $form = null;
+
+    private string $vm_period = '';
+    private string $vm_status = '';
 
     /**
      * Constructor
@@ -935,11 +946,12 @@ class ilConsultationHoursGUI
 
     protected function appointments(): void
     {
+        $this->initViewMode();
         $table = new BookingTableGUI(
-            new BookingDataProvider($this->getUserId())
+            new BookingDataProvider($this->getUserId(), $this->vm_period, $this->vm_status)
         );
         $this->tpl->setContent(
-            $this->renderSequenceCreation() .
+            $this->renderViewControl() .
             $table->render()
         );
     }
@@ -1114,13 +1126,105 @@ class ilConsultationHoursGUI
         $this->ctrl->redirect($this, 'appointments');
     }
 
-    protected function renderSequenceCreation(): string
+    protected function initSequenceCreation(): ILIAS\UI\Component\Component
     {
         $add_sequence_button = $this->ui_factory->button()->standard(
             $this->lng->txt('cal_ch_add_sequence'),
             $this->ctrl->getLinkTarget($this, 'createSequence')
         );
-        return $this->ui_renderer->render($add_sequence_button);
+        return $add_sequence_button;
+    }
+
+    protected function renderViewControl(): string
+    {
+        $toolbar = new ilToolbarGUI();
+        $toolbar->addComponent($this->initSequenceCreation());
+        $toolbar->addSeparator();
+
+        $this->ctrl->setParameter($this, 'vm_period', self::VIEW_MODE_PERIOD_PAST);
+        $actions[$this->lng->txt('cal_ch_vm_period_' . self::VIEW_MODE_PERIOD_PAST)] = $this->ctrl->getLinkTarget(
+            $this,
+            'appointments'
+        );
+        $this->ctrl->setParameter($this, 'vm_period', self::VIEW_MODE_PERIOD_UPCOMING);
+        $actions[$this->lng->txt('cal_ch_vm_period_' . self::VIEW_MODE_PERIOD_UPCOMING)] = $this->ctrl->getLinkTarget(
+            $this,
+            'appointments'
+        );
+        $this->ctrl->setParameter($this, 'vm_period', self::VIEW_MODE_PERIOD_ALL);
+        $actions[$this->lng->txt('cal_ch_vm_period_' . self::VIEW_MODE_PERIOD_ALL)] = $this->ctrl->getLinkTarget(
+            $this,
+            'appointments'
+        );
+        $this->ctrl->setParameter($this, 'vm_period', '');
+
+        $view_control_period = $this->ui_factory->viewControl()->mode(
+            $actions,
+            $this->lng->txt('meta_aria_language_selection')
+        )->withActive($this->lng->txt('cal_ch_vm_period_' . $this->vm_period));
+
+        $toolbar->addComponent($view_control_period);
+
+        $actions = [];
+        $this->ctrl->setParameter($this, 'vm_status', self::VIEW_MODE_STATUS_OPEN);
+        $actions[$this->lng->txt('cal_ch_vm_status_' . self::VIEW_MODE_STATUS_OPEN)] = $this->ctrl->getLinkTarget(
+            $this,
+            'appointments'
+        );
+        $this->ctrl->setParameter($this, 'vm_status', self::VIEW_MODE_STATUS_BOOKED);
+        $actions[$this->lng->txt('cal_ch_vm_status_' . self::VIEW_MODE_STATUS_BOOKED)] = $this->ctrl->getLinkTarget(
+            $this,
+            'appointments'
+        );
+        $this->ctrl->setParameter($this, 'vm_status', self::VIEW_MODE_STATUS_ALL);
+        $actions[$this->lng->txt('cal_ch_vm_status_' . self::VIEW_MODE_STATUS_ALL)] = $this->ctrl->getLinkTarget(
+            $this,
+            'appointments'
+        );
+        $this->ctrl->setParameter($this, 'vm_status', '');
+
+        $view_control_status = $this->ui_factory->viewControl()->mode(
+            $actions,
+            $this->lng->txt('meta_aria_language_selection')
+        )->withActive($this->lng->txt('cal_ch_vm_status_' . $this->vm_status));
+
+        $toolbar->addComponent($view_control_status);
+        return $toolbar->getHTML();
+    }
+
+    protected function initViewMode(): void
+    {
+        global $DIC;
+
+        $user = $DIC->user();
+        $vm_period = $this->http->wrapper()->query()->retrieve(
+            'vm_period',
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->string(),
+                    $this->refinery->always('')
+                ]
+            )
+        );
+        $vm_status = $this->http->wrapper()->query()->retrieve(
+            'vm_status',
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->string(),
+                    $this->refinery->always('')
+                ]
+            )
+        );
+
+        if ($vm_period !== '') {
+            $user->writePref('cal_ch_vm_period', $vm_period);
+        }
+        if ($vm_status !== '') {
+            $user->writePref('cal_ch_vm_status', $vm_status);
+        }
+        $this->vm_period = $user->getPref('cal_ch_vm_period') ? $user->getPref('cal_ch_vm_period') : self::VIEW_MODE_PERIOD_ALL;
+        $this->vm_status = $user->getPref('cal_ch_vm_status') ? $user->getPref('cal_ch_vm_status') : self::VIEW_MODE_STATUS_ALL;
+
     }
 
 }

@@ -1148,11 +1148,16 @@ class ilCalendarAppointmentGUI
         $this->ctrl->returnToParent($this);
     }
 
+    protected function deleteBooking(): void
+    {
+        $this->cancelBooking(false);
+    }
+
     /**
      * Confirmation screen to cancel consultation appointment or ressource booking
      * depends on calendar category
      */
-    public function cancelBooking(): void
+    public function cancelBooking(bool $send_mail = true): void
     {
         $entry = $this->getAppointmentIdFromQuery();
         $entry = new ilCalendarEntry($entry);
@@ -1160,11 +1165,10 @@ class ilCalendarAppointmentGUI
         $category = $this->calendarEntryToCategory($entry);
         if ($category->getType() == ilCalendarCategory::TYPE_CH) {
             $booking = new ilBookingEntry($entry->getContextId());
-            if (!$booking->hasBooked($entry->getEntryId())) {
+            if (!$booking->hasBooked($entry->getEntryId()) && !$booking->isOwner()) {
                 $this->ctrl->returnToParent($this);
                 return;
             }
-
             $entry_title = ' ' . $entry->getTitle() . " (" . ilObjUser::_lookupFullname($booking->getObjId()) . ')';
         } elseif ($category->getType() == ilCalendarCategory::TYPE_BOOK) {
             $entry_title = ' ' . $entry->getTitle();
@@ -1172,24 +1176,37 @@ class ilCalendarAppointmentGUI
             $this->ctrl->returnToParent($this);
             return;
         }
-
         $title = ilDatePresentation::formatPeriod($entry->getStart(), $entry->getEnd());
-
         $conf = new ilConfirmationGUI();
         $conf->setFormAction($this->ctrl->getFormAction($this));
-        $conf->setHeaderText($this->lng->txt('cal_cancel_booking_info'));
-        $conf->setConfirm($this->lng->txt('cal_cancel_booking'), 'cancelconfirmed');
+        $conf->setHeaderText(
+            $send_mail ?
+                $this->lng->txt('cal_cancel_booking_info') :
+                $this->lng->txt('cal_delete_booking_info')
+        );
+        $conf->setConfirm(
+            $send_mail ?
+                $this->lng->txt('cal_cancel_booking') :
+                $this->lng->txt('delete'),
+            $send_mail ?
+                'cancelConfirmed' :
+                'deleteConfirmed'
+        );
         $conf->setCancel($this->lng->txt('cancel'), 'cancel');
         $conf->addItem('app_id', (string) $entry->getEntryId(), $title . ' - ' . $entry_title);
-
         $this->tpl->setContent($conf->getHTML());
+    }
+
+    protected function deleteConfirmed(): void
+    {
+        $this->cancelConfirmed(false);
     }
 
     /**
      * Cancel consultation appointment or ressource booking, was confirmed
      * This will delete the calendar entry
      */
-    public function cancelConfirmed(): void
+    public function cancelConfirmed(bool $send_mail = true): void
     {
         $app_id = 0;
         if ($this->http->wrapper()->post()->has('app_id')) {
@@ -1200,7 +1217,16 @@ class ilCalendarAppointmentGUI
         }
         $entry = new ilCalendarEntry($app_id);
         $category = $this->calendarEntryToCategory($entry);
-        if ($category->getType() == ilCalendarCategory::TYPE_CH) {
+        $booking = new ilBookingEntry($entry->getContextId());
+        if ($category->getType() == ilCalendarCategory::TYPE_CH && $booking->isOwner()) {
+            foreach ($booking->getCurrentBookings($entry->getEntryId()) as $bookuser) {
+                ilConsultationHourUtils::cancelBooking(
+                    $bookuser,
+                    (int) $app_id,
+                    $send_mail
+                );
+            }
+        } elseif ($category->getType() == ilCalendarCategory::TYPE_CH) {
             // find cloned calendar entry in user calendar
             $apps = ilConsultationHourAppointments::getAppointmentIds(
                 $this->user->getId(),

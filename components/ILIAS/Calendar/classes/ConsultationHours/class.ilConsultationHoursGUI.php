@@ -849,7 +849,7 @@ class ilConsultationHoursGUI
         ilBookingEntry::removeObsoleteEntries();
 
         $this->tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'), true);
-        $this->ctrl->redirect($this, 'appointmentList');
+        $this->ctrl->redirect($this, 'appointments');
         $this->tpl->setContent($this->form->getHTML());
     }
 
@@ -885,7 +885,7 @@ class ilConsultationHoursGUI
             $url = $this->ctrl->getLinkTargetByClass('ilCalendarPresentationGUI');
         } // from appointments
         else {
-            $url = $this->ctrl->getLinkTarget($this, 'appointmentList');
+            $url = $this->ctrl->getLinkTarget($this, 'appointments');
         }
         return $url;
     }

@@ -26,7 +26,7 @@ class ilAppointmentPresentationConsultationHoursGUI extends ilAppointmentPresent
             $this->addInfoProperty($this->lng->txt("cal_ch_manager"), $manager);
         }
 
-        if ($booking->isOwner()) {
+        if ($booking->isOwner($this->user->getId())) {
             $buttons = array();
             foreach ($booking->getTargetObjIds() as $obj_id) {
                 //$this->addObjectLinks($obj_id, $this->appointment);
@@ -81,7 +81,7 @@ class ilAppointmentPresentationConsultationHoursGUI extends ilAppointmentPresent
 
         // for the following code
         // see ilCalendarAppointmentPanelGUI in ILIAS 5.2 (getHTML())
-        $is_owner = $booking->isOwner();
+        $is_owner = $booking->isOwner($this->user->getId());
         $user_entry = ($cat_info['obj_id'] == $this->user->getId());
 
         if ($user_entry && !$is_owner) {
@@ -97,11 +97,6 @@ class ilAppointmentPresentationConsultationHoursGUI extends ilAppointmentPresent
         }
 
         $cb = $booking->getCurrentNumberOfBookings($ref_event);
-        if (!$is_owner) {
-            $this->addInfoProperty($this->lng->txt('cal_ch_current_bookings'), (string) $cb);
-        }
-        $this->addListItemProperty($this->lng->txt('cal_ch_current_bookings'), (string) $cb);
-
         if (!$is_owner) {
             if ($booking->hasBooked($ref_event)) {
                 if (ilDateTime::_after($a_app['event']->getStart(), new ilDateTime(time(), IL_CAL_UNIX))) {
@@ -121,25 +116,43 @@ class ilAppointmentPresentationConsultationHoursGUI extends ilAppointmentPresent
                 );
             }
         } else {
-            // list booking users
+            // current user is owner of booking
+            if (ilDateTime::_after($a_app['event']->getStart(), new ilDateTime(time(), IL_CAL_UNIX))) {
+                $this->ctrl->setParameterByClass('ilcalendarappointmentgui', 'app_id', $a_app['event']->getEntryId());
+                $this->addAction(
+                    $this->lng->txt('cal_ch_cancel_booking'),
+                    $this->ctrl->getLinkTargetByClass('ilcalendarappointmentgui', 'cancelBooking')
+                );
+                $this->addAction(
+                    $this->lng->txt('cal_ch_delete_booking'),
+                    $this->ctrl->getLinkTargetByClass('ilcalendarappointmentgui', 'deleteBooking')
+                );
+            }
             $link_users = true;
             if (ilCalendarCategories::_getInstance()->getMode() == ilCalendarCategories::MODE_PORTFOLIO_CONSULTATION) {
                 $link_users = false;
             }
-            $users = array();
+            $users = [];
+            $booking_comments = [];
             foreach ($booking->getCurrentBookings($a_app['event']->getEntryId()) as $user_id) {
+
+                $booking_comments[$user_id] = ilBookingEntry::lookupBookingMessage(
+                    $a_app['event']->getEntryId(),
+                    $user_id
+                );
                 if ($link_users) {
-                    $users[] = $this->getUserName($user_id);
+                    $users[$user_id] = $this->getUserName($user_id);
                 } else {
-                    $users[] = ilObjUser::_lookupFullname($user_id);
+                    $users[$user_id] = ilObjUser::_lookupFullname($user_id);
                 }
             }
             if ($users) {
-                $this->addInfoProperty($this->lng->txt('cal_ch_current_bookings'), implode('<br>', $users));
+                foreach ($booking_comments as $user_id => $comment) {
+                    $this->addInfoProperty($this->lng->txt('cal_ch_current_bookings'), $users[$user_id]);
+                    $this->addInfoProperty($this->lng->txt('cal_ch_current_booking_comment'), $comment);
+                }
+                $this->addListItemProperty($this->lng->txt('cal_ch_current_bookings'), implode(' ', $users));
             }
         }
-
-        // last edited
-        $this->addLastUpdate($a_app);
     }
 }

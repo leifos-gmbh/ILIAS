@@ -1912,7 +1912,17 @@ class ilObjMediaObject extends ilObject
 
     public function getStandardSrc() : string
     {
-        $med = $this->getMediaItem("Standard");
+        return $this->getLocationSrc("Standard");
+    }
+
+    public function getFullscreenSrc() : string
+    {
+        return $this->getLocationSrc("Fullscreen");
+    }
+
+    protected function getLocationSrc(string $purpose) : string
+    {
+        $med = $this->getMediaItem($purpose);
         if (strcasecmp("Reference", $med->getLocationType()) === 0) {
             $src = $med->getLocation();
         } else {

@@ -422,8 +422,7 @@ class ilCalendarPresentationGUI
             $this->ctrl->getCmdClass() == ''
         ) {
             $cmd_class = $this->readLastClass();
-            // @todo: removed deprecated ilCtrl methods, this needs inspection by a maintainer.
-            // $this->ctrl->setCmdClass($cmd_class);
+            $this->ctrl->redirectByClass($cmd_class);
             return $cmd_class;
         }
         return '';
@@ -464,8 +463,7 @@ class ilCalendarPresentationGUI
         // If cmd class == 'ilcalendarpresentationgui' the cmd class is set to the the new forwarded class
         // otherwise e.g ilcalendarmonthgui tries to forward (back) to ilcalendargui.
         if ($this->ctrl->getCmdClass() == strtolower(get_class($this))) {
-            // @todo: removed deprecated ilCtrl methods, this needs inspection by a maintainer.
-            // $this->ctrl->setCmdClass(strtolower($a_class));
+            $this->ctrl->redirectByClass($a_class);
         }
     }
 

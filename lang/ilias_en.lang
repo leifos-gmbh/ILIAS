@@ -17662,3 +17662,9 @@ wsp#:#wsp_type_scov#:#Certificate: SCORM
 wsp#:#wsp_type_tstv#:#Certificate: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Folder
+dateplaner#:#cal_ch_vm_period_upcoming#:#Upcoming
+dateplaner#:#cal_ch_vm_period_past#:#Past
+dateplaner#:#cal_ch_vm_period_all#:#All
+dateplaner#:#cal_ch_vm_status_booked#:#Booked Slots
+dateplaner#:#cal_ch_vm_status_open#:#Open Slots
+dateplaner#:#cal_ch_vm_status_all#:#All

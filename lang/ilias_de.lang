@@ -17682,3 +17682,11 @@ wsp#:#wsp_type_wfld#:#Ordner
 dateplaner#:#cal_ch_booking_participants#:#Teilnehmer
 dateplaner#:#cal_ch_minutes#:#Dauer (min)
 dateplaner#:#cal_ch_booking_start#:#Start
+dateplaner#:#cal_ch_vm_period_upcoming#:#Zukünftige Termine
+dateplaner#:#cal_ch_vm_period_past#:#Vergangene Termine
+dateplaner#:#cal_ch_vm_period_all#:#Alle
+dateplaner#:#cal_ch_vm_status_booked#:#Belegte Termine
+dateplaner#:#cal_ch_vm_status_open#:#Freie Termine
+dateplaner#:#cal_ch_vm_status_all#:#Alle
+dateplaner#:#cal_ch_current_booking_comment#:#Kommentar
+dateplaner#:#cal_delete_booking_info#:#Bitte bestätigen Sie das Löschen diese Termins

@@ -87,7 +87,10 @@ class BookingTableGUI implements DataRetrieval
             $id = $row['id'];
             $records_row = $row_builder->buildDataRow($id, $row);
             if (count($row['booking_participant']->getItems()) === 0) {
-                $records_row = $records_row->withDisabledAction('confirmCancelAppointments');
+                $records_row = $records_row
+                    ->withDisabledAction('confirmCancelBooking')
+                    ->withDisabledAction('confirmDeleteBooking')
+                    ->withDisabledAction('sendMail');
             }
             yield $records_row;
         }
@@ -161,7 +164,12 @@ class BookingTableGUI implements DataRetrieval
                 $this->lng->txt('delete'),
                 $url_builder->withParameter($action_parameter_token, 'confirmDeleteAppointments'),
                 $row_id_token
-            )->withAsync(true)
+            )->withAsync(true),
+            'sendMail' => $this->ui_factory->table()->action()->standard(
+                $this->lng->txt('cal_ch_send_mail'),
+                $url_builder->withParameter($action_parameter_token, 'sendMail'),
+                $row_id_token
+            )
         ];
     }
 

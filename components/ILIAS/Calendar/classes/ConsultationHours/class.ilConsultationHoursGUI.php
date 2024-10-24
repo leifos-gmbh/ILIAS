@@ -952,8 +952,50 @@ class ilConsultationHoursGUI
             'confirmDeleteAppointments' => $this->confirmDeleteAppointments(),
             'confirmCancelBooking' => $this->confirmCancelBooking(true),
             'confirmDeleteBooking' => $this->confirmCancelBooking(false),
+            'sendMail' => $this->sendMailToSelectedUsers(),
             default => $this->ctrl->redirect($this, 'appointments')
         };
+    }
+
+    protected function sendMailToSelectedUsers(): void
+    {
+        $appointment_ids = $this->http->wrapper()->query()->retrieve(
+            BookingTableGUI::ID_TOKEN_NS,
+            $this->refinery->byTrying(
+                [
+                    $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int()),
+                    $this->refinery->always([])
+                ]
+            )
+        );
+        if ($appointment_ids === []) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
+            $this->appointments();
+            return;
+        }
+
+        $bookusers = [];
+        foreach ($appointment_ids as $appointment_id) {
+            $entry = new ilCalendarEntry($appointment_id);
+            $booking = new ilBookingEntry($entry->getContextId());
+            foreach ($booking->getCurrentBookings($entry->getEntryId()) as $bookuser) {
+                $login = ilObjUser::_lookupLogin($bookuser);
+                if (!in_array($login, $bookusers)) {
+                    $bookusers[] = $login;
+                }
+            }
+        }
+        $this->ctrl->redirectToURL(
+            ilMailFormCall::getRedirectTarget(
+                $this,
+                'appointments',
+                [],
+                [
+                    'type' => 'new',
+                    'rcp_to' => implode(',', $bookusers)
+                ]
+            )
+        );
     }
 
     protected function confirmCancelBooking(bool $with_notification = true): void
@@ -1052,6 +1094,11 @@ class ilConsultationHoursGUI
                 ]
             )
         );
+        if (!count($appointment_ids)) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
+            $this->appointments();
+            return;
+        }
         $items = [];
         foreach ($appointment_ids as $appointment) {
             $entry = new ilCalendarEntry($appointment);

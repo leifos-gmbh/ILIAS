@@ -22,6 +22,7 @@ namespace ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS;
 
 use DateTimeImmutable;
 use ILIAS\ResourceStorage\Identification\ResourceIdentification;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\HandlerInterface as ilAMDRecordFileRepositoryStakeholderInterface;
 
 interface HandlerInterface
 {
@@ -39,7 +40,9 @@ interface HandlerInterface
 
     public function getRecords(): array;
 
-    public function deleteResource(): void;
+    public function deleteResource(
+        ilAMDRecordFileRepositoryStakeholderInterface $stakeholder
+    ): void;
 
     public function resourceExists(): bool;
 

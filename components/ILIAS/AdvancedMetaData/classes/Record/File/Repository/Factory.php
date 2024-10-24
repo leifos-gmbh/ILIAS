@@ -51,7 +51,9 @@ class Factory implements ilAMDRecordFileRepositoryFactoryInterface
 
     public function handler(): ilAMDRecordFileRepositoryInterface
     {
-        return new ilAMDRecordFileRepository();
+        return new ilAMDRecordFileRepository(
+            $this->wrapper()->db()->handler()
+        );
     }
 
     public function element(): ilAMDRecordFileRepositoryElementFactoryInterface

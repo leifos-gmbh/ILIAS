@@ -31,6 +31,12 @@ class Handler implements ilAMDRecordFileRepositoryInterface
 {
     protected ilAMDRecordFileRepositoryDBWrapperInterface $db_wrapper;
 
+    public function __construct(
+        ilAMDRecordFileRepositoryDBWrapperInterface $db_wrapper
+    ) {
+        $this->db_wrapper = $db_wrapper;
+    }
+
     public function store(
         ilAMDRecordFileRepositoryKeyInterface $key,
         ilAMDRecordFileRepositoryValuesInterface $values

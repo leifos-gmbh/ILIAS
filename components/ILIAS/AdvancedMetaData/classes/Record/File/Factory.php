@@ -42,7 +42,10 @@ class Factory implements ilAMDRecordFileFactoryInterface
 
     public function handler(): ilAMDRecordFileInterface
     {
-        return new ilAMDRecordFile();
+        return new ilAMDRecordFile(
+            $this,
+            $this->irss
+        );
     }
 
     public function repository(): ilAMDRecordFileRepositoryFactoryInterface

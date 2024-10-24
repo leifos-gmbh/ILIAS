@@ -170,7 +170,7 @@ class ilAdvancedMDSettingsGUI
                 $this->http->wrapper()->post()->retrieve(
                     'file_id',
                     $this->refinery->kindlyTo()->dictOf(
-                        $this->refinery->kindlyTo()->int()
+                        $this->refinery->kindlyTo()->string()
                     )
                 )
             );
@@ -505,7 +505,7 @@ class ilAdvancedMDSettingsGUI
             $this->user->getId(),
             $this->context === self::CONTEXT_ADMINISTRATION ? null : new ObjectId($this->obj_id)
         );
-        $export_files->create($xml_writer->xmlDumpMem());
+        $export_files->create($xml_writer->xmlDumpMem(false));
 
         $this->tpl->setOnScreenMessage('success', $this->lng->txt('md_adv_records_exported'));
         $this->showFiles();
@@ -619,7 +619,10 @@ class ilAdvancedMDSettingsGUI
             $this->context === self::CONTEXT_ADMINISTRATION ? null : new ObjectId($this->obj_id)
         );
         foreach ($file_ids as $file_id) {
-            $files->deleteByFileId((int) $file_id);
+            $files->deleteByFileId(
+                $this->user->getId(),
+                $file_id
+            );
         }
         $this->tpl->setOnScreenMessage('success', $this->lng->txt('md_adv_deleted_files'));
         $this->showFiles();

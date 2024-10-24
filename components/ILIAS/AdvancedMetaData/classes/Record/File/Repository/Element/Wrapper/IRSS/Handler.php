@@ -22,6 +22,7 @@ namespace ILIAS\AdvancedMetaData\Record\File\Repository\Element\Wrapper\IRSS;
 
 use DateTimeImmutable;
 use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\HandlerInterface as ilAMDRecordFileRepositoryElementIRSSWrapperInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\HandlerInterface as ilAMDRecordFileRepositoryStakeholderInterface;
 use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 use ILIAS\ResourceStorage\Services as ilResourceStorageServices;
 use SimpleXMLElement;
@@ -69,16 +70,17 @@ class Handler implements ilAMDRecordFileRepositoryElementIRSSWrapperInterface
     {
         $records = [];
         $stream = $this->irss->consume()->stream($this->getResourceIdentification())->getStream();
-        $xml = simplexml_load_file($stream->getContents());
+        $xml = simplexml_load_string($stream->getContents());
         if ($xml instanceof SimpleXMLElement) {
             $records = array_map(function ($title) { return (string) $title; }, $xml->xpath('Record/Title'));
         }
         return $records;
     }
 
-    public function deleteResource(): void
-    {
-        // TODO: Implement deleteResource() method.
+    public function deleteResource(
+        ilAMDRecordFileRepositoryStakeholderInterface $stakeholder
+    ): void {
+        $this->irss->manage()->remove($this->getResourceIdentification(), $stakeholder);
     }
 
     public function resourceExists(): bool

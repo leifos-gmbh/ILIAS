@@ -61,4 +61,15 @@ interface HandlerInterface
         string $resource_id_serialized,
         string|null $filename_overwrite
     ): void;
+
+    public function delete(
+        ObjectId $object_id,
+        int $user_id,
+        string $resource_id_serialized
+    ): void;
+
+    public function deleteGlobal(
+        int $user_id,
+        string $resource_id_serialized
+    ): void;
 }

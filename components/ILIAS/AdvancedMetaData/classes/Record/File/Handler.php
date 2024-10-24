@@ -77,7 +77,7 @@ class Handler implements ilAMDRecordFileInterface
         $stakeholder = $this->amd_record_file_factory->repository()->stakeholder()->handler()
             ->withOwnerId($user_id);
         $rid = $this->irss->manage()->stream($content, $stakeholder);
-        $this->irss->manage()->getResource($rid)->getCurrentRevision()->setTitle();
+        $this->irss->manage()->getResource($rid)->getCurrentRevision()->setTitle($file_name);
         $key = $this->amd_record_file_factory->repository()->key()->handler()
             ->withObjectId($object_id)
             ->withIsGlobal(false)

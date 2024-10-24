@@ -71,7 +71,7 @@ class Handler implements ilAMDRecordFileRepositoryDBWrapperInterface
         while ($row = $res->fetchAssoc()) {
             $key = $this->key_factory->handler()
                 ->withObjectId(new ObjectId((int) $row['object_id']))
-                ->withResourceIdSerialized($row['resource_id'])
+                ->withResourceIdSerialized($row['rid'])
                 ->withIsGlobal((bool) $row['is_global']);
             $values = $this->values_factory->handler();
             $element = $this->element_factory->handler()
@@ -121,7 +121,7 @@ class Handler implements ilAMDRecordFileRepositoryDBWrapperInterface
         ilAMDRecordFileRepositoryKeyInterface $key
     ): string {
         if ($key->isObjectIdKey()) {
-            return " WHERE object_id = " . $this->db->quote($key->getObjectId(), ilDBConstants::T_INTEGER);
+            return " WHERE object_id = " . $this->db->quote($key->getObjectId()->toInt(), ilDBConstants::T_INTEGER);
         }
         if ($key->isResourceIdKey()) {
             return " WHERE rid = " . $this->db->quote($key->getResourceIdSerialized(), ilDBConstants::T_TEXT);
@@ -130,11 +130,11 @@ class Handler implements ilAMDRecordFileRepositoryDBWrapperInterface
             return " WHERE is_global = " . $this->db->quote((int) $key->getIsGlobal(), ilDBConstants::T_INTEGER);
         }
         if ($key->isCompositKeyOfObjectIdAndResourceId()) {
-            return " WHERE object_id = " . $this->db->quote($key->getObjectId(), ilDBConstants::T_INTEGER)
+            return " WHERE object_id = " . $this->db->quote($key->getObjectId()->toInt(), ilDBConstants::T_INTEGER)
                 . " AND rid = " . $this->db->quote($key->getResourceIdSerialized(), ilDBConstants::T_TEXT);
         }
         if ($key->isCompositKeyOfAll()) {
-            return " WHERE object_id = " . $this->db->quote($key->getObjectId(), ilDBConstants::T_INTEGER)
+            return " WHERE object_id = " . $this->db->quote($key->getObjectId()->toInt(), ilDBConstants::T_INTEGER)
                 . " AND rid = " . $this->db->quote($key->getResourceIdSerialized(), ilDBConstants::T_TEXT)
                 . " AND is_global = " . $this->db->quote((int) $key->getIsGlobal(), ilDBConstants::T_INTEGER);
         }

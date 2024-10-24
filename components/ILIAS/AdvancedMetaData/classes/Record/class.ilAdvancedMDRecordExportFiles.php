@@ -56,10 +56,10 @@ class ilAdvancedMDRecordExportFiles
             ? $this->amd_record_file_factory->handler()->getGlobalFiles()
             : $this->amd_record_file_factory->handler()->getFilesByObjectId($this->object_id);
         foreach ($elements as $element) {
-            $file_name_without_extension = explode('.', $element->getIRSS()->getFileName())[0];
-            $file_info[$file_name_without_extension][self::SIZE] = $element->getIRSS()->getResourceSize();
-            $file_info[$file_name_without_extension][self::DATE] = $element->getIRSS()->getCreationDate();
-            $file_info[$file_name_without_extension][self::NAME] = $element->getIRSS()->getRecords();
+            $file_id = $element->getIRSS()->getResourceIdSerialized();
+            $file_info[$file_id][self::SIZE] = $element->getIRSS()->getResourceSize();
+            $file_info[$file_id][self::DATE] = $element->getIRSS()->getCreationDate()->getTimestamp();
+            $file_info[$file_id][self::NAME] = $element->getIRSS()->getRecords();
         }
         return $file_info;
     }
@@ -105,21 +105,23 @@ class ilAdvancedMDRecordExportFiles
         }
     }
 
-    public function delete(
+    public function deleteByFileId(
+        int $user_id,
         string $file_id
-    ): void {
-
-    }
-
-    public function deleteByFileId(int $a_timest): bool
-    {
-        global $DIC;
-
-        $ilLog = $DIC['ilLog'];
-
-        if (!unlink($this->export_dir . '/' . $a_timest . '.xml')) {
-            $ilLog->write(__METHOD__ . ': Cannot delete file ' . $this->export_dir . '/' . $a_timest . '.xml');
-            return false;
+    ): bool {
+        $global = is_null($this->object_id);
+        if ($global) {
+            $this->amd_record_file_factory->handler()->deleteGlobal(
+                $user_id,
+                $file_id
+            );
+        }
+        if (!$global) {
+            $this->amd_record_file_factory->handler()->delete(
+                $this->object_id,
+                $user_id,
+                $file_id
+            );
         }
         return true;
     }

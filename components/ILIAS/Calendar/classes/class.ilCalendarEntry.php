@@ -175,6 +175,7 @@ class ilCalendarEntry implements ilDatePeriod
                     if ($entry->isOwner()) {
                         $max = $entry->getNumberOfBookings();
                         $current = $entry->getCurrentNumberOfBookings($this->getEntryId());
+                        $free = (($max - $current) >= 0 ?  ($max - $current) : 0);
                         if (!$current) {
                             $style = ';border-left-width: 5px; border-left-style: solid; border-left-color: green';
                             $title = $this->lng->txt('cal_book_free');
@@ -183,7 +184,7 @@ class ilCalendarEntry implements ilDatePeriod
                             $title = $this->lng->txt('cal_booked_out');
                         } else {
                             $style = ';border-left-width: 5px; border-left-style: solid; border-left-color: yellow';
-                            $title = $current . '/' . $max;
+                            $title = sprintf($this->lng->txt('cal_ch_booking_num_free_short'), $free);
                         }
                     } else {
                         $apps = ilConsultationHourAppointments::getAppointmentIds(

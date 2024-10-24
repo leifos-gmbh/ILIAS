@@ -17690,3 +17690,7 @@ dateplaner#:#cal_ch_vm_status_open#:#Freie Termine
 dateplaner#:#cal_ch_vm_status_all#:#Alle
 dateplaner#:#cal_ch_current_booking_comment#:#Kommentar
 dateplaner#:#cal_delete_booking_info#:#Bitte bestätigen Sie das Löschen diese Termins
+dateplaner#:#cal_ch_booking_col_comments#:#Commentare
+dateplaner#:#cal_ch_booking_num_free_short#:#%s frei
+dateplaner#:#cal_ch_booking_num_available#:#Freie Termine
+dateplaner#:#cal_ch_free_of_available#:#%s von %s

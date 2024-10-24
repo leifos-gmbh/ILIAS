@@ -428,28 +428,6 @@ class ilConsultationHoursGUI
     }
 
     /**
-     * Delete booking
-     */
-    protected function deleteBooking(): void
-    {
-        $this->rejectBooking(false);
-    }
-
-    protected function rejectBooking(bool $a_send_notification = true): void
-    {
-        foreach ($this->initBookingUsersFromPost() as $bookuser) {
-            $ids = explode('_', $bookuser);
-            ilConsultationHourUtils::cancelBooking((int) $ids[1], (int) $ids[0], $a_send_notification);
-        }
-        if ($a_send_notification) {
-            $this->tpl->setOnScreenMessage('success', $this->lng->txt('cal_ch_canceled_bookings'), true);
-        } else {
-            $this->tpl->setOnScreenMessage('success', $this->lng->txt('cal_ch_deleted_bookings'), true);
-        }
-        $this->ctrl->redirect($this, 'bookingList');
-    }
-
-    /**
      * Create new sequence
      */
     protected function createSequence(): void
@@ -972,12 +950,13 @@ class ilConsultationHoursGUI
             'edit' => $this->edit(),
             'searchUsersForAppointments' => $this->searchUsersForAppointments(),
             'confirmDeleteAppointments' => $this->confirmDeleteAppointments(),
-            'confirmCancelAppointments' => $this->confirmCancelAppointments(),
+            'confirmCancelBooking' => $this->confirmCancelBooking(true),
+            'confirmDeleteBooking' => $this->confirmCancelBooking(false),
             default => $this->ctrl->redirect($this, 'appointments')
         };
     }
 
-    protected function confirmCancelAppointments(): void
+    protected function confirmCancelBooking(bool $with_notification = true): void
     {
         $appointment_ids = $this->http->wrapper()->query()->retrieve(
             BookingTableGUI::ID_TOKEN_NS,
@@ -994,28 +973,21 @@ class ilConsultationHoursGUI
             return;
         }
 
-        foreach ($appointment_ids as $appointment) {
-            $entry = new ilCalendarEntry($appointment);
-            $booking = new ilBookingEntry($entry->getContextId());
-            $user_info = [];
-            foreach ($booking->getCurrentBookings($entry->getEntryId()) as $booking_user_id) {
-                $user_info[] = ilObjUser::_lookupFullname($booking_user_id);
-            }
-            $items[] = $this->ui_factory->modal()->interruptiveItem()->standard(
-                (string) $appointment,
-                ilDatePresentation::formatDate($entry->getStart()) . ', ' . $entry->getTitle() . ': ' . implode(', ', $user_info)
-            );
-        }
+        $appointment = end($appointment_ids);
+        $this->ctrl->setParameter($this, 'appointment_id', $appointment);
+        $entry = new ilCalendarEntry($appointment);
+        $booking = new ilBookingEntry($entry->getContextId());
 
-        $output = $this->ui_renderer->renderAsync(
-            [
-                $this->ui_factory->modal()->interruptive(
-                    $this->lng->txt('confirm'),
-                    $this->lng->txt('cal_ch_cancel_booking_sure'),
-                    $this->ctrl->getFormAction($this, 'cancelAppointments')
-                )->withAffectedItems($items)
-            ]
+        $cancel = new \ILIAS\Calendar\ConsultationHours\BookingCancellationGUI(
+            $this,
+            $entry,
+            $booking,
+            $with_notification ?
+                \ILIAS\Calendar\ConsultationHours\BookingCancellationGUI::TYPE_CANCEL :
+                \ILIAS\Calendar\ConsultationHours\BookingCancellationGUI::TYPE_DELETE
         );
+        $modal = $cancel->renderModal();
+        $output = $this->ui_renderer->renderAsync($modal);
         $this->http->saveResponse($this->http->response()->withBody(
             Streams::ofString($output)
         ));
@@ -1023,30 +995,45 @@ class ilConsultationHoursGUI
         $this->http->close();
     }
 
-    protected function cancelAppointments(): void
+    protected function deleteBooking(): void
     {
-        $appointment_ids = $this->http->wrapper()->post()->retrieve(
-            'interruptive_items',
+        $this->cancelBooking(false);
+    }
+
+    protected function cancelBooking(bool $with_notification = true): void
+    {
+        $appointment_id = $this->http->wrapper()->query()->retrieve(
+            'appointment_id',
             $this->refinery->byTrying(
                 [
-                    $this->refinery->kindlyTo()->listOf($this->refinery->kindlyTo()->int()),
-                    $this->refinery->always([])
+                    $this->refinery->kindlyTo()->int(),
+                    $this->refinery->always(0)
                 ]
             )
         );
-        if (!count($appointment_ids)) {
+        if (!$appointment_id) {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
             $this->appointments();
             return;
         }
-        foreach ($appointment_ids as $appointment) {
-            $entry = new ilCalendarEntry($appointment);
-            $booking = new ilBookingEntry($entry->getContextId());
-            foreach ($booking->getCurrentBookings($entry->getEntryId()) as $bookuser) {
+
+        $entry = new ilCalendarEntry($appointment_id);
+        $booking = new ilBookingEntry($entry->getContextId());
+        $cancel = new \ILIAS\Calendar\ConsultationHours\BookingCancellationGUI(
+            $this,
+            $entry,
+            $booking,
+            $with_notification ?
+                \ILIAS\Calendar\ConsultationHours\BookingCancellationGUI::TYPE_CANCEL :
+                \ILIAS\Calendar\ConsultationHours\BookingCancellationGUI::TYPE_DELETE
+        );
+        $data = $cancel->renderModal()->withRequest($this->http->request())->getData();
+        foreach ((array) $data['bookings'] as $user => $checked) {
+            if ($checked) {
                 ilConsultationHourUtils::cancelBooking(
-                    $bookuser,
-                    (int) $appointment,
-                    true
+                    $user,
+                    $appointment_id,
+                    $with_notification
                 );
             }
         }

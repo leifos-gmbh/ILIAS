@@ -147,9 +147,14 @@ class BookingTableGUI implements DataRetrieval
                 $url_builder->withParameter($action_parameter_token, 'searchUsersForAppointments'),
                 $row_id_token
             ),
-            'confirmCancelAppointments' => $this->ui_factory->table()->action()->single(
+            'confirmCancelBooking' => $this->ui_factory->table()->action()->single(
                 $this->lng->txt('cal_ch_cancel_booking'),
-                $url_builder->withParameter($action_parameter_token, 'confirmCancelAppointments'),
+                $url_builder->withParameter($action_parameter_token, 'confirmCancelBooking'),
+                $row_id_token
+            )->withAsync(true),
+            'confirmDeleteBooking' => $this->ui_factory->table()->action()->single(
+                $this->lng->txt('cal_ch_delete_booking'),
+                $url_builder->withParameter($action_parameter_token, 'confirmDeleteBooking'),
                 $row_id_token
             )->withAsync(true),
             'confirmDeleteAppointments' => $this->ui_factory->table()->action()->standard(
@@ -191,6 +196,10 @@ class BookingTableGUI implements DataRetrieval
                     ->table()
                     ->column()
                     ->linkListing($this->lng->txt('cal_ch_booking_participants')),
+            'booking_comment' => $this->ui_factory
+                ->table()
+                ->column()
+                ->linkListing($this->lng->txt('cal_ch_booking_col_comments')),
             'booking_location' => $this->ui_factory
                 ->table()
                 ->column()

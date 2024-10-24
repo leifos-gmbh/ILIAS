@@ -75,9 +75,15 @@ class ilAppointmentPresentationConsultationHoursGUI extends ilAppointmentPresent
             }
         }
 
-        // max nr of bookings
-        $this->addInfoProperty($this->lng->txt('cal_ch_num_bookings'), (string) $booking->getNumberOfBookings());
-        $this->addListItemProperty($this->lng->txt('cal_ch_num_bookings'), (string) $booking->getNumberOfBookings());
+        $free = $booking->getNumberOfBookings() - $booking->getCurrentNumberOfBookings($a_app['event']->getEntryId());
+        $this->addInfoProperty(
+            $this->lng->txt('cal_ch_booking_num_available'),
+            sprintf($this->lng->txt('cal_ch_free_of_available'), $free, $booking->getNumberOfBookings())
+        );
+        $this->addListItemProperty(
+            $this->lng->txt('cal_ch_booking_num_available'),
+            sprintf($this->lng->txt('cal_ch_free_of_available'), $free, $booking->getNumberOfBookings())
+        );
 
         // for the following code
         // see ilCalendarAppointmentPanelGUI in ILIAS 5.2 (getHTML())

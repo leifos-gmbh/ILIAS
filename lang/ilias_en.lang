@@ -17670,3 +17670,7 @@ dateplaner#:#cal_ch_vm_status_open#:#Open Slots
 dateplaner#:#cal_ch_vm_status_all#:#All
 dateplaner#:#cal_ch_current_booking_comment#:#Comment
 dateplaner#:#cal_delete_booking_info#:#Please confirm the deletion of this booking
+dateplaner#:#cal_ch_booking_col_comments#:#Comments
+dateplaner#:#cal_ch_booking_num_free_short#:#%s free
+dateplaner#:#cal_ch_booking_num_available#:#Available Slots
+dateplaner#:#cal_ch_free_of_available#:#%s of %s

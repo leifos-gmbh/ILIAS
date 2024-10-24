@@ -111,18 +111,36 @@ class BookingDataProvider
             // booking users
             $booked_user_ids = array_map('intval', ilUtil::_sortIds($booked_user_ids, 'usr_data', 'lastname', 'usr_id'));
             $bookings = [];
+            $comments = [];
             foreach ($booked_user_ids as $booked_user_id) {
+                $fullname = ilObjUser::_lookupFullname($booked_user_id);
                 $link = \ilUserUtil::getProfileLink($booked_user_id);
                 $ui_link = $this->ui_factory->link()->standard(
-                   ilObjUser::_lookupFullname($booked_user_id),
+                   $fullname,
                    $link ? $link : '#'
                 );
                 if ($link === '') {
                     $ui_link = $ui_link->withDisabled(true);
                 }
                 $bookings[] = $ui_link;
+
+                $comment = ilBookingEntry::lookupBookingMessage(
+                    $appointment->getEntryId(),
+                    $booked_user_id
+                );
+                if (trim($comment) !== '') {
+                    $ui_link = $this->ui_factory->link()
+                        ->standard(
+                            $fullname . ': "' . $comment . '"',
+                            '#'
+                        )
+                        ->withDisabled(true);
+                    $comments[] = $ui_link;
+                }
+
             }
             $row['booking_participant'] = $this->ui_factory->listing()->unordered($bookings);
+            $row['booking_comment'] = $this->ui_factory->listing()->unordered($comments);
             $data[$counter++] = $row;
         }
         $this->data = $data;

@@ -20,15 +20,15 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\I\Repository\Element;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as ilAMDRecordFileRepositoryElementInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\FactoryInterface as ilAMDRecordFileRepositoryElementWrapperFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as ilAMDRecordFileRepositoryElementCollectionInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as FileRepositoryElementInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\FactoryInterface as FileRepositoryElementWrapperFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as FileRepositoryElementCollectionInterface;
 
 interface FactoryInterface
 {
-    public function handler(): ilAMDRecordFileRepositoryElementInterface;
+    public function handler(): FileRepositoryElementInterface;
 
-    public function collection(): ilAMDRecordFileRepositoryElementCollectionInterface;
+    public function collection(): FileRepositoryElementCollectionInterface;
 
-    public function wrapper(): ilAMDRecordFileRepositoryElementWrapperFactoryInterface;
+    public function wrapper(): FileRepositoryElementWrapperFactoryInterface;
 }

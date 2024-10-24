@@ -20,14 +20,14 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\Repository\Key;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\FactoryInterface as ilAMDRecordFileRepositoryKeyFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as ilAMDRecordFileRepositoryKeyInterface;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Key\Handler as ilAMDRecordFileRepositoryKey;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\FactoryInterface as FileRepositoryKeyFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as FileRepositoryKeyInterface;
+use ILIAS\AdvancedMetaData\Record\File\Repository\Key\Handler as FileRepositoryKey;
 
-class Factory implements ilAMDRecordFileRepositoryKeyFactoryInterface
+class Factory implements FileRepositoryKeyFactoryInterface
 {
-    public function handler(): ilAMDRecordFileRepositoryKeyInterface
+    public function handler(): FileRepositoryKeyInterface
     {
-        return new ilAMDRecordFileRepositoryKey();
+        return new FileRepositoryKey();
     }
 }

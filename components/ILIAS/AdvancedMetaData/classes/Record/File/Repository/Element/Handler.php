@@ -20,51 +20,36 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\Repository\Element;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as ilAMDRecordFileRepositoryElementInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\HandlerInterface as ilAMDRecordFileRepositoryElementIRSSWrapperInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\FactoryInterface as ilAMDRecordFileRepositoryElementIRSSWrapperFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as ilAMDRecordFileRepositoryKeyInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Values\HandlerInterface as ilAMDRecordFileRepositoryValuesInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as FileRepositoryElementInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\HandlerInterface as FileRepositoryElementIRSSWrapperInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\FactoryInterface as FileRepositoryElementIRSSWrapperFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as FileRepositoryKeyInterface;
 
-class Handler implements ilAMDRecordFileRepositoryElementInterface
+class Handler implements FileRepositoryElementInterface
 {
-    protected ilAMDRecordFileRepositoryKeyInterface $key;
-    protected ilAMDRecordFileRepositoryValuesInterface $values;
-    protected ilAMDRecordFileRepositoryElementIRSSWrapperFactoryInterface $irss_wrapper_factory;
+    protected FileRepositoryKeyInterface $key;
+    protected FileRepositoryElementIRSSWrapperFactoryInterface $irss_wrapper_factory;
 
     public function __construct(
-        ilAMDRecordFileRepositoryElementIRSSWrapperFactoryInterface $irss_wrapper_factory
+        FileRepositoryElementIRSSWrapperFactoryInterface $irss_wrapper_factory
     ) {
         $this->irss_wrapper_factory = $irss_wrapper_factory;
     }
 
     public function withKey(
-        ilAMDRecordFileRepositoryKeyInterface $key
-    ): ilAMDRecordFileRepositoryElementInterface {
+        FileRepositoryKeyInterface $key
+    ): FileRepositoryElementInterface {
         $clone = clone $this;
         $clone->key = $key;
         return $clone;
     }
 
-    public function withValues(
-        ilAMDRecordFileRepositoryValuesInterface $values
-    ): ilAMDRecordFileRepositoryElementInterface {
-        $clone = clone $this;
-        $clone->values = $values;
-        return $clone;
-    }
-
-    public function getKey(): ilAMDRecordFileRepositoryKeyInterface
+    public function getKey(): FileRepositoryKeyInterface
     {
         return $this->key;
     }
 
-    public function getValues(): ilAMDRecordFileRepositoryValuesInterface
-    {
-        return $this->values;
-    }
-
-    public function getIRSS(): ilAMDRecordFileRepositoryElementIRSSWrapperInterface
+    public function getIRSS(): FileRepositoryElementIRSSWrapperInterface
     {
         return $this->irss_wrapper_factory->handler()
             ->withResourceIdSerialized($this->key->getResourceIdSerialized());

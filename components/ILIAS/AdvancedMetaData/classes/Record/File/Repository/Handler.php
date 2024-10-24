@@ -20,36 +20,34 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\Repository;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as ilAMDRecordFileRepositoryElementInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\HandlerInterface as ilAMDRecordFileRepositoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as ilAMDRecordFileRepositoryKeyInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as ilAMDRecordFileRepositoryElementCollectionInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Values\HandlerInterface as ilAMDRecordFileRepositoryValuesInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper\DB\HandlerInterface as ilAMDRecordFileRepositoryDBWrapperInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as FileRepositoryElementInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\HandlerInterface as FileRepositoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as FileRepositoryKeyInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as FileRepositoryElementCollectionInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper\DB\HandlerInterface as FileRepositoryDBWrapperInterface;
 
-class Handler implements ilAMDRecordFileRepositoryInterface
+class Handler implements FileRepositoryInterface
 {
-    protected ilAMDRecordFileRepositoryDBWrapperInterface $db_wrapper;
+    protected FileRepositoryDBWrapperInterface $db_wrapper;
 
     public function __construct(
-        ilAMDRecordFileRepositoryDBWrapperInterface $db_wrapper
+        FileRepositoryDBWrapperInterface $db_wrapper
     ) {
         $this->db_wrapper = $db_wrapper;
     }
 
     public function store(
-        ilAMDRecordFileRepositoryKeyInterface $key,
-        ilAMDRecordFileRepositoryValuesInterface $values
+        FileRepositoryKeyInterface $key
     ): void {
         if (!$key->isCompositKeyOfAll()) {
             return;
         }
-        $this->db_wrapper->insert($key, $values);
+        $this->db_wrapper->insert($key);
     }
 
     public function getElements(
-        ilAMDRecordFileRepositoryKeyInterface $key
-    ): ilAMDRecordFileRepositoryElementCollectionInterface|null {
+        FileRepositoryKeyInterface $key
+    ): FileRepositoryElementCollectionInterface|null {
         if (!$key->isValid()) {
             return null;
         }
@@ -57,7 +55,7 @@ class Handler implements ilAMDRecordFileRepositoryInterface
     }
 
     public function delete(
-        ilAMDRecordFileRepositoryKeyInterface $key
+        FileRepositoryKeyInterface $key
     ): void {
         if (!$key->isValid()) {
             return;

@@ -20,30 +20,34 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File;
 
-use ILIAS\AdvancedMetaData\Record\File\I\HandlerInterface as ilAMDRecordFileInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as ilAMDRecordFileRepositoryElementCollectionInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as ilAMDRecordFileRepositoryElementInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\HandlerInterface as FileInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as FileRepositoryElementCollectionInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as FileRepositoryElementInterface;
 use ILIAS\Data\ObjectId;
-use ILIAS\AdvancedMetaData\Record\File\I\FactoryInterface as ilAMDRecordFileFactoryInterface;
+use ILIAS\Data\Factory as DataFactory;
+use ILIAS\AdvancedMetaData\Record\File\I\FactoryInterface as FileFactoryInterface;
 use ILIAS\Filesystem\Stream\FileStream;
-use ILIAS\ResourceStorage\Services as ilResourceStorageServices;
+use ILIAS\ResourceStorage\Services as IRSS;
 
-class Handler implements ilAMDRecordFileInterface
+class Handler implements FileInterface
 {
-    protected ilAMDRecordFileFactoryInterface $amd_record_file_factory;
-    protected ilResourceStorageServices $irss;
+    protected FileFactoryInterface $amd_record_file_factory;
+    protected IRSS $irss;
+    protected DataFactory $data_factory;
 
     public function __construct(
-        ilAMDRecordFileFactoryInterface $amd_record_file_factory,
-        ilResourceStorageServices $irss
+        FileFactoryInterface $amd_record_file_factory,
+        IRSS $irss,
+        DataFactory $data_factory
     ) {
         $this->amd_record_file_factory = $amd_record_file_factory;
         $this->irss = $irss;
+        $this->data_factory = $data_factory;
     }
 
     public function getFilesByObjectId(
         ObjectId $object_id
-    ): ilAMDRecordFileRepositoryElementCollectionInterface {
+    ): FileRepositoryElementCollectionInterface {
         $key = $this->amd_record_file_factory->repository()->key()->handler()
             ->withObjectId($object_id);
         return $this->amd_record_file_factory->repository()->handler()->getElements($key);
@@ -52,7 +56,7 @@ class Handler implements ilAMDRecordFileInterface
     public function getFileByObjectIdAndResourceId(
         ObjectId $object_id,
         string $resource_id_serialized
-    ): ilAMDRecordFileRepositoryElementInterface|null {
+    ): FileRepositoryElementInterface|null {
         $key = $this->amd_record_file_factory->repository()->key()->handler()
             ->withObjectId($object_id)
             ->withResourceIdSerialized($resource_id_serialized);
@@ -61,7 +65,7 @@ class Handler implements ilAMDRecordFileInterface
         return $elements->count() === 0 ? null : $elements->current();
     }
 
-    public function getGlobalFiles(): ilAMDRecordFileRepositoryElementCollectionInterface
+    public function getGlobalFiles(): FileRepositoryElementCollectionInterface
     {
         $key = $this->amd_record_file_factory->repository()->key()->handler()
             ->withIsGlobal(true);
@@ -82,8 +86,7 @@ class Handler implements ilAMDRecordFileInterface
             ->withObjectId($object_id)
             ->withIsGlobal(false)
             ->withResourceIdSerialized($rid->serialize());
-        $values = $this->amd_record_file_factory->repository()->values()->handler();
-        $this->amd_record_file_factory->repository()->handler()->store($key, $values);
+        $this->amd_record_file_factory->repository()->handler()->store($key);
     }
 
     public function addGlobalFile(
@@ -94,13 +97,12 @@ class Handler implements ilAMDRecordFileInterface
         $stakeholder = $this->amd_record_file_factory->repository()->stakeholder()->handler()
             ->withOwnerId($user_id);
         $rid = $this->irss->manage()->stream($content, $stakeholder);
-        $this->irss->manage()->getResource($rid)->getCurrentRevision()->setTitle();
+        $this->irss->manage()->getResource($rid)->getCurrentRevision()->setTitle($file_name);
         $key = $this->amd_record_file_factory->repository()->key()->handler()
-            ->withObjectId(new ObjectId(0))
+            ->withObjectId($this->data_factory->objId(0))
             ->withIsGlobal(true)
             ->withResourceIdSerialized($rid->serialize());
-        $values = $this->amd_record_file_factory->repository()->values()->handler();
-        $this->amd_record_file_factory->repository()->handler()->store($key, $values);
+        $this->amd_record_file_factory->repository()->handler()->store($key);
     }
 
     public function download(
@@ -126,7 +128,7 @@ class Handler implements ilAMDRecordFileInterface
     ): void {
         $key = $this->amd_record_file_factory->repository()->key()->handler()
             ->withIsGlobal(true)
-            ->withObjectId(new ObjectId(0))
+            ->withObjectId($this->data_factory->objId(0))
             ->withResourceIdSerialized($resource_id_serialized);
         $elements = $this->amd_record_file_factory->repository()->handler()->getElements($key);
         if ($elements->count() === 0) {
@@ -160,7 +162,7 @@ class Handler implements ilAMDRecordFileInterface
     ): void {
         $key = $this->amd_record_file_factory->repository()->key()->handler()
             ->withIsGlobal(true)
-            ->withObjectId(new ObjectId(0))
+            ->withObjectId($this->data_factory->objId(0))
             ->withResourceIdSerialized($resource_id_serialized);
         $elements = $this->amd_record_file_factory->repository()->handler()->getElements($key);
         if ($elements->count() === 0) {

@@ -20,24 +20,21 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\I\Repository;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\FactoryInterface as ilAMDRecordFileRepositoryElementFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\HandlerInterface as ilAMDRecordFileRepositoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\FactoryInterface as ilAMDRecordFileRepositoryKeyFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\FactoryInterface as ilAMDRecordFileRepositoryStakeholderFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Values\FactoryInterface as ilAMDRecordFileRepositoryValuesFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper\FactoryInterface as ilAMDRecordFileRepositoryWrapperFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\FactoryInterface as FileRepositoryElementFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\HandlerInterface as FileRepositoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\FactoryInterface as FileRepositoryKeyFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\FactoryInterface as FileRepositoryStakeholderFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper\FactoryInterface as FileRepositoryWrapperFactoryInterface;
 
 interface FactoryInterface
 {
-    public function handler(): ilAMDRecordFileRepositoryInterface;
+    public function handler(): FileRepositoryInterface;
 
-    public function element(): ilAMDRecordFileRepositoryElementFactoryInterface;
+    public function element(): FileRepositoryElementFactoryInterface;
 
-    public function key(): ilAMDRecordFileRepositoryKeyFactoryInterface;
+    public function key(): FileRepositoryKeyFactoryInterface;
 
-    public function stakeholder(): ilAMDRecordFileRepositoryStakeholderFactoryInterface;
+    public function stakeholder(): FileRepositoryStakeholderFactoryInterface;
 
-    public function values(): ilAMDRecordFileRepositoryValuesFactoryInterface;
-
-    public function wrapper(): ilAMDRecordFileRepositoryWrapperFactoryInterface;
+    public function wrapper(): FileRepositoryWrapperFactoryInterface;
 }

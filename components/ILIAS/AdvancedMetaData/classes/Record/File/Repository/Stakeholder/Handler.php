@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\Repository\Stakeholder;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\HandlerInterface as ilAMDRecordFileRepositoryStakeholderInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\HandlerInterface as FileRepositoryStakeholderInterface;
 use ILIAS\ResourceStorage\Stakeholder\AbstractResourceStakeholder;
 
-class Handler extends AbstractResourceStakeholder implements ilAMDRecordFileRepositoryStakeholderInterface
+class Handler extends AbstractResourceStakeholder implements FileRepositoryStakeholderInterface
 {
     protected int $owner_id;
 
@@ -35,7 +35,7 @@ class Handler extends AbstractResourceStakeholder implements ilAMDRecordFileRepo
 
     public function getId(): string
     {
-        return "AdvancedMetaDataRecordFiles";
+        return "AdvancedMetaDataFiles";
     }
 
     public function getOwnerOfNewResources(): int
@@ -45,7 +45,7 @@ class Handler extends AbstractResourceStakeholder implements ilAMDRecordFileRepo
 
     public function withOwnerId(
         int $owner_id
-    ): ilAMDRecordFileRepositoryStakeholderInterface {
+    ): FileRepositoryStakeholderInterface {
         $clone = clone $this;
         $clone->owner_id = $owner_id;
         return $clone;

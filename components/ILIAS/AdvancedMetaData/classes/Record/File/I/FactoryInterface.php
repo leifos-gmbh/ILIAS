@@ -20,12 +20,12 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\I;
 
-use ILIAS\AdvancedMetaData\Record\File\I\HandlerInterface as ilAMDRecordFileInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\FactoryInterface as ilAMDRecordFileRepositoryFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\HandlerInterface as FileInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\FactoryInterface as FileRepositoryFactoryInterface;
 
 interface FactoryInterface
 {
-    public function handler(): ilAMDRecordFileInterface;
+    public function handler(): FileInterface;
 
-    public function repository(): ilAMDRecordFileRepositoryFactoryInterface;
+    public function repository(): FileRepositoryFactoryInterface;
 }

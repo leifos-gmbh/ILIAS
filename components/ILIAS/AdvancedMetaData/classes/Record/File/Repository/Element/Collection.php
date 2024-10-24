@@ -20,13 +20,13 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\Repository\Element;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as ilAMDRecordFileRepositoryElementCollectionInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as ilAMDRecordFileRepositoryElementInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as FileRepositoryElementCollectionInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as FileRepositoryElementInterface;
 
-class Collection implements ilAMDRecordFileRepositoryElementCollectionInterface
+class Collection implements FileRepositoryElementCollectionInterface
 {
     /**
-     * @var ilAMDRecordFileRepositoryElementInterface[]
+     * @var FileRepositoryElementInterface[]
      */
     protected array $elements = [];
     protected int $index;
@@ -38,14 +38,14 @@ class Collection implements ilAMDRecordFileRepositoryElementCollectionInterface
     }
 
     public function withElement(
-        ilAMDRecordFileRepositoryElementInterface $element
-    ): ilAMDRecordFileRepositoryElementCollectionInterface {
+        FileRepositoryElementInterface $element
+    ): FileRepositoryElementCollectionInterface {
         $clone = clone $this;
         $clone->elements[] = $element;
         return $clone;
     }
 
-    public function current(): ilAMDRecordFileRepositoryElementInterface
+    public function current(): FileRepositoryElementInterface
     {
         return $this->elements[$this->index];
     }

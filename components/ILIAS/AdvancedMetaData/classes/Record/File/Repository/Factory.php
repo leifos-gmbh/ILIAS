@@ -21,70 +21,62 @@ declare(strict_types=1);
 namespace ILIAS\AdvancedMetaData\Record\File\Repository;
 
 use ilDBInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\FactoryInterface as ilAMDRecordFileRepositoryElementFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\FactoryInterface as ilAMDRecordFileRepositoryFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\HandlerInterface as ilAMDRecordFileRepositoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\FactoryInterface as ilAMDRecordFileRepositoryKeyFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\FactoryInterface as ilAMDRecordFileRepositoryStakeholderFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Stakeholder\Factory as ilAMDRecordFileRepositoryStakeholderFactory;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Values\FactoryInterface as ilAMDRecordFileRepositoryValuesFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper\FactoryInterface as ilAMDRecordFileRepositoryWrapperFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Element\Factory as ilAMDRecordFileRepositoryElementFactory;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Handler as ilAMDRecordFileRepository;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Key\Factory as ilAMDRecordFileRepositoryKeyFactory;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Values\Factory as ilAMDRecordFileRepositoryValuesFactory;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Wrapper\Factory as ilAMDRecordFileRepositoryWrapperFactory;
-use ILIAS\ResourceStorage\Services as ilResourceStorageServices;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\FactoryInterface as FileRepositoryElementFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\FactoryInterface as FileRepositoryFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\HandlerInterface as FileRepositoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\FactoryInterface as FileRepositoryKeyFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\FactoryInterface as FileRepositoryStakeholderFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\Repository\Stakeholder\Factory as FileRepositoryStakeholderFactory;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper\FactoryInterface as FileRepositoryWrapperFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\Repository\Element\Factory as FileRepositoryElementFactory;
+use ILIAS\AdvancedMetaData\Record\File\Repository\Handler as FileRepository;
+use ILIAS\AdvancedMetaData\Record\File\Repository\Key\Factory as FileRepositoryKeyFactory;
+use ILIAS\AdvancedMetaData\Record\File\Repository\Wrapper\Factory as FileRepositoryWrapperFactory;
+use ILIAS\ResourceStorage\Services as IRSS;
 
-class Factory implements ilAMDRecordFileRepositoryFactoryInterface
+class Factory implements FileRepositoryFactoryInterface
 {
     protected ilDBInterface $db;
-    protected ilResourceStorageServices $irss;
+    protected IRSS $irss;
 
     public function __construct(
         ilDBInterface $db,
-        ilResourceStorageServices $irss
+        IRSS $irss
     ) {
         $this->db = $db;
         $this->irss = $irss;
     }
 
-    public function handler(): ilAMDRecordFileRepositoryInterface
+    public function handler(): FileRepositoryInterface
     {
-        return new ilAMDRecordFileRepository(
+        return new FileRepository(
             $this->wrapper()->db()->handler()
         );
     }
 
-    public function element(): ilAMDRecordFileRepositoryElementFactoryInterface
+    public function element(): FileRepositoryElementFactoryInterface
     {
-        return new ilAMDRecordFileRepositoryElementFactory(
+        return new FileRepositoryElementFactory(
             $this->irss
         );
     }
 
-    public function key(): ilAMDRecordFileRepositoryKeyFactoryInterface
+    public function key(): FileRepositoryKeyFactoryInterface
     {
-        return new ilAMDRecordFileRepositoryKeyFactory();
+        return new FileRepositoryKeyFactory();
     }
 
-    public function stakeholder(): ilAMDRecordFileRepositoryStakeholderFactoryInterface
+    public function stakeholder(): FileRepositoryStakeholderFactoryInterface
     {
-        return new ilAMDRecordFileRepositoryStakeholderFactory();
+        return new FileRepositoryStakeholderFactory();
     }
 
-    public function values(): ilAMDRecordFileRepositoryValuesFactoryInterface
+    public function wrapper(): FileRepositoryWrapperFactoryInterface
     {
-        return new ilAMDRecordFileRepositoryValuesFactory();
-    }
-
-    public function wrapper(): ilAMDRecordFileRepositoryWrapperFactoryInterface
-    {
-        return new ilAMDRecordFileRepositoryWrapperFactory(
+        return new FileRepositoryWrapperFactory(
             $this->db,
             $this->element(),
-            $this->key(),
-            $this->values()
+            $this->key()
         );
     }
 }

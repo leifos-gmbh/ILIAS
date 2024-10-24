@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper\DB\FactoryInterface as ilAMDRecordFileRepositoryDBWrapperFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper\DB\FactoryInterface as FileRepositoryDBWrapperFactoryInterface;
 
 interface FactoryInterface
 {
-    public function db(): ilAMDRecordFileRepositoryDBWrapperFactoryInterface;
+    public function db(): FileRepositoryDBWrapperFactoryInterface;
 }

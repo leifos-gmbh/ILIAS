@@ -20,23 +20,21 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\I\Repository;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as ilAMDRecordFileRepositoryElementInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as ilAMDRecordFileRepositoryElementCollectionInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as ilAMDRecordFileRepositoryKeyInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Values\HandlerInterface as ilAMDRecordFileRepositoryValuesInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as FileRepositoryElementInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as FileRepositoryElementCollectionInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as FileRepositoryKeyInterface;
 
 interface HandlerInterface
 {
     public function store(
-        ilAMDRecordFileRepositoryKeyInterface $key,
-        ilAMDRecordFileRepositoryValuesInterface $values
+        FileRepositoryKeyInterface $key
     ): void;
 
     public function getElements(
-        ilAMDRecordFileRepositoryKeyInterface $key
-    ): ilAMDRecordFileRepositoryElementCollectionInterface|null;
+        FileRepositoryKeyInterface $key
+    ): FileRepositoryElementCollectionInterface|null;
 
     public function delete(
-        ilAMDRecordFileRepositoryKeyInterface $key
+        FileRepositoryKeyInterface $key
     ): void;
 }

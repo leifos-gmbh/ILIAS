@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\I\Repository\Key;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as ilAMDRecordFileRepositoryKeyInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as FileRepositoryKeyInterface;
 
 interface FactoryInterface
 {
-    public function handler(): ilAMDRecordFileRepositoryKeyInterface;
+    public function handler(): FileRepositoryKeyInterface;
 }

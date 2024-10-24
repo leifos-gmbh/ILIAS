@@ -20,14 +20,14 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\Repository\Stakeholder;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\FactoryInterface as ilAMDRecordFileRepositoryStakeholderFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\HandlerInterface as ilAMDRecordFileRepositoryStakeholderInterface;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Stakeholder\Handler as ilAMDRecordFileRepositoryStakeholder;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\FactoryInterface as FileRepositoryStakeholderFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\HandlerInterface as FileRepositoryStakeholderInterface;
+use ILIAS\AdvancedMetaData\Record\File\Repository\Stakeholder\Handler as FileRepositoryStakeholder;
 
-class Factory implements ilAMDRecordFileRepositoryStakeholderFactoryInterface
+class Factory implements FileRepositoryStakeholderFactoryInterface
 {
-    public function handler(): ilAMDRecordFileRepositoryStakeholderInterface
+    public function handler(): FileRepositoryStakeholderInterface
     {
-        return new ilAMDRecordFileRepositoryStakeholder();
+        return new FileRepositoryStakeholder();
     }
 }

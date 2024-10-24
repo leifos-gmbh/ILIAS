@@ -20,23 +20,16 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\I\Repository\Element;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\HandlerInterface as ilAMDRecordFileRepositoryElementIRSSWrapperInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as ilAMDRecordFileRepositoryKeyInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Values\HandlerInterface as ilAMDRecordFileRepositoryValuesInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\HandlerInterface as FileRepositoryElementIRSSWrapperInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as FileRepositoryKeyInterface;
 
 interface HandlerInterface
 {
     public function withKey(
-        ilAMDRecordFileRepositoryKeyInterface $key
+        FileRepositoryKeyInterface $key
     ): HandlerInterface;
 
-    public function withValues(
-        ilAMDRecordFileRepositoryValuesInterface $values
-    ): HandlerInterface;
+    public function getKey(): FileRepositoryKeyInterface;
 
-    public function getKey(): ilAMDRecordFileRepositoryKeyInterface;
-
-    public function getValues(): ilAMDRecordFileRepositoryValuesInterface;
-
-    public function getIRSS(): ilAMDRecordFileRepositoryElementIRSSWrapperInterface;
+    public function getIRSS(): FileRepositoryElementIRSSWrapperInterface;
 }

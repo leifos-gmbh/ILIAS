@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\FactoryInterface as ilAMDRecordFileRepositoryElementIRSSWrapperFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\FactoryInterface as FileRepositoryElementIRSSWrapperFactoryInterface;
 
 interface FactoryInterface
 {
-    public function irss(): ilAMDRecordFileRepositoryElementIRSSWrapperFactoryInterface;
+    public function irss(): FileRepositoryElementIRSSWrapperFactoryInterface;
 }

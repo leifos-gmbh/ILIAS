@@ -20,24 +20,24 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\Repository\Element\Wrapper\IRSS;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\FactoryInterface as ilAMDRecordFileRepositoryElementIRSSWrapperFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\HandlerInterface as ilAMDRecordFileRepositoryElementIRSSWrapperInterface;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Element\Wrapper\IRSS\Handler as ilAMDRecordFileRepositoryElementIRSSWrapper;
-use ILIAS\ResourceStorage\Services as ilResourceStorageServices;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\FactoryInterface as FileRepositoryElementIRSSWrapperFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\HandlerInterface as FileRepositoryElementIRSSWrapperInterface;
+use ILIAS\AdvancedMetaData\Record\File\Repository\Element\Wrapper\IRSS\Handler as FileRepositoryElementIRSSWrapper;
+use ILIAS\ResourceStorage\Services as IRSS;
 
-class Factory implements ilAMDRecordFileRepositoryElementIRSSWrapperFactoryInterface
+class Factory implements FileRepositoryElementIRSSWrapperFactoryInterface
 {
-    protected ilResourceStorageServices $irss;
+    protected IRSS $irss;
 
     public function __construct(
-        ilResourceStorageServices $irss
+        IRSS $irss
     ) {
         $this->irss = $irss;
     }
 
-    public function handler(): ilAMDRecordFileRepositoryElementIRSSWrapperInterface
+    public function handler(): FileRepositoryElementIRSSWrapperInterface
     {
-        return new ilAMDRecordFileRepositoryElementIRSSWrapper(
+        return new FileRepositoryElementIRSSWrapper(
             $this->irss
         );
     }

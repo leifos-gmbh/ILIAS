@@ -20,37 +20,34 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\I\Repository\Wrapper\DB;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as ilAMDRecordFileRepositoryKeyInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Values\HandlerInterface as ilAMDRecordFileRepositoryValuesInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as ilAMDRecordFileRepositoryElementCollectionInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as FileRepositoryKeyInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as FileRepositoryElementCollectionInterface;
 
 interface HandlerInterface
 {
     public const TABLE_NAME = "adv_md_record_files";
 
     public function insert(
-        ilAMDRecordFileRepositoryKeyInterface $key,
-        ilAMDRecordFileRepositoryValuesInterface $values
+        FileRepositoryKeyInterface $key
     ): void;
 
     public function delete(
-        ilAMDRecordFileRepositoryKeyInterface $key
+        FileRepositoryKeyInterface $key
     ): void;
 
     public function select(
-        ilAMDRecordFileRepositoryKeyInterface $key
-    ): ilAMDRecordFileRepositoryElementCollectionInterface;
+        FileRepositoryKeyInterface $key
+    ): FileRepositoryElementCollectionInterface;
 
     public function buildSelectQuery(
-        ilAMDRecordFileRepositoryKeyInterface $key
+        FileRepositoryKeyInterface $key
     ): string;
 
     public function buildDeleteQuery(
-        ilAMDRecordFileRepositoryKeyInterface $key
+        FileRepositoryKeyInterface $key
     ): string;
 
     public function buildInsertQuery(
-        ilAMDRecordFileRepositoryKeyInterface $key,
-        ilAMDRecordFileRepositoryValuesInterface $values
+        FileRepositoryKeyInterface $key
     ): string;
 }

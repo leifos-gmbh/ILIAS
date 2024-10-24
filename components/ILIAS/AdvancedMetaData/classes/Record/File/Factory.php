@@ -21,36 +21,40 @@ declare(strict_types=1);
 namespace ILIAS\AdvancedMetaData\Record\File;
 
 use ilDBInterface;
-use ILIAS\AdvancedMetaData\Record\File\Handler as ilAMDRecordFile;
-use ILIAS\AdvancedMetaData\Record\File\I\FactoryInterface as ilAMDRecordFileFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\HandlerInterface as ilAMDRecordFileInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\FactoryInterface as ilAMDRecordFileRepositoryFactoryInterface;
-use ILIAS\AdvancedMetaData\Record\File\Repository\Factory as ilAMDRecordFileRepositoryFactory;
-use ILIAS\ResourceStorage\Services as ilResourceStorageServices;
+use ILIAS\Data\Factory as DataFactory;
+use ILIAS\AdvancedMetaData\Record\File\Handler as File;
+use ILIAS\AdvancedMetaData\Record\File\I\FactoryInterface as FileFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\HandlerInterface as FileInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\FactoryInterface as FileRepositoryFactoryInterface;
+use ILIAS\AdvancedMetaData\Record\File\Repository\Factory as FileRepositoryFactory;
+use ILIAS\ResourceStorage\Services as IRSS;
 
-class Factory implements ilAMDRecordFileFactoryInterface
+class Factory implements FileFactoryInterface
 {
     protected ilDBInterface $db;
-    protected ilResourceStorageServices $irss;
+    protected IRSS $irss;
+    protected DataFactory $data_factory;
 
     public function __construct()
     {
         global $DIC;
         $this->db = $DIC->database();
         $this->irss = $DIC->resourceStorage();
+        $this->data_factory = new DataFactory();
     }
 
-    public function handler(): ilAMDRecordFileInterface
+    public function handler(): FileInterface
     {
-        return new ilAMDRecordFile(
+        return new File(
             $this,
-            $this->irss
+            $this->irss,
+            $this->data_factory
         );
     }
 
-    public function repository(): ilAMDRecordFileRepositoryFactoryInterface
+    public function repository(): FileRepositoryFactoryInterface
     {
-        return new ilAMDRecordFileRepositoryFactory(
+        return new FileRepositoryFactory(
             $this->db,
             $this->irss
         );

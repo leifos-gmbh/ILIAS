@@ -40,7 +40,7 @@ interface HandlerInterface
 
     public function getResourceIdSerialized(): string;
 
-    public function getIsGlobal(): bool;
+    public function isGlobal(): bool;
 
     public function isValid(): bool;
 
@@ -48,7 +48,7 @@ interface HandlerInterface
 
     public function isResourceIdKey(): bool;
 
-    public function isIsGlobalKey(): bool;
+    public function isGlobalKey(): bool;
 
     public function isCompositKeyOfObjectIdAndResourceId(): bool;
 

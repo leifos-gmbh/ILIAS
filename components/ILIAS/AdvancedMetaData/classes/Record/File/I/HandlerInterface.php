@@ -21,22 +21,22 @@ declare(strict_types=1);
 namespace ILIAS\AdvancedMetaData\Record\File\I;
 
 use ILIAS\Data\ObjectId;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as ilAMDRecordFileRepositoryElementCollectionInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as ilAMDRecordFileRepositoryElementInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\CollectionInterface as FileRepositoryElementCollectionInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\HandlerInterface as FileRepositoryElementInterface;
 use ILIAS\Filesystem\Stream\FileStream;
 
 interface HandlerInterface
 {
     public function getFilesByObjectId(
         ObjectId $object_id
-    ): ilAMDRecordFileRepositoryElementCollectionInterface;
+    ): FileRepositoryElementCollectionInterface;
 
     public function getFileByObjectIdAndResourceId(
         ObjectId $object_id,
         string $resource_id_serialized
-    ): ilAMDRecordFileRepositoryElementInterface|null;
+    ): FileRepositoryElementInterface|null;
 
-    public function getGlobalFiles(): ilAMDRecordFileRepositoryElementCollectionInterface;
+    public function getGlobalFiles(): FileRepositoryElementCollectionInterface;
 
     public function addFile(
         ObjectId $object_id,

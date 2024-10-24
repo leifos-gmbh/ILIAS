@@ -21,26 +21,26 @@ declare(strict_types=1);
 namespace ILIAS\AdvancedMetaData\Record\File\Repository\Element\Wrapper\IRSS;
 
 use DateTimeImmutable;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\HandlerInterface as ilAMDRecordFileRepositoryElementIRSSWrapperInterface;
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\HandlerInterface as ilAMDRecordFileRepositoryStakeholderInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Element\Wrapper\IRSS\HandlerInterface as FileRepositoryElementIRSSWrapperInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Stakeholder\HandlerInterface as FileRepositoryStakeholderInterface;
 use ILIAS\ResourceStorage\Identification\ResourceIdentification;
-use ILIAS\ResourceStorage\Services as ilResourceStorageServices;
+use ILIAS\ResourceStorage\Services as IRSS;
 use SimpleXMLElement;
 
-class Handler implements ilAMDRecordFileRepositoryElementIRSSWrapperInterface
+class Handler implements FileRepositoryElementIRSSWrapperInterface
 {
-    protected ilResourceStorageServices $irss;
+    protected IRSS $irss;
     protected string $resource_id_serialized;
 
     public function __construct(
-        ilResourceStorageServices $irss
+        IRSS $irss
     ) {
         $this->irss = $irss;
     }
 
     public function withResourceIdSerialized(
         string $resource_id_serialized
-    ): ilAMDRecordFileRepositoryElementIRSSWrapperInterface {
+    ): FileRepositoryElementIRSSWrapperInterface {
         $clone = clone $this;
         $clone->resource_id_serialized = $resource_id_serialized;
         return $clone;
@@ -78,7 +78,7 @@ class Handler implements ilAMDRecordFileRepositoryElementIRSSWrapperInterface
     }
 
     public function deleteResource(
-        ilAMDRecordFileRepositoryStakeholderInterface $stakeholder
+        FileRepositoryStakeholderInterface $stakeholder
     ): void {
         $this->irss->manage()->remove($this->getResourceIdentification(), $stakeholder);
     }

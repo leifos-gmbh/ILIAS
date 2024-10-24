@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace ILIAS\AdvancedMetaData\Record\File\Repository\Key;
 
-use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as ilAMDRecordFileRepositoryKeyInterface;
+use ILIAS\AdvancedMetaData\Record\File\I\Repository\Key\HandlerInterface as FileRepositoryKeyInterface;
 use ILIAS\Data\ObjectId;
 
-class Handler implements ilAMDRecordFileRepositoryKeyInterface
+class Handler implements FileRepositoryKeyInterface
 {
     protected ObjectId $object_id;
     protected string $resource_id_serialized;
@@ -31,7 +31,7 @@ class Handler implements ilAMDRecordFileRepositoryKeyInterface
 
     public function withObjectId(
         ObjectId $object_id
-    ): ilAMDRecordFileRepositoryKeyInterface {
+    ): FileRepositoryKeyInterface {
         $clone = clone $this;
         $clone->object_id = $object_id;
         return $clone;
@@ -39,7 +39,7 @@ class Handler implements ilAMDRecordFileRepositoryKeyInterface
 
     public function withResourceIdSerialized(
         string $resource_id_serialized
-    ): ilAMDRecordFileRepositoryKeyInterface {
+    ): FileRepositoryKeyInterface {
         $clone = clone $this;
         $clone->resource_id_serialized = $resource_id_serialized;
         return $clone;
@@ -47,7 +47,7 @@ class Handler implements ilAMDRecordFileRepositoryKeyInterface
 
     public function withIsGlobal(
         bool $is_global
-    ): ilAMDRecordFileRepositoryKeyInterface {
+    ): FileRepositoryKeyInterface {
         $clone = clone $this;
         $clone->is_global = $is_global;
         return $clone;
@@ -63,7 +63,7 @@ class Handler implements ilAMDRecordFileRepositoryKeyInterface
         return $this->resource_id_serialized;
     }
 
-    public function getIsGlobal(): bool
+    public function isGlobal(): bool
     {
         return $this->is_global;
     }
@@ -74,15 +74,16 @@ class Handler implements ilAMDRecordFileRepositoryKeyInterface
             $this->isObjectIdKey() or
             $this->isResourceIdKey() or
             $this->isCompositKeyOfObjectIdAndResourceId() or
-            $this->isCompositKeyOfAll()
+            $this->isCompositKeyOfAll() or
+            $this->isGlobalKey()
         );
     }
 
     public function isObjectIdKey(): bool
     {
         return (
-            isset($this->object_id) and
-            !isset($this->resource_id_serialized) and
+            isset($this->object_id) &&
+            !isset($this->resource_id_serialized) &&
             !isset($this->is_global)
         );
     }
@@ -90,17 +91,17 @@ class Handler implements ilAMDRecordFileRepositoryKeyInterface
     public function isResourceIdKey(): bool
     {
         return (
-            !isset($this->object_id) and
-            isset($this->resource_id_serialized) and
+            !isset($this->object_id) &&
+            isset($this->resource_id_serialized) &&
             !isset($this->is_global)
         );
     }
 
-    public function isIsGlobalKey(): bool
+    public function isGlobalKey(): bool
     {
         return (
-            !isset($this->object_id) and
-            !isset($this->resource_id_serialized) and
+            !isset($this->object_id) &&
+            !isset($this->resource_id_serialized) &&
             isset($this->is_global)
         );
     }
@@ -108,8 +109,8 @@ class Handler implements ilAMDRecordFileRepositoryKeyInterface
     public function isCompositKeyOfObjectIdAndResourceId(): bool
     {
         return (
-            isset($this->object_id) and
-            isset($this->resource_id_serialized) and
+            isset($this->object_id) &&
+            isset($this->resource_id_serialized) &&
             !isset($this->is_global)
         );
     }
@@ -117,8 +118,8 @@ class Handler implements ilAMDRecordFileRepositoryKeyInterface
     public function isCompositKeyOfAll(): bool
     {
         return (
-            isset($this->object_id) and
-            isset($this->resource_id_serialized) and
+            isset($this->object_id) &&
+            isset($this->resource_id_serialized) &&
             isset($this->is_global)
         );
     }

@@ -616,12 +616,6 @@ class ilBookingEntry
             $this->db->manipulate('INSERT INTO booking_user (entry_id, user_id, tstamp)' .
                 ' VALUES (' . $this->db->quote($a_entry_id, 'integer') . ',' .
                 $this->db->quote($a_user_id, 'integer') . ',' . $this->db->quote(time(), 'integer') . ')');
-
-            $mail = new ilCalendarMailNotification();
-            $mail->setAppointmentId($a_entry_id);
-            $mail->setRecipients(array($a_user_id));
-            $mail->setType(ilCalendarMailNotification::TYPE_BOOKING_CONFIRMATION);
-            $mail->send();
         }
         return true;
     }

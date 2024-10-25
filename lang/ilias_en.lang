@@ -17675,3 +17675,7 @@ dateplaner#:#cal_ch_booking_num_free_short#:#%s free
 dateplaner#:#cal_ch_booking_num_available#:#Available Slots
 dateplaner#:#cal_ch_free_of_available#:#%s of %s
 dateplaner#:#cal_ch_send_mail#:#Send Mail
+dateplaner#:#cal_ch_booking_your_comment#:#Your comment:
+dateplaner#:#cal_ch_booking_comment#:#Comment:
+dateplaner#:#cal_ch_booking_other_participants#:#Other Participants:
+dateplaner#:#cal_ch_booking_link#:#Link to Consultation Hours:

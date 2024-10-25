@@ -1141,8 +1141,7 @@ class ilCalendarAppointmentGUI
                 $this->ctrl->returnToParent($this);
             }
 
-            ilConsultationHourUtils::bookAppointment($this->user->getId(), $entry);
-            ilBookingEntry::writeBookingMessage($entry, $this->user->getId(), $form->getInput('comment'));
+            ilConsultationHourUtils::bookAppointment($this->user->getId(), $entry, $form->getInput('comment'));
         }
         $this->tpl->setOnScreenMessage('success', $this->lng->txt('cal_booking_confirmed'), true);
         $this->ctrl->returnToParent($this);

@@ -132,7 +132,7 @@ class ilConsultationHourUtils
      * @param int $a_app_id
      * @return bool
      */
-    public static function bookAppointment(int $a_usr_id, int $a_app_id): bool
+    public static function bookAppointment(int $a_usr_id, int $a_app_id, string $comment = ''): bool
     {
         global $DIC;
 
@@ -161,6 +161,40 @@ class ilConsultationHourUtils
         // book appointment
         $booking = new ilBookingEntry($app->getContextId());
         $booking->book($app->getEntryId(), $a_usr_id);
+        ilBookingEntry::writeBookingMessage(
+            $app->getEntryId(),
+            $a_usr_id,
+            $comment
+        );
+
+        $mail = new ilCalendarMailNotification();
+        $mail->setAppointmentId($app->getEntryId());
+        $mail->setRecipients([$a_usr_id]);
+        $mail->setType(ilCalendarMailNotification::TYPE_BOOKING_CONFIRMATION);
+        $mail->send();
+
+        $recipients = [$booking->getObjId()];
+        $mail = new ilCalendarMailNotification();
+        $mail->setAppointmentId($app->getEntryId());
+        $mail->setBookerID($a_usr_id);
+        $mail->setRecipients($recipients);
+        $mail->setType(ilCalendarMailNotification::TYPE_BOOKING_CONFIRMATION_MANAGER);
+        $mail->send();
+
+        $manager = ilConsultationHourAppointments::getManager(
+            false,
+            false,
+            $booking->getObjId()
+        );
+        if ($manager > 0) {
+            $recipients = [$manager];
+            $mail = new ilCalendarMailNotification();
+            $mail->setAppointmentId($app->getEntryId());
+            $mail->setBookerID($a_usr_id);
+            $mail->setRecipients($recipients);
+            $mail->setType(ilCalendarMailNotification::TYPE_BOOKING_CONFIRMATION_MANAGER);
+            $mail->send();
+        }
         return true;
     }
 

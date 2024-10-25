@@ -17695,3 +17695,7 @@ dateplaner#:#cal_ch_booking_num_free_short#:#%s frei
 dateplaner#:#cal_ch_booking_num_available#:#Freie Termine
 dateplaner#:#cal_ch_free_of_available#:#%s von %s
 dateplaner#:#cal_ch_send_mail#:#Mail verschicken
+dateplaner#:#cal_ch_booking_your_comment#:#Ihr Kommentar:
+dateplaner#:#cal_ch_booking_comment#:#Kommentar:
+dateplaner#:#cal_ch_booking_other_participants#:#Andere Teilnehmende:
+dateplaner#:#cal_ch_booking_link#:#Link zur Sprechstundenverwaltung:

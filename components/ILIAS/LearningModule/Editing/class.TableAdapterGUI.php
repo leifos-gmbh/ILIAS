@@ -101,9 +101,10 @@ class TableAdapterGUI
 
     public function singleAction(
         string $action,
-        string $title
+        string $title,
+        bool $async = false
     ): self {
-        $this->addAction(self::SINGLE, $action, $title);
+        $this->addAction(self::SINGLE, $action, $title, $async);
         return $this;
     }
 
@@ -138,12 +139,13 @@ class TableAdapterGUI
         return $this;
     }
 
-    protected function addAction(int $type, string $action, string $title): void
+    protected function addAction(int $type, string $action, string $title, bool $async = false): void
     {
         $this->actions[$action] = [
             "type" => $type,
             "action" => $action,
-            "title" => $title
+            "title" => $title,
+            "async" => $async
         ];
         $this->last_action_key = $action;
     }
@@ -252,6 +254,9 @@ class TableAdapterGUI
                         );
                         break;
                 }
+                if ($act["async"]) {
+                    $actions[$act["action"]] = $actions[$act["action"]]->withAsync(true);
+                }
             }
             if ($this->order_cmd !== "") {
                 $uri = $this->df->uri(
@@ -280,6 +285,11 @@ class TableAdapterGUI
             }
         }
         return $this->table;
+    }
+
+    public function getData(): ?array
+    {
+        return $this->getTable()->getData();
     }
 
     public function render(): string

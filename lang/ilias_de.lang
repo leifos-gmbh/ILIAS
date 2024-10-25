@@ -10831,6 +10831,15 @@ lm#:#lm_edit_chapters#:#Kapitel bearbeiten
 lm#:#lm_edit_lm_settings#:#Lernmoduleinstellungen bearbeiten
 lm#:#lm_est_reading_time#:#Geschätzte Lesedauer
 lm#:#lm_est_reading_time_info#:#In Lernmodulen kann eine geschätzte Lesezeit ermittelt und angezeigt werden.
+lm#:#lm_insert_chapter#:#Kapitel einfügen
+lm#:#lm_insert_chapter_after#:#Kapitel danach einfügen
+lm#:#lm_insert_chapter_before#:#Kapitel davor einfügen
+lm#:#lm_insert_page#:#Seite einfügen
+lm#:#lm_insert_page_after#:#Seite danach einfügen
+lm#:#lm_insert_page_before#:#Seite davor einfügen
+lm#:#lm_insert_page_clip#:#Seiten aus Zwischenablage einfügen
+lm#:#lm_insert_page_clip_after#:#Seiten aus Zwischenablage danach einfügen
+lm#:#lm_insert_page_clip_before#:#Seiten aus Zwischenablage davor einfügen
 lm#:#lm_page_added#:#Eine Seite wurde hinzugefügt.
 lm#:#lm_page_type_lm#:#Lernmodulseite
 lm#:#lm_pages_added#:#Die Seiten wurden hinzugefügt.

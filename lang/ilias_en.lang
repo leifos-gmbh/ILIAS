@@ -10824,6 +10824,15 @@ lm#:#lm_edit_chapters#:#Edit Chapters
 lm#:#lm_edit_lm_settings#:#Edit Learning Module Settings
 lm#:#lm_est_reading_time#:#Estimated Reading Time
 lm#:#lm_est_reading_time_info#:#In Learning Modules in the repository the estimated reading time can be determined and displayed.
+lm#:#lm_insert_chapter#:#Insert chapter
+lm#:#lm_insert_chapter_after#:#Insert chapter after
+lm#:#lm_insert_chapter_before#:#Insert chapter before
+lm#:#lm_insert_page#:#Insert page
+lm#:#lm_insert_page_after#:#Insert page after
+lm#:#lm_insert_page_before#:#Insert page before
+lm#:#lm_insert_page_clip#:#Insert page from clipboard
+lm#:#lm_insert_page_clip_after#:#Insert page from clipboard after
+lm#:#lm_insert_page_clip_before#:#Insert page from clipboard before
 lm#:#lm_page_added#:#Page has been added.
 lm#:#lm_page_type_lm#:#LM Page
 lm#:#lm_pages_added#:#Pages have been added.

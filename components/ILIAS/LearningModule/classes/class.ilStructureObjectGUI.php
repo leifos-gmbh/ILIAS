@@ -17,12 +17,11 @@
  *********************************************************************/
 
 use ILIAS\UI\Component\Input\Container\Form;
+use ILIAS\LearningModule\Editing\EditSubObjectsGUI;
 
 /**
- * User Interface for Structure Objects Editing
- *
- * @author Alexander Killing <killing@leifos.de>
  * @ilCtrl_Calls ilStructureObjectGUI: ilConditionHandlerGUI, ilObjectMetaDataGUI
+ * @ilCtrl_Calls ilStructureObjectGUI: ILIAS\LearningModule\Editing\EditSubObjectsGUI
  */
 class ilStructureObjectGUI extends ilLMObjectGUI
 {
@@ -89,6 +88,23 @@ class ilStructureObjectGUI extends ilLMObjectGUI
                 $ilTabs->setTabActive('preconditions');
                 break;
 
+            case strtolower(EditSubObjectsGUI::class):
+                $this->setTabs();
+                if ($this->request->getSubType() === "pg") {
+                    $this->addSubTabs("sub_pages");
+                    $table_title = $this->lng->txt("cont_pages");
+                } else {
+                    $this->addSubTabs("sub_chapters");
+                    $table_title = $this->lng->txt("cont_subchapters");
+                }
+                $gui = $this->gui->editing()->editSubObjectsGUI(
+                    $this->request->getSubType(),
+                    $this->content_object,
+                    $table_title
+                );
+                $this->ctrl->forwardCommand($gui);
+                break;
+
             default:
                 if ($cmd == 'listConditions') {
                     $this->setTabs();
@@ -120,42 +136,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 
     public function view(): void
     {
-        if (true) {
-            $retrieval = $this->domain->subObjectRetrieval(
-                $this->content_object->getId(),
-                "st",
-                $this->requested_obj_id
-            );
-
-            if ($retrieval->count() === 0) {
-                $this->gui->button(
-                    $this->lng->txt("cont_insert_first_chapter"),
-                    $this->ctrl->getLinkTargetByClass(self::class, "insertChapter")
-                )->toToolbar();
-            }
-
-            $this->ctrl->setParameterByClass(self::class, "backcmd", "view");
-            $this->setTabs();
-            $table = $this->gui->editing()->subObjectTableGUI(
-                $this->content_object->getId(),
-                "st",
-                $this
-            );
-            $this->tpl->setContent($table->render());
-            return;
-        }
-
-        $this->showHierarchy();
-    }
-
-    public function tableCommand(): void
-    {
-        $table = $this->gui->editing()->subObjectTableGUI(
-            $this->content_object->getId(),
-            "st",
-            $this
-        );
-        $table->handleCommand();
+        $this->ctrl->redirectByClass(EditSubObjectsGUI::class, "editPages");
     }
 
     public function showHierarchy(): void
@@ -196,79 +177,6 @@ class ilStructureObjectGUI extends ilLMObjectGUI
         $this->tpl->addOnloadCode("window.setTimeout(() => { il.repository.core.trigger('il-lm-editor-tree'); }, 500);");
     }
 
-    /**
-     * Copy items to clipboard, then cut them from the current tree
-     */
-    public function cutItems(
-        string $a_return = "view"
-    ): void {
-        $ilCtrl = $this->ctrl;
-        $lng = $this->lng;
-
-        $items = $this->request->getIds();
-        if (count($items) == 0) {
-            $this->tpl->setOnScreenMessage('failure', $lng->txt("no_checkbox"), true);
-            $ilCtrl->redirect($this, "showHierarchy");
-        }
-
-        $todel = array();			// delete IDs < 0 (needed for non-js editing)
-        foreach ($items as $k => $item) {
-            if ($item < 0) {
-                $todel[] = $k;
-            }
-        }
-        foreach ($todel as $k) {
-            unset($items[$k]);
-        }
-
-        if (!ilLMObject::uniqueTypesCheck($items)) {
-            $this->tpl->setOnScreenMessage('failure', $lng->txt("cont_choose_pages_or_chapters_only"), true);
-            $ilCtrl->redirect($this, "showHierarchy");
-        }
-
-        ilLMObject::clipboardCut($this->content_object->getId(), $items);
-        ilEditClipboard::setAction("cut");
-        $this->tpl->setOnScreenMessage('info', $lng->txt("cont_selected_items_have_been_cut"), true);
-
-        $ilCtrl->redirect($this, $a_return);
-    }
-
-    /**
-     * Copy items to clipboard
-     */
-    public function copyItems(
-        string $a_return = "view"
-    ): void {
-        $ilCtrl = $this->ctrl;
-        $lng = $this->lng;
-
-        $items = $this->request->getIds();
-        if (count($items) == 0) {
-            $this->tpl->setOnScreenMessage('failure', $lng->txt("no_checkbox"), true);
-            $ilCtrl->redirect($this, "showHierarchy");
-        }
-
-        $todel = array();				// delete IDs < 0 (needed for non-js editing)
-        foreach ($items as $k => $item) {
-            if ($item < 0) {
-                $todel[] = $k;
-            }
-        }
-        foreach ($todel as $k) {
-            unset($items[$k]);
-        }
-
-        if (!ilLMObject::uniqueTypesCheck($items)) {
-            $this->tpl->setOnScreenMessage('failure', $lng->txt("cont_choose_pages_or_chapters_only"), true);
-            $ilCtrl->redirect($this, "showHierarchy");
-        }
-
-        ilLMObject::clipboardCopy($this->content_object->getId(), $items);
-        ilEditClipboard::setAction("copy");
-
-        $this->tpl->setOnScreenMessage('info', $lng->txt("cont_selected_items_have_been_copied"), true);
-        $ilCtrl->redirect($this, $a_return);
-    }
 
     /**
      * Save all titles of chapters/pages
@@ -592,6 +500,29 @@ class ilStructureObjectGUI extends ilLMObjectGUI
         );
     }
 
+    protected function addSubTabs($active = "")
+    {
+        $ilTabs = $this->tabs;
+        $lng = $this->lng;
+
+        // content -> pages
+        $this->ctrl->setParameterByClass(static::class, "sub_type", "pg");
+        $ilTabs->addSubTab(
+            "sub_pages",
+            $lng->txt("cont_pages"),
+            $this->ctrl->getLinkTargetByClass(EditSubObjectsGUI::class)
+        );
+
+        // chapters
+        $this->ctrl->setParameterByClass(static::class, "sub_type", "st");
+        $ilTabs->addSubTab(
+            "sub_chapters",
+            $lng->txt("cont_subchapters"),
+            $this->ctrl->getLinkTargetByClass(EditSubObjectsGUI::class)
+        );
+        $ilTabs->activateSubTab($active);
+    }
+
     /**
      * @throws ilPermissionException
      */
@@ -638,204 +569,6 @@ class ilStructureObjectGUI extends ilLMObjectGUI
         throw new ilPermissionException($lng->txt("msg_no_perm_read_lm"));
     }
 
-    /**
-     * Insert (multiple) chapters at node
-     */
-    public function insertChapter(
-        int $id = 0
-    ): void {
-        $ilCtrl = $this->ctrl;
-        $lng = $this->lng;
-
-        $num = 1;
-        $parent_id = $this->requested_obj_id;
-        $target = $id;
-
-        for ($i = 1; $i <= $num; $i++) {
-            $chap = new ilStructureObject($this->content_object);
-            $chap->setType("st");
-            $chap->setTitle($lng->txt("cont_new_chap"));
-            $chap->setLMId($this->content_object->getId());
-            $chap->create();
-            ilLMObject::putInTree($chap, (int) $parent_id, (int) $target);
-        }
-
-        $ilCtrl->redirect($this, "view");
-    }
-
-    /**
-     * Insert (multiple) subchapters at node
-     */
-    public function insertSubchapter(): void
-    {
-        $this->insertChapter(true);
-    }
-
-    /**
-     * Insert Chapter from clipboard
-     */
-    public function insertChapterClip(
-        bool $a_as_sub = false,
-        string $a_return = "view"
-    ): void {
-        $ilUser = $this->user;
-        $ilCtrl = $this->ctrl;
-        $ilLog = $this->log;
-
-        $ilLog->write("Insert Chapter From Clipboard");
-
-
-        $node_id = ilChapterHierarchyFormGUI::getPostNodeId();
-        $first_child = ilChapterHierarchyFormGUI::getPostFirstChild();
-
-        if ($a_as_sub) {		// as subchapter
-            if (!$first_child) {	// insert under parent
-                $parent_id = $node_id;
-                $target = "";
-            } else {													// we shouldnt end up here
-                $ilCtrl->redirect($this, "showHierarchy");
-                return;
-            }
-        } else {	// as chapter
-            if (!$first_child) {	// insert after node id
-                $parent_id = $this->tree->getParentId($node_id);
-                $target = $node_id;
-            } else {													// insert as first child
-                $parent_id = $node_id;
-                $target = ilTree::POS_FIRST_NODE;
-
-                // do not move a chapter in front of a page
-                $childs = $this->tree->getChildsByType($parent_id, "pg");
-                if (count($childs) != 0) {
-                    $target = $childs[count($childs) - 1]["obj_id"];
-                }
-            }
-        }
-
-        // copy and paste
-        $chapters = $ilUser->getClipboardObjects("st", true);
-        $copied_nodes = array();
-
-        foreach ($chapters as $chap) {
-            $ilLog->write("Call pasteTree, Target LM: " . $this->content_object->getId() . ", Chapter ID: " . $chap["id"]
-                . ", Parent ID: " . $parent_id . ", Target: " . $target);
-            $cid = ilLMObject::pasteTree(
-                $this->content_object,
-                $chap["id"],
-                $parent_id,
-                (int) $target,
-                (string) ($chap["insert_time"] ?? ""),
-                $copied_nodes,
-                (ilEditClipboard::getAction() == "copy")
-            );
-            $target = $cid;
-        }
-        ilLMObject::updateInternalLinks($copied_nodes);
-
-        if (ilEditClipboard::getAction() == "cut") {
-            $ilUser->clipboardDeleteObjectsOfType("pg");
-            $ilUser->clipboardDeleteObjectsOfType("st");
-            ilEditClipboard::clear();
-        }
-
-        $this->content_object->checkTree();
-        $ilCtrl->redirect($this, $a_return);
-    }
-
-    public function insertSubchapterClip(): void
-    {
-        $this->insertChapterClip(true);
-    }
-
-    public function insertPage(): void
-    {
-        $ilCtrl = $this->ctrl;
-        $lng = $this->lng;
-
-        $num = ilChapterHierarchyFormGUI::getPostMulti();
-        $node_id = ilChapterHierarchyFormGUI::getPostNodeId();
-
-        if (!ilChapterHierarchyFormGUI::getPostFirstChild()) {	// insert after node id
-            $parent_id = $this->tree->getParentId($node_id);
-            $target = $node_id;
-        } else {													// insert as first child
-            $parent_id = $node_id;
-            $target = ilTree::POS_FIRST_NODE;
-        }
-
-        for ($i = 1; $i <= $num; $i++) {
-            $page = new ilLMPageObject($this->content_object);
-            $page->setType("pg");
-            $page->setTitle($lng->txt("cont_new_page"));
-            $page->setLMId($this->content_object->getId());
-            $page->create();
-            ilLMObject::putInTree($page, $parent_id, $target);
-        }
-
-        if ($num == 1) {
-            $this->tpl->setOnScreenMessage("success", $this->lng->txt("lm_page_added"), true);
-        } else {
-            $this->tpl->setOnScreenMessage("success", $this->lng->txt("lm_pages_added"), true);
-        }
-
-        $ilCtrl->redirect($this, "showHierarchy");
-    }
-
-    public function insertPageClip(): void
-    {
-        $ilCtrl = $this->ctrl;
-        $ilUser = $this->user;
-
-        $node_id = ilChapterHierarchyFormGUI::getPostNodeId();
-        $first_child = ilChapterHierarchyFormGUI::getPostFirstChild();
-
-        if (!$first_child) {	// insert after node id
-            $parent_id = $this->tree->getParentId($node_id);
-            $target = $node_id;
-        } else {													// insert as first child
-            $parent_id = $node_id;
-            $target = ilTree::POS_FIRST_NODE;
-        }
-
-        // cut and paste
-        $pages = $ilUser->getClipboardObjects("pg");
-        $copied_nodes = array();
-        foreach ($pages as $pg) {
-            $cid = ilLMObject::pasteTree(
-                $this->content_object,
-                $pg["id"],
-                $parent_id,
-                $target,
-                (string) ($pg["insert_time"] ?? ""),
-                $copied_nodes,
-                (ilEditClipboard::getAction() == "copy")
-            );
-            $target = $cid;
-        }
-        ilLMObject::updateInternalLinks($copied_nodes);
-
-        if (ilEditClipboard::getAction() == "cut") {
-            $ilUser->clipboardDeleteObjectsOfType("pg");
-            $ilUser->clipboardDeleteObjectsOfType("st");
-            ilEditClipboard::clear();
-        }
-
-        $ilCtrl->redirect($this, "view");
-    }
-
-    public function proceedDragDrop(): void
-    {
-        $ilCtrl = $this->ctrl;
-
-        $req = $this->request;
-        $this->content_object->executeDragDrop(
-            $req->getHFormPar("source_id"),
-            $req->getHFormPar("target_id"),
-            $req->getHFormPar("fc"),
-            $req->getHFormPar("as_subitem")
-        );
-        $ilCtrl->redirect($this, "showHierarchy");
-    }
 
     ////
     //// Pages layout

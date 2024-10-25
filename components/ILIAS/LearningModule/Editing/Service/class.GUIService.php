@@ -28,15 +28,10 @@ use ILIAS\LearningModule\InternalDomainService;
  */
 class GUIService
 {
-    protected InternalGUIService $gui_service;
-    protected InternalDomainService $domain_service;
-
     public function __construct(
-        InternalDomainService $domain_service,
-        InternalGUIService $gui_service
+        protected InternalDomainService $domain,
+        protected InternalGUIService $gui
     ) {
-        $this->gui_service = $gui_service;
-        $this->domain_service = $domain_service;
     }
 
     public function request(
@@ -44,10 +39,80 @@ class GUIService
         ?array $passed_post_data = null
     ): EditingGUIRequest {
         return new EditingGUIRequest(
-            $this->gui_service->http(),
-            $this->domain_service->refinery(),
+            $this->gui->http(),
+            $this->domain->refinery(),
             $passed_query_params,
             $passed_post_data
         );
+    }
+
+    public function subObjectTableGUI(
+        int $lm_id,
+        string $type,
+        object $parent_gui
+    ): \ILIAS\LearningModule\Table\TableAdapterGUI {
+        $lng = $this->domain->lng();
+        $table = new \ILIAS\LearningModule\Table\TableAdapterGUI(
+            "subobj",
+            ($type === "st")
+                ? $lng->txt("cont_subchapters")
+                : $lng->txt("cont_pages"),
+            $this->domain->subObjectRetrieval(
+                $lm_id,
+                $type,
+                $this->request()->getObjId()
+            ),
+            $parent_gui
+        );
+        $table = $table
+            ->ordering("saveOrder")
+            ->textColumn("title", $lng->txt("title"));
+
+        if ($type === "st") {
+            $acts = [
+                [
+                    "editChapter",
+                    $lng->txt("edit"),
+                    [\ilObjLearningModuleGUI::class, \ilStructureObjectGUI::class],
+                    "view",
+                    "obj_id"
+                ],
+                [
+                    "insertChapter",
+                    $lng->txt("cont_insert_chapter_after"),
+                    [\ilObjLearningModuleGUI::class],
+                    "insertChapter",
+                    "obj_id"
+                ],
+            ];
+        } else {
+            $acts = [
+                [
+                    "editPage",
+                    $lng->txt("edit"),
+                    [\ilObjLearningModuleGUI::class, \ilLMPageObjectGUI::class],
+                    "edit",
+                    "obj_id"
+                ]
+            ];
+        }
+        foreach ($acts as $a) {
+            $table = $table->singleAction($a[0], $a[1])
+                           ->redirect($a[2], $a[3], $a[4]);
+        }
+        $table = $table
+            ->standardAction(
+                "delete",
+                $lng->txt("delete")
+            )
+            ->standardAction(
+                "cutItems",
+                $lng->txt("cut")
+            )
+            ->standardAction(
+                "copyItems",
+                $lng->txt("copy")
+            );
+        return $table;
     }
 }

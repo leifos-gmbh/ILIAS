@@ -32,6 +32,8 @@ use ILIAS\LearningModule\Editing\EditingGUIRequest;
  */
 class ilObjContentObjectGUI extends ilObjectGUI
 {
+    protected \ILIAS\LearningModule\InternalGUIService $gui;
+    protected \ILIAS\LearningModule\InternalDomainService $domain;
     protected ilRbacSystem $rbacsystem;
     protected \ILIAS\LearningModule\ReadingTime\SettingsGUI $reading_time_gui;
     protected ilLMMenuEditor $lmme_obj;
@@ -143,6 +145,8 @@ class ilObjContentObjectGUI extends ilObjectGUI
             ? $this->object->getId()
             : 0;
         $this->reading_time_gui = new \ILIAS\LearningModule\ReadingTime\SettingsGUI($id);
+        $this->domain = $DIC->learningModule()->internal()->domain();
+        $this->gui = $DIC->learningModule()->internal()->gui();
     }
 
     protected function checkCtrlPath(): void
@@ -1001,6 +1005,15 @@ class ilObjContentObjectGUI extends ilObjectGUI
         $this->ctrl->redirectByClass([ilLMEditorGUI::class, ilObjLearningModuleGUI::class], "");
     }
 
+    public function tableCommand(): void
+    {
+        $table = $this->gui->editing()->subObjectTableGUI(
+            $this->lm->getId(),
+            "st",
+            $this
+        );
+        $table->handleCommand();
+    }
     /**
      * show chapters
      */
@@ -1009,10 +1022,36 @@ class ilObjContentObjectGUI extends ilObjectGUI
         $lng = $this->lng;
         $ilCtrl = $this->ctrl;
 
+        $retrieval = $this->domain->subObjectRetrieval(
+            $this->lm->getId(),
+            "st",
+            $this->requested_obj_id
+        );
+
         $this->setTabs();
         $this->setContentSubTabs("chapters");
 
         $ilCtrl->setParameter($this, "backcmd", "chapters");
+
+        $ml_head = self::getMultiLangHeader($this->lm->getId(), $this);
+
+        if (true) {
+            if ($retrieval->count() === 0) {
+                $this->gui->button(
+                    $this->lng->txt("cont_insert_first_chapter"),
+                    "insertChapter"
+                )->toToolbar();
+            }
+            $table = $this->gui->editing()->subObjectTableGUI(
+                $this->lm->getId(),
+                "st",
+                $this
+            );
+            $this->tpl->setContent($ml_head . $table->render());
+            return;
+        }
+
+
 
         $form_gui = new ilChapterHierarchyFormGUI($this->lm->getType(), $this->requested_transl);
         $form_gui->setFormAction($ilCtrl->getFormAction($this));
@@ -1036,7 +1075,6 @@ class ilObjContentObjectGUI extends ilObjectGUI
         $ctpl->setVariable("HIERARCHY_FORM", $form_gui->getHTML());
         $ilCtrl->setParameter($this, "obj_id", null);
 
-        $ml_head = self::getMultiLangHeader($this->lm->getId(), $this);
 
         $this->tpl->setContent($ml_head . $ctpl->get());
     }
@@ -1266,9 +1304,9 @@ class ilObjContentObjectGUI extends ilObjectGUI
      *								  of the objects, that should be deleted
      *								  (or no parent object id for top level)
      */
-    public function delete(int $a_parent_subobj_id = 0): void
+    public function delete(array $ids): void
     {
-        $ids = $this->edit_request->getIds();
+        $a_parent_subobj_id = $this->requested_obj_id;
 
         if (count($ids) == 0) {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt("no_checkbox"), true);
@@ -2304,16 +2342,16 @@ class ilObjContentObjectGUI extends ilObjectGUI
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
 
-        $num = ilChapterHierarchyFormGUI::getPostMulti();
-        $node_id = ilChapterHierarchyFormGUI::getPostNodeId();
+        $num = 1;
+        $node_id = $this->edit_request->getObjId();
 
-        if (!ilChapterHierarchyFormGUI::getPostFirstChild()) {	// insert after node id
-            $parent_id = $this->lm_tree->getParentId($node_id);
-            $target = $node_id;
-        } else {													// insert as first child
+        //if (!ilChapterHierarchyFormGUI::getPostFirstChild()) {	// insert after node id
+        $parent_id = $this->lm_tree->getParentId($node_id);
+        $target = $node_id;
+        /*} else {													// insert as first child
             $parent_id = $node_id;
             $target = ilTree::POS_FIRST_NODE;
-        }
+        }*/
 
         for ($i = 1; $i <= $num; $i++) {
             $chap = new ilStructureObject($this->lm);
@@ -2322,6 +2360,12 @@ class ilObjContentObjectGUI extends ilObjectGUI
             $chap->setLMId($this->lm->getId());
             $chap->create();
             ilLMObject::putInTree($chap, $parent_id, $target);
+        }
+
+        if ($parent_id === $this->lm_tree->readRootId()) {
+            $ilCtrl->setParameterByClass(static::class, "obj_id", 0);
+        } else {
+            $ilCtrl->setParameterByClass(static::class, "obj_id", $parent_id);
         }
 
         $ilCtrl->redirect($this, "chapters");
@@ -2408,15 +2452,14 @@ class ilObjContentObjectGUI extends ilObjectGUI
         $ilErr->raiseError($lng->txt("msg_no_perm_read_lm"), $ilErr->FATAL);
     }
 
-    public function cutItems(string $a_return = "chapters"): void
+    public function cutItems(array $ids): void
     {
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
 
-        $ids = $this->edit_request->getIds();
         if (count($ids) == 0) {
             $this->tpl->setOnScreenMessage('failure', $lng->txt("no_checkbox"), true);
-            $ilCtrl->redirect($this, $a_return);
+            $ilCtrl->redirect($this, $this->edit_request->getBackCmd());
         }
 
         $todel = array();			// delete IDs < 0 (needed for non-js editing)
@@ -2432,18 +2475,17 @@ class ilObjContentObjectGUI extends ilObjectGUI
         ilEditClipboard::setAction("cut");
         $this->tpl->setOnScreenMessage('info', $lng->txt("cont_selected_items_have_been_cut"), true);
 
-        $ilCtrl->redirect($this, $a_return);
+        $ilCtrl->redirect($this, $this->edit_request->getBackCmd());
     }
 
     /**
      * Copy items to clipboard
      */
-    public function copyItems(): void
+    public function copyItems(array $ids): void
     {
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
 
-        $ids = $this->edit_request->getIds();
         if (count($ids) == 0) {
             $this->tpl->setOnScreenMessage('failure', $lng->txt("no_checkbox"), true);
             $ilCtrl->redirect($this, "chapters");

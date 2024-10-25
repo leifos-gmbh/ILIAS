@@ -26,6 +26,8 @@ use ILIAS\UI\Component\Input\Container\Form;
  */
 class ilStructureObjectGUI extends ilLMObjectGUI
 {
+    protected \ILIAS\LearningModule\InternalDomainService $domain;
+    protected \ILIAS\LearningModule\InternalGUIService $gui;
     protected ilPropertyFormGUI $form;
     protected ilConditionHandlerGUI $condHI;
     protected ilObjUser $user;
@@ -47,6 +49,8 @@ class ilStructureObjectGUI extends ilLMObjectGUI
         $this->tpl = $DIC->ui()->mainTemplate();
         parent::__construct($a_content_obj);
         $this->tree = $a_tree;
+        $this->gui = $DIC->learningModule()->internal()->gui();
+        $this->domain = $DIC->learningModule()->internal()->domain();
     }
 
     public function setStructureObject(
@@ -116,7 +120,42 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 
     public function view(): void
     {
+        if (true) {
+            $retrieval = $this->domain->subObjectRetrieval(
+                $this->content_object->getId(),
+                "st",
+                $this->requested_obj_id
+            );
+
+            if ($retrieval->count() === 0) {
+                $this->gui->button(
+                    $this->lng->txt("cont_insert_first_chapter"),
+                    $this->ctrl->getLinkTargetByClass(self::class, "insertChapter")
+                )->toToolbar();
+            }
+
+            $this->ctrl->setParameterByClass(self::class, "backcmd", "view");
+            $this->setTabs();
+            $table = $this->gui->editing()->subObjectTableGUI(
+                $this->content_object->getId(),
+                "st",
+                $this
+            );
+            $this->tpl->setContent($table->render());
+            return;
+        }
+
         $this->showHierarchy();
+    }
+
+    public function tableCommand(): void
+    {
+        $table = $this->gui->editing()->subObjectTableGUI(
+            $this->content_object->getId(),
+            "st",
+            $this
+        );
+        $table->handleCommand();
     }
 
     public function showHierarchy(): void
@@ -603,31 +642,15 @@ class ilStructureObjectGUI extends ilLMObjectGUI
      * Insert (multiple) chapters at node
      */
     public function insertChapter(
-        bool $a_as_sub = false
+        int $id = 0
     ): void {
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
 
-        $num = ilChapterHierarchyFormGUI::getPostMulti();
-        $node_id = ilChapterHierarchyFormGUI::getPostNodeId();
+        $num = 1;
+        $parent_id = $this->requested_obj_id;
+        $target = $id;
 
-        if ($a_as_sub) {		// as subchapter
-            if (!ilChapterHierarchyFormGUI::getPostFirstChild()) {	// insert under parent
-                $parent_id = $node_id;
-                $target = "";
-            } else {													// we shouldnt end up here
-                $ilCtrl->redirect($this, "showHierarchy");
-                return;
-            }
-        } else {				// as chapter
-            if (!ilChapterHierarchyFormGUI::getPostFirstChild()) {	// insert after node id
-                $parent_id = $this->tree->getParentId($node_id);
-                $target = $node_id;
-            } else {													// insert as first child
-                $parent_id = $node_id;
-                $target = ilTree::POS_FIRST_NODE;
-            }
-        }
         for ($i = 1; $i <= $num; $i++) {
             $chap = new ilStructureObject($this->content_object);
             $chap->setType("st");

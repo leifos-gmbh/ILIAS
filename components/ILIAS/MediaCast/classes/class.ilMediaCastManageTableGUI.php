@@ -61,8 +61,6 @@ class ilMediaCastManageTableGUI implements Table\DataRetrieval
         $this->ctrl = $DIC->ctrl();
         $this->lng = $DIC->language();
         $this->access = $DIC->access();
-        $ilCtrl = $DIC->ctrl();
-        $lng = $DIC->language();
         $this->request = $DIC->mediaCast()
             ->internal()
             ->gui()

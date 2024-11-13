@@ -278,6 +278,11 @@ class ilSessionDataSet extends ilDataSet
                     break;
             }
         }
+        $clean_data = [];
+        foreach ($this->data as $rec) {
+            $clean_data[] = $this->stripTags($rec);
+        }
+        $this->data = $clean_data;
     }
 
     public function getXmlRecord(string $a_entity, string $a_version, array $a_set): array

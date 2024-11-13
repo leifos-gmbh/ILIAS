@@ -305,6 +305,9 @@ class ilSessionDataSet extends ilDataSet
         ?array $a_rec = null,
         ?array $a_ids = null
     ): array {
+        if (!is_null($a_rec)) {
+            $a_rec = $this->stripTags($a_rec);
+        }
         switch ($a_entity) {
             case "sess":
                 return array(
@@ -317,6 +320,7 @@ class ilSessionDataSet extends ilDataSet
 
     public function importRecord(string $a_entity, array $a_types, array $a_rec, ilImportMapping $a_mapping, string $a_schema_version): void
     {
+        $a_rec = $this->stripTags($a_rec);
         switch ($a_entity) {
             case "sess":
                 if ($new_id = $a_mapping->getMapping('Services/Container', 'objs', $a_rec['Id'])) {

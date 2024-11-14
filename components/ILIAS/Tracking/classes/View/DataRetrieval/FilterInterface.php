@@ -22,15 +22,24 @@ namespace ILIAS\Tracking\View\DataRetrieval;
 
 interface FilterInterface
 {
-    public function withUserIds(): self;
+    public function withUserId(int $id): self;
 
-    public function withObjectTypes(): self;
+    public function withObjectType(string $type): self;
 
-    public function withObjectIds(): self;
+    public function withObjectId(int $id): self;
 
+    /**
+     * @return int[]
+     */
     public function getUserIds(): array;
 
+    /**
+     * @return string[]
+     */
     public function getObjectTypes(): array;
 
+    /**
+     * @return int[]
+     */
     public function getObjectIds(): array;
 }

@@ -20,6 +20,20 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\PropertyList;
 
-interface PropertyListInterface
+use Countable;
+use Iterator;
+
+interface PropertyListInterface extends Countable, Iterator
 {
+    public function next(): void;
+
+    public function rewind(): void;
+
+    public function valid(): bool;
+
+    public function key(): string;
+
+    public function current(): string;
+
+    public function count(): int;
 }

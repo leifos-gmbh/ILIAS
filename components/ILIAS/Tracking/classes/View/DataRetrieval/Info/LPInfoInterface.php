@@ -18,10 +18,13 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View\DataRetrieval\Info\Iterator;
+namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
-use Iterator;
-
-interface IteratorInterface extends Iterator
+interface LPInfoInterface
 {
+    public function getUserId(): int;
+
+    public function getObjectId(): int;
+
+    public function getLPStatus(): int;
 }

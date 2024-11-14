@@ -20,8 +20,14 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval\Info\Iterator;
 
-use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\IteratorInterface as InfoIteratorInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\ObjectInfoInterface;
+use Iterator;
 
-interface ObjectInfoIteratorInterface extends InfoIteratorInterface
+interface ObjectInfoIteratorInterface extends Iterator
 {
+    public function current(): ObjectInfoInterface;
+    public function key(): int;
+    public function valid(): bool;
+    public function rewind(): void;
+    public function next(): void;
 }

@@ -20,15 +20,12 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
-use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\ObjectInfoIteratorInterface;
-use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\LPInfoIteratorInterface;
-use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\CombinedInfoIteratorInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\LPInfoInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\ObjectInfoInterface;
 
-interface ViewInfoInterface
+interface CombinedInfoInterface
 {
-    public function objectIterator(): ObjectInfoIteratorInterface;
+    public function getLPInfo(): LPInfoInterface;
 
-    public function lpInfoIterator(): LPInfoIteratorInterface;
-
-    public function combinedInfoIterator(): CombinedInfoIteratorInterface;
+    public function getObjectInfo(): ObjectInfoInterface;
 }

@@ -20,6 +20,20 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\Renderer;
 
+use ILIAS\Tracking\View\DataRetrieval\Info\LPInfoInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\ObjectInfoInterface;
+use ILIAS\Tracking\View\PropertyList\PropertyListInterface;
+use ILIAS\UI\Component\Item\Standard as UIStandardItem;
+use ILIAS\UI\Component\Chart\ProgressMeter\Standard as UIStandardProgressMeter;
+
 interface RendererInterface
 {
+    public function renderStandardProgressMeter(
+        LPInfoInterface $lp_info
+    ): UIStandardProgressMeter;
+
+    public function renderStandardItem(
+        ObjectInfoInterface $object_info,
+        PropertyListInterface $property_list
+    ): UIStandardItem;
 }

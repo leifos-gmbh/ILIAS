@@ -20,6 +20,12 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval;
 
+use ILIAS\Tracking\View\DataRetrieval\FilterInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\ViewInfoInterface;
+
 interface DataRetrievalInterface
 {
+    public function filter(): FilterInterface;
+
+    public function retrieveViewInfo(FilterInterface $filter): ViewInfoInterface;
 }

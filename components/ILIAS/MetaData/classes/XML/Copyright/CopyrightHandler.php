@@ -52,27 +52,7 @@ class CopyrightHandler implements CopyrightHandlerInterface
 
     public function copyrightForExport(string $copyright): string
     {
-        if (!$this->isCopyrightSelectionActive()) {
-            return $copyright;
-        }
-
-        if (!$this->identifier_handler->isIdentifierValid($copyright) && $copyright !== '') {
-            return $copyright;
-        }
-
-        if ($copyright === '') {
-            $entry_data = $this->copyright_repository->getDefaultEntry()->copyrightData();
-        } else {
-            $entry_id = $this->identifier_handler->parseEntryIDFromIdentifier($copyright);
-            $entry_data = $this->copyright_repository->getEntry($entry_id)->copyrightData();
-        }
-        $full_name = $entry_data->fullName();
-        $link = $entry_data->link();
-
-        if (!is_null($link)) {
-            return (string) $link;
-        }
-        return $full_name;
+        return $this->copyrightAsString($copyright);
     }
 
     public function copyrightFromExport(string $copyright): string
@@ -108,16 +88,27 @@ class CopyrightHandler implements CopyrightHandlerInterface
 
     public function copyrightAsString(string $copyright): string
     {
-        if (
-            !$this->isCopyrightSelectionActive() ||
-            !$this->identifier_handler->isIdentifierValid($copyright)
-        ) {
+        if (!$this->isCopyrightSelectionActive()) {
             return $copyright;
         }
 
-        $entry_id = $this->identifier_handler->parseEntryIDFromIdentifier($copyright);
-        $entry_data = $this->copyright_repository->getEntry($entry_id)->copyrightData();
-        return $this->copyright_renderer->toString($entry_data);
+        if (!$this->identifier_handler->isIdentifierValid($copyright) && $copyright !== '') {
+            return $copyright;
+        }
+
+        if ($copyright === '') {
+            $entry_data = $this->copyright_repository->getDefaultEntry()->copyrightData();
+        } else {
+            $entry_id = $this->identifier_handler->parseEntryIDFromIdentifier($copyright);
+            $entry_data = $this->copyright_repository->getEntry($entry_id)->copyrightData();
+        }
+        $full_name = $entry_data->fullName();
+        $link = $entry_data->link();
+
+        if (!is_null($link)) {
+            return (string) $link;
+        }
+        return $full_name;
     }
 
     /**

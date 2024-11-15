@@ -83,7 +83,6 @@ class Services
             new CopyrightHandler(
                 $this->copyright_services->repository(),
                 $this->copyright_services->identifiersHandler(),
-                $this->copyright_services->renderer(),
                 \ilMDSettings::_getInstance()
             ),
             $this->path_services->pathFactory(),
@@ -106,7 +105,6 @@ class Services
         $copyright_handler = new CopyrightHandler(
             $this->copyright_services->repository(),
             $this->copyright_services->identifiersHandler(),
-            $this->copyright_services->renderer(),
             \ilMDSettings::_getInstance()
         );
         return $this->standard_reader = new StandardReader(
@@ -144,7 +142,6 @@ class Services
             new CopyrightHandler(
                 $this->copyright_services->repository(),
                 $this->copyright_services->identifiersHandler(),
-                $this->copyright_services->renderer(),
                 \ilMDSettings::_getInstance()
             ),
             new LinkGenerator(

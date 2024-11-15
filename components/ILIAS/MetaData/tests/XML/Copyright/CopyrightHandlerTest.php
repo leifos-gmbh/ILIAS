@@ -148,16 +148,6 @@ class CopyrightHandlerTest extends TestCase
         };
     }
 
-    protected function getRenderer(): RendererInterface
-    {
-        return new class () extends NullRenderer {
-            public function toString(CopyrightDataInterface $copyright): string
-            {
-                return 'rendered full name: "' . $copyright->fullName() . '" and link: "' . $copyright->link() . '"';
-            }
-        };
-    }
-
     protected function getSettings(bool $selection_active): SettingsInterface
     {
         return new class ($selection_active) extends NullSettings {
@@ -177,7 +167,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -189,7 +178,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(false)
         );
 
@@ -206,12 +194,11 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
         $this->assertSame(
-            'rendered full name: "second entry" and link: "http://www.example2.com"',
+            'http://www.example2.com',
             $handler->copyrightAsString('valid_identifier_55')
         );
     }
@@ -226,7 +213,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(false)
         );
 
@@ -246,7 +232,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -266,12 +251,11 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
         $this->assertSame(
-            'rendered full name: "" and link: ""',
+            '',
             $handler->copyrightAsString('valid_identifier_678')
         );
     }
@@ -286,7 +270,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -306,7 +289,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -326,7 +308,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(false)
         );
 
@@ -346,7 +327,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -366,7 +346,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -386,7 +365,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -406,7 +384,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -426,7 +403,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -446,7 +422,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -466,7 +441,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -490,7 +464,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -510,7 +483,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(false)
         );
 
@@ -530,7 +502,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -554,7 +525,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -574,7 +544,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -594,7 +563,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 
@@ -614,7 +582,6 @@ class CopyrightHandlerTest extends TestCase
         $handler = new CopyrightHandler(
             $this->getCopyrightRepository(...$entries),
             $this->getIdentifierHandler(),
-            $this->getRenderer(),
             $this->getSettings(true)
         );
 

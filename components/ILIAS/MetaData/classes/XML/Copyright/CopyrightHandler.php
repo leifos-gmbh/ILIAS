@@ -30,7 +30,6 @@ class CopyrightHandler implements CopyrightHandlerInterface
 {
     protected CopyrightRepository $copyright_repository;
     protected IdentifierHandler $identifier_handler;
-    protected CopyrightRenderer $copyright_renderer;
     protected SettingsInterface $settings;
 
     /**
@@ -41,12 +40,10 @@ class CopyrightHandler implements CopyrightHandlerInterface
     public function __construct(
         CopyrightRepository $copyright_repository,
         IdentifierHandler $identifier_handler,
-        CopyrightRenderer $copyright_renderer,
         SettingsInterface $settings
     ) {
         $this->copyright_repository = $copyright_repository;
         $this->identifier_handler = $identifier_handler;
-        $this->copyright_renderer = $copyright_renderer;
         $this->settings = $settings;
     }
 

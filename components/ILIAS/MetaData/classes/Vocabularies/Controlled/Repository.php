@@ -106,7 +106,7 @@ class Repository implements RepositoryInterface
         string ...$values
     ): \Generator {
         $result = $this->db->query(
-            'SELECT value FROM il_md_vocab_contr_vals JOIN il_md_vocab_contr ON vocab_id
+            'SELECT value FROM il_md_vocab_contr_vals JOIN il_md_vocab_contr ON id = vocab_id
             WHERE slot = ' . $this->db->quoteAsString($slot->value) . ' AND ' .
             $this->db->in('value', ...$values)
         );
@@ -176,7 +176,7 @@ class Repository implements RepositoryInterface
         }
 
         $result = $this->db->query(
-            'SELECT value, label FROM il_md_vocab_contr_vals JOIN il_md_vocab_contr ON vocab_id
+            'SELECT value, label FROM il_md_vocab_contr_vals JOIN il_md_vocab_contr ON id = vocab_id
             WHERE slot = ' . $this->db->quoteAsString($slot->value) . ' AND ' . $active_where .
             $this->db->in('value', ...$values)
         );

@@ -27,4 +27,8 @@ interface LPInterface
     public function getObjectId(): int;
 
     public function getLPStatus(): int;
+
+    public function getPercentage(): int;
+
+    public function getLPMode(): int;
 }

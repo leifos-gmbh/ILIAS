@@ -61,49 +61,49 @@ class DataRetrieval implements DataRetrievalInterface
             . " object_data.type as obj_type,"
             . " object_data.description as obj_description,"
             . " object_data.obj_id as obj_id,"
-            . " ut_lp_user_status.usr_id as usr_id,"
-            . " ut_lp_user_status.status as lp_status"
-            . " FROM object_data JOIN ut_lp_user_status ON object_data.obj_id = ut_lp_user_status.obj_id "
-            . $this->buildWhere($filter);
+            . " ut_lp_marks.usr_id as usr_id,"
+            . " ut_lp_marks.status as lp_status,"
+            . " ut_lp_marks.percentage as lp_percentage,"
+            . " ut_lp_settings.u_mode as lp_mode"
+            . " FROM object_data"
+            . " JOIN ut_lp_marks ON object_data.obj_id = ut_lp_marks.obj_id"
+            . " JOIN ut_lp_settings ON object_data.obj_id = ut_lp_settings.obj_id"
+            . " " . $this->buildWhere($filter);
         $res = $this->db->query($query);
-        $infos = [];
+        $object_infos = [];
+        $lp_infos = [];
+        $combined_infos = [];
         while ($row = $res->fetchAssoc()) {
             $usr_id = (int) $row["usr_id"];
             $lp_status = (int) $row["lp_status"];
+            $percentage = (int) $row["lp_percentage"];
             $obj_id = (int) $row["obj_id"];
             $obj_title = (string) $row["obj_title"];
             $obj_type = (string) $row["obj_type"];
             $obj_description = (string) $row["obj_description"];
-            $infos[$usr_id . ":" . $obj_id] = [
-                self::KEY_USR_ID => $usr_id,
-                self::KEY_LP_STATUS => $lp_status,
-                self::KEY_OBJ_ID => $obj_id,
-                self::KEY_OBJ_TITLE => $obj_title,
-                self::KEY_OBJ_TYPE => $obj_type,
-                self::KEY_OBJ_DESCRIPTION => $obj_description,
-            ];
-        }
-        $object_infos = [];
-        $lp_infos = [];
-        $combined_infos = [];
-        foreach ($infos as $info) {
+            $lp_mode = (int) $row["lp_mode"];
+            if (!$this->isValidMode($lp_mode)) {
+                continue;
+            }
             $lp_info = new LPInfo(
-                $info[self::KEY_USR_ID],
-                $info[self::KEY_LP_STATUS],
-                $info[self::KEY_OBJ_ID],
+                $usr_id,
+                $obj_id,
+                $lp_status,
+                $percentage,
+                $lp_mode
             );
             $object_info = new ObjectDataInfo(
-                $info[self::KEY_OBJ_ID],
-                $info[self::KEY_OBJ_TITLE],
-                $info[self::KEY_OBJ_DESCRIPTION],
-                $info[self::KEY_OBJ_TYPE],
+                $obj_id,
+                $obj_title,
+                $obj_description,
+                $obj_type,
             );
             $combined_info = new CombinedInfo(
                 $lp_info,
                 $object_info
             );
-            $lp_infos[$info[self::KEY_USR_ID]] = $lp_info;
-            $object_infos[$info[self::KEY_OBJ_ID]] = $object_info;
+            $lp_infos[$usr_id . ":" . $obj_id] = $lp_info;
+            $object_infos[$obj_id] = $object_info;
             $combined_infos[] = $combined_info;
         }
         return new ViewInfo(
@@ -138,5 +138,10 @@ class DataRetrieval implements DataRetrievalInterface
             $where .= " " . $clause;
         }
         return $where;
+    }
+
+    protected function isValidMode(int $lp_mode): bool
+    {
+        return true;
     }
 }

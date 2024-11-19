@@ -42,7 +42,7 @@ class Renderer implements RendererInterface
     ): UIStandardProgressMeter {
         return $this->ui->factory()->chart()->progressMeter()->standard(
             100,
-            $lp_info->getLPStatus()
+            $lp_info->getPercentage()
         );
     }
 

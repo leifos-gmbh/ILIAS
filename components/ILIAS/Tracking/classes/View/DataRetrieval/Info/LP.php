@@ -27,7 +27,9 @@ class LP implements LPInterface
     public function __construct(
         protected int $user_id,
         protected int $object_id,
-        protected int $lp_status
+        protected int $lp_status,
+        protected int $percentage,
+        protected int $lp_mode
     ) {
     }
 
@@ -44,5 +46,15 @@ class LP implements LPInterface
     public function getLPStatus(): int
     {
         return $this->lp_status;
+    }
+
+    public function getPercentage(): int
+    {
+        return $this->percentage;
+    }
+
+    public function getLPMode(): int
+    {
+        return $this->lp_mode;
     }
 }

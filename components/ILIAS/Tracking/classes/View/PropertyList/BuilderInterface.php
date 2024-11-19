@@ -18,13 +18,13 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View\DataRetrieval\Info;
+namespace ILIAS\Tracking\View\PropertyList;
 
-interface LPInfoInterface
+use ILIAS\Tracking\View\PropertyList\PropertyListInterface;
+
+interface BuilderInterface
 {
-    public function getUserId(): int;
+    public function withProperty(string $key, string $value): self;
 
-    public function getObjectId(): int;
-
-    public function getLPStatus(): int;
+    public function getList(): PropertyListInterface;
 }

@@ -20,7 +20,7 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View;
 
-use ILIAS\Tracking\View\PropertyList\PropertyListFactoryInterface;
+use ILIAS\Tracking\View\PropertyList\FactoryInterface;
 use ILIAS\Tracking\View\DataRetrieval\DataRetrievalInterface;
 use ILIAS\Tracking\View\Renderer\RendererInterface;
 
@@ -28,7 +28,7 @@ interface ViewInterface
 {
     public function dataRetrieval(): DataRetrievalInterface;
 
-    public function propertyList(): PropertyListFactoryInterface;
+    public function propertyList(): FactoryInterface;
 
     public function renderer(): RendererInterface;
 }

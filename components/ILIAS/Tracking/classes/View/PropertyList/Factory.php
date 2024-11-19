@@ -18,16 +18,16 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View\DataRetrieval\Info\Iterator;
+namespace ILIAS\Tracking\View\PropertyList;
 
-use ILIAS\Tracking\View\DataRetrieval\Info\ObjectInfoInterface;
-use Iterator;
+use ILIAS\Tracking\View\PropertyList\FactoryInterface;
+use ILIAS\Tracking\View\PropertyList\BuilderInterface;
+use ILIAS\Tracking\View\PropertyList\Builder;
 
-interface ObjectInfoIteratorInterface extends Iterator
+class Factory implements FactoryInterface
 {
-    public function current(): ObjectInfoInterface;
-    public function key(): int;
-    public function valid(): bool;
-    public function rewind(): void;
-    public function next(): void;
+    public function builder(): BuilderInterface
+    {
+        return new Builder();
+    }
 }

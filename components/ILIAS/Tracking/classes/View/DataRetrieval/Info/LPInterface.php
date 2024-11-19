@@ -20,11 +20,11 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
-interface ObjectInfoInterface
+interface LPInterface
 {
+    public function getUserId(): int;
+
     public function getObjectId(): int;
 
-    public function getTitle(): string;
-
-    public function getDescription(): string;
+    public function getLPStatus(): int;
 }

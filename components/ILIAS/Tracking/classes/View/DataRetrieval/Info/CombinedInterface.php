@@ -20,12 +20,12 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
-use ILIAS\Tracking\View\DataRetrieval\Info\LPInfoInterface;
-use ILIAS\Tracking\View\DataRetrieval\Info\ObjectInfoInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\LPInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\ObjectDataInterface;
 
-interface CombinedInfoInterface
+interface CombinedInterface
 {
-    public function getLPInfo(): LPInfoInterface;
+    public function getLPInfo(): LPInterface;
 
-    public function getObjectInfo(): ObjectInfoInterface;
+    public function getObjectInfo(): ObjectDataInterface;
 }

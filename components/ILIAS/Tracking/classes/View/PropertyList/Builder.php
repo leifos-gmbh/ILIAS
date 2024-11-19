@@ -20,11 +20,30 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\PropertyList;
 
+use ILIAS\Tracking\View\PropertyList\BuilderInterface;
 use ILIAS\Tracking\View\PropertyList\PropertyListInterface;
+use ILIAS\Tracking\View\PropertyList\PropertyList;
 
-interface PropertyListBuilderInterface
+class Builder implements BuilderInterface
 {
-    public function withProperty(string $key, string $value): self;
+    protected array $properties;
 
-    public function getList(): PropertyListInterface;
+    public function __construct()
+    {
+        $this->properties = [];
+    }
+
+    public function withProperty(
+        string $key,
+        string $value
+    ): BuilderInterface {
+        $clone = clone $this;
+        $clone->properties[$key] = $value;
+        return $clone;
+    }
+
+    public function getList(): PropertyListInterface
+    {
+        return new PropertyList($this->properties);
+    }
 }

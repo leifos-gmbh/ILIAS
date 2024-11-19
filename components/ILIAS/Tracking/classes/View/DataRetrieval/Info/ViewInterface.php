@@ -18,14 +18,17 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View\DataRetrieval;
+namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
-use ILIAS\Tracking\View\DataRetrieval\FilterInterface;
-use ILIAS\Tracking\View\DataRetrieval\Info\ViewInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\ObjectDataInterface as ObjectDataIteratorInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\LPInterface as LPIteratorInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\CombinedInterface as CombinedIteratorInterface;
 
-interface DataRetrievalInterface
+interface ViewInterface
 {
-    public function filter(): FilterInterface;
+    public function objectIterator(): ObjectDataIteratorInterface;
 
-    public function retrieveViewInfo(FilterInterface $filter): ViewInterface;
+    public function lpInfoIterator(): LPIteratorInterface;
+
+    public function combinedInfoIterator(): CombinedIteratorInterface;
 }

@@ -18,11 +18,15 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View\PropertyList;
+namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
-use ILIAS\Tracking\View\PropertyList\PropertyListBuilderInterface;
-
-interface PropertyListFactoryInterface
+interface ObjectDataInterface
 {
-    public function builder(): PropertyListBuilderInterface;
+    public function getObjectId(): int;
+
+    public function getTitle(): string;
+
+    public function getDescription(): string;
+
+    public function getType(): string;
 }

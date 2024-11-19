@@ -18,22 +18,37 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View\Renderer;
+namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
-use ILIAS\Tracking\View\DataRetrieval\Info\LPInterface;
 use ILIAS\Tracking\View\DataRetrieval\Info\ObjectDataInterface;
-use ILIAS\Tracking\View\PropertyList\PropertyListInterface;
-use ILIAS\UI\Component\Item\Standard as UIStandardItem;
-use ILIAS\UI\Component\Chart\ProgressMeter\Standard as UIStandardProgressMeter;
 
-interface RendererInterface
+class ObjectData implements ObjectDataInterface
 {
-    public function standardProgressMeter(
-        LPInterface $lp_info
-    ): UIStandardProgressMeter;
+    public function __construct(
+        protected int $object_id,
+        protected string $title,
+        protected string $description,
+        protected string $type
+    ) {
+    }
 
-    public function standardItem(
-        ObjectDataInterface $object_info,
-        PropertyListInterface $property_list
-    ): UIStandardItem;
+    public function getObjectId(): int
+    {
+        return $this->object_id;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
 }

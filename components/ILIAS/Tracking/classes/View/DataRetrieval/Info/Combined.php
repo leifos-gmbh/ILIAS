@@ -18,16 +18,25 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View\DataRetrieval\Info\Iterator;
+namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
-use Iterator;
-use ILIAS\Tracking\View\DataRetrieval\Info\LPInfoInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\CombinedInterface;
 
-interface LPInfoIteratorInterface extends Iterator
+class Combined implements CombinedInterface
 {
-    public function current(): LPInfoInterface;
-    public function key(): int;
-    public function valid(): bool;
-    public function rewind(): void;
-    public function next(): void;
+    public function __construct(
+        protected LPInterface $lp_info,
+        protected ObjectDataInterface $obj_info
+    ) {
+    }
+
+    public function getLPInfo(): LPInterface
+    {
+        return $this->lp_info;
+    }
+
+    public function getObjectInfo(): ObjectDataInterface
+    {
+        return $this->obj_info;
+    }
 }

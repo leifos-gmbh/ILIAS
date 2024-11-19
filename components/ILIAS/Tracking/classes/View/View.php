@@ -30,7 +30,7 @@ use ILIAS\Tracking\View\Renderer\Renderer;
 use ILIAS\Tracking\View\ViewInterface;
 use ILIAS\DI\UIServices;
 
-class ViewInfo implements ViewInterface
+class View implements ViewInterface
 {
     protected UIServices $ui;
     protected ilDBInterface $db;

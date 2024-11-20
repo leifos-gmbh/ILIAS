@@ -24,15 +24,8 @@ use ilDBConstants;
 use ilDBInterface;
 use ILIAS\Tracking\View\DataRetrieval\DataRetrievalInterface;
 use ILIAS\Tracking\View\DataRetrieval\Info\ViewInterface;
-use ILIAS\Tracking\View\DataRetrieval\Info\View as ViewInfo;
-use ILIAS\Tracking\View\DataRetrieval\Info\ObjectData as ObjectDataInfo;
-use ILIAS\Tracking\View\DataRetrieval\Info\LP as LPInfo;
-use ILIAS\Tracking\View\DataRetrieval\Info\Combined as CombinedInfo;
-use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\Combined as CombinedIterator;
-use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\ObjectData as ObjectDataIterator;
-use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\LP as LPIterator;
-use ILIAS\Tracking\View\DataRetrieval\Filter;
 use ILIAS\Tracking\View\DataRetrieval\FilterInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\FactoryInterface as InfoFactoryInterface;
 
 class DataRetrieval implements DataRetrievalInterface
 {
@@ -44,13 +37,9 @@ class DataRetrieval implements DataRetrievalInterface
     protected const KEY_LP_STATUS = "lp_status";
 
     public function __construct(
-        protected ilDBInterface $db
+        protected ilDBInterface $db,
+        protected InfoFactoryInterface $info_factory
     ) {
-    }
-
-    public function filter(): FilterInterface
-    {
-        return new Filter();
     }
 
     public function retrieveViewInfo(
@@ -85,20 +74,20 @@ class DataRetrieval implements DataRetrievalInterface
             if (!$this->isValidMode($lp_mode)) {
                 continue;
             }
-            $lp_info = new LPInfo(
+            $lp_info = $this->info_factory->lp(
                 $usr_id,
                 $obj_id,
                 $lp_status,
                 $percentage,
                 $lp_mode
             );
-            $object_info = new ObjectDataInfo(
+            $object_info = $this->info_factory->objectData(
                 $obj_id,
                 $obj_title,
                 $obj_description,
                 $obj_type,
             );
-            $combined_info = new CombinedInfo(
+            $combined_info = $this->info_factory->combined(
                 $lp_info,
                 $object_info
             );
@@ -106,10 +95,10 @@ class DataRetrieval implements DataRetrievalInterface
             $object_infos[$obj_id] = $object_info;
             $combined_infos[] = $combined_info;
         }
-        return new ViewInfo(
-            new ObjectDataIterator(...$object_infos),
-            new LPIterator(...$lp_infos),
-            new CombinedIterator(...$combined_infos)
+        return $this->info_factory->view(
+            $this->info_factory->iterator()->objectData(...$object_infos),
+            $this->info_factory->iterator()->lp(...$lp_infos),
+            $this->info_factory->iterator()->combined(...$combined_infos)
         );
     }
 

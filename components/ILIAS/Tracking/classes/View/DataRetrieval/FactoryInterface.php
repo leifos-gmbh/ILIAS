@@ -20,10 +20,15 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval;
 
-use ILIAS\Tracking\View\DataRetrieval\FilterInterface;
-use ILIAS\Tracking\View\DataRetrieval\Info\ViewInterface;
+use ILIAS\Tracking\View\DataRetrieval\DataRetrievalInterface as DRInterface;
+use ILIAS\Tracking\View\DataRetrieval\FilterInterface as DRFilterInterface;
+use ILIAS\Tracking\View\DataRetrieval\Info\FactoryInterface as InfoFactoryInterface;
 
-interface DataRetrievalInterface
+interface FactoryInterface
 {
-    public function retrieveViewInfo(FilterInterface $filter): ViewInterface;
+    public function info(): InfoFactoryInterface;
+
+    public function service(): DRInterface;
+
+    public function filter(): DRFilterInterface;
 }

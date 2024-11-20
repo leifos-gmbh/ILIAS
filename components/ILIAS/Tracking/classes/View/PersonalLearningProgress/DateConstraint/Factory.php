@@ -18,17 +18,16 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View;
+namespace ILIAS\Tracking\PersonalLearningProgress\DateConstraint;
 
-use ILIAS\Tracking\View\PropertyList\FactoryInterface;
-use ILIAS\Tracking\View\DataRetrieval\DataRetrievalInterface;
-use ILIAS\Tracking\View\Renderer\RendererInterface;
+use ILIAS\Tracking\PersonalLearningProgress\I\DateConstraint\FactoryInterface as PLPDateConstraintFactoryInterface;
+use ILIAS\Tracking\PersonalLearningProgress\I\DateConstraint\HandlerInterface as PLPDateConstraintInterface;
+use ILIAS\Tracking\PersonalLearningProgress\DateConstraint\Handler as PLPDateConstraint;
 
-interface ViewInterface
+class Factory implements PLPDateConstraintFactoryInterface
 {
-    public function dataRetrieval(): DataRetrievalInterface;
-
-    public function propertyList(): FactoryInterface;
-
-    public function renderer(): RendererInterface;
+    public function handler(): PLPDateConstraintInterface
+    {
+        return new PLPDateConstraint();
+    }
 }

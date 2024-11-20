@@ -18,12 +18,17 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View\DataRetrieval;
+namespace ILIAS\Tracking\View;
 
-use ILIAS\Tracking\View\DataRetrieval\FilterInterface;
-use ILIAS\Tracking\View\DataRetrieval\Info\ViewInterface;
+use ILIAS\Tracking\View\Renderer\FactoryInterface as RendererFactoryInterface;
+use ILIAS\Tracking\View\DataRetrieval\FactoryInterface as DataRetrievalFactoryInterface;
+use ILIAS\Tracking\View\PropertyList\FactoryInterface as PropertyListFactoryInterface;
 
-interface DataRetrievalInterface
+interface FactoryInterface
 {
-    public function retrieveViewInfo(FilterInterface $filter): ViewInterface;
+    public function renderer(): RendererFactoryInterface;
+
+    public function dataRetrieval(): DataRetrievalFactoryInterface;
+
+    public function propertyList(): PropertyListFactoryInterface;
 }

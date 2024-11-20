@@ -18,12 +18,22 @@
 
 declare(strict_types=0);
 
-namespace ILIAS\Tracking\View\DataRetrieval;
+namespace ILIAS\Tracking\View\Renderer;
 
-use ILIAS\Tracking\View\DataRetrieval\FilterInterface;
-use ILIAS\Tracking\View\DataRetrieval\Info\ViewInterface;
+use ILIAS\Tracking\View\Renderer\FactoryInterface as RendererFactoryInterface;
+use ILIAS\Tracking\View\Renderer\RendererInterface;
+use ILIAS\Tracking\View\Renderer\Renderer;
+use ILIAS\DI\UIServices;
 
-interface DataRetrievalInterface
+class Factory implements RendererFactoryInterface
 {
-    public function retrieveViewInfo(FilterInterface $filter): ViewInterface;
+    public function __construct(
+        protected UIServices $ui
+    ) {
+    }
+
+    public function service(): RendererInterface
+    {
+        return new Renderer($this->ui);
+    }
 }

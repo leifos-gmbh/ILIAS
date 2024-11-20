@@ -27,6 +27,7 @@ use ILIAS\HTTP\Services as HTTPServices;
 use ILIAS\Tracking\View\Factory as ViewFactory;
 use ILIAS\UI\URLBuilder;
 use ILIAS\Data\Factory as DataFactory;
+use ILIAS\UI\Component\Item\Standard as UIStandardItem;
 
 /**
  * @ilCtrl_IsCalledBy ilLPPersonalGUI: ilDashboardGUI
@@ -78,8 +79,54 @@ class ilLPPersonalGUI
         $this->listCourses();
     }
 
-    protected function listCourses(): void
+    protected function getCurrentPresentationModeFromQuery(): string
     {
+        if ($this->http->wrapper()->query()->has(self::URL_VAR_MODE)) {
+            return $this->http->wrapper()->query()->retrieve(
+                self::URL_VAR_MODE,
+                $this->refinery->kindlyTo()->string()
+            );
+        }
+        return self::PRESENTATION_OPTION_CURRENT;
+    }
+
+    protected function buildViewControls(): array
+    {
+        $current_presentation = $this->getCurrentPresentationModeFromQuery();
+        $presentation_options = [
+            self::PRESENTATION_OPTION_CURRENT => $this->lng->txt(self::LNG_VAR_PRESENTATION_OPTION_CURRENT),
+            self::PRESENTATION_OPTION_FUTURE => $this->lng->txt(self::LNG_VAR_PRESENTATION_OPTION_FUTURE),
+            self::PRESENTATION_OPTION_PAST => $this->lng->txt(self::LNG_VAR_PRESENTATION_OPTION_PAST),
+            self::PRESENTATION_OPTION_ALL => $this->lng->txt(self::LNG_VAR_PRESENTATION_OPTION_ALL),
+        ];
+        $uri = $this->http->request()->getUri()->__toString();
+        $url_builder = new URLBuilder($this->data_factory->uri($uri));
+        list($url_builder, $action_parameter_token) =
+            $url_builder->acquireParameters(
+                [self::URL_NAMESPACE_VIEWCONTROL, self::URL_NAMESPACE_PLP],
+                self::URL_VAR_ACTION_MODE
+            );
+        $modes = $this->ui->factory()->viewControl()->mode(
+            [
+                $presentation_options[self::PRESENTATION_OPTION_CURRENT] => (string) $url_builder->withParameter($action_parameter_token, self::PRESENTATION_OPTION_CURRENT)->buildURI(),
+                $presentation_options[self::PRESENTATION_OPTION_FUTURE] => (string) $url_builder->withParameter($action_parameter_token, self::PRESENTATION_OPTION_FUTURE)->buildURI(),
+                $presentation_options[self::PRESENTATION_OPTION_PAST] => (string) $url_builder->withParameter($action_parameter_token, self::PRESENTATION_OPTION_PAST)->buildURI(),
+                $presentation_options[self::PRESENTATION_OPTION_ALL] => (string) $url_builder->withParameter($action_parameter_token, self::PRESENTATION_OPTION_ALL)->buildURI(),
+            ],
+            'Presentation Mode'
+        )
+            ->withActive($presentation_options[$current_presentation]);
+        return [
+            $modes
+        ];
+    }
+
+    /**
+     * @return UIStandardItem[]
+     */
+    protected function buildPanelItems(
+        string $presentation_mode
+    ): array {
         $filter = $this->tracking_view->dataRetrieval()->filter()
             ->withUserIds($this->user->getId())
             ->withObjectTypes("crs");
@@ -88,6 +135,9 @@ class ilLPPersonalGUI
         foreach ($view_info->combinedInfoIterator() as $combinedInfo) {
             $obj_id = $combinedInfo->getObjectInfo()->getObjectId();
             $crs = new ilObjCourse($obj_id, false);
+            if (!$this->isPresentable($presentation_mode, $crs->getCourseStart(), $crs->getCourseEnd())) {
+                continue;
+            }
             $offline_str = $crs->getOfflineStatus()
                 ? $this->lng->txt(self::LNG_VAR_PROPERTY_CRS_ONLINE_NO)
                 : $this->lng->txt(self::LNG_VAR_PROPERTY_CRS_ONLINE_YES);
@@ -105,51 +155,51 @@ class ilLPPersonalGUI
             )->withProgress(
                 $progress_chart
             );
-            $items[] = $item;
+            $items[$obj_id] = $item;
         }
-        $current_presentation = self::PRESENTATION_OPTION_CURRENT;
-        if ($this->http->wrapper()->query()->has(self::URL_VAR_MODE)) {
-            $current_presentation = $this->http->wrapper()->query()->retrieve(
-                self::URL_VAR_MODE,
-                $this->refinery->kindlyTo()->string()
-            );
+        return $items;
+    }
+
+    protected function isPresentable(
+        string $presentation_mode,
+        ilDateTime|null $crs_start,
+        ilDateTime|null $crs_end
+    ): bool {
+        $now = new ilDateTime(time(), IL_CAL_UNIX);
+        $crs_start = is_null($crs_start) ? $crs_end : $crs_start;
+        $crs_end = is_null($crs_end) ? $crs_start : $crs_end;
+        $dates_set = !is_null($crs_start) && !is_null($crs_end);
+        if ($presentation_mode === self::PRESENTATION_OPTION_ALL) {
+            return true;
         }
-        $presentation_options = [
-            self::PRESENTATION_OPTION_CURRENT => $this->lng->txt(self::LNG_VAR_PRESENTATION_OPTION_CURRENT),
-            self::PRESENTATION_OPTION_FUTURE => $this->lng->txt(self::LNG_VAR_PRESENTATION_OPTION_FUTURE),
-            self::PRESENTATION_OPTION_PAST => $this->lng->txt(self::LNG_VAR_PRESENTATION_OPTION_PAST),
-            self::PRESENTATION_OPTION_ALL => $this->lng->txt(self::LNG_VAR_PRESENTATION_OPTION_ALL),
-        ];
-        $uri = $this->http->request()->getUri()->__toString();
-        $url_builder = new URLBuilder($this->data_factory->uri($uri));
-        list($url_builder, $action_parameter_token) =
-            $url_builder->acquireParameters(
-                [self::URL_NAMESPACE_VIEWCONTROL, self::URL_NAMESPACE_PLP],
-                self::URL_VAR_ACTION_MODE
-            );
-        /** @var URLBuilder $url_builder */
-        ;
-        $modes = $this->ui->factory()->viewControl()->mode(
-            [
-                $presentation_options[self::PRESENTATION_OPTION_CURRENT] => (string) $url_builder->withParameter($action_parameter_token, self::PRESENTATION_OPTION_CURRENT)->buildURI(),
-                $presentation_options[self::PRESENTATION_OPTION_FUTURE] => (string) $url_builder->withParameter($action_parameter_token, self::PRESENTATION_OPTION_FUTURE)->buildURI(),
-                $presentation_options[self::PRESENTATION_OPTION_PAST] => (string) $url_builder->withParameter($action_parameter_token, self::PRESENTATION_OPTION_PAST)->buildURI(),
-                $presentation_options[self::PRESENTATION_OPTION_ALL] => (string) $url_builder->withParameter($action_parameter_token, self::PRESENTATION_OPTION_ALL)->buildURI(),
-            ],
-            'Presentation Mode'
-        )
-            ->withActive($presentation_options[$current_presentation]);
-        $view_controls = [
-            $modes,
-        ];
-        switch ($current_presentation) {
-            case self::PRESENTATION_OPTION_CURRENT:
-            case self::PRESENTATION_OPTION_FUTURE:
-            case self::PRESENTATION_OPTION_PAST:
-            case self::PRESENTATION_OPTION_ALL:
-            default:
-                break;
+        if (
+            $dates_set &&
+            $presentation_mode === self::PRESENTATION_OPTION_PAST &&
+            ilDateTime::_after($now, $crs_end)
+        ) {
+            return true;
         }
+        if (
+            $dates_set &&
+            $presentation_mode === self::PRESENTATION_OPTION_FUTURE &&
+            ilDateTime::_before($now, $crs_start)
+        ) {
+            return true;
+        }
+        if (
+            $dates_set &&
+            $presentation_mode === self::PRESENTATION_OPTION_CURRENT &&
+            ilDateTime::_within($now, $crs_start, $crs_end)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    protected function listCourses(): void
+    {
+        $view_controls = $this->buildViewControls();
+        $items = $this->buildPanelItems($this->getCurrentPresentationModeFromQuery());
         $crs_item_group = $this->ui->factory()->item()->group("", $items);
         $ui_panel = $this->ui->factory()->panel()->listing()->standard(
             $this->lng->txt(self::LNG_VAR_LISTING_TITLE),

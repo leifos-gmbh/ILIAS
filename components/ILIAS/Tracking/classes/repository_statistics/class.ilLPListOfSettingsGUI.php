@@ -19,6 +19,7 @@
 declare(strict_types=0);
 
 use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
+use ILIAS\Tracking\View\ProgressBlock\Settings\RepositoryInterface as ProgressBlockSettings;
 
 /**
  * Class ilLPListOfSettingsGUI
@@ -30,6 +31,7 @@ class ilLPListOfSettingsGUI extends ilLearningProgressBaseGUI
 {
     protected ilLPObjSettings $obj_settings;
     protected ilObjectLP $obj_lp;
+    protected ProgressBlockSettings $progress_block_settings;
 
     public function __construct(int $a_mode, int $a_ref_id)
     {
@@ -37,6 +39,9 @@ class ilLPListOfSettingsGUI extends ilLearningProgressBaseGUI
 
         $this->obj_settings = new ilLPObjSettings($this->getObjId());
         $this->obj_lp = ilObjectLP::getInstance($this->getObjId());
+        /** TODO replace with View */
+        global $DIC;
+        $this->progress_block_settings = new ILIAS\Tracking\View\ProgressBlock\Settings\Repository($DIC->database());
     }
 
     /**
@@ -108,6 +113,14 @@ class ilLPListOfSettingsGUI extends ilLearningProgressBaseGUI
                      )->withValue($this->obj_settings->getVisits());
                 }
 
+                if ($mode_key == ilLPObjSettings::LP_MODE_COLLECTION) {
+                    $mode_config_inputs['show_block'] = $this->ui_factory->input()->field()->checkbox(
+                        $this->lng->txt('trac_show_progress_block'),
+                    )->withValue(
+                        $this->progress_block_settings->isBlockShownForObject($this->getObjId())
+                    );
+                }
+
                 $mode_config_inputs = array_merge(
                     $mode_config_inputs,
                     $this->obj_lp->appendModeConfiguration($mode_key)
@@ -166,6 +179,14 @@ class ilLPListOfSettingsGUI extends ilLearningProgressBaseGUI
                 $new_visits = (int) $mode_data['visits'];
                 $old_visits = $this->obj_settings->getVisits();
                 $visits_changed = ($old_visits != $new_visits);
+            }
+
+            // progress block
+            if ($new_mode == ilLPObjSettings::LP_MODE_COLLECTION) {
+                $this->progress_block_settings->setShowBlockForObject(
+                    $this->getObjId(),
+                    (bool) $mode_data['show_block']
+                );
             }
 
             $this->obj_lp->saveModeConfiguration(

@@ -527,4 +527,21 @@ class ilLPStatusCollection extends ilLPStatus
             $a_user_ids
         );
     }
+
+    public function determinePercentage(int $a_obj_id, int $a_usr_id, ?object $a_obj = null): int
+    {
+        $status_info = self::_getStatusInfo($a_obj_id);
+        if (empty($status_info)) {
+            return 0;
+        }
+        $passed = 0;
+        foreach ($status_info['collections'] as $item_ref_id) {
+            $obj_id = ilObject::_lookupObjId($item_ref_id);
+            if (ilLPStatusWrapper::_determineStatus($obj_id, $a_usr_id) === self::LP_STATUS_COMPLETED_NUM) {
+                $passed++;
+            }
+        }
+        $percentage = (int) ((100.0 / $status_info["num_collections"]) * $passed);
+        return $percentage;
+    }
 }

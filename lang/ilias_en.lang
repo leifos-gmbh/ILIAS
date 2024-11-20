@@ -17010,7 +17010,7 @@ trac#:#create_date_min#:#Earliest Registration
 trac#:#info_valid_request#:#The maximum valid time between two requests of a user.
 trac#:#meta_typical_learning_time#:#Typical learning time
 trac#:#obj_types#:#Object Types
-trac#:#personal_learning_progress_view_description#:#Running courses with membership
+trac#:#personal_learning_progress_view_description#:#Ongoing courses with membership
 trac#:#personal_learning_progress_view_title#:#Your Learning Progress
 trac#:#read_count_avg#:#Average page views
 trac#:#registration_filter#:#Date of Registration

@@ -42,16 +42,16 @@ class ilLPPersonalGUI
     protected const URL_VAR_ACTION_MODE = "mode";
     protected const URL_NAMESPACE_PLP = "plp";
     protected const URL_NAMESPACE_VIEWCONTROL = "viewcontrol";
-    protected const LNG_VAR_PRESENTATION_OPTION_CURRENT = "Current";
-    protected const LNG_VAR_PRESENTATION_OPTION_FUTURE = "Future";
-    protected const LNG_VAR_PRESENTATION_OPTION_PAST = "Past";
-    protected const LNG_VAR_PRESENTATION_OPTION_ALL = "All";
-    protected const LNG_VAR_PROPERTY_CRS_START = "Start";
-    protected const LNG_VAR_PROPERTY_CRS_END = "End";
-    protected const LNG_VAR_PROPERTY_CRS_ONLINE = "Online";
-    protected const LNG_VAR_PROPERTY_CRS_ONLINE_YES = "Yes";
-    protected const LNG_VAR_PROPERTY_CRS_ONLINE_NO = "No";
-    protected const LNG_VAR_LISTING_TITLE = "Courses";
+    protected const LNG_VAR_PRESENTATION_OPTION_CURRENT = "view_mode_current";
+    protected const LNG_VAR_PRESENTATION_OPTION_FUTURE = "view_mode_future";
+    protected const LNG_VAR_PRESENTATION_OPTION_PAST = "view_mode_past";
+    protected const LNG_VAR_PRESENTATION_OPTION_ALL = "view_mode_all";
+    protected const LNG_VAR_PROPERTY_CRS_START = "trac_begin_at";
+    protected const LNG_VAR_PROPERTY_CRS_END = "trac_end_at";
+    protected const LNG_VAR_PROPERTY_CRS_ONLINE = "online";
+    protected const LNG_VAR_PROPERTY_CRS_ONLINE_YES = "yes";
+    protected const LNG_VAR_PROPERTY_CRS_ONLINE_NO = "no";
+    protected const LNG_VAR_LISTING_TITLE = "courses";
     protected HTTPServices $http;
     protected UIServices $ui;
     protected ilCtrl $ctrl;
@@ -72,6 +72,7 @@ class ilLPPersonalGUI
         $this->refinery = $DIC->refinery();
         $this->data_factory = new DataFactory();
         $this->tracking_view = new ViewFactory();
+        $this->lng->loadLanguageModule("trac");
     }
 
     public function executeCommand(): void

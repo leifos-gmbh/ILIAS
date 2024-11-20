@@ -52,13 +52,6 @@ class ilAchievementsGUI
 
 
         switch ($next_class) {
-            #case strtolower(ilLearningProgressGUI::class):
-            #    $main_tpl->setTitle($lng->txt('learning_progress'));
-            #    $main_tpl->setTitleIcon(ilUtil::getImagePath('standard/icon_trac.svg'));
-            #    $new_gui = new ilLearningProgressGUI(ilLearningProgressBaseGUI::LP_CONTEXT_PERSONAL_DESKTOP, 0);
-            #    $ctrl->forwardCommand($new_gui);
-            #    break;
-
             case strtolower(ilLearningHistoryGUI::class):
                 $main_tpl->setTitle($lng->txt('lhist_learning_history'));
                 $main_tpl->setTitleIcon(ilUtil::getImagePath('standard/icon_lhist.svg'));
@@ -68,9 +61,10 @@ class ilAchievementsGUI
                 break;
 
             case strtolower(ilLPPersonalGUI::class):
-                $main_tpl->setTitle($lng->txt("Your Learning Progress"));
+                $lng->loadLanguageModule("trac");
+                $main_tpl->setTitle($lng->txt("personal_learning_progress_view_title"));
                 $main_tpl->setTitleIcon(ilUtil::getImagePath('standard/icon_trac.svg'));
-                $main_tpl->setDescription($lng->txt("Running courses with membership"));
+                $main_tpl->setDescription($lng->txt("personal_learning_progress_view_description"));
                 $plp_gui = new ilLPPersonalGUI();
                 $ctrl->forwardCommand($plp_gui);
                 $this->main_tpl->printToStdout();

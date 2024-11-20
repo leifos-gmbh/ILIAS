@@ -17010,6 +17010,8 @@ trac#:#create_date_min#:#Earliest Registration
 trac#:#info_valid_request#:#The maximum valid time between two requests of a user.
 trac#:#meta_typical_learning_time#:#Typical learning time
 trac#:#obj_types#:#Object Types
+trac#:#personal_learning_progress_view_description#:#Running courses with membership
+trac#:#personal_learning_progress_view_title#:#Your Learning Progress
 trac#:#read_count_avg#:#Average page views
 trac#:#registration_filter#:#Date of Registration
 trac#:#search_area_info#:#Please choose one object.
@@ -17251,6 +17253,10 @@ trac#:#trac_visits#:#Required Number of Visits
 trac#:#trac_visits_info#:#A click counts as new visit only after %s seconds.
 trac#:#user_total#:#User Total
 trac#:#view_mode#:#View Mode
+trac#:#view_mode_all#:#All
+trac#:#view_mode_current#:#Current
+trac#:#view_mode_future#:#Future
+trac#:#view_mode_past#:#Past
 tstv#:#tstv_create#:#Create Test Certificate
 tstv#:#tstv_create_info#:#Select a completed test to generate a certificate for it.
 ui#:#1stars#:#one of five stars

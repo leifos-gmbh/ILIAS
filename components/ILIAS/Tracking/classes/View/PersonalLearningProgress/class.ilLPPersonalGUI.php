@@ -135,24 +135,31 @@ class ilLPPersonalGUI
         $items = [];
         foreach ($view_info->combinedInfoIterator() as $combinedInfo) {
             $obj_id = $combinedInfo->getObjectInfo()->getObjectId();
-            $crs = new ilObjCourse($obj_id, false);
+            /** @var ilObjCourse $crs */
+            $crs = ilObjectFactory::getInstanceByObjId($obj_id); # Change if obj_id -> ref_id
             if (!$this->isPresentable($presentation_mode, $crs->getCourseStart(), $crs->getCourseEnd())) {
                 continue;
             }
             $offline_str = $crs->getOfflineStatus()
                 ? $this->lng->txt(self::LNG_VAR_PROPERTY_CRS_ONLINE_NO)
                 : $this->lng->txt(self::LNG_VAR_PROPERTY_CRS_ONLINE_YES);
-            $crs_start = ilDatePresentation::formatDate($crs->getCourseStart());
-            $crs_end = ilDatePresentation::formatDate($crs->getCourseEnd());
-            $properties = $this->tracking_view->propertyList()->builder()
-                ->withProperty($this->lng->txt(self::LNG_VAR_PROPERTY_CRS_START), $crs_start)
-                ->withProperty($this->lng->txt(self::LNG_VAR_PROPERTY_CRS_END), $crs_end)
-                ->withProperty($this->lng->txt(self::LNG_VAR_PROPERTY_CRS_ONLINE), $offline_str)
-                ->getList();
+            $property_builder = $this->tracking_view->propertyList()->builder();
+            if (!is_null($crs->getCourseStart())) {
+                $crs_start = ilDatePresentation::formatDate($crs->getCourseStart());
+                $property_builder = $property_builder
+                    ->withProperty($this->lng->txt(self::LNG_VAR_PROPERTY_CRS_START), $crs_start);
+            }
+            if (!is_null($crs->getCourseEnd())) {
+                $crs_end = ilDatePresentation::formatDate($crs->getCourseEnd());
+                $property_builder = $property_builder
+                    ->withProperty($this->lng->txt(self::LNG_VAR_PROPERTY_CRS_END), $crs_end);
+            }
+            $property_builder = $property_builder
+                ->withProperty($this->lng->txt(self::LNG_VAR_PROPERTY_CRS_ONLINE), $offline_str);
             $progress_chart = $this->tracking_view->renderer()->service()->standardProgressMeter($combinedInfo->getLPInfo());
             $item = $this->tracking_view->renderer()->service()->standardItem(
                 $combinedInfo->getObjectInfo(),
-                $properties
+                $property_builder->getList()
             )->withProgress(
                 $progress_chart
             );

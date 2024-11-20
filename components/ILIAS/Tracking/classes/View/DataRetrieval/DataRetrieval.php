@@ -20,12 +20,18 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval;
 
+use ilDateTime;
 use ilDBConstants;
 use ilDBInterface;
 use ILIAS\Tracking\View\DataRetrieval\DataRetrievalInterface;
 use ILIAS\Tracking\View\DataRetrieval\Info\ViewInterface;
 use ILIAS\Tracking\View\DataRetrieval\FilterInterface;
 use ILIAS\Tracking\View\DataRetrieval\Info\FactoryInterface as InfoFactoryInterface;
+use ilLPMarks;
+use ilLPObjSettings;
+use ilObject;
+use ilObjectLP;
+use ilTrQuery;
 
 class DataRetrieval implements DataRetrievalInterface
 {
@@ -45,41 +51,113 @@ class DataRetrieval implements DataRetrievalInterface
     public function retrieveViewInfo(
         FilterInterface $filter
     ): ViewInterface {
-        $query = "SELECT"
-            . " object_data.title as obj_title,"
-            . " object_data.type as obj_type,"
-            . " object_data.description as obj_description,"
-            . " object_data.obj_id as obj_id,"
-            . " ut_lp_marks.usr_id as usr_id,"
-            . " ut_lp_marks.status as lp_status,"
-            . " ut_lp_marks.percentage as lp_percentage,"
-            . " ut_lp_settings.u_mode as lp_mode"
-            . " FROM object_data"
-            . " JOIN ut_lp_marks ON object_data.obj_id = ut_lp_marks.obj_id"
-            . " JOIN ut_lp_settings ON object_data.obj_id = ut_lp_settings.obj_id"
-            . " " . $this->buildWhere($filter);
-        $res = $this->db->query($query);
         $object_infos = [];
         $lp_infos = [];
         $combined_infos = [];
-        while ($row = $res->fetchAssoc()) {
-            $usr_id = (int) $row["usr_id"];
-            $lp_status = (int) $row["lp_status"];
-            $percentage = (int) $row["lp_percentage"];
-            $obj_id = (int) $row["obj_id"];
-            $obj_title = (string) $row["obj_title"];
-            $obj_type = (string) $row["obj_type"];
-            $obj_description = (string) $row["obj_description"];
-            $lp_mode = (int) $row["lp_mode"];
-            if (!$this->isValidMode($lp_mode)) {
-                continue;
+
+        # Remove obj_ids if type is set
+        $object_ids = $filter->hasObjectTypes() ? [] : $filter->getObjectIds();
+        $user_ids = $filter->getUserIds();
+
+        # Get additional obj_ids with types
+        if ($filter->hasObjectTypes()) {
+            foreach ($filter->getObjectTypes() as $type) {
+                $object_datas = ilObject::_getObjectsByType($type);
+                $new_object_ids = array_map(function ($object_data) { return $object_data['obj_id']; }, $object_datas);
+                $object_ids = array_merge($object_ids, $new_object_ids);
             }
+        }
+
+        # Get additional user_ids for object_ids if no user ids are supplied
+        if (!$filter->hasUserIds()) {
+            foreach ($object_ids as $obj_id) {
+                $user_ids = array_merge($user_ids, ilLPMarks::_getAllUserIds($obj_id));
+            }
+            $user_ids = array_unique($user_ids);
+        }
+        $user_obj_id_mappings = [];
+
+        foreach ($user_ids as $usr_id) {
+            foreach ($object_ids as $obj_id) {
+                $lp_mode = (int) ilLPObjSettings::_lookupDBMode($obj_id);
+                $user_obj_id_mappings[$usr_id][$lp_mode][] = $obj_id;
+            }
+        }
+
+        $data = [];
+        foreach ($user_obj_id_mappings as $usr_id => $mode_mapping) {
+            foreach ($mode_mapping as $lp_mode => $obj_ids) {
+                $obj_ids = array_flip($obj_ids);
+                $new_data = [];
+                switch ($lp_mode) {
+                    case ilLPObjSettings::LP_MODE_SCORM:
+                        $new_data = ilTrQuery::getSCOsStatusForUser(
+                            $usr_id,
+                            0,
+                            $obj_ids
+                        );
+                        break;
+                    case ilLPObjSettings::LP_MODE_OBJECTIVES:
+                        $new_data = ilTrQuery::getObjectivesStatusForUser(
+                            $usr_id,
+                            0,
+                            $obj_ids
+                        );
+                        break;
+                    case ilLPObjSettings::LP_MODE_COLLECTION_MANUAL:
+                    case ilLPObjSettings::LP_MODE_COLLECTION_TLT:
+                    case ilLPObjSettings::LP_MODE_COLLECTION_MOBS:
+                        if ($usr_id) {
+                            $data = ilTrQuery::getSubItemsStatusForUser(
+                                $usr_id,
+                                0,
+                                $obj_ids
+                            );
+                        }
+                        break;
+                    case ilLPObjSettings::LP_MODE_UNDEFINED:
+                    case ilLPObjSettings::LP_MODE_DEACTIVATED:
+                        break;
+                    default:
+                        $new_data = ilTrQuery::getObjectsStatusForUser(
+                            $usr_id,
+                            $obj_ids
+                        );
+                        break;
+                }
+                foreach ($new_data as $new) {
+                    $new["lp_mode"] = $lp_mode;
+                    $new["usr_id"] = $usr_id;
+                    $data[] = $new;
+                }
+            }
+        }
+
+        foreach ($data as $entry) {
+            global $DIC;
+            $DIC->logger()->root()->dump($entry);
+            $obj_id = (int) $entry['obj_id'];
+            $obj_title = (string) $entry['title'];
+            $percentage = (int) $entry['percentage'];
+            $obj_description = "...";
+            $lp_status = (int) $entry['status'];
+            $obj_type = (string) $entry['type'];
+            $usr_id = (int) $entry['usr_id'];
+            $lp_mode = (int) $entry['lp_mode'];
+            $spent_seconds = (int) $entry['spent_seconds'];
+            $status_changed = new ilDateTime($entry['status_changed'], IL_CAL_DATETIME);
+            $visits = (int) $entry['visits'];
+            $read_count = (int) $entry['read_count'];
             $lp_info = $this->info_factory->lp(
                 $usr_id,
                 $obj_id,
                 $lp_status,
                 $percentage,
-                $lp_mode
+                $lp_mode,
+                $spent_seconds,
+                $status_changed,
+                $visits,
+                $read_count
             );
             $object_info = $this->info_factory->objectData(
                 $obj_id,
@@ -87,50 +165,20 @@ class DataRetrieval implements DataRetrievalInterface
                 $obj_description,
                 $obj_type,
             );
-            $combined_info = $this->info_factory->combined(
+            $lp_infos[] = $lp_info;
+            $object_infos[] = $object_info;
+            $combined_infos[] = $this->info_factory->combined(
                 $lp_info,
                 $object_info
             );
-            $lp_infos[$usr_id . ":" . $obj_id] = $lp_info;
-            $object_infos[$obj_id] = $object_info;
-            $combined_infos[] = $combined_info;
         }
+        # ref_id -> welche benutzer sind relevant, not attempted z.B in Kursen benötigt die ref id
+        # obj_id -> hilft nicht bei not attemptet
+
         return $this->info_factory->view(
             $this->info_factory->iterator()->objectData(...$object_infos),
             $this->info_factory->iterator()->lp(...$lp_infos),
             $this->info_factory->iterator()->combined(...$combined_infos)
         );
-    }
-
-    protected function buildWhere(
-        FilterInterface $filter
-    ): string {
-        $clauses = [];
-        $empty_clause = "";
-        $clauses[] = $filter->hasObjectTypes()
-            ? $this->db->in("type", $filter->getObjectTypes(), false, ilDBConstants::T_TEXT)
-            : $empty_clause;
-        $clauses[] = $filter->hasUserIds()
-            ? $this->db->in("usr_id", $filter->getUserIds(), false, ilDBConstants::T_INTEGER)
-            : $empty_clause;
-        $clauses[] = $filter->hasObjectIds()
-            ? $this->db->in("obj_id", $filter->getObjectIds(), false, ilDBConstants::T_INTEGER)
-            : $empty_clause;
-        $where = "WHERE";
-        foreach ($clauses as $clause) {
-            if ($clause === $empty_clause) {
-                continue;
-            }
-            if ($where !== "WHERE") {
-                $where .= " AND";
-            }
-            $where .= " " . $clause;
-        }
-        return $where;
-    }
-
-    protected function isValidMode(int $lp_mode): bool
-    {
-        return true;
     }
 }

@@ -20,6 +20,8 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
+use ilDateTime;
+
 interface LPInterface
 {
     public function getUserId(): int;
@@ -28,7 +30,15 @@ interface LPInterface
 
     public function getLPStatus(): int;
 
+    public function getStatusChanged(): ilDateTime;
+
     public function getPercentage(): int;
 
+    public function getReadCount(): int;
+
+    public function getSpentSeconds(): int;
+
     public function getLPMode(): int;
+
+    public function getVisits(): int;
 }

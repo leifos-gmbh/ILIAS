@@ -20,6 +20,7 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
+use ilDateTime;
 use ILIAS\Tracking\View\DataRetrieval\Info\CombinedInterface as CombinedInfoInterface;
 use ILIAS\Tracking\View\DataRetrieval\Info\Combined as CombinedInfo;
 use ILIAS\Tracking\View\DataRetrieval\Info\FactoryInterface as InfoFactoryInterface;
@@ -47,14 +48,22 @@ class Factory implements InfoFactoryInterface
         int $object_id,
         int $lp_status,
         int $percentage,
-        int $lp_mode
+        int $lp_mode,
+        int $spent_seconds,
+        ilDateTime $status_changed,
+        int $visits,
+        int $read_count
     ): LPInfoInterface {
         return new LPInfo(
             $user_id,
             $object_id,
             $lp_status,
             $percentage,
-            $lp_mode
+            $lp_mode,
+            $spent_seconds,
+            $status_changed,
+            $visits,
+            $read_count
         );
     }
 

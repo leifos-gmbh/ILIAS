@@ -20,6 +20,7 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
+use ilDateTime;
 use ILIAS\Tracking\View\DataRetrieval\Info\LPInterface;
 
 class LP implements LPInterface
@@ -29,7 +30,11 @@ class LP implements LPInterface
         protected int $object_id,
         protected int $lp_status,
         protected int $percentage,
-        protected int $lp_mode
+        protected int $lp_mode,
+        protected int $spend_seconds,
+        protected ilDateTime $status_changed,
+        protected int $visits,
+        protected int $read_count
     ) {
     }
 
@@ -56,5 +61,25 @@ class LP implements LPInterface
     public function getLPMode(): int
     {
         return $this->lp_mode;
+    }
+
+    public function getStatusChanged(): ilDateTime
+    {
+        return $this->status_changed;
+    }
+
+    public function getReadCount(): int
+    {
+        return $this->read_count;
+    }
+
+    public function getSpentSeconds(): int
+    {
+        return $this->spend_seconds;
+    }
+
+    public function getVisits(): int
+    {
+        return $this->visits;
     }
 }

@@ -20,6 +20,7 @@ declare(strict_types=0);
 
 namespace ILIAS\Tracking\View\DataRetrieval\Info;
 
+use ilDateTime;
 use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\FactoryInterface as IteratorFactoryInterface;
 use ILIAS\Tracking\View\DataRetrieval\Info\LPInterface as LPInfoInterface;
 use ILIAS\Tracking\View\DataRetrieval\Info\Iterator\LPInterface as LPIteratorInterface;
@@ -38,7 +39,11 @@ interface FactoryInterface
         int $object_id,
         int $lp_status,
         int $percentage,
-        int $lp_mode
+        int $lp_mode,
+        int $spent_seconds,
+        ilDateTime $status_changed,
+        int $visits,
+        int $read_count
     ): LPInfoInterface;
 
     public function combined(

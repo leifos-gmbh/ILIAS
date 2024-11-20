@@ -17190,6 +17190,7 @@ trac#:#trac_paths#:#Paths
 trac#:#trac_percentage#:#Percentage
 trac#:#trac_periodic_system_load#:#Periodic
 trac#:#trac_progress#:#Personal Learning Progress
+trac#:#trac_progress_block_title#:#Your Learning Progress
 trac#:#trac_read_count#:#Access Number
 trac#:#trac_read_count_spent_seconds#:#Time Spent / Access
 trac#:#trac_reference#:#References
@@ -17221,6 +17222,7 @@ trac#:#trac_settings#:#Settings
 trac#:#trac_settings_saved#:#Settings saved
 trac#:#trac_short_system_load#:#Short term
 trac#:#trac_show_graph#:#Show Graph
+trac#:#trac_show_progress_block#:#Show Personal Progress Chart in ‘Content’-Tab
 trac#:#trac_show_repository_views#:#Show Tracking Information
 trac#:#trac_show_repository_views_info#:#Show tracking information for repository objects on info page.
 trac#:#trac_spent_seconds#:#Time Spent

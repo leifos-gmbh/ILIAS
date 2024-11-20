@@ -84,6 +84,7 @@ class ilColumnGUI
         'ilClassificationBlockGUI' => 'components/ILIAS/Classification/',
         "ilPDStudyProgrammeSimpleListGUI" => "components/ILIAS/StudyProgramme/",
         "ilPDStudyProgrammeExpandableListGUI" => "components/ILIAS/StudyProgramme/",
+        "ilLPProgressBlockGUI" => "components/ILIAS/Tracking/"
     );
 
     protected static array $block_types = array(
@@ -100,6 +101,7 @@ class ilColumnGUI
         'ilClassificationBlockGUI' => 'clsfct',
         "ilPDStudyProgrammeSimpleListGUI" => "prgsimplelist",
         "ilPDStudyProgrammeExpandableListGUI" => "prgexpandablelist",
+        "ilLPProgressBlockGUI" => "lpprogress"
     );
 
 
@@ -113,14 +115,19 @@ class ilColumnGUI
             "ilCalendarBlockGUI" => IL_COL_RIGHT,
             "ilTutorialSupportBlockGUI" => IL_COL_RIGHT,
             "ilConsultationHoursCalendarBlockGUI" => IL_COL_RIGHT,
-            "ilClassificationBlockGUI" => IL_COL_RIGHT
+            "ilClassificationBlockGUI" => IL_COL_RIGHT,
+            "ilLPProgressBlockGUI" => IL_COL_RIGHT
             ),
         "grp" => array(
             "ilNewsForContextBlockGUI" => IL_COL_RIGHT,
             "ilCalendarBlockGUI" => IL_COL_RIGHT,
             "ilConsultationHoursCalendarBlockGUI" => IL_COL_RIGHT,
-            "ilClassificationBlockGUI" => IL_COL_RIGHT
+            "ilClassificationBlockGUI" => IL_COL_RIGHT,
+            "ilLPProgressBlockGUI" => IL_COL_RIGHT
             ),
+        "fold" => array(
+            "ilLPProgressBlockGUI" => IL_COL_RIGHT
+        ),
         "frm" => array("ilNewsForContextBlockGUI" => IL_COL_RIGHT),
         "root" => array(),
         "info" => array(
@@ -162,7 +169,8 @@ class ilColumnGUI
             "pd" . ilDashboardSidePanelSettingsRepository::MAIL => true,
             "pd" . ilDashboardSidePanelSettingsRepository::TASKS => true,
             "tagcld" => true,
-            "clsfct" => true);
+            "clsfct" => true,
+            "lpprogress" => true);
 
     protected array $check_nr_limit =
         array("pdfeed" => true);
@@ -603,6 +611,9 @@ class ilColumnGUI
                     if ($type == "clsfct") {		// mkunkel wants to have this on top
                         $nr = -16;
                     }
+                    if ($type == "lpprogress") {		// learning progress above news
+                        $nr = -17;
+                    }
                     $side = ilBlockSetting::_lookupSide($type, $user_id);
                     if (is_null($side) || $side === "") {
                         $side = $def_side;
@@ -771,6 +782,9 @@ class ilColumnGUI
                 ilObjCourse::lookupTutorialBlockSettingEabled($ilCtrl->getContextObjId())
             ) {
                 return true;
+            } elseif ($a_type === "lpprogress") {
+                $obj_lp = ilObjectLP::getInstance($ilCtrl->getContextObjId());
+                return $obj_lp->getCurrentMode() === ilLPObjSettings::LP_MODE_COLLECTION;
             }
             return false;
         }

@@ -17,6 +17,7 @@
 
 class ilCSVWriter
 {
+    protected const QUOTE = '"';
     private string $csv = '';
     private string $separator = ',';
     private string $delimiter = '"';
@@ -63,10 +64,11 @@ class ilCSVWriter
 
     private function quote(string $a_str): string
     {
-        return str_replace(
+        $a_str = str_replace(
             $this->delimiter,
             $this->delimiter . $this->delimiter,
             ($this->do_utf8_decoding) ? utf8_decode($a_str) : $a_str
         );
+        return self::QUOTE . $a_str . self::QUOTE;
     }
 }

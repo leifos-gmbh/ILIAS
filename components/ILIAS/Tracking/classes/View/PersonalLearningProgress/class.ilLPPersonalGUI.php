@@ -59,6 +59,7 @@ class ilLPPersonalGUI
     protected ilLanguage $lng;
     protected RefineryFactory $refinery;
     protected DataFactory $data_factory;
+    protected ilAccessHandler $access;
     protected ViewFactoryInterface $tracking_view;
 
     public function __construct()
@@ -70,6 +71,7 @@ class ilLPPersonalGUI
         $this->lng = $DIC->language();
         $this->http = $DIC->http();
         $this->refinery = $DIC->refinery();
+        $this->access = $DIC->access();
         $this->data_factory = new DataFactory();
         $this->tracking_view = new ViewFactory();
         $this->lng->loadLanguageModule("trac");
@@ -128,8 +130,6 @@ class ilLPPersonalGUI
     protected function buildPanelItems(
         string $presentation_mode
     ): array {
-        # read access
-        # crs availability (nicht gleich online status)
         $ids = ilParticipants::_getMembershipByType($this->user->getId(), ["crs"], true);
         $filter = $this->tracking_view->dataRetrieval()->filter()
             ->withUserIds($this->user->getId())
@@ -139,8 +139,11 @@ class ilLPPersonalGUI
         foreach ($view_info->combinedInfoIterator() as $combinedInfo) {
             $obj_id = $combinedInfo->getObjectInfo()->getObjectId();
             /** @var ilObjCourse $crs */
-            $crs = ilObjectFactory::getInstanceByObjId($obj_id); # Change if obj_id -> ref_id
-            if (!$this->isPresentable($presentation_mode, $crs->getCourseStart(), $crs->getCourseEnd())) {
+            $crs = ilObjectFactory::getInstanceByObjId($obj_id);
+            if (
+                !$this->hasReadAccess($obj_id) ||
+                !$this->isPresentable($presentation_mode, $crs->getCourseStart(), $crs->getCourseEnd())
+            ) {
                 continue;
             }
             $offline_str = $crs->getOfflineStatus()
@@ -220,5 +223,15 @@ class ilLPPersonalGUI
         )
             ->withViewControls($view_controls);
         $this->ui->mainTemplate()->setContent($this->ui->renderer()->render([$ui_panel]));
+    }
+
+    protected function hasReadAccess(int $obj_id): bool
+    {
+        foreach (ilObject::_getAllReferences($obj_id) as $ref_id) {
+            if ($this->access->checkAccess("read", "", $ref_id)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

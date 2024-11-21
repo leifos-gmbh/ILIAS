@@ -128,9 +128,12 @@ class ilLPPersonalGUI
     protected function buildPanelItems(
         string $presentation_mode
     ): array {
+        # read access
+        # crs availability (nicht gleich online status)
+        $ids = ilParticipants::_getMembershipByType($this->user->getId(), ["crs"], true);
         $filter = $this->tracking_view->dataRetrieval()->filter()
             ->withUserIds($this->user->getId())
-            ->withObjectTypes("crs");
+            ->withObjectIds(...$ids);
         $view_info = $this->tracking_view->dataRetrieval()->service()->retrieveViewInfo($filter);
         $items = [];
         foreach ($view_info->combinedInfoIterator() as $combinedInfo) {

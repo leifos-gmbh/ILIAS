@@ -24,8 +24,6 @@ interface FilterInterface
 {
     public function withUserIds(int ...$ids): self;
 
-    public function withObjectTypes(string ...$types): self;
-
     public function withObjectIds(int ...$ids): self;
 
     /**
@@ -34,18 +32,11 @@ interface FilterInterface
     public function getUserIds(): array;
 
     /**
-     * @return string[]
-     */
-    public function getObjectTypes(): array;
-
-    /**
      * @return int[]
      */
     public function getObjectIds(): array;
 
     public function hasObjectIds(): bool;
-
-    public function hasObjectTypes(): bool;
 
     public function hasUserIds(): bool;
 }

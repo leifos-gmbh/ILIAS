@@ -35,13 +35,11 @@ class Filter implements FilterInterface
     /**
      * @var string[] $object_types
      */
-    protected array $object_types;
 
     public function __construct()
     {
         $this->user_ids = [];
         $this->object_ids = [];
-        $this->object_types = [];
     }
 
     public function withUserIds(
@@ -49,14 +47,6 @@ class Filter implements FilterInterface
     ): FilterInterface {
         $clone = clone $this;
         $clone->user_ids = $ids;
-        return $clone;
-    }
-
-    public function withObjectTypes(
-        string ...$types
-    ): FilterInterface {
-        $clone = clone $this;
-        $clone->object_types = $types;
         return $clone;
     }
 
@@ -79,14 +69,6 @@ class Filter implements FilterInterface
     /**
      * @inheritDoc
      */
-    public function getObjectTypes(): array
-    {
-        return $this->object_types;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getObjectIds(): array
     {
         return $this->object_ids;
@@ -95,11 +77,6 @@ class Filter implements FilterInterface
     public function hasObjectIds(): bool
     {
         return count($this->object_ids) > 0;
-    }
-
-    public function hasObjectTypes(): bool
-    {
-        return count($this->object_types) > 0;
     }
 
     public function hasUserIds(): bool

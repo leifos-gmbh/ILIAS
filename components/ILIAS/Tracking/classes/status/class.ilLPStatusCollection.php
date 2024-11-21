@@ -541,7 +541,10 @@ class ilLPStatusCollection extends ilLPStatus
                 $passed++;
             }
         }
-        $percentage = (int) ((100.0 / $status_info["num_collections"]) * $passed);
+        $percentage = 0;
+        if ($status_info["num_collections"] > 0) {
+            $percentage = (int) ((100.0 / $status_info["num_collections"]) * $passed);
+        }
         return $percentage;
     }
 }

@@ -25,11 +25,8 @@ use ilDBConstants;
 
 class Repository implements RepositoryInterface
 {
-    protected ilDBInterface $db;
-
-    public function __construct(ilDBInterface $db)
+    public function __construct(protected ilDBInterface $db)
     {
-        $this->db = $db;
     }
 
     public function isBlockShownForObject(int $obj_id): bool

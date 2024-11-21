@@ -18,14 +18,21 @@
 
 declare(strict_types=1);
 
+use ILIAS\Tracking\View\Factory as ViewFactory;
+use ILIAS\Tracking\View\DataRetrieval\FactoryInterface as DataRetrievalFactoryInterface;
+
 /**
  * @ilCtrl_IsCalledBy ilLPProgressBlockGUI: ilColumnGUI
  */
 class ilLPProgressBlockGUI extends ilBlockGUI
 {
+    protected DataRetrievalFactoryInterface $data_retrieval;
+
     public function __construct()
     {
         parent::__construct();
+
+        $this->data_retrieval = (new ViewFactory())->dataRetrieval();
 
         $this->lng->loadLanguageModule('trac');
 
@@ -46,8 +53,18 @@ class ilLPProgressBlockGUI extends ilBlockGUI
 
     protected function getLegacyContent(): string
     {
-        $status = 1;
-        $percentage = 75;
+        $filter = $this->data_retrieval
+            ->filter()
+            ->withObjectIds(ilObject::_lookupObjectId($this->requested_ref_id))
+            ->withUserIds($this->user->getId());
+        $lp_info = $this->data_retrieval
+            ->service()
+            ->retrieveViewInfo($filter)
+            ->lpInfoIterator()
+            ->current();
+
+        $status = $lp_info->getLPStatus();
+        $percentage = $lp_info->getPercentage();
 
         $progress = $this->ui->factory()->chart()->progressMeter()->fixedSize(100, $percentage);
         $mode_and_status = $this->ui->factory()->item()->standard(

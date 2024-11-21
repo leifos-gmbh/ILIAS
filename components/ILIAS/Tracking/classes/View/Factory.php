@@ -29,6 +29,8 @@ use ILIAS\Tracking\View\PropertyList\FactoryInterface as PropertyListFactoryInte
 use ILIAS\Tracking\View\PropertyList\Factory as PropertyListFactory;
 use ILIAS\Tracking\View\Renderer\FactoryInterface as RendererFactoryInterface;
 use ILIAS\Tracking\View\Renderer\Factory as RendererFactory;
+use ILIAS\Tracking\View\ProgressBlock\FactoryInterface as ProgressBlockFactoryInterface;
+use ILIAS\Tracking\View\ProgressBlock\Factory as ProgressBlockFactory;
 
 class Factory implements ViewFactoryInterface
 {
@@ -49,11 +51,6 @@ class Factory implements ViewFactoryInterface
         );
     }
 
-    public function view(): ViewInterface
-    {
-        // TODO: Implement view() method.
-    }
-
     public function dataRetrieval(): DataRetrievalFactoryInterface
     {
         return new DataRetrievalFactory(
@@ -64,5 +61,10 @@ class Factory implements ViewFactoryInterface
     public function propertyList(): PropertyListFactoryInterface
     {
         return new PropertyListFactory();
+    }
+
+    public function progressBlock(): ProgressBlockFactory
+    {
+        return new ProgressBlockFactory($this->db);
     }
 }

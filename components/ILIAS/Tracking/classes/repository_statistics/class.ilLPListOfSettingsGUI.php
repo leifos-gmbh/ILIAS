@@ -19,6 +19,7 @@
 declare(strict_types=0);
 
 use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
+use ILIAS\Tracking\View\Factory as ViewFactory;
 use ILIAS\Tracking\View\ProgressBlock\Settings\RepositoryInterface as ProgressBlockSettings;
 
 /**
@@ -39,9 +40,7 @@ class ilLPListOfSettingsGUI extends ilLearningProgressBaseGUI
 
         $this->obj_settings = new ilLPObjSettings($this->getObjId());
         $this->obj_lp = ilObjectLP::getInstance($this->getObjId());
-        /** TODO replace with View */
-        global $DIC;
-        $this->progress_block_settings = new ILIAS\Tracking\View\ProgressBlock\Settings\Repository($DIC->database());
+        $this->progress_block_settings = (new ViewFactory())->progressBlock()->settings()->repository();
     }
 
     /**

@@ -23,6 +23,7 @@ namespace ILIAS\Tracking\View;
 use ILIAS\Tracking\View\Renderer\FactoryInterface as RendererFactoryInterface;
 use ILIAS\Tracking\View\DataRetrieval\FactoryInterface as DataRetrievalFactoryInterface;
 use ILIAS\Tracking\View\PropertyList\FactoryInterface as PropertyListFactoryInterface;
+use ILIAS\Tracking\View\ProgressBlock\FactoryInterface as ProgressBlockFactoryInterface;
 
 interface FactoryInterface
 {
@@ -31,4 +32,6 @@ interface FactoryInterface
     public function dataRetrieval(): DataRetrievalFactoryInterface;
 
     public function propertyList(): PropertyListFactoryInterface;
+
+    public function progressBlock(): ProgressBlockFactoryInterface;
 }

@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 use ILIAS\HTTP\Agent\AgentDetermination;
 use ILIAS\Container\Content\ItemPresentationManager;
+use ILIAS\Tracking\View\Factory as TrackingView;
 
 define("IL_COL_LEFT", "left");
 define("IL_COL_RIGHT", "right");
@@ -784,7 +785,9 @@ class ilColumnGUI
                 return true;
             } elseif ($a_type === "lpprogress") {
                 $obj_lp = ilObjectLP::getInstance($ilCtrl->getContextObjId());
-                return $obj_lp->getCurrentMode() === ilLPObjSettings::LP_MODE_COLLECTION;
+                $progress_block_settings = (new TrackingView())->progressBlock()->settings()->repository();
+                return $obj_lp->getCurrentMode() === ilLPObjSettings::LP_MODE_COLLECTION &&
+                    $progress_block_settings->isBlockShownForObject($ilCtrl->getContextObjId());
             }
             return false;
         }

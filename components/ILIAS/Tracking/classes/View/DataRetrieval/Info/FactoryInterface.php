@@ -43,7 +43,8 @@ interface FactoryInterface
         int $spent_seconds,
         ilDateTime $status_changed,
         int $visits,
-        int $read_count
+        int $read_count,
+        bool $has_percentage
     ): LPInfoInterface;
 
     public function combined(

@@ -24,6 +24,8 @@ use ilDateTime;
 
 interface LPInterface
 {
+    public function hasPercentage(): bool;
+
     public function getUserId(): int;
 
     public function getObjectId(): int;

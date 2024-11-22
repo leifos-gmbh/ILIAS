@@ -52,7 +52,8 @@ class Factory implements InfoFactoryInterface
         int $spent_seconds,
         ilDateTime $status_changed,
         int $visits,
-        int $read_count
+        int $read_count,
+        bool $has_percentage
     ): LPInfoInterface {
         return new LPInfo(
             $user_id,
@@ -63,7 +64,8 @@ class Factory implements InfoFactoryInterface
             $spent_seconds,
             $status_changed,
             $visits,
-            $read_count
+            $read_count,
+            $has_percentage
         );
     }
 

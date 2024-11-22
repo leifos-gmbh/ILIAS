@@ -36,4 +36,8 @@ interface RendererInterface
         ObjectDataInterface $object_info,
         PropertyListInterface $property_list
     ): UIStandardItem;
+
+    public function fixedSizeProgressMeter(
+        LPInterface $lp_info
+    ): UIStandardProgressMeter;
 }

@@ -29,6 +29,8 @@ use ILIAS\UI\Component\Item\Standard as UIStandardItem;
 use ILIAS\DI\UIServices;
 use ILIAS\UI\Component\Symbol\Icon\Icon as UIIconIcon;
 use ILIAS\UI\Component\Symbol\Icon\Standard as UIStandardIcon;
+use ilLPObjSettings;
+use ilLPStatus;
 
 class Renderer implements RendererInterface
 {
@@ -42,7 +44,16 @@ class Renderer implements RendererInterface
     ): UIStandardProgressMeter {
         return $this->ui->factory()->chart()->progressMeter()->standard(
             100,
-            $lp_info->getPercentage()
+            $this->determinePercentage($lp_info)
+        );
+    }
+
+    public function fixedSizeProgressMeter(
+        LPInterface $lp_info
+    ): UIStandardProgressMeter {
+        return $this->ui->factory()->chart()->progressMeter()->fixedSize(
+            100,
+            $this->determinePercentage($lp_info)
         );
     }
 
@@ -63,5 +74,13 @@ class Renderer implements RendererInterface
             ->withProperties($properties)
             ->withDescription($object_info->getDescription())
             ->withLeadIcon($icon);
+    }
+
+    protected function determinePercentage(
+        LPInterface $lp_info
+    ): int {
+        $percentage = $lp_info->getPercentage();
+        $percentage_by_status = $lp_info->getLPStatus() === ilLPStatus::LP_STATUS_COMPLETED_NUM ? 100 : 0;
+        return !$lp_info->hasPercentage() ? $percentage_by_status : $percentage;
     }
 }

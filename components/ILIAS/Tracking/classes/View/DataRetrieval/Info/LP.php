@@ -34,8 +34,14 @@ class LP implements LPInterface
         protected int $spend_seconds,
         protected ilDateTime $status_changed,
         protected int $visits,
-        protected int $read_count
+        protected int $read_count,
+        protected bool $has_percentage
     ) {
+    }
+
+    public function hasPercentage(): bool
+    {
+        return $this->has_percentage;
     }
 
     public function getUserId(): int

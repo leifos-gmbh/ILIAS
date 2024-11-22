@@ -63,7 +63,8 @@ class DataRetrieval implements DataRetrievalInterface
         $user_obj_id_mappings = [];
         foreach ($user_ids as $usr_id) {
             foreach ($object_ids as $obj_id) {
-                $lp_mode = (int) ilLPObjSettings::_lookupDBMode($obj_id);
+                $olp = ilObjectLP::getInstance($obj_id);
+                $lp_mode = $olp->getCurrentMode();
                 $user_obj_id_mappings[$usr_id][$lp_mode][] = $obj_id;
             }
         }
@@ -98,7 +99,8 @@ class DataRetrieval implements DataRetrievalInterface
                 $spent_seconds,
                 $status_changed,
                 $visits,
-                $read_count
+                $read_count,
+                $this->isPercentageAvailable($lp_mode)
             );
             $object_info = $this->info_factory->objectData(
                 $obj_id,
@@ -169,10 +171,6 @@ class DataRetrieval implements DataRetrievalInterface
                         );
                         break;
                 }
-                global $DIC;
-                $DIC->logger()->root()->debug("-------------------------------------");
-                $DIC->logger()->root()->debug(($only_data_of_objects_with_lp_enabled ? "yes" : "no"));
-                $DIC->logger()->root()->dump($new_data);
                 foreach ($new_data as $new) {
                     $new[self::KEY_LP_MODE] = $lp_mode;
                     $new[self::KEY_USR_ID] = $usr_id;
@@ -181,5 +179,31 @@ class DataRetrieval implements DataRetrievalInterface
             }
         }
         return $data;
+    }
+
+    protected function isPercentageAvailable(
+        int $lp_mode
+    ): bool {
+        if (in_array(
+            $lp_mode,
+            [
+                ilLPObjSettings::LP_MODE_TLT,
+                ilLPObjSettings::LP_MODE_VISITS,
+                ilLPObjSettings::LP_MODE_SCORM,
+                ilLPObjSettings::LP_MODE_LTI_OUTCOME,
+                ilLPObjSettings::LP_MODE_CMIX_COMPLETED,
+                ilLPObjSettings::LP_MODE_CMIX_COMPL_WITH_FAILED,
+                ilLPObjSettings::LP_MODE_CMIX_PASSED,
+                ilLPObjSettings::LP_MODE_CMIX_PASSED_WITH_FAILED,
+                ilLPObjSettings::LP_MODE_CMIX_COMPLETED_OR_PASSED,
+                ilLPObjSettings::LP_MODE_CMIX_COMPL_OR_PASSED_WITH_FAILED,
+                ilLPObjSettings::LP_MODE_VISITED_PAGES,
+                ilLPObjSettings::LP_MODE_TEST_PASSED,
+                ilLPObjSettings::LP_MODE_COLLECTION
+            ]
+        )) {
+            return true;
+        }
+        return false;
     }
 }

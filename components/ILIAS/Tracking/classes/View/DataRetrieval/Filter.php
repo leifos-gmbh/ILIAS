@@ -32,14 +32,21 @@ class Filter implements FilterInterface
      * @var int[] $object_ids
      */
     protected array $object_ids;
-    /**
-     * @var string[] $object_types
-     */
+    protected bool $only_data_of_object_with_lp_enabled;
 
     public function __construct()
     {
         $this->user_ids = [];
         $this->object_ids = [];
+        $this->only_data_of_object_with_lp_enabled = true;
+    }
+
+    public function withOnlyDataOfObjectWithLPEnabled(
+        bool $only_data_of_object_with_lp_enabled
+    ): FilterInterface {
+        $clone = clone $this;
+        $clone->only_data_of_object_with_lp_enabled = $only_data_of_object_with_lp_enabled;
+        return $clone;
     }
 
     public function withUserIds(
@@ -72,6 +79,11 @@ class Filter implements FilterInterface
     public function getObjectIds(): array
     {
         return $this->object_ids;
+    }
+
+    public function collectOnlyDataOfObjectsWithLPEnabled(): bool
+    {
+        return $this->only_data_of_object_with_lp_enabled;
     }
 
     public function hasObjectIds(): bool

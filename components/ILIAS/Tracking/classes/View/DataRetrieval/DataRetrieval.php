@@ -68,7 +68,10 @@ class DataRetrieval implements DataRetrievalInterface
             }
         }
 
-        $data = $this->collectLPDataWithIlTryQuery($user_obj_id_mappings);
+        $data = $this->collectLPDataWithIlTryQuery(
+            $user_obj_id_mappings,
+            $filter->collectOnlyDataOfObjectsWithLPEnabled()
+        );
 
         $object_infos = [];
         $lp_infos = [];
@@ -119,7 +122,8 @@ class DataRetrieval implements DataRetrievalInterface
     }
 
     protected function collectLPDataWithIlTryQuery(
-        array $user_obj_id_mappings
+        array $user_obj_id_mappings,
+        bool $only_data_of_objects_with_lp_enabled = true
     ): array {
         $data = [];
         foreach ($user_obj_id_mappings as $usr_id => $mode_mapping) {
@@ -154,7 +158,10 @@ class DataRetrieval implements DataRetrievalInterface
                         break;
                     case ilLPObjSettings::LP_MODE_UNDEFINED:
                     case ilLPObjSettings::LP_MODE_DEACTIVATED:
-                        break;
+                        if ($only_data_of_objects_with_lp_enabled) {
+                            break;
+                        }
+                        // no break
                     default:
                         $new_data = ilTrQuery::getObjectsStatusForUser(
                             $usr_id,
@@ -162,6 +169,10 @@ class DataRetrieval implements DataRetrievalInterface
                         );
                         break;
                 }
+                global $DIC;
+                $DIC->logger()->root()->debug("-------------------------------------");
+                $DIC->logger()->root()->debug(($only_data_of_objects_with_lp_enabled ? "yes" : "no"));
+                $DIC->logger()->root()->dump($new_data);
                 foreach ($new_data as $new) {
                     $new[self::KEY_LP_MODE] = $lp_mode;
                     $new[self::KEY_USR_ID] = $usr_id;

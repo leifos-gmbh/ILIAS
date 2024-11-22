@@ -26,6 +26,10 @@ interface FilterInterface
 
     public function withObjectIds(int ...$ids): self;
 
+    public function withOnlyDataOfObjectWithLPEnabled(
+        bool $only_data_of_object_with_lp_enabled
+    ): FilterInterface;
+
     /**
      * @return int[]
      */
@@ -35,6 +39,8 @@ interface FilterInterface
      * @return int[]
      */
     public function getObjectIds(): array;
+
+    public function collectOnlyDataOfObjectsWithLPEnabled(): bool;
 
     public function hasObjectIds(): bool;
 

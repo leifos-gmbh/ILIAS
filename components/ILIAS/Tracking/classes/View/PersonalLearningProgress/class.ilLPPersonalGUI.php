@@ -131,13 +131,16 @@ class ilLPPersonalGUI
         string $presentation_mode
     ): array {
         $ids = ilParticipants::_getMembershipByType($this->user->getId(), ["crs"], true);
+        $ids_with_lp = [];
         $filter = $this->tracking_view->dataRetrieval()->filter()
             ->withUserIds($this->user->getId())
-            ->withObjectIds(...$ids);
+            ->withObjectIds(...$ids)
+            ->withOnlyDataOfObjectWithLPEnabled(false);
         $view_info = $this->tracking_view->dataRetrieval()->service()->retrieveViewInfo($filter);
         $items = [];
         foreach ($view_info->combinedInfoIterator() as $combinedInfo) {
             $obj_id = $combinedInfo->getObjectInfo()->getObjectId();
+            $ids_with_lp[] = $obj_id;
             /** @var ilObjCourse $crs */
             $crs = ilObjectFactory::getInstanceByObjId($obj_id);
             if (
@@ -162,13 +165,17 @@ class ilLPPersonalGUI
             }
             $property_builder = $property_builder
                 ->withProperty($this->lng->txt(self::LNG_VAR_PROPERTY_CRS_ONLINE), $offline_str);
-            $progress_chart = $this->tracking_view->renderer()->service()->standardProgressMeter($combinedInfo->getLPInfo());
             $item = $this->tracking_view->renderer()->service()->standardItem(
                 $combinedInfo->getObjectInfo(),
                 $property_builder->getList()
-            )->withProgress(
-                $progress_chart
             );
+            if (
+                $combinedInfo->getLPInfo()->getLPMode() !== ilLPObjSettings::LP_MODE_UNDEFINED &&
+                $combinedInfo->getLPInfo()->getLPMode() !== ilLPObjSettings::LP_MODE_DEACTIVATED
+            ) {
+                $progress_chart = $this->tracking_view->renderer()->service()->standardProgressMeter($combinedInfo->getLPInfo());
+                $item = $item->withProgress($progress_chart);
+            }
             $items[$obj_id] = $item;
         }
         return $items;

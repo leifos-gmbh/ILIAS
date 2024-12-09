@@ -28,6 +28,8 @@ use ILIAS\Tracking\View\Factory as ViewFactory;
 use ILIAS\UI\URLBuilder;
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\UI\Component\Item\Standard as UIStandardItem;
+use ILIAS\StaticURL\Services as StaticURL;
+use ILIAS\Data\URI as URI;
 
 /**
  * @ilCtrl_IsCalledBy ilLPPersonalGUI: ilDashboardGUI
@@ -60,11 +62,13 @@ class ilLPPersonalGUI
     protected RefineryFactory $refinery;
     protected DataFactory $data_factory;
     protected ilAccessHandler $access;
+    protected StaticURL $static_url;
     protected ViewFactoryInterface $tracking_view;
 
     public function __construct()
     {
         global $DIC;
+
         $this->ui = $DIC->ui();
         $this->ctrl = $DIC->ctrl();
         $this->user = $DIC->user();
@@ -73,6 +77,7 @@ class ilLPPersonalGUI
         $this->refinery = $DIC->refinery();
         $this->access = $DIC->access();
         $this->data_factory = new DataFactory();
+        $this->static_url = $DIC['static_url'];
         $this->tracking_view = new ViewFactory();
         $this->lng->loadLanguageModule("trac");
     }
@@ -167,7 +172,8 @@ class ilLPPersonalGUI
                 ->withProperty($this->lng->txt(self::LNG_VAR_PROPERTY_CRS_ONLINE), $offline_str);
             $item = $this->tracking_view->renderer()->service()->standardItem(
                 $combinedInfo->getObjectInfo(),
-                $property_builder->getList()
+                $property_builder->getList(),
+                $this->buildLinkToCourse($obj_id)
             );
             if (
                 $combinedInfo->getLPInfo()->getLPMode() !== ilLPObjSettings::LP_MODE_UNDEFINED &&
@@ -187,28 +193,28 @@ class ilLPPersonalGUI
         ilDateTime|null $crs_end
     ): bool {
         $now = new ilDateTime(time(), IL_CAL_UNIX);
-        $crs_start = is_null($crs_start) ? $crs_end : $crs_start;
-        $crs_end = is_null($crs_end) ? $crs_start : $crs_end;
-        $dates_set = !is_null($crs_start) && !is_null($crs_end);
+        $crs_start = (is_null($crs_start) || $crs_start->isNull()) ? $now : $crs_start;
+        $crs_end = (is_null($crs_end) || $crs_end->isNull()) ? $now : $crs_end;
         if ($presentation_mode === self::PRESENTATION_OPTION_ALL) {
             return true;
         }
+        // courses without end are never in the past
         if (
-            $dates_set &&
             $presentation_mode === self::PRESENTATION_OPTION_PAST &&
             ilDateTime::_after($now, $crs_end)
         ) {
             return true;
         }
+        // courses without start are never in the future
         if (
-            $dates_set &&
             $presentation_mode === self::PRESENTATION_OPTION_FUTURE &&
             ilDateTime::_before($now, $crs_start)
         ) {
             return true;
         }
+        // courses without start and end are always current
+        // courses without start or end are current if their end/start is not in the past/future
         if (
-            $dates_set &&
             $presentation_mode === self::PRESENTATION_OPTION_CURRENT &&
             ilDateTime::_within($now, $crs_start, $crs_end)
         ) {
@@ -240,5 +246,17 @@ class ilLPPersonalGUI
             }
         }
         return false;
+    }
+
+    protected function buildLinkToCourse(int $obj_id): ?URI
+    {
+        $ref_ids = ilObject::_getAllReferences($obj_id);
+        if (count($ref_ids) === 0) {
+            return null;
+        }
+        return $this->static_url->builder()->build(
+            'crs',
+            $this->data_factory->refId((int) current($ref_ids))
+        );
     }
 }

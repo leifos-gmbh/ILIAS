@@ -25,6 +25,7 @@ use ILIAS\Tracking\View\DataRetrieval\Info\ObjectDataInterface;
 use ILIAS\Tracking\View\PropertyList\PropertyListInterface;
 use ILIAS\UI\Component\Item\Standard as UIStandardItem;
 use ILIAS\UI\Component\Chart\ProgressMeter\Standard as UIStandardProgressMeter;
+use ILIAS\Data\URI;
 
 interface RendererInterface
 {
@@ -32,9 +33,13 @@ interface RendererInterface
         LPInterface $lp_info
     ): UIStandardProgressMeter;
 
+    /**
+     * The optional link is applied to the title.
+     */
     public function standardItem(
         ObjectDataInterface $object_info,
-        PropertyListInterface $property_list
+        PropertyListInterface $property_list,
+        ?URI $title_link = null
     ): UIStandardItem;
 
     public function fixedSizeProgressMeter(

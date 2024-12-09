@@ -31,6 +31,7 @@ use ILIAS\UI\Component\Symbol\Icon\Icon as UIIconIcon;
 use ILIAS\UI\Component\Symbol\Icon\Standard as UIStandardIcon;
 use ilLPObjSettings;
 use ilLPStatus;
+use ILIAS\Data\URI;
 
 class Renderer implements RendererInterface
 {
@@ -59,7 +60,8 @@ class Renderer implements RendererInterface
 
     public function standardItem(
         ObjectDataInterface $object_info,
-        PropertyListInterface $property_list
+        PropertyListInterface $property_list,
+        ?URI $title_link = null
     ): UIStandardItem {
         $properties = [];
         foreach ($property_list as $property) {
@@ -70,7 +72,11 @@ class Renderer implements RendererInterface
             $object_info->getType() . " Icon",
             UIIconIcon::MEDIUM
         );
-        return $this->ui->factory()->item()->standard($object_info->getTitle())
+        $title = $object_info->getTitle();
+        if ($title_link !== null) {
+            $title = $this->ui->factory()->link()->standard($title, (string) $title_link);
+        }
+        return $this->ui->factory()->item()->standard($title)
             ->withProperties($properties)
             ->withDescription($object_info->getDescription())
             ->withLeadIcon($icon);

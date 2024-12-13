@@ -14,14 +14,9 @@
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
  *
- ********************************************************************
- */
+ *********************************************************************/
 
 /**
- * @author       Martin Studer <ms@studer-raimann.ch>
- * @author       Marcel Raimann <mr@studer-raimann.ch>
- * @author       Fabian Schmid <fs@studer-raimann.ch>
- * @version      $Id:
  * @ilCtrl_Calls ilDclDetailedViewGUI: ilDclDetailedViewDefinitionGUI, ilEditClipboardGUI
  */
 class ilDclDetailedViewGUI
@@ -418,14 +413,14 @@ class ilDclDetailedViewGUI
      */
     private function loadSession(): void
     {
-        // We need the default sorting etc. to dertermine on which position we currently are, thus we instantiate the table gui.
         $list = new ilDclRecordListTableGUI(
             new ilDclRecordListGUI($this->dcl_gui_object, $this->table->getId(), $this->tableview_id),
             "listRecords",
             $this->table,
             $this->tableview_id
         );
-        //we then partially load the records. note that this also fills up session data.
+        $list->initFilter();
+        $list->determineOffsetAndOrder();
         $this->table->getPartialRecords(
             $this->table->getId(),
             $list->getOrderField(),

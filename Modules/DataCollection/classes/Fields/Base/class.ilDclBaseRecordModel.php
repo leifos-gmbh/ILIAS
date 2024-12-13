@@ -18,16 +18,6 @@
 
 use ILIAS\Notes\Service;
 
-/**
- * Class ilDclBaseRecordModel
- * @author  Martin Studer <ms@studer-raimann.ch>
- * @author  Marcel Raimann <mr@studer-raimann.ch>
- * @author  Fabian Schmid <fs@studer-raimann.ch>
- * @author  Oskar Truffer <ot@studer-raimann.ch>
- * @author  Stefan Wanzenried <sw@studer-raimann.ch>
- * @version $Id:
- * @ingroup ModulesDataCollection
- */
 class ilDclBaseRecordModel
 {
     protected \ILIAS\UI\Factory $ui_factory;
@@ -128,6 +118,7 @@ class ilDclBaseRecordModel
         }
 
         $this->setTableId((int) $rec["table_id"]);
+        $this->loadTable();
         if (null !== $rec["create_date"]) {
             $this->setCreateDate(new ilDateTime($rec["create_date"], IL_CAL_DATETIME));
         }

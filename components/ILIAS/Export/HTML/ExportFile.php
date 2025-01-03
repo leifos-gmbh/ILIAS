@@ -18,19 +18,35 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Export;
+namespace ILIAS\Export\HTML;
 
-use ILIAS\Export\HTML;
-
-class InternalDataService
+class ExportFile
 {
-    protected static array $instance = [];
-    public function __construct()
-    {
+    public function __construct(
+        protected int $object_id,
+        protected string $rid,
+        protected string $timestamp,
+        protected string $type
+    ) {
     }
 
-    public function html() : HTML\DataService
+    public function getObjectId(): int
     {
-        return self::$instance['html'] ??= new HTML\DataService();
+        return $this->object_id;
+    }
+
+    public function getRid(): string
+    {
+        return $this->rid;
+    }
+
+    public function getTimestamp(): string
+    {
+        return $this->timestamp;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 }

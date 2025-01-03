@@ -18,19 +18,21 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Export;
+namespace ILIAS\Export\HTML;
 
-use ILIAS\Export\HTML;
+use ILIAS\Repository\GlobalDICDomainServices;
+use ILIAS\Export\HTML\RepoService;
+use ILIAS\Export\HTML\DataService;
+use ILIAS\Export\InternalDomainService;
 
-class InternalDataService
+class DomainService
 {
     protected static array $instance = [];
-    public function __construct()
-    {
-    }
 
-    public function html() : HTML\DataService
-    {
-        return self::$instance['html'] ??= new HTML\DataService();
+    public function __construct(
+        protected DataService $data,
+        protected RepoService $repo,
+        protected InternalDomainService $domain
+    ) {
     }
 }

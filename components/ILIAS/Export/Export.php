@@ -24,6 +24,7 @@ use ILIAS\MetaData\Elements\Set;
 use ILIAS\Setup\Agent as SetupAgent;
 use ILIAS\Refinery\Factory as RefineryFactory;
 use ILIAS\Export\Setup\Agent as ilExportSetupAgent;
+use ILIAS\Export\HTML;
 
 class Export implements Component\Component
 {
@@ -38,5 +39,6 @@ class Export implements Component\Component
         array | \ArrayAccess &$internal,
     ): void {
         $contribute[SetupAgent::class] = fn() => new ilExportSetupAgent($pull[RefineryFactory::class]);
+        $contribute[SetupAgent::class] = fn() => new HTML\Setup\Agent($pull[RefineryFactory::class]);
     }
 }

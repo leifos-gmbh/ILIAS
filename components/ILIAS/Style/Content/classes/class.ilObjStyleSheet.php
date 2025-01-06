@@ -489,7 +489,7 @@ class ilObjStyleSheet extends ilObject
     // basic style xml file, image directory and dom
     protected static string $basic_style_file = "../vendor/ilias/Style/basic_style/style.xml";
     protected static string $basic_style_zip = "../vendor/ilias/Style/basic_style/style.zip";
-    protected static string $basic_style_image_dir = "../vendor/ilias/Style/basic_style/images";
+    protected static string $basic_style_image_dir = "./components/ILIAS/COPage/basic_style/images";
     protected static ?DOMDocument $basic_style_dom = null;
 
     public function __construct(
@@ -1573,6 +1573,10 @@ class ilObjStyleSheet extends ilObject
         return array();
     }
 
+    public static function getExportContentStylePath() : string {
+        return "content_style/style.css";
+    }
+
     /**
      * get content style path
      * static (to avoid full reading)
@@ -1583,12 +1587,10 @@ class ilObjStyleSheet extends ilObject
         bool $add_token = true
     ): string {
         global $DIC;
-
         $ilSetting = $DIC->settings();
 
         $random = new \ilRandom();
         $rand = $random->int(1, 999999);
-
 
         // check global fixed content style
         $fixed_style = $ilSetting->get("fixed_content_style_id");

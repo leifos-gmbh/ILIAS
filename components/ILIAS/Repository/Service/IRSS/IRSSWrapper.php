@@ -469,6 +469,27 @@ class IRSSWrapper
         return $entries;
     }
 
+    public function addContainerDirToTargetContainer(
+        string $source_container_id,
+        string $target_container_id,
+        string $source_dir_path = "",
+        string $target_dir_path = ""
+    ): void {
+        $reader = new ZipReader(
+            $this->irss->consume()->stream($this->getResourceIdForIdString($source_container_id))->getStream()
+        );
+        $entries = [];
+        foreach ($reader->getStructure() as $path => $entry) {
+            if (str_starts_with($entry['dirname'], $source_dir_path) && !$entry['is_dir']) {
+                $this->addStreamToContainer(
+                    $target_container_id,
+                    $this->getStreamOfContainerEntry($source_container_id, $path),
+                    $target_dir_path . "/" . substr($path, strlen($source_dir_path))
+                );
+            }
+        }
+    }
+
     public function createContainer(
         ResourceStakeholder $stakeholder
     ): string {
@@ -557,6 +578,36 @@ class IRSSWrapper
         fclose($stream);
     }
 
+    public function addDirectoryToContainer(
+        string $rid,
+        string $source_dir,
+        string $target_path = ""
+    ): void {
+        $source_dir = realpath($source_dir);
+        $directoryIterator = new \RecursiveDirectoryIterator(
+            $source_dir,
+            \FilesystemIterator::SKIP_DOTS
+        );
+
+        $recursiveIterator = new \RecursiveIteratorIterator(
+            $directoryIterator,
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($recursiveIterator as $fileInfo) {
+            if ($fileInfo->isFile()) {
+                $fullPath = $fileInfo->getPathname();
+                $relativePath = substr($fullPath, strlen($source_dir) + 1);
+                $files[] = $relativePath;
+                $this->addLocalFileToContainer(
+                    $rid,
+                    $fullPath,
+                    $target_path . "/" . $relativePath
+                );
+            }
+        }
+    }
+
     public function addUploadToContainer(
         string $rid,
         UploadResult $result
@@ -579,6 +630,8 @@ class IRSSWrapper
             $path,
             8 * 60
         )->getURI();
+        // temp fixes wrong slash escaping, maybe due to 24805bcaabb33b1c5c82609dbe6791c55577c6a4
+        $uri = str_replace("%2F", "/", (string) $uri);
         return (string) $uri;
     }
 
@@ -644,21 +697,6 @@ class IRSSWrapper
                 $target_path
             );
         }
-    }
-
-    public function getContainerSrc(
-        string $rid,
-        string $path
-    ): string {
-        if ($rid !== "") {
-            $uri = $this->irss->consume()->containerURI(
-                $this->getResourceIdForIdString($rid),
-                $path,
-                8 * 60
-            )->getURI();
-            return (string) $uri;
-        }
-        return "";
     }
 
     public function addStreamToContainer(

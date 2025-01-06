@@ -23,6 +23,7 @@ namespace ILIAS\Export\HTML;
 use ilDBInterface;
 use ILIAS\Repository\IRSS\IRSSWrapper;
 use ILIAS\ResourceStorage\Identification\ResourceIdentification;
+use ILIAS\components\ResourceStorage\Container\Wrapper\ZipReader;
 
 class ExportFileDBRepository
 {
@@ -61,6 +62,45 @@ class ExportFileDBRepository
             $rid,
             $content,
             $path
+        );
+    }
+
+    public function addFile(
+        string $rid,
+        string $fullpath,
+        string $path,
+    ): void {
+        $this->irss->addLocalFileToContainer(
+            $rid,
+            $fullpath,
+            $path
+        );
+    }
+
+    public function addDirectory(
+        string $rid,
+        string $source_dir,
+        string $target_path = ""
+    ): void
+    {
+        $this->irss->addDirectoryToContainer(
+            $rid,
+            $source_dir,
+            $target_path
+        );
+    }
+
+    public function addContainerDirToTargetContainer(
+        string $source_container_id,
+        string $target_container_id,
+        string $source_dir_path = "",
+        string $target_dir_path = ""
+    ): void {
+        $this->irss->addContainerDirToTargetContainer(
+            $source_container_id,
+            $target_container_id,
+            $source_dir_path,
+            $target_dir_path
         );
     }
 

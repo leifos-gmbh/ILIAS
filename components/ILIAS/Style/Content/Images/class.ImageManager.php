@@ -124,10 +124,6 @@ class ImageManager
     }
 
     // upload image
-    public function uploadImage(): void
-    {
-        $this->repo->uploadImage($this->style_id);
-    }
 
     public function deleteByFilename(string $filename): void
     {

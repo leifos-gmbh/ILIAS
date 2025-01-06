@@ -82,6 +82,7 @@ class MediaObjectCommandActionHandler implements Server\CommandActionHandler
         $mob_gui = new \ilObjMediaObjectGUI("");
         $mob_gui->initForm("create");
         $ok = false;
+        $error = "";
         if ($mob_gui->checkFormInput()) {
             $ok = true;
             try {

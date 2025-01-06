@@ -39,7 +39,7 @@ a.ilc_link_IntLink {
   text-decoration: underline;
 }
 a.ilc_marker_Marker {
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/icon_pin.svg");
+  background-image: url("../basic_style/images/icon_pin.svg");
   background-repeat: no-repeat;
   cursor: pointer;
   display: block;
@@ -49,7 +49,7 @@ a.ilc_marker_Marker {
 }
 a.ilc_marker_Marker:hover {
   background-repeat: no-repeat;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/icon_pin_on.svg");
+  background-image: url("../basic_style/images/icon_pin_on.svg");
 }
 a.ilc_rte_mlink_RTELink {
   font-size: 100%;
@@ -77,7 +77,7 @@ a.ilc_rte_mlink_RTELink:hover {
   text-decoration: none !important;
 }
 a.ilc_rte_texp_RTETreeCollapsed {
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/arrow_right.svg");
+  background-image: url("../basic_style/images/arrow_right.svg");
   background-repeat: no-repeat;
   background-position: 0px 0px;
   background-size: 15px 15px !important;
@@ -92,7 +92,7 @@ a.ilc_rte_tlink_RTETreeCurrent {
   background-color: #E2E8EF !important;
 }
 a.ilc_rte_texp_RTETreeExpanded {
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/arrow_down.svg");
+  background-image: url("../basic_style/images/arrow_down.svg");
   background-size: 15px 15px;
 }
 a.ilc_rte_tlink_RTETreeLink {
@@ -130,7 +130,7 @@ div.ilc_va_ihead_AccordIHead {
   border-color: #DDDDDD;
   border-style: solid;
   background-color: #F9F9F9;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/arrow_right.svg");
+  background-image: url("../basic_style/images/arrow_right.svg");
   background-repeat: no-repeat;
   background-position: 15px center;
   cursor: pointer;
@@ -169,7 +169,7 @@ a.ilc_section_Additional::before {
   background-color: #eceff4;
   background-position: center center;
   left: 15px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/additional.svg");
+  background-image: url("../basic_style/images/additional.svg");
   background-repeat: no-repeat;
   position: absolute;
   width: 60px;
@@ -204,7 +204,7 @@ a.ilc_section_AdvancedKnowledge::before {
   background-color: #eceff4;
   background-position: center center;
   left: 15px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/advknowledge.svg");
+  background-image: url("../basic_style/images/advknowledge.svg");
   position: absolute;
   top: -32px;
   right: 0px;
@@ -245,7 +245,7 @@ a.ilc_section_Attention::before {
   content: "";
   display: block;
   border-radius: 50px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/attention.svg");
+  background-image: url("../basic_style/images/attention.svg");
   background-repeat: no-repeat;
   position: absolute;
   top: -32px;
@@ -310,7 +310,7 @@ a.ilc_section_Citation::before {
   content: "";
   display: block;
   border-radius: 50px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/citation.svg");
+  background-image: url("../basic_style/images/citation.svg");
   background-repeat: no-repeat;
   position: absolute;
   top: -32px;
@@ -348,7 +348,7 @@ a.ilc_section_Confirmation::before {
   content: "";
   display: block;
   border-radius: 50px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/confirmation.svg");
+  background-image: url("../basic_style/images/confirmation.svg");
   position: absolute;
   top: -32px;
   width: 60px;
@@ -368,7 +368,7 @@ div.ilc_iim_ContentPopup {
 div.ilc_qover_Correct {
   padding-top: 20px;
   padding-right: 20px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/correct.svg");
+  background-image: url("../basic_style/images/correct.svg");
   padding-bottom: 20px;
   padding-left: 60px;
   background-position: 10px;
@@ -398,7 +398,7 @@ div.ilc_va_ihead_EmphasisedAccordIHead {
   color: #FFFFFF;
   padding: 15px;
   background-color: #4C6586;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/expand_white.svg");
+  background-image: url("../basic_style/images/expand_white.svg");
   background-repeat: no-repeat;
   background-position: right center;
   transition: all 0.5s ease-out;
@@ -428,7 +428,7 @@ a.ilc_section_Example::before {
   background-color: #eceff4;
   background-position: center center;
   left: 15px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/example.svg");
+  background-image: url("../basic_style/images/example.svg");
   background-repeat: no-repeat;
   position: absolute;
   top: -32px;
@@ -468,7 +468,7 @@ a.ilc_section_Excursus::before {
   content: "";
   display: block;
   border-radius: 50px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/excursus.svg");
+  background-image: url("../basic_style/images/excursus.svg");
   background-repeat: no-repeat;
   position: absolute;
   top: -32px;
@@ -484,7 +484,7 @@ div.ilc_qfeedr_FeedbackRight {
   padding-left: 60px;
   padding-bottom: 20px;
   padding-right: 160px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/correct.svg");
+  background-image: url("../basic_style/images/correct.svg");
   background-position: 10px;
   background-repeat: no-repeat;
   border-radius: 3px;
@@ -494,7 +494,7 @@ div.ilc_qfeedw_FeedbackWrong {
   padding-bottom: 20px;
   background-position: 24px;
   padding-right: 160px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/exclamation.svg");
+  background-image: url("../basic_style/images/exclamation.svg");
   margin-top: 10px;
   background-repeat: no-repeat;
   padding-top: 20px;
@@ -521,7 +521,7 @@ div.ilc_flist_head_FileListHeading {
   text-align: left;
   color: #FFFFFF;
   font-weight: bold;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/download.svg");
+  background-image: url("../basic_style/images/download.svg");
   background-color: #4C6586;
   margin-top: 0px;
   background-position: 10px;
@@ -556,7 +556,7 @@ div.ilc_ha_ihead_HAccordIHead:hover {
 }
 div.ilc_qover_Incorrect {
   padding-left: 60px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/exclamation.svg");
+  background-image: url("../basic_style/images/exclamation.svg");
   background-repeat: no-repeat;
   background-position: 24px;
   padding-bottom: 20px;
@@ -591,7 +591,7 @@ a.ilc_section_Information::before {
   border-width: 2px;
   border-color: #FFFFFF;
   border-style: solid;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/information.svg");
+  background-image: url("../basic_style/images/information.svg");
   background-repeat: no-repeat;
   position: absolute;
   top: -32px;
@@ -608,7 +608,7 @@ a.ilc_section_Interaction {
   margin-bottom: 10px;
   padding-right: 20px;
   padding-bottom: 20px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/interaction.svg");
+  background-image: url("../basic_style/images/interaction.svg");
   padding-left: 60px;
   background-position: 12px;
   background-repeat: no-repeat;
@@ -634,7 +634,7 @@ div.ilc_va_ihead_LightAccordIHead {
   border-width: 2px;
   border-color: #4C6586;
   border-bottom-style: solid;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/expand.svg");
+  background-image: url("../basic_style/images/expand.svg");
   background-position: right center;
   background-repeat: no-repeat;
   font-size: 1.5em;
@@ -660,7 +660,7 @@ a.ilc_section_Link {
   border-width: 1px;
   border-color: #4C6586;
   border-style: dashed;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/link.svg");
+  background-image: url("../basic_style/images/link.svg");
   background-repeat: no-repeat;
   background-position: 10px;
   border-radius: 3px;
@@ -691,7 +691,7 @@ a.ilc_section_Literature::before {
   content: "";
   display: block;
   border-radius: 50px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/literature.svg");
+  background-image: url("../basic_style/images/literature.svg");
   background-repeat: no-repeat;
   position: absolute;
   top: -32px;
@@ -731,7 +731,7 @@ a.ilc_section_Mnemonic::before {
   content: "";
   display: block;
   border-radius: 50px;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/mnemonic.svg");
+  background-image: url("../basic_style/images/mnemonic.svg");
   background-repeat: no-repeat;
   position: absolute;
   top: -32px;
@@ -769,7 +769,7 @@ div.ilc_section_Remark::before,
 a.ilc_section_Remark::before {
   border-width: 2px;
   border-color: #FFFFFF;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/remark.svg");
+  background-image: url("../basic_style/images/remark.svg");
   border-style: solid;
   background-repeat: no-repeat;
   background-color: #eceff4;
@@ -935,7 +935,7 @@ li.ilc_list_item_Attention {
   list-style-type: none;
 }
 li.ilc_list_item_Attention::before {
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/attention_red.svg");
+  background-image: url("../basic_style/images/attention_red.svg");
   background-repeat: no-repeat;
   position: absolute;
   width: 35px;
@@ -953,7 +953,7 @@ li.ilc_list_item_Checklist {
   position: relative;
 }
 li.ilc_list_item_Checklist2::before {
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/wrong.svg");
+  background-image: url("../basic_style/images/wrong.svg");
   background-repeat: no-repeat;
   position: absolute;
   width: 35px;
@@ -964,7 +964,7 @@ li.ilc_list_item_Checklist2::before {
 }
 li.ilc_list_item_Checklist::before {
   content: "";
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/checked.svg");
+  background-image: url("../basic_style/images/checked.svg");
   background-repeat: no-repeat;
   width: 35px;
   height: 35px;
@@ -1181,7 +1181,7 @@ li.ilc_list_item_ListItem2Grid::before {
   align-items: center;
 }
 li.ilc_list_item_ListItem3::before {
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/checked.svg");
+  background-image: url("../basic_style/images/checked.svg");
   background-repeat: no-repeat;
   width: 35px;
   height: 35px;
@@ -1190,7 +1190,7 @@ li.ilc_list_item_ListItem3::before {
   content: "";
 }
 li.ilc_list_item_ListItem4::before {
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/wrong.svg");
+  background-image: url("../basic_style/images/wrong.svg");
   background-repeat: no-repeat;
   width: 35px;
   height: 35px;
@@ -1243,7 +1243,7 @@ li.ilc_list_item_Pointer {
   list-style-type: none;
 }
 li.ilc_list_item_Pointer::before {
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/pointer.svg");
+  background-image: url("../basic_style/images/pointer.svg");
   background-repeat: no-repeat;
   position: absolute;
   width: 35px;
@@ -1466,7 +1466,7 @@ div.ilc_va_iheada_AccordIHeadActive {
   border-color: #DDDDDD;
   border-style: solid;
   background-color: #E2E8EF;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/arrow_down.svg");
+  background-image: url("../basic_style/images/arrow_down.svg");
   background-repeat: no-repeat;
   background-position: 10px center;
   cursor: pointer;
@@ -1481,7 +1481,7 @@ div.ilc_va_iheada_AccordIHeadActive:hover {
 }
 div.ilc_va_iheada_ColoredAccordIHeadActive:hover {
   background-color: #3d506b;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/collapse_white.svg");
+  background-image: url("../basic_style/images/collapse_white.svg");
   background-position: right center;
   cursor: pointer;
   transition: all 0.5s ease-out;
@@ -1491,7 +1491,7 @@ div.ilc_va_iheada_EmphasisedAccordIHeadActive {
   color: #FFFFFF;
   padding: 15px;
   background-color: #3d506b;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/collapse_white.svg");
+  background-image: url("../basic_style/images/collapse_white.svg");
   background-repeat: no-repeat;
   background-position: right center;
   border-radius: 0px;
@@ -1503,14 +1503,14 @@ div.ilc_va_iheada_EmphasisedAccordIHeadActive {
 }
 div.ilc_va_iheada_EmphasisedAccordIHeadActive:hover {
   background-color: #3d506b;
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/collapse_white.svg");
+  background-image: url("../basic_style/images/collapse_white.svg");
   background-repeat: no-repeat;
   background-position: right center;
   cursor: pointer;
   transition: all 0.5s ease-out;
 }
 div.ilc_va_iheada_LightAccordIHeadActive {
-  background-image: url("../../../vendor/ilias/Style/basic_style/images/collapse.svg");
+  background-image: url("../basic_style/images/collapse.svg");
   background-repeat: no-repeat;
   border-radius: 0px;
   transition: all 0.5s ease-out;

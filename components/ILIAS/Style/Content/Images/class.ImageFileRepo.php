@@ -64,7 +64,6 @@ class ImageFileRepo
         int $style_id,
         string $rid
     ): Generator {
-
         if ($rid !== "") {
             $unzip = $this->irss->getContainerZip($rid);
             $uri = $this->irss->stream($rid)->getMetadata("uri");
@@ -83,7 +82,10 @@ class ImageFileRepo
                 }
                 $att = $zip_archive->statName($path);
                 $full_path = $this->irss->getContainerUri($rid, $path);
-                $image_size = getimagesize($full_path);
+                try {
+                    $image_size = getimagesize($full_path);
+                } catch (\Exception $e) {
+                }
                 $width = $image_size[0] ?? 0;
                 $height = $image_size[1] ?? 0;
                 yield $this->factory->image(
@@ -137,29 +139,6 @@ class ImageFileRepo
             }
         }
         return null;
-    }
-
-    /**
-     * @param int $style_id
-     * @throws Filesystem\Exception\IOException
-     * @throws \ILIAS\FileUpload\Exception\IllegalStateException
-     */
-    public function uploadImage(int $style_id): void
-    {
-        $upload = $this->upload;
-        $dir = $this->dir($style_id);
-        if (!$this->web_files->hasDir($dir)) {
-            $this->web_files->createDir($dir);
-        }
-        if ($upload->hasUploads()) {
-            if (!$upload->hasBeenProcessed()) {
-                $upload->process();
-            }
-            $result = array_values($upload->getResults())[0];
-            if ($result->getStatus()->getCode() === ProcessingStatus::OK) {
-                $upload->moveFilesTo($dir, Location::WEB);
-            }
-        }
     }
 
     // delete image

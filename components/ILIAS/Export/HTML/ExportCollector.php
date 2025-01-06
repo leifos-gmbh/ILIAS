@@ -75,4 +75,55 @@ class ExportCollector
             $path
         );
     }
+
+    /**
+     * @throws ExportException
+     */
+    public function addFile(
+        string $fullpath,
+        string $target_path
+    ): void {
+        if ($this->rid === "") {
+            throw $this->data->exportException("HTML Export has not been initialised.");
+        }
+        $this->repo->addFile(
+            $this->rid,
+            $fullpath,
+            $target_path
+        );
+    }
+
+    /**
+     * @throws ExportException
+     */
+    public function addDirectory(
+        string $source_dir,
+        string $target_path
+    ): void {
+        if ($this->rid === "") {
+            throw $this->data->exportException("HTML Export has not been initialised.");
+        }
+        $this->repo->addDirectory(
+            $this->rid,
+            $source_dir,
+            $target_path
+        );
+    }
+
+    public function addContainerDirectory(
+        string $source_container_id,
+        string $source_dir_path = "",
+        string $target_dir_path = ""
+    ): void {
+        if ($this->rid === "") {
+            throw $this->data->exportException("HTML Export has not been initialised.");
+        }
+        $this->repo->addContainerDirToTargetContainer(
+            $source_container_id,
+            $this->rid,
+            $source_dir_path,
+            $target_dir_path
+        );
+    }
+
 }

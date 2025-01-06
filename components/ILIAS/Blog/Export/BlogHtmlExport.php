@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\Blog\Export;
 
 use ilFileUtils;
+use ILIAS\components\Export\HTML\Util;
 
 class BlogHtmlExport
 {
@@ -31,7 +32,7 @@ class BlogHtmlExport
     protected string $sub_dir;
     protected string $target_dir;
     protected \ILIAS\GlobalScreen\Services $global_screen;
-    protected \ILIAS\components\Export\HTML\Util $export_util;
+    protected Util $export_util;
     protected \ilCOPageHTMLExport $co_page_html_export;
     protected \ilLanguage $lng;
     protected \ilTabsGUI $tabs;
@@ -63,7 +64,7 @@ class BlogHtmlExport
         $this->target_dir = $exp_dir . "/" . $sub_dir;
 
         $this->global_screen = $DIC->globalScreen();
-        $this->export_util = new \ILIAS\components\Export\HTML\Util($exp_dir, $sub_dir);
+        $this->export_util = new Util("", "", $this->collector);
         $this->co_page_html_export = new \ilCOPageHTMLExport($this->target_dir);
         $this->tabs = $DIC->tabs();
         $this->lng = $DIC->language();
@@ -115,13 +116,14 @@ class BlogHtmlExport
     public function exportHTML(): string
     {
         $this->initDirectories();
-/*
+
         $this->export_util->exportSystemStyle();
+
         $this->export_util->exportCOPageFiles(
             $this->content_style_domain->getEffectiveStyleId(),
             "blog"
         );
-
+/*
         \ilObjUser::copyProfilePicturesToDirectory($this->blog->getOwner(), $this->target_dir);
 */
         // export pages
@@ -356,7 +358,7 @@ class BlogHtmlExport
         $location_stylesheet = \ilUtil::getStyleSheetLocation();
         $this->global_screen->layout()->meta()->addCss($location_stylesheet);
         $this->global_screen->layout()->meta()->addCss(
-            \ilObjStyleSheet::getContentStylePath($this->content_style_domain->getEffectiveStyleId())
+            \ilObjStyleSheet::getExportContentStylePath()
         );
         \ilPCQuestion::resetInitialState();
 
@@ -388,12 +390,6 @@ class BlogHtmlExport
         string $comments = ""
     ): string {
         $file = $this->target_dir . "/" . $a_file;
-        // return if file is already existing
-/*
-        if (is_file($file)) {
-            return "";
-        }
-*/
 
         // export template: page content
         $ep_tpl = new \ilTemplate(
@@ -420,7 +416,7 @@ class BlogHtmlExport
 
         // open file
 //        file_put_contents($file, $content);
-        $this->collector->addString($content, $file);
+        $this->collector->addString($content, $a_file);
 
 
         return $file;

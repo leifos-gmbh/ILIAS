@@ -97,12 +97,13 @@ class ilBlogPostingGUI extends ilPageObjectGUI
         $tpl->parseCurrentBlock();
 
         // #17814
+        /*
         $tpl->setCurrentBlock("ContentStyle");
         $tpl->setVariable(
             "LOCATION_CONTENT_STYLESHEET",
             ilObjStyleSheet::getContentStylePath($a_style_sheet_id)
         );
-        $tpl->parseCurrentBlock();
+        $tpl->parseCurrentBlock();*/
 
         // needed for editor
         $this->setStyleId($a_style_sheet_id);

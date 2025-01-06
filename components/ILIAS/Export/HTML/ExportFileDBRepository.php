@@ -22,25 +22,26 @@ namespace ILIAS\Export\HTML;
 
 use ilDBInterface;
 use ILIAS\Repository\IRSS\IRSSWrapper;
+use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 
 class ExportFileDBRepository
 {
     public function __construct(
         protected ilDBInterface $db,
         protected IRSSWrapper $irss,
-        protected DataService $data
+        protected DataService $data,
+        protected \ilExportHTMLStakeholder $stakeholder
     )
     {
     }
 
     public function create(
-        \ilExportHTMLStakeholder $stakeholder,
         int $object_id,
         string $type = ""
     ): string
     {
         $rid = $this->irss->createContainer(
-            $stakeholder
+            $this->stakeholder
         );
         $this->db->insert('export_files_html', [
             'object_id' => ['integer', $object_id],
@@ -74,8 +75,15 @@ class ExportFileDBRepository
         ]);
     }
 
-    public function delete(int $object_id, string $rid): void
+    public function delete(
+        int $object_id,
+        string $rid
+    ): void
     {
+        $this->irss->deleteResource(
+            $rid,
+            $this->stakeholder
+        );
         $this->db->manipulateF(
             'DELETE FROM export_files_html WHERE object_id = %s AND rid = %s',
             ['integer', 'text'],
@@ -110,6 +118,11 @@ class ExportFileDBRepository
         }
     }
 
+    public function getResourceIdForIdString(string $rid): ?ResourceIdentification
+    {
+        return $this->irss->getResourceIdForIdString($rid);
+    }
+
     protected function getExportFileFromRecord(array $record): ExportFile
     {
         return $this->data->exportFile(
@@ -119,4 +132,19 @@ class ExportFileDBRepository
             (string) $record['type']
         );
     }
+
+    public function deliverFile(string $rid): void
+    {
+        $this->irss->deliverFile($rid);
+    }
+
+    public function rename(
+        string $rid,
+        string $title
+    ): void
+    {
+        $this->irss->renameContainer($rid, $title);
+    }
+
+
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,17 +16,15 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 namespace ILIAS\Blog\Export;
 
 use ilFileUtils;
 
-/**
- * Blog HTML export
- *
- * @author Alexander Killing <killing@leifos.de>
- */
 class BlogHtmlExport
 {
+    protected \ILIAS\components\Export\HTML\ExportCollector $collector;
     protected \ilObjBlog $blog;
     protected \ilObjBlogGUI $blog_gui;
     protected string $export_dir;
@@ -58,6 +54,9 @@ class BlogHtmlExport
         $this->blog_gui = $blog_gui;
         /** @var \ilObjBlog $blog */
         $blog = $blog_gui->getObject();
+        $this->collector = $DIC->export()->domain()->html()->collector($blog->getId());
+        $this->collector->init();
+
         $this->blog = $blog;
         $this->export_dir = $exp_dir;
         $this->sub_dir = $sub_dir;
@@ -116,6 +115,7 @@ class BlogHtmlExport
     public function exportHTML(): string
     {
         $this->initDirectories();
+/*
         $this->export_util->exportSystemStyle();
         $this->export_util->exportCOPageFiles(
             $this->content_style_domain->getEffectiveStyleId(),
@@ -123,20 +123,20 @@ class BlogHtmlExport
         );
 
         \ilObjUser::copyProfilePicturesToDirectory($this->blog->getOwner(), $this->target_dir);
-
+*/
         // export pages
         if ($this->print_version) {
             $this->exportHTMLPagesPrint();
         } else {
             $this->exportHTMLPages();
         }
-
+/*
         // export comments user images
         $this->exportUserImages();
 
         $this->export_util->exportResourceFiles();
         $this->co_page_html_export->exportPageElements();
-
+*/
         return $this->zipPackage();
     }
 
@@ -205,10 +205,12 @@ class BlogHtmlExport
             $file = self::buildExportLink($a_link_template, "list", $month, $this->keywords);
             $file = $this->writeExportFile($file, $tpl, $list, $nav);
 
+/*
             if (!$has_index) {
                 copy($file, $this->target_dir . "/" . $a_index_name);
                 $has_index = true;
             }
+*/
         }
 
         // keywords
@@ -387,9 +389,11 @@ class BlogHtmlExport
     ): string {
         $file = $this->target_dir . "/" . $a_file;
         // return if file is already existing
+/*
         if (is_file($file)) {
             return "";
         }
+*/
 
         // export template: page content
         $ep_tpl = new \ilTemplate(
@@ -415,7 +419,9 @@ class BlogHtmlExport
         $content = $a_tpl->printToString();
 
         // open file
-        file_put_contents($file, $content);
+//        file_put_contents($file, $content);
+        $this->collector->addString($content, $file);
+
 
         return $file;
     }

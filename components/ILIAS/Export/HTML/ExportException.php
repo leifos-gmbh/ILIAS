@@ -18,28 +18,8 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Export;
+namespace ILIAS\components\Export\HTML;
 
-/**
- * @author Alexander Killing <killing@leifos.de>
- */
-class Service
+class ExportException extends \ilException
 {
-    protected static array $instance = [];
-    public function __construct()
-    {
-    }
-
-    public function internal(): InternalService
-    {
-        return self::$instance["internal"] ??= new InternalService();
-    }
-
-    public function domain(): ExternalDomainService
-    {
-        return self::$instance["domain"] ??= new ExternalDomainService(
-            $this->internal()->domain()
-        );
-    }
-
 }

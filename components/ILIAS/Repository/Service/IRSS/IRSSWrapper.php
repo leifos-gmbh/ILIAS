@@ -687,4 +687,16 @@ class IRSSWrapper
         }
     }
 
+    public function renameContainer(
+        string $rid,
+        string $title
+    ): void {
+        $id = $this->getResourceIdForIdString($rid);
+        $rev = $this->irss->manageContainer()->getCurrentRevision($id);
+        $info = $rev->getInformation();
+        $info->setTitle($title);
+        $rev->setInformation($info);
+        $this->irss->manageContainer()->updateRevision($rev);
+    }
+
 }

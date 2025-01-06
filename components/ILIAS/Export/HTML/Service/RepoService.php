@@ -39,7 +39,8 @@ class RepoService
         return self::$instance['export_file'] ??= new ExportFileDBRepository(
             $this->db,
             $this->irss,
-            $this->data
+            $this->data,
+            new \ilExportHTMLStakeholder()
         );
     }
 }

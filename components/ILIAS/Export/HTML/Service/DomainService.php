@@ -24,6 +24,7 @@ use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\Export\HTML\RepoService;
 use ILIAS\Export\HTML\DataService;
 use ILIAS\Export\InternalDomainService;
+use ILIAS\components\Export\HTML\ExportCollector;
 
 class DomainService
 {
@@ -34,5 +35,18 @@ class DomainService
         protected RepoService $repo,
         protected InternalDomainService $domain
     ) {
+    }
+
+    public function collector(
+        int $obj_id,
+        string $type = ""
+    ) : ExportCollector
+    {
+        return new ExportCollector(
+            $this->data,
+            $this->repo->exportFile(),
+            $obj_id,
+            $type
+        );
     }
 }

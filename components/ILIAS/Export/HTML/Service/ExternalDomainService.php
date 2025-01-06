@@ -18,28 +18,31 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Export;
+namespace ILIAS\Export\HTML;
 
-/**
- * @author Alexander Killing <killing@leifos.de>
- */
-class Service
+use ILIAS\Repository\GlobalDICDomainServices;
+use ILIAS\Export\HTML\RepoService;
+use ILIAS\Export\HTML\DataService;
+use ILIAS\Export\InternalDomainService;
+use ILIAS\components\Export\HTML\ExportCollector;
+
+class ExternalDomainService
 {
     protected static array $instance = [];
-    public function __construct()
-    {
+
+    public function __construct(
+        protected InternalDomainService $internal_domain
+    ) {
     }
 
-    public function internal(): InternalService
+    public function collector(
+        int $obj_id,
+        string $type = ""
+    ) : ExportCollector
     {
-        return self::$instance["internal"] ??= new InternalService();
-    }
-
-    public function domain(): ExternalDomainService
-    {
-        return self::$instance["domain"] ??= new ExternalDomainService(
-            $this->internal()->domain()
+        return $this->internal_domain->html()->collector(
+            $obj_id,
+            $type
         );
     }
-
 }

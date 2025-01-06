@@ -20,26 +20,21 @@ declare(strict_types=1);
 
 namespace ILIAS\Export;
 
-/**
- * @author Alexander Killing <killing@leifos.de>
- */
-class Service
+use ILIAS\Repository\GlobalDICDomainServices;
+
+class ExternalDomainService
 {
     protected static array $instance = [];
-    public function __construct()
-    {
+
+    public function __construct(
+        protected InternalDomainService $internal_domain
+    ) {
     }
 
-    public function internal(): InternalService
+    public function html() : HTML\ExternalDomainService
     {
-        return self::$instance["internal"] ??= new InternalService();
-    }
-
-    public function domain(): ExternalDomainService
-    {
-        return self::$instance["domain"] ??= new ExternalDomainService(
-            $this->internal()->domain()
+        return self::$instance['html'] ??= new HTML\ExternalDomainService(
+            $this->internal_domain
         );
     }
-
 }

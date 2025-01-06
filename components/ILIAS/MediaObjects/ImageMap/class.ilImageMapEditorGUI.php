@@ -407,7 +407,7 @@ class ilImageMapEditorGUI
             $form = $this->initAreaEditingForm($a_edit_property);
             $this->tpl->setVariable("FORM", $form->getHTML());
         }
-        
+
         $ilCtrl->setParameter($this, "out_edit_property", $a_edit_property);
         $ilCtrl->setParameter($this, "out_area_nr", $a_area_nr);
         $ilCtrl->setParameter($this, "out_output_new_area", (int) $a_output_new_area);

@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace ILIAS\Export\HTML;
 
+use ILIAS\components\Export\HTML\ExportException;
+
 class DataService
 {
     public function __construct()
@@ -33,5 +35,12 @@ class DataService
         string $type
     ): ExportFile {
         return new ExportFile($object_id, $rid, $timestamp, $type);
+    }
+
+    public function exportException(
+        string $message
+    ) : ExportException
+    {
+        return new ExportException($message);
     }
 }

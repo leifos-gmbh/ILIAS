@@ -26,6 +26,7 @@ use ILIAS\Filesystem\Util\Convert\ImageOutputOptions;
 use ILIAS\Filesystem\Stream\Stream;
 use _PHPStan_9815bbba4\Nette\Neon\Exception;
 use ILIAS\ResourceStorage\Resource\StorableResource;
+use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 
 class MediaObjectManager
 {
@@ -96,6 +97,12 @@ class MediaObjectManager
         int $mob_id
     ): ?StorableResource {
         return $this->repo->getContainerResource($mob_id);
+    }
+
+    public function getContainerResourceId(
+        int $mob_id
+    ): ?ResourceIdentification {
+        return $this->repo->getContainerResourceId($mob_id);
     }
 
     public function getFilesOfPath(

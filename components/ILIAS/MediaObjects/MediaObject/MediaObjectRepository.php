@@ -26,6 +26,7 @@ use ILIAS\FileUpload\DTO\UploadResult;
 use ILIAS\Filesystem\Stream\ZIPStream;
 use ILIAS\Filesystem\Stream\FileStream;
 use ILIAS\ResourceStorage\Resource\StorableResource;
+use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 
 class MediaObjectRepository
 {
@@ -154,6 +155,12 @@ class MediaObjectRepository
         int $mob_id
     ): ?StorableResource {
         return $this->irss->getResource($this->getRidForMobId($mob_id));
+    }
+
+    public function getContainerResourceId(
+        int $mob_id
+    ): ?ResourceIdentification {
+        return $this->irss->getResourceIdForIdString($this->getRidForMobId($mob_id));
     }
 
     public function removeLocation(

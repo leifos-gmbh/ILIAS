@@ -1355,7 +1355,8 @@ class ilPageObjectGUI
                 true,
                 $link_xml . $template_xml . $this->getComponentPluginsXML(),
                 false,
-                $this->getStyleId()
+                $this->getStyleId(),
+                $this->getOutputMode() === "offline"
             );
         }
 

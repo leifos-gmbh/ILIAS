@@ -25,6 +25,7 @@ use ILIAS\components\Export\HTML\ExportCollector;
  */
 class ilCOPageHTMLExport
 {
+    protected \ILIAS\MediaObjects\MediaObjectManager $media_manager;
     protected \ILIAS\Style\Content\InternalDomainService $content_style;
     protected \ILIAS\COPage\Xsl\XslManager $xsl;
     protected string $mp3_dir = "";
@@ -62,7 +63,6 @@ class ilCOPageHTMLExport
         protected ?ExportCollector $export_collector = null
     ) {
         global $DIC;
-
         $this->log = ilLoggerFactory::getLogger('copg');
         $this->user = $DIC->user();
         $this->global_screen = $DIC->globalScreen();
@@ -90,6 +90,7 @@ class ilCOPageHTMLExport
         $this->css_dir = $a_exp_dir . '/css';
         $this->xsl = $DIC->copage()->internal()->domain()->xsl();
         $this->content_style = $DIC->contentStyle()->internal()->domain();
+        $this->media_manager = $DIC->mediaObjects()->internal()->domain()->mediaObject();
     }
 
     public function setContentStyleId(int $a_val): void
@@ -138,16 +139,16 @@ class ilCOPageHTMLExport
                     $this->exp_dir . "/" . ilObjStyleSheet::getBasicImageDir()
                 );
                 ilFileUtils::makeDirParents($this->exp_dir . "/components/ILIAS/COPage/css");
-                copy("components/ILIAS/COPage/resources/content.css",
+                copy("../components/ILIAS/COPage/resources/content.css",
                     $this->exp_dir . "/components/ILIAS/COPage/css/content.css");
             } else {
                 $this->export_collector->addDirectory(
                     ilObjStyleSheet::getBasicImageDir(),
-                    ilObjStyleSheet::getBasicImageDir()
+                    "/basic_style/images"
                 );
                 $this->export_collector->addFile(
-                    "components/ILIAS/COPage/resources/content.css",
-                    "/components/ILIAS/COPage/css/content.css"
+                    "../components/ILIAS/COPage/css/content.css",
+                    ilObjStyleSheet::getExportContentStylePath()
                 );
             }
         } else {
@@ -508,10 +509,21 @@ class ilCOPageHTMLExport
     ): void {
         $this->log->debug("export html mobs");
 
-        $source_dir = ilFileUtils::getWebspaceDir() . "/mobs/mm_" . $a_mob_id;
-        if (is_dir($source_dir)) {
-            ilFileUtils::makeDir($this->mobs_dir . "/mm_" . $a_mob_id);
-            ilFileUtils::rCopy($source_dir, $this->mobs_dir . "/mm_" . $a_mob_id);
+        if (is_null($this->export_collector)) {
+            $source_dir = ilFileUtils::getWebspaceDir() . "/mobs/mm_" . $a_mob_id;
+            if (is_dir($source_dir)) {
+                ilFileUtils::makeDir($this->mobs_dir . "/mm_" . $a_mob_id);
+                ilFileUtils::rCopy($source_dir, $this->mobs_dir . "/mm_" . $a_mob_id);
+            }
+        } else {
+            $mob_res_id = $this->media_manager->getContainerResourceId($a_mob_id);
+            if ($mob_res_id) {
+                $this->export_collector->addContainerDirectory(
+                    $mob_res_id->serialize(),
+                    "",
+                    "/mobs/mm_" . $a_mob_id,
+                );
+            }
         }
 
         $mob_obj = new ilObjMediaObject($a_mob_id);
@@ -533,22 +545,30 @@ class ilCOPageHTMLExport
 
         $tpl->setVariable("MEDIA_CONTENT", $this->renderMob($mob_obj, $link_xml, $params));
         $html = $tpl->printToString();
-        $file = $this->exp_dir . "/media_" . $a_mob_id . ".html";
-        $fp = fopen($file, "w+");
-        fwrite($fp, $html);
-        fclose($fp);
-        unset($fp);
+        if (is_null($this->export_collector)) {
+            $file = $this->exp_dir . "/media_" . $a_mob_id . ".html";
+            $fp = fopen($file, "w+");
+            fwrite($fp, $html);
+            fclose($fp);
+            unset($fp);
+        } else {
+            $this->export_collector->addString($html, "/media_" . $a_mob_id . ".html");
+        }
 
         if ($mob_obj->hasFullscreenItem()) {
             $tpl = $this->initResourceTemplate("tpl.fullscreen.html");
             $params["mode"] = "fullscreen";
             $tpl->setVariable("MEDIA_CONTENT", $this->renderMob($mob_obj, $link_xml, $params));
             $html = $tpl->printToString();
-            $file = $this->exp_dir . "/fullscreen_" . $a_mob_id . ".html";
-            $fp = fopen($file, "w+");
-            fwrite($fp, $html);
-            fclose($fp);
-            unset($fp);
+            if (is_null($this->export_collector)) {
+                $file = $this->exp_dir . "/fullscreen_" . $a_mob_id . ".html";
+                $fp = fopen($file, "w+");
+                fwrite($fp, $html);
+                fclose($fp);
+                unset($fp);
+            } else {
+                $this->export_collector->addString($html, "/fullscreen_" . $a_mob_id . ".html");
+            }
         }
 
         $linked_mobs = $mob_obj->getLinkedMediaObjects();

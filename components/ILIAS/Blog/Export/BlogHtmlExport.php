@@ -65,7 +65,7 @@ class BlogHtmlExport
 
         $this->global_screen = $DIC->globalScreen();
         $this->export_util = new Util("", "", $this->collector);
-        $this->co_page_html_export = new \ilCOPageHTMLExport($this->target_dir);
+        $this->co_page_html_export = new \ilCOPageHTMLExport($this->target_dir, null, 0, $this->collector);
         $this->tabs = $DIC->tabs();
         $this->lng = $DIC->language();
 
@@ -135,10 +135,10 @@ class BlogHtmlExport
 /*
         // export comments user images
         $this->exportUserImages();
-
+*/
         $this->export_util->exportResourceFiles();
         $this->co_page_html_export->exportPageElements();
-*/
+
         return $this->zipPackage();
     }
 

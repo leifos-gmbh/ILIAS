@@ -474,12 +474,11 @@ class ilObjMediaObject extends ilObject
     public function getXML(
         int $a_mode = IL_MODE_FULL,
         int $a_inst = 0,
-        bool $a_sign_locals = false
+        bool $a_sign_locals = false,
+        bool $offline = false
     ): string {
         $ilUser = $this->user;
         $xml = "";
-        // TODO: full implementation of all parameters
-        //echo "-".$a_mode."-";
         switch ($a_mode) {
             case IL_MODE_ALIAS:
                 $xml = "<MediaObject>";
@@ -541,10 +540,14 @@ class ilObjMediaObject extends ilObject
                             $location = ilWACSignedPath::signFile($this->getDataDirectory() . "/" . $item->getLocation());
                             $location = substr($location, strrpos($location, "/") + 1);
                         } else {
-                            $location = $this->manager->getLocalSrc(
-                                $this->getId(),
-                                $item->getLocation()
-                            );
+                            if ($offline) {
+                                $location = $item->getLocation();
+                            } else {
+                                $location = $this->manager->getLocalSrc(
+                                    $this->getId(),
+                                    $item->getLocation()
+                                );
+                            }
                         }
                     } else {
                         $location = $item->getLocation();

@@ -238,7 +238,9 @@ class ilTimeZone
         if (!strlen($tz)) {
             $tz = 'UTC';
         }
-        date_default_timezone_set($tz);
+        if (in_array($tz, timezone_identifiers_list())) {
+            date_default_timezone_set($tz);
+        }
         return $tz;
     }
 }

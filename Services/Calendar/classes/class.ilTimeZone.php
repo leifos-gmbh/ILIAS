@@ -164,6 +164,10 @@ class ilTimeZone
 
         // PHP >= 5.2.0
         if (function_exists('date_default_timezone_set')) {
+            if (!in_array($a_timezone, timezone_identifiers_list())) {
+                $logger->info('Invalid timezone given. Timezone: ' . $a_timezone);
+                return true;
+            }
             if (!date_default_timezone_set($a_timezone)) {
                 $logger->info('Invalid timezone given. Timezone: ' . $a_timezone);
                 throw new ilTimeZoneException('Invalid timezone given');

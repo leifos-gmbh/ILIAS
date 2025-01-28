@@ -174,7 +174,7 @@ class Recursion implements TreeRecursion
         ElementInterface ...$elements
     ): string {
         if (!$with_representation) {
-            $name =  $this->presenter->elements()->name(
+            $name = $this->presenter->elements()->name(
                 $elements[0],
                 $plural
             );
@@ -229,7 +229,7 @@ class Recursion implements TreeRecursion
             $skip_last_id = false;
         }
         $path_string = $builder->get()->toString();
-        return $this->link_factory->custom(Command::SHOW_FULL)
+        return $this->link_factory->standard(Command::SHOW_FULL)
                                   ->withParameter(Parameter::BASE_PATH, $path_string)
                                   ->get();
     }

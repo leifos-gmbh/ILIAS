@@ -29,7 +29,6 @@ interface RequestParserInterface
     public function fetchActionPath(): PathInterface;
 
     public function fetchRequest(
-        bool $with_action_path,
         bool $apply_to_forms
     ): RequestInterface;
 }

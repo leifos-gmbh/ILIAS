@@ -20,31 +20,32 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Editor\Full\Services\Actions;
 
+use ILIAS\UI\Component\Prompt\Prompt;
 use ILIAS\UI\Component\Modal\Modal;
 use ILIAS\UI\Component\Signal as Signal;
 
 class FlexibleModal
 {
-    protected ?Modal $modal = null;
+    protected Modal|Prompt|null $component = null;
     protected FlexibleSignal $flexible_signal;
 
-    public function __construct(Modal|string $modal_or_link)
+    public function __construct(Modal|Prompt|string $component_or_link)
     {
-        if (is_string($modal_or_link)) {
+        if (is_string($component_or_link)) {
             $this->flexible_signal = new FlexibleSignal(
-                $modal_or_link
+                $component_or_link
             );
         } else {
-            $this->modal = $modal_or_link;
+            $this->component = $component_or_link;
             $this->flexible_signal = new FlexibleSignal(
-                $this->modal->getShowSignal()
+                $this->component->getShowSignal()
             );
         }
     }
 
-    public function getModal(): ?Modal
+    public function getComponent(): Modal|Prompt|null
     {
-        return $this->modal;
+        return $this->component;
     }
 
     public function getFlexibleSignal(): FlexibleSignal

@@ -63,10 +63,9 @@ class TableContent
                 $element,
                 $request
             );
-            $delete_modal = $this->services->actions()->getModal()->delete(
+            $delete_modal = $this->services->actions()->getModal()->deletePlaceholder(
                 $base_path,
-                $element,
-                true
+                $element
             );
             $builder = $builder->withAdditionalRow(
                 $element,

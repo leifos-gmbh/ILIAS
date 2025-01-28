@@ -33,15 +33,18 @@ class LinkBuilder implements LinkBuilderInterface
      */
     protected array $parameters = [];
     protected Command $command;
+    protected bool $is_async;
 
     public function __construct(
         \ilCtrlInterface $ctrl,
         DataFactory $data_factory,
-        Command $command
+        Command $command,
+        bool $is_async
     ) {
         $this->ctrl = $ctrl;
         $this->data_factory = $data_factory;
         $this->command = $command;
+        $this->is_async = $is_async;
     }
 
     public function withParameter(
@@ -65,7 +68,9 @@ class LinkBuilder implements LinkBuilderInterface
         }
         $link = ILIAS_HTTP_PATH . '/' . $this->ctrl->getLinkTargetByClass(
             $class,
-            $this->command->value
+            $this->command->value,
+            null,
+            $this->is_async
         );
         $this->ctrl->clearParametersByClass($class);
         return $this->data_factory->uri($link);

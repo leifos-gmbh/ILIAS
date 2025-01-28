@@ -35,6 +35,7 @@ use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as Const
 use ILIAS\MetaData\Repository\Validation\Dictionary\Restriction;
 use ILIAS\MetaData\Paths\FactoryInterface;
 use ILIAS\MetaData\Editor\Http\RequestInterface;
+use ILIAS\UI\Component\Prompt\State\State;
 
 class ModalFactory
 {
@@ -66,27 +67,40 @@ class ModalFactory
         $this->path_factory = $path_factory;
     }
 
-    public function delete(
+    public function deletePlaceholder(
         PathInterface $base_path,
-        ElementInterface $to_be_deleted,
-        bool $props_from_data = false
+        ElementInterface $to_be_deleted
     ): ?FlexibleModal {
         if (!$this->isDeletable($to_be_deleted)) {
             return null;
         }
 
-        $action = $this->link_provider->delete(
+        $async_url = $this->link_provider->async(
             $base_path,
-            $to_be_deleted
+            $to_be_deleted,
+            Command::SHOW_DELETE_FULL_ASYNC
+        );
+        $modal = $this->factory->modal()->interruptive(
+            '',
+            '',
+            ''
+        )->withAsyncRenderUrl((string) $async_url);
+        return new FlexibleModal($modal);
+    }
+
+    public function deleteContent(
+        PathInterface $base_path,
+        ElementInterface $to_be_deleted
+    ): FlexibleModal {
+        $action = $this->link_provider->standard(
+            $base_path,
+            $to_be_deleted,
+            Command::DELETE_FULL
         );
 
         $items = [];
         $index = 0;
-        if ($props_from_data) {
-            $content = $this->properties_fetcher->getPropertiesByData($to_be_deleted);
-        } else {
-            $content = $this->properties_fetcher->getPropertiesByPreview($to_be_deleted);
-        }
+        $content = $this->properties_fetcher->getPropertiesByData($to_be_deleted);
         foreach ($content as $key => $value) {
             $items[] = $this->factory->modal()->interruptiveItem()->keyValue(
                 'md_delete_' . $index,
@@ -108,99 +122,86 @@ class ModalFactory
         return new FlexibleModal($modal);
     }
 
-    public function update(
+    public function updatePlaceholder(
+        PathInterface $base_path,
+        ElementInterface $to_be_updated
+    ): FlexibleModal {
+        $async_url = $this->link_provider->async(
+            $base_path,
+            $to_be_updated,
+            Command::SHOW_UPDATE_FULL_ASYNC
+        );
+        return new FlexibleModal($this->factory->prompt()->standard($async_url));
+    }
+
+    public function updateContent(
         PathInterface $base_path,
         ElementInterface $to_be_updated,
         RequestInterface $request
-    ): FlexibleModal {
+    ): State {
         $form = $this->form_factory->getUpdateForm(
             $base_path,
             $to_be_updated,
+            true,
             false
         );
-        $modal = $this->getRoundtripModal(
-            $to_be_updated,
-            $form,
-            Command::UPDATE_FULL,
-            $request
+        if ($request->shouldBeAppliedToForms()) {
+            $form = $request->applyRequestToForm($form);
+        }
+        $show_state = $this->factory->prompt()->state()->show($form)->withTitle(
+            $this->getModalTitle(Command::UPDATE_FULL_ASYNC, $to_be_updated)
         );
 
-        return new FlexibleModal($modal);
+        return $show_state;
     }
 
-    public function create(
+    public function createPlaceholder(
         PathInterface $base_path,
-        ElementInterface $to_be_created,
-        RequestInterface $request
+        ElementInterface $to_be_created
     ): FlexibleModal {
+        // TODO find a better way to do this, maybe pull out of here? or use prompts to redirect
         $form = $this->form_factory->getCreateForm(
             $base_path,
             $to_be_created,
             false
         );
-        // if the modal is empty, directly return the form action
+        // if the form is empty, directly return the form action
         if (empty($form->getInputs())) {
-            return new FlexibleModal($form->getPostURL());
-        }
-
-        $modal = $this->getRoundtripModal(
-            $to_be_created,
-            $form,
-            Command::CREATE_FULL,
-            $request
-        );
-
-        return new FlexibleModal($modal);
-    }
-
-    protected function getRoundtripModal(
-        ElementInterface $element,
-        StandardForm $form,
-        Command $action_cmd,
-        RequestInterface $request
-    ): RoundtripModal {
-        $modal = $this->factory->modal()->roundtrip(
-            $this->getModalTitle($action_cmd, $element),
-            null,
-            $form->getInputs(),
-            $form->getPostURL()
-        );
-        return $this->handleError($modal, $element, $request);
-    }
-
-    protected function handleError(
-        RoundtripModal $modal,
-        ElementInterface $element,
-        RequestInterface $request
-    ): RoundtripModal {
-        if (!$request->shouldBeAppliedToForms()) {
-            return $modal;
-        }
-        $action_path = $this->path_factory->toElement($element, true);
-        if (strtolower($action_path->toString()) !== strtolower($request->path()?->toString() ?? '')) {
-            return $modal;
-        }
-        // For error handling, make the modal open on load and pass request
-        $modal = $request->applyRequestToModal($modal);
-
-        /*
-         * Show error message in a box, since KS groups don't pass along
-         * errors on their own.
-         */
-        if (
-            ($group = $modal->getInputs()[0]) instanceof Group &&
-            $error = $group->getError()
-        ) {
-            $modal = $this->factory->modal()->roundtrip(
-                $modal->getTitle(),
-                [$this->factory->messageBox()->failure($error)],
-                $modal->getInputs(),
-                $modal->getPostURL()
+            $link = $this->link_provider->standard(
+                $base_path,
+                $to_be_created,
+                Command::CREATE_FULL
             );
-            $modal = $request->applyRequestToModal($modal);
+            return new FlexibleModal((string) $link);
         }
 
-        return $modal->withOnLoad($modal->getShowSignal());
+        $async_url = $this->link_provider->async(
+            $base_path,
+            $to_be_created,
+            Command::SHOW_CREATE_FULL_ASYNC
+        );
+        return new FlexibleModal($this->factory->prompt()->standard($async_url));
+    }
+
+    public function createContent(
+        PathInterface $base_path,
+        ElementInterface $to_be_created,
+        RequestInterface $request
+    ): State {
+        $form = $this->form_factory->getCreateForm(
+            $base_path,
+            $to_be_created,
+            false
+        );
+
+        if ($request->shouldBeAppliedToForms()) {
+            $form = $request->applyRequestToForm($form);
+        }
+        $show_state = $this->factory->prompt()->state()->show($form)->withTitle(
+            $this->getModalTitle(Command::CREATE_FULL_ASYNC, $to_be_created)
+        );
+
+        return $show_state;
     }
 
     protected function getModalTitle(
@@ -208,11 +209,11 @@ class ModalFactory
         ElementInterface $element
     ): string {
         switch ($action_cmd) {
-            case Command::UPDATE_FULL:
+            case Command::UPDATE_FULL_ASYNC:
                 $title_key = 'meta_edit_element';
                 break;
 
-            case Command::CREATE_FULL:
+            case Command::CREATE_FULL_ASYNC:
                 $title_key = 'meta_add_element';
                 break;
 

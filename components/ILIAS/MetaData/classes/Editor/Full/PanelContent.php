@@ -28,7 +28,6 @@ use ILIAS\UI\Component\Panel\Panel;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Implementation\Component\Listing\CharacteristicValue\Text as Listing;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
-use ILIAS\MetaData\Editor\Http\RequestInterface;
 
 class PanelContent
 {
@@ -52,14 +51,12 @@ class PanelContent
     public function content(
         PathInterface $base_path,
         ElementInterface $element,
-        bool $is_subpanel,
-        RequestInterface $request
+        bool $is_subpanel
     ): \Generator {
         $buttons = [];
-        $delete_modal = $this->services->actions()->getModal()->delete(
+        $delete_modal = $this->services->actions()->getModal()->deletePlaceholder(
             $base_path,
-            $element,
-            true
+            $element
         );
         if ($delete_modal) {
             $buttons[] = $this->services->actions()->getButton()->delete(
@@ -73,10 +70,9 @@ class PanelContent
             if (!$sub->isScaffold()) {
                 continue;
             }
-            $create_modal = $this->services->actions()->getModal()->create(
+            $create_modal = $this->services->actions()->getModal()->createPlaceholder(
                 $base_path,
-                $sub,
-                $request
+                $sub
             );
             $buttons[] = $this->services->actions()->getButton()->create(
                 $create_modal->getFlexibleSignal(),

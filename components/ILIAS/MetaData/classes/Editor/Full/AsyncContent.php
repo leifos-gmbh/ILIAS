@@ -20,15 +20,14 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Editor\Full;
 
-use ILIAS\UI\Component\Button\Button;
-use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
+use ILIAS\UI\Component\Prompt\State\State;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Editor\Full\Services\Services as FullEditorServices;
 use ILIAS\MetaData\Editor\Full\Services\Actions\FlexibleModal;
 use ILIAS\MetaData\Editor\Http\RequestInterface;
 
-class FormContent
+class AsyncContent
 {
     protected FullEditorServices $services;
 
@@ -38,35 +37,29 @@ class FormContent
         $this->services = $services;
     }
 
-    /**
-     * @return StandardForm[]|FlexibleModal[]|Button[]
-     */
-    public function content(
+    public function contentForEdit(
         PathInterface $base_path,
         ElementInterface $element,
         RequestInterface $request
-    ): \Generator {
-        $delete_modal = $this->services->actions()->getModal()->deletePlaceholder(
-            $base_path,
-            $element
-        );
-        if ($delete_modal) {
-            $button = $this->services->actions()->getButton()->delete(
-                $delete_modal->getFlexibleSignal(),
-                false,
-                true
+    ): State {
+        if ($element->isScaffold()) {
+            return $this->services->actions()->getModal()->createContent(
+                $base_path,
+                $element,
+                $request
             );
-            yield ContentType::MODAL => $delete_modal;
-            yield ContentType::TOOLBAR => $button;
         }
-        $form = $this->services->formFactory()->getUpdateForm(
+        return $this->services->actions()->getModal()->updateContent(
             $base_path,
             $element,
-            false
+            $request
         );
-        if ($request->shouldBeAppliedToForms()) {
-            $form = $request->applyRequestToForm($form);
-        }
-        yield ContentType::MAIN => $form;
+    }
+
+    public function contentForDelete(
+        PathInterface $base_path,
+        ElementInterface $element
+    ): FlexibleModal {
+        return $this->services->actions()->getModal()->deleteContent($base_path, $element);
     }
 }

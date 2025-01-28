@@ -22,5 +22,7 @@ namespace ILIAS\MetaData\Editor\Http;
 
 interface LinkFactoryInterface
 {
-    public function custom(Command $command): LinkBuilderInterface;
+    public function standard(Command $command): LinkBuilderInterface;
+
+    public function async(Command $command): LinkBuilderInterface;
 }

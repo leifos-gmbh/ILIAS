@@ -27,13 +27,9 @@ use ILIAS\UI\Component\Table\Data as DataTable;
 
 interface RequestInterface
 {
-    public function path(): ?PathInterface;
-
     public function shouldBeAppliedToForms(): bool;
 
     public function applyRequestToForm(StandardForm $form): StandardForm;
-
-    public function applyRequestToModal(RoundtripModal $modal): RoundtripModal;
 
     public function applyRequestToDataTable(DataTable $table): DataTable;
 }

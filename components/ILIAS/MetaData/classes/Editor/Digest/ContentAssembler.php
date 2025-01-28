@@ -103,7 +103,7 @@ class ContentAssembler
         }
         $sections[self::TYPICAL_LEARNING_TIME] = $this->getTypicalLearningTimeSection($set);
         $form = $this->ui_factory->input()->container()->form()->standard(
-            (string) $this->link_factory->custom(Command::UPDATE_DIGEST)->get(),
+            (string) $this->link_factory->standard(Command::UPDATE_DIGEST)->get(),
             $sections
         );
 
@@ -270,7 +270,7 @@ class ContentAssembler
         $modal = $this->ui_factory->modal()->interruptive(
             $this->presenter->utilities()->txt("meta_copyright_change_warning_title"),
             $message,
-            (string) $this->link_factory->custom(Command::UPDATE_DIGEST)->get()
+            (string) $this->link_factory->standard(Command::UPDATE_DIGEST)->get()
         );
 
         return $modal;

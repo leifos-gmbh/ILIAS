@@ -52,12 +52,10 @@ class RequestParser implements RequestParserInterface
     }
 
     public function fetchRequest(
-        bool $with_action_path,
         bool $apply_to_forms
     ): RequestInterface {
         return new Request(
             $request = $this->http->request(),
-            $with_action_path ? $this->fetchActionPath() : null,
             $apply_to_forms
         );
     }

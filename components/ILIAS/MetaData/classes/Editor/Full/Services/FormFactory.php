@@ -29,6 +29,7 @@ use ILIAS\MetaData\Editor\Full\Services\Inputs\InputFactory;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Editor\Dictionary\DictionaryInterface as EditorDictionary;
 use ILIAS\MetaData\Editor\Full\Services\Actions\LinkProvider;
+use ILIAS\MetaData\Editor\Http\Command;
 
 class FormFactory
 {
@@ -55,9 +56,15 @@ class FormFactory
     public function getUpdateForm(
         PathInterface $base_path,
         ElementInterface $element,
+        bool $async,
         bool $with_title = true
     ): StandardForm {
-        $link = $this->link_provider->update($base_path, $element);
+        if ($async) {
+            $link = $this->link_provider->async($base_path, $element, Command::UPDATE_FULL_ASYNC);
+        } else {
+            $link = $this->link_provider->standard($base_path, $element, Command::UPDATE_FULL);
+        }
+
 
         return $this->getFormForElement(
             $base_path,
@@ -74,7 +81,7 @@ class FormFactory
         ElementInterface $element,
         bool $with_title = true
     ): StandardForm {
-        $link = $this->link_provider->create($base_path, $element);
+        $link = $this->link_provider->async($base_path, $element, Command::CREATE_FULL_ASYNC);
         $editor_tag = $this->editor_dictionary->tagForElement($element);
         $context_element = $element;
         if ($created_with = $editor_tag?->createdWith()) {

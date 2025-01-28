@@ -59,6 +59,7 @@ class FullEditorInitiator
                 $presenter,
                 $panel_content
             ),
+            new AsyncContent($services)
         );
     }
 }

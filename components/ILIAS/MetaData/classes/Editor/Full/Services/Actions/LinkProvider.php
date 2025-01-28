@@ -41,46 +41,27 @@ class LinkProvider
         $this->path_factory = $path_factory;
     }
 
-    public function create(
+    public function standard(
         PathInterface $base_path,
-        ElementInterface $to_be_created
-    ): URI {
-        return $this->getLink(
-            $base_path,
-            $this->path_factory->toElement($to_be_created, true),
-            Command::CREATE_FULL
-        );
-    }
-
-    public function update(
-        PathInterface $base_path,
-        ElementInterface $to_be_updated
-    ): URI {
-        return $this->getLink(
-            $base_path,
-            $this->path_factory->toElement($to_be_updated, true),
-            Command::UPDATE_FULL
-        );
-    }
-
-    public function delete(
-        PathInterface $base_path,
-        ElementInterface $to_be_deleted
-    ): URI {
-        return $this->getLink(
-            $base_path,
-            $this->path_factory->toElement($to_be_deleted, true),
-            Command::DELETE_FULL
-        );
-    }
-
-    protected function getLink(
-        PathInterface $base_path,
-        PathInterface $action_path,
+        ElementInterface $action_element,
         Command $action_cmd
     ): URI {
+        $action_path = $this->path_factory->toElement($action_element, true);
         return $this->link_factory
-            ->custom($action_cmd)
+            ->standard($action_cmd)
+            ->withParameter(Parameter::BASE_PATH, $base_path->toString())
+            ->withParameter(Parameter::ACTION_PATH, $action_path->toString())
+            ->get();
+    }
+
+    public function async(
+        PathInterface $base_path,
+        ElementInterface $action_element,
+        Command $action_cmd
+    ): URI {
+        $action_path = $this->path_factory->toElement($action_element, true);
+        return $this->link_factory
+            ->async($action_cmd)
             ->withParameter(Parameter::BASE_PATH, $base_path->toString())
             ->withParameter(Parameter::ACTION_PATH, $action_path->toString())
             ->get();

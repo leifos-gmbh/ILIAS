@@ -29,22 +29,14 @@ use ILIAS\UI\Component\Table\Data as DataTable;
 class Request implements RequestInterface
 {
     protected HttpRequest $request;
-    protected ?PathInterface $path;
     protected bool $apply_to_forms = false;
 
     public function __construct(
         HttpRequest $request,
-        ?PathInterface $path,
         bool $apply_to_forms
     ) {
         $this->request = $request;
-        $this->path = $path;
         $this->apply_to_forms = $apply_to_forms;
-    }
-
-    public function path(): ?PathInterface
-    {
-        return $this->path;
     }
 
     public function shouldBeAppliedToForms(): bool
@@ -55,11 +47,6 @@ class Request implements RequestInterface
     public function applyRequestToForm(StandardForm $form): StandardForm
     {
         return $form->withRequest($this->request);
-    }
-
-    public function applyRequestToModal(RoundtripModal $modal): RoundtripModal
-    {
-        return $modal->withRequest($this->request);
     }
 
     public function applyRequestToDataTable(DataTable $table): DataTable

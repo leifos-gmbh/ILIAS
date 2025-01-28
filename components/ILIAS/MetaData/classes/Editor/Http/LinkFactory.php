@@ -41,8 +41,23 @@ class LinkFactory implements LinkFactoryInterface
         $this->data_factory = $data_factory;
     }
 
-    public function custom(Command $command): LinkBuilderInterface
+    public function standard(Command $command): LinkBuilderInterface
     {
-        return new LinkBuilder($this->ctrl, $this->data_factory, $command);
+        return new LinkBuilder(
+            $this->ctrl,
+            $this->data_factory,
+            $command,
+            false
+        );
+    }
+
+    public function async(Command $command): LinkBuilderInterface
+    {
+        return new LinkBuilder(
+            $this->ctrl,
+            $this->data_factory,
+            $command,
+            true
+        );
     }
 }

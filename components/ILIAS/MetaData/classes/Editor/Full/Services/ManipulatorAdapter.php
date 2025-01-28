@@ -64,10 +64,20 @@ class ManipulatorAdapter
     ): bool {
         $action_element = $this->navigator_factory->navigator($action_path, $set->getRoot())
                                                   ->lastElementAtFinalStep();
-        $form = $this->form_factory->getCreateForm(
-            $base_path,
-            $action_element,
-        );
+        if ($action_element->isScaffold()) {
+            $form = $this->form_factory->getCreateForm(
+                $base_path,
+                $action_element,
+                false
+            );
+        } else {
+            $form = $this->form_factory->getUpdateForm(
+                $base_path,
+                $action_element,
+                false,
+                false
+            );
+        }
         $data = [];
         if (
             !empty($form->getInputs()) &&

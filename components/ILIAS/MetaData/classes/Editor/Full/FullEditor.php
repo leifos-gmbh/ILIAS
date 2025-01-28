@@ -34,6 +34,7 @@ use ILIAS\MetaData\Editor\Full\Services\ManipulatorAdapter;
 use ILIAS\MetaData\Editor\Full\Services\Actions\FlexibleModal;
 use ILIAS\MetaData\Editor\Http\RequestInterface;
 use ILIAS\UI\Component\Table\Data as DataTable;
+use ILIAS\UI\Component\Prompt\State\State;
 
 class FullEditor
 {
@@ -49,6 +50,7 @@ class FullEditor
     protected TableContent $table_content;
     protected PanelContent $panel_content;
     protected RootContent $root_content;
+    protected AsyncContent $async_content;
 
     public function __construct(
         EditorDictionaryInterface $editor_dictionary,
@@ -57,7 +59,8 @@ class FullEditor
         FormContent $form_content,
         TableContent $table_content,
         PanelContent $panel_content,
-        RootContent $root_content
+        RootContent $root_content,
+        AsyncContent $async_content
     ) {
         $this->editor_dictionary = $editor_dictionary;
         $this->navigator_factory = $navigator_factory;
@@ -66,11 +69,31 @@ class FullEditor
         $this->table_content = $table_content;
         $this->panel_content = $panel_content;
         $this->root_content = $root_content;
+        $this->async_content = $async_content;
     }
 
     public function manipulateMD(): ManipulatorAdapter
     {
         return $this->services->manipulatorAdapter();
+    }
+
+    public function getAsyncContentForEdit(
+        SetInterface $set,
+        PathInterface $base_path,
+        PathInterface $action_path,
+        RequestInterface $request
+    ): State {
+        $element = $this->getElements($set, $action_path)[0];
+        return $this->async_content->contentForEdit($base_path, $element, $request);
+    }
+
+    public function getAsyncContentForDelete(
+        SetInterface $set,
+        PathInterface $base_path,
+        PathInterface $action_path
+    ): FlexibleModal {
+        $element = $this->getElements($set, $action_path)[0];
+        return $this->async_content->contentForDelete($base_path, $element);
     }
 
     /**
@@ -103,16 +126,14 @@ class FullEditor
                 yield from $this->panel_content->content(
                     $base_path,
                     $elements[0],
-                    false,
-                    $request,
+                    false
                 );
                 return;
 
             case self::ROOT:
                 yield from $this->root_content->content(
                     $base_path,
-                    $elements[0],
-                    $request
+                    $elements[0]
                 );
                 return;
 

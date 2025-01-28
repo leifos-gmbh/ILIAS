@@ -54,13 +54,11 @@ class RootContent
      */
     public function content(
         PathInterface $base_path,
-        ElementInterface $element,
-        RequestInterface $request
+        ElementInterface $element
     ): \Generator {
         yield from $this->createModalsAndDropdown(
             $base_path,
-            $element,
-            $request
+            $element
         );
 
         $content = [];
@@ -74,8 +72,7 @@ class RootContent
             $sub_content = $this->panel_content->content(
                 $base_path,
                 $sub,
-                true,
-                $request
+                true
             );
             foreach ($sub_content as $type => $entity) {
                 if ($type === ContentType::MAIN) {
@@ -98,18 +95,16 @@ class RootContent
      */
     protected function createModalsAndDropdown(
         PathInterface $base_path,
-        ElementInterface $element,
-        RequestInterface $request
+        ElementInterface $element
     ): \Generator {
         $buttons = [];
         foreach ($element->getSubElements() as $sub) {
             if (!$sub->isScaffold()) {
                 continue;
             }
-            $create_modal = $this->services->actions()->getModal()->create(
+            $create_modal = $this->services->actions()->getModal()->createPlaceholder(
                 $base_path,
-                $sub,
-                $request
+                $sub
             );
             $buttons[] = $this->services->actions()->getButton()->create(
                 $create_modal->getFlexibleSignal(),

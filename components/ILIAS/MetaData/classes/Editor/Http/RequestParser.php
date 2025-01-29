@@ -24,9 +24,12 @@ use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactoryInterface;
+use ILIAS\UI\URLBuilder;
 
 class RequestParser implements RequestParserInterface
 {
+    use NamespaceHelper;
+
     protected GlobalHttpState $http;
     protected Refinery $refinery;
     protected PathFactoryInterface $path_factory;
@@ -51,6 +54,26 @@ class RequestParser implements RequestParserInterface
         return $this->fetchPath(Parameter::ACTION_PATH, true);
     }
 
+    public function fetchAction(): StandardAction
+    {
+        $action_string = $this->fetchActionAsString(Parameter::ACTION);
+        $action = StandardAction::tryFrom($action_string);
+        if ($action !== null) {
+            return $action;
+        }
+        throw new \ilMDEditorException('No valid action parameter found.');
+    }
+
+    public function fetchAsyncAction(): AsyncAction
+    {
+        $action_string = $this->fetchActionAsString(Parameter::ASYNC_ACTION);
+        $action = AsyncAction::tryFrom($action_string);
+        if ($action !== null) {
+            return $action;
+        }
+        throw new \ilMDEditorException('No valid action parameter found.');
+    }
+
     public function fetchRequest(
         bool $apply_to_forms
     ): RequestInterface {
@@ -64,10 +87,11 @@ class RequestParser implements RequestParserInterface
         Parameter $parameter,
         bool $throw_error
     ): PathInterface {
+        $name = $this->buildParameterName($parameter);
         $request_wrapper = $this->http->wrapper()->query();
-        if ($request_wrapper->has($parameter->value)) {
+        if ($request_wrapper->has($name)) {
             $path_string = $request_wrapper->retrieve(
-                $parameter->value,
+                $name,
                 $this->refinery->kindlyTo()->string()
             );
             return $this->path_factory->fromString(urldecode($path_string));
@@ -77,5 +101,24 @@ class RequestParser implements RequestParserInterface
         } else {
             return $this->path_factory->custom()->get();
         }
+    }
+
+    protected function fetchActionAsString(Parameter $parameter): string
+    {
+        $name = $this->buildParameterName($parameter);
+        $request_wrapper = $this->http->wrapper()->query();
+        if ($request_wrapper->has($name)) {
+            return $request_wrapper->retrieve(
+                $name,
+                $this->refinery->kindlyTo()->string()
+            );
+        }
+        throw new \ilMDEditorException('No valid action parameter found.');
+    }
+
+    protected function buildParameterName(Parameter $parameter): string
+    {
+        return implode(URLBuilder::SEPARATOR, self::NAMESPACE) .
+            URLBuilder::SEPARATOR . $parameter->value;
     }
 }

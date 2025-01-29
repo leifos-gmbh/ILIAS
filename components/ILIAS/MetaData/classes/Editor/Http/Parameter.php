@@ -22,6 +22,8 @@ namespace ILIAS\MetaData\Editor\Http;
 
 enum Parameter: string
 {
-    case BASE_PATH = 'md_base_path';
-    case ACTION_PATH = 'md_action_path';
+    case BASE_PATH = 'base_path';
+    case ACTION = 'action';
+    case ASYNC_ACTION = 'async_action';
+    case ACTION_PATH = 'action_path';
 }

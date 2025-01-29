@@ -38,7 +38,10 @@ use ILIAS\MetaData\Editor\Digest\ContentType as DigestContentType;
 use ILIAS\MetaData\Editor\Digest\DigestInitiator;
 use ILIAS\MetaData\Editor\Digest\Digest;
 use ILIAS\MetaData\XML\Writer\WriterInterface as XMLWriter;
-use ILIAS\Data\Factory as DataFactory;
+use ILIAS\MetaData\Editor\Http\StandardAction;
+use ILIAS\MetaData\Editor\Http\AsyncAction;
+use ILIAS\UI\Component\Prompt\State\State;
+use ILIAS\MetaData\Editor\Http\LinkFactoryInterface;
 use JetBrains\PhpStorm\NoReturn;
 
 /**
@@ -58,6 +61,7 @@ class ilMDEditorGUI
     protected PresenterInterface $presenter;
     protected RepositoryInterface $repository;
     protected RequestParserInterface $request_parser;
+    protected LinkFactoryInterface $link_factory;
     protected ObserverHandler $observer_handler;
     protected ilAccessHandler $access;
     protected ilToolbarGUI $toolbar;
@@ -65,7 +69,6 @@ class ilMDEditorGUI
     protected ilTabsGUI $tabs;
     protected UIFactory $ui_factory;
     protected XMLWriter $xml_writer;
-    protected DataFactory $data_factory;
 
     protected int $obj_id;
     protected int $sub_id;
@@ -84,6 +87,7 @@ class ilMDEditorGUI
         $this->ui_renderer = $services->dic()->ui()->renderer();
         $this->presenter = $services->editor()->presenter();
         $this->request_parser = $services->editor()->requestParser();
+        $this->link_factory = $services->editor()->linkFactory();
         $this->repository = $services->repository()->repository();
         $this->observer_handler = $services->editor()->observerHandler();
         $this->access = $services->dic()->access();
@@ -92,7 +96,6 @@ class ilMDEditorGUI
         $this->tabs = $services->dic()->tabs();
         $this->ui_factory = $services->dic()->ui()->factory();
         $this->xml_writer = $services->xml()->standardWriter();
-        $this->data_factory = new DataFactory();
 
         $this->obj_id = $obj_id;
         $this->sub_id = $sub_id === 0 ? $obj_id : $sub_id;
@@ -178,7 +181,9 @@ class ilMDEditorGUI
             $this->presenter->utilities()->txt("saved_successfully"),
             true
         );
-        $this->ctrl->redirect($this, Command::SHOW_DIGEST->value);
+        $this->ctrl->redirectToURL(
+            (string) $this->link_factory->standard(Command::SHOW_DIGEST)->get()
+        );
     }
 
     protected function renderDigest(
@@ -206,39 +211,16 @@ class ilMDEditorGUI
         );
     }
 
-    protected function fullEditorCreate(): void
-    {
-        $this->fullEditorEdit(true, false);
-    }
-
-    /**
-     * Hopefully this becomes redundant at some point in the future,
-     * and "mormal" forms can also be handled asynchronously.
-     */
-    protected function fullEditorUpdate(): void
-    {
-        $this->fullEditorEdit(false, false);
-    }
-
-    protected function fullEditorCreateAsync(): void
-    {
-        $this->fullEditorEdit(true, true);
-    }
-
-    protected function fullEditorUpdateAsync(): void
-    {
-        $this->fullEditorEdit(false, true);
-    }
-
-    protected function fullEditorEdit(bool $create, bool $async): void
+    protected function fullAction(): void
     {
         $this->checkAccess();
 
-        // get the paths from the http request
+        // get the parameters from the http request
         $base_path = $this->request_parser->fetchBasePath();
         $action_path = $this->request_parser->fetchActionPath();
+        $action = $this->request_parser->fetchAction();
 
-        // get and prepare the MD
+        // get the MD
         $set = $this->repository->getMD(
             $this->obj_id,
             $this->sub_id,
@@ -247,23 +229,33 @@ class ilMDEditorGUI
         $editor = $this->full_editor_initiator->init();
         $set = $editor->manipulateMD()->prepare($set, $base_path);
 
-        // update or create
-        $request = $this->request_parser->fetchRequest(true);
-        $success = $editor->manipulateMD()->createOrUpdate(
-            $set,
-            $base_path,
-            $action_path,
-            $request
-        );
+        // do the action
+        $success = false;
+        switch ($action) {
+            case StandardAction::CREATE:
+            case StandardAction::UPDATE:
+                $success = $this->handleFullEditorEdit(
+                    $set,
+                    $base_path,
+                    $action_path,
+                    $editor
+                );
+                break;
+
+            case StandardAction::DELETE:
+                $success = true;
+                $base_path = $editor->manipulateMD()->deleteAndTrimBasePath(
+                    $set,
+                    $base_path,
+                    $action_path
+                );
+                break;
+
+            default:
+                throw new ilMDEditorException('Invalid standard action ' . $action->value);
+        }
+
         if (!$success) {
-            $this->showFullEditorContentAfterEditFailure(
-                $set,
-                $base_path,
-                $action_path,
-                $editor,
-                $request,
-                $async
-            );
             return;
         }
 
@@ -271,34 +263,121 @@ class ilMDEditorGUI
         $this->observer_handler->callObserversByPath($action_path);
 
         // redirect back to the full editor
-        $this->redirectAfterEditSuccess($base_path, $create, $async);
+        $message_var = match ($action) {
+            StandardAction::CREATE => 'meta_add_element_success',
+            StandardAction::UPDATE => 'meta_edit_element_success',
+            StandardAction::DELETE => 'meta_delete_element_success',
+        };
+        $this->tpl->setOnScreenMessage(
+            'success',
+            $this->presenter->utilities()->txt($message_var),
+            true
+        );
+
+        $link = $this->link_factory->standard(Command::SHOW_DIGEST)
+                                   ->withParameter(Parameter::BASE_PATH, $base_path->toString())
+                                   ->get();
+        $this->ctrl->redirectToURL((string) $link);
     }
 
-    protected function showFullEditorContentAfterEditFailure(
+    protected function handleFullEditorEdit(
+        SetInterface $set,
+        PathInterface $base_path,
+        PathInterface $action_path,
+        FullEditor $full_editor
+    ): bool {
+        $request = $this->request_parser->fetchRequest(true);
+        $success = $full_editor->manipulateMD()->createOrUpdate(
+            $set,
+            $base_path,
+            $action_path,
+            $request
+        );
+
+        if (!$success) {
+            $this->tpl->setOnScreenMessage(
+                'failure',
+                $this->presenter->utilities()->txt('msg_form_save_error'),
+                true
+            );
+            $this->renderFullEditor($set, $base_path, $full_editor, $request);
+        }
+        return $success;
+    }
+
+    #[NoReturn]
+    protected function fullActionAsync(): void
+    {
+        $this->checkAccess();
+
+        // get the parameters from the http request
+        $base_path = $this->request_parser->fetchBasePath();
+        $action_path = $this->request_parser->fetchActionPath();
+        $action = $this->request_parser->fetchAsyncAction();
+
+        // get the MD
+        $set = $this->repository->getMD(
+            $this->obj_id,
+            $this->sub_id,
+            $this->type
+        );
+        $editor = $this->full_editor_initiator->init();
+        $set = $editor->manipulateMD()->prepare($set, $base_path);
+
+        $response = match ($action) {
+            AsyncAction::SHOW_CREATE, AsyncAction::SHOW_UPDATE => $editor->getAsyncContentForEdit(
+                $set,
+                $base_path,
+                $action_path,
+                $this->request_parser->fetchRequest(false)
+            ),
+
+            AsyncAction::SHOW_DELETE => $editor->getAsyncContentForDelete(
+                $set,
+                $base_path,
+                $action_path
+            )->getComponent(),
+
+            AsyncAction::CREATE, AsyncAction::UPDATE => $this->handleFullEditorAsyncEdit(
+                $set,
+                $base_path,
+                $action_path,
+                $editor,
+                $action === AsyncAction::CREATE
+            ),
+
+            default => throw new ilMDEditorException('Invalid async action ' . $action->value)
+        };
+
+        echo($this->ui_renderer->renderAsync($response));
+        exit;
+    }
+
+    protected function handleFullEditorAsyncEdit(
         SetInterface $set,
         PathInterface $base_path,
         PathInterface $action_path,
         FullEditor $full_editor,
-        RequestInterface $request,
-        bool $async
-    ): void {
-        if ($async) {
-            $this->renderEditFormAsync($set, $base_path, $action_path, $full_editor, $request);
-        }
-        $this->tpl->setOnScreenMessage(
-            'failure',
-            $this->presenter->utilities()->txt('msg_form_save_error'),
-            true
+        bool $create
+    ): State {
+        // update or create
+        $request = $this->request_parser->fetchRequest(true);
+        $success = $full_editor->manipulateMD()->createOrUpdate(
+            $set,
+            $base_path,
+            $action_path,
+            $request
         );
-        $this->renderFullEditor($set, $base_path, $full_editor, $request);
-    }
+        if (!$success) {
+            $show = $full_editor->getAsyncContentForEdit($set, $base_path, $action_path, $request);
+            echo($this->ui_renderer->renderAsync($show));
+            exit;
+        }
 
-    #[NoReturn]
-    protected function redirectAfterEditSuccess(
-        PathInterface $base_path,
-        bool $create,
-        bool $async
-    ): void {
+        // call listeners
+        $this->observer_handler->callObserversByPath($action_path);
+
+        // redirect back to the full editor
         $this->tpl->setOnScreenMessage(
             'success',
             $this->presenter->utilities()->txt(
@@ -309,62 +388,10 @@ class ilMDEditorGUI
             true
         );
 
-        $this->ctrl->setParameter(
-            $this,
-            Parameter::BASE_PATH->value,
-            urlencode($base_path->toString())
-        );
-        if (!$async) {
-            $this->ctrl->redirect($this, Command::SHOW_FULL->value);
-        }
-        // TODO use the link builder here?
-        $redirect = $this->ui_factory->prompt()->state()->redirect(
-            $this->data_factory->uri(
-                ILIAS_HTTP_PATH . '/' . $this->ctrl->getLinkTarget($this, Command::SHOW_FULL->value)
-            )
-        );
-        echo($this->ui_renderer->renderAsync($redirect));
-        exit;
-    }
-
-    protected function fullEditorDelete(): void
-    {
-        $this->checkAccess();
-
-        // get the paths from the http request
-        $base_path = $this->request_parser->fetchBasePath();
-        $delete_path = $this->request_parser->fetchActionPath();
-
-        // get the MD
-        $set = $this->repository->getMD(
-            $this->obj_id,
-            $this->sub_id,
-            $this->type
-        );
-        $editor = $this->full_editor_initiator->init();
-
-        // delete
-        $base_path = $editor->manipulateMD()->deleteAndTrimBasePath(
-            $set,
-            $base_path,
-            $delete_path
-        );
-
-        // call listeners
-        $this->observer_handler->callObserversByPath($delete_path);
-
-        // redirect back to the full editor
-        $this->tpl->setOnScreenMessage(
-            'success',
-            $this->presenter->utilities()->txt('meta_delete_element_success'),
-            true
-        );
-        $this->ctrl->setParameter(
-            $this,
-            Parameter::BASE_PATH->value,
-            urlencode($base_path->toString())
-        );
-        $this->ctrl->redirect($this, Command::SHOW_FULL->value);
+        $link = $this->link_factory->standard(Command::SHOW_FULL)
+                                   ->withParameter(Parameter::BASE_PATH, $base_path->toString())
+                                   ->get();
+        return $this->ui_factory->prompt()->state()->redirect($link);
     }
 
     protected function fullEditor(): void
@@ -427,74 +454,6 @@ class ilMDEditorGUI
         $this->tpl->setContent($this->ui_renderer->render($template_content));
     }
 
-    #[NoReturn]
-    protected function fullEditorShowCreateAsync(): void
-    {
-        $this->fullEditorShowEditAsync();
-    }
-
-    #[NoReturn]
-    protected function fullEditorShowUpdateAsync(): void
-    {
-        $this->fullEditorShowEditAsync();
-    }
-
-    #[NoReturn]
-    protected function fullEditorShowDeleteAsync(): void
-    {
-        // get the paths from the http request
-        $base_path = $this->request_parser->fetchBasePath();
-        $action_path = $this->request_parser->fetchActionPath();
-
-        // get and prepare the MD
-        $set = $this->repository->getMD(
-            $this->obj_id,
-            $this->sub_id,
-            $this->type
-        );
-        $editor = $this->full_editor_initiator->init();
-        $set = $editor->manipulateMD()->prepare($set, $base_path);
-
-        // add content for element
-        $modal = $editor->getAsyncContentForDelete($set, $base_path, $action_path);
-        echo($this->ui_renderer->renderAsync($modal->getComponent()));
-        exit;
-    }
-
-    #[NoReturn]
-    protected function fullEditorShowEditAsync(): void
-    {
-        // get the paths from the http request
-        $base_path = $this->request_parser->fetchBasePath();
-        $action_path = $this->request_parser->fetchActionPath();
-
-        // get and prepare the MD
-        $set = $this->repository->getMD(
-            $this->obj_id,
-            $this->sub_id,
-            $this->type
-        );
-        $editor = $this->full_editor_initiator->init();
-        $set = $editor->manipulateMD()->prepare($set, $base_path);
-
-        // add content for element
-        $request = $this->request_parser->fetchRequest(false);
-        $this->renderEditFormAsync($set, $base_path, $action_path, $editor, $request);
-    }
-
-    #[NoReturn]
-    protected function renderEditFormAsync(
-        SetInterface $set,
-        PathInterface $base_path,
-        PathInterface $action_path,
-        FullEditor $full_editor,
-        RequestInterface $request
-    ): void {
-        $show = $full_editor->getAsyncContentForEdit($set, $base_path, $action_path, $request);
-        echo($this->ui_renderer->renderAsync($show));
-        exit;
-    }
-
     protected function setTabsForFullEditor(): void
     {
         $this->tabs->clearSubTabs();
@@ -506,7 +465,7 @@ class ilMDEditorGUI
         $this->tabs->removeNonTabbedLinks();
         $this->tabs->setBackTarget(
             $this->presenter->utilities()->txt('back'),
-            $this->ctrl->getLinkTarget($this, Command::SHOW_DIGEST->value)
+            (string) $this->link_factory->standard(Command::SHOW_DIGEST)->get()
         );
     }
 
@@ -519,7 +478,7 @@ class ilMDEditorGUI
                 'medium'
             ),
             $this->presenter->utilities()->txt('meta_button_to_full_editor_label'),
-            $this->ctrl->getLinkTarget($this, Command::SHOW_FULL->value)
+            (string) $this->link_factory->standard(Command::SHOW_FULL)->get()
         );
         if (DEVMODE) {
             $debug = $this->ui_factory->button()->bulky(
@@ -528,7 +487,7 @@ class ilMDEditorGUI
                     'Debug'
                 ),
                 'Debug',
-                $this->ctrl->getLinkTarget($this, Command::DEBUG->value)
+                (string) $this->link_factory->standard(Command::DEBUG)->get()
             );
         }
         return  $this->ui_renderer->render($bulky) .

@@ -118,17 +118,6 @@ into `MetaData` (and `Services` reserved for things used across
 
 Further, `Settings` should also be refactored to use `Services` properly.
 
-### Clean up Control Flow in the Editor GUI
-
-The control flow in `ilMDEditorGUI` is not really apparent from just that
-class, since form actions and similar links are generated elsewhere. It
-would be nice if one could see at a glance how stuff works.
-
-Further, it might be possible to simplify the control flow itself: Is 
-it possible to merge `update` and `create` into a single `edit`, and
-derive all the needed information from the action path? Is there a way
-to organize the async calls a bit more neatly?
-
 ### Improve Unit Test Coverage
 
 The following classes are not yet covered by unit tests:

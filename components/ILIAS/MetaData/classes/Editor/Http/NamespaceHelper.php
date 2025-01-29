@@ -20,19 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Editor\Http;
 
-use ILIAS\MetaData\Paths\PathInterface;
-
-interface RequestParserInterface
+trait NamespaceHelper
 {
-    public function fetchBasePath(): PathInterface;
-
-    public function fetchActionPath(): PathInterface;
-
-    public function fetchAction(): StandardAction;
-
-    public function fetchAsyncAction(): AsyncAction;
-
-    public function fetchRequest(
-        bool $apply_to_forms
-    ): RequestInterface;
+    protected const NAMESPACE = ['lom', 'editor'];
 }

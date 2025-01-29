@@ -27,6 +27,8 @@ use ILIAS\MetaData\Editor\Http\Command;
 use ILIAS\MetaData\Editor\Http\Parameter;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Elements\ElementInterface;
+use ILIAS\MetaData\Editor\Http\StandardAction;
+use ILIAS\MetaData\Editor\Http\AsyncAction;
 
 class LinkProvider
 {
@@ -44,11 +46,12 @@ class LinkProvider
     public function standard(
         PathInterface $base_path,
         ElementInterface $action_element,
-        Command $action_cmd
+        StandardAction $action
     ): URI {
         $action_path = $this->path_factory->toElement($action_element, true);
         return $this->link_factory
-            ->standard($action_cmd)
+            ->standard(Command::ACTION_FULL)
+            ->withParameter(Parameter::ACTION, $action->value)
             ->withParameter(Parameter::BASE_PATH, $base_path->toString())
             ->withParameter(Parameter::ACTION_PATH, $action_path->toString())
             ->get();
@@ -57,11 +60,12 @@ class LinkProvider
     public function async(
         PathInterface $base_path,
         ElementInterface $action_element,
-        Command $action_cmd
+        AsyncAction $action
     ): URI {
         $action_path = $this->path_factory->toElement($action_element, true);
         return $this->link_factory
-            ->async($action_cmd)
+            ->async(Command::ACTION_FULL_ASYNC)
+            ->withParameter(Parameter::ASYNC_ACTION, $action->value)
             ->withParameter(Parameter::BASE_PATH, $base_path->toString())
             ->withParameter(Parameter::ACTION_PATH, $action_path->toString())
             ->get();

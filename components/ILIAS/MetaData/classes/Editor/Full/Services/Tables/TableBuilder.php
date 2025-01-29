@@ -125,7 +125,7 @@ class TableBuilder
             new DataRetrieval($this->raw_rows)
         );
 
-        return $table;//->withActions([$update_action, $delete_action]);
+        return $table->withActions([$update_action, $delete_action]);
     }
 
     protected function extractDataValue(

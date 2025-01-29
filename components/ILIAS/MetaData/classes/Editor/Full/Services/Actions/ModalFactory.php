@@ -36,6 +36,8 @@ use ILIAS\MetaData\Repository\Validation\Dictionary\Restriction;
 use ILIAS\MetaData\Paths\FactoryInterface;
 use ILIAS\MetaData\Editor\Http\RequestInterface;
 use ILIAS\UI\Component\Prompt\State\State;
+use ILIAS\MetaData\Editor\Http\StandardAction;
+use ILIAS\MetaData\Editor\Http\AsyncAction;
 
 class ModalFactory
 {
@@ -78,7 +80,7 @@ class ModalFactory
         $async_url = $this->link_provider->async(
             $base_path,
             $to_be_deleted,
-            Command::SHOW_DELETE_FULL_ASYNC
+            AsyncAction::SHOW_DELETE
         );
         $modal = $this->factory->modal()->interruptive(
             '',
@@ -95,7 +97,7 @@ class ModalFactory
         $action = $this->link_provider->standard(
             $base_path,
             $to_be_deleted,
-            Command::DELETE_FULL
+            StandardAction::DELETE
         );
 
         $items = [];
@@ -112,7 +114,7 @@ class ModalFactory
 
         $modal = $this->factory->modal()->interruptive(
             $this->getModalTitle(
-                Command::DELETE_FULL,
+                StandardAction::DELETE,
                 $to_be_deleted
             ),
             $this->presenter->utilities()->txt('meta_delete_confirm'),
@@ -129,7 +131,7 @@ class ModalFactory
         $async_url = $this->link_provider->async(
             $base_path,
             $to_be_updated,
-            Command::SHOW_UPDATE_FULL_ASYNC
+            AsyncAction::SHOW_UPDATE
         );
         return new FlexibleModal($this->factory->prompt()->standard($async_url));
     }
@@ -149,7 +151,7 @@ class ModalFactory
             $form = $request->applyRequestToForm($form);
         }
         $show_state = $this->factory->prompt()->state()->show($form)->withTitle(
-            $this->getModalTitle(Command::UPDATE_FULL_ASYNC, $to_be_updated)
+            $this->getModalTitle(StandardAction::UPDATE, $to_be_updated)
         );
 
         return $show_state;
@@ -170,7 +172,7 @@ class ModalFactory
             $link = $this->link_provider->standard(
                 $base_path,
                 $to_be_created,
-                Command::CREATE_FULL
+                StandardAction::CREATE
             );
             return new FlexibleModal((string) $link);
         }
@@ -178,7 +180,7 @@ class ModalFactory
         $async_url = $this->link_provider->async(
             $base_path,
             $to_be_created,
-            Command::SHOW_CREATE_FULL_ASYNC
+            AsyncAction::SHOW_CREATE
         );
         return new FlexibleModal($this->factory->prompt()->standard($async_url));
     }
@@ -198,32 +200,32 @@ class ModalFactory
             $form = $request->applyRequestToForm($form);
         }
         $show_state = $this->factory->prompt()->state()->show($form)->withTitle(
-            $this->getModalTitle(Command::CREATE_FULL_ASYNC, $to_be_created)
+            $this->getModalTitle(StandardAction::CREATE, $to_be_created)
         );
 
         return $show_state;
     }
 
     protected function getModalTitle(
-        Command $action_cmd,
+        StandardAction $action,
         ElementInterface $element
     ): string {
-        switch ($action_cmd) {
-            case Command::UPDATE_FULL_ASYNC:
+        switch ($action) {
+            case StandardAction::UPDATE:
                 $title_key = 'meta_edit_element';
                 break;
 
-            case Command::CREATE_FULL_ASYNC:
+            case StandardAction::CREATE:
                 $title_key = 'meta_add_element';
                 break;
 
-            case Command::DELETE_FULL:
+            case StandardAction::DELETE:
                 $title_key = 'meta_delete_element';
                 break;
 
             default:
                 throw new \ilMDEditorException(
-                    'Invalid action: ' . $action_cmd->name
+                    'Invalid action: ' . $action->name
                 );
         }
         return $this->presenter->utilities()->txtFill(

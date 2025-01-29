@@ -22,18 +22,17 @@ namespace ILIAS\MetaData\Editor\Http;
 
 use ILIAS\Data\URI;
 use ILIAS\Data\Factory as DataFactory;
+use ILIAS\UI\URLBuilder;
 
 class LinkBuilder implements LinkBuilderInterface
 {
-    protected \ilCtrlInterface $ctrl;
-    protected DataFactory $data_factory;
+    use NamespaceHelper;
 
     /**
-     * @var string[]
+     * @var string[] with parameter names as keys
      */
     protected array $parameters = [];
-    protected Command $command;
-    protected bool $is_async;
+    protected URLBuilder $url_builder;
 
     public function __construct(
         \ilCtrlInterface $ctrl,
@@ -41,10 +40,13 @@ class LinkBuilder implements LinkBuilderInterface
         Command $command,
         bool $is_async
     ) {
-        $this->ctrl = $ctrl;
-        $this->data_factory = $data_factory;
-        $this->command = $command;
-        $this->is_async = $is_async;
+        $link = ILIAS_HTTP_PATH . '/' . $ctrl->getLinkTargetByClass(
+            strtolower(\ilMDEditorGUI::class),
+            $command->value,
+            null,
+            $is_async
+        );
+        $this->url_builder = new URLBuilder($data_factory->uri($link));
     }
 
     public function withParameter(
@@ -58,21 +60,14 @@ class LinkBuilder implements LinkBuilderInterface
 
     public function get(): URI
     {
-        $class = strtolower(\ilMDEditorGUI::class);
+        $builder = clone $this->url_builder;
         foreach ($this->parameters as $key => $value) {
-            $this->ctrl->setParameterByClass(
-                $class,
+            $builder = $builder->acquireParameter(
+                self::NAMESPACE,
                 $key,
-                urlencode($value)
-            );
+                $value
+            )[0];
         }
-        $link = ILIAS_HTTP_PATH . '/' . $this->ctrl->getLinkTargetByClass(
-            $class,
-            $this->command->value,
-            null,
-            $this->is_async
-        );
-        $this->ctrl->clearParametersByClass($class);
-        return $this->data_factory->uri($link);
+        return $builder->buildURI();
     }
 }

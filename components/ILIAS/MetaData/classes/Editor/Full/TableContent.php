@@ -85,17 +85,15 @@ class TableContent
      */
     protected function createModalAndButton(
         PathInterface $base_path,
-        RequestInterface $request,
         ElementInterface ...$elements
     ): \Generator {
         foreach ($elements as $element) {
             if (!$element->isScaffold()) {
                 continue;
             }
-            $modal = $this->services->actions()->getModal()->create(
+            $modal = $this->services->actions()->getModal()->createPlaceholder(
                 $base_path,
-                $element,
-                $request
+                $element
             );
             $button = $this->services->actions()->getButton()->create(
                 $modal->getFlexibleSignal(),

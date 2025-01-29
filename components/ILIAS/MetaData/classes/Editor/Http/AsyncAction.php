@@ -20,19 +20,11 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Editor\Http;
 
-use ILIAS\MetaData\Paths\PathInterface;
-
-interface RequestParserInterface
+enum AsyncAction: string
 {
-    public function fetchBasePath(): PathInterface;
-
-    public function fetchActionPath(): PathInterface;
-
-    public function fetchAction(): StandardAction;
-
-    public function fetchAsyncAction(): AsyncAction;
-
-    public function fetchRequest(
-        bool $apply_to_forms
-    ): RequestInterface;
+    case SHOW_CREATE = 'show_create';
+    case SHOW_UPDATE = 'show_update';
+    case SHOW_DELETE = 'show_delete';
+    case CREATE = 'create';
+    case UPDATE = 'update';
 }

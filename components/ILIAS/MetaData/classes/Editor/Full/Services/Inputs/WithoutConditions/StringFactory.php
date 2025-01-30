@@ -27,7 +27,6 @@ use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelperInterface;
 use ILIAS\UI\Component\Input\Field\Factory as UIFactory;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
 use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as ConstraintDictionary;
-use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 use ILIAS\MetaData\Elements\Data\Type;
 use ILIAS\Refinery\Factory as Refinery;
 
@@ -50,8 +49,7 @@ class StringFactory extends BaseFactory
 
     protected function rawInput(
         ElementInterface $element,
-        ElementInterface $context_element,
-        SlotIdentifier $conditional_slot = SlotIdentifier::NULL
+        ElementInterface $context_element
     ): FormInput {
         $slot = $this->element_vocab_helper->slotForElement($element);
 

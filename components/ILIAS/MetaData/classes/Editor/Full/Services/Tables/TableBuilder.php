@@ -24,18 +24,17 @@ use ILIAS\UI\Factory as UIFactory;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface as PresenterInterface;
 use ILIAS\MetaData\Editor\Full\Services\DataFinder;
 use ILIAS\MetaData\Elements\ElementInterface;
-use ILIAS\MetaData\Editor\Full\Services\Actions\FlexibleSignal;
 use ILIAS\MetaData\Elements\Data\Type;
 use ILIAS\UI\Component\Table\Column\Column;
 use ILIAS\UI\Component\Table\Data as DataTable;
 use ILIAS\MetaData\DataHelper\DataHelperInterface;
-use ILIAS\MetaData\Editor\Http\Request;
 use ILIAS\MetaData\Editor\Full\Services\Actions\LinkProvider;
 use ILIAS\MetaData\Editor\Http\AsyncAction;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Editor\Full\Services\ConstraintHelper;
 use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as ConstraintDictionaryInterface;
+use ILIAS\MetaData\Editor\Http\RequestInterface;
 
 class TableBuilder
 {
@@ -72,7 +71,7 @@ class TableBuilder
 
     public function get(
         PathInterface $base_path,
-        Request $request
+        RequestInterface $request
     ): DataTable {
         $table = $this->init($base_path);
         return $request->applyRequestToDataTable($table);

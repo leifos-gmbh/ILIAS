@@ -21,12 +21,10 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Editor\Presenter;
 
 use ILIAS\MetaData\Elements\Data\DataInterface as ElementsDataInterface;
-use ILIAS\MetaData\Elements\Data\Type;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as BaseUtilities;
 use ILIAS\MetaData\Presentation\DataInterface as DataPresentation;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\PresentationInterface as VocabulariesPresentation;
-use ILIAS\MetaData\Vocabularies\Dispatch\Presentation\LabelledValueInterface;
 
 class Data implements DataInterface
 {

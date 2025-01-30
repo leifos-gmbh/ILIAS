@@ -22,7 +22,6 @@ namespace ILIAS\MetaData\Editor\Full\Services\Actions;
 
 use ILIAS\UI\Component\Prompt\Prompt;
 use ILIAS\UI\Component\Modal\Modal;
-use ILIAS\UI\Component\Signal as Signal;
 
 class FlexibleModal
 {

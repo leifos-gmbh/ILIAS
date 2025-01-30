@@ -50,8 +50,7 @@ class DurationFactory extends BaseFactory
 
     protected function rawInput(
         ElementInterface $element,
-        ElementInterface $context_element,
-        SlotIdentifier $conditional_slot = SlotIdentifier::NULL
+        ElementInterface $context_element
     ): FormInput {
         $num = $this->ui_factory
             ->numeric('placeholder')

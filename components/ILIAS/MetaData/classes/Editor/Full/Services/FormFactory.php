@@ -68,7 +68,6 @@ class FormFactory
 
 
         return $this->getFormForElement(
-            $base_path,
             $element,
             $element,
             $link,
@@ -92,7 +91,6 @@ class FormFactory
             )->lastElementAtFinalStep();
         }
         return $this->getFormForElement(
-            $base_path,
             $element,
             $context_element,
             $link,
@@ -102,7 +100,6 @@ class FormFactory
     }
 
     protected function getFormForElement(
-        PathInterface $base_path,
         ElementInterface $element,
         ElementInterface $context_element,
         URI $link,

@@ -27,7 +27,6 @@ use ILIAS\MetaData\Editor\Full\Services\PropertiesFetcher;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Editor\Full\Services\FormFactory;
 use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as ConstraintDictionaryInterface;
-use ILIAS\MetaData\Repository\Validation\Dictionary\Restriction;
 use ILIAS\MetaData\Editor\Http\RequestInterface;
 use ILIAS\UI\Component\Prompt\State\State;
 use ILIAS\MetaData\Editor\Http\StandardAction;

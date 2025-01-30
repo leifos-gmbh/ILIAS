@@ -65,8 +65,7 @@ class DatetimeFactory extends BaseFactory
 
     protected function rawInput(
         ElementInterface $element,
-        ElementInterface $context_element,
-        SlotIdentifier $conditional_slot = SlotIdentifier::NULL
+        ElementInterface $context_element
     ): FormInput {
         $dh = $this->data_helper;
         $input = $this->ui_factory

@@ -181,7 +181,7 @@ class ContentAssembler
 
         $keywords = [];
         $keyword_els = $this->navigator_factory->navigator(
-            $keywords_path = $this->path_collection->keywords(),
+            $this->path_collection->keywords(),
             $root
         )->elementsAtFinalStep();
         foreach ($keyword_els as $el) {
@@ -389,7 +389,6 @@ class ContentAssembler
         SetInterface $set
     ): Section {
         $ff = $this->ui_factory->input()->field();
-        $inputs = [];
 
         $tlt_el = $this->navigator_factory->navigator(
             $path = $this->path_collection->firstTypicalLearningTime(),

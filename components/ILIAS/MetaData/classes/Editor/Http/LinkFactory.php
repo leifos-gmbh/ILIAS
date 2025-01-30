@@ -27,12 +27,6 @@ class LinkFactory implements LinkFactoryInterface
     protected \ilCtrlInterface $ctrl;
     protected DataFactory $data_factory;
 
-    /**
-     * @var string[]
-     */
-    protected array $parameters = [];
-    protected Command $command;
-
     public function __construct(
         \ilCtrlInterface $ctrl,
         DataFactory $data_factory

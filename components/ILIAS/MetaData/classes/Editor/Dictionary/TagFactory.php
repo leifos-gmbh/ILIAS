@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Editor\Dictionary;
 
-use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactoryInterface;
 use ILIAS\MetaData\Elements\Structure\StructureElementInterface;
 

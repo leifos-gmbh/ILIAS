@@ -21,9 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Editor\Http;
 
 use Psr\Http\Message\ServerRequestInterface as HttpRequest;
-use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
-use ILIAS\UI\Component\Modal\RoundTrip as RoundtripModal;
 use ILIAS\UI\Component\Table\Data as DataTable;
 
 class Request implements RequestInterface

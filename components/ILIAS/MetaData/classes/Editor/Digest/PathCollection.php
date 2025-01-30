@@ -23,7 +23,6 @@ namespace ILIAS\MetaData\Editor\Digest;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Paths\Filters\FilterType;
-use ILIAS\MetaData\Paths\Path;
 
 class PathCollection
 {

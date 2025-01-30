@@ -23,7 +23,6 @@ namespace ILIAS\MetaData\Editor\Full\Services\Tables;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface as PresenterInterface;
 use ILIAS\MetaData\Editor\Full\Services\DataFinder;
-use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\DataHelper\DataHelperInterface;
 use ILIAS\MetaData\Editor\Full\Services\Actions\LinkProvider;

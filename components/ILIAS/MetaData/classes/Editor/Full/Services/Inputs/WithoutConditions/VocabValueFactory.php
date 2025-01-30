@@ -29,7 +29,6 @@ use ILIAS\MetaData\Elements\Data\Type;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelperInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
-use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\MetaData\Paths\PathInterface;
 
@@ -112,7 +111,7 @@ class VocabValueFactory extends BaseFactory
         return $this->rawInput(
             $element,
             $context_element,
-            $slot = $this->element_vocab_helper->slotForElement($element),
+            $this->element_vocab_helper->slotForElement($element),
             true
         );
     }

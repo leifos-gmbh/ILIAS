@@ -230,7 +230,6 @@ class ilMDEditorGUI
         $set = $editor->manipulateMD()->prepare($set, $base_path);
 
         // do the action
-        $success = false;
         switch ($action) {
             case StandardAction::CREATE:
             case StandardAction::UPDATE:

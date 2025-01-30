@@ -78,7 +78,7 @@ class RequestParser implements RequestParserInterface
         bool $apply_to_forms
     ): RequestInterface {
         return new Request(
-            $request = $this->http->request(),
+            $this->http->request(),
             $apply_to_forms
         );
     }

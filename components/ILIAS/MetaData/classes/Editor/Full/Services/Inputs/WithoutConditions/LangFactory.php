@@ -27,7 +27,6 @@ use ILIAS\UI\Component\Input\Field\Factory as UIFactory;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
 use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as ConstraintDictionary;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
-use ILIAS\MetaData\Elements\Data\Type;
 
 class LangFactory extends BaseFactory
 {
@@ -45,8 +44,7 @@ class LangFactory extends BaseFactory
 
     protected function rawInput(
         ElementInterface $element,
-        ElementInterface $context_element,
-        SlotIdentifier $conditional_slot = SlotIdentifier::NULL
+        ElementInterface $context_element
     ): FormInput {
         $langs = [];
         foreach ($this->data_helper->getAllLanguages() as $key) {

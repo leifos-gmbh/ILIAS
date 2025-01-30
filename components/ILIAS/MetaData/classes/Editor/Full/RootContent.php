@@ -28,7 +28,6 @@ use ILIAS\UI\Component\Panel\Panel;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
 use ILIAS\UI\Component\Dropdown\Standard as StandardDropdown;
-use ILIAS\MetaData\Editor\Http\RequestInterface;
 
 class RootContent
 {

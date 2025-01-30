@@ -29,9 +29,7 @@ use ILIAS\MetaData\Repository\Dictionary\DictionaryInterface as DatabaseDictiona
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Editor\Full\Services\DataFinder;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
-use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Editor\Full\Services\Inputs\Conditions\FactoryWithConditionTypesService;
-use ILIAS\MetaData\Elements\Data\Type;
 use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelperInterface;
 
 class InputFactory
@@ -40,7 +38,6 @@ class InputFactory
     protected Refinery $refinery;
     protected PresenterInterface $presenter;
     protected PathFactory $path_factory;
-    protected NavigatorFactoryInterface $navigator_factory;
     protected ElementHelperInterface $element_vocab_helper;
     protected DataFinder $data_finder;
     protected FactoryWithConditionTypesService $types;

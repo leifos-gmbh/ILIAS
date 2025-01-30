@@ -105,7 +105,7 @@ class MDEditorToolProvider extends AbstractDynamicToolProvider
             ))
             ->addComponentDecorator(static function (Component $c) use ($hashed): Component {
                 if ($c instanceof LegacySlate) {
-                    $signal_id = $c->getToggleSignal()->getId();
+                    $c->getToggleSignal()->getId();
                     return $c->withAdditionalOnLoadCode(static function ($id) use ($hashed) {
                         return "il.UI.maincontrols.mainbar.engageTool('$hashed');";
                     });

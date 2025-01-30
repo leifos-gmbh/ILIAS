@@ -51,8 +51,6 @@ class TableContent
             ...$elements
         );
         $builder = $this->services->tableFactory()->table();
-        $delete_buttons = [];
-        $update_buttons = [];
         foreach ($elements as $element) {
             if ($element->isScaffold()) {
                 continue;

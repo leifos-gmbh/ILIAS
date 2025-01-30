@@ -85,7 +85,7 @@ class Services
             return $this->presenter;
         }
         return $this->presenter = new Presenter(
-            $utilities = new Utilities(
+            new Utilities(
                 $this->presentation_services->utilities()
             ),
             $data = new Data(

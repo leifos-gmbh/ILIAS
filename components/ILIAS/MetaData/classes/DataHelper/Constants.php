@@ -28,7 +28,7 @@ class Constants
      * match 1: years, 2: months, 3: days, 4: hours, 5: minutes, 6: seconds
      */
     public const DURATION_REGEX = '/^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)' .
-    '?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(?:.\d+)?S)?)?$/';
+        '?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(?:.\d+)?S)?)?$/';
 
     /**
      * This monstrosity makes sure datetimes conform to the format given by LOM,
@@ -38,8 +38,8 @@ class Constants
      * UTC or +- hh:mm (mm is optional)
      */
     protected const DATETIME_REGEX = '/^(\d{4})(?:-(\d{2})(?:-(\d{2})' .
-    '(?:T(\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d+)(Z|[+\-]' .
-    '\d{2}(?::\d{2})?)?)?)?)?)?)?)?$/';
+        '(?:T(\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d+)(Z|[+\-]' .
+        '\d{2}(?::\d{2})?)?)?)?)?)?)?)?$/';
 
     /**
      * Note that 'xx' should be translated to 'none'

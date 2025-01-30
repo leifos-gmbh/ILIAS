@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Editor\Http;
 
 use ILIAS\Data\URI;
+use ILIAS\UI\URLBuilder;
+use ILIAS\UI\URLBuilderToken;
 
 interface LinkBuilderInterface
 {
@@ -30,4 +32,9 @@ interface LinkBuilderInterface
     ): LinkBuilderInterface;
 
     public function get(): URI;
+
+    /**
+     * @return URLBuilder[]|URLBuilderToken[] first entry is the builder, all others tokens in order
+     */
+    public function getAsBuilder(Parameter ...$additional_parameters): array;
 }

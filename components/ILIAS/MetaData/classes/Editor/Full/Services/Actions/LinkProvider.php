@@ -29,6 +29,8 @@ use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Editor\Http\StandardAction;
 use ILIAS\MetaData\Editor\Http\AsyncAction;
+use ILIAS\UI\URLBuilder;
+use ILIAS\UI\URLBuilderToken;
 
 class LinkProvider
 {
@@ -69,5 +71,20 @@ class LinkProvider
             ->withParameter(Parameter::BASE_PATH, $base_path->toString())
             ->withParameter(Parameter::ACTION_PATH, $action_path->toString())
             ->get();
+    }
+
+    /**
+     * Also returns token for the action path
+     * @return array{0: URLBuilder, 1: URLBuilderToken}
+     */
+    public function asyncForTable(
+        PathInterface $base_path,
+        AsyncAction $action
+    ): array {
+        return $this->link_factory
+            ->async(Command::ACTION_FULL_ASYNC)
+            ->withParameter(Parameter::ASYNC_ACTION, $action->value)
+            ->withParameter(Parameter::BASE_PATH, $base_path->toString())
+            ->getAsBuilder(Parameter::ACTION_PATH);
     }
 }

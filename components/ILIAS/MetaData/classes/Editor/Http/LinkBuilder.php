@@ -29,7 +29,7 @@ class LinkBuilder implements LinkBuilderInterface
     use NamespaceHelper;
 
     /**
-     * @var string[] with parameter names as keys
+     * @var array<string, string> with parameter names as keys
      */
     protected array $parameters = [];
     protected URLBuilder $url_builder;
@@ -60,6 +60,11 @@ class LinkBuilder implements LinkBuilderInterface
 
     public function get(): URI
     {
+        return $this->getAsBuilder()[0]->buildURI();
+    }
+
+    public function getAsBuilder(Parameter ...$additional_parameters): array
+    {
         $builder = clone $this->url_builder;
         foreach ($this->parameters as $key => $value) {
             $builder = $builder->acquireParameter(
@@ -68,6 +73,9 @@ class LinkBuilder implements LinkBuilderInterface
                 $value
             )[0];
         }
-        return $builder->buildURI();
+        return $builder->acquireParameters(
+            self::NAMESPACE,
+            ...array_map(fn(Parameter $param) => $param->value, $additional_parameters)
+        );
     }
 }

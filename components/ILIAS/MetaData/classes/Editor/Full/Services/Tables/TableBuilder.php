@@ -30,16 +30,24 @@ use ILIAS\UI\Component\Table\Column\Column;
 use ILIAS\UI\Component\Table\Data as DataTable;
 use ILIAS\MetaData\DataHelper\DataHelperInterface;
 use ILIAS\MetaData\Editor\Http\Request;
-use ILIAS\UI\URLBuilder;
-use ILIAS\UI\URLBuilderToken;
-use ILIAS\Data\URI;
+use ILIAS\MetaData\Editor\Full\Services\Actions\LinkProvider;
+use ILIAS\MetaData\Editor\Http\AsyncAction;
+use ILIAS\MetaData\Paths\PathInterface;
+use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
+use ILIAS\MetaData\Editor\Full\Services\ConstraintHelper;
+use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as ConstraintDictionaryInterface;
 
 class TableBuilder
 {
+    use ConstraintHelper;
+
     protected UIFactory $ui_factory;
     protected PresenterInterface $presenter;
     protected DataHelperInterface $data_helper;
     protected DataFinder $data_finder;
+    protected LinkProvider $link_provider;
+    protected PathFactory $path_factory;
+    protected ConstraintDictionaryInterface $constraint_dictionary;
 
     protected ElementInterface $template_element;
     protected array $raw_rows;
@@ -48,25 +56,30 @@ class TableBuilder
         UIFactory $ui_factory,
         PresenterInterface $presenter,
         DataHelperInterface $data_helper,
-        DataFinder $data_finder
+        DataFinder $data_finder,
+        LinkProvider $link_provider,
+        PathFactory $path_factory,
+        ConstraintDictionaryInterface $constraint_dictionary
     ) {
         $this->ui_factory = $ui_factory;
         $this->presenter = $presenter;
         $this->data_helper = $data_helper;
         $this->data_finder = $data_finder;
+        $this->link_provider = $link_provider;
+        $this->path_factory = $path_factory;
+        $this->constraint_dictionary = $constraint_dictionary;
     }
 
-    public function get(Request $request): DataTable
-    {
-        $table = $this->init();
+    public function get(
+        PathInterface $base_path,
+        Request $request
+    ): DataTable {
+        $table = $this->init($base_path);
         return $request->applyRequestToDataTable($table);
     }
 
-    public function withAdditionalRow(
-        ElementInterface $element,
-        FlexibleSignal $update_signal,
-        ?FlexibleSignal $delete_signal
-    ): TableBuilder {
+    public function withAdditionalRow(ElementInterface $element): TableBuilder
+    {
         if (!isset($this->template_element)) {
             $this->template_element = $element;
         }
@@ -82,14 +95,17 @@ class TableBuilder
             }
         }
 
-        $res['disable_delete'] = false;
+        $res['disable_delete'] = !$this->isDeletable(
+            $this->constraint_dictionary,
+            $element
+        );
 
         $clone = clone $this;
-        $clone->raw_rows[] = $res;
+        $clone->raw_rows[$this->path_factory->toElement($element, true)->toString()] = $res;
         return $clone;
     }
 
-    protected function init(): DataTable
+    protected function init(PathInterface $base_path): DataTable
     {
         if (!isset($this->template_element)) {
             throw new \ilMDEditorException('Table cannot be empty.');
@@ -109,15 +125,14 @@ class TableBuilder
             true
         );
 
-        /**
-         * TODO: figure out how to implement actions
-         */
         $update_action = $this->ui_factory->table()->action()->single(
             $this->presenter->utilities()->txt('edit'),
-        );
+            ...$this->link_provider->asyncForTable($base_path, AsyncAction::SHOW_UPDATE)
+        )->withAsync(true);
         $delete_action = $this->ui_factory->table()->action()->single(
             $this->presenter->utilities()->txt('delete'),
-        );
+            ...$this->link_provider->asyncForTable($base_path, AsyncAction::SHOW_DELETE)
+        )->withAsync(true);
 
         $table = $this->ui_factory->table()->data(
             $name,
@@ -125,7 +140,10 @@ class TableBuilder
             new DataRetrieval($this->raw_rows)
         );
 
-        return $table->withActions([$update_action, $delete_action]);
+        return $table->withActions([
+            'update' => $update_action,
+            'delete' => $delete_action
+        ]);
     }
 
     protected function extractDataValue(

@@ -26,6 +26,8 @@ use ILIAS\MetaData\Editor\Full\Services\DataFinder;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\DataHelper\DataHelperInterface;
+use ILIAS\MetaData\Editor\Full\Services\Actions\LinkProvider;
+use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as ConstraintDictionaryInterface;
 
 class TableFactory
 {
@@ -33,17 +35,26 @@ class TableFactory
     protected PresenterInterface $presenter;
     protected DataHelperInterface $data_helper;
     protected DataFinder $data_finder;
+    protected LinkProvider $link_provider;
+    protected PathFactory $path_factory;
+    protected ConstraintDictionaryInterface $constraint_dictionary;
 
     public function __construct(
         UIFactory $ui_factory,
         PresenterInterface $presenter,
         DataHelperInterface $data_helper,
-        DataFinder $data_finder
+        DataFinder $data_finder,
+        LinkProvider $link_provider,
+        PathFactory $path_factory,
+        ConstraintDictionaryInterface $constraint_dictionary
     ) {
         $this->ui_factory = $ui_factory;
         $this->presenter = $presenter;
         $this->data_helper = $data_helper;
         $this->data_finder = $data_finder;
+        $this->link_provider = $link_provider;
+        $this->path_factory = $path_factory;
+        $this->constraint_dictionary = $constraint_dictionary;
     }
 
     public function table(): TableBuilder
@@ -52,7 +63,10 @@ class TableFactory
             $this->ui_factory,
             $this->presenter,
             $this->data_helper,
-            $this->data_finder
+            $this->data_finder,
+            $this->link_provider,
+            $this->path_factory,
+            $this->constraint_dictionary
         );
     }
 }

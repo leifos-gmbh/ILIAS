@@ -143,8 +143,7 @@ class Services
                 $presenter,
                 $this->propertiesFetcher(),
                 $this->formFactory(),
-                $this->repository_services->constraintDictionary(),
-                $this->path_services->pathFactory()
+                $this->repository_services->constraintDictionary()
             )
         );
     }
@@ -172,7 +171,10 @@ class Services
             $this->dic->ui()->factory(),
             $this->editor_services->presenter(),
             $this->data_helper_services->dataHelper(),
-            $this->dataFinder()
+            $this->dataFinder(),
+            $this->linkProvider(),
+            $this->path_services->pathFactory(),
+            $this->repository_services->constraintDictionary()
         );
     }
 

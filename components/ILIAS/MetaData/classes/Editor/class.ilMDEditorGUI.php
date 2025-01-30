@@ -211,7 +211,7 @@ class ilMDEditorGUI
         );
     }
 
-    protected function fullAction(): void
+    protected function fullEditorAction(): void
     {
         $this->checkAccess();
 
@@ -274,7 +274,7 @@ class ilMDEditorGUI
             true
         );
 
-        $link = $this->link_factory->standard(Command::SHOW_DIGEST)
+        $link = $this->link_factory->standard(Command::SHOW_FULL)
                                    ->withParameter(Parameter::BASE_PATH, $base_path->toString())
                                    ->get();
         $this->ctrl->redirectToURL((string) $link);
@@ -306,7 +306,7 @@ class ilMDEditorGUI
     }
 
     #[NoReturn]
-    protected function fullActionAsync(): void
+    protected function fullEditorActionAsync(): void
     {
         $this->checkAccess();
 

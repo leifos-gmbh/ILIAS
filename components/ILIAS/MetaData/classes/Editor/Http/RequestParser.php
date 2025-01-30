@@ -92,8 +92,16 @@ class RequestParser implements RequestParserInterface
         if ($request_wrapper->has($name)) {
             $path_string = $request_wrapper->retrieve(
                 $name,
-                $this->refinery->kindlyTo()->string()
+                $this->refinery->byTrying([
+                    $this->refinery->kindlyTo()->string(),
+                    $this->refinery->kindlyTo()->listOf(
+                        $this->refinery->kindlyTo()->string()
+                    )
+                ])
             );
+            if (is_array($path_string)) {
+                $path_string = $path_string[0];
+            }
             return $this->path_factory->fromString(urldecode($path_string));
         }
         if ($throw_error) {

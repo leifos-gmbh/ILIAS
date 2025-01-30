@@ -21,26 +21,23 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Editor\Full\Services\Actions;
 
 use ILIAS\UI\Factory as UIFactory;
-use ILIAS\UI\Component\Modal\RoundTrip as RoundtripModal;
-use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
-use ILIAS\UI\Component\Input\Field\Group as Group;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
 use ILIAS\MetaData\Paths\PathInterface;
-use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Editor\Full\Services\PropertiesFetcher;
-use ILIAS\MetaData\Editor\Http\Command;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Editor\Full\Services\FormFactory;
 use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as ConstraintDictionaryInterface;
 use ILIAS\MetaData\Repository\Validation\Dictionary\Restriction;
-use ILIAS\MetaData\Paths\FactoryInterface;
 use ILIAS\MetaData\Editor\Http\RequestInterface;
 use ILIAS\UI\Component\Prompt\State\State;
 use ILIAS\MetaData\Editor\Http\StandardAction;
 use ILIAS\MetaData\Editor\Http\AsyncAction;
+use ILIAS\MetaData\Editor\Full\Services\ConstraintHelper;
 
 class ModalFactory
 {
+    use ConstraintHelper;
+
     public const MAX_LENGTH = 128;
 
     protected LinkProvider $link_provider;
@@ -49,7 +46,6 @@ class ModalFactory
     protected PropertiesFetcher $properties_fetcher;
     protected FormFactory $form_factory;
     protected ConstraintDictionaryInterface $constraint_dictionary;
-    protected FactoryInterface $path_factory;
 
     public function __construct(
         LinkProvider $link_provider,
@@ -57,8 +53,7 @@ class ModalFactory
         PresenterInterface $presenter,
         PropertiesFetcher $properties_fetcher,
         FormFactory $form_factory,
-        ConstraintDictionaryInterface $constraint_dictionary,
-        FactoryInterface $path_factory
+        ConstraintDictionaryInterface $constraint_dictionary
     ) {
         $this->link_provider = $link_provider;
         $this->factory = $factory;
@@ -66,14 +61,13 @@ class ModalFactory
         $this->properties_fetcher = $properties_fetcher;
         $this->form_factory = $form_factory;
         $this->constraint_dictionary = $constraint_dictionary;
-        $this->path_factory = $path_factory;
     }
 
     public function deletePlaceholder(
         PathInterface $base_path,
         ElementInterface $to_be_deleted
     ): ?FlexibleModal {
-        if (!$this->isDeletable($to_be_deleted)) {
+        if (!$this->isDeletable($this->constraint_dictionary, $to_be_deleted)) {
             return null;
         }
 
@@ -237,15 +231,5 @@ class ModalFactory
                 true
             )
         );
-    }
-
-    protected function isDeletable(ElementInterface $element): bool
-    {
-        foreach ($this->constraint_dictionary->tagsForElement($element) as $tag) {
-            if ($tag->restriction() === Restriction::NOT_DELETABLE) {
-                return false;
-            }
-        }
-        return true;
     }
 }

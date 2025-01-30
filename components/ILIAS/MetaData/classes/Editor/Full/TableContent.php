@@ -48,7 +48,6 @@ class TableContent
     ): \Generator {
         yield from $this->createModalAndButton(
             $base_path,
-            $request,
             ...$elements
         );
         $builder = $this->services->tableFactory()->table();
@@ -58,26 +57,9 @@ class TableContent
             if ($element->isScaffold()) {
                 continue;
             }
-            $update_modal = $this->services->actions()->getModal()->update(
-                $base_path,
-                $element,
-                $request
-            );
-            $delete_modal = $this->services->actions()->getModal()->deletePlaceholder(
-                $base_path,
-                $element
-            );
-            $builder = $builder->withAdditionalRow(
-                $element,
-                $update_modal->getFlexibleSignal(),
-                $delete_modal?->getFlexibleSignal()
-            );
-            yield ContentType::MODAL => $update_modal;
-            if (isset($delete_modal)) {
-                yield ContentType::MODAL => $delete_modal;
-            }
+            $builder = $builder->withAdditionalRow($element);
         }
-        yield ContentType::MAIN => $builder->get($request);
+        yield ContentType::MAIN => $builder->get($base_path, $request);
     }
 
     /**

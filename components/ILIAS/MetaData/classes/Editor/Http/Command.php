@@ -26,7 +26,7 @@ enum Command: string
     case SHOW_DIGEST = 'listQuickEdit';
     case UPDATE_DIGEST = 'updateQuickEdit';
     case SHOW_FULL = 'fullEditor';
-    case ACTION_FULL = 'fullAction';
-    case ACTION_FULL_ASYNC = 'fullActionAsync';
+    case ACTION_FULL = 'fullEditorAction';
+    case ACTION_FULL_ASYNC = 'fullEditorActionAsync';
     case DEBUG = 'debug';
 }

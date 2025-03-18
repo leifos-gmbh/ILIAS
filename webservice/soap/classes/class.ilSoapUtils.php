@@ -338,6 +338,18 @@ class ilSoapUtils extends ilSoapAdministration
 
         // Finally add new mapping entry
         $cp_options->appendMapping($source_id, $new_obj->getRefId());
+
+         // begin-patch bghw veda
+        $GLOBALS['DIC']['ilAppEventHandler']->raise(
+            'Services/Object',
+            'afterCloning',
+            [
+                'source_id' => $source_id,
+                'target_id' => $new_obj->getRefId(),
+                'copy_id' => $cp_options->getCopyId()
+            ]
+        );
+        // end-patch bghw veda
         return $new_obj->getRefId();
     }
 
@@ -358,6 +370,18 @@ class ilSoapUtils extends ilSoapAdministration
 
         $orig = ilObjectFactory::getInstanceByRefId($source_id);
         $orig->cloneDependencies($target_id, $cp_options->getCopyId());
+
+         // begin-patch bghw veda
+        $GLOBALS['DIC']['ilAppEventHandler']->raise(
+            'Services/Object',
+            'afterCloningDependencies',
+            [
+                'source_id' => $source_id,
+                'target_id' => $target_id,
+                'copy_id' => $cp_options->getCopyId()
+            ]
+        );
+        // end-patch bghw veda
     }
 
     private function internalLinkNode(array $node, ilCopyWizardOptions $cp_options): int

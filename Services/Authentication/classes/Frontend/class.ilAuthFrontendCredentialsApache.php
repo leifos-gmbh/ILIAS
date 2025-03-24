@@ -40,6 +40,20 @@ class ilAuthFrontendCredentialsApache extends ilAuthFrontendCredentials implemen
      */
     public function tryAuthenticationOnLoginPage()
     {
+        // begin-patch sky-sso
+        if (($this->httpRequest->getServerParams()['SKY_SSO'] ?? 1) == 3) {
+            $target = $this->httpRequest->getQueryParams()['target'] ?? '';
+            $target_str = '';
+            if ($target != '') {
+                $target_str = '?target=' . $target;
+            }
+            $this->ctrl->redirectToURL(
+                \ilUtil::getHtmlPath(
+                    './saml.php' . $target_str
+                )
+            );
+        }
+        // end-patch sky-sso
         $cmd = (string) ($this->httpRequest->getQueryParams()['cmd'] ?? '');
         if ('' === $cmd) {
             $cmd = (string) ($this->httpRequest->getParsedBody()['cmd'] ?? '');

@@ -314,6 +314,10 @@ class ilAuthProviderSaml extends ilAuthProvider implements ilAuthProviderInterfa
      */
     public function getUserAuthModeName()
     {
+        // begin-patch sky-sso
+        $ldap_server_id = ilLDAPServer::_getFirstActiveServer();
+        return 'ldap_' . $ldap_server_id;
+        // end-patch sky-sso
         return 'saml_' . $this->idp->getIdpId();
     }
 

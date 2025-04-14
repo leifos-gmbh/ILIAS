@@ -529,23 +529,18 @@ class ilDclTable
      */
     public function getFieldsForFormula(): array
     {
-        $unsupported = [
-            ilDclDatatype::INPUTFORMAT_ILIAS_REF,
-            ilDclDatatype::INPUTFORMAT_FORMULA,
-            ilDclDatatype::INPUTFORMAT_MOB,
-            ilDclDatatype::INPUTFORMAT_REFERENCELIST,
-            ilDclDatatype::INPUTFORMAT_REFERENCE,
-            ilDclDatatype::INPUTFORMAT_FILE,
-            ilDclDatatype::INPUTFORMAT_RATING,
-        ];
-
-        $this->loadCustomFields();
-        $return = $this->getStandardFields();
-        /**
-         * @var $field ilDclBaseFieldModel
-         */
-        foreach ($this->fields as $field) {
-            if (!in_array($field->getDatatypeId(), $unsupported)) {
+        $syntax_chars = array_merge(
+            array_keys(ilDclExpressionParser::getOperators()),
+            ilDclExpressionParser::getFunctions(),
+            ['(', ')', ',']
+        );
+        foreach ($this->getFields() as $field) {
+            if (in_array($field->getDatatypeId(), ilDclFormulaFieldModel::SUPPORTED_FIELDS)) {
+                foreach ($syntax_chars as $element) {
+                    if (str_contains($field->getTitle(), $element)) {
+                        continue 2;
+                    }
+                }
                 $return[] = $field;
             }
         }

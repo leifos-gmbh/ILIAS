@@ -42,6 +42,14 @@ interface ElementHelperInterface
         SlotIdentifier $slot
     ): \Generator;
 
+    public function doesSlotHaveVocabularies(
+        SlotIdentifier $slot
+    ): bool;
+
+    public function doesSlotAllowCustomInput(
+        SlotIdentifier $slot,
+    ): bool;
+
     public function findElementOfCondition(
         SlotIdentifier $slot,
         ElementInterface $element,

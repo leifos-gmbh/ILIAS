@@ -58,6 +58,10 @@ class VocabValueConditionFactory extends BaseConditionFactory
         ElementInterface $context_element,
         ElementInterface $conditional_element
     ): FormInput {
+        /**
+         * TODO refactor this with the new helper methods!
+         */
+
         $slot = $this->element_vocab_helper->slotForElement($element);
         $unique_path_to_conditional_element = $this->path_factory->toElement($conditional_element, true);
         $path_for_conditional_slot = $this->path_factory->toElement($conditional_element);

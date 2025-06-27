@@ -34,19 +34,35 @@ use ILIAS\MetaData\Editor\Http\LinkFactory;
 use ILIAS\MetaData\Editor\Http\Command;
 use ILIAS\UI\Component\Signal;
 use ILIAS\MetaData\DataHelper\DataHelperInterface;
+use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelperInterface;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\UI\Component\Input\Input;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 
 class ContentAssembler
 {
-    // post variables
-    public const string KEYWORDS = 'keywords';
+    /**
+     * POST VARS
+     *
+     * For some elements we can't just use the path
+     * as the post key, because capitalization is not
+     * preserved: LOMv1.0 as a data filter becomes lomv1.0
+     */
+
     public const string GENERAL = 'general';
+    public const string KEYWORDS = 'keywords';
+
+    public const string CLASSIFICATION = 'classification';
+    public const string LEARNING_RESOURCE_TYPE = 'learning_resource_type';
+    public const string DISCIPLINE = 'discipline';
+
     public const string AUTHORS = 'authors';
-    public const string RIGHTS = 'rights';
-    public const string TYPICAL_LEARNING_TIME = 'tlt';
     public const string FIRST_AUTHOR = 'first_author';
     public const string SECOND_AUTHOR = 'second_author';
     public const string THIRD_AUTHOR = 'third_author';
+    public const string PUBLISHER = 'publisher';
 
+    public const string RIGHTS = 'rights';
     public const string CUSTOM_CP = 'custom_cp';
     public const string CUSTOM_CP_DESCRIPTION = 'custom_cp_description';
     public const string OER_BLOCKED = 'oer_blocked_';
@@ -60,6 +76,7 @@ class ContentAssembler
     protected LinkFactory $link_factory;
     protected CopyrightHandler $copyright_handler;
     protected DataHelperInterface $data_helper;
+    protected ElementHelperInterface $vocab_helper;
 
     public function __construct(
         PathFactory $path_factory,
@@ -70,7 +87,8 @@ class ContentAssembler
         PathCollection $path_collection,
         LinkFactory $link_factory,
         CopyrightHandler $copyright_handler,
-        DataHelperInterface $data_helper
+        DataHelperInterface $data_helper,
+        ElementHelperInterface $vocab_helper
     ) {
         $this->path_factory = $path_factory;
         $this->navigator_factory = $navigator_factory;
@@ -81,6 +99,7 @@ class ContentAssembler
         $this->link_factory = $link_factory;
         $this->copyright_handler = $copyright_handler;
         $this->data_helper = $data_helper;
+        $this->vocab_helper = $vocab_helper;
     }
 
     /**
@@ -92,6 +111,7 @@ class ContentAssembler
     ): \Generator {
         $sections = [
             self::GENERAL => $this->getGeneralSection($set),
+            self::CLASSIFICATION => $this->getClassificationSection($set),
             self::AUTHORS => $this->getAuthorsSection($set)
         ];
         foreach ($this->getCopyrightContent($set) as $type => $entity) {
@@ -101,7 +121,6 @@ class ContentAssembler
             }
             yield $type => $entity;
         }
-        $sections[self::TYPICAL_LEARNING_TIME] = $this->getTypicalLearningTimeSection($set);
         $form = $this->ui_factory->input()->container()->form()->standard(
             (string) $this->link_factory->custom(Command::UPDATE_DIGEST)->get(),
             $sections
@@ -200,6 +219,40 @@ class ContentAssembler
         );
     }
 
+    protected function getClassificationSection(
+        SetInterface $set
+    ): Section {
+        $ff = $this->ui_factory->input()->field();
+        $inputs = [];
+
+        $type_el = $this->navigator_factory->navigator(
+            $this->path_collection->firstLearningResourceType(),
+            $set->getRoot()
+        )->lastElementAtFinalStep();
+        $inputs[self::LEARNING_RESOURCE_TYPE] = $this->buildControlledVocabInput(
+            $this->presenter->utilities()->txt('meta_learning_resource_type'),
+            SlotIdentifier::EDUCATIONAL_LEARNING_RESOURCE_TYPE,
+            true,
+            $type_el?->getData()?->value()
+        );
+
+        $discipline_el = $this->navigator_factory->navigator(
+            $this->path_collection->firstDiscipline(),
+            $set->getRoot()
+        )->lastElementAtFinalStep();
+        $inputs[self::DISCIPLINE] = $this->buildControlledVocabInput(
+            $this->presenter->utilities()->txt('meta_discipline'),
+            SlotIdentifier::CLASSIFICATION_TAXON_ENTRY,
+            false,
+            $discipline_el?->getData()?->value()
+        );
+
+        return $ff->section(
+            $inputs,
+            $this->presenter->utilities()->txt('meta_classification')
+        );
+    }
+
     protected function getAuthorsSection(
         SetInterface $set
     ): Section {
@@ -219,7 +272,8 @@ class ContentAssembler
         $post_keys = [
             self::FIRST_AUTHOR,
             self::SECOND_AUTHOR,
-            self::THIRD_AUTHOR
+            self::THIRD_AUTHOR,
+            self::PUBLISHER
         ];
         foreach ($paths as $path) {
             $el = $this->navigator_factory->navigator(
@@ -230,6 +284,17 @@ class ContentAssembler
                 ->text(array_shift($labels))
                 ->withValue($el?->getData()?->value() ?? '');
         }
+
+        $publisher_el = $this->navigator_factory->navigator(
+            $this->path_collection->firstPublisher(),
+            $set->getRoot()
+        )->lastElementAtFinalStep();
+        $inputs[self::PUBLISHER] = $this->buildControlledVocabInput(
+            $this->presenter->utilities()->txt('meta_publisher'),
+            SlotIdentifier::LIFECYCLE_CONTRIBUTE_PUBLISHER,
+            false,
+            $publisher_el?->getData()?->value()
+        );
 
         return $ff->section(
             $inputs,
@@ -385,48 +450,83 @@ class ContentAssembler
         );
     }
 
-    protected function getTypicalLearningTimeSection(
-        SetInterface $set
-    ): Section {
-        $ff = $this->ui_factory->input()->field();
-        $inputs = [];
+    protected function buildControlledVocabInput(
+        string $label,
+        SlotIdentifier $slot,
+        bool $select_only,
+        ?string $data = null
+    ): Input {
+        /**
+         * TODO include source for learning resource type!
+         * TODO refactor this with the new helper methods!
+         */
+        $raw_values = [];
+        $allows_custom_input = !$select_only;
+        foreach ($this->vocab_helper->vocabulariesForSlot($slot) as $vocab) {
+            $values_from_vocab = iterator_to_array($vocab->values());
+            $raw_values = array_merge($raw_values, $values_from_vocab);
 
-        $tlt_el = $this->navigator_factory->navigator(
-            $path = $this->path_collection->firstTypicalLearningTime(),
-            $set->getRoot()
-        )->lastElementAtFinalStep();
-        $matches = iterator_to_array(
-            $this->data_helper->durationToIterator($tlt_el?->getData()?->value() ?? '')
-        );
-        $num = $ff->numeric('placeholder')
-                  ->withAdditionalTransformation($this->refinery->int()->isGreaterThanOrEqual(0));
-        $labels = [
-            $this->presenter->utilities()->txt('years'),
-            $this->presenter->utilities()->txt('months'),
-            $this->presenter->utilities()->txt('days'),
-            $this->presenter->utilities()->txt('hours'),
-            $this->presenter->utilities()->txt('minutes'),
-            $this->presenter->utilities()->txt('seconds')
-        ];
-        $inputs = [];
-        foreach ($labels as $key => $label) {
-            $inputs[] = (clone $num)
-                ->withLabel($label)
-                ->withValue($matches[$key] ?? null);
+            if (!$vocab->allowsCustomInputs()) {
+                $allows_custom_input = false;
+            }
         }
-        $dh = $this->data_helper;
-        $group = $ff->group(
-            $inputs
-        )->withAdditionalTransformation(
-            $this->refinery->custom()->transformation(function ($vs) use ($dh) {
-                $vs = array_map(fn($v) => is_null($v) ? $v : (int) $v, $vs);
-                return $dh->durationFromIntegers(...$vs);
-            })
+
+        $text_input = $this->ui_factory->input()->field()->text($label);
+        if (empty($raw_values)) {
+            if (isset($data) && !in_array($data, $raw_values)) {
+                $text_input = $text_input->withValue($data);
+            }
+            return $text_input;
+        }
+
+        if (!$allows_custom_input && isset($data) && !in_array($data, $raw_values)) {
+            array_unshift($raw_values, $data);
+        }
+
+        $values = [];
+        foreach ($this->presenter->data()->vocabularyValues($slot, ...$raw_values) as $labelled_value) {
+            $values[$labelled_value->value()] = $labelled_value->label();
+        }
+        $select_input = $this->ui_factory->input()->field()->select(
+            $label,
+            $values
         );
 
-        return $ff->section(
-            [$path->toString() => $group],
-            $this->presenter->utilities()->txt('meta_typical_learning_time')
+        $radio_value = null;
+        if (isset($data)) {
+            if (in_array($data, $raw_values)) {
+                $select_input = $select_input->withValue($data);
+                $radio_value = 'from_vocab';
+            } else {
+                $text_input = $text_input->withValue($data);
+                $radio_value = 'custom';
+            }
+        }
+
+        if (!$allows_custom_input) {
+            return $select_input;
+        }
+
+        $input = $this->ui_factory->input()->field()->switchableGroup(
+            [
+                'from_vocab' => $this->ui_factory->input()->field()->group(
+                    ['value' => $select_input],
+                    $this->presenter->utilities()->txt('md_editor_from_vocab_input')
+                ),
+                'custom' => $this->ui_factory->input()->field()->group(
+                    ['value' => $text_input],
+                    $this->presenter->utilities()->txt('md_editor_custom_input')
+                )
+            ],
+            $label
+        );
+        if (isset($radio_value)) {
+            $input = $input->withValue($radio_value);
+        }
+        return $input->withAdditionalTransformation(
+            $this->refinery->custom()->transformation(function ($vs) {
+                return $vs[1]['value'] ?? null;
+            })
         );
     }
 }

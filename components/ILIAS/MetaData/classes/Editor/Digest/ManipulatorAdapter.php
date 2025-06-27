@@ -71,14 +71,14 @@ class ManipulatorAdapter
         $data = $form->getData();
 
         $set = $this->prepareGeneral($set, $data[ContentAssembler::GENERAL]);
-        $set = $this->prepareAuthors($set, $data[ContentAssembler::AUTHORS]);
+        $set = $this->prepareClassification($set, $data[ContentAssembler::CLASSIFICATION]);
+        $set = $this->prepareContributors($set, $data[ContentAssembler::AUTHORS]);
         if (
             $this->copyright_handler->isCPSelectionActive() &&
             isset($data[ContentAssembler::RIGHTS])
         ) {
             $set = $this->prepareRights($set, $data[ContentAssembler::RIGHTS][0]);
         }
-        $set = $this->prepareTypicalLearningTime($set, $data[ContentAssembler::TYPICAL_LEARNING_TIME]);
 
         $this->manipulator->execute($set);
         return true;
@@ -129,12 +129,16 @@ class ManipulatorAdapter
         return $set;
     }
 
-    protected function prepareTypicalLearningTime(
+    protected function prepareClassification(
         SetInterface $set,
         array $data
     ): SetInterface {
+        $paths = [
+            ContentAssembler::LEARNING_RESOURCE_TYPE => $this->path_collection->firstLearningResourceType(),
+            ContentAssembler::DISCIPLINE => $this->path_collection->firstDiscipline()
+        ];
         foreach ($data as $post_key => $value) {
-            $path = $this->path_factory->fromString($post_key);
+            $path = $paths[$post_key];
             if ($value === null || $value === '') {
                 $set = $this->manipulator->prepareDelete($set, $path);
                 continue;
@@ -144,14 +148,15 @@ class ManipulatorAdapter
         return $set;
     }
 
-    protected function prepareAuthors(
+    protected function prepareContributors(
         SetInterface $set,
         array $data
     ): SetInterface {
         $paths = [
             ContentAssembler::FIRST_AUTHOR => $this->path_collection->firstAuthor(),
             ContentAssembler::SECOND_AUTHOR => $this->path_collection->secondAuthor(),
-            ContentAssembler::THIRD_AUTHOR => $this->path_collection->thirdAuthor()
+            ContentAssembler::THIRD_AUTHOR => $this->path_collection->thirdAuthor(),
+            ContentAssembler::PUBLISHER => $this->path_collection->firstPublisher()
         ];
         foreach ($data as $post_key => $value) {
             $path = $paths[$post_key];

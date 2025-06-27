@@ -51,7 +51,8 @@ class DigestInitiator
                     $this->services->OERHarvester()->statusRepository(),
                     $this->services->copyright()->identifiersHandler()
                 ),
-                $this->services->dataHelper()->dataHelper()
+                $this->services->dataHelper()->dataHelper(),
+                $this->services->vocabularies()->elementHelper()
             ),
             new ManipulatorAdapter(
                 $content_assembler,

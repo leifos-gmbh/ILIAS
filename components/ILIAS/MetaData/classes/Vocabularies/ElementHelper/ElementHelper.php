@@ -32,11 +32,17 @@ use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 
 class ElementHelper implements ElementHelperInterface
 {
+    /**
+     * TODO unit test this!
+     */
+
     protected SlotHandler $slot_handler;
     protected PathFactory $path_factory;
     protected NavigatorFactoryInterface $navigator_factory;
     protected ConditionChecker $condition_checker;
     protected ReaderInterface $reader;
+
+    protected array $cached_vocabularies_by_slot = [];
 
     public function __construct(
         SlotHandler $slot_handler,
@@ -76,7 +82,27 @@ class ElementHelper implements ElementHelperInterface
     public function vocabulariesForSlot(
         SlotIdentifier $slot
     ): \Generator {
-        yield from $this->reader->activeVocabulariesForSlots($slot);
+        if (!isset($this->cached_vocabularies_by_slot[$slot->value])) {
+            $this->cached_vocabularies_by_slot[$slot->value] = iterator_to_array(
+                $this->reader->activeVocabulariesForSlots($slot)
+            );
+        }
+        yield from $this->cached_vocabularies_by_slot[$slot->value];
+    }
+
+    public function doesSlotHaveVocabularies(SlotIdentifier $slot): bool
+    {
+        return $this->vocabulariesForSlot($slot)->current() !== null;
+    }
+
+    public function doesSlotAllowCustomInput(SlotIdentifier $slot): bool
+    {
+        foreach ($this->vocabulariesForSlot($slot) as $vocab) {
+            if (!$vocab->allowsCustomInputs()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public function findElementOfCondition(

@@ -53,6 +53,10 @@ class StringFactory extends BaseFactory
         ElementInterface $context_element,
         SlotIdentifier $conditional_slot = SlotIdentifier::NULL
     ): FormInput {
+        /**
+         * TODO refactor this with the new helper methods!
+         */
+
         $slot = $this->element_vocab_helper->slotForElement($element);
 
         $data = null;

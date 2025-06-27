@@ -59,6 +59,10 @@ class VocabValueFactory extends BaseFactory
         SlotIdentifier $slot,
         bool $add_value_from_data
     ): FormInput {
+        /**
+         * TODO refactor this with the new helper methods!
+         */
+
         $data = null;
         if ($element->getData()->type() !== Type::NULL) {
             $data = $element->getData()->value();

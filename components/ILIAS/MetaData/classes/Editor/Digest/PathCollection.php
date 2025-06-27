@@ -33,10 +33,12 @@ class PathCollection
     protected PathInterface $descriptions;
     protected PathInterface $languages;
     protected PathInterface $keywords;
+    protected PathInterface $first_learning_resource_type;
+    protected PathInterface $first_discipline;
     protected PathInterface $first_author;
     protected PathInterface $second_author;
     protected PathInterface $third_author;
-    protected PathInterface $first_typical_learning_time;
+    protected PathInterface $first_publisher;
     protected PathInterface $copyright;
     protected PathInterface $has_copyright;
     protected PathInterface $has_copyright_source;
@@ -74,16 +76,50 @@ class PathCollection
             ->withNextStep('string')
             ->get();
 
+        $this->first_learning_resource_type = $this->path_factory
+            ->custom()
+            ->withNextStep('educational')
+            ->withNextStep('learningResourceType')
+            ->withAdditionalFilterAtCurrentStep(FilterType::INDEX, '0')
+            ->withNextStep('value')
+            ->get();
+
+        $this->first_discipline = $this->path_factory
+            ->custom()
+            ->withNextStep('classification')
+            ->withNextStep('purpose')
+            ->withNextStep('value')
+            ->withAdditionalFilterAtCurrentStep(FilterType::DATA, 'discipline')
+            ->withNextStepToSuperElement()
+            ->withNextStep('source')
+            ->withAdditionalFilterAtCurrentStep(FilterType::DATA, 'LOMv1.0')
+            ->withNextStepToSuperElement()
+            ->withNextStepToSuperElement()
+            ->withNextStep('taxonPath')
+            ->withNextStep('taxon')
+            ->withAdditionalFilterAtCurrentStep(FilterType::INDEX, '0')
+            ->withNextStep('entry')
+            ->withNextStep('string')
+            ->get();
+
         $this->first_author = $this->authorWithIndex(0);
         $this->second_author = $this->authorWithIndex(1);
         $this->third_author = $this->authorWithIndex(2);
 
-        $this->first_typical_learning_time = $this->path_factory
+        $this->first_publisher = $this->path_factory
             ->custom()
-            ->withNextStep('educational')
+            ->withNextStep('lifeCycle')
+            ->withNextStep('contribute')
+            ->withNextStep('role')
+            ->withNextStep('value')
+            ->withAdditionalFilterAtCurrentStep(FilterType::DATA, 'publisher')
+            ->withNextStepToSuperElement()
+            ->withNextStep('source')
+            ->withAdditionalFilterAtCurrentStep(FilterType::DATA, 'LOMv1.0')
+            ->withNextStepToSuperElement()
+            ->withNextStepToSuperElement()
+            ->withNextStep('entity')
             ->withAdditionalFilterAtCurrentStep(FilterType::INDEX, '0')
-            ->withNextStep('typicalLearningTime')
-            ->withNextStep('duration')
             ->get();
 
         $this->copyright = $this->path_factory
@@ -145,6 +181,16 @@ class PathCollection
             ->get();
     }
 
+    public function firstLearningResourceType(): PathInterface
+    {
+        return $this->first_learning_resource_type;
+    }
+
+    public function firstDiscipline(): PathInterface
+    {
+        return $this->first_discipline;
+    }
+
     public function firstAuthor(): PathInterface
     {
         return $this->first_author;
@@ -168,8 +214,7 @@ class PathCollection
             ->withNextStep('contribute')
             ->withNextStep('role')
             ->withNextStep('value')
-            // also capitalized to ensure backwards compatibility (38865)
-            ->withAdditionalFilterAtCurrentStep(FilterType::DATA, 'author', 'Author')
+            ->withAdditionalFilterAtCurrentStep(FilterType::DATA, 'author')
             ->withNextStepToSuperElement()
             ->withNextStep('source')
             ->withAdditionalFilterAtCurrentStep(FilterType::DATA, 'LOMv1.0')
@@ -180,9 +225,9 @@ class PathCollection
             ->get();
     }
 
-    public function firstTypicalLearningTime(): PathInterface
+    public function firstPublisher(): PathInterface
     {
-        return $this->first_typical_learning_time;
+        return $this->first_publisher;
     }
 
     public function copyright(): PathInterface

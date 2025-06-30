@@ -34,6 +34,7 @@ class PathCollection
     protected PathInterface $languages;
     protected PathInterface $keywords;
     protected PathInterface $first_learning_resource_type;
+    protected PathInterface $first_learning_resource_type_source;
     protected PathInterface $first_discipline;
     protected PathInterface $first_author;
     protected PathInterface $second_author;
@@ -76,12 +77,18 @@ class PathCollection
             ->withNextStep('string')
             ->get();
 
-        $this->first_learning_resource_type = $this->path_factory
+        $first_type_builder = $this->path_factory
             ->custom()
             ->withNextStep('educational')
             ->withNextStep('learningResourceType')
-            ->withAdditionalFilterAtCurrentStep(FilterType::INDEX, '0')
+            ->withAdditionalFilterAtCurrentStep(FilterType::INDEX, '0');
+
+        $this->first_learning_resource_type = $first_type_builder
             ->withNextStep('value')
+            ->get();
+
+        $this->first_learning_resource_type_source = $first_type_builder
+            ->withNextStep('source')
             ->get();
 
         $this->first_discipline = $this->path_factory
@@ -184,6 +191,11 @@ class PathCollection
     public function firstLearningResourceType(): PathInterface
     {
         return $this->first_learning_resource_type;
+    }
+
+    public function firstLearningResourceTypeSource(): PathInterface
+    {
+        return $this->first_learning_resource_type_source;
     }
 
     public function firstDiscipline(): PathInterface

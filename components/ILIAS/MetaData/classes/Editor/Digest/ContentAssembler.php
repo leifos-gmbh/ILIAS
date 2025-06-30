@@ -34,10 +34,9 @@ use ILIAS\MetaData\Editor\Http\LinkFactory;
 use ILIAS\MetaData\Editor\Http\Command;
 use ILIAS\UI\Component\Signal;
 use ILIAS\MetaData\DataHelper\DataHelperInterface;
-use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelperInterface;
+use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as VocabInputBridge;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 use ILIAS\UI\Component\Input\Input;
-use ILIAS\MetaData\Vocabularies\Slots\Identifier;
 
 class ContentAssembler
 {
@@ -76,7 +75,7 @@ class ContentAssembler
     protected LinkFactory $link_factory;
     protected CopyrightHandler $copyright_handler;
     protected DataHelperInterface $data_helper;
-    protected ElementHelperInterface $vocab_helper;
+    protected VocabInputBridge $vocab_input_bridge;
 
     public function __construct(
         PathFactory $path_factory,
@@ -88,7 +87,7 @@ class ContentAssembler
         LinkFactory $link_factory,
         CopyrightHandler $copyright_handler,
         DataHelperInterface $data_helper,
-        ElementHelperInterface $vocab_helper
+        VocabInputBridge $vocab_input_bridge
     ) {
         $this->path_factory = $path_factory;
         $this->navigator_factory = $navigator_factory;
@@ -99,7 +98,7 @@ class ContentAssembler
         $this->link_factory = $link_factory;
         $this->copyright_handler = $copyright_handler;
         $this->data_helper = $data_helper;
-        $this->vocab_helper = $vocab_helper;
+        $this->vocab_input_bridge = $vocab_input_bridge;
     }
 
     /**
@@ -229,22 +228,35 @@ class ContentAssembler
             $this->path_collection->firstLearningResourceType(),
             $set->getRoot()
         )->lastElementAtFinalStep();
-        $inputs[self::LEARNING_RESOURCE_TYPE] = $this->buildControlledVocabInput(
-            $this->presenter->utilities()->txt('meta_learning_resource_type'),
+        $data = !$type_el?->isScaffold() ? $type_el?->getData()?->value() : null;
+        $values = [];
+        $raw_values = $this->vocab_input_bridge->valuesInVocabulariesForSlot(
             SlotIdentifier::EDUCATIONAL_LEARNING_RESOURCE_TYPE,
-            true,
-            $type_el?->getData()?->value()
+            $data
         );
+        foreach ($this->presenter->data()->vocabularyValues(
+            SlotIdentifier::EDUCATIONAL_LEARNING_RESOURCE_TYPE,
+            ...$raw_values
+        ) as $labelled_value) {
+            $values[$labelled_value->value()] = $labelled_value->label();
+        }
+        $input = $this->ui_factory->input()->field()->select(
+            $this->presenter->utilities()->txt('meta_learning_resource_type'),
+            $values
+        );
+        if (isset($data)) {
+            $input = $input->withValue($data);
+        }
+        $inputs[self::LEARNING_RESOURCE_TYPE] = $input;
 
         $discipline_el = $this->navigator_factory->navigator(
             $this->path_collection->firstDiscipline(),
             $set->getRoot()
         )->lastElementAtFinalStep();
-        $inputs[self::DISCIPLINE] = $this->buildControlledVocabInput(
+        $inputs[self::DISCIPLINE] = $this->buildStringFromControlledVocabInput(
             $this->presenter->utilities()->txt('meta_discipline'),
             SlotIdentifier::CLASSIFICATION_TAXON_ENTRY,
-            false,
-            $discipline_el?->getData()?->value()
+            !$discipline_el?->isScaffold() ? $discipline_el?->getData()?->value() : null
         );
 
         return $ff->section(
@@ -289,10 +301,9 @@ class ContentAssembler
             $this->path_collection->firstPublisher(),
             $set->getRoot()
         )->lastElementAtFinalStep();
-        $inputs[self::PUBLISHER] = $this->buildControlledVocabInput(
+        $inputs[self::PUBLISHER] = $this->buildStringFromControlledVocabInput(
             $this->presenter->utilities()->txt('meta_publisher'),
             SlotIdentifier::LIFECYCLE_CONTRIBUTE_PUBLISHER,
-            false,
             $publisher_el?->getData()?->value()
         );
 
@@ -450,47 +461,39 @@ class ContentAssembler
         );
     }
 
-    protected function buildControlledVocabInput(
+    protected function buildStringFromControlledVocabInput(
         string $label,
         SlotIdentifier $slot,
-        bool $select_only,
         ?string $data = null
     ): Input {
-        /**
-         * TODO include source for learning resource type!
-         * TODO refactor this with the new helper methods!
-         */
-        $raw_values = [];
-        $allows_custom_input = !$select_only;
-        foreach ($this->vocab_helper->vocabulariesForSlot($slot) as $vocab) {
-            $values_from_vocab = iterator_to_array($vocab->values());
-            $raw_values = array_merge($raw_values, $values_from_vocab);
-
-            if (!$vocab->allowsCustomInputs()) {
-                $allows_custom_input = false;
+        if (!$this->vocab_input_bridge->doesSlotHaveVocabularies($slot)) {
+            $input = $this->ui_factory->input()->field()->text($label);
+            if (isset($data)) {
+                $input = $input->withValue($data);
             }
-        }
-
-        $text_input = $this->ui_factory->input()->field()->text($label);
-        if (empty($raw_values)) {
-            if (isset($data) && !in_array($data, $raw_values)) {
-                $text_input = $text_input->withValue($data);
-            }
-            return $text_input;
-        }
-
-        if (!$allows_custom_input && isset($data) && !in_array($data, $raw_values)) {
-            array_unshift($raw_values, $data);
+            return $input;
         }
 
         $values = [];
+        $raw_values = iterator_to_array($this->vocab_input_bridge->valuesInVocabulariesForSlot(
+            $slot,
+            !$this->vocab_input_bridge->doesSlotAllowCustomInput($slot) ? $data : null
+        ));
         foreach ($this->presenter->data()->vocabularyValues($slot, ...$raw_values) as $labelled_value) {
             $values[$labelled_value->value()] = $labelled_value->label();
         }
-        $select_input = $this->ui_factory->input()->field()->select(
-            $label,
-            $values
-        );
+
+        if (!$this->vocab_input_bridge->doesSlotAllowCustomInput($slot)) {
+            $input = $this->ui_factory->input()->field()->select($label, $values);
+            if (isset($data)) {
+                $input = $input->withValue($data);
+            }
+            return $input;
+        }
+
+        $value_label = $this->presenter->utilities()->txt('md_editor_value');
+        $text_input = $this->ui_factory->input()->field()->text($value_label);
+        $select_input = $this->ui_factory->input()->field()->select($value_label, $values);
 
         $radio_value = null;
         if (isset($data)) {
@@ -501,10 +504,6 @@ class ContentAssembler
                 $text_input = $text_input->withValue($data);
                 $radio_value = 'custom';
             }
-        }
-
-        if (!$allows_custom_input) {
-            return $select_input;
         }
 
         $input = $this->ui_factory->input()->field()->switchableGroup(

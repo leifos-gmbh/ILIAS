@@ -27,7 +27,8 @@ use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\MetaData\Elements\Data\Type;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\DataHelper\DataHelperInterface;
-use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelperInterface;
+use ILIAS\MetaData\Vocabularies\Slots\ElementHelperInterface as ElementVocabSlotsHelper;
+use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as VocabInputBridge;
 
 class FactoryWithoutConditionTypesService
 {
@@ -44,7 +45,8 @@ class FactoryWithoutConditionTypesService
         ConstraintDictionary $constraint_dictionary,
         Refinery $refinery,
         DataHelperInterface $data_helper,
-        ElementHelperInterface $element_vocab_helper,
+        ElementVocabSlotsHelper $element_vocab_slots_helper,
+        VocabInputBridge $vocab_input_bridge,
         PathFactory $path_factory
     ) {
         $this->datetime = new DatetimeFactory(
@@ -77,14 +79,16 @@ class FactoryWithoutConditionTypesService
             $ui_factory,
             $presenter,
             $constraint_dictionary,
-            $element_vocab_helper,
+            $element_vocab_slots_helper,
+            $vocab_input_bridge,
             $refinery
         );
         $this->vocab_value = new VocabValueFactory(
             $ui_factory,
             $presenter,
             $constraint_dictionary,
-            $element_vocab_helper,
+            $element_vocab_slots_helper,
+            $vocab_input_bridge,
             $refinery,
             $path_factory
         );

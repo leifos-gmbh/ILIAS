@@ -44,15 +44,18 @@ use ILIAS\MetaData\Vocabularies\Dispatch\ReaderInterface;
 use ILIAS\MetaData\Vocabularies\Dispatch\Reader;
 use ILIAS\MetaData\Vocabularies\Dispatch\Actions;
 use ILIAS\MetaData\Vocabularies\Dispatch\Info\Infos;
-use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelperInterface;
-use ILIAS\MetaData\Vocabularies\ElementHelper\ElementHelper;
+use ILIAS\MetaData\Vocabularies\Slots\ElementHelperInterface as SlotElementHelperInterface;
+use ILIAS\MetaData\Vocabularies\Slots\ElementHelper as SlotElementHelper;
+use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as InputBridgeInterface;
+use ILIAS\MetaData\Vocabularies\Input\Bridge as InputBridge;
 use ILIAS\MetaData\Vocabularies\Slots\Conditions\Checker;
 
 class Services
 {
     protected PresentationInterface $presentation;
     protected ManagerInterface $manager;
-    protected ElementHelperInterface $element_helper;
+    protected SlotElementHelperInterface $slot_element_helper;
+    protected InputBridgeInterface $input_bridge;
     protected SlotHandler $slot_handler;
 
     protected ReaderInterface $reader;
@@ -90,12 +93,12 @@ class Services
         );
     }
 
-    public function elementHelper(): ElementHelperInterface
+    public function slotElementHelper(): SlotElementHelperInterface
     {
-        if (isset($this->element_helper)) {
-            return $this->element_helper;
+        if (isset($this->slot_element_helper)) {
+            return $this->slot_element_helper;
         }
-        return $this->element_helper = new ElementHelper(
+        return $this->slot_element_helper = new SlotElementHelper(
             $this->slotHandler(),
             $this->path_services->pathFactory(),
             $this->path_services->navigatorFactory(),
@@ -103,7 +106,16 @@ class Services
                 $this->slotHandler(),
                 $this->path_services->pathFactory(),
                 $this->path_services->navigatorFactory()
-            ),
+            )
+        );
+    }
+
+    public function inputBridge(): InputBridgeInterface
+    {
+        if (isset($this->input_bridge)) {
+            return $this->input_bridge;
+        }
+        return $this->input_bridge = new InputBridge(
             $this->reader()
         );
     }

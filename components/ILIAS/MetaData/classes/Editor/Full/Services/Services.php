@@ -89,7 +89,7 @@ class Services
         $refinery = $this->dic->refinery();
         $presenter = $this->editor_services->presenter();
         $path_factory = $this->path_services->pathFactory();
-        $element_vocab_helper = $this->vocabularies_services->elementHelper();
+        $element_vocab_slot_helper = $this->vocabularies_services->slotElementHelper();
         return $this->input_factory = new InputFactory(
             $field_factory,
             $refinery,
@@ -104,10 +104,10 @@ class Services
                 $refinery,
                 $path_factory,
                 $this->data_helper_services->dataHelper(),
-                $element_vocab_helper,
-                $this->vocabularies_services->slotHandler()
+                $element_vocab_slot_helper,
+                $this->vocabularies_services->inputBridge()
             ),
-            $element_vocab_helper
+            $element_vocab_slot_helper
         );
     }
 

@@ -27,6 +27,8 @@ use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Editor\Manipulator\ManipulatorInterface;
 use ILIAS\MetaData\Vocabularies\Factory\Factory;
 use ILIAS\MetaData\Vocabularies\Factory\FactoryInterface;
+use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as VocabInputBridge;
+use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class ManipulatorAdapter
 {
@@ -36,6 +38,7 @@ class ManipulatorAdapter
     protected ManipulatorInterface $manipulator;
     protected PathFactory $path_factory;
     protected NavigatorFactoryInterface $navigator_factory;
+    protected VocabInputBridge $vocab_input_bridge;
 
     public function __construct(
         ContentAssembler $content_assembler,
@@ -43,7 +46,8 @@ class ManipulatorAdapter
         PathCollection $path_collection,
         ManipulatorInterface $manipulator,
         PathFactory $path_factory,
-        NavigatorFactoryInterface $navigator_factory
+        NavigatorFactoryInterface $navigator_factory,
+        VocabInputBridge $vocab_input_bridge
     ) {
         $this->content_assembler = $content_assembler;
         $this->copyright_handler = $copyright_handler;
@@ -51,6 +55,7 @@ class ManipulatorAdapter
         $this->manipulator = $manipulator;
         $this->path_factory = $path_factory;
         $this->navigator_factory = $navigator_factory;
+        $this->vocab_input_bridge = $vocab_input_bridge;
     }
 
     public function update(
@@ -133,18 +138,38 @@ class ManipulatorAdapter
         SetInterface $set,
         array $data
     ): SetInterface {
-        $paths = [
-            ContentAssembler::LEARNING_RESOURCE_TYPE => $this->path_collection->firstLearningResourceType(),
-            ContentAssembler::DISCIPLINE => $this->path_collection->firstDiscipline()
-        ];
-        foreach ($data as $post_key => $value) {
-            $path = $paths[$post_key];
-            if ($value === null || $value === '') {
-                $set = $this->manipulator->prepareDelete($set, $path);
-                continue;
-            }
-            $set = $this->manipulator->prepareCreateOrUpdate($set, $path, $value);
+        $type_value = $data[ContentAssembler::LEARNING_RESOURCE_TYPE] ?? '';
+        $type_source = $this->vocab_input_bridge->sourceMapForSlot(SlotIdentifier::EDUCATIONAL_LEARNING_RESOURCE_TYPE)($type_value);
+        if ($type_value === null || $type_value === '') {
+            $set = $this->manipulator->prepareDelete($set, $this->path_collection->firstLearningResourceType());
+        } else {
+            $set = $this->manipulator->prepareCreateOrUpdate(
+                $set,
+                $this->path_collection->firstLearningResourceType(),
+                $type_value
+            );
         }
+        if ($type_source === null || $type_source === '') {
+            $set = $this->manipulator->prepareDelete($set, $this->path_collection->firstLearningResourceTypeSource());
+        } else {
+            $set = $this->manipulator->prepareCreateOrUpdate(
+                $set,
+                $this->path_collection->firstLearningResourceTypeSource(),
+                $type_source
+            );
+        }
+
+        $discipline = $data[ContentAssembler::DISCIPLINE] ?? '';
+        if ($discipline === null || $discipline === '') {
+            $set = $this->manipulator->prepareDelete($set, $this->path_collection->firstDiscipline());
+        } else {
+            $set = $this->manipulator->prepareCreateOrUpdate(
+                $set,
+                $this->path_collection->firstDiscipline(),
+                $discipline
+            );
+        }
+
         return $set;
     }
 

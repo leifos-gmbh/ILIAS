@@ -18,16 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\ElementHelper;
+namespace ILIAS\MetaData\Vocabularies\Slots;
 
-use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Elements\ElementInterface;
-use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
-use ILIAS\MetaData\Vocabularies\Slots\HandlerInterface as SlotHandler;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Vocabularies\Slots\Conditions\CheckerInterface as ConditionChecker;
-use ILIAS\MetaData\Vocabularies\Slots\Identifier;
-use ILIAS\MetaData\Vocabularies\Dispatch\ReaderInterface;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 
 class ElementHelper implements ElementHelperInterface
@@ -36,77 +31,55 @@ class ElementHelper implements ElementHelperInterface
      * TODO unit test this!
      */
 
-    protected SlotHandler $slot_handler;
+    protected HandlerInterface $slot_handler;
     protected PathFactory $path_factory;
     protected NavigatorFactoryInterface $navigator_factory;
     protected ConditionChecker $condition_checker;
-    protected ReaderInterface $reader;
-
-    protected array $cached_vocabularies_by_slot = [];
 
     public function __construct(
-        SlotHandler $slot_handler,
+        HandlerInterface $slot_handler,
         PathFactory $path_factory,
         NavigatorFactoryInterface $navigator_factory,
-        ConditionChecker $condition_checker,
-        ReaderInterface $reader
+        ConditionChecker $condition_checker
     ) {
         $this->slot_handler = $slot_handler;
         $this->path_factory = $path_factory;
         $this->navigator_factory = $navigator_factory;
         $this->condition_checker = $condition_checker;
-        $this->reader = $reader;
     }
 
-    public function slotForElement(ElementInterface $element): SlotIdentifier
+    public function slotForElement(ElementInterface $element): Identifier
     {
         foreach ($this->slotsForElementWithoutCondition($element) as $slot) {
             if ($this->condition_checker->doesElementFitSlot($element, $slot)) {
                 return $slot;
             }
         }
-        return SlotIdentifier::NULL;
+        return Identifier::NULL;
     }
 
     /**
-     * @return SlotIdentifier[]
+     * @return Identifier[]
      */
     public function slotsForElementWithoutCondition(ElementInterface $element): \Generator
     {
         yield from $this->slot_handler->allSlotsForPath($this->path_factory->toElement($element));
     }
 
-    /**
-     * @return VocabularyInterface[]
-     */
-    public function vocabulariesForSlot(
-        SlotIdentifier $slot
-    ): \Generator {
-        if (!isset($this->cached_vocabularies_by_slot[$slot->value])) {
-            $this->cached_vocabularies_by_slot[$slot->value] = iterator_to_array(
-                $this->reader->activeVocabulariesForSlots($slot)
-            );
-        }
-        yield from $this->cached_vocabularies_by_slot[$slot->value];
-    }
-
-    public function doesSlotHaveVocabularies(SlotIdentifier $slot): bool
-    {
-        return $this->vocabulariesForSlot($slot)->current() !== null;
-    }
-
-    public function doesSlotAllowCustomInput(SlotIdentifier $slot): bool
-    {
-        foreach ($this->vocabulariesForSlot($slot) as $vocab) {
-            if (!$vocab->allowsCustomInputs()) {
-                return false;
-            }
-        }
-        return true;
+    public function potentialSlotForElementByCondition(
+        ElementInterface $element,
+        ElementInterface $element_in_condition,
+        string $value
+    ): Identifier {
+        return $this->slot_handler->identiferFromPathAndCondition(
+            $this->path_factory->toElement($element),
+            $this->path_factory->betweenElements($element, $element_in_condition),
+            $value,
+        );
     }
 
     public function findElementOfCondition(
-        SlotIdentifier $slot,
+        Identifier $slot,
         ElementInterface $element,
         ElementInterface ...$all_elements
     ): ?ElementInterface {

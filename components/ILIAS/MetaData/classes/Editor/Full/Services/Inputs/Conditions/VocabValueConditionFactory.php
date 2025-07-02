@@ -27,10 +27,8 @@ use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as Const
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
 use ILIAS\MetaData\Editor\Full\Services\Inputs\WithoutConditions\FactoryWithoutConditionTypesService;
-use ILIAS\MetaData\Vocabularies\Slots\ElementHelperInterface as ElementVocabSlotsHelper;
-use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as VocabInputBridge;
+use ILIAS\MetaData\Editor\Vocabulary\AdapterInterface as VocabularyAdapter;
 use ILIAS\MetaData\Elements\Data\Type;
-use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
@@ -39,8 +37,7 @@ class VocabValueConditionFactory extends BaseConditionFactory
 {
     protected PathFactory $path_factory;
     protected Refinery $refinery;
-    protected ElementVocabSlotsHelper $element_vocab_slot_helper;
-    protected VocabInputBridge $vocab_input_bridge;
+    protected VocabularyAdapter $vocabulary_adapter;
 
     public function __construct(
         UIFactory $ui_factory,
@@ -49,14 +46,12 @@ class VocabValueConditionFactory extends BaseConditionFactory
         FactoryWithoutConditionTypesService $types,
         PathFactory $path_factory,
         Refinery $refinery,
-        ElementVocabSlotsHelper $element_vocab_slot_helper,
-        VocabInputBridge $vocab_input_bridge
+        VocabularyAdapter $vocabulary_adapter
     ) {
         parent::__construct($ui_factory, $presenter, $constraint_dictionary, $types);
         $this->path_factory = $path_factory;
         $this->refinery = $refinery;
-        $this->element_vocab_slot_helper = $element_vocab_slot_helper;
-        $this->vocab_input_bridge = $vocab_input_bridge;
+        $this->vocabulary_adapter = $vocabulary_adapter;
     }
 
     public function getConditionInput(
@@ -64,17 +59,17 @@ class VocabValueConditionFactory extends BaseConditionFactory
         ElementInterface $context_element,
         ElementInterface $conditional_element
     ): FormInput {
-        $slot = $this->element_vocab_slot_helper->slotForElement($element);
+        $slot = $this->vocabulary_adapter->slotForElement($element);
         $unique_path_to_conditional_element = $this->path_factory->toElement($conditional_element, true);
 
         $data = $this->getDataFromElementOrConstraint($element);
         $conditional_data = $this->getDataFromElementOrConstraint($conditional_element);
 
         $groups = [];
-        $values = iterator_to_array($this->vocab_input_bridge->valuesInVocabulariesForSlot($slot));
+        $values = iterator_to_array($this->vocabulary_adapter->valuesInVocabulariesForSlot($slot));
         $labels_by_value = $this->getLabelsByValueForVocabulary($slot, ...$values);
         foreach ($values as $value) {
-            $conditional_slot = $this->element_vocab_slot_helper->potentialSlotForElementByCondition(
+            $conditional_slot = $this->vocabulary_adapter->potentialSlotForElementByCondition(
                 $conditional_element,
                 $element,
                 $value
@@ -104,7 +99,7 @@ class VocabValueConditionFactory extends BaseConditionFactory
             $radios = $radios->withValue($data);
         }
 
-        $source_map = $this->vocab_input_bridge->sourceMapForSlot($slot);
+        $source_map = $this->vocabulary_adapter->sourceMapForSlot($slot);
         $source_path = $this->getPathToSourceElement($element);
         return $this->addConstraintsFromElement(
             $this->constraint_dictionary,

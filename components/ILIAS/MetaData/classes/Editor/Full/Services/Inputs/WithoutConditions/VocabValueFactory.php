@@ -27,16 +27,14 @@ use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as Const
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
 use ILIAS\MetaData\Elements\Data\Type;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
-use ILIAS\MetaData\Vocabularies\Slots\ElementHelperInterface as ElementVocabSlotsHelper;
-use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as VocabInputBridge;
+use ILIAS\MetaData\Editor\Vocabulary\AdapterInterface as VocabularyAdapter;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\MetaData\Paths\PathInterface;
 
 class VocabValueFactory extends BaseFactory
 {
-    protected ElementVocabSlotsHelper $element_vocab_slots_helper;
-    protected VocabInputBridge $vocab_input_bridge;
+    protected VocabularyAdapter $vocabulary_adapter;
     protected Refinery $refinery;
     protected PathFactory $path_factory;
 
@@ -44,14 +42,12 @@ class VocabValueFactory extends BaseFactory
         UIFactory $ui_factory,
         PresenterInterface $presenter,
         ConstraintDictionary $constraint_dictionary,
-        ElementVocabSlotsHelper $element_vocab_slots_helper,
-        VocabInputBridge $vocab_input_bridge,
+        VocabularyAdapter $vocabulary_adapter,
         Refinery $refinery,
         PathFactory $path_factory
     ) {
         parent::__construct($ui_factory, $presenter, $constraint_dictionary);
-        $this->element_vocab_slots_helper = $element_vocab_slots_helper;
-        $this->vocab_input_bridge = $vocab_input_bridge;
+        $this->vocabulary_adapter = $vocabulary_adapter;
         $this->refinery = $refinery;
         $this->path_factory = $path_factory;
     }
@@ -68,7 +64,7 @@ class VocabValueFactory extends BaseFactory
         }
 
         $values = [];
-        $raw_values = $this->vocab_input_bridge->valuesInVocabulariesForSlot(
+        $raw_values = $this->vocabulary_adapter->valuesInVocabulariesForSlot(
             $slot,
             $add_value_from_data ? $data : null
         );
@@ -85,7 +81,7 @@ class VocabValueFactory extends BaseFactory
         }
 
         $source_path = $this->getPathToSourceElement($element);
-        $sources_by_value = $this->vocab_input_bridge->sourceMapForSlot($slot);
+        $sources_by_value = $this->vocabulary_adapter->sourceMapForSlot($slot);
         return $this->addConstraintsFromElement($this->constraint_dictionary, $element, $input)
                     ->withAdditionalTransformation(
                         $this->refinery->custom()->transformation(function ($vs) use ($sources_by_value, $source_path) {
@@ -105,7 +101,7 @@ class VocabValueFactory extends BaseFactory
         return $this->rawInput(
             $element,
             $context_element,
-            $slot = $this->element_vocab_slots_helper->slotForElement($element),
+            $slot = $this->vocabulary_adapter->slotForElement($element),
             true
         );
     }
@@ -115,7 +111,7 @@ class VocabValueFactory extends BaseFactory
         ElementInterface $context_element,
         SlotIdentifier $conditional_slot
     ): FormInput {
-        $slot = $this->element_vocab_slots_helper->slotForElement($element);
+        $slot = $this->vocabulary_adapter->slotForElement($element);
         return $this->rawInput(
             $element,
             $context_element,

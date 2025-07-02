@@ -27,10 +27,6 @@ use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 
 class ElementHelper implements ElementHelperInterface
 {
-    /**
-     * TODO unit test this!
-     */
-
     protected HandlerInterface $slot_handler;
     protected PathFactory $path_factory;
     protected NavigatorFactoryInterface $navigator_factory;

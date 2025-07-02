@@ -18,14 +18,32 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Input;
+namespace ILIAS\MetaData\Editor\Vocabulary;
 
-use ILIAS\MetaData\Vocabularies\VocabularyInterface;
-use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
+use ILIAS\MetaData\Elements\ElementInterface;
 
-interface BridgeInterface
+interface AdapterInterface
 {
+    public function findElementOfCondition(
+        SlotIdentifier $slot,
+        ElementInterface $element,
+        ElementInterface ...$all_elements
+    ): ?ElementInterface;
+
+    public function slotForElement(ElementInterface $element): SlotIdentifier;
+
+    /**
+     * @return SlotIdentifier[]
+     */
+    public function slotsForElementWithoutCondition(ElementInterface $element): \Generator;
+
+    public function potentialSlotForElementByCondition(
+        ElementInterface $element,
+        ElementInterface $element_in_condition,
+        string $value
+    ): SlotIdentifier;
+
     public function doesSlotHaveVocabularies(
         SlotIdentifier $slot
     ): bool;

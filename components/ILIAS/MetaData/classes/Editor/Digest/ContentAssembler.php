@@ -34,7 +34,7 @@ use ILIAS\MetaData\Editor\Http\LinkFactory;
 use ILIAS\MetaData\Editor\Http\Command;
 use ILIAS\UI\Component\Signal;
 use ILIAS\MetaData\DataHelper\DataHelperInterface;
-use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as VocabInputBridge;
+use ILIAS\MetaData\Editor\Vocabulary\AdapterInterface as VocabularyAdapter;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 use ILIAS\UI\Component\Input\Input;
 
@@ -75,7 +75,7 @@ class ContentAssembler
     protected LinkFactory $link_factory;
     protected CopyrightHandler $copyright_handler;
     protected DataHelperInterface $data_helper;
-    protected VocabInputBridge $vocab_input_bridge;
+    protected VocabularyAdapter $vocabulary_adapter;
 
     public function __construct(
         PathFactory $path_factory,
@@ -87,7 +87,7 @@ class ContentAssembler
         LinkFactory $link_factory,
         CopyrightHandler $copyright_handler,
         DataHelperInterface $data_helper,
-        VocabInputBridge $vocab_input_bridge
+        VocabularyAdapter $vocabulary_adapter
     ) {
         $this->path_factory = $path_factory;
         $this->navigator_factory = $navigator_factory;
@@ -98,7 +98,7 @@ class ContentAssembler
         $this->link_factory = $link_factory;
         $this->copyright_handler = $copyright_handler;
         $this->data_helper = $data_helper;
-        $this->vocab_input_bridge = $vocab_input_bridge;
+        $this->vocabulary_adapter = $vocabulary_adapter;
     }
 
     /**
@@ -230,7 +230,7 @@ class ContentAssembler
         )->lastElementAtFinalStep();
         $data = !$type_el?->isScaffold() ? $type_el?->getData()?->value() : null;
         $values = [];
-        $raw_values = $this->vocab_input_bridge->valuesInVocabulariesForSlot(
+        $raw_values = $this->vocabulary_adapter->valuesInVocabulariesForSlot(
             SlotIdentifier::EDUCATIONAL_LEARNING_RESOURCE_TYPE,
             $data
         );
@@ -466,7 +466,7 @@ class ContentAssembler
         SlotIdentifier $slot,
         ?string $data = null
     ): Input {
-        if (!$this->vocab_input_bridge->doesSlotHaveVocabularies($slot)) {
+        if (!$this->vocabulary_adapter->doesSlotHaveVocabularies($slot)) {
             $input = $this->ui_factory->input()->field()->text($label);
             if (isset($data)) {
                 $input = $input->withValue($data);
@@ -475,15 +475,15 @@ class ContentAssembler
         }
 
         $values = [];
-        $raw_values = iterator_to_array($this->vocab_input_bridge->valuesInVocabulariesForSlot(
+        $raw_values = iterator_to_array($this->vocabulary_adapter->valuesInVocabulariesForSlot(
             $slot,
-            !$this->vocab_input_bridge->doesSlotAllowCustomInput($slot) ? $data : null
+            !$this->vocabulary_adapter->doesSlotAllowCustomInput($slot) ? $data : null
         ));
         foreach ($this->presenter->data()->vocabularyValues($slot, ...$raw_values) as $labelled_value) {
             $values[$labelled_value->value()] = $labelled_value->label();
         }
 
-        if (!$this->vocab_input_bridge->doesSlotAllowCustomInput($slot)) {
+        if (!$this->vocabulary_adapter->doesSlotAllowCustomInput($slot)) {
             $input = $this->ui_factory->input()->field()->select($label, $values);
             if (isset($data)) {
                 $input = $input->withValue($data);

@@ -52,7 +52,7 @@ class DigestInitiator
                     $this->services->copyright()->identifiersHandler()
                 ),
                 $this->services->dataHelper()->dataHelper(),
-                $vocab_input_bridge = $this->services->vocabularies()->inputBridge()
+                $vocabulary_adapter = $this->services->editor()->vocabularyAdapter()
             ),
             new ManipulatorAdapter(
                 $content_assembler,
@@ -61,7 +61,7 @@ class DigestInitiator
                 $this->services->editor()->manipulator(),
                 $path_factory,
                 $navigator_factory,
-                $vocab_input_bridge
+                $vocabulary_adapter
             )
         );
     }

@@ -22,26 +22,34 @@ namespace ILIAS\MetaData\Vocabularies\Slots;
 
 use ILIAS\MetaData\Elements\ElementInterface;
 
-interface ElementHelperInterface
+class NullElementHelper implements ElementHelperInterface
 {
-    public function slotForElement(ElementInterface $element): Identifier;
+    public function slotForElement(ElementInterface $element): Identifier
+    {
+        return Identifier::NULL;
+    }
 
     /**
-     * Does not check the condition of the slots, so can return multiple slots
-     * per element.
      * @return Identifier[]
      */
-    public function slotsForElementWithoutCondition(ElementInterface $element): \Generator;
+    public function slotsForElementWithoutCondition(ElementInterface $element): \Generator
+    {
+        yield from [];
+    }
 
     public function potentialSlotForElementByCondition(
         ElementInterface $element,
         ElementInterface $element_in_condition,
         string $value
-    ): Identifier;
+    ): Identifier {
+        return Identifier::NULL;
+    }
 
     public function findElementOfCondition(
         Identifier $slot,
         ElementInterface $element,
         ElementInterface ...$all_elements
-    ): ?ElementInterface;
+    ): ?ElementInterface {
+        return null;
+    }
 }

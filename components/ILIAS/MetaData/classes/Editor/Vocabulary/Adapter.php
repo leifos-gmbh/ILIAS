@@ -18,25 +18,60 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\Vocabularies\Input;
+namespace ILIAS\MetaData\Editor\Vocabulary;
 
 use ILIAS\MetaData\Vocabularies\VocabularyInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 use ILIAS\MetaData\Vocabularies\Dispatch\ReaderInterface;
+use ILIAS\MetaData\Elements\ElementInterface;
+use ILIAS\MetaData\Vocabularies\Slots\ElementHelperInterface;
 
-class Bridge implements BridgeInterface
+class Adapter implements AdapterInterface
 {
-    /**
-     * TODO unit test this!
-     */
-
     protected ReaderInterface $reader;
+    protected ElementHelperInterface $element_helper;
 
     protected array $cached_vocabularies_by_slot = [];
 
-    public function __construct(ReaderInterface $reader)
-    {
+    public function __construct(
+        ReaderInterface $reader,
+        ElementHelperInterface $element_helper
+    ) {
         $this->reader = $reader;
+        $this->element_helper = $element_helper;
+    }
+
+    public function findElementOfCondition(
+        SlotIdentifier $slot,
+        ElementInterface $element,
+        ElementInterface ...$all_elements
+    ): ?ElementInterface {
+        return $this->element_helper->findElementOfCondition($slot, $element, ...$all_elements);
+    }
+
+    public function slotForElement(ElementInterface $element): SlotIdentifier
+    {
+        return $this->element_helper->slotForElement($element);
+    }
+
+    /**
+     * @return SlotIdentifier[]
+     */
+    public function slotsForElementWithoutCondition(ElementInterface $element): \Generator
+    {
+        return $this->element_helper->slotsForElementWithoutCondition($element);
+    }
+
+    public function potentialSlotForElementByCondition(
+        ElementInterface $element,
+        ElementInterface $element_in_condition,
+        string $value
+    ): SlotIdentifier {
+        return $this->element_helper->potentialSlotForElementByCondition(
+            $element,
+            $element_in_condition,
+            $value
+        );
     }
 
     /**

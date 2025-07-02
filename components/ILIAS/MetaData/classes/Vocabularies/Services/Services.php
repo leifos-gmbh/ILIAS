@@ -46,8 +46,6 @@ use ILIAS\MetaData\Vocabularies\Dispatch\Actions;
 use ILIAS\MetaData\Vocabularies\Dispatch\Info\Infos;
 use ILIAS\MetaData\Vocabularies\Slots\ElementHelperInterface as SlotElementHelperInterface;
 use ILIAS\MetaData\Vocabularies\Slots\ElementHelper as SlotElementHelper;
-use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as InputBridgeInterface;
-use ILIAS\MetaData\Vocabularies\Input\Bridge as InputBridge;
 use ILIAS\MetaData\Vocabularies\Slots\Conditions\Checker;
 
 class Services
@@ -55,7 +53,6 @@ class Services
     protected PresentationInterface $presentation;
     protected ManagerInterface $manager;
     protected SlotElementHelperInterface $slot_element_helper;
-    protected InputBridgeInterface $input_bridge;
     protected SlotHandler $slot_handler;
 
     protected ReaderInterface $reader;
@@ -110,16 +107,6 @@ class Services
         );
     }
 
-    public function inputBridge(): InputBridgeInterface
-    {
-        if (isset($this->input_bridge)) {
-            return $this->input_bridge;
-        }
-        return $this->input_bridge = new InputBridge(
-            $this->reader()
-        );
-    }
-
     public function manager(): ManagerInterface
     {
         if (isset($this->manager)) {
@@ -152,7 +139,7 @@ class Services
         );
     }
 
-    protected function reader(): ReaderInterface
+    public function reader(): ReaderInterface
     {
         if (isset($this->reader)) {
             return $this->reader;

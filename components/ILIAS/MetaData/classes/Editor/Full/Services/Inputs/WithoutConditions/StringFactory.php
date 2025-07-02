@@ -23,8 +23,7 @@ namespace ILIAS\MetaData\Editor\Full\Services\Inputs\WithoutConditions;
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
 use ILIAS\MetaData\Elements\ElementInterface;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
-use ILIAS\MetaData\Vocabularies\Slots\ElementHelperInterface as ElementVocabSlotsHelper;
-use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as VocabInputBridge;
+use ILIAS\MetaData\Editor\Vocabulary\AdapterInterface as VocabularyAdapter;
 use ILIAS\UI\Component\Input\Field\Factory as UIFactory;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
 use ILIAS\MetaData\Repository\Validation\Dictionary\DictionaryInterface as ConstraintDictionary;
@@ -34,21 +33,18 @@ use ILIAS\Refinery\Factory as Refinery;
 
 class StringFactory extends BaseFactory
 {
-    protected ElementVocabSlotsHelper $element_vocab_slots_helper;
-    protected VocabInputBridge $vocab_input_bridge;
+    protected VocabularyAdapter $vocabulary_adapter;
     protected Refinery $refinery;
 
     public function __construct(
         UIFactory $ui_factory,
         PresenterInterface $presenter,
         ConstraintDictionary $constraint_dictionary,
-        ElementVocabSlotsHelper $element_vocab_slots_helper,
-        VocabInputBridge $vocab_input_bridge,
+        VocabularyAdapter $vocabulary_adapter,
         Refinery $refinery
     ) {
         parent::__construct($ui_factory, $presenter, $constraint_dictionary);
-        $this->element_vocab_slots_helper = $element_vocab_slots_helper;
-        $this->vocab_input_bridge = $vocab_input_bridge;
+        $this->vocabulary_adapter = $vocabulary_adapter;
         $this->refinery = $refinery;
     }
 
@@ -57,16 +53,16 @@ class StringFactory extends BaseFactory
         ElementInterface $context_element,
         SlotIdentifier $conditional_slot = SlotIdentifier::NULL
     ): FormInput {
-        $slot = $this->element_vocab_slots_helper->slotForElement($element);
+        $slot = $this->vocabulary_adapter->slotForElement($element);
 
-        if (!$this->vocab_input_bridge->doesSlotHaveVocabularies($slot)) {
+        if (!$this->vocabulary_adapter->doesSlotHaveVocabularies($slot)) {
             return $this->buildTextInput(
                 $this->getInputLabelFromElement($this->presenter, $element, $context_element),
                 $element,
                 true
             );
         }
-        if (!$this->vocab_input_bridge->doesSlotAllowCustomInput($slot)) {
+        if (!$this->vocabulary_adapter->doesSlotAllowCustomInput($slot)) {
             return $this->buildSelectInput(
                 $this->getInputLabelFromElement($this->presenter, $element, $context_element),
                 $slot,
@@ -112,7 +108,7 @@ class StringFactory extends BaseFactory
     ): FormInput {
         $values = [];
         $data = $this->getValueFromElementOrConstraint($element);
-        $raw_values = $this->vocab_input_bridge->valuesInVocabulariesForSlot($slot, $data);
+        $raw_values = $this->vocabulary_adapter->valuesInVocabulariesForSlot($slot, $data);
         foreach ($this->presenter->data()->vocabularyValues($slot, ...$raw_values) as $labelled_value) {
             $values[$labelled_value->value()] = $labelled_value->label();
         }
@@ -136,7 +132,7 @@ class StringFactory extends BaseFactory
         $text_input = $this->buildTextInput($value_label, $element, false);
 
         if (isset($data)) {
-            if ($this->vocab_input_bridge->isValueInVocabulariesForSlot($slot, $data)) {
+            if ($this->vocabulary_adapter->isValueInVocabulariesForSlot($slot, $data)) {
                 $select_input = $select_input->withValue($data);
                 $radio_value = 'from_vocab';
             } else {

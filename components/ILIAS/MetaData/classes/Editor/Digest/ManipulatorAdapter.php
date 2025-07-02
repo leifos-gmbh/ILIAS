@@ -27,7 +27,7 @@ use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Editor\Manipulator\ManipulatorInterface;
 use ILIAS\MetaData\Vocabularies\Factory\Factory;
 use ILIAS\MetaData\Vocabularies\Factory\FactoryInterface;
-use ILIAS\MetaData\Vocabularies\Input\BridgeInterface as VocabInputBridge;
+use ILIAS\MetaData\Editor\Vocabulary\AdapterInterface as VocabularyAdapter;
 use ILIAS\MetaData\Vocabularies\Slots\Identifier as SlotIdentifier;
 
 class ManipulatorAdapter
@@ -38,7 +38,7 @@ class ManipulatorAdapter
     protected ManipulatorInterface $manipulator;
     protected PathFactory $path_factory;
     protected NavigatorFactoryInterface $navigator_factory;
-    protected VocabInputBridge $vocab_input_bridge;
+    protected VocabularyAdapter $vocabulary_adapter;
 
     public function __construct(
         ContentAssembler $content_assembler,
@@ -47,7 +47,7 @@ class ManipulatorAdapter
         ManipulatorInterface $manipulator,
         PathFactory $path_factory,
         NavigatorFactoryInterface $navigator_factory,
-        VocabInputBridge $vocab_input_bridge
+        VocabularyAdapter $vocabulary_adapter
     ) {
         $this->content_assembler = $content_assembler;
         $this->copyright_handler = $copyright_handler;
@@ -55,7 +55,7 @@ class ManipulatorAdapter
         $this->manipulator = $manipulator;
         $this->path_factory = $path_factory;
         $this->navigator_factory = $navigator_factory;
-        $this->vocab_input_bridge = $vocab_input_bridge;
+        $this->vocabulary_adapter = $vocabulary_adapter;
     }
 
     public function update(
@@ -139,7 +139,7 @@ class ManipulatorAdapter
         array $data
     ): SetInterface {
         $type_value = $data[ContentAssembler::LEARNING_RESOURCE_TYPE] ?? '';
-        $type_source = $this->vocab_input_bridge->sourceMapForSlot(SlotIdentifier::EDUCATIONAL_LEARNING_RESOURCE_TYPE)($type_value);
+        $type_source = $this->vocabulary_adapter->sourceMapForSlot(SlotIdentifier::EDUCATIONAL_LEARNING_RESOURCE_TYPE)($type_value);
         if ($type_value === null || $type_value === '') {
             $set = $this->manipulator->prepareDelete($set, $this->path_collection->firstLearningResourceType());
         } else {

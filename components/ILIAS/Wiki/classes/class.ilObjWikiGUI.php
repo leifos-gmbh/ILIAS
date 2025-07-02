@@ -467,6 +467,8 @@ class ilObjWikiGUI extends ilObjectGUI
         $this->lng->loadLanguageModule("meta");
         $this->lng->loadLanguageModule("wiki");
 
+        $info->addMetaDataSections($this->getObject()->getId(), 0, 'wiki');
+
         // forward the command
         $this->ctrl->forwardCommand($info);
     }
@@ -563,7 +565,7 @@ class ilObjWikiGUI extends ilObjectGUI
                 strtolower($ilCtrl->getCmdClass()),
                 array("", "ilobjectcontentstylesettingsgui", "ilobjwikigui",
             "ilinfoscreengui", "ilpermissiongui", "ilexportgui", "ilratingcategorygui", "ilobjnotificationsettingsgui", "iltaxmdgui",
-            "ilwikistatgui", "ilwikipagetemplategui", "iladvancedmdsettingsgui", "ilsettingspermissiongui", 'ilrepositoryobjectsearchgui')
+            "ilwikistatgui", "ilwikipagetemplategui", "iladvancedmdsettingsgui", "ilmdeditorgui", "ilsettingspermissiongui", 'ilrepositoryobjectsearchgui')
             ) || in_array($ilCtrl->getNextClass(), ["ilpermissiongui", strtolower(TranslationGUI::class)])) {
             if ($this->requested_page !== "") {
                 $page_id = ($this->edit_request->getWikiPageId() > 0)

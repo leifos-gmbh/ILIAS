@@ -495,7 +495,7 @@ class ContentAssembler
         $text_input = $this->ui_factory->input()->field()->text($value_label);
         $select_input = $this->ui_factory->input()->field()->select($value_label, $values);
 
-        $radio_value = null;
+        $radio_value = 'from_vocab';
         if (isset($data)) {
             if (in_array($data, $raw_values)) {
                 $select_input = $select_input->withValue($data);

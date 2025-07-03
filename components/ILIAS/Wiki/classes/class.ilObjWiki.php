@@ -228,7 +228,7 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
 
         $this->notes->domain()->activateComments($this->getId(), $this->getPublicNotes());
 
-        //parent::createMetaData();
+        parent::createMetaData();
 
         return $id;
     }
@@ -271,7 +271,7 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
         }
         $this->notes->domain()->activateComments($this->getId(), $this->getPublicNotes());
 
-        //parent::updateMetaData();
+        parent::updateMetaData();
 
         return true;
     }

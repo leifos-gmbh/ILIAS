@@ -259,7 +259,6 @@ abstract class CronJob
     /**
      * @deprecated
      */
-    #[\Deprecated('Will be removed without any alternative, KS/UI forms will be expected', since: '13.0')]
     public function usesLegacyForms(): bool
     {
         return true;
@@ -276,7 +275,6 @@ abstract class CronJob
     /**
      * @deprecated
      */
-    #[\Deprecated('Will be removed without any alternative, KS/UI forms will be expected', since: '13.0')]
     public function addCustomSettingsToForm(\ilPropertyFormGUI $a_form): void
     {
     }
@@ -294,7 +292,6 @@ abstract class CronJob
     /**
      * @deprecated
      */
-    #[\Deprecated('Will be removed without any alternative, KS/UI forms will be expected', since: '13.0')]
     public function saveCustomSettings(\ilPropertyFormGUI $a_form): bool
     {
         return true;

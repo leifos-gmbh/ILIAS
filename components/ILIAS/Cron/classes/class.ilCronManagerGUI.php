@@ -510,7 +510,6 @@ class ilCronManagerGUI
     /**
      * @deprecated
      */
-    #[\Deprecated('Will be removed without any alternative, KS/UI forms will be expected', since: '13.0')]
     protected function initLegacyEditForm(?CronJob $job): ilPropertyFormGUI
     {
         if (!($job instanceof CronJob)) {
@@ -632,7 +631,6 @@ class ilCronManagerGUI
     /**
      * @deprecated
      */
-    #[\Deprecated('Will be removed without any alternative, KS/UI forms will be expected', since: '12.0')]
     public function updateLegacy(): void
     {
         if (!$this->rbac->system()->checkAccess('write', SYSTEM_FOLDER_ID)) {

@@ -209,7 +209,13 @@ class ilCalendarAppointmentGUI
          ->withRequired(true);
 
         // TODO replace
-        $builder = new \ILIAS\Calendar\Recurrence\InputBuilderImpl($this->ui_factory, $this->refinery, $this->lng, ilCalendarUserSettings::_getInstanceByUserId($this->user->getId()));
+        $builder = new \ILIAS\Calendar\Recurrence\InputBuilderImpl(
+            $this->rec,
+            $this->ui_factory,
+            $this->refinery,
+            $this->lng,
+            ilCalendarUserSettings::_getInstanceByUserId($this->user->getId())
+        );
         $recurrence_input = $builder->get();
 
         $location_input = $this->ui_factory->input()->field()->text($this->lng->txt('cal_where'))
@@ -457,14 +463,13 @@ class ilCalendarAppointmentGUI
 
     protected function save(): void
     {
-        $form = $this->load('create');
+        $data = $this->load('create');
 
-        // TODO implement
-        if ($this->app->validate() and $this->notification->validate()) {
-            if ((int) $form->getInput('calendar') === 0) {
+        if ($data && $this->app->validate() && $this->notification->validate()) {
+            if ((int) $data['calendar'] === 0) {
                 $cat_id = $this->createDefaultCalendar();
             } else {
-                $cat_id = (int) $form->getInput('calendar');
+                $cat_id = (int) $data['calendar'];
             }
 
             $this->app->save();
@@ -479,7 +484,7 @@ class ilCalendarAppointmentGUI
             // Send notifications
             if (
                 ilCalendarSettings::_getInstance()->isNotificationEnabled() &&
-                (int) $form->getInput('not')
+                (int) $data['not']
             ) {
                 $this->distributeNotifications($cat_id, $this->app->getEntryId(), true);
             }
@@ -490,8 +495,7 @@ class ilCalendarAppointmentGUI
             $this->tpl->setOnScreenMessage('success', $this->lng->txt('cal_created_appointment'), true);
             $this->ctrl->returnToParent($this);
         } else {
-            $this->form->withRequest($this->request);
-            if ($this->error->getMessage() !== '') {
+            if ($data && $this->error->getMessage() !== '') {
                 $this->tpl->setOnScreenMessage('failure', $this->error->getMessage());
             } else {
                 $this->tpl->setOnScreenMessage('failure', $this->lng->txt('err_check_input'));
@@ -702,14 +706,13 @@ class ilCalendarAppointmentGUI
     protected function update(): void
     {
         $single_editing = $this->requested_rexl;
-        $form = $this->load('edit');
+        $data = $this->load('edit');
 
-        // TODO implement
-        if ($this->app->validate() and $this->notification->validate()) {
-            if (!(int) $form->getInput('calendar')) {
+        if ($data && $this->app->validate() && $this->notification->validate()) {
+            if (!(int) $data['calendar']) {
                 $cat_id = $this->createDefaultCalendar();
             } else {
-                $cat_id = (int) $form->getInput('calendar');
+                $cat_id = (int) $data['calendar'];
             }
 
             if ($single_editing) {
@@ -736,7 +739,7 @@ class ilCalendarAppointmentGUI
             $ass->addAssignment($cat_id);
 
             // Send notifications
-            $notification = (bool) $form->getInput('not');
+            $notification = (bool) ($data['not'] ?? false);
             if (
                 ilCalendarSettings::_getInstance()->isNotificationEnabled() &&
                 $notification
@@ -750,7 +753,6 @@ class ilCalendarAppointmentGUI
             $this->tpl->setOnScreenMessage('success', $this->lng->txt('msg_obj_modified'), true);
             $this->ctrl->returnToParent($this);
         } else {
-            $this->form->withRequest($this->request);
             $this->tpl->setOnScreenMessage('failure', $this->error->getMessage());
         }
         $this->edit(false, $this->form);
@@ -904,36 +906,51 @@ class ilCalendarAppointmentGUI
         }
     }
 
-    protected function load($a_mode): Form
+    protected function load($a_mode): ?array
     {
         // needed for date handling
-        $form = $this->initForm($a_mode);
-        // TODO implement
-        $this->form->checkInput();
+        $form = $this->initForm($a_mode)->withRequest($this->request);
+        $data = $this->form->getData();
+        if (!$data) {
+            return null;
+        }
 
-        $this->app->setTitle($form->getInput('title'));
-        $this->app->setLocation($form->getInput('location'));
-        $this->app->setDescription($form->getInput('description'));
-        $this->app->enableNotification((bool) $form->getInput('not'));
+        $this->app->setTitle($data['title']);
+        $this->app->setLocation($data['location']);
+        $this->app->setDescription($data['description']);
+        if (ilCalendarSettings::_getInstance()->isNotificationEnabled()) {
+            $this->app->enableNotification((bool) ($data['not'] ?? false));
+        }
 
-        $period = $this->form->getItemByPostVar('event');
-        $start = $period->getStart();
-        $end = $period->getEnd();
+        $datetimes = $data['event'][1][0];
+        $full_day = $data['event'][0] === 'full_day';
+        if ($full_day) {
+            $start = new ilDate($datetimes[0], IL_CAL_UNIX);
+            $end = new ilDate($datetimes[1], IL_CAL_UNIX);
+        } else {
+            $start = new ilDateTime($datetimes[0], IL_CAL_UNIX);
+            $end = new ilDateTime($datetimes[1], IL_CAL_UNIX);
+        }
 
-        $this->app->setFullday($start instanceof ilDate);
+        $this->app->setFullday($full_day);
         $this->app->setStart($start);
         $this->app->setEnd($end);
 
-        $this->loadNotificationRecipients($form);
-        $this->loadRecurrenceSettings($form);
-        return $form;
+        if (ilCalendarSettings::_getInstance()->isUserNotificationEnabled()) {
+            $this->loadNotificationRecipients((array) $data['notu']);
+        }
+        $this->loadRecurrenceSettings($data['recurrence'] ?? null);
+        return $data;
     }
 
-    protected function loadNotificationRecipients(ilPropertyFormGUI $form): void
+    /**
+     * @param string[] $recipients
+     */
+    protected function loadNotificationRecipients(array $recipients): void
     {
-        $this->notification->setRecipients(array());
+        $this->notification->setRecipients([]);
         $map = [];
-        foreach ((array) $form->getInput('notu') as $rcp) {
+        foreach ($recipients as $rcp) {
             $rcp = trim($rcp);
             $usr_id = (int) ilObjUser::_loginExists($rcp);
             if ($rcp === '') {
@@ -958,10 +975,10 @@ class ilCalendarAppointmentGUI
         }
     }
 
-    protected function loadRecurrenceSettings(ilPropertyFormGUI $form): void
+    protected function loadRecurrenceSettings(?ilCalendarRecurrence $recurrence): void
     {
-        if ($form->getItemByPostVar('frequence') instanceof ilRecurrenceInputGUI) {
-            $this->rec = $form->getItemByPostVar('frequence')->getRecurrence();
+        if ($recurrence) {
+            $this->rec = $recurrence;
         } else {
             $this->rec = new ilCalendarRecurrence();
         }

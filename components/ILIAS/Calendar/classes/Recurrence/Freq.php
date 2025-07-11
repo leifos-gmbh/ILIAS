@@ -20,9 +20,14 @@ declare(strict_types=1);
 
 namespace ILIAS\Calendar\Recurrence;
 
-use ilCalendarRecurrence;
-
-interface InputFactory
+/**
+ * SECONDLY, MINUTELY, and HOURLY are not supported.
+ */
+enum Freq: string
 {
-    public function build(ilCalendarRecurrence $recurrence): InputBuilder;
+    case NONE = 'none';
+    case DAILY = 'daily';
+    case WEEKLY = 'weekly';
+    case MONTHLY = 'monthly';
+    case YEARLY = 'yearly';
 }

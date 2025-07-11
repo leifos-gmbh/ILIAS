@@ -28,9 +28,13 @@ use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\Refinery\Transformation;
 use ilCalendarUserSettings;
 use ilCalendarUtil;
+use ilCalendarRecurrence;
+use ilDate;
 
 class InputBuilderImpl implements InputBuilder
 {
+    protected const string RULE = 'rule';
+    protected const string END = 'end';
     protected const string NO_RECURRENCE = 'none';
     protected const string DAILY = 'daily';
     protected const string WEEKLY = 'weekly';
@@ -43,31 +47,31 @@ class InputBuilderImpl implements InputBuilder
     protected const string WEEK = 'week';
     protected const string DAY = 'day';
     protected const string DAY_OF_MONTH = 'day_of_month';
-    protected const string MONDAY = 'monday';
-    protected const string TUESDAY = 'tuesday';
-    protected const string WEDNESDAY = 'wednesday';
-    protected const string THURSDAY = 'thursday';
-    protected const string FRIDAY = 'friday';
-    protected const string SATURDAY = 'saturday';
-    protected const string SUNDAY = 'sunday';
-    protected const string FIRST = 'first';
-    protected const string SECOND = 'second';
-    protected const string THIRD = 'third';
-    protected const string FOURTH = 'fourth';
-    protected const string FIFTH = 'fifth';
-    protected const string LAST = 'last';
-    protected const string JANUARY = 'january';
-    protected const string FEBRUARY = 'february';
-    protected const string MARCH = 'march';
-    protected const string APRIL = 'april';
-    protected const string MAY = 'may';
-    protected const string JUNE = 'june';
-    protected const string JULY = 'july';
-    protected const string AUGUST = 'august';
-    protected const string SEPTEMBER = 'september';
-    protected const string OCTOBER = 'october';
-    protected const string NOVEMBER = 'november';
-    protected const string DECEMBER = 'december';
+    protected const string MONDAY = 'MO';
+    protected const string TUESDAY = 'TU';
+    protected const string WEDNESDAY = 'WE';
+    protected const string THURSDAY = 'TH';
+    protected const string FRIDAY = 'FR';
+    protected const string SATURDAY = 'SA';
+    protected const string SUNDAY = 'SU';
+    protected const int FIRST = 1;
+    protected const int SECOND = 2;
+    protected const int THIRD = 3;
+    protected const int FOURTH = 4;
+    protected const int FIFTH = 5;
+    protected const int LAST = -1;
+    protected const int JANUARY = 1;
+    protected const int FEBRUARY = 2;
+    protected const int MARCH = 3;
+    protected const int APRIL = 4;
+    protected const int MAY = 5;
+    protected const int JUNE = 6;
+    protected const int JULY = 7;
+    protected const int AUGUST = 8;
+    protected const int SEPTEMBER = 9;
+    protected const int OCTOBER = 10;
+    protected const int NOVEMBER = 11;
+    protected const int DECEMBER = 12;
     protected const string NO_UNTIL = 'no_until';
     protected const string COUNT = 'count';
     protected const string UNTIL_COUNT = 'until_count';
@@ -81,6 +85,7 @@ class InputBuilderImpl implements InputBuilder
     protected bool $yearly = true;
 
     public function __construct(
+        protected ilCalendarRecurrence $recurrence,
         protected UIFactory $ui_factory,
         protected Refinery $refinery,
         protected ilLanguage $lng,
@@ -152,11 +157,11 @@ class InputBuilderImpl implements InputBuilder
     {
         $rule_input = $this->getRuleInput();
         $end_input = $this->getEndInput();
-        //$output_trafo = $this->getOutputTransformation();
+        $output_trafo = $this->getOutputTransformation();
         return $this->ui_factory->input()->field()->group([
-            $rule_input,
-            $end_input
-        ]);//->withAdditionalTransformation($output_trafo);
+            self::RULE => $rule_input,
+            self::END => $end_input
+        ])->withAdditionalTransformation($output_trafo);
     }
 
     protected function getRuleInput(): Input
@@ -281,7 +286,8 @@ class InputBuilderImpl implements InputBuilder
         $end_date = $this->ui_factory->input()->field()->dateTime(
             $this->lng->txt('cal_rec_end_date'),
             $this->lng->txt('cal_rec_end_date_info')
-        )->withRequired(true);
+        )->withUseTime(false)
+         ->withRequired(true);
         $groups[self::UNTIL_END_DATE] = $this->ui_factory->input()->field()->group(
             [self::END_DATE => $end_date],
             $this->lng->txt('cal_rec_until_end_date')
@@ -320,7 +326,7 @@ class InputBuilderImpl implements InputBuilder
         for ($i = $this->user_settings->getWeekStart(); $i < 7 + $this->user_settings->getWeekStart(); $i++) {
             $options[$days[$i]] = ilCalendarUtil::_numericDayToString($i);
         }
-        return $this->ui_factory->input()->field()->select(
+        return $this->ui_factory->input()->field()->multiSelect(
             $this->lng->txt('cal_day_s'),
             $options
         )->withRequired(true);
@@ -383,6 +389,81 @@ class InputBuilderImpl implements InputBuilder
 
     protected function getOutputTransformation(): Transformation
     {
-        // TODO bespoke data object or work with ilCalendarRecurrence?
+        $recurrence = clone $this->recurrence;
+        $with_daily = $this->hasDaily();
+        $with_weekly = $this->hasWeekly();
+        $with_monthly = $this->hasMonthly();
+        $with_yearly = $this->hasYearly();
+        $with_unlimited = $this->hasUnlimitedRecurrences();
+
+        return $this->refinery->custom()->transformation(function ($values) use (
+            $recurrence,
+            $with_daily,
+            $with_weekly,
+            $with_monthly,
+            $with_yearly,
+            $with_unlimited
+        ) {
+            $recurrence->reset();
+
+            $rule_data = $values[self::RULE];
+            switch ($rule_data[0]) {
+                case self::DAILY:
+                    $recurrence->setFrequenceType(ilCalendarRecurrence::FREQ_DAILY);
+                    $recurrence->setInterval((int) $rule_data[1][self::INTERVAL]);
+                    break;
+
+                case self::WEEKLY:
+                    $recurrence->setFrequenceType(ilCalendarRecurrence::FREQ_WEEKLY);
+                    $recurrence->setInterval((int) $rule_data[1][self::INTERVAL]);
+                    $recurrence->setBYDAY(implode(',', $rule_data[1][self::DAY]));
+                    break;
+
+                case self::MONTHLY_BY_DAY:
+                    $recurrence->setFrequenceType(ilCalendarRecurrence::FREQ_MONTHLY);
+                    $recurrence->setInterval((int) $rule_data[1][self::INTERVAL]);
+                    $index = $rule_data[1][self::WEEK];
+                    $recurrence->setBYDAY($index . implode(',' . $index, $rule_data[1][self::DAY]));
+                    break;
+
+                case self::MONTHLY_BY_DATE:
+                    $recurrence->setFrequenceType(ilCalendarRecurrence::FREQ_MONTHLY);
+                    $recurrence->setInterval((int) $rule_data[1][self::INTERVAL]);
+                    $recurrence->setBYMONTHDAY((string) $rule_data[1][self::DAY_OF_MONTH]);
+                    break;
+
+                case self::YEARLY_BY_DAY:
+                    $recurrence->setFrequenceType(ilCalendarRecurrence::FREQ_YEARLY);
+                    $recurrence->setInterval((int) $rule_data[1][self::INTERVAL]);
+                    $recurrence->setBYMONTH((string) $rule_data[1][self::MONTH]);
+                    $index = $rule_data[1][self::WEEK];
+                    $recurrence->setBYDAY($index . implode(',' . $index, $rule_data[1][self::DAY]));
+                    break;
+
+                case self::YEARLY_BY_DATE:
+                    $recurrence->setFrequenceType(ilCalendarRecurrence::FREQ_YEARLY);
+                    $recurrence->setInterval((int) $rule_data[1][self::INTERVAL]);
+                    $recurrence->setBYMONTH((string) $rule_data[1][self::MONTH]);
+                    $recurrence->setBYMONTHDAY((string) $rule_data[1][self::DAY_OF_MONTH]);
+                    break;
+
+                default:
+                case self::NO_RECURRENCE:
+                    break;
+            }
+
+            $end_data = $values[self::END];
+            if ($end_data[0] === self::UNTIL_COUNT) {
+                $recurrence->setFrequenceUntilCount($end_data[1][self::COUNT]);
+            }
+            if ($end_data[0] === self::UNTIL_END_DATE) {
+                $recurrence->setFrequenceUntilDate(new ilDate(
+                    $end_data[1][self::END_DATE]->getTimestamp(),
+                    IL_CAL_UNIX
+                ));
+            }
+
+            return $recurrence;
+        });
     }
 }

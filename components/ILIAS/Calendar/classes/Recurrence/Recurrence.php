@@ -20,9 +20,17 @@ declare(strict_types=1);
 
 namespace ILIAS\Calendar\Recurrence;
 
-use ilCalendarRecurrence;
+use DateTimeImmutable;
 
-interface InputFactory
+interface Recurrence
 {
-    public function build(ilCalendarRecurrence $recurrence): InputBuilder;
+    public function freq(): Freq;
+
+    public function until(): DateTimeImmutable;
+
+    public function count(): ?int;
+
+    public function interval(): int;
+
+    public function wkst(): Weekday;
 }

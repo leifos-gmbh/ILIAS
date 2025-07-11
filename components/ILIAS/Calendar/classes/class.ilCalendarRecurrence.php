@@ -156,6 +156,7 @@ class ilCalendarRecurrence implements ilCalendarRecurrenceCalculation
         $this->setFrequenceType('');
         $this->setInterval(1);
         $this->setFrequenceUntilCount(0);
+        $this->setFrequenceUntilDate(null);
     }
 
     public function getRecurrenceId(): int

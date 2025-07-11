@@ -20,9 +20,14 @@ declare(strict_types=1);
 
 namespace ILIAS\Calendar\Recurrence;
 
-use ilCalendarRecurrence;
-
-interface InputFactory
+enum Weekday: string
 {
-    public function build(ilCalendarRecurrence $recurrence): InputBuilder;
+    case NONE = 'none';
+    case SUNDAY = 'SU';
+    case MONDAY = 'MO';
+    case TUESDAY = 'TU';
+    case WEDNESDAY = 'WE';
+    case THURSDAY = 'TH';
+    case FRIDAY = 'FR';
+    case SATURDAY = 'SA';
 }

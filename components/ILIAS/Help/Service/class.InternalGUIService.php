@@ -23,6 +23,7 @@ namespace ILIAS\Help;
 use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICGUIServices;
 use ILIAS\Export\PrintProcessGUI;
+use ilGuidedTourGUI;
 
 class InternalGUIService
 {
@@ -47,5 +48,10 @@ class InternalGUIService
             $this->http(),
             $this->domain_service->refinery()
         );
+    }
+
+    public function guidedTourGUI(): ilGuidedTourGUI
+    {
+        return new ilGuidedTourGUI();
     }
 }

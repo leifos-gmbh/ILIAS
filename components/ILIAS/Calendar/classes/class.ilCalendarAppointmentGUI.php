@@ -25,6 +25,7 @@ use ILIAS\Refinery\Factory as RefineryFactory;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\UI\Component\Input\Container\Form\Standard as Form;
+use ILIAS\Calendar\Recurrence\Input\FactoryImpl as RecurrenceInputFactory;
 
 /**
  * Administrate calendar appointments
@@ -176,14 +177,15 @@ class ilCalendarAppointmentGUI
 
         // time and date
 
+        $start_time = new DateTimeImmutable('@' . $this->app->getStart()->getUnixTime());
+        $end_time = new DateTimeImmutable('@' . $this->app->getEnd()->getUnixTime());
+
         $duration_date_input = $this->ui_factory->input()->field()->duration(
             $this->lng->txt('cal_duration')
-        )->withUseTime(false)
+        )->withTimezone('UTC')
+         ->withUseTime(false)
          ->withRequired(true)
-         ->withValue([
-             new DateTimeImmutable('@' . $this->app->getStart()->getUnixTime()),
-             new DateTimeImmutable('@' . $this->app->getEnd()->getUnixTime()),
-         ]);
+         ->withValue([$start_time, $end_time]);
         $date_group = $this->ui_factory->input()->field()->group(
             [$duration_date_input],
             $this->lng->txt('cal_fullday_title')
@@ -191,12 +193,13 @@ class ilCalendarAppointmentGUI
 
         $duration_datetime_input = $this->ui_factory->input()->field()->duration(
             $this->lng->txt('cal_duration')
-        )->withUseTime(true)
+        )->withTimezone($this->user->getTimeZone())
+         ->withUseTime(true)
          ->withRequired(true)
          ->withValue([
-            new DateTimeImmutable('@' . $this->app->getStart()->getUnixTime()),
-            new DateTimeImmutable('@' . $this->app->getEnd()->getUnixTime()),
-        ]);
+             $start_time->setTimezone(new DateTimeZone($this->user->getTimeZone())),
+             $end_time->setTimezone(new DateTimeZone($this->user->getTimeZone()))
+         ]);
         $datetime_group = $this->ui_factory->input()->field()->group(
             [$duration_datetime_input],
             $this->lng->txt('cal_date_time_title')
@@ -208,18 +211,15 @@ class ilCalendarAppointmentGUI
         )->withValue($this->app->isFullday() ? 'full_day' : 'with_time')
          ->withRequired(true);
 
-        // TODO replace
-        $builder = new \ILIAS\Calendar\Recurrence\InputBuilderImpl(
-            $this->rec,
+        $rec_factory = new RecurrenceInputFactory(
             $this->ui_factory,
             $this->refinery,
             $this->lng,
             ilCalendarUserSettings::_getInstanceByUserId($this->user->getId())
         );
-        $recurrence_input = $builder->get();
+        $recurrence_input = $rec_factory->build($this->rec)->get();
 
         $location_input = $this->ui_factory->input()->field()->text($this->lng->txt('cal_where'))
-            ->withRequired(true)
             ->withValue($this->app->getLocation())
             ->withAdditionalTransformation($this->refinery->string()->hasMaxLength(128));
 
@@ -251,11 +251,15 @@ class ilCalendarAppointmentGUI
                 }
             }
 
-            // TODO autocomplete gets lost, comma separated in info?
-            $notif_inputs['notu'] = $this->ui_factory->input()->field()->text(
+            /**
+             * Reimplement autocomplete, as soon as tag inputs support it,
+             * see ilCalendarAppointmentGUI::doUserAutoComplete
+             */
+            $notif_inputs['notu'] = $this->ui_factory->input()->field()->tag(
                 $this->lng->txt('cal_user_notification'),
+                [],
                 $this->lng->txt('cal_user_notification_info')
-            )->withValue(implode(', ', $values));
+            )->withValue($values);
         }
 
         if (ilCalendarSettings::_getInstance()->isNotificationEnabled() && count($cats->getNotificationCalendars())) {
@@ -392,7 +396,8 @@ class ilCalendarAppointmentGUI
     }
 
     /**
-     * TODO: abandon?
+     * Currently not in use, but will be as soon as tag inputs support autocomplete,
+     * see ilCalendarAppointmentGUI::initForm
      */
     protected function doUserAutoComplete(): ?string
     {
@@ -653,10 +658,10 @@ class ilCalendarAppointmentGUI
             $this->showInfoScreen();
             return;
         }
-        if (!$form instanceof ilPropertyFormGUI) {
+        if (!$form) {
             $form = $this->initForm('edit', $a_edit_single_app);
         }
-        $this->tpl->setContent($form->getHTML());
+        $this->tpl->setContent($this->ui_renderer->render($form));
     }
 
     protected function showInfoScreen(): void
@@ -909,7 +914,7 @@ class ilCalendarAppointmentGUI
     protected function load($a_mode): ?array
     {
         // needed for date handling
-        $form = $this->initForm($a_mode)->withRequest($this->request);
+        $this->form = $this->initForm($a_mode)->withRequest($this->request);
         $data = $this->form->getData();
         if (!$data) {
             return null;
@@ -922,14 +927,17 @@ class ilCalendarAppointmentGUI
             $this->app->enableNotification((bool) ($data['not'] ?? false));
         }
 
-        $datetimes = $data['event'][1][0];
+        /** @var DateTimeImmutable $start_datetime */
+        $start_datetime = $data['event'][1][0]['start'];
+        /** @var DateTimeImmutable $end_datetime */
+        $end_datetime = $data['event'][1][0]['end'];
         $full_day = $data['event'][0] === 'full_day';
         if ($full_day) {
-            $start = new ilDate($datetimes[0], IL_CAL_UNIX);
-            $end = new ilDate($datetimes[1], IL_CAL_UNIX);
+            $start = new ilDate($start_datetime->getTimestamp(), IL_CAL_UNIX);
+            $end = new ilDate($end_datetime->getTimestamp(), IL_CAL_UNIX);
         } else {
-            $start = new ilDateTime($datetimes[0], IL_CAL_UNIX);
-            $end = new ilDateTime($datetimes[1], IL_CAL_UNIX);
+            $start = new ilDateTime($start_datetime->getTimestamp(), IL_CAL_UNIX);
+            $end = new ilDateTime($end_datetime->getTimestamp(), IL_CAL_UNIX);
         }
 
         $this->app->setFullday($full_day);

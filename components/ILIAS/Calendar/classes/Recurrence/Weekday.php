@@ -22,7 +22,6 @@ namespace ILIAS\Calendar\Recurrence;
 
 enum Weekday: string
 {
-    case NONE = 'none';
     case SUNDAY = 'SU';
     case MONDAY = 'MO';
     case TUESDAY = 'TU';

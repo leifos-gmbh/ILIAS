@@ -18,21 +18,21 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Calendar\Recurrence;
+namespace ILIAS\Calendar\Recurrence\Input;
 
 use ILIAS\UI\Component\Input\Field\Group;
 
-interface InputBuilder
+interface Builder
 {
-    public function withoutUnlimitedRecurrences(bool $without = true): InputBuilder;
+    public function withoutUnlimitedRecurrences(bool $without = true): Builder;
 
-    public function withoutDaily(bool $without = true): InputBuilder;
+    public function withoutDaily(bool $without = true): Builder;
 
-    public function withoutWeekly(bool $without = true): InputBuilder;
+    public function withoutWeekly(bool $without = true): Builder;
 
-    public function withoutMonthly(bool $without = true): InputBuilder;
+    public function withoutMonthly(bool $without = true): Builder;
 
-    public function withoutYearly(bool $without = true): InputBuilder;
+    public function withoutYearly(bool $without = true): Builder;
 
     public function hasUnlimitedRecurrences(): bool;
 

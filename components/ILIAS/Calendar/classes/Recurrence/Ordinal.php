@@ -20,17 +20,15 @@ declare(strict_types=1);
 
 namespace ILIAS\Calendar\Recurrence;
 
-use DateTimeImmutable;
-
-interface Recurrence
+/**
+ * Technically these also include the sign...
+ */
+enum Ordinal: int
 {
-    public function freq(): Freq;
-
-    public function until(): DateTimeImmutable;
-
-    public function count(): ?int;
-
-    public function interval(): int;
-
-    public function wkst(): Weekday;
+    case FIRST = 1;
+    case SECOND = 2;
+    case THIRD = 3;
+    case FOURTH = 4;
+    case FIFTH = 5;
+    case LAST = -1;
 }

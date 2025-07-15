@@ -18,11 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Calendar\Recurrence;
+namespace ILIAS\Calendar\Recurrence\Input;
 
 use ilCalendarRecurrence;
 
-interface InputFactory
+interface Factory
 {
-    public function build(ilCalendarRecurrence $recurrence): InputBuilder;
+    public function build(ilCalendarRecurrence $recurrence): Builder;
 }

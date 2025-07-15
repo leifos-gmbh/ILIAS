@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Calendar\Recurrence;
+namespace ILIAS\Calendar\Recurrence\Input;
 
 use ilLanguage;
 use ILIAS\UI\Factory as UIFactory;
@@ -30,11 +30,19 @@ use ilCalendarUserSettings;
 use ilCalendarUtil;
 use ilCalendarRecurrence;
 use ilDate;
+use DateTimeZone;
+use ILIAS\Calendar\Recurrence\Weekday;
+use ILIAS\Calendar\Recurrence\Ordinal;
+use ILIAS\Calendar\Recurrence\Month;
+use DateTimeImmutable;
 
-class InputBuilderImpl implements InputBuilder
+class BuilderImpl implements Builder
 {
+    // radios
     protected const string RULE = 'rule';
     protected const string END = 'end';
+
+    //rule freq
     protected const string NO_RECURRENCE = 'none';
     protected const string DAILY = 'daily';
     protected const string WEEKLY = 'weekly';
@@ -42,36 +50,16 @@ class InputBuilderImpl implements InputBuilder
     protected const string MONTHLY_BY_DATE = 'monthly_by_date';
     protected const string YEARLY_BY_DAY = 'yearly_by_day';
     protected const string YEARLY_BY_DATE = 'yearly_by_date';
+
+    // common rule inputs
     protected const string INTERVAL = 'interval';
     protected const string MONTH = 'month';
     protected const string WEEK = 'week';
     protected const string DAY = 'day';
     protected const string DAY_OF_MONTH = 'day_of_month';
-    protected const string MONDAY = 'MO';
-    protected const string TUESDAY = 'TU';
-    protected const string WEDNESDAY = 'WE';
-    protected const string THURSDAY = 'TH';
-    protected const string FRIDAY = 'FR';
-    protected const string SATURDAY = 'SA';
-    protected const string SUNDAY = 'SU';
-    protected const int FIRST = 1;
-    protected const int SECOND = 2;
-    protected const int THIRD = 3;
-    protected const int FOURTH = 4;
-    protected const int FIFTH = 5;
-    protected const int LAST = -1;
-    protected const int JANUARY = 1;
-    protected const int FEBRUARY = 2;
-    protected const int MARCH = 3;
-    protected const int APRIL = 4;
-    protected const int MAY = 5;
-    protected const int JUNE = 6;
-    protected const int JULY = 7;
-    protected const int AUGUST = 8;
-    protected const int SEPTEMBER = 9;
-    protected const int OCTOBER = 10;
-    protected const int NOVEMBER = 11;
-    protected const int DECEMBER = 12;
+
+
+    // end inputs
     protected const string NO_UNTIL = 'no_until';
     protected const string COUNT = 'count';
     protected const string UNTIL_COUNT = 'until_count';
@@ -93,35 +81,35 @@ class InputBuilderImpl implements InputBuilder
     ) {
     }
 
-    public function withoutUnlimitedRecurrences(bool $without = true): InputBuilder
+    public function withoutUnlimitedRecurrences(bool $without = true): Builder
     {
         $clone = clone $this;
         $clone->unlimited_recurrences = !$without;
         return $clone;
     }
 
-    public function withoutDaily(bool $without = true): InputBuilder
+    public function withoutDaily(bool $without = true): Builder
     {
         $clone = clone $this;
         $clone->daily = !$without;
         return $clone;
     }
 
-    public function withoutWeekly(bool $without = true): InputBuilder
+    public function withoutWeekly(bool $without = true): Builder
     {
         $clone = clone $this;
         $clone->weekly = !$without;
         return $clone;
     }
 
-    public function withoutMonthly(bool $without = true): InputBuilder
+    public function withoutMonthly(bool $without = true): Builder
     {
         $clone = clone $this;
         $clone->monthly = !$without;
         return $clone;
     }
 
-    public function withoutYearly(bool $without = true): InputBuilder
+    public function withoutYearly(bool $without = true): Builder
     {
         $clone = clone $this;
         $clone->yearly = !$without;
@@ -185,10 +173,18 @@ class InputBuilderImpl implements InputBuilder
             $groups[self::YEARLY_BY_DAY] = $this->getYearlyByDayGroup();
             $groups[self::YEARLY_BY_DATE] = $this->getYearlyByDateGroup();
         }
+
+        $value = match ($this->recurrence->getFrequenceType()) {
+            ilCalendarRecurrence::FREQ_DAILY => self::DAILY,
+            ilCalendarRecurrence::FREQ_WEEKLY => self::WEEKLY,
+            ilCalendarRecurrence::FREQ_MONTHLY => $this->recurrence->getBYDAY() ? self::MONTHLY_BY_DAY : self::MONTHLY_BY_DATE,
+            ilCalendarRecurrence::FREQ_YEARLY => $this->recurrence->getBYDAY() ? self::YEARLY_BY_DAY : self::YEARLY_BY_DATE,
+            default => self::NO_RECURRENCE
+        };
         return $this->ui_factory->input()->field()->switchableGroup(
             $groups,
             $this->lng->txt('cal_recurrences')
-        )->withValue(self::NO_RECURRENCE);
+        )->withValue($value);
     }
 
     protected function getDailyGroup(): Group
@@ -269,8 +265,12 @@ class InputBuilderImpl implements InputBuilder
             );
         }
 
+        $count_value = $this->recurrence->getFrequenceUntilCount();
+        if ($count_value < 1 || $count_value > 100) {
+            $count_value = 1;
+        }
         $count = $this->ui_factory->input()->field()->numeric($this->lng->txt('cal_rec_count'))
-                         ->withValue(1)
+                         ->withValue($count_value)
                          ->withRequired(true)
                          ->withAdditionalTransformation(
                              $this->refinery->in()->series([
@@ -286,24 +286,37 @@ class InputBuilderImpl implements InputBuilder
         $end_date = $this->ui_factory->input()->field()->dateTime(
             $this->lng->txt('cal_rec_end_date'),
             $this->lng->txt('cal_rec_end_date_info')
-        )->withUseTime(false)
+        )->withTimezone('UTC')
+         ->withUseTime(false)
          ->withRequired(true);
+        if ($this->recurrence->getFrequenceUntilDate()) {
+            $end_date = $end_date->withValue(
+                new DateTimeImmutable('@' . $this->recurrence->getFrequenceUntilDate()->getUnixTime())
+            );
+        }
         $groups[self::UNTIL_END_DATE] = $this->ui_factory->input()->field()->group(
             [self::END_DATE => $end_date],
             $this->lng->txt('cal_rec_until_end_date')
         );
 
+        $value = self::NO_UNTIL;
+        if ($this->recurrence->getFrequenceUntilDate()) {
+            $value = self::UNTIL_END_DATE;
+        }
+        if ($this->recurrence->getFrequenceUntilCount()) {
+            $value = self::UNTIL_COUNT;
+        }
         return $this->ui_factory->input()->field()->switchableGroup(
             $groups,
             $this->lng->txt('cal_rec_until'),
             $this->lng->txt('cal_rec_until_info')
-        )->withValue(self::NO_UNTIL);
+        )->withValue($value);
     }
 
     protected function getIntervalInput(string $label): Input
     {
         return $this->ui_factory->input()->field()->numeric($label)
-                                ->withValue(1)
+                                ->withValue($this->recurrence->getInterval())
                                 ->withRequired(true)
                                 ->withAdditionalTransformation(
                                     $this->refinery->int()->isGreaterThanOrEqual(1)
@@ -313,45 +326,66 @@ class InputBuilderImpl implements InputBuilder
     protected function getDayInput(): Input
     {
         $days = [
-            0 => self::SUNDAY,
-            1 => self::MONDAY,
-            2 => self::TUESDAY,
-            3 => self::WEDNESDAY,
-            4 => self::THURSDAY,
-            5 => self::FRIDAY,
-            6 => self::SATURDAY,
-            7 => self::SUNDAY
+            0 => Weekday::SUNDAY->value,
+            1 => Weekday::MONDAY->value,
+            2 => Weekday::TUESDAY->value,
+            3 => Weekday::WEDNESDAY->value,
+            4 => Weekday::THURSDAY->value,
+            5 => Weekday::FRIDAY->value,
+            6 => Weekday::SATURDAY->value,
+            7 => Weekday::SUNDAY->value
         ];
         $options = [];
         for ($i = $this->user_settings->getWeekStart(); $i < 7 + $this->user_settings->getWeekStart(); $i++) {
             $options[$days[$i]] = ilCalendarUtil::_numericDayToString($i);
         }
+
+        $values = [];
+        foreach ($this->recurrence->getBYDAYList() as $byday) {
+            // BYDAY can also contain ordinance numbers in front of the days
+            $v = substr($byday, -2);
+            if (in_array($v, $days)) {
+                $values[] = $v;
+            }
+        }
+
         return $this->ui_factory->input()->field()->multiSelect(
             $this->lng->txt('cal_day_s'),
             $options
-        )->withRequired(true);
+        )->withValue($values)->withRequired(true);
     }
 
     protected function getWeekInput(): Input
     {
         $options = [
-            self::FIRST => $this->lng->txt('cal_first'),
-            self::SECOND => $this->lng->txt('cal_second'),
-            self::THIRD => $this->lng->txt('cal_third'),
-            self::FOURTH => $this->lng->txt('cal_fourth'),
-            self::FIFTH => $this->lng->txt('cal_fifth'),
-            self::LAST => $this->lng->txt('cal_last')
+            Ordinal::FIRST->value => $this->lng->txt('cal_first'),
+            Ordinal::SECOND->value => $this->lng->txt('cal_second'),
+            Ordinal::THIRD->value => $this->lng->txt('cal_third'),
+            Ordinal::FOURTH->value => $this->lng->txt('cal_fourth'),
+            Ordinal::FIFTH->value => $this->lng->txt('cal_fifth'),
+            Ordinal::LAST->value => $this->lng->txt('cal_last')
         ];
+
+        // The last two characters of any BYDAY entry are the day, the remainder is the ordinal.
+        $value = substr($this->recurrence->getBYDAYList()[0] ?? '', 0, -2);
+        if ($value === '') {
+            $value = Ordinal::FIRST->value;
+        }
+
         return $this->ui_factory->input()->field()->select(
             $this->lng->txt('week'),
             $options
-        )->withRequired(true);
+        )->withValue($value)->withRequired(true);
     }
 
     protected function getDayOfMonthInput(): Input
     {
+        $value = (int) $this->recurrence->getBYMONTHDAY();
+        if ($value < 1 || $value > 31) {
+            $value = 1;
+        }
         return $this->ui_factory->input()->field()->numeric($this->lng->txt('cal_day_of_month'))
-                                ->withValue(1)
+                                ->withValue($value)
                                 ->withRequired(true)
                                 ->withAdditionalTransformation(
                                     $this->refinery->in()->series([
@@ -364,27 +398,32 @@ class InputBuilderImpl implements InputBuilder
     protected function getMonthInput(): Input
     {
         $months = [
-            1 => self::JANUARY,
-            2 => self::FEBRUARY,
-            3 => self::MARCH,
-            4 => self::APRIL,
-            5 => self::MAY,
-            6 => self::JUNE,
-            7 => self::JULY,
-            8 => self::AUGUST,
-            9 => self::SEPTEMBER,
-            10 => self::OCTOBER,
-            11 => self::NOVEMBER,
-            12 => self::DECEMBER
+            1 => Month::JANUARY->value,
+            2 => Month::FEBRUARY->value,
+            3 => Month::MARCH->value,
+            4 => Month::APRIL->value,
+            5 => Month::MAY->value,
+            6 => Month::JUNE->value,
+            7 => Month::JULY->value,
+            8 => Month::AUGUST->value,
+            9 => Month::SEPTEMBER->value,
+            10 => Month::OCTOBER->value,
+            11 => Month::NOVEMBER->value,
+            12 => Month::DECEMBER->value
         ];
         $options = [];
         foreach ($months as $month => $key) {
             $options[$key] = ilCalendarUtil::_numericMonthToString($month);
         }
+
+        $value = $this->recurrence->getBYMONTH();
+        if (!in_array($value, $options)) {
+            $value = Month::JANUARY->value;
+        }
         return $this->ui_factory->input()->field()->select(
             $this->lng->txt('month'),
             $options
-        )->withRequired(true);
+        )->withValue($value)->withRequired(true);
     }
 
     protected function getOutputTransformation(): Transformation

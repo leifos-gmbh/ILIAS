@@ -18,20 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Help;
+namespace ILIAS\Help\GuidedTour\Settings;
 
-class InternalDataService
+enum PermissionType: int
 {
-    static protected array $instance = [];
-
-    public function __construct()
-    {
-        //$this->..._factory = new ...\DataFactory();
-    }
-
-    public function guidedTour(): \ILIAS\Help\GuidedTour\InternalDataService
-    {
-        return self::$instance["guided_data"] ??= new GuidedTour\InternalDataService();
-    }
-
+    case None = 0;
+    case Read = 1;
+    case Write = 2;
+    case Create = 3;
 }

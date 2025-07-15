@@ -19,7 +19,7 @@
 use ILIAS\Help\StandardGUIRequest;
 
 /**
- * @ilCtrl_Calls ilObjHelpSettingsGUI: ilPermissionGUI
+ * @ilCtrl_Calls ilObjHelpSettingsGUI: ilPermissionGUI, ilGuidedTourAdminGUI
  * @ilCtrl_isCalledBy ilObjHelpSettingsGUI: ilAdministrationGUI
  */
 class ilObjHelpSettingsGUI extends ilObject2GUI
@@ -74,6 +74,13 @@ class ilObjHelpSettingsGUI extends ilObject2GUI
         }
 
         switch ($next_class) {
+
+            case strtolower(ilGuidedTourAdminGUI::class):
+                $this->tabs_gui->setTabActive('guided_tour');
+                $gui = $this->gui->guidedTour()->adminGUI();
+                $this->ctrl->forwardCommand($gui);
+                break;
+
             case strtolower(ilPermissionGUI::class):
                 $this->tabs_gui->setTabActive('perm_settings');
                 $perm_gui = new ilPermissionGUI($this);
@@ -133,6 +140,11 @@ class ilObjHelpSettingsGUI extends ilObject2GUI
                 "settings",
                 $this->lng->txt("settings"),
                 $this->ctrl->getLinkTarget($this, "editSettings")
+            );
+            $this->tabs_gui->addTab(
+                "guided_tour",
+                $this->lng->txt("guided_tour"),
+                $this->ctrl->getLinkTargetByClass(ilGuidedTourAdminGUI::class)
             );
         }
 

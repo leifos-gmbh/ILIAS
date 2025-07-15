@@ -18,20 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Help;
-
-class InternalDataService
+class ilObjGuidedTour extends ilObject
 {
-    static protected array $instance = [];
-
-    public function __construct()
-    {
-        //$this->..._factory = new ...\DataFactory();
+    public function __construct(
+        int $a_id = 0,
+        bool $a_call_by_reference = false
+    ) {
+        if ($a_call_by_reference) {
+            throw new \RuntimeException("Can't instantiate guided tour via reference id.");
+        }
+        $this->type = "gdtr";
+        parent::__construct($a_id, false);
     }
-
-    public function guidedTour(): \ILIAS\Help\GuidedTour\InternalDataService
-    {
-        return self::$instance["guided_data"] ??= new GuidedTour\InternalDataService();
-    }
-
 }

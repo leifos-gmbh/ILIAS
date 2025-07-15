@@ -16,22 +16,25 @@
  *
  *********************************************************************/
 
-declare(strict_types=1);
+namespace ILIAS\Help\GuidedTour;
 
-namespace ILIAS\Help;
+use ILIAS\Repository\BaseGUIRequest;
 
-class InternalDataService
+class StandardGUIRequest
 {
-    static protected array $instance = [];
+    use BaseGUIRequest;
 
-    public function __construct()
-    {
-        //$this->..._factory = new ...\DataFactory();
+    public function __construct(
+        \ILIAS\HTTP\Services $http,
+        \ILIAS\Refinery\Factory $refinery,
+        ?array $passed_query_params = null,
+        ?array $passed_post_data = null
+    ) {
+        $this->initRequest(
+            $http,
+            $refinery,
+            $passed_query_params,
+            $passed_post_data
+        );
     }
-
-    public function guidedTour(): \ILIAS\Help\GuidedTour\InternalDataService
-    {
-        return self::$instance["guided_data"] ??= new GuidedTour\InternalDataService();
-    }
-
 }

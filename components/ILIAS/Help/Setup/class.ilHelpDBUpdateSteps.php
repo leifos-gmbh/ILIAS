@@ -86,4 +86,72 @@ class ilHelpDBUpdateSteps implements \ilDatabaseUpdateSteps
         }
     }
 
+    public function step_5(): void
+    {
+        if (!$this->db->tableExists('help_gt_settings')) {
+            $this->db->createTable('help_gt_settings',
+                [
+                'obj_id' => [
+                    'type' => 'integer',
+                    'length' => 4,
+                    'notnull' => true
+                ],
+                'active' => [
+                    'type' => 'integer',
+                    'length' => 1,
+                    'notnull' => true,
+                    'default' => 0
+                ],
+                'screen_ids' => [
+                    'type' => 'text',
+                    'length' => 1000,
+                    'notnull' => true,
+                    'default' => ''
+                ],
+                'permission' => [
+                    'type' => 'integer',
+                    'length' => 1,
+                    'notnull' => true,
+                    'default' => 0
+                ],
+            ]);
+            $this->db->addPrimaryKey('help_gt_settings', ['obj_id']);
+        }
+    }
+
+    public function step_6(): void
+    {
+        if (!$this->db->tableExists('help_gt_step')) {
+            $this->db->createTable('help_gt_step',
+                [
+                    'id' => [
+                        'type' => 'integer',
+                        'length' => 4,
+                        'notnull' => true
+                    ],
+                    'tour_id' => [
+                        'type' => 'integer',
+                        'length' => 4,
+                        'notnull' => true
+                    ],
+                    'order_nr' => [
+                        'type' => 'integer',
+                        'length' => 4,
+                        'notnull' => true
+                    ],
+                    'type' => [
+                        'type' => 'integer',
+                        'length' => 1,
+                        'notnull' => true
+                    ],
+                    'element_id' => [
+                        'type' => 'text',
+                        'length' => 1000,
+                        'notnull' => true,
+                        'default' => ''
+                    ]
+                ]);
+            $this->db->addPrimaryKey('help_gt_step', ['id']);
+        }
+    }
 }

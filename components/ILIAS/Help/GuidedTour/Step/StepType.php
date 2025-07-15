@@ -18,20 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Help;
+namespace ILIAS\Help\GuidedTour\Step;
 
-class InternalDataService
+enum StepType: int
 {
-    static protected array $instance = [];
-
-    public function __construct()
-    {
-        //$this->..._factory = new ...\DataFactory();
-    }
-
-    public function guidedTour(): \ILIAS\Help\GuidedTour\InternalDataService
-    {
-        return self::$instance["guided_data"] ??= new GuidedTour\InternalDataService();
-    }
-
+    case Mainbar = 1;
+    case Metabar = 2;
+    case Tab = 3;
+    case Form = 4;
+    case Table = 5;
+    case Toolbar = 6;
 }

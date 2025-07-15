@@ -18,20 +18,35 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Help;
+namespace ILIAS\Help\GuidedTour\Settings;
 
-class InternalDataService
+class Settings
 {
-    static protected array $instance = [];
-
-    public function __construct()
-    {
-        //$this->..._factory = new ...\DataFactory();
+    public function __construct(
+        protected int $obj_id,
+        protected bool $active,
+        protected string $screen_ids,
+        protected PermissionType $permission
+    ) {
     }
 
-    public function guidedTour(): \ILIAS\Help\GuidedTour\InternalDataService
+    public function getObjId(): int
     {
-        return self::$instance["guided_data"] ??= new GuidedTour\InternalDataService();
+        return $this->obj_id;
     }
 
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function getScreenIds(): string
+    {
+        return $this->screen_ids;
+    }
+
+    public function getPermission(): PermissionType
+    {
+        return $this->permission;
+    }
 }

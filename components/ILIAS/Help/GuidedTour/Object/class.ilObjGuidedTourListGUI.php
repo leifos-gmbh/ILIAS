@@ -18,20 +18,6 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Help;
-
-class InternalDataService
+class ilObjGuidedTourListGUI extends ilObjectListGUI
 {
-    static protected array $instance = [];
-
-    public function __construct()
-    {
-        //$this->..._factory = new ...\DataFactory();
-    }
-
-    public function guidedTour(): \ILIAS\Help\GuidedTour\InternalDataService
-    {
-        return self::$instance["guided_data"] ??= new GuidedTour\InternalDataService();
-    }
-
 }

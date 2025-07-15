@@ -18,20 +18,27 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Help;
+namespace ILIAS\Help\GuidedTour;
 
-class InternalDataService
+use ILIAS\Help\GuidedTour\Step\StepDBRepository;
+use ILIAS\Help\GuidedTour\Settings\SettingsDBRepository;
+
+class InternalRepoService
 {
     static protected array $instance = [];
-
-    public function __construct()
+    public function __construct(
+        protected InternalDataService $data,
+        protected \ilDBInterface $db)
     {
-        //$this->..._factory = new ...\DataFactory();
     }
 
-    public function guidedTour(): \ILIAS\Help\GuidedTour\InternalDataService
+    public function step(): StepDBRepository
     {
-        return self::$instance["guided_data"] ??= new GuidedTour\InternalDataService();
+        return self::$instance["step"] ??= new StepDBRepository($this->db, $this->data);
     }
 
+    public function settings(): SettingsDBRepository
+    {
+        return self::$instance["settings"] ??= new SettingsDBRepository($this->db, $this->data);
+    }
 }

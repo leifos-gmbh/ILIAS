@@ -10485,6 +10485,7 @@ gsfo#:#reset_footer#:#Fußzeile zurücksetzen
 gsfo#:#reset_success#:#Fußzeile erfolgreich zurückgesetzt
 gsfo#:#services#:#Services
 gsfo#:#support#:#Support
+help#:#guided_tour#:#Guided Tour
 help#:#help_all#:#Alle
 help#:#help_component#:#Komponente
 help#:#help_filter#:#Filter

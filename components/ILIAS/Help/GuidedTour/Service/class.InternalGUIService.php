@@ -18,24 +18,28 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Help;
+namespace ILIAS\Help\GuidedTour;
 
 use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICGUIServices;
 use ILIAS\Export\PrintProcessGUI;
 use ilGuidedTourGUI;
+use ilGuidedTourAdminGUI;
 
 class InternalGUIService
 {
     use GlobalDICGUIServices;
 
-    static protected array $instance = [];
+    protected InternalDataService $data_service;
+    protected InternalDomainService $domain_service;
 
     public function __construct(
         Container $DIC,
-        protected InternalDataService $data_service,
-        protected InternalDomainService $domain_service
+        InternalDataService $data_service,
+        InternalDomainService $domain_service
     ) {
+        $this->data_service = $data_service;
+        $this->domain_service = $domain_service;
         $this->initGUIServices($DIC);
     }
 
@@ -47,12 +51,18 @@ class InternalGUIService
         );
     }
 
-    public function guidedTour(): \ILIAS\Help\GuidedTour\InternalGUIService
+    public function guidedTourGUI(): ilGuidedTourGUI
     {
-        return self::$instance["guided_gui"] ??= new GuidedTour\InternalGUIService(
-            $this->DIC,
-            $this->data_service->guidedTour(),
-            $this->domain_service->guidedTour()
+        return new ilGuidedTourGUI();
+    }
+
+    public function adminGUI(): ilGuidedTourAdminGUI
+    {
+        return new ilGuidedTourAdminGUI(
+            $this->data_service,
+            $this->domain_service,
+            $this
         );
     }
+
 }

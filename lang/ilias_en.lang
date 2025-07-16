@@ -8114,6 +8114,7 @@ dateplaner#:#cal_agenda#:#Agenda
 dateplaner#:#cal_all_day#:#All Day
 dateplaner#:#cal_app_info#:#Appointment Information
 dateplaner#:#cal_app_other_materials_num#:#View other materials
+dateplaner#:#cal_appointment_notifications#:#Notification
 dateplaner#:#cal_appointments#:#Appointment(s)
 dateplaner#:#cal_apps#:#Number of Appointments
 dateplaner#:#cal_assigned_appointments#:#Assigned Appointments
@@ -8122,6 +8123,7 @@ dateplaner#:#cal_back_to_list#:#Back to List
 dateplaner#:#cal_back_to_search#:#Back to Search
 dateplaner#:#cal_batch_file_downloads#:#Batch Download of Calendar Files
 dateplaner#:#cal_batch_file_downloads_info#:#Display a button in calendars to allow all files related to the current calendar/appointment view to be downloaded as a batch.
+dateplaner#:#cal_belongs_to#:#Belongs to Calendar
 dateplaner#:#cal_book_free#:#available
 dateplaner#:#cal_booked_out#:#booked up
 dateplaner#:#cal_booking_cancellation_body#:#your appointment with %s has been cancelled.
@@ -8261,8 +8263,10 @@ dateplaner#:#cal_crs_notification_sub#:#Changed Appointment in Course "%s"
 dateplaner#:#cal_crs_timing_end#:#Suggested End
 dateplaner#:#cal_crs_timing_start#:#Suggested Start
 dateplaner#:#cal_daily#:#Daily
+dateplaner#:#cal_date_and_time#:#Date and Time
 dateplaner#:#cal_date_booked#:#booked
 dateplaner#:#cal_date_format_info#:#Please choose a format for the input of dates.
+dateplaner#:#cal_date_time_title#:#Date and Time
 dateplaner#:#cal_day_end#:#Day End
 dateplaner#:#cal_day_of_month#:#Day of the month
 dateplaner#:#cal_day_overview#:#Day Overview
@@ -8355,6 +8359,8 @@ dateplaner#:#cal_month_overview#:#Month Overview
 dateplaner#:#cal_month_s#:#Month(s)
 dateplaner#:#cal_month_selection#:#Select Month
 dateplaner#:#cal_monthly#:#Monthly
+dateplaner#:#cal_monthly_by_date#:#Monthly by Date
+dateplaner#:#cal_monthly_by_day#:#Monthly by Day
 dateplaner#:#cal_ms_details#:#Milestone Details
 dateplaner#:#cal_ms_users_responsible#:#Users Responsible
 dateplaner#:#cal_new_app#:#New Appointment
@@ -8375,6 +8381,17 @@ dateplaner#:#cal_owner#:#Owner
 dateplaner#:#cal_period#:#Period
 dateplaner#:#cal_rec_err_limit#:#Please enter a valid number of appointments.
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.
+dateplaner#:#cal_recurrence_count#:#Number of Appointments
+dateplaner#:#cal_recurrence_day_interval#:#Every x Day(s)
+dateplaner#:#cal_recurrence_end_date#:#End Date
+dateplaner#:#cal_recurrence_end_date_info#:#Last possible date for an appointment.
+dateplaner#:#cal_recurrence_month_interval#:#Every x Month(s)
+dateplaner#:#cal_recurrence_until#:#Recurrence End
+dateplaner#:#cal_recurrence_until_count#:#Fixed Number of Appointments
+dateplaner#:#cal_recurrence_until_end_date#:#Repeat Until End Date
+dateplaner#:#cal_recurrence_until_info#:#Only relevant if a recurrence was selected.
+dateplaner#:#cal_recurrence_week_interval#:#Every x Week(s)
+dateplaner#:#cal_recurrence_year_interval#:#Every x Year(s)
 dateplaner#:#cal_recurrences#:#Recurrences
 dateplaner#:#cal_reg_register#:#Register
 dateplaner#:#cal_reg_registered#:#You have been registered.
@@ -8468,6 +8485,8 @@ dateplaner#:#cal_weekly#:#Weekly
 dateplaner#:#cal_where#:#Location
 dateplaner#:#cal_year_s#:#Year(s)
 dateplaner#:#cal_yearly#:#Yearly
+dateplaner#:#cal_yearly_by_date#:#Yearly by Date
+dateplaner#:#cal_yearly_by_day#:#Yearly by Day
 dateplaner#:#consultation_hours_block_title#:#Consultation Hours
 dateplaner#:#crs_cal_activation_end#:#Course Availability ends
 dateplaner#:#crs_cal_activation_start#:#Course Availability starts

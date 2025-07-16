@@ -8106,6 +8106,7 @@ dateplaner#:#cal_agenda#:#Agenda
 dateplaner#:#cal_all_day#:#Ganztags
 dateplaner#:#cal_app_info#:#Information zum Kalendertermin
 dateplaner#:#cal_app_other_materials_num#:#Weitere Materialien anzeigen
+dateplaner#:#cal_appointment_notifications#:#Benachrichtigung
 dateplaner#:#cal_appointments#:#Termine
 dateplaner#:#cal_apps#:#Anzahl Termine
 dateplaner#:#cal_assigned_appointments#:#Termine dieses Kalenders
@@ -8114,6 +8115,7 @@ dateplaner#:#cal_back_to_list#:#Zurück zur Liste
 dateplaner#:#cal_back_to_search#:#Zurück zur Suche
 dateplaner#:#cal_batch_file_downloads#:#Datei-Downloads aus Kalender stapelweise verarbeiten
 dateplaner#:#cal_batch_file_downloads_info#:#Erlaubt Herunterladen aller Dateien zu Einträgen in der gewählten Kalenderansicht
+dateplaner#:#cal_belongs_to#:#Gehört zu Kalender
 dateplaner#:#cal_book_free#:#frei
 dateplaner#:#cal_booked_out#:#ausgebucht
 dateplaner#:#cal_booking_cancellation_body#:#Ihr Termin mit %s ist abgesagt.
@@ -8253,8 +8255,10 @@ dateplaner#:#cal_crs_notification_sub#:#Terminänderung in Kurs „%s“
 dateplaner#:#cal_crs_timing_end#:#Bearbeitungsende
 dateplaner#:#cal_crs_timing_start#:#Bearbeitungsbeginn
 dateplaner#:#cal_daily#:#Täglich
+dateplaner#:#cal_date_and_time#:#Datum und Uhrzeit
 dateplaner#:#cal_date_booked#:#gebucht
 dateplaner#:#cal_date_format_info#:#Bitte wählen Sie ein Format für die Eingabe eines Datums aus.
+dateplaner#:#cal_date_time_title#:#Datum und Uhrzeit
 dateplaner#:#cal_day_end#:#Tagesende
 dateplaner#:#cal_day_of_month#:#Tag des Monats
 dateplaner#:#cal_day_overview#:#Tagesübersicht
@@ -8347,6 +8351,8 @@ dateplaner#:#cal_month_overview#:#Monatsübersicht
 dateplaner#:#cal_month_s#:#Monat(e)
 dateplaner#:#cal_month_selection#:#Monatsauswahl
 dateplaner#:#cal_monthly#:#Monatlich
+dateplaner#:#cal_monthly_by_date#:#Monatlich nach Datum
+dateplaner#:#cal_monthly_by_day#:#Monatlich nach Tag
 dateplaner#:#cal_ms_details#:#Details zum Meilenstein
 dateplaner#:#cal_ms_users_responsible#:#Verantwortliche Mitglieder
 dateplaner#:#cal_new_app#:#Neuer Termin
@@ -8367,6 +8373,17 @@ dateplaner#:#cal_owner#:#Im Besitz von
 dateplaner#:#cal_period#:#Zeitraum
 dateplaner#:#cal_rec_err_limit#:#Bitte geben Sie eine Anzahl von Terminen ein.
 dateplaner#:#cal_recurrence_confirm_deletion#:#Bitte wählen Sie aus, ob Sie einzelne Termine oder aber die gesamte Terminserie löschen möchten.
+dateplaner#:#cal_recurrence_count#:#Anzahl
+dateplaner#:#cal_recurrence_day_interval#:#Alle x Tag(e)
+dateplaner#:#cal_recurrence_end_date#:#Enddatum
+dateplaner#:#cal_recurrence_end_date_info#:#Letztes mögliches Datum für einen Termin.
+dateplaner#:#cal_recurrence_month_interval#:#Alle x Monat(e)
+dateplaner#:#cal_recurrence_until#:#Wiederholungsende
+dateplaner#:#cal_recurrence_until_count#:#Feste Anzahl von Terminen
+dateplaner#:#cal_recurrence_until_end_date#:#Wiederholen bis zu Enddatum
+dateplaner#:#cal_recurrence_until_info#:#Nur relevant wenn eine Wiederholung ausgewählt wurde.
+dateplaner#:#cal_recurrence_week_interval#:#Alle x Woche(n)
+dateplaner#:#cal_recurrence_year_interval#:#Alle x Jahr(e)
 dateplaner#:#cal_recurrences#:#Wiederholungen
 dateplaner#:#cal_reg_register#:#Anmelden
 dateplaner#:#cal_reg_registered#:#Sie wurden für diesen Termin angemeldet.
@@ -8460,6 +8477,8 @@ dateplaner#:#cal_weekly#:#Wöchentlich
 dateplaner#:#cal_where#:#Ort
 dateplaner#:#cal_year_s#:#Jahr(e)
 dateplaner#:#cal_yearly#:#Jährlich
+dateplaner#:#cal_yearly_by_date#:#Jährlich nach Datum
+dateplaner#:#cal_yearly_by_day#:#Jährlich nach Tag
 dateplaner#:#consultation_hours_block_title#:#Sprechstunden
 dateplaner#:#crs_cal_activation_end#:#Kursende
 dateplaner#:#crs_cal_activation_start#:#Kursbeginn

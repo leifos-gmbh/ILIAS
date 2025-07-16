@@ -190,7 +190,7 @@ class BuilderImpl implements Builder
     protected function getDailyGroup(): Group
     {
         return $this->ui_factory->input()->field()->group(
-            [self::INTERVAL => $this->getIntervalInput('cal_recurrence_day_interval')],
+            [self::INTERVAL => $this->getIntervalInput($this->lng->txt('cal_recurrence_day_interval'))],
             $this->lng->txt('cal_daily')
         );
     }
@@ -199,7 +199,7 @@ class BuilderImpl implements Builder
     {
         return $this->ui_factory->input()->field()->group(
             [
-                self::INTERVAL => $this->getIntervalInput('cal_recurrence_week_interval'),
+                self::INTERVAL => $this->getIntervalInput($this->lng->txt('cal_recurrence_week_interval')),
                 self::DAY => $this->getDayInput()
             ],
             $this->lng->txt('cal_weekly')
@@ -210,7 +210,7 @@ class BuilderImpl implements Builder
     {
         return $this->ui_factory->input()->field()->group(
             [
-                self::INTERVAL => $this->getIntervalInput('Every x Month(s)'),
+                self::INTERVAL => $this->getIntervalInput($this->lng->txt('cal_recurrence_month_interval')),
                 self::WEEK => $this->getWeekInput(),
                 self::DAY => $this->getDayInput()
             ],
@@ -222,7 +222,7 @@ class BuilderImpl implements Builder
     {
         return $this->ui_factory->input()->field()->group(
             [
-                self::INTERVAL => $this->getIntervalInput('Every x Month(s)'),
+                self::INTERVAL => $this->getIntervalInput($this->lng->txt('cal_recurrence_month_interval')),
                 self::DAY_OF_MONTH => $this->getDayOfMonthInput()
             ],
             $this->lng->txt('cal_monthly_by_date')
@@ -233,7 +233,7 @@ class BuilderImpl implements Builder
     {
         return $this->ui_factory->input()->field()->group(
             [
-                self::INTERVAL => $this->getIntervalInput('Every x Years(s)'),
+                self::INTERVAL => $this->getIntervalInput($this->lng->txt('cal_recurrence_year_interval')),
                 self::MONTH => $this->getMonthInput(),
                 self::WEEK => $this->getWeekInput(),
                 self::DAY => $this->getDayInput()
@@ -246,7 +246,7 @@ class BuilderImpl implements Builder
     {
         return $this->ui_factory->input()->field()->group(
             [
-                self::INTERVAL => $this->getIntervalInput('Every x Year(s)'),
+                self::INTERVAL => $this->getIntervalInput($this->lng->txt('cal_recurrence_year_interval')),
                 self::MONTH => $this->getMonthInput(),
                 self::DAY_OF_MONTH => $this->getDayOfMonthInput()
             ],
@@ -269,7 +269,7 @@ class BuilderImpl implements Builder
         if ($count_value < 1 || $count_value > 100) {
             $count_value = 1;
         }
-        $count = $this->ui_factory->input()->field()->numeric($this->lng->txt('cal_rec_count'))
+        $count = $this->ui_factory->input()->field()->numeric($this->lng->txt('cal_recurrence_count'))
                          ->withValue($count_value)
                          ->withRequired(true)
                          ->withAdditionalTransformation(
@@ -280,12 +280,12 @@ class BuilderImpl implements Builder
                          );
         $groups[self::UNTIL_COUNT] = $this->ui_factory->input()->field()->group(
             [self::COUNT => $count],
-            $this->lng->txt('cal_rec_until_count')
+            $this->lng->txt('cal_recurrence_until_count')
         );
 
         $end_date = $this->ui_factory->input()->field()->dateTime(
-            $this->lng->txt('cal_rec_end_date'),
-            $this->lng->txt('cal_rec_end_date_info')
+            $this->lng->txt('cal_recurrence_end_date'),
+            $this->lng->txt('cal_recurrence_end_date_info')
         )->withTimezone('UTC')
          ->withUseTime(false)
          ->withRequired(true);
@@ -296,7 +296,7 @@ class BuilderImpl implements Builder
         }
         $groups[self::UNTIL_END_DATE] = $this->ui_factory->input()->field()->group(
             [self::END_DATE => $end_date],
-            $this->lng->txt('cal_rec_until_end_date')
+            $this->lng->txt('cal_recurrence_until_end_date')
         );
 
         $value = self::NO_UNTIL;
@@ -308,8 +308,8 @@ class BuilderImpl implements Builder
         }
         return $this->ui_factory->input()->field()->switchableGroup(
             $groups,
-            $this->lng->txt('cal_rec_until'),
-            $this->lng->txt('cal_rec_until_info')
+            $this->lng->txt('cal_recurrence_until'),
+            $this->lng->txt('cal_recurrence_until_info')
         )->withValue($value);
     }
 

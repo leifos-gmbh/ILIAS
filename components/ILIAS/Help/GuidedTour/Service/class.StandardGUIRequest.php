@@ -37,4 +37,14 @@ class StandardGUIRequest
             $passed_post_data
         );
     }
+
+    public function getTourId(): int
+    {
+        return $this->int("tour_id");
+    }
+
+    public function getStepId(): int
+    {
+        return $this->int("step_id");
+    }
 }

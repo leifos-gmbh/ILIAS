@@ -154,4 +154,10 @@ class ilHelpDBUpdateSteps implements \ilDatabaseUpdateSteps
             $this->db->addPrimaryKey('help_gt_step', ['id']);
         }
     }
+
+    public function step_7(): void
+    {
+        $this->db->createSequence('help_gt_step');
+    }
+
 }

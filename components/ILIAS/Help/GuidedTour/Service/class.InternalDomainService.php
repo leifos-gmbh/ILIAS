@@ -24,6 +24,8 @@ use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\Help\GuidedTour\Settings\SettingsManager;
 use ILIAS\Help\GuidedTour\Tour\TourManager;
+use ILIAS\Help\GuidedTour\Step\StepManager;
+use ILIAS\LearningModule\Table\StepRetrieval;
 
 class InternalDomainService
 {
@@ -52,6 +54,23 @@ class InternalDomainService
         return self::$instance["tour"] ??= new TourManager(
             $this->data,
             $this
+        );
+    }
+
+    public function step(): StepManager
+    {
+        return self::$instance["step"] ??= new StepManager(
+            $this->data,
+            $this->repo,
+            $this
+        );
+    }
+
+    public function stepRetrieval(int $tour_id): StepRetrieval
+    {
+        return self::$instance["step_retrieval"][$tour_id] ??= new StepRetrieval(
+            $this,
+            $tour_id
         );
     }
 

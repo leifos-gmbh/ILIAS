@@ -10485,6 +10485,21 @@ gsfo#:#reset_footer#:#Fußzeile zurücksetzen
 gsfo#:#reset_success#:#Fußzeile erfolgreich zurückgesetzt
 gsfo#:#services#:#Services
 gsfo#:#support#:#Support
+help#:#gdtr_step_type#:#Type
+help#:#gdtr_mainbar#:#Mainbar
+help#:#gdtr_metabar#:#Metabar
+help#:#gdtr_element_id#:#Element ID
+help#:#gdtr_tabs#:#Reiter
+help#:#gdtr_form#:#Formular
+help#:#gdtr_table#:#Tabelle
+help#:#gdtr_toolbar#:#Toolbar
+help#:#gdtr_primary_button#:#Primary Button
+help#:#gdtr_add_step#:#Schritt hinzufügen
+help#:#gdtr_tour_steps#:#Schritte
+help#:#gdtr_type#:#Typ
+help#:#gdtr_guided_tours#:#Guided Tours
+help#:#gdtr_add_tour#:#Add Tour
+help#:#gdtr_edit_steps#:#Edit Steps
 help#:#guided_tour#:#Guided Tour
 help#:#help_all#:#Alle
 help#:#help_component#:#Komponente

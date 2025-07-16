@@ -22,10 +22,13 @@ use ILIAS\GlobalScreen\Scope\MainMenu\Factory\Item;
 use ILIAS\Help\StandardGUIRequest;
 use ILIAS\Services\Help\ScreenId\HelpScreenIdObserver;
 use ILIAS\Repository\Form\FormAdapterGUI;
+use ILIAS\Help\GuidedTour\Step\StepType;
+use ILIAS\Help\GuidedTour\Step\Step;
 
 class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
 {
 
+    private \ILIAS\Help\GuidedTour\Step\StepManager $step_manager;
     protected \ILIAS\Help\GuidedTour\Tour\TourManager $tm;
 
     public function __construct(
@@ -34,7 +37,10 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         protected \ILIAS\Help\GuidedTour\InternalGUIService $gui
     )
     {
+        $ctrl = $this->gui->ctrl();
         $this->tm = $domain->tour();
+        $ctrl->saveParameterByClass(self::class, "tour_id");
+        $this->step_manager = $domain->step();
     }
 
     public function executeCommand() : void
@@ -50,6 +56,11 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                     "show",
                     "addTour",
                     "saveTour",
+                    "listSteps",
+                    "addStep",
+                    "saveStep",
+                    "tableCommand",
+                    "editStep",
                 ])) {
                     $this->$cmd();
                 }
@@ -65,19 +76,25 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $lng = $this->domain->lng();
 
         $b = $f->button()->standard(
-            $lng->txt("add_tour"),
+            $lng->txt("gdtr_add_tour"),
             $ctrl->getLinkTarget($this, "addTour")
         );
         $this->gui->toolbar()->addComponent($b);
 
         $items = [];
         foreach ($this->tm->getAll() as $tour) {
-            $items[] = $f->item()->standard($tour->getTitle());
+            $ctrl->setParameterByClass(self::class, "tour_id", $tour->getId());
+            $link = $f->link()->standard(
+               $lng->txt("gdtr_edit_steps"),
+               $ctrl->getLinkTargetByClass(self::class, "listSteps")
+            );
+            $items[] = $f->item()->standard($tour->getTitle())
+                ->withActions($f->dropdown()->standard([$link]));
         }
         if (count($items) > 0) {
             $grp = $f->item()->group("", $items);
             $panel = $f->panel()->listing()->standard(
-                $lng->txt("guided_tours"),
+                $lng->txt("gdtr_guided_tours"),
                 [$grp]
             );
             $mt->setContent($r->render([$panel]));
@@ -106,6 +123,145 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         } else {
             $mt->setContent($form->render());
         }
+    }
+
+    protected function setStepsHeader() : void
+    {
+        $tabs = $this->gui->tabs();
+        $lng = $this->domain->lng();
+        $mt = $this->gui->ui()->mainTemplate();
+        $ctrl = $this->gui->ctrl();
+        $tour = $this->tm->getByObjId($this->gui->standardRequest()->getTourId());
+        $mt->setTitle($lng->txt("guided_tour") . ": " . $tour?->getTitle());
+        $mt->setDescription($tour?->getDescription());
+        $tabs->clearTargets();
+        $tabs->setBackTarget(
+            $lng->txt("back"),
+            $ctrl->getLinkTargetByClass(self::class, "show")
+        );
+    }
+
+    protected function setSingleStepHeader() : void
+    {
+        $this->setStepsHeader();
+        $tabs = $this->gui->tabs();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $tabs->setBackTarget(
+            $lng->txt("back"),
+            $ctrl->getLinkTargetByClass(self::class, "listSteps")
+        );
+    }
+
+    protected function listSteps() : void
+    {
+        $mt = $this->gui->ui()->mainTemplate();
+        $f = $this->gui->ui()->factory();
+        $ctrl = $this->gui->ctrl();
+        $lng = $this->domain->lng();
+        $this->setStepsHeader();
+
+        $b = $f->button()->standard(
+            $lng->txt("gdtr_add_step"),
+            $ctrl->getLinkTarget($this, "addStep")
+        );
+        $this->gui->toolbar()->addComponent($b);
+
+        $table = $this->gui->stepTableGUI(
+            $this->gui->standardRequest()->getTourId(),
+            $this
+        );
+        $mt->setContent($table->render());
+    }
+
+    public function tableCommand(): void
+    {
+        $table = $this->gui->stepTableGUI(
+            $this->gui->standardRequest()->getTourId(),
+            $this
+        );
+        $table->handleCommand();
+    }
+
+    protected function addStep() : void
+    {
+        $this->setSingleStepHeader();
+        $mt = $this->gui->ui()->mainTemplate();
+        $mt->setContent($this->getStepForm()->render());
+    }
+
+    protected function getStepForm(?Step $step = null) : FormAdapterGUI
+    {
+        $lng = $this->domain->lng();
+        $type_val = (string) $step?->getType()->value;
+        $mb_element_id = $step?->getType()->value === StepType::Mainbar->value
+            ? $step?->getElementId()
+            : null;
+        $mt_element_id = $step?->getType()->value === StepType::Metabar->value
+            ? $step?->getElementId()
+            : null;
+        $tab_element_id = $step?->getType()->value === StepType::Tab->value
+            ? $step?->getElementId()
+            : null;
+        return $this->gui->form(self::class, "saveStep")
+            ->switch("type", $lng->txt("gdtr_step_type"), "", $type_val)
+            ->group((string) StepType::Mainbar->value, $lng->txt("gdtr_mainbar"))
+            ->text("mb_element_id", $lng->txt("gdtr_element_id"), "", $mb_element_id)
+            ->group((string) StepType::Metabar->value, $lng->txt("gdtr_metabar"))
+            ->text("mt_element_id", $lng->txt("gdtr_element_id"), "", $mt_element_id)
+            ->group((string) StepType::Tab->value, $lng->txt("gdtr_tabs"))
+            ->text("tab_element_id", $lng->txt("gdtr_element_id"), "", $tab_element_id)
+            ->group((string) StepType::Form->value, $lng->txt("gdtr_form"))
+            ->group((string) StepType::Table->value, $lng->txt("gdtr_table"))
+            ->group((string) StepType::Toolbar->value, $lng->txt("gdtr_toolbar"))
+            ->group((string) StepType::PrimaryButton->value, $lng->txt("gdtr_primary_button"))
+            ->end();
+    }
+
+    public function saveStep() : void
+    {
+        $ctrl = $this->gui->ctrl();
+        $mt = $this->gui->ui()->mainTemplate();
+        $oder_nr = 0;
+        if (($step_id = $this->gui->standardRequest()->getStepId()) > 0) {
+            $step = $this->step_manager->getById($step_id);
+            $oder_nr = $step->getOrderNr();
+        }
+        $form = $this->getStepForm();
+        if ($form->isValid()) {
+            $element_id = match ((int) $form->getData("type")) {
+                StepType::Mainbar->value => $form->getData("mb_element_id"),
+                StepType::Metabar->value => $form->getData("mt_element_id"),
+                StepType::Tab->value => $form->getData("tab_element_id"),
+                default => ''
+            };
+            $step = $this->data->step(
+                $step_id,
+                $this->gui->standardRequest()->getTourId(),
+                $oder_nr,
+                StepType::from((int) $form->getData("type")),
+                $element_id
+            );
+            if ($step_id > 0) {
+                $this->step_manager->update($step);
+            } else {
+                $this->step_manager->create($step);
+            }
+            $ctrl->redirectByClass(self::class, "listSteps");
+        } else {
+            $mt->setContent($form->render());
+        }
+    }
+
+    public function editStep(int $step_id) : void
+    {
+        $this->setSingleStepHeader();
+        $ctrl = $this->gui->ctrl();
+        $ctrl->setParameterByClass(self::class, "step_id", $step_id);
+        $step = $this->step_manager->getById($step_id);
+        $form = $this->getStepForm($step);
+        $mt = $this->gui->ui()->mainTemplate();
+        $mt->setContent($form->render());
     }
 
 }

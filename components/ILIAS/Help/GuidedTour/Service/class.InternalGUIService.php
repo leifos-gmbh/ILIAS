@@ -25,6 +25,7 @@ use ILIAS\Repository\GlobalDICGUIServices;
 use ILIAS\Export\PrintProcessGUI;
 use ilGuidedTourGUI;
 use ilGuidedTourAdminGUI;
+use ILIAS\LearningModule\Table\TableAdapterGUI;
 
 class InternalGUIService
 {
@@ -65,4 +66,26 @@ class InternalGUIService
         );
     }
 
+    public function stepTableGUI(
+        int $tour_id,
+        object $parent_gui
+    ): TableAdapterGUI {
+        $domain = $this->domain_service;
+        $lng = $domain->lng();
+        $table = new TableAdapterGUI(
+            "gdtr_steps",
+            $lng->txt("gdtr_tour_steps"),
+            $domain->stepRetrieval(
+                $tour_id
+            ),
+            $parent_gui
+        );
+        $table = $table
+            ->ordering("saveOrder")
+            ->textColumn("type", $lng->txt("gdtr_type"))
+            ->textColumn("element_id", $lng->txt("gdtr_element_id"))
+            ->singleAction("editStep", $lng->txt("edit"))
+            ->singleAction("confirmStepDeletion", $lng->txt("delete"), true);
+        return $table;
+    }
 }

@@ -28,4 +28,5 @@ enum StepType: int
     case Form = 4;
     case Table = 5;
     case Toolbar = 6;
+    case PrimaryButton = 7;
 }

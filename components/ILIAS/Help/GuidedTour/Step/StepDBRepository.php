@@ -31,13 +31,27 @@ class StepDBRepository
     ) {
     }
 
+    protected function getMaxOrderNr(int $tour_id): int
+    {
+        $set = $this->db->queryF("SELECT MAX(order_nr) max_order FROM help_gt_step " .
+            " WHERE tour_id = %s",
+            ["integer"],
+            [$tour_id]
+        );
+        if ($record = $this->db->fetchAssoc($set)) {
+            return (int) $record["max_order"];
+        }
+        return 0;
+    }
+
     public function create(Step $step): int
     {
         $id = $this->db->nextId('help_gt_step');
+        $order_nr = $this->getMaxOrderNr($step->getTourId()) + 10;
         $this->db->insert('help_gt_step', [
             'id' => ['integer', $id],
             'tour_id' => ['integer', $step->getTourId()],
-            'order_nr' => ['integer', $step->getOrderNr()],
+            'order_nr' => ['integer', $order_nr],
             'type' => ['integer', $step->getType()->value],
             'element_id' => ['text', $step->getElementId()]
         ]);
@@ -84,13 +98,31 @@ class StepDBRepository
     /**
      * @return \Generator<Step>
      */
-    public function getAll(): \Generator
+    public function getStepsOfTour(int $tour_id): \Generator
     {
-        $set = $this->db->query('SELECT * FROM help_gt_step');
+        $set = $this->db->queryF("SELECT * FROM help_gt_step " .
+            " WHERE tour_id = %s ORDER BY order_nr ASC",
+            ["integer"],
+            [$tour_id]
+        );
         while ($record = $this->db->fetchAssoc($set)) {
             yield $this->mapRecordToStep($record);
         }
     }
+
+    public function countStepsOfTour(int $tour_id): int
+    {
+        $set = $this->db->queryF("SELECT COUNT(*) cnt FROM help_gt_step " .
+            " WHERE tour_id = %s",
+            ["integer"],
+            [$tour_id]
+        );
+        if ($record = $this->db->fetchAssoc($set)) {
+            return (int) $record["cnt"];
+        }
+        return 0;
+    }
+
 
     protected function mapRecordToStep(array $record): Step
     {

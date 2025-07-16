@@ -64,4 +64,10 @@ class TourManager
             yield \ilObjectFactory::getInstanceByObjId($tour["obj_id"]);
         }
     }
+
+    public function getByObjId(int $obj_id) : ?ilObjGuidedTour
+    {
+        return \ilObjectFactory::getInstanceByObjId($obj_id);
+    }
+
 }

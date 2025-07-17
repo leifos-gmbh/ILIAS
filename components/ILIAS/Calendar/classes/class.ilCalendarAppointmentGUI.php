@@ -489,7 +489,7 @@ class ilCalendarAppointmentGUI
             // Send notifications
             if (
                 ilCalendarSettings::_getInstance()->isNotificationEnabled() &&
-                (int) $data['not']
+                ($data['not'] ?? false)
             ) {
                 $this->distributeNotifications($cat_id, $this->app->getEntryId(), true);
             }

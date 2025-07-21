@@ -759,8 +759,10 @@ class ilCalendarAppointmentGUI
 
             $this->tpl->setOnScreenMessage('success', $this->lng->txt('msg_obj_modified'), true);
             $this->ctrl->returnToParent($this);
-        } else {
+        } elseif ($data && $this->error->getMessage() !== '') {
             $this->tpl->setOnScreenMessage('failure', $this->error->getMessage());
+        } else {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('err_check_input'));
         }
         $this->edit(false, $this->form);
     }

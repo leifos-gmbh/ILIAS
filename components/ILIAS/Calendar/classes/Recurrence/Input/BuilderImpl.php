@@ -455,14 +455,18 @@ class BuilderImpl implements Builder
                 case self::WEEKLY:
                     $recurrence->setFrequenceType(ilCalendarRecurrence::FREQ_WEEKLY);
                     $recurrence->setInterval((int) $rule_data[1][self::INTERVAL]);
-                    $recurrence->setBYDAY(implode(',', $rule_data[1][self::DAY]));
+                    if (is_array($rule_data[1][self::DAY]) && $rule_data[1][self::DAY] !== []) {
+                        $recurrence->setBYDAY(implode(',', $rule_data[1][self::DAY]));
+                    }
                     break;
 
                 case self::MONTHLY_BY_DAY:
                     $recurrence->setFrequenceType(ilCalendarRecurrence::FREQ_MONTHLY);
                     $recurrence->setInterval((int) $rule_data[1][self::INTERVAL]);
-                    $index = $rule_data[1][self::WEEK];
-                    $recurrence->setBYDAY($index . implode(',' . $index, $rule_data[1][self::DAY]));
+                    if (is_array($rule_data[1][self::DAY]) && $rule_data[1][self::DAY] !== []) {
+                        $index = $rule_data[1][self::WEEK];
+                        $recurrence->setBYDAY($index . implode(',' . $index, $rule_data[1][self::DAY]));
+                    }
                     break;
 
                 case self::MONTHLY_BY_DATE:
@@ -475,8 +479,10 @@ class BuilderImpl implements Builder
                     $recurrence->setFrequenceType(ilCalendarRecurrence::FREQ_YEARLY);
                     $recurrence->setInterval((int) $rule_data[1][self::INTERVAL]);
                     $recurrence->setBYMONTH((string) $rule_data[1][self::MONTH]);
-                    $index = $rule_data[1][self::WEEK];
-                    $recurrence->setBYDAY($index . implode(',' . $index, $rule_data[1][self::DAY]));
+                    if (is_array($rule_data[1][self::DAY]) && $rule_data[1][self::DAY] !== []) {
+                        $index = $rule_data[1][self::WEEK];
+                        $recurrence->setBYDAY($index . implode(',' . $index, $rule_data[1][self::DAY]));
+                    }
                     break;
 
                 case self::YEARLY_BY_DATE:

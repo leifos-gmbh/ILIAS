@@ -183,6 +183,7 @@ class ilCalendarAppointmentGUI
         $duration_date_input = $this->ui_factory->input()->field()->duration(
             $this->lng->txt('cal_duration')
         )->withTimezone('UTC')
+         ->withLabels($this->lng->txt('cal_duration_start'), $this->lng->txt('cal_duration_end'))
          ->withUseTime(false)
          ->withRequired(true)
          ->withValue([$start_time, $end_time]);
@@ -194,6 +195,7 @@ class ilCalendarAppointmentGUI
         $duration_datetime_input = $this->ui_factory->input()->field()->duration(
             $this->lng->txt('cal_duration')
         )->withTimezone($this->user->getTimeZone())
+         ->withLabels($this->lng->txt('cal_duration_start'), $this->lng->txt('cal_duration_end'))
          ->withUseTime(true)
          ->withRequired(true)
          ->withValue([

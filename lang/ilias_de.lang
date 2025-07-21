@@ -8297,6 +8297,8 @@ dateplaner#:#cal_download_files#:#Dateien herunterladen
 dateplaner#:#cal_download_files_started#:#Ein ZIP-Archiv mit allen Download-Dateien wird jetzt im Hintergrund erstellt. Den Status Ihrer Hintergrundprozesse sehen Sie oben rechts in der Nachrichtenzentrale. Dort können Sie das ZIP-Archiv auch herunterladen.
 dateplaner#:#cal_dstart_dend_warn#:#Bitte überprüfen Sie Ihre Eingabe. Der Tagesbeginn muss vor dem Tagesende sein.
 dateplaner#:#cal_duration#:#Dauer
+dateplaner#:#cal_duration_end#:#Ende
+dateplaner#:#cal_duration_start#:#Start
 dateplaner#:#cal_edit_appointment#:#Termin bearbeiten
 dateplaner#:#cal_edit_category#:#Kalender bearbeiten
 dateplaner#:#cal_edit_milestone#:#Meilenstein bearbeiten

@@ -26,6 +26,7 @@ use ILIAS\Help\GuidedTour\Settings\SettingsManager;
 use ILIAS\Help\GuidedTour\Tour\TourManager;
 use ILIAS\Help\GuidedTour\Step\StepManager;
 use ILIAS\LearningModule\Table\StepRetrieval;
+use ILIAS\Help\GuidedTour\Page\PageManager;
 
 class InternalDomainService
 {
@@ -71,6 +72,13 @@ class InternalDomainService
         return self::$instance["step_retrieval"][$tour_id] ??= new StepRetrieval(
             $this,
             $tour_id
+        );
+    }
+
+    public function page(): PageManager
+    {
+        return self::$instance["page"] ??= new PageManager(
+            $this
         );
     }
 

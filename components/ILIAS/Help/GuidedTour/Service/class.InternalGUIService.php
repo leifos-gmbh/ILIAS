@@ -84,7 +84,8 @@ class InternalGUIService
             ->ordering("saveOrder")
             ->textColumn("type", $lng->txt("gdtr_type"))
             ->textColumn("element_id", $lng->txt("gdtr_element_id"))
-            ->singleAction("editStep", $lng->txt("edit"))
+            ->singleAction("editStep", $lng->txt("gdtr_edit_properties"))
+            ->singleAction("editPage", $lng->txt("gdtr_edit_content"))
             ->singleAction("confirmStepDeletion", $lng->txt("delete"), true);
         return $table;
     }

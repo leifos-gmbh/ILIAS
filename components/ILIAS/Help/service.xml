@@ -4,6 +4,9 @@
 	<baseclasses>
 		<baseclass name="ilHelpGUI" dir="classes" />
 	</baseclasses>
+	<copage>
+		<pageobject parent_type="gdtr" class_name="ilGuidedTourPage" directory="Guidedtour/Page"/>
+	</copage>
 	<objects>
 		<object id="hlps" class_name="HelpSettings" dir="classes"
 			checkbox="0" inherit="0" translate="sys" rbac="1" system="1" administration="1">

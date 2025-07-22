@@ -18,13 +18,13 @@
 
 declare(strict_types=1);
 
-use ILIAS\GlobalScreen\Scope\MainMenu\Factory\Item;
-use ILIAS\Help\StandardGUIRequest;
-use ILIAS\Services\Help\ScreenId\HelpScreenIdObserver;
 use ILIAS\Repository\Form\FormAdapterGUI;
 use ILIAS\Help\GuidedTour\Step\StepType;
 use ILIAS\Help\GuidedTour\Step\Step;
 
+/**
+ * @ilCtrl_Calls ilGuidedTourAdminGUI: ilGuidedTourPageGUI
+ */
 class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
 {
 
@@ -46,11 +46,19 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
     public function executeCommand() : void
     {
         $ctrl = $this->gui->ctrl();
+        $mt = $this->gui->ui()->mainTemplate();
 
         $next_class = $ctrl->getNextClass($this);
         $cmd = $ctrl->getCmd("show");
 
         switch ($next_class) {
+            case strtolower(ilGuidedTourPageGUI::class):
+                $ctrl->setReturnByClass(self::class, "listSteps");
+                $ctrl->saveParameterByClass(self::class, "step_id");
+                $ret = $this->forwardToPageObject();
+                $mt->setContent($ret);
+                break;
+
             default:
                 if (in_array($cmd, [
                     "show",
@@ -61,11 +69,53 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                     "saveStep",
                     "tableCommand",
                     "editStep",
+                    "editPage",
                 ])) {
                     $this->$cmd();
                 }
         }
     }
+
+    public function forwardToPageObject(): string
+    {
+        $tabs = $this->gui->tabs();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $step_id = $this->gui->standardRequest()->getStepId();
+        $tour_id = $this->gui->standardRequest()->getTourId();
+
+        $tabs->clearTargets();
+        $tabs->setBackTarget(
+            $lng->txt("back"),
+            $ctrl->getLinkTargetByClass(ilGuidedTourPageGUI::class, "edit")
+        );
+
+        if (!ilGuidedTourPage::_exists(
+            "gdtr",
+            $step_id
+        )) {
+            $new_page_object = new ilGuidedTourPage();
+            $new_page_object->setParentId($tour_id);
+            $new_page_object->setId($step_id);
+            $new_page_object->createFromXML();
+        }
+
+        // get page object
+        $page_gui = new ilGuidedTourPageGUI($step_id);
+        /*$page_gui->setStyleId(
+            $style->getEffectiveStyleId()
+        );*/
+        $page_gui->setTemplateTargetVar("ADM_CONTENT");
+        $page_gui->setFileDownloadLink("");
+        $page_gui->setPresentationTitle("");
+        $page_gui->setTemplateOutput(false);
+
+        // style tab
+        //$page_gui->setTabHook($this, "addPageTabs");
+
+        return $ctrl->forwardCommand($page_gui);
+    }
+
 
     protected function show() : void
     {
@@ -262,6 +312,13 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $form = $this->getStepForm($step);
         $mt = $this->gui->ui()->mainTemplate();
         $mt->setContent($form->render());
+    }
+
+    public function editPage(int $step_id) : void
+    {
+        $ctrl = $this->gui->ctrl();
+        $ctrl->setParameterByClass(self::class, "step_id", $step_id);
+        $ctrl->redirectByClass(ilGuidedTourPageGUI::class, "edit");
     }
 
 }

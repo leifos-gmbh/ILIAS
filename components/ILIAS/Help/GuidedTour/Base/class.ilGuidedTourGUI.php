@@ -19,11 +19,17 @@
 declare(strict_types=1);
 
 use ILIAS\GlobalScreen\Scope\MainMenu\Factory\Item;
-use ILIAS\Help\StandardGUIRequest;
 use ILIAS\Services\Help\ScreenId\HelpScreenIdObserver;
 
+/**
+ * @ilCtrl_Calls ilGuidedTourGUI: ilGuidedTourPageGUI
+ */
 class ilGuidedTourGUI implements ilCtrlBaseClassInterface
 {
+    protected \ILIAS\Help\GuidedTour\StandardGUIRequest $request;
+    protected \ILIAS\Help\GuidedTour\Page\PageManager $page_manager;
+    protected \ILIAS\Help\GuidedTour\Tour\TourManager $tour_manager;
+    protected \ILIAS\Help\GuidedTour\Step\StepManager $step_manager;
     protected \ILIAS\Help\InternalGUIService $gui;
     protected \ILIAS\Help\InternalService $help;
 
@@ -32,6 +38,10 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         global $DIC;
         $this->help = $DIC->help()->internal();
         $this->gui = $this->help->gui();
+        $this->tour_manager = $this->help->domain()->guidedTour()->tour();
+        $this->step_manager = $this->help->domain()->guidedTour()->step();
+        $this->page_manager = $this->help->domain()->guidedTour()->page();
+        $this->request = $this->gui->guidedTour()->standardRequest();
     }
 
     public function executeCommand() : void
@@ -44,7 +54,8 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         switch ($next_class) {
             default:
                 if (in_array($cmd, [
-                    "getPopover"
+                    "getData",
+                    "showStep"
                 ])) {
                     $this->$cmd();
                 }
@@ -71,14 +82,38 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $mt->addOnloadCode("il.guidedTour.init('$target');");
     }
 
-    public function getPopover() : void
+    public function getData() : void
     {
         $f = $this->gui->ui()->factory();
         $r = $this->gui->ui()->renderer();
-        $popover = $f->popover()->standard($f->legacy('Hello World'));
+        $ctrl = $this->gui->ctrl();
+        $popover = $f->popover()->standard($f->legacy(''));
         $data = new \stdClass();
-        $data->html = $r->renderAsync($popover);
-        $data->showSignal = $popover->getShowSignal()->getId();
+        $data->popoverHtml = $r->renderAsync($popover);
+        $data->popoverShowSignal = $popover->getShowSignal()->getId();
+        foreach ($this->tour_manager->getAll() as $tour) {
+            $data->tour[$tour->getId()] = [
+                "name" => $tour->getTitle()
+            ];
+            foreach ($this->step_manager->getStepsOfTour($tour->getId()) as $step) {
+                $step_id = $step->getId();
+                $ctrl->setParameterByClass(self::class, "tour_id", $tour->getId());
+                $ctrl->setParameterByClass(self::class, "step_id", $step_id);
+                $data->tour[$tour->getId()]["steps"][$step_id] = [
+                    "id" => $step_id,
+                    "type" => $step->getType(),
+                    "elementId" => $step->getElementId(),
+                    "url" => $ctrl->getLinkTargetByClass(ilGuidedTourPageGUI::class, "showStep"),
+                ];
+            }
+        }
         $this->gui->httpUtil()->sendJson($data);
+    }
+
+    protected function showStep() : void
+    {
+        $tour_id = $this->request->getTourId();
+        $step_id = $this->request->getStepId();
+        $this->page_manager->printPage($step_id);
     }
 }

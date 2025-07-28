@@ -180,18 +180,6 @@ class ilCalendarAppointmentGUI
         $start_time = new DateTimeImmutable('@' . $this->app->getStart()->getUnixTime());
         $end_time = new DateTimeImmutable('@' . $this->app->getEnd()->getUnixTime());
 
-        $duration_date_input = $this->ui_factory->input()->field()->duration(
-            $this->lng->txt('cal_duration')
-        )->withTimezone('UTC')
-         ->withLabels($this->lng->txt('cal_duration_start'), $this->lng->txt('cal_duration_end'))
-         ->withUseTime(false)
-         ->withRequired(true)
-         ->withValue([$start_time, $end_time]);
-        $date_group = $this->ui_factory->input()->field()->group(
-            [$duration_date_input],
-            $this->lng->txt('cal_fullday_title')
-        );
-
         $duration_datetime_input = $this->ui_factory->input()->field()->duration(
             $this->lng->txt('cal_duration')
         )->withTimezone($this->user->getTimeZone())
@@ -207,8 +195,20 @@ class ilCalendarAppointmentGUI
             $this->lng->txt('cal_date_time_title')
         );
 
+        $duration_date_input = $this->ui_factory->input()->field()->duration(
+            $this->lng->txt('cal_duration')
+        )->withTimezone('UTC')
+         ->withLabels($this->lng->txt('cal_duration_start'), $this->lng->txt('cal_duration_end'))
+         ->withUseTime(false)
+         ->withRequired(true)
+         ->withValue([$start_time, $end_time]);
+        $date_group = $this->ui_factory->input()->field()->group(
+            [$duration_date_input],
+            $this->lng->txt('cal_fullday_title')
+        );
+
         $event_input = $this->ui_factory->input()->field()->switchableGroup(
-            ['full_day' => $date_group, 'with_time' => $datetime_group],
+            ['with_time' => $datetime_group, 'full_day' => $date_group],
             $this->lng->txt('appointment')
         )->withValue($this->app->isFullday() ? 'full_day' : 'with_time')
          ->withRequired(true);

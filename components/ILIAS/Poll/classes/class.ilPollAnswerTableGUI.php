@@ -27,7 +27,6 @@ use ILIAS\UI\Component\Table\Data as ilDataTable;
 use ILIAS\UI\URLBuilder;
 use ILIAS\UI\URLBuilderToken as ilURLBuilderToken;
 use ILIAS\UI\Renderer as UIRenderer;
-use JetBrains\PhpStorm\NoReturn;
 
 class ilPollAnswerTableGUI
 {

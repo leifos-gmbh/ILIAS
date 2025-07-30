@@ -42,7 +42,18 @@ class ilLOTestAssignmentTableDataRetrieval implements ilTableDataRetrievalInterf
         ?array $filter_data,
         ?array $additional_parameters
     ): Generator {
-        foreach ($this->data as $row) {
+        [$column_name, $direction] = $order->join([], fn($ret, $key, $value) => [$key, $value]);
+        if ($column_name === ilLOTestAssignmentTableGUI::TABLE_COL_TITLE) {
+            uasort($this->data, function ($a, $b) {
+                return strcmp($a['title'], $b['title']);
+            });
+        }
+        if ($direction === 'DESC') {
+            $rows = array_reverse($this->data);
+        } else {
+            $rows = $this->data;
+        }
+        foreach ($rows as $row) {
             $id = $this->assignment_type === ilLOTestAssignmentTableGUI::TYPE_MULTIPLE_ASSIGNMENTS
                 ? $row['assignment_id']
                 : $row['ref_id'];

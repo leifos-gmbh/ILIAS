@@ -18,31 +18,27 @@
 
 declare(strict_types=1);
 
-declare(strict_types=1);
-
-use ILIAS\Data\Factory as ilDataFactory;
-use ILIAS\UI\Factory as ilUIFactory;
 use ILIAS\HTTP\Services as ilHTTPServices;
-use ILIAS\Refinery\Factory as ilRefineryFactory;
 use ILIAS\UI\Component\Table\Data as ilDataTable;
+use ILIAS\UI\Factory as ilUIFactory;
+use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\UI\URLBuilder;
 use ILIAS\UI\URLBuilderToken as ilURLBuilderToken;
-use ILIAS\UI\Renderer as UIRenderer;
 
 class ilPollAnswerTableGUI
 {
-    public const TABLE_COL_ORDER = 'pos';
-    public const TABLE_COL_ANSWER = 'answer';
-    public const TABLE_COL_CURRENT_VOTES = 'votes';
-    public const TABLE_COL_CURRENT_PERCENTAGE = 'percentage';
-    protected const LNG_TABLE_COL_ORDER = 'poll_sortorder';
-    protected const LNG_TABLE_COL_ANSWER = 'poll_answer';
-    protected const LNG_TABLE_COL_CURRENT_VOTES = 'poll_absolute';
-    protected const LNG_TABLE_COL_CURRENT_PERCENTAGE = 'poll_percentage';
-    protected const TABLE_ID = 'pllnswrtbl';
-    protected const TABLE_ACTION_ID = 'table_action';
-    protected const ROW_ID = 'row_ids';
-    protected const ALL_OBJECTS = "ALL_OBJECTS";
+    public const string TABLE_COL_ORDER = 'pos';
+    public const string TABLE_COL_ANSWER = 'answer';
+    public const string TABLE_COL_CURRENT_VOTES = 'votes';
+    public const string TABLE_COL_CURRENT_PERCENTAGE = 'percentage';
+    protected const string LNG_TABLE_COL_ORDER = 'poll_sortorder';
+    protected const string LNG_TABLE_COL_ANSWER = 'poll_answer';
+    protected const string LNG_TABLE_COL_CURRENT_VOTES = 'poll_absolute';
+    protected const string LNG_TABLE_COL_CURRENT_PERCENTAGE = 'poll_percentage';
+    protected const string TABLE_ID = 'pllnswrtbl';
+    protected const string TABLE_ACTION_ID = 'table_action';
+    protected const string ROW_ID = 'row_ids';
+    protected const string ALL_OBJECTS = "ALL_OBJECTS";
 
     protected URLBuilder $url_builder;
     protected ilURLBuilderToken $action_parameter_token;
@@ -91,9 +87,9 @@ class ilPollAnswerTableGUI
         }
         $title = $this->lng->txt("poll_question") . ": \"" . $this->data_retrieval->getPollQuestion() . "\"";
         $this->table = $this->ui_factory->table()->data(
+            $this->data_retrieval,
             $title,
-            $this->getColumns(),
-            $this->data_retrieval
+            $this->getColumns()
         )
             ->withId(self::TABLE_ID)
             ->withActions($this->getActions())

@@ -18,10 +18,10 @@
 
 declare(strict_types=1);
 
+use ILIAS\UI\Component\Symbol\Icon\Icon;
 use ILIAS\UI\Component\Table\DataRetrieval as ilTableDataRetrievalInterface;
 use ILIAS\UI\Factory as ilUIFactory;
 use ILIAS\UI\Renderer as UIRenderer;
-use ILIAS\UI\Component\Symbol\Icon\Icon;
 
 class ilPollUserTableDataRetrieval implements ilTableDataRetrievalInterface
 {

@@ -18,29 +18,26 @@
 
 declare(strict_types=1);
 
-use ILIAS\UI\Component\Symbol\Icon\Icon;
-use ILIAS\Data\Factory as ilDataFactory;
-use ILIAS\UI\Factory as ilUIFactory;
 use ILIAS\HTTP\Services as ilHTTPServices;
-use ILIAS\Refinery\Factory as ilRefineryFactory;
 use ILIAS\UI\Component\Table\Data as ilDataTable;
+use ILIAS\UI\Factory as ilUIFactory;
+use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\UI\URLBuilder;
 use ILIAS\UI\URLBuilderToken as ilURLBuilderToken;
-use ILIAS\UI\Renderer as UIRenderer;
 
 class ilPollUserTableGUI
 {
-    public const TABLE_COL_LOGIN = 'login';
-    public const TABLE_COL_LASTNAME = 'lastname';
-    public const TABLE_COL_FIRSTNAME = 'firstname';
-    public const TABLE_COL_ANSWER_PREFIX = 'answer';
-    public const LNG_TABLE_COL_LOGIN = 'login';
-    public const LNG_TABLE_COL_LASTNAME = 'lastname';
-    public const LNG_TABLE_COL_FIRSTNAME = 'firstname';
-    protected const TABLE_ID = 'pllusrtbl';
-    protected const TABLE_ACTION_ID = 'table_action';
-    protected const ROW_ID = 'row_ids';
-    protected const ALL_OBJECTS = "ALL_OBJECTS";
+    public const string TABLE_COL_LOGIN = 'login';
+    public const string TABLE_COL_LASTNAME = 'lastname';
+    public const string TABLE_COL_FIRSTNAME = 'firstname';
+    public const string TABLE_COL_ANSWER_PREFIX = 'answer';
+    public const string LNG_TABLE_COL_LOGIN = 'login';
+    public const string LNG_TABLE_COL_LASTNAME = 'lastname';
+    public const string LNG_TABLE_COL_FIRSTNAME = 'firstname';
+    protected const string TABLE_ID = 'pllusrtbl';
+    protected const string TABLE_ACTION_ID = 'table_action';
+    protected const string ROW_ID = 'row_ids';
+    protected const string ALL_OBJECTS = "ALL_OBJECTS";
 
     protected URLBuilder $url_builder;
     protected ilURLBuilderToken $action_parameter_token;
@@ -92,9 +89,9 @@ class ilPollUserTableGUI
         }
         $title = $this->lng->txt("poll_question") . ": \"" . $this->data_retrieval->getPollQuestion() . "\"";
         $this->table = $this->ui_factory->table()->data(
+            $this->data_retrieval,
             $title,
-            $this->getColumns(),
-            $this->data_retrieval
+            $this->getColumns()
         )
             ->withId(self::TABLE_ID)
             ->withActions($this->getActions())

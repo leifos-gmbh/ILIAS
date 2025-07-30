@@ -23,6 +23,7 @@ use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\Poll\Image\I\FactoryInterface as PollImageFactoryInterface;
 use ILIAS\Poll\Image\Factory as PollImageFactory;
+use ILIAS\HTTP\Services as ilHTTPServices;
 use ILIAS\Data\Factory as DataFactory;
 
 /**
@@ -41,6 +42,7 @@ class ilObjPollGUI extends ilObject2GUI
     protected UIFactory $ui_factory;
     protected UIRenderer $ui_renderer;
     protected DataFactory $data_factory;
+    protected ilHTTPServices $http_services;
     protected PollImageFactoryInterface $poll_image_factory;
 
     public function __construct(int $a_id = 0, int $a_id_type = self::REPOSITORY_NODE_ID, int $a_parent_node_id = 0)
@@ -59,6 +61,7 @@ class ilObjPollGUI extends ilObject2GUI
         $this->locator = $DIC["ilLocator"];
         $this->ui_factory = $DIC->ui()->factory();
         $this->ui_renderer = $DIC->ui()->renderer();
+        $this->http_services = $DIC->http();
         $this->poll_image_factory = new PollImageFactory();
         $this->data_factory = new DataFactory();
 
@@ -502,9 +505,21 @@ class ilObjPollGUI extends ilObject2GUI
         $this->tabs->activateTab("participants");
         $this->setParticipantsSubTabs("result_answers");
 
-        $tbl = new ilPollAnswerTableGUI($this, "showParticipants");
+        /** @var ilObjPoll $poll */
+        $poll = $this->object;
+        $data_retrieval = new ilPollAnswerTableDataRetrieval(
+            $poll
+        );
+        $data_retrieval->init();
+        $tbl = new ilPollAnswerTableGUI(
+            $data_retrieval,
+            $this->ui_factory,
+            $this->ui_renderer,
+            $this->lng,
+            $this->http_services
+        );
 
-        if ($tbl->getItems()) {
+        if ($data_retrieval->getItems()) {
             $this->toolbar->addComponent(
                 $this->ui_factory->button()->standard(
                     $this->lng->txt("poll_delete_votes"),

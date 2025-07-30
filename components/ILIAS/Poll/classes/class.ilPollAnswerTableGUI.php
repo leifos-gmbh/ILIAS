@@ -18,95 +18,92 @@
 
 declare(strict_types=1);
 
-/**
- * TableGUI class for poll answers
- *
- * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
- */
-class ilPollAnswerTableGUI extends ilTable2GUI
+declare(strict_types=1);
+
+use ILIAS\Data\Factory as ilDataFactory;
+use ILIAS\UI\Factory as ilUIFactory;
+use ILIAS\HTTP\Services as ilHTTPServices;
+use ILIAS\Refinery\Factory as ilRefineryFactory;
+use ILIAS\UI\Component\Table\Data as ilDataTable;
+use ILIAS\UI\URLBuilder;
+use ILIAS\UI\URLBuilderToken as ilURLBuilderToken;
+use ILIAS\UI\Renderer as UIRenderer;
+use JetBrains\PhpStorm\NoReturn;
+
+class ilPollAnswerTableGUI
 {
-    public function __construct(?object $a_parent_obj, string $a_parent_cmd)
-    {
-        global $DIC;
+    public const TABLE_COL_ORDER = 'pos';
+    public const TABLE_COL_ANSWER = 'answer';
+    public const TABLE_COL_CURRENT_VOTES = 'votes';
+    public const TABLE_COL_CURRENT_PERCENTAGE = 'percentage';
+    protected const LNG_TABLE_COL_ORDER = 'poll_sortorder';
+    protected const LNG_TABLE_COL_ANSWER = 'poll_answer';
+    protected const LNG_TABLE_COL_CURRENT_VOTES = 'poll_absolute';
+    protected const LNG_TABLE_COL_CURRENT_PERCENTAGE = 'poll_percentage';
+    protected const TABLE_ID = 'pllnswrtbl';
+    protected const TABLE_ACTION_ID = 'table_action';
+    protected const ROW_ID = 'row_ids';
+    protected const ALL_OBJECTS = "ALL_OBJECTS";
 
-        $this->ctrl = $DIC->ctrl();
-        $this->lng = $DIC->language();
+    protected URLBuilder $url_builder;
+    protected ilURLBuilderToken $action_parameter_token;
+    protected ilURLBuilderToken $row_id_token;
+    protected ilDataTable $table;
 
-        $this->setId("ilobjpollaw");
-
-        parent::__construct($a_parent_obj, $a_parent_cmd);
-
-        $this->addColumn($this->lng->txt("poll_sortorder"), "pos");
-        $this->addColumn($this->lng->txt("poll_answer"), "answer");
-        $this->addColumn($this->lng->txt("poll_absolute"), "votes");
-        $this->addColumn($this->lng->txt("poll_percentage"), "percentage");
-
-        $total = $this->getItems();
-
-        $this->setTitle(
-            $this->lng->txt("poll_question") . ": \"" .
-                $a_parent_obj->getObject()->getQuestion() . "\""
-        );
-        $this->setDescription(sprintf($this->lng->txt("poll_population"), $total));
-
-        $this->setRowTemplate("tpl.answer_row.html", "components/ILIAS/Poll");
-        $this->setDefaultOrderField("pos");
-        $this->setDefaultOrderDirection("asc");
-
-        $this->setExportFormats(array(self::EXPORT_CSV, self::EXPORT_EXCEL));
+    public function __construct(
+        protected ilPollAnswerTableDataRetrieval $data_retrieval,
+        protected ilUIFactory $ui_factory,
+        protected UIRenderer $ui_renderer,
+        protected ilLanguage $lng,
+        protected ilHTTPServices $http_services
+    ) {
     }
 
-    public function numericOrdering(string $a_field): bool
+    public function getColumns(): array
     {
-        return $a_field !== "answer";
+        $columns = [
+            self::TABLE_COL_ORDER => $this->ui_factory->table()->column()->number(
+                $this->lng->txt(self::LNG_TABLE_COL_ORDER)
+            )
+                ->withHighlight(true),
+            self::TABLE_COL_ANSWER => $this->ui_factory->table()->column()->text(
+                $this->lng->txt(self::LNG_TABLE_COL_ANSWER)
+            ),
+            self::TABLE_COL_CURRENT_VOTES => $this->ui_factory->table()->column()->number(
+                $this->lng->txt(self::LNG_TABLE_COL_CURRENT_VOTES)
+            ),
+            self::TABLE_COL_CURRENT_PERCENTAGE => $this->ui_factory->table()->column()->number(
+                $this->lng->txt(self::LNG_TABLE_COL_CURRENT_PERCENTAGE)
+            )
+                ->withUnit('%')
+        ];
+        return $columns;
     }
 
-    public function getItems(): int
+    protected function getActions(): array
     {
-        $data = $this->parent_obj->getObject()->getAnswers();
-        $perc = $this->parent_obj->getObject()->getVotePercentages();
-        $total = (int) ($perc["total"] ?? 0);
-        $perc = (array) ($perc["perc"] ?? []);
+        return [];
+    }
 
-        // add current percentages
-        foreach ($data as $idx => $item) {
-            $item_id = (int) ($item['id'] ?? 0);
-            if (!isset($perc[$item_id])) {
-                $data[$idx]["percentage"] = 0;
-                $data[$idx]["votes"] = 0;
-            } else {
-                $data[$idx]["percentage"] = round((float) ($perc[$item_id]["perc"] ?? 0));
-                $data[$idx]["votes"] = (int) ($perc[$item_id]["abs"] ?? 0);
-            }
+    protected function initTable(): void
+    {
+        if (isset($this->table)) {
+            return;
         }
-
-        $this->setData($data);
-
-        return $total;
+        $title = $this->lng->txt("poll_question") . ": \"" . $this->data_retrieval->getPollQuestion() . "\"";
+        $this->table = $this->ui_factory->table()->data(
+            $title,
+            $this->getColumns(),
+            $this->data_retrieval
+        )
+            ->withId(self::TABLE_ID)
+            ->withActions($this->getActions())
+            ->withRequest($this->http_services->request());
     }
 
-    protected function fillRow(array $a_set): void
+    public function getHTML(): string
     {
-        $this->tpl->setVariable("VALUE_POS", (int) ($a_set["pos"] ?? 10) / 10);
-        $this->tpl->setVariable("TXT_ANSWER", nl2br((string) ($a_set["answer"] ?? '')));
-        $this->tpl->setVariable("VALUE_VOTES", (int) ($a_set["votes"] ?? 0));
-        $this->tpl->setVariable("VALUE_PERCENTAGE", (int) ($a_set["percentage"] ?? 0));
-    }
-
-    protected function fillRowCSV(ilCSVWriter $a_csv, array $a_set): void
-    {
-        $a_csv->addColumn((string) ((int) ($a_set["pos"] ?? 10) / 10));
-        $a_csv->addColumn((string) ($a_set["answer"] ?? ''));
-        $a_csv->addColumn((string) ((int) ($a_set["votes"] ?? 0)));
-        $a_csv->addColumn((string) ((int) ($a_set["percentage"] ?? 0)));
-        $a_csv->addRow();
-    }
-
-    protected function fillRowExcel(ilExcel $a_excel, int &$a_row, array $a_set): void
-    {
-        $a_excel->setCell($a_row, 0, (int) ($a_set["pos"] ?? 10) / 10);
-        $a_excel->setCell($a_row, 1, (string) ($a_set["answer"] ?? ''));
-        $a_excel->setCell($a_row, 2, (int) ($a_set["votes"] ?? 0));
-        $a_excel->setCell($a_row, 3, (int) ($a_set["percentage"] ?? 0) . "%");
+        $this->initTable();
+        return $this->ui_renderer->render([$this->table]);
     }
 }

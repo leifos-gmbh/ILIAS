@@ -19,129 +19,91 @@
 declare(strict_types=1);
 
 use ILIAS\UI\Component\Symbol\Icon\Icon;
+use ILIAS\Data\Factory as ilDataFactory;
+use ILIAS\UI\Factory as ilUIFactory;
+use ILIAS\HTTP\Services as ilHTTPServices;
+use ILIAS\Refinery\Factory as ilRefineryFactory;
+use ILIAS\UI\Component\Table\Data as ilDataTable;
+use ILIAS\UI\URLBuilder;
+use ILIAS\UI\URLBuilderToken as ilURLBuilderToken;
+use ILIAS\UI\Renderer as UIRenderer;
 
-/**
- * TableGUI class for poll users
- *
- * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
- */
-class ilPollUserTableGUI extends ilTable2GUI
+class ilPollUserTableGUI
 {
-    protected array $answer_ids = [];
-    protected string $rendered_checked_icon;
+    public const TABLE_COL_LOGIN = 'login';
+    public const TABLE_COL_LASTNAME = 'lastname';
+    public const TABLE_COL_FIRSTNAME = 'firstname';
+    public const TABLE_COL_ANSWER_PREFIX = 'answer';
+    public const LNG_TABLE_COL_LOGIN = 'login';
+    public const LNG_TABLE_COL_LASTNAME = 'lastname';
+    public const LNG_TABLE_COL_FIRSTNAME = 'firstname';
+    protected const TABLE_ID = 'pllusrtbl';
+    protected const TABLE_ACTION_ID = 'table_action';
+    protected const ROW_ID = 'row_ids';
+    protected const ALL_OBJECTS = "ALL_OBJECTS";
 
-    public function __construct(object $a_parent_obj, string $a_parent_cmd)
-    {
-        global $DIC;
+    protected URLBuilder $url_builder;
+    protected ilURLBuilderToken $action_parameter_token;
+    protected ilURLBuilderToken $row_id_token;
+    protected ilDataTable $table;
 
-        $this->ctrl = $DIC->ctrl();
-        $this->lng = $DIC->language();
-        $ilCtrl = $DIC->ctrl();
-        $lng = $DIC->language();
-        $ui_factory = $DIC->ui()->factory();
-        $ui_renderer = $DIC->ui()->renderer();
-
+    public function __construct(
+        protected ilPollUserTableDataRetrieval $data_retrieval,
+        protected ilUIFactory $ui_factory,
+        protected UIRenderer $ui_renderer,
+        protected ilLanguage $lng,
+        protected ilHTTPServices $http_services
+    ) {
         $lng->loadLanguageModule('poll');
+    }
 
-        $this->rendered_checked_icon = $ui_renderer->render(
-            $ui_factory->symbol()->icon()->custom(
-                ilUtil::getImagePath('standard/icon_ok.svg'),
-                $lng->txt('poll_answer_selected_alt_text'),
-                Icon::MEDIUM
+    public function getColumns(): array
+    {
+        $columns = [
+            self::TABLE_COL_LOGIN => $this->ui_factory->table()->column()->text(
+                $this->lng->txt(self::LNG_TABLE_COL_LOGIN)
             )
-        );
+                ->withHighlight(true),
+            self::TABLE_COL_FIRSTNAME => $this->ui_factory->table()->column()->text(
+                $this->lng->txt(self::LNG_TABLE_COL_FIRSTNAME)
+            ),
+            self::TABLE_COL_LASTNAME => $this->ui_factory->table()->column()->text(
+                $this->lng->txt(self::LNG_TABLE_COL_LASTNAME)
+            )
+        ];
 
-        $this->setId("ilobjpollusr");
-
-        parent::__construct($a_parent_obj, $a_parent_cmd);
-
-        $this->addColumn($lng->txt("login"), "login");
-        $this->addColumn($lng->txt("lastname"), "lastname");
-        $this->addColumn($lng->txt("firstname"), "firstname");
-
-        foreach ($this->getParentObject()->getObject()->getAnswers() as $answer) {
-            $this->answer_ids[] = (int) ($answer["id"] ?? 0);
-            $this->addColumn((string) ($answer["answer"] ?? ''), "answer" . (int) ($answer["id"] ?? 0));
+        foreach ($this->data_retrieval->getAnswers() as $answer) {
+            $columns[self::TABLE_COL_ANSWER_PREFIX . (int) ($answer["id"] ?? 0)] = $this->ui_factory->table()->column()->statusIcon(
+                (string) ($answer["answer"] ?? '')
+            );
         }
-
-        $this->getItems($this->answer_ids);
-
-        $this->setTitle(
-            $this->lng->txt("poll_question") . ": \"" .
-                $this->getParentObject()->getObject()->getQuestion() . "\""
-        );
-
-        $this->setFormAction($ilCtrl->getFormAction($a_parent_obj, $a_parent_cmd));
-        $this->setRowTemplate("tpl.user_row.html", "components/ILIAS/Poll");
-        $this->setDefaultOrderField("login");
-        $this->setDefaultOrderDirection("asc");
-
-        $this->setExportFormats(array(self::EXPORT_CSV, self::EXPORT_EXCEL));
+        return $columns;
     }
 
-    protected function getItems(array $a_answer_ids): void
+    protected function getActions(): array
     {
-        $data = [];
-
-        foreach ($this->getParentObject()->getObject()->getVotesByUsers() as $user_id => $vote) {
-            $answers = (array) ($vote["answers"] ?? []);
-            unset($vote["answers"]);
-
-            foreach ($a_answer_ids as $answer_id) {
-                $vote["answer" . $answer_id] = in_array($answer_id, $answers);
-            }
-
-            $data[] = $vote;
-        }
-
-        $this->setData($data);
+        return [];
     }
 
-    protected function fillRow(array $a_set): void
+    protected function initTable(): void
     {
-        $this->tpl->setCurrentBlock("answer_bl");
-        foreach ($this->answer_ids as $answer_id) {
-            if ($a_set["answer" . $answer_id]) {
-                $this->tpl->setVariable("ANSWER", $this->rendered_checked_icon);
-            } else {
-                $this->tpl->setVariable("ANSWER", "&nbsp;");
-            }
-            $this->tpl->parseCurrentBlock();
+        if (isset($this->table)) {
+            return;
         }
-
-        $this->tpl->setVariable("LOGIN", (string) ($a_set["login"] ?? ''));
-        $this->tpl->setVariable("FIRSTNAME", (string) ($a_set["firstname"] ?? ''));
-        $this->tpl->setVariable("LASTNAME", (string) ($a_set["lastname"] ?? ''));
+        $title = $this->lng->txt("poll_question") . ": \"" . $this->data_retrieval->getPollQuestion() . "\"";
+        $this->table = $this->ui_factory->table()->data(
+            $title,
+            $this->getColumns(),
+            $this->data_retrieval
+        )
+            ->withId(self::TABLE_ID)
+            ->withActions($this->getActions())
+            ->withRequest($this->http_services->request());
     }
 
-    protected function fillRowCSV(ilCSVWriter $a_csv, array $a_set): void
+    public function getHTML(): string
     {
-        $a_csv->addColumn((string) ($a_set["login"] ?? ''));
-        $a_csv->addColumn((string) ($a_set["lastname"] ?? ''));
-        $a_csv->addColumn((string) ($a_set["firstname"] ?? ''));
-        foreach ($this->answer_ids as $answer_id) {
-            if ($a_set["answer" . $answer_id]) {
-                $a_csv->addColumn('1');
-            } else {
-                $a_csv->addColumn('');
-            }
-        }
-        $a_csv->addRow();
-    }
-
-    protected function fillRowExcel(ilExcel $a_excel, int &$a_row, array $a_set): void
-    {
-        $a_excel->setCell($a_row, 0, (string) ($a_set["login"] ?? ''));
-        $a_excel->setCell($a_row, 1, (string) ($a_set["lastname"] ?? ''));
-        $a_excel->setCell($a_row, 2, (string) ($a_set["firstname"] ?? ''));
-
-        $col = 2;
-        foreach ($this->answer_ids as $answer_id) {
-            if ($a_set["answer" . $answer_id]) {
-                $a_excel->setCell($a_row, ++$col, true);
-            } else {
-                $a_excel->setCell($a_row, ++$col, false);
-            }
-        }
+        $this->initTable();
+        return $this->ui_renderer->render([$this->table]);
     }
 }

@@ -542,7 +542,22 @@ class ilObjPollGUI extends ilObject2GUI
         $this->tabs->activateTab("participants");
         $this->setParticipantsSubTabs("result_users");
 
-        $tbl = new ilPollUserTableGUI($this, "showParticipantVotes");
+        /** @var ilObjPoll $poll */
+        $poll = $this->object;
+        $data_retrieval = new ilPollUserTableDataRetrieval(
+            $poll,
+            $this->ui_factory,
+            $this->ui_renderer,
+            $this->lng
+        );
+        $data_retrieval->init();
+        $tbl = new ilPollUserTableGUI(
+            $data_retrieval,
+            $this->ui_factory,
+            $this->ui_renderer,
+            $this->lng,
+            $this->http_services
+        );
         $this->tpl->setContent($tbl->getHTML());
     }
 

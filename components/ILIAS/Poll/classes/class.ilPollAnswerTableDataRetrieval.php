@@ -33,12 +33,6 @@ class ilPollAnswerTableDataRetrieval implements ilTableDataRetrievalInterface
                 $data[$idx]["votes"] = (int) ($perc[$item_id]["abs"] ?? 0);
             }
         }
-        global $DIC;
-        $DIC->logger()->root()->debug("--------------");
-        $DIC->logger()->root()->debug("--------------");
-        $DIC->logger()->root()->debug("--------------");
-        $DIC->logger()->root()->dump($perc);
-        $DIC->logger()->root()->dump($data);
         $this->data = $data;
     }
 

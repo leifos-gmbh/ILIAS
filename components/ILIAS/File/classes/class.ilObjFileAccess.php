@@ -366,6 +366,6 @@ class ilObjFileAccess extends ilObjectAccess implements ilWACCheckingClass
 
     public static function _lookupOnline(int $a_obj_id): bool
     {
-        return ilObjectDIC::dic()['object_properties_agregator']->getFor($a_obj_id, 'file')->getPropertyIsOnline()->getIsOnline();
+        return true;//return ilObjectDIC::dic()['object_properties_agregator']->getFor($a_obj_id, 'file')->getPropertyIsOnline()->getIsOnline();
     }
 }

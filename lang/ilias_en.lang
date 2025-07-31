@@ -15381,6 +15381,7 @@ search#:#search_created_after#:#Objects created after
 search#:#search_created_before#:#Objects created before...
 search#:#search_created_on#:#Objects create on...
 search#:#search_crs_title#:#Course Name
+search#:#search_detailed_results_title#:#Detailed results in %s
 search#:#search_details_info#:#Detailed search. Please select one or more resource types.
 search#:#search_direct#:#Direct search
 search#:#search_err_user_not_exist#:#A user with that login name does not exist.
@@ -15416,6 +15417,8 @@ search#:#search_no_match#:#Your search did not match any results.
 search#:#search_no_match_hint#:#Your search for <b>%s</b> did not match any documents.<br /><br />Suggestions:<br />• Make sure all words are spelled correctly.<br />• Try different keywords.<br />• Try more general keywords.<br />• Try fewer keywords.
 search#:#search_no_selection#:#You made no selection.
 search#:#search_off#:#Off
+search#:#search_results_show_subitems#:#See detailed results
+search#:#search_results_too_many_subitems#:#More results are available, please make your search terms more precise.
 search#:#search_role_title#:#Role Name
 search#:#search_select_search_area#:#Select Search Area
 search#:#search_show_inactive_user#:#Show Inactive Users

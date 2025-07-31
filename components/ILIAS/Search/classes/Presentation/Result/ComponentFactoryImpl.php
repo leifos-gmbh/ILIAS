@@ -1,0 +1,201 @@
+<?php
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
+declare(strict_types=1);
+
+namespace ILIAS\Search\Presentation\Result;
+
+use ILIAS\Search\Result\PaginationInfo;
+use ILIAS\Data\URI;
+use ILIAS\UI\Component\Item\Item;
+use ILIAS\UI\Component\Panel\Listing\Listing as ListingPanel;
+use DateTimeImmutable;
+use ILIAS\UI\Component\Signal;
+use ILIAS\UI\Component\ViewControl\Pagination;
+use ILIAS\UI\Component\ViewControl\Sortation as SortationViewControl;
+use ILIAS\UI\Factory as UIFactory;
+use ilLanguage;
+use ilDateTime;
+use ilDatePresentation;
+use ILIAS\UI\Component\Modal\Modal;
+
+class ComponentFactoryImpl implements ComponentFactory
+{
+    protected const int MAX_DESCRIPTION_LENGTH = 128;
+
+    public function __construct(
+        protected UIFactory $ui_factory,
+        protected ilLanguage $lng
+    ) {
+    }
+
+    public function getPanel(
+        Sortation $sortation,
+        int $current_page,
+        int $max_pages,
+        PaginationInfo $pagination_info,
+        URI $pagination_action,
+        string $page_param_name,
+        URI $sortation_action,
+        string $sortation_param_name,
+        Item ...$items
+    ): ListingPanel {
+        $item_group = $this->ui_factory->item()->group('', $items);
+        $view_controls = [
+            $this->getPaginationViewControl($current_page, $max_pages, $pagination_info, $pagination_action, $page_param_name),
+            $this->getSortationViewControl($sortation, $sortation_action, $sortation_param_name)
+        ];
+
+        return $this->ui_factory->panel()->listing()->standard(
+            $this->lng->txt("search_results"),
+            [$item_group]
+        )->withViewControls($view_controls);
+    }
+
+    protected function getPaginationViewControl(
+        int $current_page,
+        int $max_pages,
+        PaginationInfo $pagination_info,
+        URI $action,
+        string $page_param_name
+    ): Pagination {
+        $total_known_entries = $max_pages * $pagination_info->getMaxHits();
+        if ($current_page === $max_pages) {
+            $total_known_entries += $pagination_info->isLimitReached();
+        }
+        // pages in the view control are 0-indexed, in search 1-indexed
+        return $this->ui_factory->viewControl()->pagination()
+                                ->withTargetURL((string) $action, $page_param_name)
+                                ->withCurrentPage($current_page - 1)
+                                ->withPageSize($pagination_info->getMaxHits())
+                                ->withTotalEntries($total_known_entries);
+    }
+
+    protected function getSortationViewControl(
+        Sortation $sortation,
+        URI $action,
+        string $sortation_param_name
+    ): SortationViewControl {
+        $options = [
+            Sortation::RELEVANCE_DESC->value => $this->lng->txt('search_sort_relevance'),
+            Sortation::TITLE_ASC->value => $this->lng->txt('search_sort_title_asc'),
+            Sortation::TITLE_DESC->value => $this->lng->txt('search_sort_title_desc'),
+            Sortation::CREATION_DATE_DESC->value => $this->lng->txt('search_sort_creation_date_desc'),
+            Sortation::CREATION_DATE_ASC->value => $this->lng->txt('search_sort_creation_date_asc')
+        ];
+
+        return $this->ui_factory->viewControl()
+                                ->sortation($options, $sortation->value)
+                                ->withLabelPrefix($this->lng->txt('search_sort_by'))
+                                ->withTargetURL((string) $action, $sortation_param_name);
+    }
+
+    public function getModalForSubitems(
+        string $object_title,
+        int $items_per_page,
+        bool $show_too_many_items_warning,
+        Item ...$items
+    ): Modal {
+        if ($show_too_many_items_warning) {
+            $items[] = $this->ui_factory->item()->shy($this->lng->txt('search_results_too_many_subitems'));
+        }
+
+        $title = sprintf(
+            $this->lng->txt('search_detailed_results_title'),
+            $object_title
+        );
+
+        $pages = [];
+        foreach (array_chunk($items, $items_per_page) as $chunk_of_items) {
+            $card = $this->ui_factory->card()->standard($title)->withSections($chunk_of_items);
+            $pages[] = $this->ui_factory->modal()->lightboxCardPage($card);
+        }
+        return $this->ui_factory->modal()->lightbox($pages);
+    }
+
+    public function getItemForObject(
+        string $type_icon_path,
+        string $type_icon_label,
+        string $title,
+        ?URI $link,
+        string $description,
+        string $content,
+        string $path,
+        DateTimeImmutable $created_on,
+        ?Signal $subitem_show_signal
+    ): Item {
+        $item_title = $title;
+        if ($link !== null) {
+            $item_title = $this->ui_factory->link()->standard($title, (string) $link);
+        }
+
+        $type_icon = $this->ui_factory->symbol()->icon()->custom(
+            $type_icon_path,
+            $type_icon_label
+        );
+
+        $properties = [
+            $this->lng->txt('path') => $path,
+            $this->lng->txt('create_date') => $this->formatDate($created_on)
+        ];
+        if ($description !== '') {
+            if (mb_strlen($description) >= self::MAX_DESCRIPTION_LENGTH) {
+                $description = mb_substr($description, 0, self::MAX_DESCRIPTION_LENGTH) . '...';
+            }
+            $properties[$this->lng->txt('description')] = $description;
+        }
+
+        $item = $this->ui_factory->item()->standard($item_title)
+                                 ->withLeadIcon($type_icon);
+        if ($subitem_show_signal !== null) {
+            $button = $this->ui_factory->button()->standard(
+                $this->lng->txt('search_results_show_subitems'),
+                $subitem_show_signal
+            );
+            $item = $item->withMainAction($button);
+        }
+        return $item->withDescription($content)
+                    ->withProperties($properties);
+    }
+
+    protected function formatDate(DateTimeImmutable $date): string
+    {
+        $relative = ilDatePresentation::useRelativeDates();
+        ilDatePresentation::setUseRelativeDates(true);
+        $res = ilDatePresentation::formatDate(new ilDateTime($date->getTimestamp(), IL_CAL_UNIX));
+        ilDatePresentation::setUseRelativeDates($relative);
+        return $res;
+    }
+
+    public function getItemForSubitem(
+        string $title,
+        ?URI $link,
+        bool $open_link_in_new_viewport,
+        string $content,
+        string $type
+    ): Item {
+        $item_title = $title;
+        if ($link !== null) {
+            $item_title = $this->ui_factory->link()->standard($title, (string) $link)
+                                                   ->withOpenInNewViewport($open_link_in_new_viewport);
+        }
+        return $this->ui_factory->item()->standard($item_title)
+                                ->withDescription($content)
+                                ->withProperties([$this->lng->txt('type') => $type]);
+    }
+}

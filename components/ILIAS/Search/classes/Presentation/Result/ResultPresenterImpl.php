@@ -1,0 +1,247 @@
+<?php
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
+declare(strict_types=1);
+
+namespace ILIAS\Search\Presentation\Result;
+
+use ilSearchResult;
+use ilLuceneSearchResultFilter;
+use ilLuceneHighlighterResultParser;
+use ILIAS\Data\URI;
+use ILIAS\UI\Component\Modal\Modal;
+use ILIAS\UI\Component\Panel\Listing\Listing as ListingPanel;
+use DateTimeImmutable;
+use ILIAS\UI\Component\Item\Item;
+use ILIAS\Search\Presentation\Result\Subitem\SubitemPropertiesAggregator;
+use Generator;
+
+class ResultPresenterImpl implements ResultPresenter
+{
+    protected const int MAX_SUBITEMS = 9;//49;
+    protected const int MAX_SUBITEMS_PER_PAGE = 5;
+
+    public function __construct(
+        protected ComponentFactory $component_factory,
+        protected ObjectPropertiesAggregator $obj_properties,
+        protected SubitemPropertiesAggregator $subitem_properties
+    ) {
+    }
+
+    /**
+     * @return array{0: ListingPanel, 1: Modal[]}
+     */
+    public function getDirectSearchResultAsPanel(
+        ilSearchResult $result,
+        Sortation $sortation,
+        int $current_page,
+        int $max_pages,
+        URI $pagination_action,
+        string $page_param_name,
+        URI $sortation_action,
+        string $sortation_param_name
+    ): array {
+        $items = [];
+        $subitem_modals = [];
+
+        $items_with_sort_data = [];
+        $subitem_ids_by_obj_id = $result->getSubitemIds();
+        foreach ($result->getResultsForPresentation() as $ref_id => $obj_id) {
+            $title = $this->obj_properties->lookupTitle($obj_id);
+            $creation_date = $this->obj_properties->lookupCreationDate($obj_id);
+            $type = $this->obj_properties->lookupType($obj_id);
+
+            $subitem_ids = $subitem_ids_by_obj_id[$obj_id] ?? [];
+            $subitem_modal = null;
+            if ($subitem_ids !== []) {
+                $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
+                $subitem_modal = $this->component_factory->getModalForSubitems(
+                    $title,
+                    self::MAX_SUBITEMS_PER_PAGE,
+                    count($subitem_ids) > self::MAX_SUBITEMS,
+                    ...$this->getItemsForSubitemsFromDirectSearch($ref_id, $type, ...$truncated_subitem_ids),
+                );
+                $subitem_modals[] = $subitem_modal;
+            }
+
+            $item = $this->component_factory->getItemForObject(
+                $this->obj_properties->buildIconPath($obj_id, $type),
+                $this->obj_properties->makeTypePresentable($type),
+                $title,
+                $this->obj_properties->buildLink($ref_id, $type),
+                $this->obj_properties->lookupDescription($obj_id),
+                '',
+                $this->obj_properties->buildRepositoryPath($ref_id),
+                $creation_date,
+                $subitem_modal?->getShowSignal()
+            );
+            $items_with_sort_data[] = [
+                'relevance' => 0,
+                'title' => $title,
+                'creation_date' => $creation_date,
+                'item' => $item
+            ];
+        }
+
+        $items = $this->sortObjectItems($sortation, ...$items_with_sort_data);
+
+        return [
+            $this->component_factory->getPanel(
+                $sortation,
+                $current_page,
+                $max_pages,
+                $result,
+                $pagination_action,
+                $page_param_name,
+                $sortation_action,
+                $sortation_param_name,
+                ...$items
+            ),
+            $subitem_modals
+        ];
+    }
+
+    protected function getItemsForSubitemsFromDirectSearch(
+        int $ref_id,
+        string $type,
+        int ...$sub_ids
+    ): Generator {
+        foreach ($sub_ids as $sub_id) {
+            yield $this->component_factory->getItemForSubitem(
+                $this->subitem_properties->getTitle($ref_id, $type, $sub_id),
+                $this->subitem_properties->getLink($ref_id, $type, $sub_id),
+                $this->subitem_properties->openLinkInNewViewport($ref_id, $type, $sub_id),
+                '',
+                $this->subitem_properties->makeTypePresentable($ref_id, $type, $sub_id),
+            );
+        }
+    }
+
+    /**
+     * @return array{0: ListingPanel, 1: Modal[]}
+     */
+    public function getLuceneSearchResultAsPanel(
+        ilLuceneSearchResultFilter $result,
+        ilLuceneHighlighterResultParser $highlighter,
+        Sortation $sortation,
+        int $current_page,
+        int $max_pages,
+        URI $pagination_action,
+        string $page_param_name,
+        URI $sortation_action,
+        string $sortation_param_name
+    ): array {
+        $items = [];
+        $subitem_modals = [];
+
+        $items_with_sort_data = [];
+        foreach ($result->getResults() as $ref_id => $obj_id) {
+            $creation_date = $this->obj_properties->lookupCreationDate($obj_id);
+            $type = $this->obj_properties->lookupType($obj_id);
+            $title_no_highlights = $this->obj_properties->lookupTitle($obj_id);
+            $description_no_highlights = $this->obj_properties->lookupDescription($obj_id);
+
+            $subitem_ids = $highlighter->getSubItemIds($obj_id);
+            $subitem_modal = null;
+            if ($subitem_ids !== []) {
+                $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
+                $subitem_modal = $this->component_factory->getModalForSubitems(
+                    $title_no_highlights,
+                    self::MAX_SUBITEMS_PER_PAGE,
+                    count($subitem_ids) > self::MAX_SUBITEMS,
+                    ...$this->getItemsForSubitemsFromLuceneSearch($highlighter, $obj_id, $ref_id, $type, ...$truncated_subitem_ids),
+                );
+                $subitem_modals[] = $subitem_modal;
+            }
+
+            $item = $this->component_factory->getItemForObject(
+                $this->obj_properties->buildIconPath($obj_id, $type),
+                $this->obj_properties->makeTypePresentable($type),
+                $highlighter->getTitle($obj_id, 0) ?: $title_no_highlights,
+                $this->obj_properties->buildLink($ref_id, $type),
+                $highlighter->getDescription($obj_id, 0) ?: $description_no_highlights,
+                $highlighter->getContent($obj_id, 0),
+                $this->obj_properties->buildRepositoryPath($ref_id),
+                $creation_date,
+                $subitem_modal?->getShowSignal()
+            );
+            $items_with_sort_data[] = [
+                'relevance' => $highlighter->getRelevance($obj_id, 0),
+                'title' => $title_no_highlights,
+                'creation_date' => $creation_date,
+                'item' => $item
+            ];
+        }
+
+        $items = $this->sortObjectItems($sortation, ...$items_with_sort_data);
+
+        return [
+            $this->component_factory->getPanel(
+                $sortation,
+                $current_page,
+                $max_pages,
+                $result,
+                $pagination_action,
+                $page_param_name,
+                $sortation_action,
+                $sortation_param_name,
+                ...$items
+            ),
+            $subitem_modals
+        ];
+    }
+
+    protected function getItemsForSubitemsFromLuceneSearch(
+        ilLuceneHighlighterResultParser $highlighter,
+        int $obj_id,
+        int $ref_id,
+        string $type,
+        int ...$sub_ids
+    ): Generator {
+        foreach ($sub_ids as $sub_id) {
+            yield $this->component_factory->getItemForSubitem(
+                $highlighter->getTitle($obj_id, $sub_id) ?: $this->subitem_properties->getTitle($ref_id, $type, $sub_id),
+                $this->subitem_properties->getLink($ref_id, $type, $sub_id),
+                $this->subitem_properties->openLinkInNewViewport($ref_id, $type, $sub_id),
+                $highlighter->getContent($obj_id, $sub_id),
+                $this->subitem_properties->makeTypePresentable($ref_id, $type, $sub_id),
+            );
+        }
+    }
+
+    /**
+     * @param array{relevance: int, title: string, creation_date: DateTimeImmutable, item: Item} ...$items_with_sort_data
+     * @return Item[]
+     */
+    protected function sortObjectItems(Sortation $sortation, array ...$items_with_sort_data): \Generator
+    {
+        $sort_callable = match ($sortation) {
+            Sortation::RELEVANCE_DESC => fn($a, $b) => $b['relevance'] <=> $a['relevance'],
+            Sortation::TITLE_ASC => fn($a, $b) => [$a['title'], $a['relevance']] <=> [$b['title'], $b['relevance']],
+            Sortation::TITLE_DESC => fn($a, $b) => [$b['title'], $b['relevance']] <=> [$a['title'], $a['relevance']],
+            Sortation::CREATION_DATE_ASC => fn($a, $b) => [$a['creation_date'], $a['relevance']] <=> [$b['creation_date'], $b['relevance']],
+            Sortation::CREATION_DATE_DESC => fn($a, $b) => [$b['creation_date'], $b['relevance']] <=> [$a['creation_date'], $a['relevance']]
+        };
+
+        usort($items_with_sort_data, $sort_callable);
+
+        foreach ($items_with_sort_data as $item) {
+            yield $item['item'];
+        }
+    }
+}

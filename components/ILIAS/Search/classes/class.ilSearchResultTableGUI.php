@@ -200,13 +200,13 @@ class ilSearchResultTableGUI extends ilTable2GUI
 
             case 'title_desc':
                 usort($set, function ($a, $b) {
-                    return [$b['title'], $b['relevance'] ?? ''] <=> [$a['title'], $a['relevance'] ?? ''];
+                    return [$b['title_sort'], $b['relevance'] ?? ''] <=> [$a['title_sort'], $a['relevance'] ?? ''];
                 });
                 break;
 
             case 'title_asc':
                 usort($set, function ($a, $b) {
-                    return [$a['title'], $b['relevance'] ?? ''] <=> [$b['title'], $a['relevance'] ?? ''];
+                    return [$a['title_sort'], $b['relevance'] ?? ''] <=> [$b['title_sort'], $a['relevance'] ?? ''];
                 });
                 break;
 

@@ -254,11 +254,10 @@ class ilSearchResultPresentation
                     "ref_id" => $ref_id,
                     "obj_id" => $obj_id,
                     "title" => $this->lookupTitle($obj_id, 0),
-                    "title_sort" => ilObject::_lookupTitle((int) $obj_id),
-                    "description" => $this->lookupDescription((int) $obj_id, 0),
+                    "title_sort" => ilObject::_lookupTitle($obj_id),
+                    "description" => $this->lookupDescription($obj_id, 0),
                     "type" => $obj_type,
                     "relevance" => $this->getRelevance($obj_id),
-                    "s_relevance" => sprintf("%03d", $this->getRelevance($obj_id)),
                     'create_date' => ilObject::_lookupCreationDate($obj_id)
                 );
 

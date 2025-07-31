@@ -314,17 +314,22 @@ class ilSearchGUI extends ilSearchBaseGUI
 
         // Show them
         if (count($result_obj->getResults())) {
-            $this->addPager($result_obj, 'max_page');
+            $result_presenter = $this->presenter->result();
+            $result_panel_and_modals = $result_presenter->getDirectSearchResultAsPanel(
+                $result_obj,
+                $this->initSortationFromQuery(),
+                $this->search_cache->getResultPageNumber(),
+                $this->initMaxPageFromSession(),
+                $this->getPaginationAction(),
+                self::PAGE_NUMBER_PARAM,
+                $this->getSortationAction(),
+                self::ORDER_PARAM
+            );
 
-            $presentation = new ilSearchResultPresentation($this, ilSearchResultPresentation::MODE_STANDARD);
-            $presentation->setResults($result_obj->getResultsForPresentation());
-            $presentation->setSubitemIds($result_obj->getSubitemIds());
-            $presentation->setPreviousNext($this->prev_link, $this->next_link);
-            #$presentation->setSearcher($searcher);
-
-            if ($presentation->render()) {
-                $this->tpl->setVariable('SEARCH_RESULTS', $presentation->getHTML());
-            }
+            $this->tpl->setVariable(
+                'SEARCH_RESULTS',
+                $this->ui_renderer->render($result_panel_and_modals)
+            );
         }
     }
 
@@ -337,7 +342,7 @@ class ilSearchGUI extends ilSearchBaseGUI
     {
         $page_number = $this->initPageNumberFromQuery();
         if (!$page_number and $this->search_mode != 'in_results') {
-            ilSession::clear('max_page');
+            ilSession::clear(self::MAX_PAGE_PARAM);
             $this->search_cache->deleteCachedEntries();
         }
         $this->search_cache->setResultPageNumber($page_number);
@@ -397,22 +402,23 @@ class ilSearchGUI extends ilSearchBaseGUI
             $this->tpl->setOnScreenMessage('info', $this->lng->txt('search_no_match'));
         }
 
-        if ($result->isLimitReached()) {
-            #$message = sprintf($this->lng->txt('search_limit_reached'),$this->settings->getMaxHits());
-            #ilUtil::sendInfo($message);
-        }
+        // Step 5: show results
+        $result_presenter = $this->presenter->result();
+        $result_panel_and_modals = $result_presenter->getDirectSearchResultAsPanel(
+            $result,
+            $this->initSortationFromQuery(),
+            $this->search_cache->getResultPageNumber(),
+            $this->initMaxPageFromSession(),
+            $this->getPaginationAction(),
+            self::PAGE_NUMBER_PARAM,
+            $this->getSortationAction(),
+            self::ORDER_PARAM
+        );
 
-        // Step 6: show results
-        $this->addPager($result, 'max_page');
-
-        $presentation = new ilSearchResultPresentation($this, ilSearchResultPresentation::MODE_STANDARD);
-        $presentation->setResults($result->getResultsForPresentation());
-        $presentation->setSubitemIds($result->getSubitemIds());
-        $presentation->setPreviousNext($this->prev_link, $this->next_link);
-
-        if ($presentation->render()) {
-            $this->tpl->setVariable('SEARCH_RESULTS', $presentation->getHTML());
-        }
+        $this->tpl->setVariable(
+            'SEARCH_RESULTS',
+            $this->ui_renderer->render($result_panel_and_modals)
+        );
     }
 
     public function prepareOutput(): void

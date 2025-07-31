@@ -176,16 +176,26 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
         // Highlight
         $searcher->highlight($filter->getResultObjIds());
 
-        $presentation = new ilSearchResultPresentation($this);
-        $presentation->setResults($filter->getResultIds());
-        $presentation->setSearcher($searcher);
-        $this->addPager($filter, 'max_page');
-        $presentation->setPreviousNext($this->prev_link, $this->next_link);
-
         $this->showSearchForm();
 
-        if ($presentation->render()) {
-            $this->tpl->setVariable('SEARCH_RESULTS', $presentation->getHTML());
+        if ($filter->getResults()) {
+            $result_presenter = $this->presenter->result();
+            $result_panel = $result_presenter->getLuceneSearchResultAsPanel(
+                $filter,
+                $searcher->getHighlighter(),
+                $this->initSortationFromQuery(),
+                $this->search_cache->getResultPageNumber(),
+                $this->initMaxPageFromSession(),
+                $this->getPaginationAction(),
+                self::PAGE_NUMBER_PARAM,
+                $this->getSortationAction(),
+                self::ORDER_PARAM
+            );
+
+            $this->tpl->setVariable(
+                'SEARCH_RESULTS',
+                $this->ui_renderer->render($result_panel)
+            );
         } elseif (strlen($this->search_cache->getQuery())) {
             $this->tpl->setOnScreenMessage(
                 'info',
@@ -203,7 +213,8 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
      */
     protected function search(): void
     {
-        ilSession::clear('max_page');
+        $this->search_cache->deleteCachedEntries();
+        ilSession::clear(self::MAX_PAGE_PARAM);
 
         // Reset details
         ilSubItemListGUI::resetDetails();
@@ -212,7 +223,7 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
 
     protected function performSearchFilter(): void
     {
-        $this->performSearch();
+        $this->search();
     }
 
     /**
@@ -220,7 +231,10 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
      */
     protected function performSearch(): void
     {
-        $this->search_cache->deleteCachedEntries();
+        if (!$this->initPageNumberFromQuery() and $this->search_mode != 'in_results') {
+            ilSession::clear(self::MAX_PAGE_PARAM);
+            $this->search_cache->deleteCachedEntries();
+        }
         ilSession::clear('vis_references');
         $filter_query = '';
         if ($this->search_cache->getItemFilter() and ilSearchSettings::getInstance()->isLuceneItemFilterEnabled()) {
@@ -280,17 +294,24 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
         // Show results
         $this->showSearchForm();
 
-        $presentation = new ilSearchResultPresentation($this);
-        $presentation->setResults($filter->getResultIds());
-        $presentation->setSearcher($searcher);
+        if ($filter->getResultObjIds()) {
+            $result_presenter = $this->presenter->result();
+            $result_panel_and_modals = $result_presenter->getLuceneSearchResultAsPanel(
+                $filter,
+                $searcher->getHighlighter(),
+                $this->initSortationFromQuery(),
+                $this->search_cache->getResultPageNumber(),
+                $this->initMaxPageFromSession(),
+                $this->getPaginationAction(),
+                self::PAGE_NUMBER_PARAM,
+                $this->getSortationAction(),
+                self::ORDER_PARAM
+            );
 
-        // TODO: other handling required
-        $this->addPager($filter, 'max_page');
-
-        $presentation->setPreviousNext($this->prev_link, $this->next_link);
-
-        if ($presentation->render()) {
-            $this->tpl->setVariable('SEARCH_RESULTS', $presentation->getHTML());
+            $this->tpl->setVariable(
+                'SEARCH_RESULTS',
+                $this->ui_renderer->render($result_panel_and_modals)
+            );
         } else {
             $this->tpl->setOnScreenMessage(
                 'info',

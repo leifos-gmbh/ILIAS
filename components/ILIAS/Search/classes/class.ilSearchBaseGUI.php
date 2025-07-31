@@ -21,9 +21,14 @@ declare(strict_types=1);
 use ILIAS\Repository\Clipboard\ClipboardManager;
 use ILIAS\Container\Content\ViewManager;
 use ILIAS\HTTP\GlobalHttpState;
-use ILIAS\Refinery\Factory;
+use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\Object\ImplementsCreationCallback;
 use ILIAS\ILIASObject\Creation\CreationCallbackTrait;
+use ILIAS\Search\Presentation\Result\Sortation;
+use ILIAS\Data\URI;
+use ILIAS\Data\Factory as DataFactory;
+use ILIAS\Search\Presentation\PresenterImpl;
+use ILIAS\Search\Presentation\Presenter;
 
 /**
 * Class ilSearchBaseGUI
@@ -42,14 +47,18 @@ class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandH
 {
     use CreationCallbackTrait;
 
-    public const SEARCH_FAST = 1;
-    public const SEARCH_DETAILS = 2;
-    public const SEARCH_AND = 'and';
-    public const SEARCH_OR = 'or';
+    protected const string ORDER_PARAM = 'sortation';
+    protected const string MAX_PAGE_PARAM = 'max_page';
+    protected const string PAGE_NUMBER_PARAM = 'page_number';
 
-    public const SEARCH_FORM_LUCENE = 1;
-    public const SEARCH_FORM_STANDARD = 2;
-    public const SEARCH_FORM_USER = 3;
+    public const int SEARCH_FAST = 1;
+    public const int SEARCH_DETAILS = 2;
+    public const string SEARCH_AND = 'and';
+    public const string SEARCH_OR = 'or';
+
+    public const int SEARCH_FORM_LUCENE = 1;
+    public const int SEARCH_FORM_STANDARD = 2;
+    public const int SEARCH_FORM_USER = 3;
 
     protected ilUserSearchCache $search_cache;
     protected string $search_mode = '';
@@ -70,7 +79,9 @@ class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandH
     protected ilObjUser $user;
     protected ilTree $tree;
     protected GlobalHttpState $http;
-    protected Factory $refinery;
+    protected Refinery $refinery;
+    protected DataFactory $data_factory;
+    protected Presenter $presenter;
 
     protected ilLogger $logger;
 
@@ -103,17 +114,55 @@ class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandH
         $this->search_cache = ilUserSearchCache::_getInstance($this->user->getId());
         $this->http = $DIC->http();
         $this->refinery = $DIC->refinery();
+        $this->data_factory = new DataFactory();
+        $this->presenter = new PresenterImpl($DIC);
     }
 
     protected function initPageNumberFromQuery(): int
     {
-        if ($this->http->wrapper()->query()->has('page_number')) {
+        if ($this->http->wrapper()->query()->has(self::PAGE_NUMBER_PARAM)) {
+            // pages in the view control are 0-indexed, in search 1-indexed
             return $this->http->wrapper()->query()->retrieve(
-                'page_number',
+                self::PAGE_NUMBER_PARAM,
                 $this->refinery->kindlyTo()->int()
-            );
+            ) + 1;
         }
         return 0;
+    }
+
+    protected function initSortationFromQuery(): Sortation
+    {
+        $sortation_string = '';
+        if ($this->http->wrapper()->query()->has('sortation')) {
+            $sortation_string = $this->http->wrapper()->query()->retrieve(
+                'sortation',
+                $this->refinery->kindlyTo()->string()
+            );
+        }
+        return Sortation::tryFrom($sortation_string) ?? Sortation::RELEVANCE_DESC;
+    }
+
+    protected function initMaxPageFromSession(): int
+    {
+        $max_page = max(ilSession::get(self::MAX_PAGE_PARAM), $this->search_cache->getResultPageNumber());
+        ilSession::set(self::MAX_PAGE_PARAM, $max_page);
+        return $max_page;
+    }
+
+    protected function getPaginationAction(): URI
+    {
+        return $this->data_factory->uri(
+            rtrim(ILIAS_HTTP_PATH, '/') . '/' .
+            $this->ctrl->getLinkTarget($this, 'performSearch')
+        );
+    }
+
+    protected function getSortationAction(): URI
+    {
+        return $this->data_factory->uri(
+            rtrim(ILIAS_HTTP_PATH, '/') . '/' .
+            $this->ctrl->getLinkTarget($this, 'showSavedResults')
+        );
     }
 
 

@@ -153,7 +153,7 @@ class ilLuceneUserSearchGUI extends ilSearchBaseGUI
             $this->showSearchForm();
             return;
         }
-        ilSession::clear('max_page');
+        ilSession::clear(self::MAX_PAGE_PARAM);
         $this->search_cache->deleteCachedEntries();
 
         // Reset details

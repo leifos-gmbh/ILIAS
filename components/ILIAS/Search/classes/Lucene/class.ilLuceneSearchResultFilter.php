@@ -17,6 +17,9 @@
  *********************************************************************/
 
 declare(strict_types=1);
+
+use ILIAS\Search\Result\PaginationInfo;
+
 /**
 * Validate Lucene search results
 * Do access checks, create ref_ids from obj_ids...
@@ -26,7 +29,7 @@ declare(strict_types=1);
 *
 * @ingroup ServicesSearch
 */
-class ilLuceneSearchResultFilter
+class ilLuceneSearchResultFilter implements PaginationInfo
 {
     protected static ?ilLuceneSearchResultFilter $instance = null;
 
@@ -157,6 +160,7 @@ class ilLuceneSearchResultFilter
     public function loadFromDb(): void
     {
         $this->checked = $this->cache->getResults();
+        $this->limit_reached = (count($this->checked) >= $this->getMaxHits());
     }
 
     /**

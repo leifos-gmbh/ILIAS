@@ -18,29 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result\Subitem;
+namespace ILIAS\Search\Presentation\Result\UI;
 
-use ILIAS\Data\URI;
-use ILIAS\DI\Container;
-use Generator;
-
-interface PropertiesReader
+interface Sanitizer
 {
-    /**
-     * Type of the parent object.
-     *
-     * Should do nothing but return a string, is called during setup.
-     */
-    public static function type(): string;
+    public function sanitize(string $text): string;
 
-    public function init(Container $dic): void;
+    public function sanitizeAndSetUpPlaceholders(string $text): string;
 
-    /**
-     * @return Properties[]
-     */
-    public function getSubitemProperties(
-        PropertiesFactory $factory,
-        int $parent_ref_id,
-        string ...$subitem_ids
-    ): array;
+    public function replacePlaceholders(string $html): string;
 }

@@ -18,12 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result;
+namespace ILIAS\Search\Presentation\Result\Object;
 
 use DateTimeImmutable;
 use ILIAS\Data\URI;
 
-interface ObjectPropertiesAggregator
+interface PropertiesAggregator
 {
     public function lookupTitle(int $obj_id): string;
 

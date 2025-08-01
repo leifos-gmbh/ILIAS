@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result;
+namespace ILIAS\Search\Presentation\Result\UI;
 
 use ILIAS\Search\Result\PaginationInfo;
 use ILIAS\Data\URI;
@@ -28,6 +28,7 @@ use ILIAS\UI\Component\Symbol\Icon\Icon;
 use DateTimeImmutable;
 use ILIAS\UI\Component\Signal;
 use ILIAS\UI\Component\Modal\Modal;
+use ILIAS\Search\Presentation\Result\Sortation;
 
 interface ComponentFactory
 {

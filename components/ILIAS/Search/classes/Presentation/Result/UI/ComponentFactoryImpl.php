@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result;
+namespace ILIAS\Search\Presentation\Result\UI;
 
 use ILIAS\Search\Result\PaginationInfo;
 use ILIAS\Data\URI;
@@ -33,6 +33,7 @@ use ilLanguage;
 use ilDateTime;
 use ilDatePresentation;
 use ILIAS\UI\Component\Modal\Modal;
+use ILIAS\Search\Presentation\Result\Sortation;
 
 class ComponentFactoryImpl implements ComponentFactory
 {
@@ -40,7 +41,8 @@ class ComponentFactoryImpl implements ComponentFactory
 
     public function __construct(
         protected UIFactory $ui_factory,
-        protected ilLanguage $lng
+        protected ilLanguage $lng,
+        protected Sanitizer $sanitizer
     ) {
     }
 
@@ -117,7 +119,7 @@ class ComponentFactoryImpl implements ComponentFactory
 
         $title = sprintf(
             $this->lng->txt('search_detailed_results_title'),
-            $object_title
+            $this->sanitizer->sanitize($object_title)
         );
 
         $pages = [];
@@ -139,25 +141,25 @@ class ComponentFactoryImpl implements ComponentFactory
         DateTimeImmutable $created_on,
         ?Signal $subitem_show_signal
     ): Item {
-        $item_title = $title;
+        $item_title = $this->sanitizer->sanitizeAndSetUpPlaceholders($title);
         if ($link !== null) {
-            $item_title = $this->ui_factory->link()->standard($title, (string) $link);
+            $item_title = $this->ui_factory->link()->standard($item_title, (string) $link);
         }
 
         $type_icon = $this->ui_factory->symbol()->icon()->custom(
             $type_icon_path,
-            $type_icon_label
+            $this->sanitizer->sanitize($type_icon_label)
         );
 
         $properties = [
-            $this->lng->txt('path') => $path,
+            $this->lng->txt('path') => $this->sanitizer->sanitize($path),
             $this->lng->txt('create_date') => $this->formatDate($created_on)
         ];
         if ($description !== '') {
             if (mb_strlen($description) >= self::MAX_DESCRIPTION_LENGTH) {
                 $description = mb_substr($description, 0, self::MAX_DESCRIPTION_LENGTH) . '...';
             }
-            $properties[$this->lng->txt('description')] = $description;
+            $properties[$this->lng->txt('description')] = $this->sanitizer->sanitizeAndSetUpPlaceholders($description);
         }
 
         $item = $this->ui_factory->item()->standard($item_title)
@@ -169,7 +171,7 @@ class ComponentFactoryImpl implements ComponentFactory
             );
             $item = $item->withMainAction($button);
         }
-        return $item->withDescription($content)
+        return $item->withDescription($this->sanitizer->sanitizeAndSetUpPlaceholders($content))
                     ->withProperties($properties);
     }
 
@@ -189,13 +191,14 @@ class ComponentFactoryImpl implements ComponentFactory
         string $content,
         string $type
     ): Item {
-        $item_title = $title;
+        $item_title = $this->sanitizer->sanitizeAndSetUpPlaceholders($title);
         if ($link !== null) {
-            $item_title = $this->ui_factory->link()->standard($title, (string) $link)
+            $item_title = $this->ui_factory->link()->standard($item_title, (string) $link)
                                                    ->withOpenInNewViewport($open_link_in_new_viewport);
         }
+        $properties = [$this->lng->txt('type') => $this->sanitizer->sanitize($type)];
         return $this->ui_factory->item()->standard($item_title)
-                                ->withDescription($content)
-                                ->withProperties([$this->lng->txt('type') => $type]);
+                                ->withDescription($this->sanitizer->sanitizeAndSetUpPlaceholders($content))
+                                ->withProperties($properties);
     }
 }

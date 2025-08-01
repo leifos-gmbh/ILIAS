@@ -23,10 +23,13 @@ namespace ILIAS\Search\Presentation;
 use ILIAS\DI\Container;
 use ILIAS\Search\Presentation\Result\ResultPresenter;
 use ILIAS\Search\Presentation\Result\ResultPresenterImpl;
-use ILIAS\Search\Presentation\Result\ComponentFactoryImpl;
-use ILIAS\Search\Presentation\Result\ObjectPropertiesAggregatorImpl;
+use ILIAS\Search\Presentation\Result\UI\ComponentFactoryImpl;
+use ILIAS\Search\Presentation\Result\Object\PropertiesAggregatorImpl as ObjectPropertiesAggregatorImpl;
 use ILIAS\Data\Factory as DataFactory;
-use ILIAS\Search\Presentation\Result\Subitem\SubitemPropertiesAggregatorImpl;
+use ILIAS\Search\Presentation\Result\Subitem\PropertiesAggregatorImpl as SubitemPropertiesAggregatorImpl;
+use ILIAS\Search\Presentation\Result\UI\SanitizerImpl;
+use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactoryImpl as SubitemPropertiesFactoryImpl;
+use ILIAS\Search\Presentation\Result\Object\AccessCheckerImpl;
 
 class PresenterImpl implements Presenter
 {
@@ -41,20 +44,27 @@ class PresenterImpl implements Presenter
     {
         $lng = $this->dic->language();
         $lng->loadLanguageModule('search');
+        $sanitizer = new SanitizerImpl($this->dic->refinery());
+        $access_checker = new AccessCheckerImpl($this->dic->access());
         return $this->result_presenter ??= new ResultPresenterImpl(
             new ComponentFactoryImpl(
                 $this->dic->ui()->factory(),
-                $lng
+                $lng,
+                $sanitizer
             ),
             new ObjectPropertiesAggregatorImpl(
+                $access_checker,
                 $this->dic['objDefinition'],
                 $lng,
                 $this->dic['static_url'],
                 new DataFactory()
             ),
             new SubitemPropertiesAggregatorImpl(
-                $this->dic
-            )
+                $this->dic,
+                new SubitemPropertiesFactoryImpl()
+            ),
+            $access_checker,
+            $sanitizer
         );
     }
 }

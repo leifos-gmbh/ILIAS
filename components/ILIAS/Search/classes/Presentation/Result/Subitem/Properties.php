@@ -21,26 +21,16 @@ declare(strict_types=1);
 namespace ILIAS\Search\Presentation\Result\Subitem;
 
 use ILIAS\Data\URI;
-use ILIAS\DI\Container;
-use Generator;
 
-interface PropertiesReader
+interface Properties
 {
-    /**
-     * Type of the parent object.
-     *
-     * Should do nothing but return a string, is called during setup.
-     */
-    public static function type(): string;
+    public function id(): string;
 
-    public function init(Container $dic): void;
+    public function title(): string;
 
-    /**
-     * @return Properties[]
-     */
-    public function getSubitemProperties(
-        PropertiesFactory $factory,
-        int $parent_ref_id,
-        string ...$subitem_ids
-    ): array;
+    public function link(): ?URI;
+
+    public function openLinkInNewViewport(): bool;
+
+    public function presentableSubitemType(): string;
 }

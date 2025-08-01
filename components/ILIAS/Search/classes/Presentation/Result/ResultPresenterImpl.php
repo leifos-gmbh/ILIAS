@@ -28,18 +28,24 @@ use ILIAS\UI\Component\Modal\Modal;
 use ILIAS\UI\Component\Panel\Listing\Listing as ListingPanel;
 use DateTimeImmutable;
 use ILIAS\UI\Component\Item\Item;
-use ILIAS\Search\Presentation\Result\Subitem\SubitemPropertiesAggregator;
+use ILIAS\Search\Presentation\Result\Subitem\PropertiesAggregator as SubitemPropertiesAggregator;
 use Generator;
+use ILIAS\Search\Presentation\Result\UI\ComponentFactory;
+use ILIAS\Search\Presentation\Result\UI\Sanitizer;
+use ILIAS\Search\Presentation\Result\Object\PropertiesAggregator as ObjectPropertiesAggregator;
+use ILIAS\Search\Presentation\Result\Object\AccessChecker;
 
 class ResultPresenterImpl implements ResultPresenter
 {
-    protected const int MAX_SUBITEMS = 9;//49;
+    protected const int MAX_SUBITEMS = 49;
     protected const int MAX_SUBITEMS_PER_PAGE = 5;
 
     public function __construct(
         protected ComponentFactory $component_factory,
         protected ObjectPropertiesAggregator $obj_properties,
-        protected SubitemPropertiesAggregator $subitem_properties
+        protected SubitemPropertiesAggregator $subitem_properties,
+        protected AccessChecker $access,
+        protected Sanitizer $sanitizer
     ) {
     }
 
@@ -66,7 +72,10 @@ class ResultPresenterImpl implements ResultPresenter
             $creation_date = $this->obj_properties->lookupCreationDate($obj_id);
             $type = $this->obj_properties->lookupType($obj_id);
 
-            $subitem_ids = $subitem_ids_by_obj_id[$obj_id] ?? [];
+            $subitem_ids = [];
+            if ($this->access->canSeeSubitemsOfObject($ref_id)) {
+                $subitem_ids = $subitem_ids_by_obj_id[$obj_id] ?? [];
+            }
             $subitem_modal = null;
             if ($subitem_ids !== []) {
                 $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
@@ -121,13 +130,19 @@ class ResultPresenterImpl implements ResultPresenter
         string $type,
         int ...$sub_ids
     ): Generator {
+        $sub_ids_as_strings = [];
         foreach ($sub_ids as $sub_id) {
+            $sub_ids_as_strings[] = (string) $sub_id;
+        }
+        $properties_by_id = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids_as_strings);
+        foreach ($sub_ids as $sub_id) {
+            $properties = $properties_by_id[$sub_id] ?? null;
             yield $this->component_factory->getItemForSubitem(
-                $this->subitem_properties->getTitle($ref_id, $type, $sub_id),
-                $this->subitem_properties->getLink($ref_id, $type, $sub_id),
-                $this->subitem_properties->openLinkInNewViewport($ref_id, $type, $sub_id),
+                $properties?->title() ?? '',
+                $properties?->link(),
+                $properties?->openLinkInNewViewport() ?? false,
                 '',
-                $this->subitem_properties->makeTypePresentable($ref_id, $type, $sub_id),
+                $properties?->presentableSubitemType() ?? '',
             );
         }
     }
@@ -154,9 +169,11 @@ class ResultPresenterImpl implements ResultPresenter
             $creation_date = $this->obj_properties->lookupCreationDate($obj_id);
             $type = $this->obj_properties->lookupType($obj_id);
             $title_no_highlights = $this->obj_properties->lookupTitle($obj_id);
-            $description_no_highlights = $this->obj_properties->lookupDescription($obj_id);
 
-            $subitem_ids = $highlighter->getSubItemIds($obj_id);
+            $subitem_ids = [];
+            if ($this->access->canSeeSubitemsOfObject($ref_id)) {
+                $subitem_ids = $highlighter->getSubItemIds($obj_id);
+            }
             $subitem_modal = null;
             if ($subitem_ids !== []) {
                 $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
@@ -174,7 +191,7 @@ class ResultPresenterImpl implements ResultPresenter
                 $this->obj_properties->makeTypePresentable($type),
                 $highlighter->getTitle($obj_id, 0) ?: $title_no_highlights,
                 $this->obj_properties->buildLink($ref_id, $type),
-                $highlighter->getDescription($obj_id, 0) ?: $description_no_highlights,
+                $highlighter->getDescription($obj_id, 0) ?: $this->obj_properties->lookupDescription($obj_id),
                 $highlighter->getContent($obj_id, 0),
                 $this->obj_properties->buildRepositoryPath($ref_id),
                 $creation_date,
@@ -213,13 +230,19 @@ class ResultPresenterImpl implements ResultPresenter
         string $type,
         int ...$sub_ids
     ): Generator {
+        $sub_ids_as_strings = [];
         foreach ($sub_ids as $sub_id) {
+            $sub_ids_as_strings[] = (string) $sub_id;
+        }
+        $properties_by_id = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids_as_strings);
+        foreach ($sub_ids as $sub_id) {
+            $properties = $properties_by_id[$sub_id] ?? null;
             yield $this->component_factory->getItemForSubitem(
-                $highlighter->getTitle($obj_id, $sub_id) ?: $this->subitem_properties->getTitle($ref_id, $type, $sub_id),
-                $this->subitem_properties->getLink($ref_id, $type, $sub_id),
-                $this->subitem_properties->openLinkInNewViewport($ref_id, $type, $sub_id),
+                $highlighter->getTitle($obj_id, $sub_id) ?: ($properties?->title() ?? ''),
+                $properties?->link(),
+                $properties?->openLinkInNewViewport() ?? false,
                 $highlighter->getContent($obj_id, $sub_id),
-                $this->subitem_properties->makeTypePresentable($ref_id, $type, $sub_id),
+                $properties?->presentableSubitemType() ?? '',
             );
         }
     }
@@ -243,5 +266,10 @@ class ResultPresenterImpl implements ResultPresenter
         foreach ($items_with_sort_data as $item) {
             yield $item['item'];
         }
+    }
+
+    public function replacePlaceholders(string $html): string
+    {
+        return $this->sanitizer->replacePlaceholders($html);
     }
 }

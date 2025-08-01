@@ -22,13 +22,21 @@ namespace ILIAS\Search\Presentation\Result\Subitem;
 
 use ILIAS\Data\URI;
 
-interface SubitemPropertiesAggregator
+class PropertiesFactoryImpl implements PropertiesFactory
 {
-    public function getTitle(int $parent_ref_id, string $parent_type, int $id): string;
-
-    public function getLink(int $parent_ref_id, string $parent_type, int $id): ?URI;
-
-    public function openLinkInNewViewport(int $parent_ref_id, string $parent_type, int $id): bool;
-
-    public function makeTypePresentable(int $parent_ref_id, string $parent_type, int $id): string;
+    public function get(
+        string $id,
+        string $title,
+        ?URI $link_to_subitem,
+        bool $open_link_in_new_viewport,
+        string $presentable_subitem_type
+    ): Properties {
+        return new PropertiesImpl(
+            $id,
+            $title,
+            $link_to_subitem,
+            $open_link_in_new_viewport,
+            $presentable_subitem_type
+        );
+    }
 }

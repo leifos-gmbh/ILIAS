@@ -180,7 +180,7 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
 
         if ($filter->getResults()) {
             $result_presenter = $this->presenter->result();
-            $result_panel = $result_presenter->getLuceneSearchResultAsPanel(
+            $result_panel_and_modals = $result_presenter->getLuceneSearchResultAsPanel(
                 $filter,
                 $searcher->getHighlighter(),
                 $this->initSortationFromQuery(),
@@ -194,7 +194,7 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
 
             $this->tpl->setVariable(
                 'SEARCH_RESULTS',
-                $this->ui_renderer->render($result_panel)
+                $result_presenter->replacePlaceholders($this->ui_renderer->render($result_panel_and_modals))
             );
         } elseif (strlen($this->search_cache->getQuery())) {
             $this->tpl->setOnScreenMessage(
@@ -310,7 +310,7 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
 
             $this->tpl->setVariable(
                 'SEARCH_RESULTS',
-                $this->ui_renderer->render($result_panel_and_modals)
+                $result_presenter->replacePlaceholders($this->ui_renderer->render($result_panel_and_modals))
             );
         } else {
             $this->tpl->setOnScreenMessage(

@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result;
+namespace ILIAS\Search\Presentation\Result\Object;
 
 use DateTimeImmutable;
 use ILIAS\Data\URI;
@@ -30,9 +30,10 @@ use ILIAS\StaticURL\Services as StaticURL;
 use ILIAS\Data\Factory as DataFactory;
 use ilPathGUI;
 
-class ObjectPropertiesAggregatorImpl implements ObjectPropertiesAggregator
+class PropertiesAggregatorImpl implements PropertiesAggregator
 {
     public function __construct(
+        protected AccessChecker $access,
         protected ilObjectDefinition $obj_definition,
         protected ilLanguage $lng,
         protected StaticURL $static_url,
@@ -62,6 +63,9 @@ class ObjectPropertiesAggregatorImpl implements ObjectPropertiesAggregator
 
     public function buildLink(int $ref_id, string $type): ?URI
     {
+        if (!$this->access->canAccessLinkToObject($ref_id)) {
+            return null;
+        }
         $ref_id = $this->data_factory->refId($ref_id);
         return $this->static_url->builder()->build($type, $ref_id);
     }

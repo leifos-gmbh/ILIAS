@@ -24,10 +24,11 @@ use ILIAS\Data\URI;
 use ILIAS\Search\Setup\BuildSubitemPresentationReadersObjective;
 use ILIAS\DI\Container;
 
-class SubitemPropertiesAggregatorImpl implements SubitemPropertiesAggregator
+class PropertiesAggregatorImpl implements PropertiesAggregator
 {
     public function __construct(
-        protected Container $dic
+        protected Container $dic,
+        protected PropertiesFactory $factory,
     ) {
     }
 
@@ -35,6 +36,26 @@ class SubitemPropertiesAggregatorImpl implements SubitemPropertiesAggregator
      * @var PropertiesReader[]
      */
     protected array $readers_by_type = [];
+
+    /**
+     * @return Properties[]
+     */
+    public function getSubitemProperties(
+        int $parent_ref_id,
+        string $parent_type,
+        string ...$subitem_ids
+    ): array {
+        $from_reader = $this->getReader($parent_type)?->getSubitemProperties(
+            $this->factory,
+            $parent_ref_id,
+            ...$subitem_ids
+        ) ?? [];
+        $result = [];
+        foreach ($from_reader as $properties) {
+            $result[$properties->id()] = $properties;
+        }
+        return $result;
+    }
 
     protected function getReader(string $parent_type): ?PropertiesReader
     {
@@ -52,25 +73,5 @@ class SubitemPropertiesAggregatorImpl implements SubitemPropertiesAggregator
         }
         $reader->init($this->dic);
         return $this->readers_by_type[$parent_type] = $reader;
-    }
-
-    public function getTitle(int $parent_ref_id, string $parent_type, int $id): string
-    {
-        return $this->getReader($parent_type)?->getSubitemTitle($parent_ref_id, $id) ?? '';
-    }
-
-    public function getLink(int $parent_ref_id, string $parent_type, int $id): ?URI
-    {
-        return $this->getReader($parent_type)?->getLinkToSubitem($parent_ref_id, $id) ?? null;
-    }
-
-    public function openLinkInNewViewport(int $parent_ref_id, string $parent_type, int $id): bool
-    {
-        return $this->getReader($parent_type)?->openLinkInNewViewport($parent_ref_id, $id) ?? false;
-    }
-
-    public function makeTypePresentable(int $parent_ref_id, string $parent_type, int $id): string
-    {
-        return $this->getReader($parent_type)?->getPresentableSubitemType($parent_ref_id, $id) ?? '';
     }
 }

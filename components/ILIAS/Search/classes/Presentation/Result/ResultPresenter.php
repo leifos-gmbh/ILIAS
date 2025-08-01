@@ -57,4 +57,6 @@ interface ResultPresenter
         URI $sortation_action,
         string $sortation_param_name
     ): array;
+
+    public function replacePlaceholders(string $html): string;
 }

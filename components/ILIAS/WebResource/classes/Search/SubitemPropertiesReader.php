@@ -22,18 +22,15 @@ namespace ILIAS\WebResource\Search;
 
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesReader;
 use ILIAS\DI\Container;
-use ILIAS\Data\URI;
 use ILIAS\Data\Factory as DataFactory;
 use ilLanguage;
-use ilWebLinkItem;
 use ilObject;
 use ilWebLinkDatabaseRepository;
 use ilWebLinkDatabaseRepositoryException;
+use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
 
 class SubitemPropertiesReader implements PropertiesReader
 {
-    protected array $items_by_ref_id_and_item_id = [];
-
     protected ilLanguage $lng;
     protected DataFactory $data_factory;
 
@@ -48,42 +45,28 @@ class SubitemPropertiesReader implements PropertiesReader
         $this->data_factory = new DataFactory();
     }
 
-    public function getSubitemTitle(int $parent_ref_id, int $id): string
-    {
-        return $this->getItem($parent_ref_id, $id)?->getTitle() ?? '';
-    }
-
-    public function getLinkToSubitem(int $parent_ref_id, int $id): ?URI
-    {
-        $item = $this->getItem($parent_ref_id, $id);
-        if ($item === null) {
-            return null;
-        }
-        return $this->data_factory->uri($item->getResolvedLink(false));
-    }
-
-    public function openLinkInNewViewport(int $parent_ref_id, int $id): bool
-    {
-        return true;
-    }
-
-    public function getPresentableSubitemType(int $parent_ref_id, int $id): string
-    {
-        return $this->lng->txt('webr');
-    }
-
-    protected function getItem(int $parent_ref_id, int $id): ?ilWebLinkItem
-    {
-        if (isset($this->items_by_ref_id_and_item_id[$parent_ref_id][$id])) {
-            return $this->items_by_ref_id_and_item_id[$parent_ref_id][$id];
-        }
+    public function getSubitemProperties(
+        PropertiesFactory $factory,
+        int $parent_ref_id,
+        string ...$subitem_ids
+    ): array {
         $obj_id = ilObject::_lookupObjId($parent_ref_id);
         $repo = new ilWebLinkDatabaseRepository($obj_id);
-        try {
-            $item = $repo->getItemByLinkId($id);
-        } catch (ilWebLinkDatabaseRepositoryException $e) {
-            $item = null;
+        $item_properties = [];
+        foreach ($subitem_ids as $subitem_id) {
+            try {
+                $item = $repo->getItemByLinkId((int) $subitem_id);
+            } catch (ilWebLinkDatabaseRepositoryException $e) {
+                continue;
+            }
+            $item_properties[] = $factory->get(
+                $subitem_id,
+                $item->getTitle(),
+                $this->data_factory->uri($item->getResolvedLink(false)),
+                true,
+                $this->lng->txt('webr')
+            );
         }
-        return $this->items_by_ref_id_and_item_id[$parent_ref_id][$id] = $item;
+        return $item_properties;
     }
 }

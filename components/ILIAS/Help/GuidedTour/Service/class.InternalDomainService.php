@@ -27,6 +27,8 @@ use ILIAS\Help\GuidedTour\Tour\TourManager;
 use ILIAS\Help\GuidedTour\Step\StepManager;
 use ILIAS\LearningModule\Table\StepRetrieval;
 use ILIAS\Help\GuidedTour\Page\PageManager;
+use ILIAS\Help\GuidedTour\Admin\AdminManager;
+use ILIAS\Help\GuidedTour\Elements\IdPresentation;
 
 class InternalDomainService
 {
@@ -78,6 +80,20 @@ class InternalDomainService
     public function page(): PageManager
     {
         return self::$instance["page"] ??= new PageManager(
+            $this
+        );
+    }
+
+    public function admin(): AdminManager
+    {
+        return self::$instance["admin"] ??= new AdminManager(
+            $this
+        );
+    }
+
+    public function idPresentation(): IdPresentation
+    {
+        return self::$instance["id_pres"] ??= new IdPresentation(
             $this
         );
     }

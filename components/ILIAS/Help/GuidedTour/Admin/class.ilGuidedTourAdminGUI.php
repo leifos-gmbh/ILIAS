@@ -21,6 +21,7 @@ declare(strict_types=1);
 use ILIAS\Repository\Form\FormAdapterGUI;
 use ILIAS\Help\GuidedTour\Step\StepType;
 use ILIAS\Help\GuidedTour\Step\Step;
+use ILIAS\Help\GuidedTour\Settings\PermissionType;
 
 /**
  * @ilCtrl_Calls ilGuidedTourAdminGUI: ilGuidedTourPageGUI
@@ -49,7 +50,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $mt = $this->gui->ui()->mainTemplate();
 
         $next_class = $ctrl->getNextClass($this);
-        $cmd = $ctrl->getCmd("show");
+        $cmd = $ctrl->getCmd("listTours");
 
         switch ($next_class) {
             case strtolower(ilGuidedTourPageGUI::class):
@@ -61,7 +62,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
 
             default:
                 if (in_array($cmd, [
-                    "show",
+                    "listTours",
                     "addTour",
                     "saveTour",
                     "listSteps",
@@ -70,6 +71,10 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                     "tableCommand",
                     "editStep",
                     "editPage",
+                    "editSettings",
+                    "saveSettings",
+                    "idSettings",
+                    "saveIdSettings",
                 ])) {
                     $this->$cmd();
                 }
@@ -117,11 +122,12 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
     }
 
 
-    protected function show() : void
+    protected function listTours() : void
     {
         $mt = $this->gui->ui()->mainTemplate();
         $f = $this->gui->ui()->factory();
         $r = $this->gui->ui()->renderer();
+        $this->setSubTabs("tours");
         $ctrl = $this->gui->ctrl();
         $lng = $this->domain->lng();
 
@@ -134,12 +140,27 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $items = [];
         foreach ($this->tm->getAll() as $tour) {
             $ctrl->setParameterByClass(self::class, "tour_id", $tour->getId());
-            $link = $f->link()->standard(
+            $actions = [];
+            $actions[] = $f->link()->standard(
                $lng->txt("gdtr_edit_steps"),
                $ctrl->getLinkTargetByClass(self::class, "listSteps")
             );
+            $actions[] = $f->link()->standard(
+               $lng->txt("settings"),
+               $ctrl->getLinkTargetByClass(self::class, "editSettings")
+            );
+            $actions[] = $f->link()->standard(
+               $lng->txt("delete"),
+               $ctrl->getLinkTargetByClass(self::class, "confirmTourDeletion")
+            );
+            $properties = [];
+            $settings = $this->domain->tourSettings()->getByObjId($tour->getId());
+            $properties[$lng->txt("active")] = $settings->isActive()
+                ? $lng->txt("yes")
+                : $lng->txt("no");
             $items[] = $f->item()->standard($tour->getTitle())
-                ->withActions($f->dropdown()->standard([$link]));
+                ->withActions($f->dropdown()->standard($actions))
+                ->withProperties($properties);
         }
         if (count($items) > 0) {
             $grp = $f->item()->group("", $items);
@@ -175,6 +196,75 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         }
     }
 
+    protected function editSettings() : void
+    {
+        $mt = $this->gui->ui()->mainTemplate();
+        $mt->setContent($this->getSettingsForm()->render());
+    }
+
+    protected function getSettingsForm() : FormAdapterGUI
+    {
+        $tour_id = $this->gui->standardRequest()->getTourId();
+        $lng = $this->domain->lng();
+        $settings = $this->domain->tourSettings()->getByObjId($tour_id);
+        $perm_val = (string) $settings?->getPermission()->value;
+        if ($perm_val === "0") {
+            $perm_val = "";
+        }
+        return $this
+            ->gui
+            ->form(self::class, "saveSettings")
+            ->addStdTitleAndDescription($tour_id, "gdtr")
+            ->checkbox(
+                "active",
+                $lng->txt("gdtr_active"),
+                "",
+                $settings?->isActive()
+            )
+            ->text(
+                "screen_ids",
+                $lng->txt("gdtr_screen_ids"),
+                "",
+                $settings?->getScreenIds()
+            )
+            ->select(
+                "permission",
+                $lng->txt("gdtr_permission"),
+                [
+                    (string) PermissionType::Read->value => $lng->txt("read"),
+                    (string) PermissionType::Write->value => $lng->txt("write"),
+                    (string) PermissionType::Create->value => $lng->txt("create"),
+                ],
+                "",
+                $perm_val
+            );
+    }
+
+    public function saveSettings() : void
+    {
+        $mt = $this->gui->ui()->mainTemplate();
+        $form = $this->getSettingsForm();
+        $tour_id = $this->gui->standardRequest()->getTourId();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+
+        $tour_settings = $this->domain->tourSettings();
+        if ($form->isValid()) {
+            $form->saveStdTitleAndDescription($tour_id, "gdtr");
+            $tour_settings->save($this->data->settings(
+                $tour_id,
+                (bool) $form->getData("active"),
+                $form->getData("screen_ids"),
+                PermissionType::from((int) $form->getData("permission"))
+            ));
+            $mt->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
+            $ctrl->redirectByClass(self::class, "listTours");
+        } else {
+            $mt->setContent($form->render());
+        }
+    }
+
+
     protected function setStepsHeader() : void
     {
         $tabs = $this->gui->tabs();
@@ -187,7 +277,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $tabs->clearTargets();
         $tabs->setBackTarget(
             $lng->txt("back"),
-            $ctrl->getLinkTargetByClass(self::class, "show")
+            $ctrl->getLinkTargetByClass(self::class, "listTours")
         );
     }
 
@@ -321,4 +411,55 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $ctrl->redirectByClass(ilGuidedTourPageGUI::class, "edit");
     }
 
+    protected function setSubTabs(string $active) : void
+    {
+        $tabs = $this->gui->tabs();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $tabs->addSubTab(
+            "tours",
+            $lng->txt("gdtr_tours"),
+            $ctrl->getLinkTargetByClass(self::class, "listTours")
+        );
+        $tabs->addSubTab(
+            "id_settings",
+            $lng->txt("gdtr_id_settings"),
+            $ctrl->getLinkTargetByClass(self::class, "idSettings")
+        );
+        $tabs->activateSubTab($active);
+    }
+
+    protected function idSettings() : void
+    {
+        $this->setSubTabs("id_settings");
+        $mt = $this->gui->ui()->mainTemplate();
+        $mt->setContent($this->getIdForm()->render());
+    }
+
+    protected function getIdForm() : FormAdapterGUI
+    {
+        $lng = $this->domain->lng();
+        $id_pres = $this->domain->idPresentation();
+        return $this
+            ->gui
+            ->form(self::class, "saveIdSettings")
+            ->text(
+                "users",
+                $lng->txt("gdtr_id_pres_users"),
+                $lng->txt("gdtr_id_pres_users_info"),
+                $id_pres->getIdPresentationUsers()
+            );
+    }
+
+    protected function saveIdSettings() : void
+    {
+        $mt = $this->gui->ui()->mainTemplate();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $form = $this->getIdForm();
+        $id_pres = $this->domain->idPresentation();
+        $id_pres->saveIdPresentationUsers($form->getData("users"));
+        $mt->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
+        $ctrl->redirectByClass(self::class, "idSettings");
+    }
 }

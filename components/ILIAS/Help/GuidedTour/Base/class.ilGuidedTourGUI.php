@@ -26,6 +26,7 @@ use ILIAS\Services\Help\ScreenId\HelpScreenIdObserver;
  */
 class ilGuidedTourGUI implements ilCtrlBaseClassInterface
 {
+    protected \ILIAS\Help\GuidedTour\Settings\SettingsManager $settings_manager;
     protected \ILIAS\Help\GuidedTour\StandardGUIRequest $request;
     protected \ILIAS\Help\GuidedTour\Page\PageManager $page_manager;
     protected \ILIAS\Help\GuidedTour\Tour\TourManager $tour_manager;
@@ -41,6 +42,7 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $this->tour_manager = $this->help->domain()->guidedTour()->tour();
         $this->step_manager = $this->help->domain()->guidedTour()->step();
         $this->page_manager = $this->help->domain()->guidedTour()->page();
+        $this->settings_manager = $this->help->domain()->guidedTour()->tourSettings();
         $this->request = $this->gui->guidedTour()->standardRequest();
     }
 
@@ -92,6 +94,10 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $data->popoverHtml = $r->renderAsync($popover);
         $data->popoverShowSignal = $popover->getShowSignal()->getId();
         foreach ($this->tour_manager->getAll() as $tour) {
+            $settings = $this->settings_manager->getByObjId($tour->getId());
+            if (!$settings?->isActive()) {
+                continue;
+            }
             $data->tour[$tour->getId()] = [
                 "name" => $tour->getTitle()
             ];

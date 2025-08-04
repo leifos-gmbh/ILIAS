@@ -72,6 +72,7 @@ class SubitemPropertiesReader implements PropertiesReader
             );
         }
     }
+
     protected function isAssignmentVisible(
         int $ref_id,
         int $subitem_id
@@ -81,5 +82,4 @@ class SubitemPropertiesReader implements PropertiesReader
         }
         return ilExAssignment::lookupAssignmentOnline($subitem_id);
     }
-
 }

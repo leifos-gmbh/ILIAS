@@ -30,7 +30,6 @@ use ilCtrlInterface;
 use ILIAS\Search\Presentation\Result\Subitem\Properties;
 use ilLMObject;
 use ilLMPresentationGUI;
-use ilLMPageGUI;
 
 class SubitemPropertiesReader implements PropertiesReader
 {

@@ -30,6 +30,7 @@ use ilMediaPoolItem;
 use ilObjMediaPool;
 use ilMediaPoolPresentationGUI;
 use ilCtrlInterface;
+use Generator;
 
 class SubitemPropertiesReader implements PropertiesReader
 {
@@ -55,8 +56,7 @@ class SubitemPropertiesReader implements PropertiesReader
         PropertiesFactory $factory,
         int $parent_ref_id,
         string ...$subitem_ids
-    ): array {
-        $item_properties = [];
+    ): Generator {
         foreach ($subitem_ids as $subitem_id) {
             $type = ilMediaPoolItem::lookupType((int) $subitem_id);
             switch ($type) {
@@ -90,7 +90,7 @@ class SubitemPropertiesReader implements PropertiesReader
                 default:
                     continue 2;
             }
-            $item_properties[] = $factory->get(
+            yield $factory->get(
                 $subitem_id,
                 ilMediaPoolItem::lookupTitle((int) $subitem_id),
                 $link,
@@ -98,6 +98,5 @@ class SubitemPropertiesReader implements PropertiesReader
                 $this->lng->txt('obj_' . $type)
             );
         }
-        return $item_properties;
     }
 }

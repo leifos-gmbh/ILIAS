@@ -28,6 +28,7 @@ use ilObject;
 use ilWebLinkDatabaseRepository;
 use ilWebLinkDatabaseRepositoryException;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
+use Generator;
 
 class SubitemPropertiesReader implements PropertiesReader
 {
@@ -49,17 +50,16 @@ class SubitemPropertiesReader implements PropertiesReader
         PropertiesFactory $factory,
         int $parent_ref_id,
         string ...$subitem_ids
-    ): array {
+    ): Generator {
         $obj_id = ilObject::_lookupObjId($parent_ref_id);
         $repo = new ilWebLinkDatabaseRepository($obj_id);
-        $item_properties = [];
         foreach ($subitem_ids as $subitem_id) {
             try {
                 $item = $repo->getItemByLinkId((int) $subitem_id);
             } catch (ilWebLinkDatabaseRepositoryException $e) {
                 continue;
             }
-            $item_properties[] = $factory->get(
+            yield $factory->get(
                 $subitem_id,
                 $item->getTitle(),
                 $this->data_factory->uri($item->getResolvedLink(false)),
@@ -67,6 +67,5 @@ class SubitemPropertiesReader implements PropertiesReader
                 $this->lng->txt('webr')
             );
         }
-        return $item_properties;
     }
 }

@@ -32,6 +32,7 @@ use ilCtrlInterface;
 use ilWikiPageGUI;
 use ilWikiHandlerGUI;
 use ILIAS\Search\Presentation\Result\Subitem\Properties;
+use Generator;
 
 class SubitemPropertiesReader implements PropertiesReader
 {
@@ -55,21 +56,19 @@ class SubitemPropertiesReader implements PropertiesReader
         PropertiesFactory $factory,
         int $parent_ref_id,
         string ...$subitem_ids
-    ): array {
+    ): Generator {
         $obj_id = ilObject::_lookupObjId($parent_ref_id);
-        $item_properties = [];
         foreach ($subitem_ids as $subitem_id) {
             $title = (string) ilWikiPage::lookupTitle((int) $subitem_id);
             if ($title !== '') {
-                $item_properties[] = $this->getPropertiesForWikiPage($factory, $parent_ref_id, $subitem_id, $title);
+                yield $this->getPropertiesForWikiPage($factory, $parent_ref_id, $subitem_id, $title);
             } else {
                 if (!ilObject::_exists((int) $subitem_id)) {
                     continue;
                 }
-                $item_properties[] = $this->getPropertiesForFile($factory, $parent_ref_id, $subitem_id);
+                yield $this->getPropertiesForFile($factory, $parent_ref_id, $subitem_id);
             }
         }
-        return $item_properties;
     }
 
     protected function getPropertiesForWikiPage(

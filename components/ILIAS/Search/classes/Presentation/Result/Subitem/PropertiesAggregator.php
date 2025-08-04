@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\Search\Presentation\Result\Subitem;
 
 use ILIAS\Data\URI;
+use Generator;
 
 interface PropertiesAggregator
 {
@@ -35,5 +36,5 @@ interface PropertiesAggregator
         int $parent_ref_id,
         string $parent_type,
         string ...$subitem_ids
-    ): array;
+    ): Generator;
 }

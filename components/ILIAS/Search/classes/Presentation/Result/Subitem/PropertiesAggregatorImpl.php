@@ -23,6 +23,7 @@ namespace ILIAS\Search\Presentation\Result\Subitem;
 use ILIAS\Data\URI;
 use ILIAS\Search\Setup\BuildSubitemPresentationReadersObjective;
 use ILIAS\DI\Container;
+use Generator;
 
 class PropertiesAggregatorImpl implements PropertiesAggregator
 {
@@ -44,17 +45,12 @@ class PropertiesAggregatorImpl implements PropertiesAggregator
         int $parent_ref_id,
         string $parent_type,
         string ...$subitem_ids
-    ): array {
-        $from_reader = $this->getReader($parent_type)?->getSubitemProperties(
+    ): Generator {
+        yield from $this->getReader($parent_type)?->getSubitemProperties(
             $this->factory,
             $parent_ref_id,
             ...$subitem_ids
         ) ?? [];
-        $result = [];
-        foreach ($from_reader as $properties) {
-            $result[$properties->id()] = $properties;
-        }
-        return $result;
     }
 
     protected function getReader(string $parent_type): ?PropertiesReader

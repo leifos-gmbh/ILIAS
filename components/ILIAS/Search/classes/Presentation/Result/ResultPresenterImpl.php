@@ -134,15 +134,14 @@ class ResultPresenterImpl implements ResultPresenter
         foreach ($sub_ids as $sub_id) {
             $sub_ids_as_strings[] = (string) $sub_id;
         }
-        $properties_by_id = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids_as_strings);
-        foreach ($sub_ids as $sub_id) {
-            $properties = $properties_by_id[$sub_id] ?? null;
+        $subitem_properties = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids_as_strings);
+        foreach ($subitem_properties as $properties) {
             yield $this->component_factory->getItemForSubitem(
-                $properties?->title() ?? '',
-                $properties?->link(),
-                $properties?->openLinkInNewViewport() ?? false,
+                $properties->title(),
+                $properties->link(),
+                $properties->openLinkInNewViewport(),
                 '',
-                $properties?->presentableSubitemType() ?? '',
+                $properties->presentableSubitemType(),
             );
         }
     }
@@ -234,15 +233,15 @@ class ResultPresenterImpl implements ResultPresenter
         foreach ($sub_ids as $sub_id) {
             $sub_ids_as_strings[] = (string) $sub_id;
         }
-        $properties_by_id = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids_as_strings);
-        foreach ($sub_ids as $sub_id) {
-            $properties = $properties_by_id[$sub_id] ?? null;
+        $subitem_properties = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids_as_strings);
+        foreach ($subitem_properties as $properties) {
+            $subitem_id = (int) $properties->id();
             yield $this->component_factory->getItemForSubitem(
-                $highlighter->getTitle($obj_id, $sub_id) ?: ($properties?->title() ?? ''),
-                $properties?->link(),
-                $properties?->openLinkInNewViewport() ?? false,
-                $highlighter->getContent($obj_id, $sub_id),
-                $properties?->presentableSubitemType() ?? '',
+                $highlighter->getTitle($obj_id, $subitem_id) ?: $properties->title(),
+                $properties->link(),
+                $properties->openLinkInNewViewport(),
+                $highlighter->getContent($obj_id, $subitem_id),
+                $properties->presentableSubitemType()
             );
         }
     }

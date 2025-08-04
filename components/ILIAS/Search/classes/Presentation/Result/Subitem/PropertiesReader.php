@@ -36,11 +36,16 @@ interface PropertiesReader
     public function init(Container $dic): void;
 
     /**
+     * Order of the output should respect the order of the
+     * subitem_ids.
+     * Subitems that should not be shown in the search
+     * results should not be included in the output.
+     *
      * @return Properties[]
      */
     public function getSubitemProperties(
         PropertiesFactory $factory,
         int $parent_ref_id,
         string ...$subitem_ids
-    ): array;
+    ): Generator;
 }

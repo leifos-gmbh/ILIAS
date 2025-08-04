@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
+declare(strict_types=1);
+
+namespace ILIAS\Glossary\Search;
+
+use ILIAS\Search\Presentation\Result\Subitem\PropertiesReader;
+use ILIAS\DI\Container;
+use ILIAS\Data\Factory as DataFactory;
+use ilLanguage;
+use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
+use ILIAS\StaticURL\Services as StaticURL;
+use ilGlossaryTerm;
+
+class SubitemPropertiesReader implements PropertiesReader
+{
+    protected ilLanguage $lng;
+    protected DataFactory $data_factory;
+    protected StaticURL $static_url;
+
+    public static function type(): string
+    {
+        return 'glo';
+    }
+
+    public function init(Container $dic): void
+    {
+        $this->lng = $dic->language();
+        $this->lng->loadLanguageModule('content');
+        $this->data_factory = new DataFactory();
+        $this->static_url = $dic['static_url'];
+    }
+
+    public function getSubitemProperties(
+        PropertiesFactory $factory,
+        int $parent_ref_id,
+        string ...$subitem_ids
+    ): array {
+        $item_properties = [];
+        foreach ($subitem_ids as $subitem_id) {
+            $link = $this->static_url->builder()->build(
+                'git',
+                $this->data_factory->refId((int) $subitem_id),
+                [$parent_ref_id]
+            );
+            $item_properties[] = $factory->get(
+                $subitem_id,
+                ilGlossaryTerm::_lookGlossaryTerm((int) $subitem_id),
+                $link,
+                false,
+                $this->lng->txt('cont_term')
+            );
+        }
+        return $item_properties;
+    }
+}

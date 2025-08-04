@@ -112,7 +112,11 @@ class ComponentFactoryImpl implements ComponentFactory
         int $items_per_page,
         bool $show_too_many_items_warning,
         Item ...$items
-    ): Modal {
+    ): ?Modal {
+        if ($items === []) {
+            return null;
+        }
+
         if ($show_too_many_items_warning) {
             $items[] = $this->ui_factory->item()->shy($this->lng->txt('search_results_too_many_subitems'));
         }

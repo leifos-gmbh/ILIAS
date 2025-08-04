@@ -46,6 +46,9 @@ class PropertiesAggregatorImpl implements PropertiesAggregator
         string $parent_type,
         string ...$subitem_ids
     ): Generator {
+        if ($subitem_ids === []) {
+            yield from [];
+        }
         yield from $this->getReader($parent_type)?->getSubitemProperties(
             $this->factory,
             $parent_ref_id,

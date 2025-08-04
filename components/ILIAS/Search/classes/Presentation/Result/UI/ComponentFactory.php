@@ -69,5 +69,5 @@ interface ComponentFactory
         int $items_per_page,
         bool $show_too_many_items_warning,
         Item ...$items
-    ): Modal;
+    ): ?Modal;
 }

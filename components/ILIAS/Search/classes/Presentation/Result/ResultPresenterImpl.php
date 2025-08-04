@@ -76,15 +76,14 @@ class ResultPresenterImpl implements ResultPresenter
             if ($this->access->canSeeSubitemsOfObject($ref_id)) {
                 $subitem_ids = $subitem_ids_by_obj_id[$obj_id] ?? [];
             }
-            $subitem_modal = null;
-            if ($subitem_ids !== []) {
-                $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
-                $subitem_modal = $this->component_factory->getModalForSubitems(
-                    $title,
-                    self::MAX_SUBITEMS_PER_PAGE,
-                    count($subitem_ids) > self::MAX_SUBITEMS,
-                    ...$this->getItemsForSubitemsFromDirectSearch($ref_id, $type, ...$truncated_subitem_ids),
-                );
+            $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
+            $subitem_modal = $this->component_factory->getModalForSubitems(
+                $title,
+                self::MAX_SUBITEMS_PER_PAGE,
+                count($subitem_ids) > self::MAX_SUBITEMS,
+                ...$this->getItemsForSubitemsFromDirectSearch($ref_id, $type, ...$truncated_subitem_ids),
+            );
+            if ($subitem_modal !== null) {
                 $subitem_modals[] = $subitem_modal;
             }
 
@@ -173,15 +172,14 @@ class ResultPresenterImpl implements ResultPresenter
             if ($this->access->canSeeSubitemsOfObject($ref_id)) {
                 $subitem_ids = $highlighter->getSubItemIds($obj_id);
             }
-            $subitem_modal = null;
-            if ($subitem_ids !== []) {
-                $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
-                $subitem_modal = $this->component_factory->getModalForSubitems(
-                    $title_no_highlights,
-                    self::MAX_SUBITEMS_PER_PAGE,
-                    count($subitem_ids) > self::MAX_SUBITEMS,
-                    ...$this->getItemsForSubitemsFromLuceneSearch($highlighter, $obj_id, $ref_id, $type, ...$truncated_subitem_ids),
-                );
+            $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
+            $subitem_modal = $this->component_factory->getModalForSubitems(
+                $title_no_highlights,
+                self::MAX_SUBITEMS_PER_PAGE,
+                count($subitem_ids) > self::MAX_SUBITEMS,
+                ...$this->getItemsForSubitemsFromLuceneSearch($highlighter, $obj_id, $ref_id, $type, ...$truncated_subitem_ids),
+            );
+            if ($subitem_modal !== null) {
                 $subitem_modals[] = $subitem_modal;
             }
 

@@ -39,7 +39,9 @@ interface PropertiesReader
      * Order of the output should respect the order of the
      * subitem_ids.
      * Subitems that should not be shown in the search
-     * results should not be included in the output.
+     * results should not be included in the output
+     * (read access on the parent object is already
+     * checked).
      *
      * @return Properties[]
      */

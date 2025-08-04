@@ -25,18 +25,17 @@ use ILIAS\DI\Container;
 use ILIAS\Data\Factory as DataFactory;
 use ilLanguage;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
-use ilCtrlInterface;
 use Generator;
 use ilExAssignment;
-use ilExerciseHandlerGUI;
 use ilAccess;
+use ILIAS\Exercise\PermanentLink\PermanentLinkManager;
 
 class SubitemPropertiesReader implements PropertiesReader
 {
     protected ilLanguage $lng;
     protected DataFactory $data_factory;
-    protected ilCtrlInterface $ctrl;
     protected ilAccess $access;
+    protected PermanentLinkManager $permanent_link;
 
     public static function type(): string
     {
@@ -48,8 +47,8 @@ class SubitemPropertiesReader implements PropertiesReader
         $this->lng = $dic->language();
         $this->lng->loadLanguageModule('exc');
         $this->data_factory = new DataFactory();
-        $this->ctrl = $dic->ctrl();
         $this->access = $dic->access();
+        $this->permanent_link = $dic->exercise()->internal()->gui()->permanentLink();
     }
 
     public function getSubitemProperties(
@@ -61,12 +60,9 @@ class SubitemPropertiesReader implements PropertiesReader
             if (!$this->isAssignmentVisible($parent_ref_id, (int) $subitem_id)) {
                 continue;
             }
-            $this->ctrl->setParameterByClass(ilExerciseHandlerGUI::class, 'ref_id', $parent_ref_id);
-            $this->ctrl->setParameterByClass(ilExerciseHandlerGUI::class, 'ass_id', $subitem_id);
-            $link = $this->data_factory->uri(rtrim(ILIAS_HTTP_PATH, '/') . '/' .
-                $this->ctrl->getLinkTargetByClass([ilExerciseHandlerGUI::class, \ilObjExerciseGUI::class, \ilAssignmentPresentationGUI::class], ''));
-            $this->ctrl->clearParameterByClass(ilExerciseHandlerGUI::class, 'ass_id');
-            $this->ctrl->clearParameterByClass(ilExerciseHandlerGUI::class, 'ref_id');
+            $link = $this->data_factory->uri(
+                $this->permanent_link->getPermanentLink($parent_ref_id, (int) $subitem_id)
+            );
             yield $factory->get(
                 $subitem_id,
                 ilExAssignment::lookupTitle((int) $subitem_id),

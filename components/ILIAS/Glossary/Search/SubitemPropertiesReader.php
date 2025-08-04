@@ -27,6 +27,7 @@ use ilLanguage;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
 use ILIAS\StaticURL\Services as StaticURL;
 use ilGlossaryTerm;
+use Generator;
 
 class SubitemPropertiesReader implements PropertiesReader
 {
@@ -51,15 +52,14 @@ class SubitemPropertiesReader implements PropertiesReader
         PropertiesFactory $factory,
         int $parent_ref_id,
         string ...$subitem_ids
-    ): array {
-        $item_properties = [];
+    ): Generator {
         foreach ($subitem_ids as $subitem_id) {
             $link = $this->static_url->builder()->build(
                 'git',
                 $this->data_factory->refId((int) $subitem_id),
                 [$parent_ref_id]
             );
-            $item_properties[] = $factory->get(
+            yield $factory->get(
                 $subitem_id,
                 ilGlossaryTerm::_lookGlossaryTerm((int) $subitem_id),
                 $link,
@@ -67,6 +67,5 @@ class SubitemPropertiesReader implements PropertiesReader
                 $this->lng->txt('cont_term')
             );
         }
-        return $item_properties;
     }
 }

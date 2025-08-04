@@ -99,6 +99,7 @@ class SubitemPropertiesReader implements PropertiesReader
         $link = rtrim(ILIAS_HTTP_PATH, '/') . '/' .
             $this->ctrl->getLinkTargetByClass([ilWikiHandlerGUI::class, ilObjWikiGUI::class, ilWikiPageGUI::class], 'downloadFile');
         $this->ctrl->clearParameterByClass(ilWikiPageGUI::class, 'file_id');
+        $this->ctrl->clearParameterByClass(ilWikiPageGUI::class, 'ref_id');
         return $factory->get(
             $subitem_id,
             ilObject::_lookupTitle((int) $subitem_id),

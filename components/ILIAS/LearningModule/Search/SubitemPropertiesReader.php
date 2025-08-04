@@ -30,6 +30,7 @@ use ilCtrlInterface;
 use ILIAS\Search\Presentation\Result\Subitem\Properties;
 use ilLMObject;
 use ilLMPresentationGUI;
+use Generator;
 
 class SubitemPropertiesReader implements PropertiesReader
 {
@@ -53,13 +54,12 @@ class SubitemPropertiesReader implements PropertiesReader
         PropertiesFactory $factory,
         int $parent_ref_id,
         string ...$subitem_ids
-    ): array {
+    ): Generator {
         $obj_id = ilObject::_lookupObjId($parent_ref_id);
-        $item_properties = [];
         foreach ($subitem_ids as $subitem_id) {
             switch (ilLMObject::_lookupType((int) $subitem_id, $obj_id)) {
                 case 'pg':
-                    $item_properties[] = $this->getPropertiesForLMObject(
+                    yield $this->getPropertiesForLMObject(
                         $factory,
                         $parent_ref_id,
                         $subitem_id,
@@ -68,7 +68,7 @@ class SubitemPropertiesReader implements PropertiesReader
                     break;
 
                 case 'st':
-                    $item_properties[] = $this->getPropertiesForLMObject(
+                    yield $this->getPropertiesForLMObject(
                         $factory,
                         $parent_ref_id,
                         $subitem_id,
@@ -80,10 +80,9 @@ class SubitemPropertiesReader implements PropertiesReader
                     if (!ilObject::_exists((int) $subitem_id)) {
                         break;
                     }
-                    $item_properties[] = $this->getPropertiesForFile($factory, $parent_ref_id, $subitem_id);
+                    yield $this->getPropertiesForFile($factory, $parent_ref_id, $subitem_id);
             }
         }
-        return $item_properties;
     }
 
     protected function getPropertiesForLMObject(

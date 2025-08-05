@@ -25,21 +25,59 @@ declare(strict_types=1);
  */
 class ilGuidedTourPageGUI extends ilPageObjectGUI
 {
+    protected \ILIAS\Help\GuidedTour\InternalDomainService $gt_domain;
+
     public function __construct(
         int $a_id = 0,
         int $a_old_nr = 0,
         string $a_lang = ""
     ) {
+        global $DIC;
+
         parent::__construct("gdtr", $a_id, $a_old_nr, false, $a_lang);
+        $this->gt_domain = $DIC->help()->internal()->domain()->guidedTour();
     }
 
-    public function getProfileBackUrl(): string
+    public function getProfileBackUrl() : string
     {
         return "#";
     }
 
-    public function finishEditing(): void
+    public function finishEditing() : void
     {
         $this->ctrl->returnToParent($this);
     }
+
+    public function showPageFullscreen() : void
+    {
+        $tpl = new ilGlobalTemplate("tpl.fullscreen.html", true, true, "components/ILIAS/COPage");
+        $this->setTemplate($tpl);
+        $this->addResourcesToTemplate($tpl);
+        $tpl->addCss(ilUtil::getStyleSheetLocation());
+        $tpl->addCss(ilObjStyleSheet::getContentStylePath($this->getStyleId()));
+        $this->setTemplateOutput(false);
+        $this->setHeader("");
+        $ret = $this->showPage();
+        $tpl->setVariable("MEDIA_CONTENT", "<div>" . $ret .
+            $this->renderButtons() . "</div>");
+        $tpl->printToStdout();
+        exit;
+    }
+
+    protected function renderButtons() : string
+    {
+        $lng = $this->gt_domain->lng();
+        $lng->loadLanguageModule("help");
+        return "<p>" .
+            $this->gui->button(
+                $lng->txt("gdtr_next_step"),
+                "#"
+            )->render(["gdtr-type" => "next"]) .
+            $this->gui->button(
+                $lng->txt("gdtr_close"),
+                "#"
+            )->render(["gdtr-type" => "close"]) .
+            "</p>";
+    }
+
 }

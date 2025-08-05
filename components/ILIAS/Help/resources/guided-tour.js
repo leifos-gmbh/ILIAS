@@ -50,6 +50,7 @@ il.guidedTour = (function ($) {
           scrollContainer.dispatchEvent(new Event('scroll'));
           first = false;
         }
+        addButtonListeners(iframe);
       });
       window.addEventListener('resize', () => {
         console.log("resize");
@@ -57,6 +58,25 @@ il.guidedTour = (function ($) {
       });
       // resizeIframe(iframe);
     }
+  }
+
+  function addButtonListeners(iframe) {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    const buttons = [...doc.querySelectorAll('button')];   // NodeList → Array
+    const lastButtons = buttons.slice(-2);
+console.log("1");
+    // Beispiel: den Text der beiden Buttons ausgeben
+    lastButtons.forEach((btn) => {
+      console.log("2");
+      console.log(btn.dataset);
+      if (btn.dataset.gdtrType === 'next') {
+        console.log("3");
+        btn.addEventListener('click', () => {
+          console.log("4");
+          nextStep();
+        });
+      }
+    });
   }
 
   function resizeIframe(iframe) {
@@ -145,6 +165,7 @@ il.guidedTour = (function ($) {
     for (const [tourId, t] of Object.entries(tour)) {
       for (const [stepId, s] of Object.entries(t.steps)) {
         if (!s.done) {
+          s.done = true;
           performStep(s);
           return;
         }

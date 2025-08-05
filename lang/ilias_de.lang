@@ -10486,6 +10486,9 @@ gsfo#:#reset_success#:#Fußzeile erfolgreich zurückgesetzt
 gsfo#:#services#:#Services
 gsfo#:#support#:#Support
 help#:#gdtr_active#:#Aktiv
+help#:#gdtr_close#:#Tour beenden
+help#:#gdtr_edit_properties#:#Eigenschaften bearbeiten
+help#:#gdtr_edit_content#:#Inhalt bearbeiten
 help#:#gdtr_step_type#:#Typ
 help#:#gdtr_mainbar#:#Mainbar
 help#:#gdtr_metabar#:#Metabar
@@ -10500,6 +10503,7 @@ help#:#gdtr_toolbar#:#Toolbar
 help#:#gdtr_permission#:#Berechtigung
 help#:#gdtr_primary_button#:#Primary Button
 help#:#gdtr_add_step#:#Schritt hinzufügen
+help#:#gdtr_next_step#:#Nächster Schritt
 help#:#gdtr_screen_ids#:#Screen IDs
 help#:#gdtr_screen_ids_info#:#Mehrere IDs müssen durch Kommas separiert werden.
 help#:#gdtr_tour_steps#:#Schritte

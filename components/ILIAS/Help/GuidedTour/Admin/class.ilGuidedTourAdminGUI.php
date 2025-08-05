@@ -174,7 +174,9 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
 
     protected function getCreateForm() : FormAdapterGUI
     {
+        $lng = $this->domain->lng();
         return $this->gui->form(self::class, "saveTour")
+            ->section("sec", $lng->txt("gdtr_add_tour"))
             ->addStdTitleAndDescription(0, "gdtr");
     }
 
@@ -214,6 +216,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         return $this
             ->gui
             ->form(self::class, "saveSettings")
+            ->section("sec", $lng->txt("settings"))
             ->addStdTitleAndDescription($tour_id, "gdtr")
             ->checkbox(
                 "active",
@@ -344,6 +347,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
             ? $step?->getElementId()
             : null;
         return $this->gui->form(self::class, "saveStep")
+            ->section("sec", $lng->txt("gdtr_step"))
             ->switch("type", $lng->txt("gdtr_step_type"), "", $type_val)
             ->group((string) StepType::Mainbar->value, $lng->txt("gdtr_mainbar"))
             ->text("mb_element_id", $lng->txt("gdtr_element_id"), "", $mb_element_id)
@@ -443,6 +447,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         return $this
             ->gui
             ->form(self::class, "saveIdSettings")
+            ->section("sec", $lng->txt("gdtr_id_settings"))
             ->text(
                 "users",
                 $lng->txt("gdtr_id_pres_users"),

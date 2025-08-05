@@ -10487,6 +10487,9 @@ gsfo#:#reset_success#:#Footer has been reset successfully
 gsfo#:#services#:#Services
 gsfo#:#support#:#Support
 help#:#gdtr_active#:#Active
+help#:#gdtr_close#:#End Tour
+help#:#gdtr_edit_properties#:#Edit Properties
+help#:#gdtr_edit_content#:#Edit Content
 help#:#gdtr_step_type#:#Type
 help#:#gdtr_mainbar#:#Mainbar
 help#:#gdtr_metabar#:#Metabar
@@ -10501,6 +10504,7 @@ help#:#gdtr_toolbar#:#Toolbar
 help#:#gdtr_permission#:#Permission
 help#:#gdtr_primary_button#:#Primary Button
 help#:#gdtr_add_step#:#Add Step
+help#:#gdtr_next_step#:#Next Step
 help#:#gdtr_screen_ids#:#Screen IDs
 help#:#gdtr_screen_ids_info#:#Multiple IDs must be separated by comma.
 help#:#gdtr_tour_steps#:#Tour Steps

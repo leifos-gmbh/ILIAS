@@ -18,12 +18,8 @@
 
 declare(strict_types=1);
 
-use ILIAS\Repository\Clipboard\ClipboardManager;
-use ILIAS\Container\Content\ViewManager;
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory as Refinery;
-use ILIAS\Object\ImplementsCreationCallback;
-use ILIAS\ILIASObject\Creation\CreationCallbackTrait;
 use ILIAS\Search\Presentation\Result\Sortation;
 use ILIAS\Data\URI;
 use ILIAS\Data\Factory as DataFactory;
@@ -43,10 +39,8 @@ use ILIAS\Search\Presentation\Presenter;
 *
 *
 */
-class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandHandling, ImplementsCreationCallback
+class ilSearchBaseGUI
 {
-    use CreationCallbackTrait;
-
     protected const string ORDER_PARAM = 'sortation';
     protected const string MAX_PAGE_PARAM = 'max_page';
     protected const string PAGE_NUMBER_PARAM = 'page_number';
@@ -64,53 +58,28 @@ class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandH
     protected string $search_mode = '';
 
     protected ilSearchSettings $settings;
-    protected ?ilPropertyFormGUI $form = null;
     protected ?ilSearchFilterGUI $search_filter = null;
     protected ?array $search_filter_data = null;
-    protected ClipboardManager $clipboard;
-    protected ViewManager $container_view_manager;
-    protected ilFavouritesManager $favourites;
 
     protected ilCtrl $ctrl;
-    protected ILIAS $ilias;
     protected ilLanguage $lng;
     protected ilGlobalTemplateInterface $tpl;
-    protected ilLocatorGUI $locator;
     protected ilObjUser $user;
-    protected ilTree $tree;
     protected GlobalHttpState $http;
     protected Refinery $refinery;
     protected DataFactory $data_factory;
     protected Presenter $presenter;
 
-    protected ilLogger $logger;
-
-
-    protected string $prev_link = '';
-    protected string $next_link = '';
-
     public function __construct()
     {
         global $DIC;
 
-
-        $this->logger = $DIC->logger()->src();
-        $this->ilias = $DIC['ilias'];
-        $this->locator = $DIC['ilLocator'];
         $this->ctrl = $DIC->ctrl();
         $this->lng = $DIC->language();
         $this->tpl = $DIC->ui()->mainTemplate();
-        $this->tree = $DIC->repositoryTree();
-
         $this->lng->loadLanguageModule('search');
         $this->settings = new ilSearchSettings();
-        $this->favourites = new ilFavouritesManager();
         $this->user = $DIC->user();
-        $this->clipboard = $DIC
-            ->repository()
-            ->internal()
-            ->domain()
-            ->clipboard();
         $this->search_cache = ilUserSearchCache::_getInstance($this->user->getId());
         $this->http = $DIC->http();
         $this->refinery = $DIC->refinery();
@@ -177,78 +146,6 @@ class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandH
         $this->tpl->setTitle($this->lng->txt("search"));
     }
 
-    /**
-     * @todo: Check if this can be removed. Still used in ilLuceneUserSearchGUI?
-     */
-    public function initStandardSearchForm(int $a_mode): ilPropertyFormGUI
-    {
-        $this->form = new ilPropertyFormGUI();
-        $this->form->setOpenTag(false);
-        $this->form->setCloseTag(false);
-
-        if (ilSearchSettings::getInstance()->isLuceneItemFilterEnabled()) {
-            $radg = new ilRadioGroupInputGUI($this->lng->txt("search_type"), "type");
-            if ($a_mode == self::SEARCH_FORM_STANDARD) {
-                // search type
-                $radg->setValue(
-                    $this->getType() ==
-                        self::SEARCH_FAST ?
-                        (string) self::SEARCH_FAST :
-                        (string) self::SEARCH_DETAILS
-                );
-                $op1 = new ilRadioOption($this->lng->txt("search_fast_info"), (string) self::SEARCH_FAST);
-                $radg->addOption($op1);
-                $op2 = new ilRadioOption($this->lng->txt("search_details_info"), (string) self::SEARCH_DETAILS);
-            } else {
-                $op2 = new ilCheckboxInputGUI($this->lng->txt('search_filter_by_type'), 'item_filter_enabled');
-                $op2->setValue('1');
-            }
-
-
-            $cbgr = new ilCheckboxGroupInputGUI('', 'filter_type');
-            $cbgr->setUseValuesAsKeys(true);
-            $details = $this->getDetails();
-            $det = false;
-            foreach (ilSearchSettings::getInstance()->getEnabledLuceneItemFilterDefinitions() as $type => $data) {
-                $cb = new ilCheckboxOption($this->lng->txt($data['trans']), $type);
-                if (isset($details[$type])) {
-                    $det = true;
-                }
-                $cbgr->addOption($cb);
-            }
-            $mimes = [];
-            if ($a_mode == self::SEARCH_FORM_LUCENE) {
-                if (ilSearchSettings::getInstance()->isLuceneMimeFilterEnabled()) {
-                    $mimes = $this->getMimeDetails();
-                    foreach (ilSearchSettings::getInstance()->getEnabledLuceneMimeFilterDefinitions() as $type => $data) {
-                        $op3 = new ilCheckboxOption($this->lng->txt($data['trans']), $type);
-                        if (isset($mimes[$type])) {
-                            $det = true;
-                        }
-                        $cbgr->addOption($op3);
-                    }
-                }
-            }
-
-            $cbgr->setValue(array_merge((array) $details, (array) $mimes));
-            $op2->addSubItem($cbgr);
-
-            if ($a_mode != self::SEARCH_FORM_STANDARD && $det) {
-                $op2->setChecked(true);
-            }
-
-            if ($a_mode == self::SEARCH_FORM_STANDARD) {
-                $radg->addOption($op2);
-                $this->form->addItem($radg);
-            } else {
-                $this->form->addItem($op2);
-            }
-        }
-
-        $this->form->setFormAction($this->ctrl->getFormAction($this, 'performSearch'));
-        return $this->form;
-    }
-
     public function handleCommand(string $a_cmd): void
     {
         if (method_exists($this, $a_cmd)) {
@@ -257,183 +154,6 @@ class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandH
             $a_cmd .= 'Object';
             $this->$a_cmd();
         }
-    }
-
-    public function addToDeskObject(): void
-    {
-        if ($this->http->wrapper()->query()->has('item_ref_id')) {
-            $this->favourites->add(
-                $this->user->getId(),
-                $this->http->wrapper()->query()->retrieve(
-                    'item_ref_id',
-                    $this->refinery->kindlyTo()->int()
-                )
-            );
-        }
-        $this->showSavedResults();
-    }
-
-    public function removeFromDeskObject(): void
-    {
-        if ($this->http->wrapper()->query()->has('item_ref_id')) {
-            $this->favourites->remove(
-                $this->user->getId(),
-                $this->http->wrapper()->query()->retrieve(
-                    'item_ref_id',
-                    $this->refinery->kindlyTo()->int()
-                )
-            );
-        }
-        $this->showSavedResults();
-    }
-
-    public function delete(): void
-    {
-        $admin = new ilAdministrationCommandGUI($this);
-        $admin->delete();
-    }
-
-    public function cancelDelete(): void
-    {
-        $this->showSavedResults();
-    }
-
-    public function cancelObject(): void
-    {
-        $this->showSavedResults();
-    }
-
-    public function cancelMoveLinkObject(): void
-    {
-        $this->showSavedResults();
-    }
-
-    public function performDelete(): void
-    {
-        $admin = new ilAdministrationCommandGUI($this);
-        $admin->performDelete();
-    }
-
-    public function cut(): void
-    {
-        $admin = new ilAdministrationCommandGUI($this);
-        $admin->cut();
-    }
-
-
-    public function link(): void
-    {
-        $admin = new ilAdministrationCommandGUI($this);
-        $admin->link();
-    }
-
-    public function paste(): void
-    {
-        $admin = new ilAdministrationCommandGUI($this);
-        $admin->paste();
-    }
-
-    public function showLinkIntoMultipleObjectsTree(): void
-    {
-        $admin = new ilAdministrationCommandGUI($this);
-        $admin->showLinkIntoMultipleObjectsTree();
-    }
-
-    public function showPasteTree(): void
-    {
-        $admin = new ilAdministrationCommandGUI($this);
-        $admin->showPasteTree();
-    }
-
-
-    public function showMoveIntoObjectTree(): void
-    {
-        $admin = new ilAdministrationCommandGUI($this);
-        $admin->showMoveIntoObjectTree();
-    }
-
-    public function performPasteIntoMultipleObjects(): void
-    {
-        $admin = new ilAdministrationCommandGUI($this);
-        $admin->performPasteIntoMultipleObjects();
-    }
-
-    public function clear(): void
-    {
-        $this->clipboard->clear();
-        $this->ctrl->redirect($this);
-    }
-
-    public function enableAdministrationPanel(): void
-    {
-    }
-
-    public function disableAdministrationPanel(): void
-    {
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function keepObjectsInClipboardObject(): void
-    {
-        $this->ctrl->redirect($this);
-    }
-
-
-    public function addLocator(): void
-    {
-        $this->locator->addItem($this->lng->txt('search'), $this->ctrl->getLinkTarget($this));
-        $this->tpl->setLocator();
-    }
-
-    /**
-     * @todo check wether result is ilSearchResult or ilLuceneSearchResult and add interface or base class.
-     */
-    protected function addPager($result, string $a_session_key): bool
-    {
-        $max_page = max(ilSession::get($a_session_key), $this->search_cache->getResultPageNumber());
-        ilSession::set($a_session_key, $max_page);
-
-        if ($max_page == 1 and
-            (count($result->getResults()) < $result->getMaxHits())) {
-            return true;
-        }
-
-        if ($this->search_cache->getResultPageNumber() > 1) {
-            $this->ctrl->setParameter($this, 'page_number', $this->search_cache->getResultPageNumber() - 1);
-            $this->prev_link = $this->ctrl->getLinkTarget($this, 'performSearch');
-        }
-        for ($i = 1;$i <= $max_page;$i++) {
-            if ($i == $this->search_cache->getResultPageNumber()) {
-                continue;
-            }
-
-            $this->ctrl->setParameter($this, 'page_number', $i);
-            $link = '<a href="' . $this->ctrl->getLinkTarget($this, 'performSearch') . '" /a>' . $i . '</a> ';
-        }
-        if (count($result->getResults()) >= $result->getMaxHits()) {
-            $this->ctrl->setParameter($this, 'page_number', $this->search_cache->getResultPageNumber() + 1);
-            $this->next_link = $this->ctrl->getLinkTarget($this, 'performSearch');
-        }
-        $this->ctrl->clearParameters($this);
-        return false;
-    }
-
-    protected function buildSearchAreaPath(int $a_root_node): string
-    {
-        $path_arr = $this->tree->getPathFull($a_root_node, ROOT_FOLDER_ID);
-        $counter = 0;
-        $path = '';
-        foreach ($path_arr as $data) {
-            if ($counter++) {
-                $path .= " > ";
-                $path .= $data['title'];
-            } else {
-                $path .= $this->lng->txt('repository');
-            }
-        }
-        return $path;
     }
 
     public function autoComplete(): void

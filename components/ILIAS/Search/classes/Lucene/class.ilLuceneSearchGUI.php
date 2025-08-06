@@ -25,10 +25,6 @@ use ILIAS\UI\Renderer as UIRenderer;
  * @author Stefan Meyer <meyer@leifos.com>
  *
  * @ilCtrl_IsCalledBy ilLuceneSearchGUI: ilSearchControllerGUI
- * @ilCtrl_Calls ilLuceneSearchGUI: ilObjectGUI, ilContainerGUI
- * @ilCtrl_Calls ilLuceneSearchGUI: ilObjCategoryGUI, ilObjCourseGUI, ilObjFolderGUI, ilObjGroupGUI
- * @ilCtrl_Calls ilLuceneSearchGUI: ilObjStudyProgrammeGUI
- * @ilCtrl_Calls ilLuceneSearchGUI: ilObjRootFolderGUI, ilObjectCopyGUI
  */
 class ilLuceneSearchGUI extends ilSearchBaseGUI
 {
@@ -71,13 +67,6 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
         $cmd = $this->ctrl->getCmd();
 
         switch ($next_class) {
-            case 'ilobjectcopygui':
-                $this->prepareOutput();
-                $this->ctrl->setReturn($this, '');
-                $cp = new ilObjectCopyGUI($this);
-                $this->ctrl->forwardCommand($cp);
-                break;
-
             default:
                 $this->prepareOutput();
                 if (!$cmd) {
@@ -235,7 +224,6 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
             ilSession::clear(self::MAX_PAGE_PARAM);
             $this->search_cache->deleteCachedEntries();
         }
-        ilSession::clear('vis_references');
         $filter_query = '';
         if ($this->search_cache->getItemFilter() and ilSearchSettings::getInstance()->isLuceneItemFilterEnabled()) {
             $filter_settings = ilSearchSettings::getInstance()->getEnabledLuceneItemFilterDefinitions();
@@ -421,106 +409,6 @@ class ilLuceneSearchGUI extends ilSearchBaseGUI
         if ($new_filter) {
             $this->search_cache->setRoot($filter_scope);
         }
-    }
-
-    /**
-    * Put admin panel into template:
-    * - creation selector
-    * - admin view on/off button
-    */
-    protected function fillAdminPanel(): void
-    {
-        $adm_view_cmp = $adm_cmds = $creation_selector = $adm_view = false;
-
-        // admin panel commands
-        if ((count($this->admin_panel_commands) > 0)) {
-            foreach ($this->admin_panel_commands as $cmd) {
-                $this->tpl->setCurrentBlock("lucene_admin_panel_cmd");
-                $this->tpl->setVariable("LUCENE_PANEL_CMD", $cmd["cmd"]);
-                $this->tpl->setVariable("LUCENE_TXT_PANEL_CMD", $cmd["txt"]);
-                $this->tpl->parseCurrentBlock();
-            }
-
-            $adm_cmds = true;
-        }
-        if ($adm_cmds) {
-            $this->tpl->setCurrentBlock("lucene_adm_view_components");
-            $this->tpl->setVariable("LUCENE_ADM_IMG_ARROW", ilUtil::getImagePath("nav/arrow_upright.svg"));
-            $this->tpl->setVariable("LUCENE_ADM_ALT_ARROW", $this->lng->txt("actions"));
-            $this->tpl->parseCurrentBlock();
-            $adm_view_cmp = true;
-        }
-
-        // admin view button
-        if (is_array($this->admin_view_button)) {
-            if (is_array($this->admin_view_button)) {
-                $this->tpl->setCurrentBlock("lucene_admin_button");
-                $this->tpl->setVariable(
-                    "LUCENE_ADMIN_MODE_LINK",
-                    $this->admin_view_button["link"]
-                );
-                $this->tpl->setVariable(
-                    "LUCENE_TXT_ADMIN_MODE",
-                    $this->admin_view_button["txt"]
-                );
-                $this->tpl->parseCurrentBlock();
-            }
-            $this->tpl->setCurrentBlock("lucene_admin_view");
-            $this->tpl->parseCurrentBlock();
-            $adm_view = true;
-        }
-
-        // creation selector
-        if (is_array($this->creation_selector)) {
-            $this->tpl->setCurrentBlock("lucene_add_commands");
-            if ($adm_cmds) {
-                $this->tpl->setVariable("LUCENE_ADD_COM_WIDTH", 'width="1"');
-            }
-            $this->tpl->setVariable(
-                "LUCENE_SELECT_OBJTYPE_REPOS",
-                $this->creation_selector["options"]
-            );
-            $this->tpl->setVariable(
-                "LUCENE_BTN_NAME_REPOS",
-                $this->creation_selector["command"]
-            );
-            $this->tpl->setVariable(
-                "LUCENE_TXT_ADD_REPOS",
-                $this->creation_selector["txt"]
-            );
-            $this->tpl->parseCurrentBlock();
-            $creation_selector = true;
-        }
-        if ($adm_view || $creation_selector) {
-            $this->tpl->setCurrentBlock("lucene_adm_panel");
-            if ($adm_view_cmp) {
-                $this->tpl->setVariable("LUCENE_ADM_TBL_WIDTH", 'width:"100%";');
-            }
-            $this->tpl->parseCurrentBlock();
-        }
-    }
-
-    /**
-    * Add a command to the admin panel
-    */
-    protected function addAdminPanelCommand(string $a_cmd, string $a_txt): void
-    {
-        $this->admin_panel_commands[] =
-            array("cmd" => $a_cmd, "txt" => $a_txt);
-    }
-
-    /**
-    * Show admin view button
-    */
-    protected function setAdminViewButton(string $a_link, string $a_txt): void
-    {
-        $this->admin_view_button =
-            array("link" => $a_link, "txt" => $a_txt);
-    }
-
-    protected function setPageFormAction(string $a_action): void
-    {
-        $this->page_form_action = $a_action;
     }
 
     protected function showSearchForm(): void

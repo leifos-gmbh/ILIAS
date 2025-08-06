@@ -69,7 +69,6 @@ class ilLuceneUserSearchGUI extends ilSearchBaseGUI
 
 
             default:
-                $this->initStandardSearchForm(ilSearchBaseGUI::SEARCH_FORM_USER);
                 if (!$cmd) {
                     $cmd = "showSavedResults";
                 }
@@ -146,13 +145,6 @@ class ilLuceneUserSearchGUI extends ilSearchBaseGUI
      */
     protected function search(): void
     {
-        if (!$this->form->checkInput()) {
-            $this->search_cache->deleteCachedEntries();
-            // Reset details
-            ilSubItemListGUI::resetDetails();
-            $this->showSearchForm();
-            return;
-        }
         ilSession::clear(self::MAX_PAGE_PARAM);
         $this->search_cache->deleteCachedEntries();
 

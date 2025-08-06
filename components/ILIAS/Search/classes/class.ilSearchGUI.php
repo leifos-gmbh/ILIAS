@@ -26,9 +26,7 @@ use ILIAS\UI\Renderer as UIRenderer;
  *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
  *
- * @ilCtrl_Calls ilSearchGUI: ilObjectGUI, ilContainerGUI
- * @ilCtrl_Calls ilSearchGUI: ilObjCategoryGUI, ilObjCourseGUI, ilObjFolderGUI, ilObjGroupGUI
- * @ilCtrl_Calls ilSearchGUI: ilObjStudyProgrammeGUI
+ * @ilCtrl_IsCalledBy ilSearchBaseGUI: ilSearchControllerGUI
  */
 class ilSearchGUI extends ilSearchBaseGUI
 {
@@ -136,13 +134,6 @@ class ilSearchGUI extends ilSearchBaseGUI
         $cmd = $this->ctrl->getCmd();
 
         switch ($next_class) {
-            case 'ilobjectcopygui':
-                $this->prepareOutput();
-                $this->ctrl->setReturn($this, '');
-                $cp = new ilObjectCopyGUI($this);
-                $this->ctrl->forwardCommand($cp);
-                break;
-
             default:
                 if (!$cmd) {
                     $cmd = "showSavedResults";

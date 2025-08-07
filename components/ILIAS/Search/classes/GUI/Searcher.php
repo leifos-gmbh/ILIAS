@@ -38,7 +38,8 @@ interface Searcher
     public function performSearchAndRenderResults(
         int $usr_id,
         ilUserSearchCache $cache,
-        ViewControlInfos $view_control_infos
+        ViewControlInfos $view_control_infos,
+        SearchStateHandler $state_handler
     ): void;
 
     public function readSavedResultsAndRenderResults(

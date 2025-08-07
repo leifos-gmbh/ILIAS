@@ -35,6 +35,7 @@ use ilObjectSearchFactory;
 use ilSearchSettings;
 use ilObjectSearch;
 use ilDate;
+use ILIAS\Search\GUI\SearchStateHandler;
 
 class SearcherImpl implements Searcher
 {
@@ -50,7 +51,8 @@ class SearcherImpl implements Searcher
     public function performSearchAndRenderResults(
         int $usr_id,
         ilUserSearchCache $cache,
-        ViewControlInfos $view_control_infos
+        ViewControlInfos $view_control_infos,
+        SearchStateHandler $state_handler
     ): void {
         // Step 1: parse query string
         if (!is_object($query_parser = $this->parseQueryString($cache->getQuery()))) {
@@ -85,6 +87,27 @@ class SearcherImpl implements Searcher
             $this->parseEndDateFromCreationFilter($cache)
         );
         $result->save();
+
+        /**
+         * This should not be here. As soon as we have a unified format
+         * for search results, this should be done by the GUI.
+         */
+        if (
+            $view_control_infos->currentPage() === $view_control_infos->maxPages() &&
+            $result->isLimitReached()
+        ) {
+            $view_control_infos = $this->presenter->getViewControlInfos(
+                $view_control_infos->sortation(),
+                $view_control_infos->currentPage(),
+                $view_control_infos->maxPages() + 1,
+                $view_control_infos->pageSize(),
+                $view_control_infos->paginationAction(),
+                $view_control_infos->pageParam(),
+                $view_control_infos->sortationAction(),
+                $view_control_infos->sortationParam()
+            );
+            $state_handler->updateMaxPage($view_control_infos->maxPages());
+        }
 
         $this->renderResults($result, $cache->getQuery(), $view_control_infos);
     }

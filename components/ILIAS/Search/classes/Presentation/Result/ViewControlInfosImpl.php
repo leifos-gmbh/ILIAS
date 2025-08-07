@@ -29,6 +29,7 @@ class ViewControlInfosImpl implements ViewControlInfos
         protected Sortation $sortation,
         protected int $current_page,
         protected int $max_pages,
+        protected int $page_size,
         protected URI $pagination_action,
         protected Param $page_param,
         protected URI $sortation_action,
@@ -49,6 +50,11 @@ class ViewControlInfosImpl implements ViewControlInfos
     public function maxPages(): int
     {
         return $this->max_pages;
+    }
+
+    public function pageSize(): int
+    {
+        return $this->page_size;
     }
 
     public function paginationAction(): URI

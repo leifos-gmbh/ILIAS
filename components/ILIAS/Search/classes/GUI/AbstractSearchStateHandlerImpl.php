@@ -38,7 +38,9 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
 
     public function fetchMaxPage(): int
     {
-        return ilSession::get(Param::MAX_PAGE->value) ?? 1;
+        global $DIC;
+        $DIC->logger()->root()->dump(ilSession::get(Param::MAX_PAGE->value));
+        return (int) (ilSession::get(Param::MAX_PAGE->value) ?? 1);
     }
 
     public function resetMaxPage(): void
@@ -48,7 +50,7 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
 
     public function updateMaxPage(int $max_page): void
     {
-        ilSession::clear($max_page > 0 ? (string) $max_page : '1');
+        ilSession::set(Param::MAX_PAGE->value, $max_page > 0 ? (string) $max_page : '1');
     }
 
     public function fetchRequestedPage(): int

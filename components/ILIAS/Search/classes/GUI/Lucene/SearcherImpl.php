@@ -35,6 +35,7 @@ use ilLuceneQueryParser;
 use ilLuceneSearcher;
 use ilLucenePathFilter;
 use ilDate;
+use ILIAS\Search\GUI\SearchStateHandler;
 
 class SearcherImpl implements Searcher
 {
@@ -50,7 +51,8 @@ class SearcherImpl implements Searcher
     public function performSearchAndRenderResults(
         int $usr_id,
         ilUserSearchCache $cache,
-        ViewControlInfos $view_control_infos
+        ViewControlInfos $view_control_infos,
+        SearchStateHandler $state_handler
     ): void {
         $filter_query = '';
         if ($cache->getItemFilter() and ilSearchSettings::getInstance()->isLuceneItemFilterEnabled()) {
@@ -103,6 +105,27 @@ class SearcherImpl implements Searcher
             $searcher->highlight($filter->getResultObjIds());
         }
 
+        /**
+         * This should not be here. As soon as we have a unified format
+         * for search results, this should be done by the GUI.
+         */
+        if (
+            $view_control_infos->currentPage() === $view_control_infos->maxPages() &&
+            $filter->isLimitReached()
+        ) {
+            $view_control_infos = $this->presenter->getViewControlInfos(
+                $view_control_infos->sortation(),
+                $view_control_infos->currentPage(),
+                $view_control_infos->maxPages() + 1,
+                $view_control_infos->pageSize(),
+                $view_control_infos->paginationAction(),
+                $view_control_infos->pageParam(),
+                $view_control_infos->sortationAction(),
+                $view_control_infos->sortationParam()
+            );
+            $state_handler->updateMaxPage($view_control_infos->maxPages());
+        }
+
         $this->renderResults($filter, $searcher->getHighlighter(), $cache->getQuery(), $view_control_infos);
     }
 
@@ -136,11 +159,11 @@ class SearcherImpl implements Searcher
 
     protected function renderResults(
         ilLuceneSearchResultFilter $filter,
-        ilLuceneHighlighterResultParser $highlighter,
+        ?ilLuceneHighlighterResultParser $highlighter,
         string $term,
         ViewControlInfos $view_control_infos
     ): void {
-        if ($filter->getResults()) {
+        if ($filter->getResults() && $highlighter !== null) {
             $result_panel_and_modals = $this->presenter->getLuceneSearchResultAsPanel(
                 $filter,
                 $highlighter,

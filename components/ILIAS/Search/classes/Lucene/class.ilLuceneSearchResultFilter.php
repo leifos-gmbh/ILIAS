@@ -18,8 +18,6 @@
 
 declare(strict_types=1);
 
-use ILIAS\Search\Result\PaginationInfo;
-
 /**
 * Validate Lucene search results
 * Do access checks, create ref_ids from obj_ids...
@@ -29,7 +27,7 @@ use ILIAS\Search\Result\PaginationInfo;
 *
 * @ingroup ServicesSearch
 */
-class ilLuceneSearchResultFilter implements PaginationInfo
+class ilLuceneSearchResultFilter
 {
     protected static ?ilLuceneSearchResultFilter $instance = null;
 

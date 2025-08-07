@@ -80,10 +80,12 @@ class ActionsImpl implements Actions
 
     public function switchResultPage(Sortation $sortation): URI
     {
+        $this->ctrl->setParameterByClass(ilSearchGUI::class, Param::SORTATION->value, $sortation->value);
         $ctrl_target = $this->ctrl->getLinkTargetByClass(
             ilSearchGUI::class,
             self::SWITCH_RESULT_PAGE_CMD
         );
+        $this->ctrl->clearParameterByClass(ilSearchGUI::class, Param::SORTATION->value);
         return $this->ctrlToURI($ctrl_target);
     }
 

@@ -16,8 +16,6 @@
  *
  *********************************************************************/
 
-use ILIAS\Search\Result\PaginationInfo;
-
 /**
  * searchResult stores all result of a search query.
  * Offers methods like mergeResults. To merge result sets of different queries.
@@ -25,7 +23,7 @@ use ILIAS\Search\Result\PaginationInfo;
  *
  * @author Stefan Meyer <meyer@leifos.com>
  */
-class ilSearchResult implements PaginationInfo
+class ilSearchResult
 {
     private string $permission = 'visible';
 

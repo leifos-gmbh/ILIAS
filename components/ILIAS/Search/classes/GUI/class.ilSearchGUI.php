@@ -25,7 +25,6 @@ use ILIAS\Search\Presentation\Result\ViewControlInfos;
 use ILIAS\Search\GUI\Actions;
 use ILIAS\Search\Presentation\Result\Sortation;
 use ILIAS\Search\GUI\Param;
-use ilSearchSettings;
 use ILIAS\Search\Service\Service;
 
 /**
@@ -59,6 +58,7 @@ class ilSearchGUI
 
         $this->initByMode($service);
         $this->tpl->loadStandardTemplate();
+        $this->tpl->addBlockFile('ADM_CONTENT', 'adm_content', 'tpl.search.html', 'components/ILIAS/Search');
     }
 
     protected function initByMode(Service $service): void
@@ -107,7 +107,7 @@ class ilSearchGUI
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos);
+        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos, $this->state_handler);
     }
 
     /**
@@ -134,7 +134,7 @@ class ilSearchGUI
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos);
+        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos, $this->state_handler);
     }
 
     protected function showSavedResults(): void
@@ -175,7 +175,7 @@ class ilSearchGUI
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos);
+        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos, $this->state_handler);
     }
 
     protected function switchResultPage(): void
@@ -197,7 +197,7 @@ class ilSearchGUI
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos);
+        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos, $this->state_handler);
     }
 
     protected function sortResultPage(): void
@@ -269,6 +269,7 @@ class ilSearchGUI
             $sortation,
             $page,
             $max_page,
+            $this->settings->getMaxHits(),
             $this->actions->switchResultPage($sortation),
             Param::PAGE_NUMBER,
             $this->actions->sortResultPage(),

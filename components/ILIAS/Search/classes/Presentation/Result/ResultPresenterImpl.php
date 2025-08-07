@@ -101,18 +101,11 @@ class ResultPresenterImpl implements ResultPresenter
             ];
         }
 
-        $items = $this->sortObjectItems($sortation, ...$items_with_sort_data);
+        $items = $this->sortObjectItems($view_control_infos->sortation(), ...$items_with_sort_data);
 
         return [
             $this->component_factory->getPanel(
-                $sortation,
-                $current_page,
-                $max_pages,
-                $result,
-                $pagination_action,
-                $page_param_name,
-                $sortation_action,
-                $sortation_param_name,
+                $view_control_infos,
                 ...$items
             ),
             $subitem_modals
@@ -191,18 +184,11 @@ class ResultPresenterImpl implements ResultPresenter
             ];
         }
 
-        $items = $this->sortObjectItems($sortation, ...$items_with_sort_data);
+        $items = $this->sortObjectItems($view_control_infos->sortation(), ...$items_with_sort_data);
 
         return [
             $this->component_factory->getPanel(
-                $sortation,
-                $current_page,
-                $max_pages,
-                $result,
-                $pagination_action,
-                $page_param_name,
-                $sortation_action,
-                $sortation_param_name,
+                $view_control_infos,
                 ...$items
             ),
             $subitem_modals
@@ -258,6 +244,7 @@ class ResultPresenterImpl implements ResultPresenter
         Sortation $sortation,
         int $current_page,
         int $max_pages,
+        int $page_size,
         URI $pagination_action,
         Param $page_param_name,
         URI $sortation_action,
@@ -267,6 +254,7 @@ class ResultPresenterImpl implements ResultPresenter
             $sortation,
             $current_page,
             $max_pages,
+            $page_size,
             $pagination_action,
             $page_param_name,
             $sortation_action,

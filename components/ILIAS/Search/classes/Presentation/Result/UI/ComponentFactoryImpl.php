@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace ILIAS\Search\Presentation\Result\UI;
 
-use ILIAS\Search\Result\PaginationInfo;
 use ILIAS\Data\URI;
 use ILIAS\UI\Component\Item\Item;
 use ILIAS\UI\Component\Panel\Listing\Listing as ListingPanel;
@@ -50,7 +49,6 @@ class ComponentFactoryImpl implements ComponentFactory
 
     public function getPanel(
         ViewControlInfos $view_control_infos,
-        PaginationInfo $pagination_info,
         Item ...$items
     ): ListingPanel {
         $item_group = $this->ui_factory->item()->group('', $items);
@@ -58,7 +56,7 @@ class ComponentFactoryImpl implements ComponentFactory
             $this->getPaginationViewControl(
                 $view_control_infos->currentPage(),
                 $view_control_infos->maxPages(),
-                $pagination_info,
+                $view_control_infos->pageSize(),
                 $view_control_infos->paginationAction(),
                 $view_control_infos->pageParam()
             ),
@@ -78,20 +76,16 @@ class ComponentFactoryImpl implements ComponentFactory
     protected function getPaginationViewControl(
         int $current_page,
         int $max_pages,
-        PaginationInfo $pagination_info,
+        int $page_size,
         URI $action,
         Param $page_param
     ): Pagination {
-        $total_known_entries = $max_pages * $pagination_info->getMaxHits();
-        if ($current_page === $max_pages) {
-            $total_known_entries += $pagination_info->isLimitReached();
-        }
         // pages in the view control are 0-indexed, in search 1-indexed
         return $this->ui_factory->viewControl()->pagination()
                                 ->withTargetURL((string) $action, $page_param->value)
                                 ->withCurrentPage($current_page - 1)
-                                ->withPageSize($pagination_info->getMaxHits())
-                                ->withTotalEntries($total_known_entries);
+                                ->withPageSize($page_size)
+                                ->withTotalEntries($page_size * $max_pages);
     }
 
     protected function getSortationViewControl(

@@ -51,6 +51,7 @@ interface ResultPresenter
         Sortation $sortation,
         int $current_page,
         int $max_pages,
+        int $page_size,
         URI $pagination_action,
         Param $page_param_name,
         URI $sortation_action,

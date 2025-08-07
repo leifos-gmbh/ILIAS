@@ -31,6 +31,8 @@ interface ViewControlInfos
 
     public function maxPages(): int;
 
+    public function pageSize(): int;
+
     public function paginationAction(): URI;
 
     public function pageParam(): Param;

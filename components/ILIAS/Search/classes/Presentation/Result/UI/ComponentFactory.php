@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace ILIAS\Search\Presentation\Result\UI;
 
-use ILIAS\Search\Result\PaginationInfo;
 use ILIAS\Data\URI;
 use ILIAS\UI\Component\Item\Item;
 use ILIAS\UI\Component\Panel\Listing\Listing as ListingPanel;
@@ -33,7 +32,6 @@ interface ComponentFactory
 {
     public function getPanel(
         ViewControlInfos $view_control_infos,
-        PaginationInfo $pagination_info,
         Item ...$items
     ): ListingPanel;
 

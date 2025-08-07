@@ -134,12 +134,6 @@ class ilMainMenuSearchGUI
 
     protected function buildSearchLink(string $cmd, bool $async): string
     {
-        if (ilSearchSettings::getInstance()->enabledLucene()) {
-            $default = strtolower(ilLuceneSearchGUI::class);
-        } else {
-            $default = strtolower(ilSearchGUI::class);
-        }
-
         $root_id = 0;
         if ($this->http->wrapper()->post()->has('root_id')) {
             $root_id = $this->http->wrapper()->post()->retrieve(
@@ -148,11 +142,13 @@ class ilMainMenuSearchGUI
             );
         }
         if ($root_id == ilSearchControllerGUI::TYPE_USER_SEARCH) {
-            $default = strtolower(ilLuceneUserSearchGUI::class);
+            $default = ilLuceneUserSearchGUI::class;
+        } else {
+            $default = ilSearchGUI::class;
         }
 
         return $this->ctrl->getLinkTargetByClass(
-            [strtolower(ilSearchControllerGUI::class), $default],
+            [ilSearchControllerGUI::class, $default],
             $cmd,
             null,
             $async

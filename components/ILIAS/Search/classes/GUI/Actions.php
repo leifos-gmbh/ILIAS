@@ -18,11 +18,26 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation;
+namespace ILIAS\Search\GUI;
 
-use ILIAS\Search\Presentation\Result\ResultPresenter;
+use ILIAS\Data\URI;
+use ILIAS\Search\Presentation\Result\Sortation;
 
-interface Presenter
+interface Actions
 {
-    public function result(): ResultPresenter;
+    public function search(): URI;
+
+    public function remoteSearch(): URI;
+
+    public function showSavedResults(): URI;
+
+    public function applyFilter(): URI;
+
+    public function switchResultPage(Sortation $sortation): URI;
+
+    public function sortResultPage(): URI;
+
+    public function autoComplete(): URI;
+
+    public function isValidCommand(string $cmd): bool;
 }

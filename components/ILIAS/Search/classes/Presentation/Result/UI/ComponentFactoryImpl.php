@@ -34,6 +34,8 @@ use ilDateTime;
 use ilDatePresentation;
 use ILIAS\UI\Component\Modal\Modal;
 use ILIAS\Search\Presentation\Result\Sortation;
+use ILIAS\Search\Presentation\Result\ViewControlInfos;
+use ILIAS\Search\GUI\Param;
 
 class ComponentFactoryImpl implements ComponentFactory
 {
@@ -47,20 +49,24 @@ class ComponentFactoryImpl implements ComponentFactory
     }
 
     public function getPanel(
-        Sortation $sortation,
-        int $current_page,
-        int $max_pages,
+        ViewControlInfos $view_control_infos,
         PaginationInfo $pagination_info,
-        URI $pagination_action,
-        string $page_param_name,
-        URI $sortation_action,
-        string $sortation_param_name,
         Item ...$items
     ): ListingPanel {
         $item_group = $this->ui_factory->item()->group('', $items);
         $view_controls = [
-            $this->getPaginationViewControl($current_page, $max_pages, $pagination_info, $pagination_action, $page_param_name),
-            $this->getSortationViewControl($sortation, $sortation_action, $sortation_param_name)
+            $this->getPaginationViewControl(
+                $view_control_infos->currentPage(),
+                $view_control_infos->maxPages(),
+                $pagination_info,
+                $view_control_infos->paginationAction(),
+                $view_control_infos->pageParam()
+            ),
+            $this->getSortationViewControl(
+                $view_control_infos->sortation(),
+                $view_control_infos->sortationAction(),
+                $view_control_infos->sortationParam()
+            )
         ];
 
         return $this->ui_factory->panel()->listing()->standard(
@@ -74,7 +80,7 @@ class ComponentFactoryImpl implements ComponentFactory
         int $max_pages,
         PaginationInfo $pagination_info,
         URI $action,
-        string $page_param_name
+        Param $page_param
     ): Pagination {
         $total_known_entries = $max_pages * $pagination_info->getMaxHits();
         if ($current_page === $max_pages) {
@@ -82,7 +88,7 @@ class ComponentFactoryImpl implements ComponentFactory
         }
         // pages in the view control are 0-indexed, in search 1-indexed
         return $this->ui_factory->viewControl()->pagination()
-                                ->withTargetURL((string) $action, $page_param_name)
+                                ->withTargetURL((string) $action, $page_param->value)
                                 ->withCurrentPage($current_page - 1)
                                 ->withPageSize($pagination_info->getMaxHits())
                                 ->withTotalEntries($total_known_entries);
@@ -91,7 +97,7 @@ class ComponentFactoryImpl implements ComponentFactory
     protected function getSortationViewControl(
         Sortation $sortation,
         URI $action,
-        string $sortation_param_name
+        Param $sortation_param
     ): SortationViewControl {
         $options = [
             Sortation::RELEVANCE_DESC->value => $this->lng->txt('search_sort_relevance'),
@@ -104,7 +110,7 @@ class ComponentFactoryImpl implements ComponentFactory
         return $this->ui_factory->viewControl()
                                 ->sortation($options, $sortation->value)
                                 ->withLabelPrefix($this->lng->txt('search_sort_by'))
-                                ->withTargetURL((string) $action, $sortation_param_name);
+                                ->withTargetURL((string) $action, $sortation_param->value);
     }
 
     public function getModalForSubitems(

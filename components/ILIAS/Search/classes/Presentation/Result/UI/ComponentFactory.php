@@ -24,23 +24,16 @@ use ILIAS\Search\Result\PaginationInfo;
 use ILIAS\Data\URI;
 use ILIAS\UI\Component\Item\Item;
 use ILIAS\UI\Component\Panel\Listing\Listing as ListingPanel;
-use ILIAS\UI\Component\Symbol\Icon\Icon;
 use DateTimeImmutable;
 use ILIAS\UI\Component\Signal;
 use ILIAS\UI\Component\Modal\Modal;
-use ILIAS\Search\Presentation\Result\Sortation;
+use ILIAS\Search\Presentation\Result\ViewControlInfos;
 
 interface ComponentFactory
 {
     public function getPanel(
-        Sortation $sortation,
-        int $current_page,
-        int $max_pages,
+        ViewControlInfos $view_control_infos,
         PaginationInfo $pagination_info,
-        URI $pagination_action,
-        string $page_param_name,
-        URI $sortation_action,
-        string $sortation_param_name,
         Item ...$items
     ): ListingPanel;
 

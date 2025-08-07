@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -15,7 +16,10 @@
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 use ILIAS\UI\Component\Input\Container\Filter;
+use ILIAS\Data\URI;
 
 /**
  * @author Thomas Famula <famula@leifos.de>
@@ -27,7 +31,7 @@ class ilSearchFilterGUI
     protected ilNavigationHistory $nav_history;
     protected Filter\Standard $filter;
 
-    public function __construct(object $parent_gui, int $mode)
+    public function __construct(URI $action, bool $for_lucene)
     {
         global $DIC;
 
@@ -55,7 +59,7 @@ class ilSearchFilterGUI
 
         $enabled_types = ilSearchSettings::getInstance()->getEnabledLuceneItemFilterDefinitions();
 
-        if ($mode === ilSearchBaseGUI::SEARCH_FORM_LUCENE) {
+        if ($for_lucene) {
             $enabled_types += ilSearchSettings::getInstance()->getEnabledLuceneMimeFilterDefinitions();
         }
 
@@ -75,7 +79,7 @@ class ilSearchFilterGUI
 
         $this->filter = $this->filter_service->standard(
             "search_filter",
-            $DIC->ctrl()->getLinkTarget($parent_gui, "performSearchFilter"),
+            (string) $action,
             $inputs,
             $inputs_activated,
             false,

@@ -28,7 +28,7 @@ use ILIAS\UI\Renderer as UIRenderer;
  *
  * @ilCtrl_IsCalledBy ilSearchBaseGUI: ilSearchControllerGUI
  */
-class ilSearchGUI extends ilSearchBaseGUI
+class ilOLDSearchGUI extends ilSearchBaseGUI
 {
     private array $details;
     public int $root_node;

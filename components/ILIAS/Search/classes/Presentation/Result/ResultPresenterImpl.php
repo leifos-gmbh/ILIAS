@@ -34,6 +34,7 @@ use ILIAS\Search\Presentation\Result\UI\ComponentFactory;
 use ILIAS\Search\Presentation\Result\UI\Sanitizer;
 use ILIAS\Search\Presentation\Result\Object\PropertiesAggregator as ObjectPropertiesAggregator;
 use ILIAS\Search\Presentation\Result\Object\AccessChecker;
+use ILIAS\Search\GUI\Param;
 
 class ResultPresenterImpl implements ResultPresenter
 {
@@ -54,13 +55,7 @@ class ResultPresenterImpl implements ResultPresenter
      */
     public function getDirectSearchResultAsPanel(
         ilSearchResult $result,
-        Sortation $sortation,
-        int $current_page,
-        int $max_pages,
-        URI $pagination_action,
-        string $page_param_name,
-        URI $sortation_action,
-        string $sortation_param_name
+        ViewControlInfos $view_control_infos
     ): array {
         $items = [];
         $subitem_modals = [];
@@ -151,13 +146,7 @@ class ResultPresenterImpl implements ResultPresenter
     public function getLuceneSearchResultAsPanel(
         ilLuceneSearchResultFilter $result,
         ilLuceneHighlighterResultParser $highlighter,
-        Sortation $sortation,
-        int $current_page,
-        int $max_pages,
-        URI $pagination_action,
-        string $page_param_name,
-        URI $sortation_action,
-        string $sortation_param_name
+        ViewControlInfos $view_control_infos
     ): array {
         $items = [];
         $subitem_modals = [];
@@ -263,6 +252,26 @@ class ResultPresenterImpl implements ResultPresenter
         foreach ($items_with_sort_data as $item) {
             yield $item['item'];
         }
+    }
+
+    public function getViewControlInfos(
+        Sortation $sortation,
+        int $current_page,
+        int $max_pages,
+        URI $pagination_action,
+        Param $page_param_name,
+        URI $sortation_action,
+        Param $sortation_param_name
+    ): ViewControlInfos {
+        return new ViewControlInfosImpl(
+            $sortation,
+            $current_page,
+            $max_pages,
+            $pagination_action,
+            $page_param_name,
+            $sortation_action,
+            $sortation_param_name
+        );
     }
 
     public function replacePlaceholders(string $html): string

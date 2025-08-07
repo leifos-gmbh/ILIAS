@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation;
+namespace ILIAS\Search\Presentation\Service;
 
 use ILIAS\DI\Container;
 use ILIAS\Search\Presentation\Result\ResultPresenter;
@@ -31,7 +31,7 @@ use ILIAS\Search\Presentation\Result\UI\SanitizerImpl;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactoryImpl as SubitemPropertiesFactoryImpl;
 use ILIAS\Search\Presentation\Result\Object\AccessCheckerImpl;
 
-class PresenterImpl implements Presenter
+class Service
 {
     protected ResultPresenter $result_presenter;
 

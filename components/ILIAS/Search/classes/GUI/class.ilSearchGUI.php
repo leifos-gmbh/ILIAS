@@ -124,6 +124,9 @@ class ilSearchGUI
         $page = 1;
         $max_page = 1;
 
+        global $DIC;
+        $DIC->logger()->root()->dump('scope: ' . $scope);
+
         $this->state_handler->resetMaxPage();
         $cache->deleteCachedEntries();
         $cache->setQuery($term);
@@ -160,6 +163,8 @@ class ilSearchGUI
         $cache = $this->state_handler->fetchCache($this->user->getId());
         $filter = $this->state_handler->fetchFilter($this->actions->applyFilter());
 
+        $this->state_handler->loadFilterToCache($filter, $cache);
+
         $term = $cache->getQuery();
         $scope = $cache->getRoot();
         $sortation = Sortation::RELEVANCE_DESC;
@@ -168,7 +173,6 @@ class ilSearchGUI
 
         $this->state_handler->resetMaxPage();
         $cache->deleteCachedEntries();
-        $this->state_handler->loadFilterToCache($filter, $cache);
         $cache->save();
 
         $this->renderHeader();

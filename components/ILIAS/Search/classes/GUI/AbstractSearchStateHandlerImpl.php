@@ -38,8 +38,6 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
 
     public function fetchMaxPage(): int
     {
-        global $DIC;
-        $DIC->logger()->root()->dump(ilSession::get(Param::MAX_PAGE->value));
         return (int) (ilSession::get(Param::MAX_PAGE->value) ?? 1);
     }
 
@@ -96,16 +94,7 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
      * propably needs to be replaced with a completely
      * different mechanism when switching to KS
      */
-    public function fetchRequestedRemoteSearchTerm(): string
-    {
-        if ($this->http->wrapper()->post()->has('queryString')) {
-            return $this->http->wrapper()->post()->retrieve(
-                'queryString',
-                $this->refinery->kindlyTo()->string()
-            );
-        }
-        return '';
-    }
+    abstract public function fetchRequestedRemoteSearchTerm(): string;
 
     /**
      * propably needs to be replaced with a completely
@@ -129,7 +118,7 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
     public function fetchRequestedRemoteScope(): int
     {
         if ($this->http->wrapper()->post()->has('root_id')) {
-            $root_id = $this->http->wrapper()->post()->retrieve(
+            return $this->http->wrapper()->post()->retrieve(
                 'root_id',
                 $this->refinery->kindlyTo()->int()
             );

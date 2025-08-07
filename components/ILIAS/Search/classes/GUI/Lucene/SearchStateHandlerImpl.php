@@ -27,6 +27,7 @@ use ILIAS\Search\GUI\AbstractSearchStateHandlerImpl;
 use ILIAS\HTTP\Services as HTTP;
 use ILIAS\Refinery\Factory as Refinery;
 use ilSearchSettings;
+use ilLuceneQueryParser;
 
 class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
 {
@@ -37,6 +38,21 @@ class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
     ) {
         parent::__construct($http, $refinery);
     }
+
+    public function fetchRequestedRemoteSearchTerm(): string
+    {
+        if ($this->http->wrapper()->post()->has('queryString')) {
+            $term = $this->http->wrapper()->post()->retrieve(
+                'queryString',
+                $this->refinery->kindlyTo()->string()
+            );
+            $qp = new ilLuceneQueryParser($term);
+            $qp->parseAutoWildcard();
+            return $qp->getQuery();
+        }
+        return '';
+    }
+
     public function fetchFilter(URI $action): ilSearchFilterGUI
     {
         return new ilSearchFilterGUI($action, true);
@@ -46,19 +62,19 @@ class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
     {
         $search_filter_data = $filter->getData();
 
-        $cache->setRoot($search_filter_data["search_scope"] ?? ROOT_FOLDER_ID);
+        $cache->setRoot((int) ($search_filter_data['search_scope'] ?? ROOT_FOLDER_ID));
 
         $creation_filter = [];
         if (
             $this->settings->isDateFilterEnabled() &&
             isset($search_filter_data['search_date'])
         ) {
-            $options['date_start'] = $search_filter_data['search_date'][0];
-            $options['date_end'] = $search_filter_data['search_date'][1];
+            $creation_filter['date_start'] = $search_filter_data['search_date'][0];
+            $creation_filter['date_end'] = $search_filter_data['search_date'][1];
         }
         $cache->setCreationFilter($creation_filter);
 
-        $types_from_filter = (array) ($this->search_filter_data["search_type"] ?? []);
+        $types_from_filter = (array) ($search_filter_data['search_type'] ?? []);
 
         $enabled_types = [];
         foreach ($this->settings->getEnabledLuceneItemFilterDefinitions() as $type => $data) {
@@ -69,7 +85,7 @@ class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
         $cache->setItemFilter($enabled_types);
 
         $enabled_mime_types = [];
-        foreach ($this->settings->getEnabledLuceneItemFilterDefinitions() as $mime_type => $data) {
+        foreach ($this->settings->getEnabledLuceneMimeFilterDefinitions() as $mime_type => $data) {
             if (in_array($mime_type, $types_from_filter)) {
                 $enabled_mime_types[$mime_type] = 1;
             }

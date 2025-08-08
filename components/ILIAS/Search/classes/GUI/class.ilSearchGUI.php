@@ -36,6 +36,8 @@ class ilSearchGUI
     protected ilObjUser $user;
     protected ilLanguage $lng;
     protected ilCtrlInterface $ctrl;
+    protected ilTabsGUI $tabs;
+    protected ilHelpGUI $help;
     protected ilSearchSettings $settings;
     protected ResultPresenter $result_presenter;
     protected Actions $actions;
@@ -52,6 +54,8 @@ class ilSearchGUI
         $this->user = $service->dic()->user();
         $this->lng = $service->dic()->language();
         $this->ctrl = $service->dic()->ctrl();
+        $this->tabs = $service->dic()->tabs();
+        $this->help = $service->dic()->help();
         $this->settings = ilSearchSettings::getInstance();
         $this->result_presenter = $service->presentation()->result();
         $this->actions = $service->gui()->actions();
@@ -103,7 +107,7 @@ class ilSearchGUI
         $cache->setQuery($term);
         $cache->save();
 
-        $this->renderHeader();
+        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
@@ -124,16 +128,13 @@ class ilSearchGUI
         $page = 1;
         $max_page = 1;
 
-        global $DIC;
-        $DIC->logger()->root()->dump('scope: ' . $scope);
-
         $this->state_handler->resetMaxPage();
         $cache->deleteCachedEntries();
         $cache->setQuery($term);
         $cache->setRoot($scope);
         $cache->save();
 
-        $this->renderHeader();
+        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
@@ -151,7 +152,7 @@ class ilSearchGUI
         $page = $cache->getResultPageNumber();
         $max_page = $this->state_handler->fetchMaxPage();
 
-        $this->renderHeader();
+        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
@@ -175,7 +176,7 @@ class ilSearchGUI
         $cache->deleteCachedEntries();
         $cache->save();
 
-        $this->renderHeader();
+        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
@@ -197,7 +198,7 @@ class ilSearchGUI
         $cache->setResultPageNumber($page);
         $cache->save();
 
-        $this->renderHeader();
+        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
@@ -215,7 +216,7 @@ class ilSearchGUI
         $page = $cache->getResultPageNumber();
         $max_page = $this->state_handler->fetchMaxPage();
 
-        $this->renderHeader();
+        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
@@ -255,8 +256,31 @@ class ilSearchGUI
         $this->tpl->addOnLoadCode("il.Search.syncFilterScope('" . $filter_id . "', '" . $scope . "');");
     }
 
-    protected function renderHeader(): void
+    protected function fillHeaderAndTabs(): void
     {
+        // tabs
+        $this->tabs->addTab(
+            'search',
+            $this->lng->txt('search'),
+            (string) $this->actions->showSavedResults()
+        );
+        if ($this->settings->enabledLucene() && $this->settings->isLuceneUserSearchEnabled()) {
+            $this->tabs->addTarget(
+                'search_user',
+                $this->ctrl->getLinkTargetByClass(ilLuceneUserSearchGUI::class)
+            );
+        }
+        $this->tabs->activateTab('search');
+
+        // help
+        if ($this->settings->enabledLucene()) {
+            $this->help->setScreenIdComponent('src_luc');
+        } else {
+            $this->help->setScreenIdComponent('src');
+
+        }
+
+        // header
         $this->tpl->setTitleIcon(
             ilObject::_getIcon(0, "big", "src"),
             ""

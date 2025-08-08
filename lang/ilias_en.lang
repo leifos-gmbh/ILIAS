@@ -15321,7 +15321,6 @@ search#:#add_members_header#:#Add Members
 search#:#append_results#:#Append results
 search#:#btn_search#:#Search
 search#:#last_search_result#:#Last Search Result
-search#:#lucene_all_occurrences#:#... %s other occurrence(s)
 search#:#lucene_and#:#AND
 search#:#lucene_cpu#:#Maximum Number of Threads
 search#:#lucene_create_ini#:#Create Configuration File
@@ -15352,9 +15351,6 @@ search#:#lucene_log#:#Path to Logfile
 search#:#lucene_log_info#:#Enter the absolute path to a file in which log messages will we written. If the file does not exist, it will be created automatically.
 search#:#lucene_max_fs#:#Maximum File Size (in MB)
 search#:#lucene_max_fs_info#:#Defines the file size limit. Bigger files will not be included in the index.
-search#:#lucene_max_sub#:#Number of Sub-items
-search#:#lucene_max_sub_info#:#Please enter maximum number of sub-items (Forum threads, Glossary terms...) that are shown by default.
-search#:#lucene_more_hits_link#:#%s more hits...
 search#:#lucene_num_frag_info#:#Please choose the maximum number of highlighted text fragments.
 search#:#lucene_num_fragments#:#Number of Text Fragments
 search#:#lucene_offline_filter#:#Online-Status
@@ -15375,7 +15371,6 @@ search#:#search_area_info#:#Please select an area where the search should start.
 search#:#search_auto_complete_length#:#Number of Auto Complete List Entries
 search#:#search_cdate_filter#:#Filter by Creation Date
 search#:#search_cdate_filter_info#:#If enabled, the object search can be filtered by an optional creation date filter.
-search#:#search_choose_object_type#:#Please choose one object type.
 search#:#search_content#:#Page Content
 search#:#search_created_after#:#Objects created after
 search#:#search_created_before#:#Objects created before...
@@ -17078,7 +17073,6 @@ trac#:#trac_lp_determination_info_crs_tutor#:#This selection is not connected to
 trac#:#trac_lp_determination_info_mob#:#Select the items that determine the overall learning progress status of the Mediacast
 trac#:#trac_lp_determination_info_sco#:#Select the items that determine the overall learning progress status of the SCORM learning module.
 trac#:#trac_lp_determination_tutor#:#Display of objects in learning progress
-trac#:#trac_lp_filter#:#Filter
 trac#:#trac_lp_learner_access#:#View Own Learning Progress
 trac#:#trac_lp_learner_access_info#:#If active, users can access their own learning progress status.
 trac#:#trac_lp_list_gui#:#Dashboard, Repository, Search
@@ -17189,7 +17183,6 @@ trac#:#trac_read_count#:#Access Number
 trac#:#trac_read_count_spent_seconds#:#Time Spent / Access
 trac#:#trac_reference#:#References
 trac#:#trac_reference_ids_column#:#Reference-IDs
-trac#:#trac_refresh#:#Refresh
 trac#:#trac_registered#:#Registered
 trac#:#trac_release_materials#:#Disintegrate Grouping with Optional Materials
 trac#:#trac_report_date#:#Date of Report

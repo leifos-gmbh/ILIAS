@@ -84,7 +84,7 @@ class ilSearchGUI
         switch ($next_class) {
             default:
                 if (!$this->actions->isValidCommand($cmd)) {
-                    $cmd = "showSavedResults";
+                    $cmd = 'showSavedResults';
                 }
                 $this->$cmd();
                 break;

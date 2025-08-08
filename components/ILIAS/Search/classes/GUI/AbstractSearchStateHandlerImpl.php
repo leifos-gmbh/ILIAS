@@ -126,10 +126,7 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
         return ROOT_FOLDER_ID;
     }
 
-    public function fetchCache(int $usr_id): ilUserSearchCache
-    {
-        return ilUserSearchCache::_getInstance($usr_id);
-    }
+    abstract public function fetchCache(int $usr_id): ilUserSearchCache;
 
     abstract public function fetchFilter(URI $action): ilSearchFilterGUI;
 

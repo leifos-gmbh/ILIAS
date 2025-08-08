@@ -117,7 +117,6 @@ class ilObjSearchLuceneSettingsFormGUI
         $settings->enableLuceneUserSearch((bool) $data['user_search_enabled']);
         $settings->setFragmentCount((int) $data['fragmentCount']);
         $settings->setFragmentSize((int) $data['fragmentSize']);
-        $settings->setMaxSubitems((int) $data['maxSubitems']);
         $settings->enableLuceneMimeFilter(!is_null($data['mime']));
         if (!is_null($data['mime'])) {
             $settings->setLuceneMimeFilter((array) $data['mime']);
@@ -207,18 +206,6 @@ class ilObjSearchLuceneSettingsFormGUI
              $this->refinery->int()->isGreaterThanOrEqual(10)
          );
 
-        // Number of sub-items
-        $max_sub = $field_factory->numeric(
-            $this->lng->txt('lucene_max_sub'),
-            $this->lng->txt('lucene_max_sub_info')
-        )->withValue($settings->getMaxSubitems())
-         ->withRequired(true)
-         ->withAdditionalTransformation(
-             $this->refinery->int()->isLessThanOrEqual(10)
-         )->withAdditionalTransformation(
-             $this->refinery->int()->isGreaterThanOrEqual(1)
-         );
-
         // Last Index
         $timezone = $this->user->getTimeZone();
         $datetime = new DateTime(
@@ -245,7 +232,6 @@ class ilObjSearchLuceneSettingsFormGUI
                 'prefix' => $prefix,
                 'fragmentCount' => $frag_count,
                 'fragmentSize' => $frag_size,
-                'maxSubitems' => $max_sub,
                 'last_index' => $last_index
             ],
             $this->lng->txt('lucene_settings_title')

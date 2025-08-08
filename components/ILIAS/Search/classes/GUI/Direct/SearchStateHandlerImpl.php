@@ -54,6 +54,11 @@ class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
         return new ilSearchFilterGUI($action, false);
     }
 
+    public function fetchCache(int $usr_id): ilUserSearchCache
+    {
+        return ilUserSearchCache::_getInstance($usr_id);
+    }
+
     public function loadFilterToCache(ilSearchFilterGUI $filter, ilUserSearchCache $cache): void
     {
         $search_filter_data = $filter->getData();

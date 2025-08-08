@@ -15310,7 +15310,6 @@ search#:#add_members_header#:#Benutzer hinzufügen
 search#:#append_results#:#Ergebnisse anhängen
 search#:#btn_search#:#Suchen
 search#:#last_search_result#:#Letztes Suchergebnis
-search#:#lucene_all_occurrences#:#... %s weitere(s) Vorkommen
 search#:#lucene_and#:#UND
 search#:#lucene_cpu#:#Anzahl Threads
 search#:#lucene_create_ini#:#Konfigurationsdatei erstellen
@@ -15341,9 +15340,6 @@ search#:#lucene_log#:#Pfad zur Logdatei
 search#:#lucene_log_info#:#Bitte tragen Sie hier den absoluten Pfad zu einer Datei ein, in die Log-Nachrichten geschrieben werden. Wenn die Datei noch nicht existiert, wird sie automatisch erzeugt.
 search#:#lucene_max_fs#:#Maximale Dateigröße (in MB)
 search#:#lucene_max_fs_info#:#Definiert das Dateigrößenlimit, bis zu dem Dateien indexiert werden. Der Inhalt größerer Dateien wird nicht in den Index aufgenommen.
-search#:#lucene_max_sub#:#Anzahl von Unterobjekten
-search#:#lucene_max_sub_info#:#Bitte geben Sie die Anzahl von Unterobjekten (z. B. Forenthemen bei Foren oder Glossarbegriffe bei Glossaren) ein, die maximal angezeigt werden.
-search#:#lucene_more_hits_link#:#%s weitere Treffer...
 search#:#lucene_num_frag_info#:#Bitte geben Sie die Maximalanzahl von Textabschnitten ein, die zur Hervorhebung der Suchtreffer ausgegeben werden sollen.
 search#:#lucene_num_fragments#:#Anzahl Textabschnitte
 search#:#lucene_offline_filter#:#Online-Status
@@ -15364,7 +15360,6 @@ search#:#search_area_info#:#Bitte wählen Sie einen Bereich aus, innerhalb dem d
 search#:#search_auto_complete_length#:#Anzahl der Einträge in Auto-Complete-Liste
 search#:#search_cdate_filter#:#Suche nach Erstellungsdatum
 search#:#search_cdate_filter_info#:#Bei der Suche kann das Erstellungsdatum von Objekten berücksichtigt werden.
-search#:#search_choose_object_type#:#Bitte wählen Sie mindestens einen Objekttyp aus.
 search#:#search_content#:#Seiteninhalt
 search#:#search_created_after#:#Objekte erstellt nach dem...
 search#:#search_created_before#:#Objekte erstellt vor dem...
@@ -17070,7 +17065,6 @@ trac#:#trac_lp_determination_info_crs_tutor#:#Wählen Sie diejenigen Objekte aus
 trac#:#trac_lp_determination_info_mob#:#Auswahl der Medienobjekte, anhand derer der Gesamtstatus des Mediacast ermittelt wird.
 trac#:#trac_lp_determination_info_sco#:#Auswahl der SCOx, anhand derer der Gesamtstatus des SCORM-Moduls ermittelt wird.
 trac#:#trac_lp_determination_tutor#:#Auswahl von Objekten, die den Lernfortschritt bestimmen
-trac#:#trac_lp_filter#:#Filter
 trac#:#trac_lp_learner_access#:#Eigenen Lernfortschritt einsehen
 trac#:#trac_lp_learner_access_info#:#Wenn aktiviert, können Benutzer ihren eigenen Lernfortschritt einsehen.
 trac#:#trac_lp_list_gui#:#Dashboard, Magazin, Suche
@@ -17181,7 +17175,6 @@ trac#:#trac_read_count#:#Zugriffe
 trac#:#trac_read_count_spent_seconds#:#Bearbeitungszeit / Zugriffe
 trac#:#trac_reference#:#Referenzen
 trac#:#trac_reference_ids_column#:#Referenz-IDs
-trac#:#trac_refresh#:#Ansicht aktualisieren
 trac#:#trac_registered#:#Angemeldet
 trac#:#trac_release_materials#:#Gruppierung mit optionalen Materialien auflösen
 trac#:#trac_report_date#:#Datum des Reports

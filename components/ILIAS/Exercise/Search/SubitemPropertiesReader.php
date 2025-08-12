@@ -25,6 +25,7 @@ use ILIAS\DI\Container;
 use ILIAS\Data\Factory as DataFactory;
 use ilLanguage;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
+use ILIAS\Search\Presentation\Result\Subitem\ID;
 use Generator;
 use ilExAssignment;
 use ilAccess;
@@ -54,18 +55,18 @@ class SubitemPropertiesReader implements PropertiesReader
     public function getSubitemProperties(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator {
         foreach ($subitem_ids as $subitem_id) {
-            if (!$this->isAssignmentVisible($parent_ref_id, (int) $subitem_id)) {
+            if (!$this->isAssignmentVisible($parent_ref_id, (int) $subitem_id->id())) {
                 continue;
             }
             $link = $this->data_factory->uri(
-                $this->permanent_link->getPermanentLink($parent_ref_id, (int) $subitem_id)
+                $this->permanent_link->getPermanentLink($parent_ref_id, (int) $subitem_id->id())
             );
             yield $factory->get(
                 $subitem_id,
-                ilExAssignment::lookupTitle((int) $subitem_id),
+                ilExAssignment::lookupTitle((int) $subitem_id->id()),
                 $link,
                 false,
                 $this->lng->txt('exc_assignment')

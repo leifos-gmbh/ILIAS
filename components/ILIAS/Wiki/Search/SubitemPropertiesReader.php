@@ -26,6 +26,7 @@ use ILIAS\Data\Factory as DataFactory;
 use ilLanguage;
 use ilObject;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
+use ILIAS\Search\Presentation\Result\Subitem\ID;
 use ilWikiPage;
 use ilObjWikiGUI;
 use ilCtrlInterface;
@@ -55,18 +56,24 @@ class SubitemPropertiesReader implements PropertiesReader
     public function getSubitemProperties(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator {
         $obj_id = ilObject::_lookupObjId($parent_ref_id);
         foreach ($subitem_ids as $subitem_id) {
-            $title = (string) ilWikiPage::lookupTitle((int) $subitem_id);
-            if ($title !== '') {
-                yield $this->getPropertiesForWikiPage($factory, $parent_ref_id, $subitem_id, $title);
-            } else {
-                if (!ilObject::_exists((int) $subitem_id)) {
-                    continue;
-                }
-                yield $this->getPropertiesForFile($factory, $parent_ref_id, $subitem_id);
+            switch ($subitem_id->type()) {
+                case 'file':
+                    if (ilObject::_exists((int) $subitem_id->id())) {
+                        yield $this->getPropertiesForFile($factory, $parent_ref_id, $subitem_id);
+                    }
+                    break;
+
+                case 'wpg':
+                default:
+                    $title = (string) ilWikiPage::lookupTitle((int) $subitem_id->id());
+                    if ($title !== '') {
+                        yield $this->getPropertiesForWikiPage($factory, $parent_ref_id, $subitem_id, $title);
+                    }
+                    break;
             }
         }
     }
@@ -74,7 +81,7 @@ class SubitemPropertiesReader implements PropertiesReader
     protected function getPropertiesForWikiPage(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string $subitem_id,
+        ID $subitem_id,
         string $title
     ): Properties {
         $link = rtrim(ILIAS_HTTP_PATH, '/') . '/' .
@@ -91,9 +98,9 @@ class SubitemPropertiesReader implements PropertiesReader
     protected function getPropertiesForFile(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string $subitem_id
+        ID $subitem_id
     ): Properties {
-        $this->ctrl->setParameterByClass(ilWikiPageGUI::class, 'file_id', 'il__file_' . $subitem_id);
+        $this->ctrl->setParameterByClass(ilWikiPageGUI::class, 'file_id', 'il__file_' . $subitem_id->id());
         $this->ctrl->setParameterByClass(ilWikiPageGUI::class, 'ref_id', $parent_ref_id);
         $link = rtrim(ILIAS_HTTP_PATH, '/') . '/' .
             $this->ctrl->getLinkTargetByClass([ilWikiHandlerGUI::class, ilObjWikiGUI::class, ilWikiPageGUI::class], 'downloadFile');
@@ -101,7 +108,7 @@ class SubitemPropertiesReader implements PropertiesReader
         $this->ctrl->clearParameterByClass(ilWikiPageGUI::class, 'ref_id');
         return $factory->get(
             $subitem_id,
-            ilObject::_lookupTitle((int) $subitem_id),
+            ilObject::_lookupTitle((int) $subitem_id->id()),
             $this->data_factory->uri($link),
             false,
             $this->lng->txt('obj_file')

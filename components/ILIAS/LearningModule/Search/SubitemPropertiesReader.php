@@ -26,6 +26,7 @@ use ILIAS\Data\Factory as DataFactory;
 use ilLanguage;
 use ilObject;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
+use ILIAS\Search\Presentation\Result\Subitem\ID;
 use ilCtrlInterface;
 use ILIAS\Search\Presentation\Result\Subitem\Properties;
 use ilLMObject;
@@ -53,11 +54,15 @@ class SubitemPropertiesReader implements PropertiesReader
     public function getSubitemProperties(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator {
         $obj_id = ilObject::_lookupObjId($parent_ref_id);
         foreach ($subitem_ids as $subitem_id) {
-            switch (ilLMObject::_lookupType((int) $subitem_id, $obj_id)) {
+            $type = $subitem_id->type();
+            if ($type === '') {
+                $type = ilLMObject::_lookupType((int) $subitem_id->id(), $obj_id);
+            }
+            switch ($type) {
                 case 'pg':
                     yield $this->getPropertiesForLMObject(
                         $factory,
@@ -76,8 +81,8 @@ class SubitemPropertiesReader implements PropertiesReader
                     );
                     break;
 
-                default:
-                    if (!ilObject::_exists((int) $subitem_id)) {
+                case 'file':
+                    if (!ilObject::_exists((int) $subitem_id->id())) {
                         break;
                     }
                     yield $this->getPropertiesForFile($factory, $parent_ref_id, $subitem_id);
@@ -88,18 +93,18 @@ class SubitemPropertiesReader implements PropertiesReader
     protected function getPropertiesForLMObject(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string $subitem_id,
+        ID $subitem_id,
         string $presentable_type
     ): Properties {
         $this->ctrl->setParameterByClass(ilLMPresentationGUI::class, 'ref_id', $parent_ref_id);
-        $this->ctrl->setParameterByClass(ilLMPresentationGUI::class, 'obj_id', $subitem_id);
+        $this->ctrl->setParameterByClass(ilLMPresentationGUI::class, 'obj_id', $subitem_id->id());
         $link = rtrim(ILIAS_HTTP_PATH, '/') . '/' .
             $this->ctrl->getLinkTargetByClass(ilLMPresentationGUI::class, '');
         $this->ctrl->clearParameterByClass(ilLMPresentationGUI::class, 'obj_id');
         $this->ctrl->clearParameterByClass(ilLMPresentationGUI::class, 'ref_id');
         return $factory->get(
             $subitem_id,
-            ilLMObject::_lookupTitle((int) $subitem_id),
+            ilLMObject::_lookupTitle((int) $subitem_id->id()),
             $this->data_factory->uri($link),
             false,
             $presentable_type
@@ -109,17 +114,17 @@ class SubitemPropertiesReader implements PropertiesReader
     protected function getPropertiesForFile(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string $subitem_id
+        ID $subitem_id
     ): Properties {
         $this->ctrl->setParameterByClass(ilLMPresentationGUI::class, 'ref_id', $parent_ref_id);
-        $this->ctrl->setParameterByClass(ilLMPresentationGUI::class, 'file_id', 'il__file_' . $subitem_id);
+        $this->ctrl->setParameterByClass(ilLMPresentationGUI::class, 'file_id', 'il__file_' . $subitem_id->id());
         $link = rtrim(ILIAS_HTTP_PATH, '/') . '/' .
             $this->ctrl->getLinkTargetByClass(ilLMPresentationGUI::class, 'downloadFile');
         $this->ctrl->clearParameterByClass(ilLMPresentationGUI::class, 'file_id');
         $this->ctrl->clearParameterByClass(ilLMPresentationGUI::class, 'ref_id');
         return $factory->get(
             $subitem_id,
-            ilObject::_lookupTitle((int) $subitem_id),
+            ilObject::_lookupTitle((int) $subitem_id->id()),
             $this->data_factory->uri($link),
             false,
             $this->lng->txt('obj_file')

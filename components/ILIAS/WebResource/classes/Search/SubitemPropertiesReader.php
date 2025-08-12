@@ -28,6 +28,7 @@ use ilObject;
 use ilWebLinkDatabaseRepository;
 use ilWebLinkDatabaseRepositoryException;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
+use ILIAS\Search\Presentation\Result\Subitem\ID;
 use Generator;
 
 class SubitemPropertiesReader implements PropertiesReader
@@ -49,13 +50,13 @@ class SubitemPropertiesReader implements PropertiesReader
     public function getSubitemProperties(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator {
         $obj_id = ilObject::_lookupObjId($parent_ref_id);
         $repo = new ilWebLinkDatabaseRepository($obj_id);
         foreach ($subitem_ids as $subitem_id) {
             try {
-                $item = $repo->getItemByLinkId((int) $subitem_id);
+                $item = $repo->getItemByLinkId((int) $subitem_id->id());
             } catch (ilWebLinkDatabaseRepositoryException $e) {
                 continue;
             }

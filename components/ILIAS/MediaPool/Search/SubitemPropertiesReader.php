@@ -25,6 +25,7 @@ use ILIAS\DI\Container;
 use ILIAS\Data\Factory as DataFactory;
 use ilLanguage;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
+use ILIAS\Search\Presentation\Result\Subitem\ID;
 use ILIAS\StaticURL\Services as StaticURL;
 use ilMediaPoolItem;
 use ilObjMediaPool;
@@ -55,22 +56,26 @@ class SubitemPropertiesReader implements PropertiesReader
     public function getSubitemProperties(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator {
         foreach ($subitem_ids as $subitem_id) {
-            $type = ilMediaPoolItem::lookupType((int) $subitem_id);
+            $type = $subitem_id->type();
+            if ($type === '') {
+                $type = ilMediaPoolItem::lookupType((int) $subitem_id->id());
+            }
+            $link = null;
             switch ($type) {
                 case 'fold':
                     $link = $this->static_url->builder()->build(
                         'mep',
                         $this->data_factory->refId($parent_ref_id),
-                        [$subitem_id]
+                        [$subitem_id->id()]
                     );
                     break;
 
                 case 'mob':
                     $this->ctrl->setParameterByClass(ilMediaPoolPresentationGUI::class, 'ref_id', $parent_ref_id);
-                    $this->ctrl->setParameterByClass(ilMediaPoolPresentationGUI::class, 'force_filter', $subitem_id);
+                    $this->ctrl->setParameterByClass(ilMediaPoolPresentationGUI::class, 'force_filter', $subitem_id->id());
                     $link = $this->data_factory->uri(rtrim(ILIAS_HTTP_PATH, '/') . '/' .
                         $this->ctrl->getLinkTargetByClass(ilMediaPoolPresentationGUI::class, 'allMedia'));
                     $this->ctrl->clearParameterByClass(ilMediaPoolPresentationGUI::class, 'force_filter');
@@ -79,20 +84,20 @@ class SubitemPropertiesReader implements PropertiesReader
 
                 case 'pg':
                     $pool = new ilObjMediaPool($parent_ref_id);
-                    $parent_id = $pool->getParentId((int) $subitem_id);
+                    $parent_id = $pool->getParentId((int) $subitem_id->id());
                     $link = $this->static_url->builder()->build(
                         'mep',
                         $this->data_factory->refId($parent_ref_id),
                         $parent_id === null ? [] : [$parent_id]
                     );
                     break;
-
-                default:
-                    continue 2;
+            }
+            if ($link === null) {
+                continue;
             }
             yield $factory->get(
                 $subitem_id,
-                ilMediaPoolItem::lookupTitle((int) $subitem_id),
+                ilMediaPoolItem::lookupTitle((int) $subitem_id->id()),
                 $link,
                 false,
                 $this->lng->txt('obj_' . $type)

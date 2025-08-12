@@ -24,7 +24,7 @@ use ILIAS\Data\URI;
 
 interface Properties
 {
-    public function id(): string;
+    public function id(): ID;
 
     public function title(): string;
 

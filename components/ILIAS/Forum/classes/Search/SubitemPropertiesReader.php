@@ -25,6 +25,7 @@ use ILIAS\DI\Container;
 use ILIAS\Data\Factory as DataFactory;
 use ilLanguage;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
+use ILIAS\Search\Presentation\Result\Subitem\ID;
 use Generator;
 use ilObjForum;
 use ILIAS\StaticURL\Services as StaticURL;
@@ -50,17 +51,17 @@ class SubitemPropertiesReader implements PropertiesReader
     public function getSubitemProperties(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator {
         foreach ($subitem_ids as $subitem_id) {
             $link = $this->static_url->builder()->build(
                 'frm',
                 $this->data_factory->refId($parent_ref_id),
-                [$subitem_id]
+                [$subitem_id->id()]
             );
             yield $factory->get(
                 $subitem_id,
-                ilObjForum::_lookupThreadSubject((int) $subitem_id),
+                ilObjForum::_lookupThreadSubject((int) $subitem_id->id()),
                 $link,
                 false,
                 $this->lng->txt('thread')

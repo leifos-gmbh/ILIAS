@@ -25,6 +25,7 @@ use ILIAS\DI\Container;
 use ILIAS\Data\Factory as DataFactory;
 use ilLanguage;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory;
+use ILIAS\Search\Presentation\Result\Subitem\ID;
 use ILIAS\StaticURL\Services as StaticURL;
 use ilGlossaryTerm;
 use Generator;
@@ -51,17 +52,17 @@ class SubitemPropertiesReader implements PropertiesReader
     public function getSubitemProperties(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator {
         foreach ($subitem_ids as $subitem_id) {
             $link = $this->static_url->builder()->build(
                 'git',
-                $this->data_factory->refId((int) $subitem_id),
+                $this->data_factory->refId((int) $subitem_id->id()),
                 [$parent_ref_id]
             );
             yield $factory->get(
                 $subitem_id,
-                ilGlossaryTerm::_lookGlossaryTerm((int) $subitem_id),
+                ilGlossaryTerm::_lookGlossaryTerm((int) $subitem_id->id()),
                 $link,
                 false,
                 $this->lng->txt('cont_term')

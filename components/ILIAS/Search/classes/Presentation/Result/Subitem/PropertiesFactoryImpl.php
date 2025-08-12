@@ -25,7 +25,7 @@ use ILIAS\Data\URI;
 class PropertiesFactoryImpl implements PropertiesFactory
 {
     public function get(
-        string $id,
+        ID $id,
         string $title,
         ?URI $link_to_subitem,
         bool $open_link_in_new_viewport,
@@ -38,5 +38,12 @@ class PropertiesFactoryImpl implements PropertiesFactory
             $open_link_in_new_viewport,
             $presentable_subitem_type
         );
+    }
+
+    public function getID(
+        string $id,
+        string $type
+    ): ID {
+        return new IDImpl($id, $type);
     }
 }

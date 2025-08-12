@@ -35,6 +35,7 @@ use ILIAS\Search\Presentation\Result\UI\Sanitizer;
 use ILIAS\Search\Presentation\Result\Object\PropertiesAggregator as ObjectPropertiesAggregator;
 use ILIAS\Search\Presentation\Result\Object\AccessChecker;
 use ILIAS\Search\GUI\Param;
+use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory as SubitemPropertiesFactory;
 
 class ResultPresenterImpl implements ResultPresenter
 {
@@ -45,6 +46,7 @@ class ResultPresenterImpl implements ResultPresenter
         protected ComponentFactory $component_factory,
         protected ObjectPropertiesAggregator $obj_properties,
         protected SubitemPropertiesAggregator $subitem_properties,
+        protected SubitemPropertiesFactory $subitem_properties_factory,
         protected AccessChecker $access,
         protected Sanitizer $sanitizer
     ) {
@@ -68,15 +70,17 @@ class ResultPresenterImpl implements ResultPresenter
             $type = $this->obj_properties->lookupType($obj_id);
 
             $subitem_ids = [];
+            $too_many_subitems = false;
             if ($this->access->canSeeSubitemsOfObject($ref_id)) {
                 $subitem_ids = $subitem_ids_by_obj_id[$obj_id] ?? [];
+                $too_many_subitems = count($subitem_ids) > self::MAX_SUBITEMS;
+                $subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
             }
-            $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
             $subitem_modal = $this->component_factory->getModalForSubitems(
                 $title,
                 self::MAX_SUBITEMS_PER_PAGE,
-                count($subitem_ids) > self::MAX_SUBITEMS,
-                ...$this->getItemsForSubitemsFromDirectSearch($ref_id, $type, ...$truncated_subitem_ids),
+                $too_many_subitems,
+                ...$this->getItemsForSubitemsFromDirectSearch($ref_id, $type, ...$subitem_ids),
             );
             if ($subitem_modal !== null) {
                 $subitem_modals[] = $subitem_modal;
@@ -112,16 +116,23 @@ class ResultPresenterImpl implements ResultPresenter
         ];
     }
 
+    /**
+     * @param array{id: string, type: string}  ...$raw_sub_ids
+     * @return Item[]
+     */
     protected function getItemsForSubitemsFromDirectSearch(
         int $ref_id,
         string $type,
-        int ...$sub_ids
+        array ...$raw_sub_ids
     ): Generator {
-        $sub_ids_as_strings = [];
-        foreach ($sub_ids as $sub_id) {
-            $sub_ids_as_strings[] = (string) $sub_id;
+        $sub_ids = [];
+        foreach ($raw_sub_ids as $raw_sub_id) {
+            $sub_ids[] = $this->subitem_properties_factory->getID(
+                (string) $raw_sub_id['id'],
+                (string) $raw_sub_id['type']
+            );
         }
-        $subitem_properties = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids_as_strings);
+        $subitem_properties = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids);
         foreach ($subitem_properties as $properties) {
             yield $this->component_factory->getItemForSubitem(
                 $properties->title(),

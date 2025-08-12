@@ -26,7 +26,7 @@ use ILIAS\Search\Presentation\Result\UI\ComponentFactory;
 class PropertiesImpl implements Properties
 {
     public function __construct(
-        protected string $id,
+        protected ID $id,
         protected string $title,
         protected ?URI $link,
         protected bool $open_link_in_new_viewport,
@@ -34,7 +34,7 @@ class PropertiesImpl implements Properties
     ) {
     }
 
-    public function id(): string
+    public function id(): ID
     {
         return $this->id;
     }

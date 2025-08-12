@@ -122,14 +122,20 @@ class ilSearchResult
      *
      * add search result entry
      * Entries are stored with 'obj_id'. This method is typically called to store db query results.
-     * @param int    $a_obj_id   object object_id
-     * @param string $a_type     obj_type 'lm' or 'crs' ...
-     * @param array  $found      value position of query parser words in query string
-     * @param int    $a_child_id child id e.g id of page or chapter
+     * @param int    $a_obj_id      object object_id
+     * @param string $a_type        obj_type 'lm' or 'crs' ...
+     * @param array  $found         value position of query parser words in query string
+     * @param int    $a_child_id    child id e.g id of page or chapter
+     * @param string $a_child_type  child type e.g 'pg' or 'st'
      * @return void
      */
-    public function addEntry(int $a_obj_id, string $a_type, array $found, int $a_child_id = 0): void
-    {
+    public function addEntry(
+        int $a_obj_id,
+        string $a_type,
+        array $found,
+        int $a_child_id = 0,
+        string $a_child_type = ''
+    ): void {
         // Create new entry if it not exists
         if (!isset($this->entries[$a_obj_id])) {
             $this->entries[$a_obj_id]['obj_id'] = $a_obj_id;
@@ -141,9 +147,11 @@ class ilSearchResult
                 $this->entries[$a_obj_id]['child'][$a_child_id] = $a_child_id;
             }
         } else {
-            // replace or add child ('pg','st') id
+            // replace or add child ('pg','st') id and type
             if ($a_child_id and $a_child_id != $a_obj_id) {
-                $this->entries[$a_obj_id]['child'][$a_child_id] = $a_child_id;
+                $this->entries[$a_obj_id]['child'][$a_child_id] = [
+                    'id' => $a_child_id, 'type' => $a_child_type
+                ];
             }
             $counter = 0;
             foreach ($found as $position) {
@@ -442,15 +450,15 @@ class ilSearchResult
 
     /**
      * @param int   $a_obj_id
-     * @param array $a_childs array of child ids. E.g 'pg', 'st'
+     * @param array $a_childs array of children as ['id' => $id, 'type' => $type]. E.g 'pg', 'st'
      * @return bool
      */
     public function __updateEntryChilds(int $a_obj_id, array $a_childs): bool
     {
         if ($this->entries[$a_obj_id] and is_array($a_childs)) {
-            foreach ($a_childs as $child_id) {
-                if ($child_id) {
-                    $this->entries[$a_obj_id]['child'][$child_id] = $child_id;
+            foreach ($a_childs as $child_info) {
+                if ($child_info) {
+                    $this->entries[$a_obj_id]['child'][$child_info['id']] = $child_info;
                 }
             }
             return true;
@@ -459,13 +467,13 @@ class ilSearchResult
     }
 
     /**
-     * Update child ids for a specific result
+     * Update children for a specific result
      */
     public function __updateResultChilds(int $a_ref_id, array $a_childs): bool
     {
         if ($this->results[$a_ref_id] and is_array($a_childs)) {
-            foreach ($a_childs as $child_id) {
-                $this->results[$a_ref_id]['child'][$child_id] = $child_id;
+            foreach ($a_childs as $child_info) {
+                $this->results[$a_ref_id]['child'][$child_info['id']] = $child_info;
             }
             return true;
         }

@@ -43,11 +43,16 @@ interface PropertiesReader
      * (read access on the parent object is already
      * checked).
      *
+     * Note that the sub type might not be available,
+     * depending on how the item was found.
+     * If possible, deduce the type from the id as a
+     * fallback.
+     *
      * @return Properties[]
      */
     public function getSubitemProperties(
         PropertiesFactory $factory,
         int $parent_ref_id,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator;
 }

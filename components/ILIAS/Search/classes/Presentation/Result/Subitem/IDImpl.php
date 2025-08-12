@@ -20,20 +20,21 @@ declare(strict_types=1);
 
 namespace ILIAS\Search\Presentation\Result\Subitem;
 
-use ILIAS\Data\URI;
-
-interface PropertiesFactory
+class IDImpl implements ID
 {
-    public function get(
-        ID $id,
-        string $title,
-        ?URI $link_to_subitem,
-        bool $open_link_in_new_viewport,
-        string $presentable_subitem_type
-    ): Properties;
+    public function __construct(
+        protected string $id,
+        protected string $type
+    ) {
+    }
 
-    public function getID(
-        string $id,
-        string $type
-    ): ID;
+    public function id(): string
+    {
+        return $this->id;
+    }
+
+    public function type(): string
+    {
+        return $this->type;
+    }
 }

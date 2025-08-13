@@ -144,12 +144,15 @@ class ilSearchResult
             $this->entries[$a_obj_id]['child'] = [];
 
             if ($a_child_id and $a_child_id != $a_obj_id) {
-                $this->entries[$a_obj_id]['child'][$a_child_id] = $a_child_id;
+                $this->entries[$a_obj_id]['child'][$a_child_type . '__' . $a_child_id] = [
+                    'id' => $a_child_id, 'type' => $a_child_type
+                ];
             }
         } else {
+            // TODO what about subitems that are sometimes found with and sometimes without type
             // replace or add child ('pg','st') id and type
             if ($a_child_id and $a_child_id != $a_obj_id) {
-                $this->entries[$a_obj_id]['child'][$a_child_id] = [
+                $this->entries[$a_obj_id]['child'][$a_child_type . '__' . $a_child_id] = [
                     'id' => $a_child_id, 'type' => $a_child_type
                 ];
             }
@@ -293,6 +296,9 @@ class ilSearchResult
         return $res;
     }
 
+    /**
+     * @return list<array{id: int, type: string}>
+     */
     public function getSubitemIds(): array
     {
         $res = array();
@@ -458,7 +464,7 @@ class ilSearchResult
         if ($this->entries[$a_obj_id] and is_array($a_childs)) {
             foreach ($a_childs as $child_info) {
                 if ($child_info) {
-                    $this->entries[$a_obj_id]['child'][$child_info['id']] = $child_info;
+                    $this->entries[$a_obj_id]['child'][$child_info['type'] . '__' . $child_info['id']] = $child_info;
                 }
             }
             return true;
@@ -473,7 +479,7 @@ class ilSearchResult
     {
         if ($this->results[$a_ref_id] and is_array($a_childs)) {
             foreach ($a_childs as $child_info) {
-                $this->results[$a_ref_id]['child'][$child_info['id']] = $child_info;
+                $this->results[$a_ref_id]['child'][$child_info['type'] . '__' . $child_info['id']] = $child_info;
             }
             return true;
         }

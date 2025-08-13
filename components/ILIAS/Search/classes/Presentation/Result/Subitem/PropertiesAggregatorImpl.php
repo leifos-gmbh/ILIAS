@@ -44,7 +44,7 @@ class PropertiesAggregatorImpl implements PropertiesAggregator
     public function getSubitemProperties(
         int $parent_ref_id,
         string $parent_type,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator {
         if ($subitem_ids === []) {
             yield from [];

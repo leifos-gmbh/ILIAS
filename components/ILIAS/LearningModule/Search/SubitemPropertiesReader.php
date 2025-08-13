@@ -58,11 +58,7 @@ class SubitemPropertiesReader implements PropertiesReader
     ): Generator {
         $obj_id = ilObject::_lookupObjId($parent_ref_id);
         foreach ($subitem_ids as $subitem_id) {
-            $type = $subitem_id->type();
-            if ($type === '') {
-                $type = ilLMObject::_lookupType((int) $subitem_id->id(), $obj_id);
-            }
-            switch ($type) {
+            switch ($subitem_id->type()) {
                 case 'pg':
                     yield $this->getPropertiesForLMObject(
                         $factory,

@@ -26,15 +26,11 @@ use Generator;
 interface PropertiesAggregator
 {
     /**
-     *
      * @return Properties[]
-     *
-     * Keys are subitem_ids, not necessarily
-     * all items are returned, and not in order.
      */
     public function getSubitemProperties(
         int $parent_ref_id,
         string $parent_type,
-        string ...$subitem_ids
+        ID ...$subitem_ids
     ): Generator;
 }

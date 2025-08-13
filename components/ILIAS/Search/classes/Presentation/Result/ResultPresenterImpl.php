@@ -117,7 +117,7 @@ class ResultPresenterImpl implements ResultPresenter
     }
 
     /**
-     * @param array{id: string, type: string}  ...$raw_sub_ids
+     * @param array{id: int, type: string}  ...$raw_sub_ids
      * @return Item[]
      */
     protected function getItemsForSubitemsFromDirectSearch(
@@ -162,15 +162,17 @@ class ResultPresenterImpl implements ResultPresenter
             $title_no_highlights = $this->obj_properties->lookupTitle($obj_id);
 
             $subitem_ids = [];
+            $too_many_subitems = false;
             if ($this->access->canSeeSubitemsOfObject($ref_id)) {
                 $subitem_ids = $highlighter->getSubItemIds($obj_id);
+                $too_many_subitems = count($subitem_ids) > self::MAX_SUBITEMS;
+                $subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
             }
-            $truncated_subitem_ids = array_slice($subitem_ids, 0, self::MAX_SUBITEMS);
             $subitem_modal = $this->component_factory->getModalForSubitems(
                 $title_no_highlights,
                 self::MAX_SUBITEMS_PER_PAGE,
-                count($subitem_ids) > self::MAX_SUBITEMS,
-                ...$this->getItemsForSubitemsFromLuceneSearch($highlighter, $obj_id, $ref_id, $type, ...$truncated_subitem_ids),
+                $too_many_subitems,
+                ...$this->getItemsForSubitemsFromLuceneSearch($highlighter, $obj_id, $ref_id, $type, ...$subitem_ids),
             );
             if ($subitem_modal !== null) {
                 $subitem_modals[] = $subitem_modal;
@@ -179,16 +181,16 @@ class ResultPresenterImpl implements ResultPresenter
             $item = $this->component_factory->getItemForObject(
                 $this->obj_properties->buildIconPath($obj_id, $type),
                 $this->obj_properties->makeTypePresentable($type),
-                $highlighter->getTitle($obj_id, 0) ?: $title_no_highlights,
+                $highlighter->getTitle($obj_id, 0, '') ?: $title_no_highlights,
                 $this->obj_properties->buildLink($ref_id, $type),
-                $highlighter->getDescription($obj_id, 0) ?: $this->obj_properties->lookupDescription($obj_id),
-                $highlighter->getContent($obj_id, 0),
+                $highlighter->getDescription($obj_id, 0, '') ?: $this->obj_properties->lookupDescription($obj_id),
+                $highlighter->getContent($obj_id, 0, ''),
                 $this->obj_properties->buildRepositoryPath($ref_id),
                 $creation_date,
                 $subitem_modal?->getShowSignal()
             );
             $items_with_sort_data[] = [
-                'relevance' => $highlighter->getRelevance($obj_id, 0),
+                'relevance' => $highlighter->getRelevance($obj_id, 0, ''),
                 'title' => $title_no_highlights,
                 'creation_date' => $creation_date,
                 'item' => $item
@@ -206,25 +208,33 @@ class ResultPresenterImpl implements ResultPresenter
         ];
     }
 
+    /**
+     * @param array{id: int, type: string}  ...$raw_sub_ids
+     * @return Item[]
+     */
     protected function getItemsForSubitemsFromLuceneSearch(
         ilLuceneHighlighterResultParser $highlighter,
         int $obj_id,
         int $ref_id,
         string $type,
-        int ...$sub_ids
+        array ...$raw_sub_ids
     ): Generator {
-        $sub_ids_as_strings = [];
-        foreach ($sub_ids as $sub_id) {
-            $sub_ids_as_strings[] = (string) $sub_id;
+        $sub_ids = [];
+        foreach ($raw_sub_ids as $raw_sub_id) {
+            $sub_ids[] = $this->subitem_properties_factory->getID(
+                (string) $raw_sub_id['id'],
+                (string) $raw_sub_id['type']
+            );
         }
-        $subitem_properties = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids_as_strings);
+        $subitem_properties = $this->subitem_properties->getSubitemProperties($ref_id, $type, ...$sub_ids);
         foreach ($subitem_properties as $properties) {
-            $subitem_id = (int) $properties->id();
+            $subitem_id = (int) $properties->id()->id();
+            $subitem_type = $properties->id()->type();
             yield $this->component_factory->getItemForSubitem(
-                $highlighter->getTitle($obj_id, $subitem_id) ?: $properties->title(),
+                $highlighter->getTitle($obj_id, $subitem_id, $subitem_type) ?: $properties->title(),
                 $properties->link(),
                 $properties->openLinkInNewViewport(),
-                $highlighter->getContent($obj_id, $subitem_id),
+                $highlighter->getContent($obj_id, $subitem_id, $subitem_type),
                 $properties->presentableSubitemType()
             );
         }

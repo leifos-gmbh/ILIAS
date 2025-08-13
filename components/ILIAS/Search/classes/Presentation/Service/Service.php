@@ -46,6 +46,7 @@ class Service
         $lng->loadLanguageModule('search');
         $sanitizer = new SanitizerImpl($this->dic->refinery());
         $access_checker = new AccessCheckerImpl($this->dic->access());
+        $subitem_properties_factory = new SubitemPropertiesFactoryImpl();
         return $this->result_presenter ??= new ResultPresenterImpl(
             new ComponentFactoryImpl(
                 $this->dic->ui()->factory(),
@@ -61,8 +62,9 @@ class Service
             ),
             new SubitemPropertiesAggregatorImpl(
                 $this->dic,
-                new SubitemPropertiesFactoryImpl()
+                $subitem_properties_factory
             ),
+            $subitem_properties_factory,
             $access_checker,
             $sanitizer
         );

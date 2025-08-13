@@ -59,12 +59,8 @@ class SubitemPropertiesReader implements PropertiesReader
         ID ...$subitem_ids
     ): Generator {
         foreach ($subitem_ids as $subitem_id) {
-            $type = $subitem_id->type();
-            if ($type === '') {
-                $type = ilMediaPoolItem::lookupType((int) $subitem_id->id());
-            }
             $link = null;
-            switch ($type) {
+            switch ($subitem_id->type()) {
                 case 'fold':
                     $link = $this->static_url->builder()->build(
                         'mep',
@@ -100,7 +96,7 @@ class SubitemPropertiesReader implements PropertiesReader
                 ilMediaPoolItem::lookupTitle((int) $subitem_id->id()),
                 $link,
                 false,
-                $this->lng->txt('obj_' . $type)
+                $this->lng->txt('obj_' . $subitem_id->type())
             );
         }
     }

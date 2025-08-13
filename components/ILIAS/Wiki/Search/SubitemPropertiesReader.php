@@ -68,7 +68,6 @@ class SubitemPropertiesReader implements PropertiesReader
                     break;
 
                 case 'wpg':
-                default:
                     $title = (string) ilWikiPage::lookupTitle((int) $subitem_id->id());
                     if ($title !== '') {
                         yield $this->getPropertiesForWikiPage($factory, $parent_ref_id, $subitem_id, $title);

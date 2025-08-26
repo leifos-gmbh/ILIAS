@@ -143,6 +143,7 @@ class ComponentFactoryImpl implements ComponentFactory
         string $content,
         string $path,
         DateTimeImmutable $created_on,
+        string $copyright,
         ?Signal $subitem_show_signal
     ): Item {
         $item_title = $this->sanitizer->sanitizeAndSetUpPlaceholders($title);
@@ -159,6 +160,9 @@ class ComponentFactoryImpl implements ComponentFactory
             $this->lng->txt('path') => $this->sanitizer->sanitize($path),
             $this->lng->txt('create_date') => $this->formatDate($created_on)
         ];
+        if ($copyright !== '') {
+            $properties[$this->lng->txt('search_copyright')] = $this->sanitizer->sanitize($copyright);
+        }
         if ($description !== '') {
             if (mb_strlen($description) >= self::MAX_DESCRIPTION_LENGTH) {
                 $description = mb_substr($description, 0, self::MAX_DESCRIPTION_LENGTH) . '...';
@@ -193,7 +197,8 @@ class ComponentFactoryImpl implements ComponentFactory
         ?URI $link,
         bool $open_link_in_new_viewport,
         string $content,
-        string $type
+        string $type,
+        string $copyright
     ): Item {
         $item_title = $this->sanitizer->sanitizeAndSetUpPlaceholders($title);
         if ($link !== null) {
@@ -201,6 +206,9 @@ class ComponentFactoryImpl implements ComponentFactory
                                                    ->withOpenInNewViewport($open_link_in_new_viewport);
         }
         $properties = [$this->lng->txt('type') => $this->sanitizer->sanitize($type)];
+        if ($copyright !== '') {
+            $properties[$this->lng->txt('search_copyright')] = $this->sanitizer->sanitize($copyright);
+        }
         return $this->ui_factory->item()->standard($item_title)
                                 ->withDescription($this->sanitizer->sanitizeAndSetUpPlaceholders($content))
                                 ->withProperties($properties);

@@ -36,6 +36,7 @@ use ILIAS\Search\Presentation\Result\Object\PropertiesAggregator as ObjectProper
 use ILIAS\Search\Presentation\Result\Object\AccessChecker;
 use ILIAS\Search\GUI\Param;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory as SubitemPropertiesFactory;
+use ILIAS\Search\Presentation\Result\Copyright\Helper as CopyrightHelper;
 
 class ResultPresenterImpl implements ResultPresenter
 {
@@ -47,6 +48,7 @@ class ResultPresenterImpl implements ResultPresenter
         protected ObjectPropertiesAggregator $obj_properties,
         protected SubitemPropertiesAggregator $subitem_properties,
         protected SubitemPropertiesFactory $subitem_properties_factory,
+        protected CopyrightHelper $copyright_helper,
         protected AccessChecker $access,
         protected Sanitizer $sanitizer
     ) {
@@ -80,7 +82,7 @@ class ResultPresenterImpl implements ResultPresenter
                 $title,
                 self::MAX_SUBITEMS_PER_PAGE,
                 $too_many_subitems,
-                ...$this->getItemsForSubitemsFromDirectSearch($ref_id, $type, ...$subitem_ids),
+                ...$this->getItemsForSubitemsFromDirectSearch($ref_id, $obj_id, $type, ...$subitem_ids),
             );
             if ($subitem_modal !== null) {
                 $subitem_modals[] = $subitem_modal;
@@ -95,6 +97,7 @@ class ResultPresenterImpl implements ResultPresenter
                 '',
                 $this->obj_properties->buildRepositoryPath($ref_id),
                 $creation_date,
+                $this->copyright_helper->readPresentableCopyright($obj_id, 0, $type),
                 $subitem_modal?->getShowSignal()
             );
             $items_with_sort_data[] = [
@@ -122,6 +125,7 @@ class ResultPresenterImpl implements ResultPresenter
      */
     protected function getItemsForSubitemsFromDirectSearch(
         int $ref_id,
+        int $obj_id,
         string $type,
         array ...$raw_sub_ids
     ): Generator {
@@ -140,6 +144,7 @@ class ResultPresenterImpl implements ResultPresenter
                 $properties->openLinkInNewViewport(),
                 '',
                 $properties->presentableSubitemType(),
+                $this->copyright_helper->readPresentableCopyright($obj_id, (int) $properties->id()->id(), $properties->id()->type())
             );
         }
     }
@@ -187,6 +192,7 @@ class ResultPresenterImpl implements ResultPresenter
                 $highlighter->getContent($obj_id, 0, ''),
                 $this->obj_properties->buildRepositoryPath($ref_id),
                 $creation_date,
+                $this->copyright_helper->readPresentableCopyright($obj_id, 0, $type),
                 $subitem_modal?->getShowSignal()
             );
             $items_with_sort_data[] = [
@@ -235,7 +241,8 @@ class ResultPresenterImpl implements ResultPresenter
                 $properties->link(),
                 $properties->openLinkInNewViewport(),
                 $highlighter->getContent($obj_id, $subitem_id, $subitem_type),
-                $properties->presentableSubitemType()
+                $properties->presentableSubitemType(),
+                $this->copyright_helper->readPresentableCopyright($obj_id, (int) $properties->id()->id(), $properties->id()->type())
             );
         }
     }

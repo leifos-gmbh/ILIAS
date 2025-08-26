@@ -59,6 +59,7 @@ class Service
     {
         return $this->lucene_search_state_handler ??= new LuceneSearchStateHandlerImpl(
             ilSearchSettings::getInstance(),
+            $this->dic->learningObjectMetadata(),
             $this->dic->http(),
             $this->dic->refinery()
         );
@@ -68,6 +69,7 @@ class Service
     {
         return $this->direct_search_state_handler ??= new DirectSearchStateHandlerImpl(
             ilSearchSettings::getInstance(),
+            $this->dic->learningObjectMetadata(),
             $this->dic->http(),
             $this->dic->refinery()
         );

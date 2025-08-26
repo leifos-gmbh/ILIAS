@@ -83,8 +83,9 @@ class SearcherImpl implements Searcher
         }
 
         $cdate_query = $this->parseCreationFilter($cache);
+        $copyright_query = $this->parseCopyrightFilter($cache);
 
-        $filter_query = $filter_query . ' ' . $mime_query . ' ' . $cdate_query;
+        $filter_query = $filter_query . ' ' . $mime_query . ' ' . $cdate_query . ' ' . $copyright_query;
 
         $query = $cache->getQuery();
         if ($query) {
@@ -216,5 +217,19 @@ class SearcherImpl implements Searcher
         }
 
         return '';
+    }
+
+    protected function parseCopyrightFilter(ilUserSearchCache $cache): string
+    {
+        $identifiers = $cache->getCopyrightFilter();
+        if ($identifiers === []) {
+            return '';
+        }
+
+        $conditions = [];
+        foreach ($identifiers as $identifier) {
+            $conditions[] = 'lomCopyright:"' . $identifier . '"';
+        }
+        return '+(' . implode(' OR ', $conditions) . ')';
     }
 }

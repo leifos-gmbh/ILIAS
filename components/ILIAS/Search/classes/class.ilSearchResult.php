@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
+
 /**
  * searchResult stores all result of a search query.
  * Offers methods like mergeResults. To merge result sets of different queries.
@@ -42,6 +44,7 @@ class ilSearchResult
     protected ilTree $tree;
     protected ilObjUser $user;
     protected ilSearchSettings $search_settings;
+    protected LOMServices $lom_services;
 
     // Stores info if MAX HITS is reached or not
     public bool $limit_reached = false;
@@ -59,6 +62,7 @@ class ilSearchResult
         $this->db = $DIC->database();
         $this->tree = $DIC->repositoryTree();
         $this->user = $DIC->user();
+        $this->lom_services = $DIC->learningObjectMetadata();
 
         if ($a_user_id) {
             $this->user_id = $a_user_id;
@@ -149,7 +153,6 @@ class ilSearchResult
                 ];
             }
         } else {
-            // TODO what about subitems that are sometimes found with and sometimes without type
             // replace or add child ('pg','st') id and type
             if ($a_child_id and $a_child_id != $a_obj_id) {
                 $this->entries[$a_obj_id]['child'][$a_child_type . '__' . $a_child_id] = [
@@ -312,13 +315,20 @@ class ilSearchResult
      * Filter search result.
      * Do RBAC checks.
      * Allows paging of results for referenced objects
+     * @param string[] $copyright_identifiers
      */
     public function filter(
         int $a_root_node,
         bool $check_and,
         ?ilDate $creation_filter_date_start = null,
-        ?ilDate $creation_filter_date_end = null
+        ?ilDate $creation_filter_date_end = null,
+        array $copyright_identifiers = []
     ): bool {
+        // check for copyright of all entries at once
+        if ($copyright_identifiers !== []) {
+            $obj_ids_with_copyright = $this->findObjIDsOfEntriesWithCopyright(...$copyright_identifiers);
+        }
+
         // get ref_ids and check access
         $counter = 0;
         $offset_counter = 0;
@@ -371,6 +381,14 @@ class ilSearchResult
                 } elseif (!ilDate::_within($creation_date, $creation_filter_date_start, $creation_filter_date_end)) {
                     continue;
                 }
+            }
+
+            // filter by copyright
+            if (
+                $copyright_identifiers !== [] &&
+                !in_array($entry['obj_id'], $obj_ids_with_copyright)
+            ) {
+                continue;
             }
 
             // Check referenced objects
@@ -427,6 +445,27 @@ class ilSearchResult
         }
         $this->search_cache->setResults($this->results);
         return false;
+    }
+
+    /**
+     * @param string ...$copyright_identifiers
+     * @return int[]
+     */
+    protected function findObjIDsOfEntriesWithCopyright(string ...$copyright_identifiers): array
+    {
+        $filters = [];
+        foreach ($this->entries as $entry) {
+            $filters[] = $this->lom_services->search()->getFilter($entry['obj_id']);
+        }
+
+        $clause = $this->lom_services->copyrightHelper()->getCopyrightSearchClause(...$copyright_identifiers);
+        $results = $this->lom_services->search()->execute($clause, null, null, ...$filters);
+
+        $obj_ids = [];
+        foreach ($results as $result) {
+            $obj_ids[] = $result->objID();
+        }
+        return $obj_ids;
     }
 
     /**

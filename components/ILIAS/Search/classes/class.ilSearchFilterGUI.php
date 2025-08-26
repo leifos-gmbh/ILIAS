@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 use ILIAS\UI\Component\Input\Container\Filter;
 use ILIAS\Data\URI;
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
 
 /**
  * @author Thomas Famula <famula@leifos.de>
@@ -30,6 +31,7 @@ class ilSearchFilterGUI
     protected \ILIAS\UI\Renderer $renderer;
     protected ilNavigationHistory $nav_history;
     protected Filter\Standard $filter;
+    protected LOMServices $lom_services;
 
     public function __construct(URI $action, bool $for_lucene)
     {
@@ -38,6 +40,7 @@ class ilSearchFilterGUI
         $this->filter_service = $DIC->uiService()->filter();
         $this->renderer = $DIC->ui()->renderer();
         $this->nav_history = $DIC["ilNavigationHistory"];
+        $this->lom_services = $DIC->learningObjectMetadata();
         $field_factory = $DIC->ui()->factory()->input()->field();
         $txt = static function (string $id) use ($DIC): string {
             return $DIC->language()->txt($id);
@@ -74,6 +77,18 @@ class ilSearchFilterGUI
 
         if (ilSearchSettings::getInstance()->isDateFilterEnabled()) {
             $inputs["search_date"] = $field_factory->duration($txt("create_date"));
+            $inputs_activated[] = true;
+        }
+
+        if ($this->lom_services->copyrightHelper()->isCopyrightSelectionActive()) {
+            $cp_selection = [];
+            foreach ($this->lom_services->copyrightHelper()->getAllCopyrightPresets() as $copyright) {
+                if ($copyright->isDefault()) {
+                    continue;
+                }
+                $cp_selection[$copyright->identifier()] = $copyright->title();
+            }
+            $inputs["search_copyright"] = $field_factory->multiSelect($txt("search_copyright"), $cp_selection);
             $inputs_activated[] = true;
         }
 

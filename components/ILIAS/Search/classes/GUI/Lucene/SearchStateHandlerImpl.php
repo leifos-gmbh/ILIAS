@@ -28,11 +28,13 @@ use ILIAS\HTTP\Services as HTTP;
 use ILIAS\Refinery\Factory as Refinery;
 use ilSearchSettings;
 use ilLuceneQueryParser;
+use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
 
 class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
 {
     public function __construct(
         protected ilSearchSettings $settings,
+        protected LOMServices $lom_services,
         HTTP $http,
         Refinery $refinery
     ) {
@@ -98,5 +100,14 @@ class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
             }
         }
         $cache->setMimeFilter($enabled_mime_types);
+
+        $copyright_filter = [];
+        if (
+            $this->lom_services->copyrightHelper()->isCopyrightSelectionActive() &&
+            isset($search_filter_data['search_copyright'])
+        ) {
+            $copyright_filter = $search_filter_data['search_copyright'];
+        }
+        $cache->setCopyrightFilter(...$copyright_filter);
     }
 }

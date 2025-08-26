@@ -30,6 +30,7 @@ use ILIAS\Search\Presentation\Result\Subitem\PropertiesAggregatorImpl as Subitem
 use ILIAS\Search\Presentation\Result\UI\SanitizerImpl;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactoryImpl as SubitemPropertiesFactoryImpl;
 use ILIAS\Search\Presentation\Result\Object\AccessCheckerImpl;
+use ILIAS\Search\Presentation\Result\Copyright\HelperImpl as CopyrightHelperImpl;
 
 class Service
 {
@@ -65,6 +66,7 @@ class Service
                 $subitem_properties_factory
             ),
             $subitem_properties_factory,
+            new CopyrightHelperImpl($this->dic->learningObjectMetadata()),
             $access_checker,
             $sanitizer
         );

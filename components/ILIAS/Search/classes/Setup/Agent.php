@@ -22,9 +22,21 @@ namespace ILIAS\Search\Setup;
 
 use ILIAS\Setup\Agent\NullAgent;
 use ILIAS\Setup\Objective;
+use ILIAS\Setup\ObjectiveCollection;
+use ILIAS\Setup\Config;
+use ilDatabaseUpdateStepsExecutedObjective;
 
 class Agent extends NullAgent
 {
+    public function getUpdateObjective(?Config $config = null): Objective
+    {
+        return new ObjectiveCollection(
+            'Search',
+            false,
+            new ilDatabaseUpdateStepsExecutedObjective(new UpdateSteps11())
+        );
+    }
+
     public function getBuildObjective(): Objective
     {
         return new BuildSubitemPresentationReadersObjective();

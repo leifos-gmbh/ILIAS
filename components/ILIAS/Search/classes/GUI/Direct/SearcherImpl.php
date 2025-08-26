@@ -84,7 +84,8 @@ class SearcherImpl implements Searcher
             $cache->getRoot(),
             ilSearchSettings::getInstance()->getDefaultOperator() == ilSearchSettings::OPERATOR_AND,
             $this->parseStartDateFromCreationFilter($cache),
-            $this->parseEndDateFromCreationFilter($cache)
+            $this->parseEndDateFromCreationFilter($cache),
+            $cache->getCopyrightFilter()
         );
         $result->save();
 

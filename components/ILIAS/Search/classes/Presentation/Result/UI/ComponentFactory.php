@@ -44,6 +44,7 @@ interface ComponentFactory
         string $content,
         string $path,
         DateTimeImmutable $created_on,
+        string $copyright,
         ?Signal $subitem_show_signal
     ): Item;
 
@@ -52,7 +53,8 @@ interface ComponentFactory
         ?URI $link,
         bool $open_link_in_new_viewport,
         string $content,
-        string $type
+        string $type,
+        string $copyright
     ): Item;
 
     public function getModalForSubitems(

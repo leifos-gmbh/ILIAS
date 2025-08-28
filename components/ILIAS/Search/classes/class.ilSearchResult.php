@@ -326,7 +326,7 @@ class ilSearchResult
     ): bool {
         // check for copyright of all entries at once
         if ($copyright_identifiers !== []) {
-            $obj_ids_with_copyright = $this->findObjIDsOfEntriesWithCopyright(...$copyright_identifiers);
+            $entries_with_copyright = $this->findEntriesWithCopyright(...$copyright_identifiers);
         }
 
         // get ref_ids and check access
@@ -384,11 +384,27 @@ class ilSearchResult
             }
 
             // filter by copyright
-            if (
-                $copyright_identifiers !== [] &&
-                !in_array($entry['obj_id'], $obj_ids_with_copyright)
-            ) {
-                continue;
+            $filtered_children = $entry['child'];
+            if ($copyright_identifiers !== []) {
+                foreach ($filtered_children as $key => $child) {
+                    if (in_array(
+                        $entry['obj_id'] . '__' . $child['id'] . '__' . $child['type'],
+                        $entries_with_copyright
+                    )) {
+                        continue;
+                    }
+                    unset($filtered_children[$key]);
+                }
+                if (
+                    empty($filtered_children) &&
+                    !in_array(
+                        $entry['obj_id'] . '__' . $entry['obj_id'] . '__' . $entry['type'],
+                        $entries_with_copyright
+                    )
+                ) {
+                    continue;
+                }
+
             }
 
             // Check referenced objects
@@ -425,8 +441,8 @@ class ilSearchResult
                         if (1) {
                             $this->addResult($ref_id, $entry['obj_id'], $type);
                             $this->search_cache->appendToChecked($ref_id, $entry['obj_id']);
-                            $this->__updateResultChilds($ref_id, $entry['child']);
-
+                            $this->__updateResultChilds($ref_id, $filtered_children);
+                            ilObject::_lookupType($entry['obj_id']);
                             $counter++;
                             $offset_counter++;
                             // Stop if maximum of hits is reached
@@ -449,23 +465,34 @@ class ilSearchResult
 
     /**
      * @param string ...$copyright_identifiers
-     * @return int[]
+     * @return string[] in the format {OBJ_ID}__{SUB_ID}__{TYPE}
      */
-    protected function findObjIDsOfEntriesWithCopyright(string ...$copyright_identifiers): array
+    protected function findEntriesWithCopyright(string ...$copyright_identifiers): array
     {
         $filters = [];
         foreach ($this->entries as $entry) {
-            $filters[] = $this->lom_services->search()->getFilter($entry['obj_id']);
+            $filters[] = $this->lom_services->search()->getFilter(
+                $entry['obj_id'],
+                0,
+                $entry['type']
+            );
+            foreach ($entry['child'] as $child) {
+                $filters[] = $this->lom_services->search()->getFilter(
+                    $entry['obj_id'],
+                    $child['id'],
+                    $child['type']
+                );
+            }
         }
 
         $clause = $this->lom_services->copyrightHelper()->getCopyrightSearchClause(...$copyright_identifiers);
         $results = $this->lom_services->search()->execute($clause, null, null, ...$filters);
 
-        $obj_ids = [];
+        $ids = [];
         foreach ($results as $result) {
-            $obj_ids[] = $result->objID();
+            $ids[] = $result->objID() . '__' . $result->subID() . '__' . $result->type();
         }
-        return $obj_ids;
+        return $ids;
     }
 
     /**

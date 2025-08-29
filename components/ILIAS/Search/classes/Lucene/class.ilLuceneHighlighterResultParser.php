@@ -51,7 +51,7 @@ class ilLuceneHighlighterResultParser
             return 0;
         }
 
-        $score = $this->result[$obj_id][$sub_type . '__' . $sub_id]['score'];
+        $score = $this->result[$obj_id][$sub_type . '__' . $sub_id]['score'] ?? 0;
         return $score / $this->getMaxScore() * 100;
     }
 
@@ -82,6 +82,9 @@ class ilLuceneHighlighterResultParser
             foreach ($object->children() as $item) {
                 $sub_type = (string) $item['type'];
                 $sub_id = (string) $item['id'];
+
+                $this->result[$obj_id][$sub_type . '__' . $sub_id]['id'] = $sub_id;
+                $this->result[$obj_id][$sub_type . '__' . $sub_id]['type'] = $sub_type;
 
                 // begin-patch mime_filter
                 $score = (string) $item['absoluteScore'];
@@ -122,6 +125,9 @@ class ilLuceneHighlighterResultParser
             return [];
         }
         foreach ($this->result[$obj_id] as $data) {
+            if ($data['id'] <= 0) {
+                continue;
+            }
             $sub_item_ids[] = ['id' => (int) $data['id'], 'type' => (string) $data['type']];
         }
         return $sub_item_ids;

@@ -89,6 +89,29 @@ class RepositoryMainBarProvider extends AbstractStaticMainMenuProvider
 
         $icon = $this->dic->ui()->factory()->symbol()->icon()->custom(ilUtil::getImagePath("standard/icon_reptr.svg"), $title);
 
+        // force ks tree js to be loaded
+        $recursion = new class () implements \ILIAS\UI\Component\Tree\TreeRecursion {
+            public function getChildren($record, $environment = null): array
+            {
+                return [];
+            }
+
+            public function build(
+                \ILIAS\UI\Component\Tree\Node\Factory $factory,
+                $record,
+                $environment = null
+            ): \ILIAS\UI\Component\Tree\Node\Node {
+                $node = $factory->simple("none");
+                return $node;
+            }
+        };
+        $this->dic->ui()->renderer()->render(
+            $this->dic->ui()->factory()->tree()->expandable(
+                "",
+                $recursion
+            )->withData([])
+        );
+
         \ilRepositoryExplorerGUI::init();
         $ref_id = $this->request->getRefId();
         $top_node = \ilRepositoryExplorerGUI::getTopNodeForRefId($ref_id);
@@ -245,6 +268,7 @@ class RepositoryMainBarProvider extends AbstractStaticMainMenuProvider
         $DIC->ctrl()->setParameterByClass("ilrepositorygui", "ref_id", $ref_id);
         $exp = new \ilRepositoryExplorerGUI("ilrepositorygui", "showRepTree");
         $exp->setSkipRootNode(true);
+        return $exp->getHTML(true);
         return $exp->getHTML() . "<script>" . $exp->getOnLoadCode() . "</script>";
     }
 }

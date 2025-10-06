@@ -31,9 +31,9 @@ class TableAdapterGUI
 {
     use BaseGUIRequest;
 
-    protected const STANDARD = 0;
-    protected const SINGLE = 1;
-    protected const MULTI = 2;
+    protected const int STANDARD = 0;
+    protected const int SINGLE = 1;
+    protected const int MULTI = 2;
     protected string $order_cmd = "";
     protected string $last_action_key;
     protected URLBuilderToken $row_id_token;
@@ -46,6 +46,7 @@ class TableAdapterGUI
     protected string $last_key;
     protected \ilCtrlInterface $ctrl;
     protected \ILIAS\DI\UIServices $ui;
+    protected \ilObjUser $user;
     protected array $columns = [];
     protected array $actions = [];
 
@@ -104,6 +105,26 @@ class TableAdapterGUI
         bool $sortable = false
     ): self {
         $column = $this->ui->factory()->table()->column()->statusIcon($title)->withIsSortable($sortable);
+        $this->addColumn($key, $column);
+        return $this;
+    }
+
+    public function dateColumn(
+        string $key,
+        string $title,
+        bool $sortable = false
+    ): self {
+        $column = $this->ui->factory()->table()->column()->date($title, $this->user->getDateTimeFormat())->withIsSortable($sortable);
+        $this->addColumn($key, $column);
+        return $this;
+    }
+
+    public function linkListingColumn(
+        string $key,
+        string $title,
+        bool $sortable = false
+    ): self {
+        $column = $this->ui->factory()->table()->column()->linkListing($title)->withIsSortable($sortable);
         $this->addColumn($key, $column);
         return $this;
     }

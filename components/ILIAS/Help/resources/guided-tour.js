@@ -7,7 +7,7 @@ il.guidedTour = (function ($) {
   let url; let tour; let signal; let popover;
 
   function addMapping(name, elId) {
-    /* console.log(`addMapping: ${name} ${elId}`); */
+    console.log(`addMapping: ${name} ${elId}`);
     compIds.set(name, elId);
   }
 
@@ -174,6 +174,9 @@ console.log("1");
   }
 
   function performStep(s) {
+    console.log("performStep");
+    console.log(s.type);
+    console.log(s.elementId);
     showPopover(s.type, s.elementId, s.url);
   }
 

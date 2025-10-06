@@ -45,7 +45,7 @@ class LayoutProvider extends AbstractModificationProvider
     public function getMainBarModification(
         CalledContexts $screen_context_stack
     ) : ?MainBarModification {
-        // init gui
+        /** @var \ilGuidedTourGUI $gui */
         $gui = $this->dic->help()->internal()->gui()->guidedTour()->guidedTourGUI();
         $gui->init();
         $this->globalScreen()->collector()->mainmenu()->collectOnce();

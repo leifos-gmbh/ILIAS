@@ -81,6 +81,7 @@ class ilHelpViewLayoutProvider extends AbstractModificationProvider
                     return $symbol->withHelpTopics(
                         ...$f->helpTopics($tt_text)
                     );*/
+                    return $symbol;
                     return $symbol->withAdditionalOnLoadCode(static function ($id) use ($tt_text): string {
                         return "il.Tooltip.addToNearest('$id', 'button,a', { context:'', my:'bottom center', at:'top center', text:'$tt_text' });";
                     });

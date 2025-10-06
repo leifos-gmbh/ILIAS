@@ -70,11 +70,11 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $f = $this->gui->ui()->factory();
         $r = $this->gui->ui()->renderer();
         $ctrl = $this->gui->ctrl();
-
         // ensure popover js being loaded
         $r->render($f->popover()->standard($f->legacy('')));
 
         $debug = true;
+        $mt->addJavaScript("assets/js/repository.js");
         if ($debug) {
             $mt->addJavaScript("../components/ILIAS/Help/resources/guided-tour.js");
         } else {
@@ -82,6 +82,13 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         }
         $target = $ctrl->getLinkTargetByClass(self::class, "", "", true);
         $mt->addOnloadCode("il.guidedTour.init('$target');");
+    }
+
+    public function registerTabLink(string $tab_id, \ILIAS\UI\Component\Link\Standard $link): \ILIAS\UI\Component\Link\Standard
+    {
+        return $link->withAdditionalOnLoadCode(static function (string $id) use ($tab_id) : string {
+            return "il.guidedTour.addMapping('$tab_id', '$id');";
+        });
     }
 
     public function getData() : void

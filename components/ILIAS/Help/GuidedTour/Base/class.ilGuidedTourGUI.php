@@ -26,6 +26,7 @@ use ILIAS\Services\Help\ScreenId\HelpScreenIdObserver;
  */
 class ilGuidedTourGUI implements ilCtrlBaseClassInterface
 {
+    protected string $current_screen_id;
     protected \ILIAS\Help\GuidedTour\Settings\SettingsManager $settings_manager;
     protected \ILIAS\Help\GuidedTour\StandardGUIRequest $request;
     protected \ILIAS\Help\GuidedTour\Page\PageManager $page_manager;
@@ -37,6 +38,7 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
     public function __construct()
     {
         global $DIC;
+        $this->current_screen_id = $DIC->help()->getScreenId();
         $this->help = $DIC->help()->internal();
         $this->gui = $this->help->gui();
         $this->tour_manager = $this->help->domain()->guidedTour()->tour();
@@ -80,6 +82,7 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         } else {
             $mt->addJavaScript("assets/js/guided-tour.js");
         }
+        $ctrl->setParameterByClass(self::class, "screen_id", rawurlencode($this->current_screen_id));
         $target = $ctrl->getLinkTargetByClass(self::class, "", "", true);
         $mt->addOnloadCode("il.guidedTour.init('$target');");
     }
@@ -97,14 +100,36 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $r = $this->gui->ui()->renderer();
         $ctrl = $this->gui->ctrl();
         $popover = $f->popover()->standard($f->legacy(''));
+        $current_screen_id = $this->help->gui()->standardRequest()->getScreenId();
         $data = new \stdClass();
-        $data->popoverHtml = $r->renderAsync($popover);
+        $popoverHtml = $r->renderAsync($popover);
+        // current workaround to not
+        $popoverHtml = str_replace("JSON.parse('{", "JSON.parse('{\"trigger\":\"manual\",", $popoverHtml);
+        $data->popoverHtml = $popoverHtml;
         $data->popoverShowSignal = $popover->getShowSignal()->getId();
         foreach ($this->tour_manager->getAll() as $tour) {
             $settings = $this->settings_manager->getByObjId($tour->getId());
+
+            // check active
             if (!$settings?->isActive()) {
                 continue;
             }
+
+            // check screen id
+            $screen_ids = $settings?->getScreenIds();
+            $found = true;
+            if (trim($screen_ids) !== "") {
+                $found = false;
+                foreach (explode(",", $screen_ids) as $screen_id) {
+                    if (trim($screen_id) === $current_screen_id) {
+                        $found = true;
+                    }
+                }
+            }
+            if (!$found) {
+                continue;
+            }
+
             $data->tour[$tour->getId()] = [
                 "name" => $tour->getTitle()
             ];

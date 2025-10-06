@@ -78,4 +78,10 @@ class StepManager
     {
         return $this->repo->countStepsOfTour($tour_id);
     }
+
+    public function saveOrder(int $tour_id, array $order): void
+    {
+        $this->repo->saveOrder($tour_id, $order);
+    }
+
 }

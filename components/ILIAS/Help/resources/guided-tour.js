@@ -24,7 +24,10 @@ il.guidedTour = (function ($) {
       id: s,
       event: null,
       triggerer: $(el),
-      options: JSON.parse('[]'),
+      options: {
+        event: 'manual',
+        trigger: 'manual',
+      },
     });
   }
 
@@ -64,15 +67,10 @@ il.guidedTour = (function ($) {
     const doc = iframe.contentDocument || iframe.contentWindow.document;
     const buttons = [...doc.querySelectorAll('button')];   // NodeList → Array
     const lastButtons = buttons.slice(-2);
-console.log("1");
     // Beispiel: den Text der beiden Buttons ausgeben
     lastButtons.forEach((btn) => {
-      console.log("2");
-      console.log(btn.dataset);
       if (btn.dataset.gdtrType === 'next') {
-        console.log("3");
         btn.addEventListener('click', () => {
-          console.log("4");
           nextStep();
         });
       }
@@ -84,15 +82,23 @@ console.log("1");
 
     iframe.style.height = `5px`;
 
+    doc.body.style.height = "100%";
+    doc.body.style.minHeight = "100%";
+
     const newWidth = Math.max(
       doc.documentElement.scrollWidth,
       doc.body.scrollWidth,
     );
 
-    const newHeight = Math.max(
+    let newHeight = Math.max(
       doc.documentElement.scrollHeight,
       doc.body.scrollHeight,
     );
+
+    doc.body.style.height = "auto";
+    doc.body.style.minHeight = "auto";
+
+    newHeight = newHeight + 10;
 
     // iframe.style.width = `${newWidth}px`;
     iframe.style.height = `${newHeight}px`;
@@ -120,20 +126,30 @@ console.log("1");
     } else {
       switch (type) {
         case 4: // Form
-          el = document.querySelector('#mainspacekeeper .c-form__header');
+          el = document.querySelector('#ilContentContainer h2');
+          generateIdIfMissing(el);
           break;
         case 5: // Table
-          el = document.querySelector('#mainspacekeeper thead');
+          el = document.querySelector('#ilContentContainer thead');
+          generateIdIfMissing(el);
           break;
         case 6: // Toolbar
-          el = document.querySelector('#mainspacekeeper .c-toolbar');
+          el = document.querySelector('#mainspacekeeper .c-toolbar .c-toolbar__item');
+          generateIdIfMissing(el);
           break;
         case 7: // Primary Button
           el = document.querySelector('#mainspacekeeper .btn-primary');
+          generateIdIfMissing(el);
           break;
       }
     }
     return el;
+  }
+
+  function generateIdIfMissing(el) {
+    if (!el.id) {
+      el.id = `uid-${Math.random().toString(36).substr(2, 9)}`;
+    }
   }
 
   /* function fetchHTML(cmd) {

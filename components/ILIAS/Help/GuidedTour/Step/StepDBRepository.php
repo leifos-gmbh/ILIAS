@@ -123,6 +123,22 @@ class StepDBRepository
         return 0;
     }
 
+    public function saveOrder(int $tour_id, array $order): void
+    {
+        $order_nr = 0;
+        foreach ($order as $step_id) {
+            $order_nr += 10;
+            $this->db->update("help_gt_step", [
+                "order_nr" => ["integer", $order_nr],
+            ], [    // where
+                    "id" => ["integer", $step_id],
+                    "tour_id" => ["integer", $tour_id],
+                ]
+            );
+
+        }
+    }
+
 
     protected function mapRecordToStep(array $record): Step
     {

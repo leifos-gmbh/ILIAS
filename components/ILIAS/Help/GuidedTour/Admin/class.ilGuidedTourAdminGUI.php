@@ -75,6 +75,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                     "saveSettings",
                     "idSettings",
                     "saveIdSettings",
+                    "saveOrder",
                 ])) {
                     $this->$cmd();
                 }
@@ -466,5 +467,27 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $id_pres->saveIdPresentationUsers($form->getData("users"));
         $mt->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
         $ctrl->redirectByClass(self::class, "idSettings");
+    }
+
+    protected function saveOrder() : void
+    {
+        $ctrl = $this->gui->ctrl();
+        $mt = $this->gui->ui()->mainTemplate();
+        $lng = $this->domain->lng();
+        $ctrl->saveParameterByClass(self::class, "tour_id");
+
+        $table = $this->gui->stepTableGUI(
+            $this->gui->standardRequest()->getTourId(),
+            $this
+        );
+        $data = $table->getData();
+        if (is_array($data)) {
+            $this->step_manager->saveOrder(
+                $this->gui->standardRequest()->getTourId(),
+                $data
+            );
+            $mt->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
+        }
+        $ctrl->redirectByClass(self::class, "listSteps");
     }
 }

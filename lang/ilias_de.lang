@@ -10506,6 +10506,7 @@ help#:#gdtr_add_step#:#Schritt hinzufügen
 help#:#gdtr_next_step#:#Nächster Schritt
 help#:#gdtr_screen_ids#:#Screen IDs
 help#:#gdtr_screen_ids_info#:#Mehrere IDs müssen durch Kommas separiert werden.
+help#:#gdtr_step#:#Schritt
 help#:#gdtr_tour_steps#:#Schritte
 help#:#gdtr_type#:#Typ
 help#:#gdtr_guided_tours#:#Guided Tours

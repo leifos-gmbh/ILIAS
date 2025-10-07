@@ -10488,6 +10488,12 @@ gsfo#:#services#:#Services
 gsfo#:#support#:#Support
 help#:#gdtr_active#:#Active
 help#:#gdtr_close#:#End Tour
+help#:#gdtr_deleted_step#:#Step has been deleted.
+help#:#gdtr_deleted_tour#:#Tour has been deleted.
+help#:#gdtr_delete_step#:#Delete Step
+help#:#gdtr_delete_step_mess#:#Are you sure you want to delete this step?
+help#:#gdtr_delete_tour#:#Delete Tour
+help#:#gdtr_delete_tour_mess#:#Are you sure you want to delete this tour?
 help#:#gdtr_edit_properties#:#Edit Properties
 help#:#gdtr_edit_content#:#Edit Content
 help#:#gdtr_step_type#:#Type

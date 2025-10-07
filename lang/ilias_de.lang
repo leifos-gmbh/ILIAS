@@ -10487,6 +10487,12 @@ gsfo#:#services#:#Services
 gsfo#:#support#:#Support
 help#:#gdtr_active#:#Aktiv
 help#:#gdtr_close#:#Tour beenden
+help#:#gdtr_deleted_step#:#Der Schritt wurde gelöscht.
+help#:#gdtr_deleted_tour#:#Die Tour wurde gelöscht.
+help#:#gdtr_delete_step#:#Schritt löschen
+help#:#gdtr_delete_step_mess#:#Sind Sie sicher, dass dieser Schritt gelöscht werden soll?
+help#:#gdtr_delete_tour#:#Tour löschen
+help#:#gdtr_delete_tour_mess#:#Sind Sie sicher, dass diese Tour gelöscht werden soll?
 help#:#gdtr_edit_properties#:#Eigenschaften bearbeiten
 help#:#gdtr_edit_content#:#Inhalt bearbeiten
 help#:#gdtr_step_type#:#Typ

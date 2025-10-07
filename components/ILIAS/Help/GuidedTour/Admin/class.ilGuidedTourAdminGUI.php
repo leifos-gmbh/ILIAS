@@ -65,6 +65,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                     "listTours",
                     "addTour",
                     "saveTour",
+                    "deleteTour",
                     "listSteps",
                     "addStep",
                     "saveStep",
@@ -76,6 +77,8 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                     "idSettings",
                     "saveIdSettings",
                     "saveOrder",
+                    "confirmStepDeletion",
+                    "deleteStep",
                 ])) {
                     $this->$cmd();
                 }
@@ -139,6 +142,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $this->gui->toolbar()->addComponent($b);
 
         $items = [];
+        $ui_items = [];
         foreach ($this->tm->getAll() as $tour) {
             $ctrl->setParameterByClass(self::class, "tour_id", $tour->getId());
             $actions = [];
@@ -150,10 +154,12 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                $lng->txt("settings"),
                $ctrl->getLinkTargetByClass(self::class, "editSettings")
             );
-            $actions[] = $f->link()->standard(
+            $delete_modal = $this->getDeleteTourModal($tour->getId());
+            $actions[] = $f->button()->shy(
                $lng->txt("delete"),
-               $ctrl->getLinkTargetByClass(self::class, "confirmTourDeletion")
-            );
+               "#"
+            )->withOnClick($delete_modal->getShowSignal());
+            $ui_items[] = $delete_modal;
             $properties = [];
             $settings = $this->domain->tourSettings()->getByObjId($tour->getId());
             $properties[$lng->txt("active")] = $settings->isActive()
@@ -169,8 +175,43 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                 $lng->txt("gdtr_guided_tours"),
                 [$grp]
             );
-            $mt->setContent($r->render([$panel]));
+            $ui_items[] = $panel;
+            $mt->setContent($r->render($ui_items));
         }
+    }
+
+    protected function getDeleteTourModal(int $tour_id): \ILIAS\UI\Component\Modal\Interruptive
+    {
+        $tour = $this->tm->getByObjId($tour_id);
+        $f = $this->gui->ui()->factory();
+        $r = $this->gui->ui()->renderer();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $del_items = [];
+        $del_items[] = $f->modal()->interruptiveItem()->keyValue(
+            (string) $tour_id,
+            $tour->getTitle(),
+            ""
+        );
+        $ctrl->setParameterByClass(self::class, "tour_id", $tour_id);
+        $action = $ctrl->getLinkTargetByClass(self::class, "deleteTour");
+
+        return $f->modal()->interruptive(
+                $lng->txt("gdtr_delete_tour"),
+                $lng->txt("gdtr_delete_tour_mess"),
+                $action
+            )->withAffectedItems($del_items);
+    }
+
+    protected function deleteTour() : void
+    {
+        $mt = $this->gui->ui()->mainTemplate();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $tour_id = $this->gui->standardRequest()->getTourId();
+        $this->tm->deleteTour($tour_id);
+        $mt->setOnScreenMessage("success", $lng->txt("gdtr_deleted_tour"), true);
+        $ctrl->redirectByClass(self::class, "listTours");
     }
 
     protected function getCreateForm() : FormAdapterGUI
@@ -190,10 +231,14 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
     public function saveTour() : void
     {
         $mt = $this->gui->ui()->mainTemplate();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
         $form = $this->getCreateForm();
         if ($form->isValid()) {
             $obj_id = $this->tm->createTour("dummy", "");
             $form->saveStdTitleAndDescription($obj_id, "gdtr");
+            $mt->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
+            $ctrl->redirectByClass(self::class, "listTours");
         } else {
             $mt->setContent($form->render());
         }
@@ -488,6 +533,43 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
             );
             $mt->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
         }
+        $ctrl->redirectByClass(self::class, "listSteps");
+    }
+
+    public function confirmStepDeletion(int $step_id) : void
+    {
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $table = $this->gui->stepTableGUI(
+            $this->gui->standardRequest()->getTourId(),
+            $this
+        );
+        $step = $this->step_manager->getById($step_id);
+        $ctrl->setParameterByClass(self::class, "step_id", $step_id);
+        $title = $this->step_manager->getStepName($step->getType());
+        if ($step->getElementId() !== "") {
+            $title .= " (" . $step->getElementId() . ")";
+        }
+        $table->renderDeletionConfirmation(
+            $lng->txt("gdtr_delete_step"),
+            $lng->txt("gdtr_delete_step_mess"),
+            "deleteStep",
+            [
+                $step_id => $title
+            ]
+        );
+    }
+
+    public function deleteStep() : void
+    {
+        $ctrl = $this->gui->ctrl();
+        $mt = $this->gui->ui()->mainTemplate();
+        $lng = $this->domain->lng();
+        $tour_id = $this->gui->standardRequest()->getTourId();
+        $step_id = $this->gui->standardRequest()->getStepId();
+
+        $this->step_manager->delete($tour_id, $step_id);
+        $mt->setOnScreenMessage("success", $lng->txt("gdtr_deleted_step"), true);
         $ctrl->redirectByClass(self::class, "listSteps");
     }
 }

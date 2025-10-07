@@ -84,4 +84,9 @@ class StepManager
         $this->repo->saveOrder($tour_id, $order);
     }
 
+    public function delete(int $tour_id, int $step_id) : void
+    {
+        $this->repo->delete($tour_id, $step_id);
+    }
+
 }

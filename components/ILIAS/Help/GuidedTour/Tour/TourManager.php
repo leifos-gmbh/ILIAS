@@ -70,4 +70,12 @@ class TourManager
         return \ilObjectFactory::getInstanceByObjId($obj_id);
     }
 
+    public function deleteTour(
+        int $obj_id
+    ) : void
+    {
+        $tour_obj = new ilObjGuidedTour($obj_id);
+        $tour_obj->delete();
+    }
+
 }

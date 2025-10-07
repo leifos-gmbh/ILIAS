@@ -70,12 +70,12 @@ class StepDBRepository
         ]);
     }
 
-    public function delete(int $id): void
+    public function delete(int $tour_id, int $step_id) : void
     {
-        $this->db->manipulateF(
-            'DELETE FROM help_gt_step WHERE id = %s',
-            ['integer'],
-            [$id]
+        $this->db->manipulateF("DELETE FROM help_gt_step WHERE " .
+            " id = %s AND tour_id = %s",
+            ["integer", "integer"],
+            [$step_id, $tour_id]
         );
     }
 
@@ -135,10 +135,8 @@ class StepDBRepository
                     "tour_id" => ["integer", $tour_id],
                 ]
             );
-
         }
     }
-
 
     protected function mapRecordToStep(array $record): Step
     {

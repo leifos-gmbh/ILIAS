@@ -68,6 +68,7 @@ class TableAdapterGUI
         $this->http = $DIC->http();
         $this->lng = $DIC->language();
         $this->refinery = $DIC->refinery();
+        $this->user = $DIC->user();
         $this->df = new \ILIAS\Data\Factory();
         $this->initRequest($this->http, $this->refinery);
         if ($namespace === "") {
@@ -115,6 +116,16 @@ class TableAdapterGUI
         bool $sortable = false
     ): self {
         $column = $this->ui->factory()->table()->column()->date($title, $this->user->getDateTimeFormat())->withIsSortable($sortable);
+        $this->addColumn($key, $column);
+        return $this;
+    }
+
+    public function linkColumn(
+        string $key,
+        string $title,
+        bool $sortable = false
+    ): self {
+        $column = $this->ui->factory()->table()->column()->link($title)->withIsSortable($sortable);
         $this->addColumn($key, $column);
         return $this;
     }

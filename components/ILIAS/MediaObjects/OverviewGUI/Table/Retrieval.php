@@ -63,12 +63,12 @@ class Retrieval implements RetrievalInterface
             foreach ($this->sub_object_retrieval->getAllIDsForType($type) as $id) {
                 $title = $this->sub_object_retrieval->getTitleOfSubObject($type, $id);
                 $link = $this->sub_object_retrieval->getLinkToSubObject($type, $id);
-                foreach (ilObjMediaObject::_getMobsOfObject($type, $id) as $mob_id) {
+                foreach (ilObjMediaObject::_getMobsOfObject($type, $id, 0) as $mob_id) {
                     /*
                      * type and id are only needed here internally to separate
                      * internal from external usages, see addExternalData
                      */
-                    $this->internal_data[$id]['internal_usages'][$type . ':' . $id] = [
+                    $this->internal_data[$mob_id]['internal_usages'][$type . ':' . $id] = [
                         'title' => $title,
                         'link' => $link
                     ];
@@ -91,6 +91,7 @@ class Retrieval implements RetrievalInterface
                 continue;
             }
 
+            $this->internal_data[$mob_id]['id'] = $mob_id;
             $this->internal_data[$mob_id]['title'] = $title;
             $this->internal_data[$mob_id]['last_update'] = $last_update->getTimestamp();
             $this->internal_data[$mob_id]['copyright'] = $this->lom->copyrightHelper()->hasPresetCopyright($reader) ?
@@ -107,7 +108,8 @@ class Retrieval implements RetrievalInterface
     protected function addExternalData(array $internal_data): array
     {
         $data = $internal_data;
-        foreach ($data as $mob_id => $datum) {
+        foreach ($data as $key => $datum) {
+            $mob_id = $datum['id'];
             foreach (ilObjMediaObject::lookupUsages($mob_id, false) as $usage) {
                 /*
                  * filter out already collected usages, see getInternalData
@@ -120,6 +122,9 @@ class Retrieval implements RetrievalInterface
                 }
 
                 $parent_obj_id = ilObjMediaObject::getParentObjectIdForUsage($usage);
+                if (!$parent_obj_id) {
+                    continue;
+                }
 
                 $parent_ref_id = null;
                 $show_link = false;
@@ -139,20 +144,20 @@ class Retrieval implements RetrievalInterface
                 $parent_type = ilObject::_lookupType($parent_obj_id);
                 $link_to_parent = '';
                 if ($show_link) {
-                    $link_to_parent = $this->static_url->builder()->build(
+                    $link_to_parent = (string) $this->static_url->builder()->build(
                         $parent_type,
                         $this->data_factory->refId($parent_ref_id)
                     );
                 }
 
                 if ($parent_type === 'mep') {
-                    $data[$mob_id]['mep_usages'][] = [
+                    $data[$key]['mep_usages'][] = [
                         'title' => $parent_title,
                         'link' => $link_to_parent
                     ];
                     continue;
                 }
-                $data[$mob_id]['external_usages'][] = [
+                $data[$key]['external_usages'][] = [
                     'title' => $parent_title,
                     'link' => $link_to_parent
                 ];
@@ -200,8 +205,8 @@ class Retrieval implements RetrievalInterface
     ): Generator {
         $data = $this->getInternalData($filter);
 
-        $this->applyOrder($data, $order);
-        $this->applyRange($data, $range);
+        $data = $this->applyOrder($data, $order);
+        $data = $this->applyRange($data, $range);
 
         /*
          * read out other usages after applying order and range,

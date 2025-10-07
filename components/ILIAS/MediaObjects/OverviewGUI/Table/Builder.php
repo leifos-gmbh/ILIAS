@@ -38,9 +38,9 @@ class Builder extends CommonTableBuilder
     public function __construct(
         object $parent_gui,
         string $parent_cmd,
+        protected SubObjectRetrieval $sub_object_retrieval,
         protected ilLanguage $lng,
         protected UIFactory $ui_factory,
-        protected SubObjectRetrieval $sub_object_retrieval,
         protected StaticURL $static_url,
         protected DataFactory $data_factory,
         protected ilAccess $access,
@@ -73,12 +73,13 @@ class Builder extends CommonTableBuilder
     protected function transformRow(array $data_row): array
     {
         $data = [
-            'title' => $data_row['id'],
-            'last_update' => new DateTimeImmutable('@' . $data_row['last_update']),
-            'copyright' => $data_row['copright'],
-            'internal_usages' => $this->buildLinkListingFromData($data_row['internal_usages']),
-            'mep_usages' => $this->buildLinkListingFromData($data_row['mep_usages']),
-            'external_usages' => $this->buildLinkListingFromData($data_row['external_usages'])
+            'id' => $data_row['id'],
+            'title' => $data_row['title'] ?? '',
+            'last_update' => new DateTimeImmutable('@' . ($data_row['last_update'] ?? 0)),
+            'copyright' => $data_row['copyright'] ?? '',
+            'internal_usages' => $this->buildLinkListingFromData($data_row['internal_usages'] ?? []),
+            'mep_usages' => $this->buildLinkListingFromData($data_row['mep_usages'] ?? []),
+            'external_usages' => $this->buildLinkListingFromData($data_row['external_usages'] ?? [])
         ];
         return $data;
     }
@@ -104,10 +105,10 @@ class Builder extends CommonTableBuilder
     protected function build(TableAdapterGUI $table): TableAdapterGUI
     {
         $table = $table
-            ->textColumn('title', $this->lng->txt('mob'))
-            ->dateColumn('last_update', $this->lng->txt('mob_last_update'));
+            ->textColumn('title', $this->lng->txt('mob'), true)
+            ->dateColumn('last_update', $this->lng->txt('mob_last_update'), true);
         if ($this->lom->copyrightHelper()->isCopyrightSelectionActive()) {
-            $table = $table->textColumn('copyright', $this->lng->txt('mob_copyright'));
+            $table = $table->textColumn('copyright', $this->lng->txt('mob_copyright'), true);
         }
         return $table
             ->linkListingColumn('internal_usages', $this->lng->txt('mob_internal_usages_in_object'))

@@ -26,6 +26,7 @@ use ILIAS\UI\URLBuilder;
 use ILIAS\Repository\BaseGUIRequest;
 use ILIAS\UI\URLBuilderToken;
 use ILIAS\Repository\RetrievalInterface;
+use ILIAS\Repository\Filter\FilterAdapterGUI;
 
 class TableAdapterGUI
 {
@@ -49,6 +50,7 @@ class TableAdapterGUI
     protected \ilObjUser $user;
     protected array $columns = [];
     protected array $actions = [];
+    protected FilterAdapterGUI $filter;
 
     public function __construct(
         protected string $id,
@@ -180,6 +182,15 @@ class TableAdapterGUI
         string $title
     ): self {
         $this->addAction(self::MULTI, $action, $title);
+        return $this;
+    }
+
+    /**
+     * Not applied if the table supports ordering.
+     */
+    public function filter(FilterAdapterGUI $filter): self
+    {
+        $this->filter = $filter;
         return $this;
     }
 
@@ -346,7 +357,8 @@ class TableAdapterGUI
                     ->data($table_retrieval, $this->title, $columns)
                     ->withId($this->id)
                     ->withActions($actions)
-                    ->withRequest($this->http->request());
+                    ->withRequest($this->http->request())
+                    ->withFilter($this->filter?->getData());
             }
         }
         return $this->table;
@@ -359,7 +371,7 @@ class TableAdapterGUI
 
     public function render(): string
     {
-        $html = $this->ui->renderer()->render($this->getTable());
+        $html = $this->filter->render() . $this->ui->renderer()->render($this->getTable());
         return $html;
     }
 }

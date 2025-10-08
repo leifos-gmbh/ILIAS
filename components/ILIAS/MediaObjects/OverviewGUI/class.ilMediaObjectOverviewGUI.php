@@ -24,6 +24,8 @@ use ILIAS\UI\Factory as UIFactory;
 use ILIAS\StaticURL\Services as StaticURL;
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\MetaData\Services\ServicesInterface as LOM;
+use ILIAS\Repository\Filter\FilterAdapterGUI;
+use ILIAS\MediaObjects\InternalGUIService;
 
 class ilMediaObjectOverviewGUI
 {
@@ -35,6 +37,7 @@ class ilMediaObjectOverviewGUI
     protected DataFactory $data_factory;
     protected ilAccess $access;
     protected LOM $lom;
+    protected InternalGUIService $gui;
 
     public function __construct(
         protected SubObjectRetrieval $sub_object_retrieval
@@ -49,6 +52,7 @@ class ilMediaObjectOverviewGUI
         $this->data_factory = new DataFactory();
         $this->access = $DIC->access();
         $this->lom = $DIC->learningObjectMetadata();
+        $this->gui = $DIC->mediaObjects()->internal()->gui();
 
         $this->lng->loadLanguageModule('mob');
     }
@@ -65,10 +69,32 @@ class ilMediaObjectOverviewGUI
 
     protected function show(): void
     {
+        $filter = $this->getFilter('show');
         $table_builder = $this->getTableBuilder('show');
-        $table = $table_builder->getTable();
+        $table = $table_builder->getTable()->filter($filter);
 
         $this->tpl->setContent($table->render());
+    }
+
+    protected function getFilter(string $cmd): FilterAdapterGUI
+    {
+        $filter = $this->gui->filter(
+            'mob_overview_filter',
+            self::class,
+            $cmd
+        );
+
+        $filter = $filter->text('title', $this->lng->txt('mob'));
+        if ($this->lom->copyrightHelper()->isCopyrightSelectionActive()) {
+            $cp_selection = [];
+            foreach ($this->lom->copyrightHelper()->getAllCopyrightPresets() as $copyright) {
+                $cp_selection[$copyright->identifier()] = $copyright->title();
+            }
+            $filter = $filter->multiSelect('copyright', $this->lng->txt('mob_copyright'), $cp_selection);
+        }
+        $filter = $filter->duration('last_update', $this->lng->txt('mob_last_update'), true);
+
+        return $filter;
     }
 
     protected function getTableBuilder(string $cmd): TableBuilder

@@ -110,6 +110,7 @@ class Retrieval implements RetrievalInterface
         $data = $internal_data;
         foreach ($data as $key => $datum) {
             $mob_id = $datum['id'];
+            $already_collected_obj_ids = [];
             foreach (ilObjMediaObject::lookupUsages($mob_id, false) as $usage) {
                 /*
                  * filter out already collected usages, see getInternalData
@@ -122,7 +123,7 @@ class Retrieval implements RetrievalInterface
                 }
 
                 $parent_obj_id = ilObjMediaObject::getParentObjectIdForUsage($usage);
-                if (!$parent_obj_id) {
+                if (!$parent_obj_id || in_array($parent_obj_id, $already_collected_obj_ids)) {
                     continue;
                 }
 
@@ -150,6 +151,7 @@ class Retrieval implements RetrievalInterface
                     );
                 }
 
+                $already_collected_obj_ids[] = $parent_obj_id;
                 if ($parent_type === 'mep') {
                     $data[$key]['mep_usages'][] = [
                         'title' => $parent_title,
@@ -180,15 +182,15 @@ class Retrieval implements RetrievalInterface
         }
 
         if (
-            ($filter['copyright'] ?? '') !== '' &&
-            $copyright_identifier !== $filter['copyright']
+            ($filter['copyright'] ?? []) !== [] &&
+            !in_array($copyright_identifier, $filter['copyright'])
         ) {
             return true;
         }
 
         if (
-            (isset($filter['last_update']['start']) && $last_update < $filter['last_update']['start']) ||
-            (isset($filter['last_update']['end']) && $last_update > $filter['last_update']['end'])
+            (isset($filter['last_update'][0]) && $last_update < new DateTimeImmutable($filter['last_update'][0])) ||
+            (isset($filter['last_update'][1]) && $last_update > new DateTimeImmutable($filter['last_update'][1]))
         ) {
             return true;
         }

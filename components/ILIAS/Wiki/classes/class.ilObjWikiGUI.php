@@ -23,6 +23,7 @@ use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
 use ILIAS\Wiki\Settings\SettingsGUI;
 use ILIAS\ILIASObject\Properties\Translations\TranslationGUI;
 use ILIAS\User\Profile\PublicProfileGUI;
+use ILIAS\Wiki\Media\PageRetrieval;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -37,6 +38,7 @@ use ILIAS\User\Profile\PublicProfileGUI;
  * @ilCtrl_Calls ilObjWikiGUI: ilRepositoryObjectSearchGUI, ilObjectCopyGUI, ilObjNotificationSettingsGUI
  * @ilCtrl_Calls ilObjWikiGUI: ilLTIProviderObjectSettingGUI, ILIAS\ILIASObject\Properties\Translations\TranslationGUI
  * @ilCtrl_Calls ilObjWikiGUI: ILIAS\Wiki\Settings\SettingsGUI
+ * @ilCtrl_Calls ilObjWikiGUI: ilMediaObjectOverviewGUI
  */
 class ilObjWikiGUI extends ilObjectGUI
 {
@@ -332,6 +334,17 @@ class ilObjWikiGUI extends ilObjectGUI
                 $this->ctrl->forwardCommand($gui);
                 break;
 
+            case strtolower(ilMediaObjectOverviewGUI::class):
+                $this->checkPermission("write");
+                $this->addHeaderAction();
+                $ilTabs->activateTab("media");
+                $this->getTabs();
+
+                $retrieval = new PageRetrieval($this->pm, $this->ctrl);
+                $gui = new ilMediaObjectOverviewGUI($retrieval);
+                $this->ctrl->forwardCommand($gui);
+                break;
+
             default:
                 $this->addHeaderAction();
                 if (!$cmd) {
@@ -561,7 +574,7 @@ class ilObjWikiGUI extends ilObjectGUI
         $ilHelp->setScreenIdComponent("wiki");
 
         // wiki tabs
-        if (in_array(strtolower($ilCtrl->getNextClass($this)), [strtolower(SettingsGUI::class)]) ||
+        if (in_array(strtolower($ilCtrl->getNextClass($this)), [strtolower(SettingsGUI::class), strtolower(ilMediaObjectOverviewGUI::class)]) ||
             in_array(
                 strtolower($ilCtrl->getCmdClass()),
                 array("", "ilobjectcontentstylesettingsgui", "ilobjwikigui",
@@ -598,6 +611,15 @@ class ilObjWikiGUI extends ilObjectGUI
                     "wiki_pages",
                     $lng->txt("wiki_pages"),
                     $this->ctrl->getLinkTarget($this, "allPages")
+                );
+            }
+
+            // media
+            if ($ilAccess->checkAccess('write', "", $this->object->getRefId())) {
+                $this->tabs_gui->addTab(
+                    "media",
+                    $this->lng->txt("mob_media"),
+                    $this->ctrl->getLinkTargetByClass(ilMediaObjectOverviewGUI::class, "show")
                 );
             }
 

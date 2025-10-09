@@ -6827,6 +6827,7 @@ content#:#cont_page_notification_activated#:#Notification Activated (Single Page
 content#:#cont_page_template#:#Page Template
 content#:#cont_page_toc#:#Page Overview
 content#:#cont_page_translation_does_not_exist#:#The translation page does not exist yet and will be created by copying the content of the current master page. Language of the translation page
+content#:#cont_page_usage#:#Page Usage
 content#:#cont_pages#:#Pages
 content#:#cont_pages_and_subchapters#:#Subchapters and Pages
 content#:#cont_par_format#:#Paragraph
@@ -6906,10 +6907,13 @@ content#:#cont_qover_short_message#:#Status Message
 content#:#cont_qover_short_message_info#:#A message ‘You have correctly answered C out of Y questions of this unit.’ will be displayed.
 content#:#cont_qtries#:#Number of Tries for Questions
 content#:#cont_qtries_info#:#Default value for number of tries for newly created questions.
+content#:#cont_question#:#Question
+content#:#cont_question_page_usage#:#Questions on Pages
 content#:#cont_question_placeh#:#Click and edit to insert question
 content#:#cont_question_placehl#:#Question Placeholder
 content#:#cont_question_stats#:#Statistic
 content#:#cont_question_type#:#Question Type
+content#:#cont_question_usage#:#Usages
 content#:#cont_quit_text_editing#:#Finish Text Editing
 content#:#cont_rand_start#:#Random Start
 content#:#cont_really_delete_overlays#:#Do you really want to delete the following overlays?
@@ -12735,13 +12739,18 @@ mme#:#type_top_link_item#:#Link
 mme#:#type_top_parent_item#:#Container
 mme#:#unable_to_render#:#Unable to show '%s' in '%s'.
 mob#:#mob_choose_from_pool#:#Choose from Media Pool
+mob#:#mob_copyright#:#Copyright
 mob#:#mob_external_url#:#External URL
 mob#:#mob_extract_preview_image#:#Extract Preview Image
 mob#:#mob_file#:#File
 mob#:#mob_file_could_not_be_uploaded#:#File could not be uploaded.
 mob#:#mob_general#:#General
 mob#:#mob_image_extracted#:#Image has been extracted.
+mob#:#mob_internal_usages_in_object#:#Page Usages
 mob#:#mob_language#:#Language
+mob#:#mob_last_update#:#Last Update
+mob#:#mob_media#:#Media
+mob#:#mob_media_objects_overview#:#Media Objects on Pages
 mob#:#mob_mime_type_not_allowed#:#The following mime types are not allowed at the destination.
 mob#:#mob_multi_srt_files#:#Subtitle Files
 mob#:#mob_no_extraction_possible#:#Sorry, it was not able to extract an image from the file.
@@ -12764,6 +12773,8 @@ mob#:#mob_url#:#URL
 mob#:#mob_url_info#:#External resource URL, e.g. Youtube or Vimeo URL.
 mob#:#mob_url_info1#:#External resource URL, allowed suffixes are:
 mob#:#mob_url_info_video#:#You may also refer to a Youtube or Vimeo URL.
+mob#:#mob_usages_in_media_pools#:#Media Pool Usages
+mob#:#mob_usages_in_other_objects#:#Other Usages
 mst#:#mst_cert_issued_on#:#Issued On
 mst#:#mst_courses_of#:#Course Memberships of %s
 mst#:#mst_download_certificate#:#Download Certificate

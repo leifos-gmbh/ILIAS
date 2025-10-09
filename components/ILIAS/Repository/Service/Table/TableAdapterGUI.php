@@ -50,7 +50,7 @@ class TableAdapterGUI
     protected \ilObjUser $user;
     protected array $columns = [];
     protected array $actions = [];
-    protected FilterAdapterGUI $filter;
+    protected array $filter_data = [];
 
     public function __construct(
         protected string $id,
@@ -188,9 +188,9 @@ class TableAdapterGUI
     /**
      * Not applied if the table supports ordering.
      */
-    public function filter(FilterAdapterGUI $filter): self
+    public function filterData(array $filter_data): self
     {
-        $this->filter = $filter;
+        $this->filter_data = $filter_data;
         return $this;
     }
 
@@ -358,7 +358,7 @@ class TableAdapterGUI
                     ->withId($this->id)
                     ->withActions($actions)
                     ->withRequest($this->http->request())
-                    ->withFilter($this->filter?->getData());
+                    ->withFilter($this->filter_data);
             }
         }
         return $this->table;
@@ -371,7 +371,7 @@ class TableAdapterGUI
 
     public function render(): string
     {
-        $html = $this->filter->render() . $this->ui->renderer()->render($this->getTable());
+        $html = $this->ui->renderer()->render($this->getTable());
         return $html;
     }
 }

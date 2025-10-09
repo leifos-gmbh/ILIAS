@@ -348,6 +348,8 @@ class ilObjMediaObject extends ilObject
             }
         }
 
+        $this->manager->updateLastChange($this->getId());
+
         self::handleQuotaUpdate($this);
         $ilAppEventHandler = $this->app_event_handler;
         $ilAppEventHandler->raise(

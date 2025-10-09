@@ -23,28 +23,23 @@ namespace ILIAS\MediaObjects\OverviewGUI\Table;
 use ILIAS\Repository\RetrievalInterface;
 use ILIAS\Repository\Table\CommonTableBuilder;
 use ILIAS\Repository\Table\TableAdapterGUI;
-use ilLanguage;
-use ILIAS\UI\Factory as UIFactory;
 use ILIAS\MediaObjects\OverviewGUI\SubObjectRetrieval;
-use ILIAS\StaticURL\Services as StaticURL;
 use ILIAS\Data\Factory as DataFactory;
-use ILIAS\MetaData\Services\ServicesInterface as LOM;
-use ilAccess;
 use DateTimeImmutable;
 use ILIAS\UI\Component\Listing\Unordered as UnorderedListing;
+use DateTimeZone;
+use ILIAS\MediaObjects\InternalGUIService;
+use ILIAS\MediaObjects\InternalDomainService;
 
 class Builder extends CommonTableBuilder
 {
     public function __construct(
-        object $parent_gui,
-        string $parent_cmd,
-        protected SubObjectRetrieval $sub_object_retrieval,
-        protected ilLanguage $lng,
-        protected UIFactory $ui_factory,
-        protected StaticURL $static_url,
+        protected InternalDomainService $domain,
+        protected InternalGUIService $gui,
         protected DataFactory $data_factory,
-        protected ilAccess $access,
-        protected LOM $lom
+        protected SubObjectRetrieval $sub_object_retrieval,
+        object $parent_gui,
+        string $parent_cmd
     ) {
         parent::__construct($parent_gui, $parent_cmd, true);
     }
@@ -56,17 +51,15 @@ class Builder extends CommonTableBuilder
 
     protected function getTitle(): string
     {
-        return $this->lng->txt('mob_media_objects_overview');
+        return $this->domain->lng()->txt('mob_media_objects_overview');
     }
 
     protected function getRetrieval(): RetrievalInterface
     {
         return new Retrieval(
             $this->sub_object_retrieval,
-            $this->static_url,
-            $this->data_factory,
-            $this->access,
-            $this->lom
+            $this->domain,
+            $this->data_factory
         );
     }
 
@@ -75,7 +68,8 @@ class Builder extends CommonTableBuilder
         $data = [
             'id' => $data_row['id'],
             'title' => $data_row['title'] ?? '',
-            'last_update' => new DateTimeImmutable('@' . ($data_row['last_update'] ?? 0)),
+            'last_update' => (new DateTimeImmutable('@' . ($data_row['last_update'] ?? 0)))
+                ->setTimezone(new DateTimeZone($this->domain->user()->getTimeZone())),
             'copyright' => $data_row['copyright'] ?? '',
             'internal_usages' => $this->buildLinkListingFromData($data_row['internal_usages'] ?? []),
             'mep_usages' => $this->buildLinkListingFromData($data_row['mep_usages'] ?? []),
@@ -86,6 +80,8 @@ class Builder extends CommonTableBuilder
 
     protected function buildLinkListingFromData(array $usage_data): UnorderedListing
     {
+        $ui_factory = $this->gui->ui()->factory();
+
         $links = [];
         foreach ($usage_data as $usage) {
             $title = $usage['title'] ?? '';
@@ -93,26 +89,29 @@ class Builder extends CommonTableBuilder
             if ($title === '') {
                 continue;
             }
-            $link = $this->ui_factory->link()->standard($title, $link_string);
+            $link = $ui_factory->link()->standard($title, $link_string);
             if ($link_string === '') {
                 $link = $link->withDisabled();
             }
             $links[] = $link;
         }
-        return $this->ui_factory->listing()->unordered($links);
+        return $ui_factory->listing()->unordered($links);
     }
 
     protected function build(TableAdapterGUI $table): TableAdapterGUI
     {
+        $lng = $this->domain->lng();
+        $lom = $this->domain->learningObjectMetadata();
+
         $table = $table
-            ->textColumn('title', $this->lng->txt('mob'), true)
-            ->dateColumn('last_update', $this->lng->txt('mob_last_update'), true);
-        if ($this->lom->copyrightHelper()->isCopyrightSelectionActive()) {
-            $table = $table->textColumn('copyright', $this->lng->txt('mob_copyright'), true);
+            ->textColumn('title', $lng->txt('mob'), true)
+            ->dateColumn('last_update', $lng->txt('mob_last_update'), true);
+        if ($lom->copyrightHelper()->isCopyrightSelectionActive()) {
+            $table = $table->textColumn('copyright', $lng->txt('mob_copyright'), true);
         }
         return $table
-            ->linkListingColumn('internal_usages', $this->lng->txt('mob_internal_usages_in_object'))
-            ->linkListingColumn('mep_usages', $this->lng->txt('mob_usages_in_media_pools'))
-            ->linkListingColumn('external_usages', $this->lng->txt('mob_usages_in_other_objects'));
+            ->linkListingColumn('internal_usages', $lng->txt('mob_internal_usages_in_object'))
+            ->linkListingColumn('mep_usages', $lng->txt('mob_usages_in_media_pools'))
+            ->linkListingColumn('external_usages', $lng->txt('mob_usages_in_other_objects'));
     }
 }

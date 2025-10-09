@@ -1885,6 +1885,7 @@ class ilObjContentObjectGUI extends ilObjectGUI
         );
 
         // media
+        $this->lng->loadLanguageModule('mob');
         $ilTabs->addTab(
             "media",
             $lng->txt("mob_media"),

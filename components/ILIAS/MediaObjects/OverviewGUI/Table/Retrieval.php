@@ -28,11 +28,9 @@ use ILIAS\Repository\RetrievalBase;
 use ILIAS\MediaObjects\OverviewGUI\SubObjectRetrieval;
 use ilObjMediaObject;
 use ilObject;
-use ILIAS\StaticURL\Services as StaticURL;
 use ILIAS\Data\Factory as DataFactory;
-use ilAccess;
 use DateTimeImmutable;
-use ILIAS\MetaData\Services\ServicesInterface as LOM;
+use ILIAS\MediaObjects\InternalDomainService;
 
 class Retrieval implements RetrievalInterface
 {
@@ -42,10 +40,8 @@ class Retrieval implements RetrievalInterface
 
     public function __construct(
         protected SubObjectRetrieval $sub_object_retrieval,
-        protected StaticURL $static_url,
-        protected DataFactory $data_factory,
-        protected ilAccess $access,
-        protected LOM $lom
+        protected InternalDomainService $domain,
+        protected DataFactory $data_factory
     ) {
     }
 
@@ -55,6 +51,9 @@ class Retrieval implements RetrievalInterface
      */
     protected function getInternalData(array $filter): array
     {
+        $media_object_manager = $this->domain->mediaObject();
+        $lom = $this->domain->learningObjectMetadata();
+
         if (isset($this->internal_data)) {
             return $this->internal_data;
         }
@@ -81,10 +80,10 @@ class Retrieval implements RetrievalInterface
                 continue;
             }
             $title = ilObject::_lookupTitle($mob_id);
-            $last_update = new DateTimeImmutable(); // TODO implement
+            $last_update = $media_object_manager->getLastChangeTimestamp($mob_id);
 
-            $reader = $this->lom->read(0, $mob_id, 'mob', $this->lom->paths()->copyright());
-            $preset_copyright = $this->lom->copyrightHelper()->readPresetCopyright($reader);
+            $reader = $lom->read(0, $mob_id, 'mob', $lom->paths()->copyright());
+            $preset_copyright = $lom->copyrightHelper()->readPresetCopyright($reader);
 
             if ($this->isDatumExcludedByFilter($title, $preset_copyright->identifier(), $last_update, $filter)) {
                 unset($this->internal_data[$mob_id]);
@@ -93,10 +92,10 @@ class Retrieval implements RetrievalInterface
 
             $this->internal_data[$mob_id]['id'] = $mob_id;
             $this->internal_data[$mob_id]['title'] = $title;
-            $this->internal_data[$mob_id]['last_update'] = $last_update->getTimestamp();
-            $this->internal_data[$mob_id]['copyright'] = $this->lom->copyrightHelper()->hasPresetCopyright($reader) ?
+            $this->internal_data[$mob_id]['last_update'] = $last_update;
+            $this->internal_data[$mob_id]['copyright'] = $lom->copyrightHelper()->hasPresetCopyright($reader) ?
                 $preset_copyright->title() :
-                $this->lom->copyrightHelper()->readCustomCopyright($reader);
+                $lom->copyrightHelper()->readCustomCopyright($reader);
         }
         return $this->internal_data;
     }
@@ -107,6 +106,9 @@ class Retrieval implements RetrievalInterface
      */
     protected function addExternalData(array $internal_data): array
     {
+        $access = $this->domain->access();
+        $static_url = $this->domain->staticUrl();
+
         $data = $internal_data;
         foreach ($data as $key => $datum) {
             $mob_id = $datum['id'];
@@ -130,11 +132,11 @@ class Retrieval implements RetrievalInterface
                 $parent_ref_id = null;
                 $show_link = false;
                 foreach (ilObject::_getAllReferences($parent_obj_id) as $ref_id) {
-                    if (!$this->access->checkAccess('visible', '', $ref_id)) {
+                    if (!$access->checkAccess('visible', '', $ref_id)) {
                         continue;
                     }
                     $parent_ref_id = $ref_id;
-                    $show_link = $this->access->checkAccess('read', '', $parent_ref_id);
+                    $show_link = $access->checkAccess('read', '', $parent_ref_id);
                     break;
                 }
                 if (!$parent_ref_id) {
@@ -145,7 +147,7 @@ class Retrieval implements RetrievalInterface
                 $parent_type = ilObject::_lookupType($parent_obj_id);
                 $link_to_parent = '';
                 if ($show_link) {
-                    $link_to_parent = (string) $this->static_url->builder()->build(
+                    $link_to_parent = (string) $static_url->builder()->build(
                         $parent_type,
                         $this->data_factory->refId($parent_ref_id)
                     );
@@ -171,7 +173,7 @@ class Retrieval implements RetrievalInterface
     protected function isDatumExcludedByFilter(
         string $title,
         string $copyright_identifier,
-        DateTimeImmutable $last_update,
+        int $last_update,
         array $filter
     ): bool {
         if (
@@ -188,6 +190,7 @@ class Retrieval implements RetrievalInterface
             return true;
         }
 
+        $last_update = new DateTimeImmutable('@' . $last_update);
         if (
             (isset($filter['last_update'][0]) && $last_update < new DateTimeImmutable($filter['last_update'][0])) ||
             (isset($filter['last_update'][1]) && $last_update > new DateTimeImmutable($filter['last_update'][1]))

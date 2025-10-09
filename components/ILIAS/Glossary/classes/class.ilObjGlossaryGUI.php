@@ -17,7 +17,7 @@
  *********************************************************************/
 
 use ILIAS\Glossary\Settings\SettingsGUI;
-use ILIAS\Glossary\Media\PageRetrieval;
+use ILIAS\Glossary\Media\TermPageRetrieval;
 
 /**
  * GUI class for ilGlossary
@@ -299,7 +299,7 @@ class ilObjGlossaryGUI extends ilObjectGUI implements \ILIAS\Taxonomy\Settings\M
                 $this->tabs->activateTab("media");
                 $this->setLocator();
 
-                $retrieval = new PageRetrieval($this->getGlossary(), $this->ctrl);
+                $retrieval = new TermPageRetrieval($this->getGlossary(), $this->ctrl);
                 $gui = new ilMediaObjectOverviewGUI($retrieval);
                 $this->ctrl->forwardCommand($gui);
                 break;
@@ -895,6 +895,7 @@ class ilObjGlossaryGUI extends ilObjectGUI implements \ILIAS\Taxonomy\Settings\M
             );
 
             // media
+            $this->lng->loadLanguageModule('mob');
             $this->tabs_gui->addTab(
                 "media",
                 $this->lng->txt("mob_media"),

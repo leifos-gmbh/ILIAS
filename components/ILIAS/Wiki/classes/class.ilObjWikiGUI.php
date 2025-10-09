@@ -616,6 +616,7 @@ class ilObjWikiGUI extends ilObjectGUI
 
             // media
             if ($ilAccess->checkAccess('write', "", $this->object->getRefId())) {
+                $this->lng->loadLanguageModule('mob');
                 $this->tabs_gui->addTab(
                     "media",
                     $this->lng->txt("mob_media"),

@@ -29,6 +29,7 @@ use ILIAS\LearningModule\Table\StepRetrieval;
 use ILIAS\Help\GuidedTour\Page\PageManager;
 use ILIAS\Help\GuidedTour\Admin\AdminManager;
 use ILIAS\Help\GuidedTour\Elements\IdPresentation;
+use ILIAS\Help\GuidedTour\UserFinished\UserFinishedManager;
 
 class InternalDomainService
 {
@@ -94,6 +95,15 @@ class InternalDomainService
     public function idPresentation(): IdPresentation
     {
         return self::$instance["id_pres"] ??= new IdPresentation(
+            $this
+        );
+    }
+
+    public function userFinished(): UserFinishedManager
+    {
+        return self::$instance["user_finished"] ??= new UserFinishedManager(
+            $this->data,
+            $this->repo,
             $this
         );
     }

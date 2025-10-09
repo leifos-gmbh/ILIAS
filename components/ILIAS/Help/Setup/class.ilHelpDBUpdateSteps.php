@@ -160,4 +160,24 @@ class ilHelpDBUpdateSteps implements \ilDatabaseUpdateSteps
         $this->db->createSequence('help_gt_step');
     }
 
+    public function step_8(): void
+    {
+        if (!$this->db->tableExists('help_gt_user_finished')) {
+            $this->db->createTable('help_gt_user_finished',
+                [
+                    'tour_id' => [
+                        'type' => 'integer',
+                        'length' => 4,
+                        'notnull' => true
+                    ],
+                    'user_id' => [
+                        'type' => 'integer',
+                        'length' => 4,
+                        'notnull' => true
+                    ]
+                ]);
+            $this->db->addPrimaryKey('help_gt_user_finished', ['tour_id', 'user_id']);
+        }
+    }
+
 }

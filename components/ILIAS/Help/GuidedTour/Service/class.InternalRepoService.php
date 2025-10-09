@@ -22,6 +22,7 @@ namespace ILIAS\Help\GuidedTour;
 
 use ILIAS\Help\GuidedTour\Step\StepDBRepository;
 use ILIAS\Help\GuidedTour\Settings\SettingsDBRepository;
+use ILIAS\Help\GuidedTour\UserFinished\UserFinishedDBRepository;
 
 class InternalRepoService
 {
@@ -40,5 +41,10 @@ class InternalRepoService
     public function settings(): SettingsDBRepository
     {
         return self::$instance["settings"] ??= new SettingsDBRepository($this->db, $this->data);
+    }
+
+    public function userFinished(): UserFinishedDBRepository
+    {
+        return self::$instance["user_finished"] ??= new UserFinishedDBRepository($this->db);
     }
 }

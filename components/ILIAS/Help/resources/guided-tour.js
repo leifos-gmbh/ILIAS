@@ -4,7 +4,7 @@ il = il || {};
 
 il.guidedTour = (function ($) {
   const compIds = new Map();
-  let url; let tour; let signal; let popover;
+  let url; let tour; let signal; let popover; let currentTour;
 
   function addMapping(name, elId) {
     console.log(`addMapping: ${name} ${elId}`);
@@ -72,6 +72,11 @@ il.guidedTour = (function ($) {
       if (btn.dataset.gdtrType === 'next') {
         btn.addEventListener('click', () => {
           nextStep();
+        });
+      }
+      if (btn.dataset.gdtrType === 'close') {
+        btn.addEventListener('click', () => {
+          closeTour();
         });
       }
     });
@@ -165,15 +170,9 @@ il.guidedTour = (function ($) {
       const main = document.querySelector('main');
       il.repository.core.appendHTML(main, json.popoverHtml);
       popover = document.querySelector('main .il-standard-popover-content');
-      console.log("###");
-      console.log(popover);
       signal = json.popoverShowSignal;
-      // showPopover('notification_center');
       tour = json.tour;
       nextStep();
-      /* setTimeout(() => {
-        showPopover('notification_center');
-      }, 1000); */
     });
   }
 
@@ -182,6 +181,7 @@ il.guidedTour = (function ($) {
       for (const [stepId, s] of Object.entries(t.steps)) {
         if (!s.done) {
           s.done = true;
+          currentTour = tourId;
           performStep(s);
           return;
         }
@@ -189,10 +189,17 @@ il.guidedTour = (function ($) {
     }
   }
 
+  function closeTour() {
+    for (const [tourId, t] of Object.entries(tour)) {
+      if (tourId === currentTour) {
+        il.repository.core.fetchJson(t.finishUrl, {}).then(() => {
+          hideAllPopovers();
+        });
+      }
+    }
+  }
+
   function performStep(s) {
-    console.log("performStep");
-    console.log(s.type);
-    console.log(s.elementId);
     showPopover(s.type, s.elementId, s.url);
   }
 

@@ -26,6 +26,8 @@ use ILIAS\Services\Help\ScreenId\HelpScreenIdObserver;
  */
 class ilGuidedTourGUI implements ilCtrlBaseClassInterface
 {
+    protected ilObjUser $user;
+    protected \ILIAS\Help\GuidedTour\UserFinished\UserFinishedManager $finish_manager;
     protected string $current_screen_id;
     protected \ILIAS\Help\GuidedTour\Settings\SettingsManager $settings_manager;
     protected \ILIAS\Help\GuidedTour\StandardGUIRequest $request;
@@ -41,10 +43,12 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $this->current_screen_id = $DIC->help()->getScreenId();
         $this->help = $DIC->help()->internal();
         $this->gui = $this->help->gui();
+        $this->user = $this->help->domain()->user();
         $this->tour_manager = $this->help->domain()->guidedTour()->tour();
         $this->step_manager = $this->help->domain()->guidedTour()->step();
         $this->page_manager = $this->help->domain()->guidedTour()->page();
         $this->settings_manager = $this->help->domain()->guidedTour()->tourSettings();
+        $this->finish_manager = $this->help->domain()->guidedTour()->userFinished();
         $this->request = $this->gui->guidedTour()->standardRequest();
     }
 
@@ -59,7 +63,8 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
             default:
                 if (in_array($cmd, [
                     "getData",
-                    "showStep"
+                    "showStep",
+                    "finishTour"
                 ])) {
                     $this->$cmd();
                 }
@@ -115,6 +120,11 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
                 continue;
             }
 
+            // check finished
+            if ($this->finish_manager->hasFinished($tour->getId(), $this->user->getId())) {
+                continue;
+            }
+
             // check screen id
             $screen_ids = $settings?->getScreenIds();
             $found = true;
@@ -130,12 +140,13 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
                 continue;
             }
 
+            $ctrl->setParameterByClass(self::class, "tour_id", $tour->getId());
             $data->tour[$tour->getId()] = [
-                "name" => $tour->getTitle()
+                "name" => $tour->getTitle(),
+                "finishUrl" => $ctrl->getLinkTargetByClass(ilGuidedTourPageGUI::class, "finishTour"),
             ];
             foreach ($this->step_manager->getStepsOfTour($tour->getId()) as $step) {
                 $step_id = $step->getId();
-                $ctrl->setParameterByClass(self::class, "tour_id", $tour->getId());
                 $ctrl->setParameterByClass(self::class, "step_id", $step_id);
                 $data->tour[$tour->getId()]["steps"][$step_id] = [
                     "id" => $step_id,
@@ -153,5 +164,14 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $tour_id = $this->request->getTourId();
         $step_id = $this->request->getStepId();
         $this->page_manager->printPage($step_id);
+    }
+
+    protected function finishTour() : void
+    {
+        $tour_id = $this->request->getTourId();
+        $this->finish_manager->setFinished($tour_id, $this->user->getId());
+        $data = new \stdClass();
+        $data->finished = true;
+        $this->gui->httpUtil()->sendJson($data);
     }
 }

@@ -18,6 +18,9 @@
 		<event type="raise" id="afterUpdate" />
 		<event type="raise" id="deleteUser" />
 		<event type="raise" id="afterCreate" />
+        <!-- BEGIN patch veda -->
+        <event type="raise" id="passwordChanged" />
+        <!-- END patch veda -->
 		<event type="raise" id="onUserFieldAttributesChanged" />
 		<event type="listen" id="Services/Object" />
 		<event type="listen" id="Services/TermsOfService" />

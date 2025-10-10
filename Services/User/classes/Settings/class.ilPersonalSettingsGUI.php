@@ -329,6 +329,17 @@ class ilPersonalSettingsGUI
                     $this->user->setLastPasswordChangeToNow();
                     $this->user->setPasswordPolicyResetStatus(false);
                     $this->user->update();
+                    // begin-patch veda
+                    global $DIC;
+                    $ilAppEventHandler = $DIC['ilAppEventHandler'];
+                    $ilAppEventHandler->raise(
+                        'Services/User',
+                        'passwordChanged',
+                        [
+                            'usr_id' => $this->user->getId()
+                        ]
+                    );
+                    // end-patch veda
                 }
 
                 if (ilSession::get('orig_request_target')) {

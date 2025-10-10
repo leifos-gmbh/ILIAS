@@ -30,6 +30,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
 {
 
     private \ILIAS\Help\GuidedTour\Step\StepManager $step_manager;
+    protected \ILIAS\Help\GuidedTour\UserFinished\UserFinishedManager $finish_manager;
     protected \ILIAS\Help\GuidedTour\Tour\TourManager $tm;
 
     public function __construct(
@@ -42,6 +43,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $this->tm = $domain->tour();
         $ctrl->saveParameterByClass(self::class, "tour_id");
         $this->step_manager = $domain->step();
+        $this->finish_manager = $domain->userFinished();
     }
 
     public function executeCommand() : void
@@ -79,6 +81,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                     "saveOrder",
                     "confirmStepDeletion",
                     "deleteStep",
+                    "resetTour",
                 ])) {
                     $this->$cmd();
                 }
@@ -154,6 +157,10 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                $lng->txt("settings"),
                $ctrl->getLinkTargetByClass(self::class, "editSettings")
             );
+            $actions[] = $f->link()->standard(
+               $lng->txt("gdtr_reset_tour"),
+               $ctrl->getLinkTargetByClass(self::class, "resetTour")
+            );
             $delete_modal = $this->getDeleteTourModal($tour->getId());
             $actions[] = $f->button()->shy(
                $lng->txt("delete"),
@@ -178,6 +185,17 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
             $ui_items[] = $panel;
             $mt->setContent($r->render($ui_items));
         }
+    }
+
+    protected function resetTour() : void
+    {
+        $mt = $this->gui->ui()->mainTemplate();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $tour_id = $this->gui->standardRequest()->getTourId();
+        $this->finish_manager->resetTour($tour_id);
+        $mt->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
+        $ctrl->redirectByClass(self::class, "listTours");
     }
 
     protected function getDeleteTourModal(int $tour_id): \ILIAS\UI\Component\Modal\Interruptive

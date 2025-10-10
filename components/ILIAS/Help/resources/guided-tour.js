@@ -35,7 +35,7 @@ il.guidedTour = (function ($) {
     WebuiPopovers.hideAll();
   }
 
-  function showPopover(type, elName, stepUrl) {
+  function showPopover(type, elName, stepUrl, latest) {
     const el = getTriggerElement(type, elName);
     const contentEl = popover;
     contentEl.innerHTML = `<iframe style="border:0; height: 5px; display:inline-block; width:20em; margin: 15px;" src='${stepUrl}'></iframe>`;
@@ -53,7 +53,7 @@ il.guidedTour = (function ($) {
           scrollContainer.dispatchEvent(new Event('scroll'));
           first = false;
         }
-        addButtonListeners(iframe);
+        addButtonListeners(iframe, latest);
       });
       window.addEventListener('resize', () => {
         console.log("resize");
@@ -63,16 +63,20 @@ il.guidedTour = (function ($) {
     }
   }
 
-  function addButtonListeners(iframe) {
+  function addButtonListeners(iframe, latest) {
     const doc = iframe.contentDocument || iframe.contentWindow.document;
     const buttons = [...doc.querySelectorAll('button')];   // NodeList → Array
     const lastButtons = buttons.slice(-2);
     // Beispiel: den Text der beiden Buttons ausgeben
     lastButtons.forEach((btn) => {
       if (btn.dataset.gdtrType === 'next') {
-        btn.addEventListener('click', () => {
-          nextStep();
-        });
+        if (latest) {
+          btn.style.display = 'none';
+        } else {
+          btn.addEventListener('click', () => {
+            nextStep();
+          });
+        }
       }
       if (btn.dataset.gdtrType === 'close') {
         btn.addEventListener('click', () => {
@@ -178,13 +182,19 @@ il.guidedTour = (function ($) {
 
   function nextStep() {
     for (const [tourId, t] of Object.entries(tour)) {
+      let nr = 1;
+      let latest = false;
       for (const [stepId, s] of Object.entries(t.steps)) {
+        if (nr === Object.entries(t.steps).length) {
+          latest = true;
+        }
         if (!s.done) {
           s.done = true;
           currentTour = tourId;
-          performStep(s);
+          performStep(s, latest);
           return;
         }
+        nr += 1;
       }
     }
   }
@@ -199,8 +209,8 @@ il.guidedTour = (function ($) {
     }
   }
 
-  function performStep(s) {
-    showPopover(s.type, s.elementId, s.url);
+  function performStep(s, latest) {
+    showPopover(s.type, s.elementId, s.url, latest);
   }
 
   function init(u) {

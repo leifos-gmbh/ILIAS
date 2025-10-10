@@ -20,12 +20,15 @@ declare(strict_types=1);
 
 use ILIAS\GlobalScreen\Scope\MainMenu\Factory\Item;
 use ILIAS\Services\Help\ScreenId\HelpScreenIdObserver;
+use ILIAS\Help\GuidedTour\Settings\PermissionType;
 
 /**
  * @ilCtrl_Calls ilGuidedTourGUI: ilGuidedTourPageGUI
  */
 class ilGuidedTourGUI implements ilCtrlBaseClassInterface
 {
+    protected ilObjectDefinition $obj_definition;
+    protected ilAccessHandler $access;
     protected ilObjUser $user;
     protected \ILIAS\Help\GuidedTour\UserFinished\UserFinishedManager $finish_manager;
     protected string $current_screen_id;
@@ -50,6 +53,8 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $this->settings_manager = $this->help->domain()->guidedTour()->tourSettings();
         $this->finish_manager = $this->help->domain()->guidedTour()->userFinished();
         $this->request = $this->gui->guidedTour()->standardRequest();
+        $this->access = $DIC->access();
+        $this->obj_definition = $this->help->domain()->objectDefinition();
     }
 
     public function executeCommand() : void
@@ -77,6 +82,11 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $f = $this->gui->ui()->factory();
         $r = $this->gui->ui()->renderer();
         $ctrl = $this->gui->ctrl();
+
+        if (!$this->tour_manager->anyActive()) {
+            return;
+        }
+
         // ensure popover js being loaded
         $r->render($f->popover()->standard($f->legacy('')));
 
@@ -88,6 +98,7 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
             $mt->addJavaScript("assets/js/guided-tour.js");
         }
         $ctrl->setParameterByClass(self::class, "screen_id", rawurlencode($this->current_screen_id));
+        $ctrl->setParameterByClass(self::class, "ref_id", (string) $this->request->getRefId());
         $target = $ctrl->getLinkTargetByClass(self::class, "", "", true);
         $mt->addOnloadCode("il.guidedTour.init('$target');");
     }
@@ -112,9 +123,10 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
         $popoverHtml = str_replace("JSON.parse('{", "JSON.parse('{\"trigger\":\"manual\",", $popoverHtml);
         $data->popoverHtml = $popoverHtml;
         $data->popoverShowSignal = $popover->getShowSignal()->getId();
+        $data->tour = [];
+        $ref_id = $this->request->getRefId();
         foreach ($this->tour_manager->getAll() as $tour) {
             $settings = $this->settings_manager->getByObjId($tour->getId());
-
             // check active
             if (!$settings?->isActive()) {
                 continue;
@@ -138,6 +150,40 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
             }
             if (!$found) {
                 continue;
+            }
+            // check permission
+            if ($ref_id > 0) {
+                if ($settings->getPermission() !== PermissionType::None) {
+                    switch ($settings->getPermission()) {
+                        case PermissionType::Read:
+                            if (!$this->access->checkAccess("read", "", $ref_id)) {
+                                continue 2;
+                            }
+                            break;
+                        case PermissionType::Write:
+                            if (!$this->access->checkAccess("write", "", $ref_id)) {
+                                continue 2;
+                            }
+                            break;
+                        case PermissionType::Create:
+                            $current_type = ilObject::_lookupType($ref_id, true);
+                            $subtypes = $this->obj_definition->getCreatableSubObjects(
+                                $current_type,
+                                ilObjectDefinition::MODE_REPOSITORY,
+                                $ref_id
+                            );
+                            $can_create = false;
+                            foreach ($subtypes as $key => $value) {
+                                if (!$can_create && $this->access->checkAccess('create_' . $key, '', $ref_id, $current_type)) {
+                                    $can_create = true;
+                                }
+                            }
+                            if (!$can_create) {
+                                continue 2;
+                            }
+                            break;
+                    }
+                }
             }
 
             $ctrl->setParameterByClass(self::class, "tour_id", $tour->getId());

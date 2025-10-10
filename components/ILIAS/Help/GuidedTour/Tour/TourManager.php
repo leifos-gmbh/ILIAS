@@ -65,6 +65,17 @@ class TourManager
         }
     }
 
+    public function anyActive() : bool
+    {
+        foreach ($this->getAll() as $tour) {
+            $settings = $this->sm->getByObjId($tour->getId());
+            if ($settings?->isActive()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function getByObjId(int $obj_id) : ?ilObjGuidedTour
     {
         return \ilObjectFactory::getInstanceByObjId($obj_id);

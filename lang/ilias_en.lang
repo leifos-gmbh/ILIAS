@@ -10511,6 +10511,7 @@ help#:#gdtr_permission#:#Permission
 help#:#gdtr_primary_button#:#Primary Button
 help#:#gdtr_add_step#:#Add Step
 help#:#gdtr_next_step#:#Next Step
+help#:#gdtr_reset_tour#:#Reset Tour
 help#:#gdtr_screen_ids#:#Screen IDs
 help#:#gdtr_screen_ids_info#:#Multiple IDs must be separated by comma.
 help#:#gdtr_step#:#Step

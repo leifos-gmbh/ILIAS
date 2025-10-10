@@ -47,4 +47,9 @@ class StandardGUIRequest
     {
         return $this->int("step_id");
     }
+
+    public function getRefId(): int
+    {
+        return $this->int("ref_id");
+    }
 }

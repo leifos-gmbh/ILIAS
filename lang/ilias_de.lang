@@ -10510,6 +10510,7 @@ help#:#gdtr_permission#:#Berechtigung
 help#:#gdtr_primary_button#:#Primary Button
 help#:#gdtr_add_step#:#Schritt hinzufügen
 help#:#gdtr_next_step#:#Nächster Schritt
+help#:#gdtr_reset_tour#:#Tour zurücksetzen
 help#:#gdtr_screen_ids#:#Screen IDs
 help#:#gdtr_screen_ids_info#:#Mehrere IDs müssen durch Kommas separiert werden.
 help#:#gdtr_step#:#Schritt

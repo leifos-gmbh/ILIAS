@@ -105,6 +105,9 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
 
     public function registerTabLink(string $tab_id, \ILIAS\UI\Component\Link\Standard $link): \ILIAS\UI\Component\Link\Standard
     {
+        if (!$this->tour_manager->anyActive()) {
+            return $link;
+        }
         return $link->withAdditionalOnLoadCode(static function (string $id) use ($tab_id) : string {
             return "il.guidedTour.addMapping('$tab_id', '$id');";
         });

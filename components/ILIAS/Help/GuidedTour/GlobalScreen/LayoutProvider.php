@@ -47,8 +47,13 @@ class LayoutProvider extends AbstractModificationProvider
     ) : ?MainBarModification {
         /** @var \ilGuidedTourGUI $gui */
         $gui = $this->dic->help()->internal()->gui()->guidedTour()->guidedTourGUI();
+        $tm = $this->dic->help()->internal()->domain()->guidedTour()->tour();
         $gui->init();
         $this->globalScreen()->collector()->mainmenu()->collectOnce();
+
+        if (!$tm->anyActive()) {
+            return null;
+        }
 
         // add id mapping of all main menu items to gui
         foreach ($this->globalScreen()->collector()->mainmenu()->getRawItems() as $item) {
@@ -66,6 +71,10 @@ class LayoutProvider extends AbstractModificationProvider
 
     public function getMetaBarModification(CalledContexts $screen_context_stack) : ?MetaBarModification
     {
+        $tm = $this->dic->help()->internal()->domain()->guidedTour()->tour();
+        if (!$tm->anyActive()) {
+            return null;
+        }
         // add id mapping of all main menu items to gui
         $this->globalScreen()->collector()->metaBar()->collectOnce();
         foreach ($this->globalScreen()->collector()->metaBar()->getRawItems() as $item) {

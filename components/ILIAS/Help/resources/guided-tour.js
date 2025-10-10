@@ -7,7 +7,7 @@ il.guidedTour = (function ($) {
   let url; let tour; let signal; let popover; let currentTour;
 
   function addMapping(name, elId) {
-    console.log(`addMapping: ${name} ${elId}`);
+    // console.log(`addMapping: ${name} ${elId}`);
     compIds.set(name, elId);
   }
 

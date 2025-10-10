@@ -28,6 +28,7 @@ use ilObjectFactory;
 
 class TourManager
 {
+    protected ?bool $any_active = null;
     private \ILIAS\Help\GuidedTour\Settings\SettingsManager $sm;
 
     public function __construct(
@@ -67,12 +68,17 @@ class TourManager
 
     public function anyActive() : bool
     {
+        if (!is_null($this->any_active)) {
+            return $this->any_active;
+        }
         foreach ($this->getAll() as $tour) {
             $settings = $this->sm->getByObjId($tour->getId());
             if ($settings?->isActive()) {
+                $this->any_active = true;
                 return true;
             }
         }
+        $this->any_active = false;
         return false;
     }
 

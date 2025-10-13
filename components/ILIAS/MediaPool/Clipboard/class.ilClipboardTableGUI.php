@@ -123,12 +123,12 @@ class ilClipboardTableGUI extends ilTable2GUI
         }
         $this->tpl->parseCurrentBlock();
 
-        if ($a_set["type"] === "mob") {
+        /*if ($a_set["type"] === "mob") {
             $this->tpl->setVariable(
                 "MEDIA_INFO",
                 ilObjMediaObjectGUI::_getMediaInfoHTML($mob)
             );
-        }
+        }*/
         $this->tpl->setVariable("CHECKBOX_ID", $a_set["type"] . ":" . $a_set["id"]);
     }
 }

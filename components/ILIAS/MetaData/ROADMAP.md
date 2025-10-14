@@ -45,6 +45,8 @@ replaced by bespoke iterator classes.
 `null` as a return type should be replaced by proper null objects.
 A good starting point might be `Tags` from `Dictionaries`.
 
+TEST
+
 ### Stricter formatting of 'format' and 'entity'
 
 The fields technical>format and the various entities should conform

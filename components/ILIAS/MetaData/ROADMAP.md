@@ -45,6 +45,18 @@ replaced by bespoke iterator classes.
 `null` as a return type should be replaced by proper null objects.
 A good starting point might be `Tags` from `Dictionaries`.
 
+### Change default behavior for copyright
+
+Currently, all objects without an entry for copyright in `il_meta_rights`
+are treated like having the default copyright. This special behavior
+has to be implemented in a variety of places (xml generation,
+copyright API, database search, ...), and makes supporting filtering for
+the default copyright in Lucene-search prohibitively complicated.
+
+Requiring default copyright in new LOM sets would alleviate these
+problems, but would also mean more redundant information in
+the MetaData tables. It should be investigated how to progress here.
+
 ### Stricter formatting of 'format' and 'entity'
 
 The fields technical>format and the various entities should conform

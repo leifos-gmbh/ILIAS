@@ -93,8 +93,9 @@ class Retrieval implements RetrievalInterface
             $this->internal_data[$mob_id]['id'] = $mob_id;
             $this->internal_data[$mob_id]['title'] = $title;
             $this->internal_data[$mob_id]['last_update'] = $last_update;
+            $this->internal_data[$mob_id]['copyright_identifier'] = $preset_copyright->identifier();
             $this->internal_data[$mob_id]['copyright'] = $lom->copyrightHelper()->hasPresetCopyright($reader) ?
-                $preset_copyright->title() :
+                $preset_copyright->presentAsString() :
                 $lom->copyrightHelper()->readCustomCopyright($reader);
         }
         return $this->internal_data;

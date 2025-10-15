@@ -12740,6 +12740,7 @@ mme#:#type_top_parent_item#:#Container
 mme#:#unable_to_render#:#Unable to show '%s' in '%s'.
 mob#:#mob_choose_from_pool#:#Choose from Media Pool
 mob#:#mob_copyright#:#Copyright
+mob#:#mob_copyright_icon#:#Copyright Icon
 mob#:#mob_external_url#:#External URL
 mob#:#mob_extract_preview_image#:#Extract Preview Image
 mob#:#mob_file#:#File

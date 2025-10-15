@@ -12737,6 +12737,7 @@ mme#:#type_top_parent_item#:#Container
 mme#:#unable_to_render#:#Der Eintrag '%s' kann nicht in '%s' angezeigt werden.
 mob#:#mob_choose_from_pool#:#Aus Medienpool
 mob#:#mob_copyright#:#Copyright
+mob#:#mob_copyright_icon#:#Copyright Icon
 mob#:#mob_external_url#:#Externe URL
 mob#:#mob_extract_preview_image#:#Vorschaubild erzeugen
 mob#:#mob_file#:#Datei

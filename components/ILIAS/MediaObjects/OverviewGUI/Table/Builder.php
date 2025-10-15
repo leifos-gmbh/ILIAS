@@ -70,11 +70,24 @@ class Builder extends CommonTableBuilder
             'title' => $data_row['title'] ?? '',
             'last_update' => (new DateTimeImmutable('@' . ($data_row['last_update'] ?? 0)))
                 ->setTimezone(new DateTimeZone($this->domain->user()->getTimeZone())),
-            'copyright' => $data_row['copyright'] ?? '',
             'internal_usages' => $this->buildLinkListingFromData($data_row['internal_usages'] ?? []),
             'mep_usages' => $this->buildLinkListingFromData($data_row['mep_usages'] ?? []),
             'external_usages' => $this->buildLinkListingFromData($data_row['external_usages'] ?? [])
         ];
+        if (($data_row['copyright_identifier'] ?? '') !== '') {
+            $preset = $this->domain->learningObjectMetadata()->copyrightHelper()->getCopyrightPreset($data_row['copyright_identifier']);
+            if ($image = $preset->presentAsImageOnly()) {
+                $data['copyright_icon'] = $image;
+            }
+            if ($link = $preset->presentAsLinkOnly()) {
+                $data['copyright'] = $link;
+            }
+        } elseif (($data_row['copyright'] ?? '') !== '') {
+            $data['copyright'] = $this->gui->ui()->factory()->link()->standard(
+                $data_row['copyright'],
+                ''
+            )->withDisabled();
+        }
         return $data;
     }
 
@@ -107,7 +120,9 @@ class Builder extends CommonTableBuilder
             ->textColumn('title', $lng->txt('mob'), true)
             ->dateColumn('last_update', $lng->txt('mob_last_update'), true);
         if ($lom->copyrightHelper()->isCopyrightSelectionActive()) {
-            $table = $table->textColumn('copyright', $lng->txt('mob_copyright'), true);
+            $table = $table
+                ->iconColumn('copyright_icon', $lng->txt('mob_copyright_icon'), false)
+                ->linkColumn('copyright', $lng->txt('mob_copyright'), true);
         }
         return $table
             ->linkListingColumn('internal_usages', $lng->txt('mob_internal_usages_in_object'))

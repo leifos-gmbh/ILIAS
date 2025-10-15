@@ -51,6 +51,25 @@ The fields technical>format and the various entities should conform
 to different standards (e.g. entities should be vcards). This could
 be supported better in ILIAS, currently any string is valid.
 
+### Simplify Copyright Handling
+
+Currently, the API leaves it to consumers to handle custom copyright
+and copyright presets differently from each other. It should be
+investigated how those two cases can be unified within the API, so that
+consumers don't need to worry about the difference, without making a
+mess.
+
+The custom copyright string could e.g. act as the analogue of title,
+full name, and identifier of presets, but these concepts shouldn't
+get watered down too much.
+
+### Unify Presentation of Copyright
+
+We are in danger of having too many modes of presentation of copyright
+in ILIAS. It should be investigated how presentation can be unified,
+while still being able to fit into the required slots in the KS (data
+table, properties in item, ...).
+
 ### Allow `INDEX` path filters in search
 
 It should be investigated, how path filters of type `INDEX` can be

@@ -150,7 +150,7 @@ class Renderer implements RendererInterface
             $copyright->fullName() !== '' ? $copyright->fullName() : (string) $copyright->link(),
             (string) $copyright->link(),
             $copyright->link() !== null ? Relationship::LICENSE : null,
-            $copyright->link() === null ? true : false,
+            $copyright->link() === null
         );
     }
 
@@ -170,7 +170,7 @@ class Renderer implements RendererInterface
             $link = $link->withAdditionalRelationshipToReferencedResource($relationship);
         }
         if ($disabled) {
-            $link->withDisabled();
+            $link = $link->withDisabled();
         }
         return $link;
     }

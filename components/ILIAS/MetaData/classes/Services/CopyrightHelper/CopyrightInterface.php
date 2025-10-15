@@ -45,6 +45,23 @@ interface CopyrightInterface
     public function presentAsUIComponents(): array;
 
     /**
+     * The copyright just as its image, for use e.g. when the copyright
+     * needs to be inserted into other KS components, and the specific
+     * component it's presented as is important.
+     * If the copyright does not have an image, null is returned.
+     */
+    public function presentAsImageOnly(): ?Icon;
+
+    /**
+     *  The copyright just as a link, for use e.g. when the copyright
+     *  needs to be inserted into other KS components, and the specific
+     *  component it's presented as is important.
+     * If the copyright has no link, its full name is returned as a disabled link.
+     * If it also does not have a full name, null is returned.
+     */
+    public function presentAsLinkOnly(): ?Link;
+
+    /**
      * The copyright without image in a reduced presentation, for displaying
      * copyright where no UI components can be used (e.g. exports of tables).
      */

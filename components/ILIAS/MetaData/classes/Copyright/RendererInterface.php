@@ -32,5 +32,13 @@ interface RendererInterface
      */
     public function toUIComponents(CopyrightDataInterface $copyright): array;
 
+    public function toImageOnly(CopyrightDataInterface $copyright): ?Icon;
+
+    /**
+     * Returns a string as a disabled link, if only a string can be returned,
+     * or null if the copyright is image only.
+     */
+    public function toLinkOnly(CopyrightDataInterface $copyright): ?Link;
+
     public function toString(CopyrightDataInterface $copyright): string;
 }

@@ -27,12 +27,21 @@ use ILIAS\UI\Component\Legacy\Content;
 class NullRenderer implements RendererInterface
 {
     /**
-     * Returns a string in a legacy UI component if only a string can be returned.
      * @return Icon[]|Link[]|Content[]
      */
     public function toUIComponents(CopyrightDataInterface $copyright): array
     {
         return [];
+    }
+
+    public function toImageOnly(CopyrightDataInterface $copyright): ?Icon
+    {
+        return null;
+    }
+
+    public function toLinkOnly(CopyrightDataInterface $copyright): ?Link
+    {
+        return null;
     }
 
     public function toString(CopyrightDataInterface $copyright): string

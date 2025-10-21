@@ -10502,6 +10502,7 @@ help#:#gdtr_element_id#:#Element ID
 help#:#gdtr_id_settings#:#ID Einstellungen
 help#:#gdtr_id_pres_users#:#IDs anzeigen für Benutzer
 help#:#gdtr_id_pres_users_info#:#Loginnamen von Benutzern, denen die Element IDs angezeigt werden. Mehrere Einträge müssen durch Kommas separiert werden.
+help#:#gdtr_import_tour#:#Tour importieren
 help#:#gdtr_tabs#:#Reiter
 help#:#gdtr_form#:#Formular
 help#:#gdtr_table#:#Tabelle
@@ -10509,6 +10510,7 @@ help#:#gdtr_toolbar#:#Toolbar
 help#:#gdtr_permission#:#Berechtigung
 help#:#gdtr_primary_button#:#Primary Button
 help#:#gdtr_add_step#:#Schritt hinzufügen
+help#:#gdtr_list_tours_mess#:#Um die Anzeige von Screen- und Element-IDs als Tooltips zu aktivieren, müssen Sie ihren Accountnamen in den ID Einstellungen eintragen.
 help#:#gdtr_next_step#:#Nächster Schritt
 help#:#gdtr_reset_tour#:#Tour zurücksetzen
 help#:#gdtr_screen_ids#:#Screen IDs

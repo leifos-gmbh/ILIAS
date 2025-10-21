@@ -197,7 +197,7 @@ class ilGuidedTourGUI implements ilCtrlBaseClassInterface
             foreach ($this->step_manager->getStepsOfTour($tour->getId()) as $step) {
                 $step_id = $step->getId();
                 $ctrl->setParameterByClass(self::class, "step_id", $step_id);
-                $data->tour[$tour->getId()]["steps"][$step_id] = [
+                $data->tour[$tour->getId()]["steps"]["step_"  . $step_id] = [
                     "id" => $step_id,
                     "type" => $step->getType(),
                     "elementId" => $step->getElementId(),

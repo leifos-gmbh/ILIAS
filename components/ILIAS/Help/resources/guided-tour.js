@@ -35,18 +35,24 @@ il.guidedTour = (function ($) {
     WebuiPopovers.hideAll();
   }
 
+  function checkStepElement(s) {
+    const el = getTriggerElement(s.type, s.elementId);
+    if (el) {
+      return true;
+    }
+    return false;
+  }
+
   function showPopover(type, elName, stepUrl, latest) {
     const el = getTriggerElement(type, elName);
-    const contentEl = popover;
-    contentEl.innerHTML = `<iframe style="border:0; height: 5px; display:inline-block; width:20em; margin: 15px;" src='${stepUrl}'></iframe>`;
-    hideAllPopovers();
     if (el) {
+      const contentEl = popover;
+      contentEl.innerHTML = `<iframe style="border:0; height: 5px; display:inline-block; width:20em; margin: 15px;" src='${stepUrl}'></iframe>`;
+      hideAllPopovers();
       trigger(el, signal);
       const iframe = contentEl.querySelector('iframe');
       let first = true;
-      console.log("in show");
       iframe.addEventListener('load', () => {
-        console.log("load");
         resizeIframe(iframe);
         if (first) {
           const scrollContainer = getScrollableContainer();
@@ -56,11 +62,11 @@ il.guidedTour = (function ($) {
         addButtonListeners(iframe, latest);
       });
       window.addEventListener('resize', () => {
-        console.log("resize");
         resizeIframe(iframe);
       });
-      // resizeIframe(iframe);
+      return true;
     }
+    return false;
   }
 
   function addButtonListeners(iframe, latest) {
@@ -180,20 +186,42 @@ il.guidedTour = (function ($) {
     });
   }
 
+  function hasValidSuccessor(t, preStepId) {
+    let foundPre = false;
+    for (const [stepId, s] of Object.entries(t.steps)) {
+      if (foundPre && checkStepElement(s)) {
+        return true;
+      }
+      if (stepId === preStepId) {
+        foundPre = true;
+      }
+    }
+    return false;
+  }
+
   function nextStep() {
     for (const [tourId, t] of Object.entries(tour)) {
       let nr = 1;
       let latest = false;
       for (const [stepId, s] of Object.entries(t.steps)) {
-        if (nr === Object.entries(t.steps).length) {
+        console.log(stepId);
+        if (!hasValidSuccessor(t, stepId)) {
+          console.log("latest!");
           latest = true;
         }
+        // no element? set to true
+        if (!checkStepElement(s)) {
+          console.log("no element!");
+          s.done = true;
+        }
         if (!s.done) {
+          console.log("performStep");
           s.done = true;
           currentTour = tourId;
           performStep(s, latest);
           return;
         }
+        console.log("increase");
         nr += 1;
       }
     }
@@ -210,7 +238,7 @@ il.guidedTour = (function ($) {
   }
 
   function performStep(s, latest) {
-    showPopover(s.type, s.elementId, s.url, latest);
+    return showPopover(s.type, s.elementId, s.url, latest);
   }
 
   function init(u) {

@@ -57,6 +57,11 @@ class InternalGUIService
         return new ilGuidedTourGUI();
     }
 
+    public function objectGUI(int $obj_id): \ilObjGuidedTourGUI
+    {
+        return new \ilObjGuidedTourGUI([], $obj_id, false);
+    }
+
     public function adminGUI(): ilGuidedTourAdminGUI
     {
         return new ilGuidedTourAdminGUI(

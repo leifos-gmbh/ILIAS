@@ -22,9 +22,12 @@ use ILIAS\Repository\Form\FormAdapterGUI;
 use ILIAS\Help\GuidedTour\Step\StepType;
 use ILIAS\Help\GuidedTour\Step\Step;
 use ILIAS\Help\GuidedTour\Settings\PermissionType;
+use ILIAS\FileUpload\FileUpload;
+use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\FileUpload\Handler\BasicHandlerResult;
 
 /**
- * @ilCtrl_Calls ilGuidedTourAdminGUI: ilGuidedTourPageGUI
+ * @ilCtrl_Calls ilGuidedTourAdminGUI: ilGuidedTourPageGUI, ilExportGUI, ilRepoStandardUploadHandlerGUI
  */
 class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
 {
@@ -55,11 +58,26 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $cmd = $ctrl->getCmd("listTours");
 
         switch ($next_class) {
+            case strtolower(ilExportGUI::class):
+                $this->setStepsHeader();
+                $this->setSettingsTabs("export");
+                $tour_id = $this->gui->standardRequest()->getTourId();
+                $exp_gui = new ilExportGUI($this->gui->objectGUI($tour_id));
+                $exp_gui->addFormat("xml");
+                $ctrl->forwardCommand($exp_gui);
+                break;
+
             case strtolower(ilGuidedTourPageGUI::class):
                 $ctrl->setReturnByClass(self::class, "listSteps");
                 $ctrl->saveParameterByClass(self::class, "step_id");
                 $ret = $this->forwardToPageObject();
                 $mt->setContent($ret);
+                break;
+
+            case strtolower(ilRepoStandardUploadHandlerGUI::class):
+                $form = $this->getImportForm();
+                $gui = $form->getRepoStandardUploadHandlerGUI("import");
+                $ctrl->forwardCommand($gui);
                 break;
 
             default:
@@ -82,10 +100,42 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                     "confirmStepDeletion",
                     "deleteStep",
                     "resetTour",
+                    "importTourForm",
+                    "importTour"
                 ])) {
                     $this->$cmd();
                 }
         }
+    }
+
+    protected function setSettingsTabs(string $active) : void
+    {
+        $tabs = $this->gui->tabs();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $tabs->clearTargets();
+        $this->gui->help()->setScreenIdComponent("hlps_gdtr");
+        $tabs->setBackTarget(
+            $lng->txt("gdtr_guided_tours"),
+            $ctrl->getLinkTargetByClass(self::class, "listTours")
+        );
+        $ctrl->saveParameterByClass(self::class, "tour_id");
+        $tabs->addTab(
+            "steps",
+            $lng->txt("gdtr_tour_steps"),
+            $ctrl->getLinkTargetByClass(self::class, "listSteps")
+        );
+        $tabs->addTab(
+            "settings",
+            $lng->txt("settings"),
+            $ctrl->getLinkTargetByClass(self::class, "editSettings")
+        );
+        $tabs->addTab(
+            "export",
+            $lng->txt("export"),
+            $ctrl->getLinkTargetByClass(ilexportGUI::class, "export", ""),
+        );
+        $tabs->activateTab($active);
     }
 
     public function forwardToPageObject(): string
@@ -97,6 +147,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $tour_id = $this->gui->standardRequest()->getTourId();
 
         $tabs->clearTargets();
+
         $tabs->setBackTarget(
             $lng->txt("back"),
             $ctrl->getLinkTargetByClass(ilGuidedTourPageGUI::class, "edit")
@@ -138,9 +189,16 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $ctrl = $this->gui->ctrl();
         $lng = $this->domain->lng();
 
+        $mt->setOnScreenMessage("info", $lng->txt("gdtr_list_tours_mess"));
+
         $b = $f->button()->standard(
             $lng->txt("gdtr_add_tour"),
             $ctrl->getLinkTarget($this, "addTour")
+        );
+        $this->gui->toolbar()->addComponent($b);
+        $b = $f->button()->standard(
+            $lng->txt("gdtr_import_tour"),
+            $ctrl->getLinkTarget($this, "importTourForm")
         );
         $this->gui->toolbar()->addComponent($b);
 
@@ -169,7 +227,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
             $ui_items[] = $delete_modal;
             $properties = [];
             $settings = $this->domain->tourSettings()->getByObjId($tour->getId());
-            $properties[$lng->txt("active")] = $settings->isActive()
+            $properties[$lng->txt("active")] = $settings?->isActive()
                 ? $lng->txt("yes")
                 : $lng->txt("no");
             $items[] = $f->item()->standard($tour->getTitle())
@@ -264,6 +322,8 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
 
     protected function editSettings() : void
     {
+        $this->setStepsHeader();
+        $this->setSettingsTabs("settings");
         $mt = $this->gui->ui()->mainTemplate();
         $mt->setContent($this->getSettingsForm()->render());
     }
@@ -325,7 +385,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                 PermissionType::from((int) $form->getData("permission"))
             ));
             $mt->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
-            $ctrl->redirectByClass(self::class, "listTours");
+            $ctrl->redirectByClass(self::class, "editSettings");
         } else {
             $mt->setContent($form->render());
         }
@@ -367,6 +427,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $ctrl = $this->gui->ctrl();
         $lng = $this->domain->lng();
         $this->setStepsHeader();
+        $this->setSettingsTabs("steps");
 
         $b = $f->button()->standard(
             $lng->txt("gdtr_add_step"),
@@ -589,5 +650,68 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $this->step_manager->delete($tour_id, $step_id);
         $mt->setOnScreenMessage("success", $lng->txt("gdtr_deleted_step"), true);
         $ctrl->redirectByClass(self::class, "listSteps");
+    }
+
+    protected function importTourForm() : void
+    {
+        $mt = $this->gui->ui()->mainTemplate();
+        $mt->setContent($this->getImportForm()->render());
+    }
+
+    protected function getImportForm(): FormAdapterGUI
+    {
+        $lng = $this->domain->lng();
+        return $this->gui->form(self::class, "importTour")
+            ->section("sec", $lng->txt("gdtr_import_tour"))
+            ->file(
+                "import",
+                $lng->txt("import_file"),
+                $this->handleImportUpload(...),
+                "id",
+                "",
+                1,
+                ["application/zip"]
+            );
+    }
+
+    protected function handleImportUpload(
+        FileUpload $upload,
+        UploadResult $result
+    ): BasicHandlerResult {
+        $new_id = $this->importTourFile($result->getName(), $result->getPath());
+        return new BasicHandlerResult(
+            '',
+            \ILIAS\FileUpload\Handler\HandlerResult::STATUS_OK,
+            (string) $new_id,
+            ''
+        );
+    }
+
+
+    protected function importTourFile(
+        string $filename,
+        string $path
+    ): int
+    {
+        $new_id = 0;
+        $fname = explode("_", $filename);
+        if ($fname[4] == "gdtr") {
+            $imp = new ilImport();
+            $new_id = $imp->importObject(
+                null,
+                $path,
+                $filename,
+                "gdtr",
+                "",
+                true
+            );
+        }
+        return $new_id;
+    }
+
+    protected function importTour() : void
+    {
+        $ctrl = $this->gui->ctrl();
+        $ctrl->redirectByClass(self::class, "listTours");
     }
 }

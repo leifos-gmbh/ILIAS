@@ -32,6 +32,13 @@ class ilGuidedTourPageConfig extends ilPageConfig
         $this->setEnablePCType("FileList", false);
         $this->setEnablePCType("Map", false);
         $this->setEnablePCType("Resources", false);
+        $this->setEnablePCType("Table", false);
+        $this->setEnablePCType("DataTable", false);
+        $this->setEnablePCType("Tabs", false);
+        $this->setEnablePCType("InteractiveImage", false);
+        $this->setEnablePCType("Grid", false);
+        $this->setEnablePCType("List", false);
+        $this->setEnablePCType("SourceCode", false);
         $this->setMultiLangSupport(false);
         $this->setSinglePageMode(false);
         $this->setEnablePermissionChecks(false);

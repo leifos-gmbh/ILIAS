@@ -10514,9 +10514,11 @@ help#:#gdtr_add_step#:#Add Step
 help#:#gdtr_list_tours_mess#:#To activate the presentation of screen and element IDs as tooltips, switch to ID Settings and enter your account name.
 help#:#gdtr_next_step#:#Next Step
 help#:#gdtr_reset_tour#:#Reset Tour
+help#:#gdtr_reset_tour_mess#:#If you reset the tour, all users that previously ended the tour, will get the tour presented again. Are you sure to proceed?
 help#:#gdtr_screen_ids#:#Screen IDs
 help#:#gdtr_screen_ids_info#:#Multiple IDs must be separated by comma.
 help#:#gdtr_step#:#Step
+help#:#gdtr_tour_has_been_reset#:#Tour has been reset.
 help#:#gdtr_tour_steps#:#Tour Steps
 help#:#gdtr_type#:#Type
 help#:#gdtr_guided_tours#:#Guided Tours

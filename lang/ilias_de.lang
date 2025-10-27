@@ -10513,9 +10513,11 @@ help#:#gdtr_add_step#:#Schritt hinzufügen
 help#:#gdtr_list_tours_mess#:#Um die Anzeige von Screen- und Element-IDs als Tooltips zu aktivieren, müssen Sie ihren Accountnamen in den ID Einstellungen eintragen.
 help#:#gdtr_next_step#:#Nächster Schritt
 help#:#gdtr_reset_tour#:#Tour zurücksetzen
+help#:#gdtr_reset_tour_mess#:#Wenn Sie die Tour zurücksetzen, werden alle diejenigen, die zuvor die Tour abgeschlossen haben, die Tour erneut präsentiert bekommen. Möchten Sie fortfahren?
 help#:#gdtr_screen_ids#:#Screen IDs
 help#:#gdtr_screen_ids_info#:#Mehrere IDs müssen durch Kommas separiert werden.
 help#:#gdtr_step#:#Schritt
+help#:#gdtr_tour_has_been_reset#:#Die Tour wurde zurückgesetzt.
 help#:#gdtr_tour_steps#:#Schritte
 help#:#gdtr_type#:#Typ
 help#:#gdtr_guided_tours#:#Guided Tours

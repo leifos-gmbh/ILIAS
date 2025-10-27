@@ -215,10 +215,12 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
                $lng->txt("settings"),
                $ctrl->getLinkTargetByClass(self::class, "editSettings")
             );
-            $actions[] = $f->link()->standard(
-               $lng->txt("gdtr_reset_tour"),
-               $ctrl->getLinkTargetByClass(self::class, "resetTour")
-            );
+            $reset_modal = $this->getResetTourModal($tour->getId());
+            $actions[] = $f->button()->shy(
+                $lng->txt("gdtr_reset_tour"),
+                "#"
+            )->withOnClick($reset_modal->getShowSignal());
+            $ui_items[] = $reset_modal;
             $delete_modal = $this->getDeleteTourModal($tour->getId());
             $actions[] = $f->button()->shy(
                $lng->txt("delete"),
@@ -245,6 +247,30 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         }
     }
 
+    protected function getResetTourModal(int $tour_id): \ILIAS\UI\Component\Modal\Interruptive
+    {
+        $tour = $this->tm->getByObjId($tour_id);
+        $f = $this->gui->ui()->factory();
+        $r = $this->gui->ui()->renderer();
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+        $res_items = [];
+        $res_items[] = $f->modal()->interruptiveItem()->keyValue(
+            (string) $tour_id,
+            $tour->getTitle(),
+            ""
+        );
+        $ctrl->setParameterByClass(self::class, "tour_id", $tour_id);
+        $action = $ctrl->getLinkTargetByClass(self::class, "resetTour");
+
+        return $f->modal()->interruptive(
+            $lng->txt("gdtr_reset_tour"),
+            $lng->txt("gdtr_reset_tour_mess"),
+            $action
+        )->withAffectedItems($res_items)
+         ->withActionButtonLabel($lng->txt("gdtr_reset_tour"));
+    }
+
     protected function resetTour() : void
     {
         $mt = $this->gui->ui()->mainTemplate();
@@ -252,7 +278,7 @@ class ilGuidedTourAdminGUI implements ilCtrlBaseClassInterface
         $ctrl = $this->gui->ctrl();
         $tour_id = $this->gui->standardRequest()->getTourId();
         $this->finish_manager->resetTour($tour_id);
-        $mt->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
+        $mt->setOnScreenMessage("success", $lng->txt("gdtr_tour_has_been_reset"), true);
         $ctrl->redirectByClass(self::class, "listTours");
     }
 

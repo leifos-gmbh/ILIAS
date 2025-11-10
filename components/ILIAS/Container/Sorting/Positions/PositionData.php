@@ -23,14 +23,14 @@ namespace ILIAS\Container\Sorting\Positions;
 class PositionData
 {
     public function __construct(
-        protected int $child_obj_id,
+        protected int $child_id,
         protected int $position
     ) {
     }
 
-    public function getChildObjID(): int
+    public function getChildID(): int
     {
-        return $this->child_obj_id;
+        return $this->child_id;
     }
 
     public function getPosition(): int

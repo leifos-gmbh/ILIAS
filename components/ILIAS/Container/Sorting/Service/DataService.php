@@ -60,11 +60,11 @@ class DataService
     }
 
     public function positionData(
-        int $child_obj_id,
+        int $child_id,
         int $position,
     ): PositionData {
         return new PositionData(
-            $child_obj_id,
+            $child_id,
             $position
         );
     }

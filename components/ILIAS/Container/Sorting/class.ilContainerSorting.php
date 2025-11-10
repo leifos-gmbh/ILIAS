@@ -67,7 +67,7 @@ class ilContainerSorting
         $sorted = [];
         foreach ($groupings as $grouping) {
             foreach ($grouping->getPositions() as $position) {
-                $sorted[$position->getChildObjID()] = $position->getPosition();
+                $sorted[$position->getChildID()] = $position->getPosition();
             }
         }
         return $sorted;
@@ -272,9 +272,9 @@ class ilContainerSorting
         foreach ($groupings as $grouping) {
             foreach ($grouping->getPositions() as $position) {
                 if ($grouping->getParentID()) {
-                    $this->sorting[$grouping->getParentType()][$grouping->getParentID()][$position->getChildObjID()] = $position->getPosition();
+                    $this->sorting[$grouping->getParentType()][$grouping->getParentID()][$position->getChildID()] = $position->getPosition();
                 } else {
-                    $this->sorting['all'][$position->getChildObjID()] = $position->getPosition();
+                    $this->sorting['all'][$position->getChildID()] = $position->getPosition();
                 }
             }
         }

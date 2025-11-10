@@ -82,25 +82,44 @@ class Manager
             }
 
             foreach ($grouping->getPositions() as $position) {
-                if (!isset($mappings[$position->getChildObjID()]) || !$mappings[$position->getChildObjID()]) {
-                    $logger->debug("No mapping found for child id:" . $position->getChildObjID());
+                if (!isset($mappings[$position->getChildID()]) || !$mappings[$position->getChildID()]) {
+                    $logger->debug("No mapping found for child id:" . $position->getChildID());
                     continue;
                 }
 
                 $this->repo->sorting()->positions()->deletePositionsForChild(
                     $target_obj_id,
-                    $mappings[$position->getChildObjID()],
+                    $mappings[$position->getChildID()],
                     $new_parent_id
                 );
                 $this->repo->sorting()->positions()->savePositionForChild(
                     $target_obj_id,
-                    $mappings[$position->getChildObjID()],
+                    $mappings[$position->getChildID()],
                     $position->getPosition(),
                     $grouping->getParentType(),
                     $new_parent_id
                 );
             }
         }
+    }
+
+    public function savePositionForChild(
+        int $obj_id,
+        int $child_id,
+        int $position,
+        string $parent_type,
+        int $parent_id
+    ): void {
+        if (!$parent_id) {
+            $parent_type = '';
+        }
+        $this->repo->sorting()->positions()->savePositionForChild(
+            $obj_id,
+            $child_id,
+            $position,
+            $parent_type,
+            $parent_id
+        );
     }
 
     /**
@@ -137,7 +156,7 @@ class Manager
     protected function saveItemsFromPost(int $obj_id, array $items): void
     {
         foreach ($items as $child_id => $position) {
-            $this->repo->sorting()->positions()->savePositionForChild(
+            $this->savePositionForChild(
                 $obj_id,
                 (int) $child_id,
                 (int) $position,
@@ -154,7 +173,7 @@ class Manager
         array $items
     ): void {
         foreach ($items as $child_id => $position) {
-            $this->repo->sorting()->positions()->savePositionForChild(
+            $this->savePositionForChild(
                 $obj_id,
                 (int) $child_id,
                 (int) $position,

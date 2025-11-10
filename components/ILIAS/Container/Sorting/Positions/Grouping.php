@@ -35,6 +35,7 @@ class Grouping
         protected int $parent_id,
         PositionData ...$positions
     ) {
+        $this->positions = $positions;
     }
 
     public function getObjId(): int

@@ -25,14 +25,12 @@ use ILIAS\Container\Sorting\Service\DomainService as SortingDomainService;
 class DomainService
 {
     public function __construct(
-        protected InternalDomainService $domain_service,
-        protected InternalRepoService $repo_service,
-        protected InternalDataService $data_service
+        protected InternalService $internal
     ) {
     }
 
     public function sorting(): SortingDomainService
     {
-        return $this->domain_service->sorting();
+        return $this->internal->domain()->sorting();
     }
 }

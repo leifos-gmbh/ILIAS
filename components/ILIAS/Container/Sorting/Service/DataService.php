@@ -22,6 +22,7 @@ namespace ILIAS\Container\Sorting\Service;
 
 use ILIAS\Container\Sorting\Settings\Settings as SortingSettings;
 use ILIAS\Container\Sorting\Positions\PositionData;
+use ILIAS\Container\Sorting\Positions\Grouping;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -44,19 +45,27 @@ class DataService
         );
     }
 
-    public function positionData(
+    public function positionGrouping(
         int $obj_id,
+        string $parent_type,
+        int $parent_id,
+        PositionData ...$positions
+    ): Grouping {
+        return new Grouping(
+            $obj_id,
+            $parent_type,
+            $parent_id,
+            ...$positions
+        );
+    }
+
+    public function positionData(
         int $child_obj_id,
         int $position,
-        string $parent_type,
-        int $parent_id
     ): PositionData {
         return new PositionData(
-            $obj_id,
             $child_obj_id,
-            $position,
-            $parent_type,
-            $parent_id
+            $position
         );
     }
 }

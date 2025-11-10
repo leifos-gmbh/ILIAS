@@ -45,22 +45,6 @@ class Repository
         return ilContainer::SORT_INHERIT;
     }
 
-    public function cloneSettings(
-        int $old_obj_id,
-        int $new_obj_id
-    ): void {
-        $old_settings = $this->getSettings($old_obj_id);
-        if ($old_settings !== null) {
-            $this->save(
-                $new_obj_id,
-                $old_settings->getSortMode(),
-                $old_settings->getSortDirection(),
-                $old_settings->getSortNewItemsPosition(),
-                $old_settings->getSortNewItemsOrder()
-            );
-        }
-    }
-
     public function save(
         int $obj_id,
         int $sort_mode,

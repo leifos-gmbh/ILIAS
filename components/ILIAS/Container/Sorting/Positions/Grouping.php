@@ -20,21 +20,43 @@ declare(strict_types=1);
 
 namespace ILIAS\Container\Sorting\Positions;
 
-class PositionData
+use Generator;
+
+class Grouping
 {
+    /**
+     * @var PositionData[]
+     */
+    protected array $positions;
+
     public function __construct(
-        protected int $child_obj_id,
-        protected int $position
+        protected int $obj_id,
+        protected string $parent_type,
+        protected int $parent_id,
+        PositionData ...$positions
     ) {
     }
 
-    public function getChildObjID(): int
+    public function getObjId(): int
     {
-        return $this->child_obj_id;
+        return $this->obj_id;
     }
 
-    public function getPosition(): int
+    public function getParentType(): string
     {
-        return $this->position;
+        return $this->parent_type;
+    }
+
+    public function getParentID(): int
+    {
+        return $this->parent_id;
+    }
+
+    /**
+     * @return PositionData[]
+     */
+    public function getPositions(): Generator
+    {
+        yield from $this->positions;
     }
 }

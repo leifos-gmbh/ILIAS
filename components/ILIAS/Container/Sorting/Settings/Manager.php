@@ -105,7 +105,16 @@ class Manager
         int $old_id,
         int $new_id
     ): void {
-        $this->repo->sorting()->settings()->cloneSettings($old_id, $new_id);
+        $old_settings = $this->repo->sorting()->settings()->getSettings($old_id);
+        if ($old_settings !== null) {
+            $this->repo->sorting()->settings()->save(
+                $new_id,
+                $old_settings->getSortMode(),
+                $old_settings->getSortDirection(),
+                $old_settings->getSortNewItemsPosition(),
+                $old_settings->getSortNewItemsOrder()
+            );
+        }
     }
 
     public function saveSettingsForObject(

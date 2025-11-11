@@ -16,7 +16,7 @@
                 <xs:element minOccurs="1" maxOccurs="1" name="ViewMode" type="xs:integer"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="SessionLimit"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="GroupMap"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="period"/>F
+                <xs:element minOccurs="0" maxOccurs="1" ref="period"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="ContainerSettings"/>
             </xs:sequence>
             <xs:attribute name="exportVersion" type="xs:string" use="required"/>

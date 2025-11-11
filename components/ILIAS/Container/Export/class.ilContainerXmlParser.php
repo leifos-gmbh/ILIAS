@@ -127,6 +127,9 @@ class ilContainerXmlParser
         }
 
         // sorting
+        foreach ($item->Sort as $sort) {
+            $this->parseSorting($new_obj_id, $sort);
+        }
     }
 
     // Parse timing info
@@ -181,21 +184,21 @@ class ilContainerXmlParser
         int $new_obj_id,
         SimpleXMLElement $sorting
     ): void {
-        $mode = match ($sorting['type'] ?? '') {
+        $mode = match ((string) ($sorting['type'] ?? '')) {
             'Manual' => ilContainer::SORT_MANUAL,
             'Creation' => ilContainer::SORT_CREATION,
             'Activation' => ilContainer::SORT_ACTIVATION,
             default => ilContainer::SORT_TITLE
         };
-        $direction = match ($sorting['direction'] ?? '') {
+        $direction = match ((string) ($sorting['direction'] ?? '')) {
             'DESC' => ilContainer::SORT_DIRECTION_DESC,
             default => ilContainer::SORT_DIRECTION_ASC
         };
-        $position = match($sorting['position'] ?? '') {
+        $position = match((string) ($sorting['position'] ?? '')) {
             'Top' => ilContainer::SORT_NEW_ITEMS_POSITION_TOP,
             default => ilContainer::SORT_NEW_ITEMS_POSITION_BOTTOM
         };
-        $order = match ($sorting['order'] ?? '') {
+        $order = match ((string) ($sorting['order'] ?? '')) {
             'Creation' => ilContainer::SORT_NEW_ITEMS_ORDER_CREATION,
             'Activation' => ilContainer::SORT_NEW_ITEMS_ORDER_ACTIVATION,
             default => ilContainer::SORT_NEW_ITEMS_ORDER_TITLE
@@ -210,8 +213,11 @@ class ilContainerXmlParser
 
         foreach ($sorting->Grouping as $grouping) {
             $old_parent_id = (int) $grouping['parent_id'];
-            $new_parent_id = $this->mapping->getMapping('components/ILIAS/Container', 'refs', $old_parent_id);
-            if (!$new_parent_id) {
+            $new_parent_id = 0;
+            if ($old_parent_id !== 0) {
+                $new_parent_id = $this->mapping->getMapping('components/ILIAS/Container', 'objs', $old_parent_id);
+            }
+            if ($new_parent_id === null) {
                 continue;
             }
             $parent_type = (string) $grouping['parent_type'];

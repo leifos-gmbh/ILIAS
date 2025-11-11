@@ -88,7 +88,7 @@ class ilContainerXmlWriter extends ilXmlWriter
             $attrs
         );
         $this->writeCourseItemInformation($a_ref_id);
-        $this->writeContainerSorting($a_ref_id);
+        $this->writeContainerSorting($obj_id);
 
         foreach ($tree->getChilds($a_ref_id) as $node) {
             $this->writeSubitems($node['child']);
@@ -159,7 +159,7 @@ class ilContainerXmlWriter extends ilXmlWriter
         }
 
         $attr['position'] = $settings->getSortNewItemsPosition() === ilContainer::SORT_NEW_ITEMS_POSITION_BOTTOM ? "Bottom" : "Top";
-        $attr['order'] = match ($settings->getSortNewItemsPosition()) {
+        $attr['order'] = match ($settings->getSortNewItemsOrder()) {
             ilContainer::SORT_NEW_ITEMS_ORDER_ACTIVATION => 'Activation',
             ilContainer::SORT_NEW_ITEMS_ORDER_CREATION =>'Creation',
             default => 'Title'

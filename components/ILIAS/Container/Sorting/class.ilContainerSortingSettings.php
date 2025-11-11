@@ -186,7 +186,7 @@ class ilContainerSortingSettings
     }
 
     /**
-     * TODO move to exporter
+     * TODO still used in SOAP export of course/group
      * sorting XML-export for all container objects
      */
     public static function _exportContainerSortingSettings(
@@ -248,7 +248,7 @@ class ilContainerSortingSettings
     }
 
     /**
-     * TODO move to exporter
+     * TODO still used in legacy and SOAP import of category/folder/course/group
      * sorting import for all container objects
      */
     public static function _importContainerSortingSettings(

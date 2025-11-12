@@ -19,7 +19,7 @@
 use ILIAS\Container\Sorting\Service\DomainService as SortingDomainService;
 
 /**
- * @deprecated Please use the sorting domain service from the Container services.
+ * @deprecated Please use the sorting domain service from the Container services. Will be removed with ILIAS 13.
  * @author Stefan Meyer <meyer@leifos.com>
  */
 class ilContainerSorting

@@ -68,22 +68,22 @@ class HarvesterTest extends TestCase
             ) {
             }
 
-            public function getObjectTypesSelectedForHarvesting(): array
+            public function getObjectTypesSelectedForPublishing(): array
             {
                 return $this->types;
             }
 
-            public function getCopyrightEntryIDsSelectedForHarvesting(): array
+            public function getCopyrightEntryIDsSelectedForPublishing(): array
             {
                 return $this->copyright_ids;
             }
 
-            public function getContainerRefIDForHarvesting(): int
+            public function getContainerRefIDForEditorialStep(): int
             {
                 return $this->harvesting_target_ref_id;
             }
 
-            public function getContainerRefIDForExposing(): int
+            public function getContainerRefIDForPublishing(): int
             {
                 return $this->exposed_source_ref_id;
             }

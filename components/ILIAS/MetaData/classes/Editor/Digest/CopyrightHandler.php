@@ -61,12 +61,12 @@ class CopyrightHandler
 
     public function isObjectTypeHarvested(string $type): bool
     {
-        return $this->harvester_settings->isObjectTypeSelectedForHarvesting($type);
+        return $this->harvester_settings->isObjectTypeSelectedForPublishing($type);
     }
 
     public function isCopyrightTemplateActive(EntryInterface $entry): bool
     {
-        return $this->harvester_settings->isCopyrightEntryIDSelectedForHarvesting($entry->id());
+        return $this->harvester_settings->isCopyrightEntryIDSelectedForPublishing($entry->id());
     }
 
     protected function hasCPEntries(): bool

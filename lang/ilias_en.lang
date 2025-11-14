@@ -12066,10 +12066,17 @@ meta#:#md_oai_contact_mail#:#Contact E-Mail
 meta#:#md_oai_identifier_prefix#:#OAI Prefix
 meta#:#md_oai_identifier_prefix_info#:#This prefix is used as a namespace in the identifiers of returned OER records.
 meta#:#md_oai_pmh_enabled#:#Allow Querying via OAI-PMH Interface
-meta#:#md_oai_pmh_enabled_info#:#If enabled, harvested OER can be queried by external interested parties, e.g. OER repositories.
+meta#:#md_oai_pmh_enabled_info#:#If enabled, published OER can be queried by external interested parties, e.g. OER repositories.
 meta#:#md_oai_repository_name#:#Repository Name
 meta#:#md_oai_repository_name_info#:#This is returned as the name of this ILIAS installation when queried.
 meta#:#md_obj_types#:#Assigned Objects
+meta#:#md_publishing#:#Publishing
+meta#:#md_publishing_workflow#:#Publishing Workflow
+meta#:#md_publishing_workflow_automatic#:#Automatic
+meta#:#md_publishing_workflow_automatic_info#:#Eligible objects are automatically published by the OER Harvester cron job.
+meta#:#md_publishing_workflow_manual#:#Manual
+meta#:#md_publishing_workflow_manual_info#:#Add an option to the LOM of objects to publish them with the click of a button.
+meta#:#md_publishing_workflow_mode#:#Enable Publishing
 meta#:#md_record_export_table#:#Export Files
 meta#:#md_record_list_table#:#Custom Metadata Sets
 meta#:#md_separated_by#:#Separated by %s
@@ -12662,16 +12669,17 @@ meta#:#meta_obj_type_mandatory#:#Data set always offered
 meta#:#meta_obj_type_optional#:#Data set needs activation
 meta#:#meta_oer_blocked#:#Ignored by OER Harvester
 meta#:#meta_oer_blocked_info#:#Will not be listed automatically as Open Educational Ressource (OER)
-meta#:#meta_oer_categories#:#Categories for Objects Gathered
 meta#:#meta_oer_copyright_selection#:#Copyright Selection
-meta#:#meta_oer_copyright_selection_info#:#Only objects that have been published with one of the selected copyrights will be linked to the OER Category.
+meta#:#meta_oer_copyright_selection_info#:#Only objects with one of the selected copyrights will be published.
+meta#:#meta_oer_editorial_category#:#Editorial Category
+meta#:#meta_oer_editorial_step_info#:#Add a step in the publishing workflow where objects can be checked by an editorial team before being published.
+meta#:#meta_oer_editorial_step_toggle#:#Enable Editorial Step
 meta#:#meta_oer_exposed_source#:#Category for Published OER Content
-meta#:#meta_oer_harvested_licences#:#Licences for Harvesting
-meta#:#meta_oer_harvested_types#:#Types of Objects to be Harvested
+meta#:#meta_oer_harvested_licences#:#Licences for Publishing
+meta#:#meta_oer_harvested_types#:#Types of Objects for Publishing
 meta#:#meta_oer_harvester#:#OER Harvester
 meta#:#meta_oer_harvester_desc#:#The OER Harvester collects all resources under selected CC licenses, adds them to a category defined in the cronjob settings, and if necessary generates export files for them. For harvested resource marked for publishing, records are compiled that can then (if enabled) be queried via an OAI-PMH interface. What object types are harvested can be configured. To get results from this cronjob it is necessary to activate and configure the copyright selection in the administration of 'Metadata'.
-meta#:#meta_oer_object_type_selection#:#Harvested Object Types
-meta#:#meta_oer_target#:#Category for Harvested OER Content
+meta#:#meta_oer_object_type_selection#:#Eligible Object Types
 meta#:#meta_opera#:#Opera
 meta#:#meta_operating_system#:#Operating System
 meta#:#meta_or_composite#:#Or Composite
@@ -12684,6 +12692,12 @@ meta#:#meta_pointofcontact#:#Point(s) of Contact
 meta#:#meta_prerequisite#:#Prerequisite
 meta#:#meta_problem_statement#:#Problem Statement
 meta#:#meta_publisher#:#Publisher
+meta#:#meta_publishing_config_cp#:#Copyright Selection: %s
+meta#:#meta_publishing_config_cron_job_admin#:#Cron Job Administration
+meta#:#meta_publishing_config_disabled#:#Disabled
+meta#:#meta_publishing_config_enabled#:#Enabled
+meta#:#meta_publishing_config_harvester#:#OER Harvester: %s
+meta#:#meta_publishing_config_status#:#For publishing to function, copyright selection and the OER Harvester cron job have to be enabled.
 meta#:#meta_purpose#:#Purpose
 meta#:#meta_questionnaire#:#Questionnaire
 meta#:#meta_references#:#References

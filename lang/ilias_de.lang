@@ -12062,10 +12062,17 @@ meta#:#md_oai_contact_mail#:#E-Mail-Kontaktadresse
 meta#:#md_oai_identifier_prefix#:#OAI Präfix
 meta#:#md_oai_identifier_prefix_info#:#Dieser Präfix wird als Namespace in den Bezeichnern von abgefragten OER-Datensätzen benutzt.
 meta#:#md_oai_pmh_enabled#:#Abfragen über OAI-PMH Schnittstelle erlauben
-meta#:#md_oai_pmh_enabled_info#:#Wenn aktiviert, können vom OER-Harvester gefundene Resourcen von externen Parteien wie OER Repositorien abgefragt werden.
+meta#:#md_oai_pmh_enabled_info#:#Wenn aktiviert, können veröffentlichte Resourcen von externen Parteien wie OER Repositorien abgefragt werden.
 meta#:#md_oai_repository_name#:#Name des Repositoriums
 meta#:#md_oai_repository_name_info#:#Bei Anfragen über die Schnittstelle wird dies als Name dieser ILIAS-Installation angegeben.
 meta#:#md_obj_types#:#Zugeordnete Objekte
+meta#:#md_publishing#:#Veröffentlichung
+meta#:#md_publishing_workflow#:#Ablauf von Veröffentlichungen
+meta#:#md_publishing_workflow_automatic#:#Automatisch
+meta#:#md_publishing_workflow_automatic_info#:#Entsprechend ausgezeichnete Objekte werden automatisch vom OER-Harvester Cron Job veröffentlicht.
+meta#:#md_publishing_workflow_manual#:#Manuell
+meta#:#md_publishing_workflow_manual_info#:#Objekte können auf ihrem Metadaten-Reiter über einen Button veröffentlicht werden.
+meta#:#md_publishing_workflow_mode#:#Veröffentlichung aktivieren
 meta#:#md_record_export_table#:#Exportdateien
 meta#:#md_record_list_table#:#Benutzerdefinierte Metadatensätze
 meta#:#md_separated_by#:#Getrennt mit %s
@@ -12658,16 +12665,17 @@ meta#:#meta_obj_type_mandatory#:#Immer zum Ausfüllen anbieten
 meta#:#meta_obj_type_optional#:#Datensatz muss aktiviert werden
 meta#:#meta_oer_blocked#:#Wird vom OER-Harvester ignoriert
 meta#:#meta_oer_blocked_info#:#Wird nicht automatisch als OER (Open Educational Resource) gelistet
-meta#:#meta_oer_categories#:#Zielkategorien für gesammelte Objekte
-meta#:#meta_oer_copyright_selection#:#Sammlung von Objekten mit folgenden Lizenzen
-meta#:#meta_oer_copyright_selection_info#:#Nur Objekte, die unter einer der ausgewählten Lizenzen veröffentlicht wurden, werden in die ausgewählten Kategorien verknüpft.
+meta#:#meta_oer_copyright_selection#:#Veröffentlichung von Objekten mit folgenden Lizenzen
+meta#:#meta_oer_copyright_selection_info#:#Nur Objekte mit einer der ausgewählten Lizenzen werden veröffentlicht.
+meta#:#meta_oer_editorial_category#:#Redaktionelle Kategorie
+meta#:#meta_oer_editorial_step_info#:#Objekte können vor ihrer Veröffentlichung von einer Redaktion geprüft werden.
+meta#:#meta_oer_editorial_step_toggle#:#Redaktionellen Zwischenschritt aktivieren
 meta#:#meta_oer_exposed_source#:#Veröffentlichung in
 meta#:#meta_oer_harvested_licences#:#Lizenzauswahl
 meta#:#meta_oer_harvested_types#:#Auswahl Objekttypen
 meta#:#meta_oer_harvester#:#OER-Harvester
 meta#:#meta_oer_harvester_desc#:#Der OER-Harvester sammelt Objekte ein, die mit vorher ausgewählten Lizenzen ausgezeichnet sind. Welche Objekttypen eingesammelt werden, kann ausgewählt werden. Der Harvester fügt diese Objekte einer definierten Kategorie hinzu und generiert dazugehörige Exportdateien.<br />Für die zur Veröffentlichung bestimmten Objekte werden Einträge angelegt. Diese Einträge können (wenn aktiviert) über eine OAI-PMH Schnittstelle ausgelesen werden. Voraussetzung dafür ist, dass die Lizenz-Auswahl in der Metadaten-Administration aktiviert und konfiguriert wurde.
-meta#:#meta_oer_object_type_selection#:#Sammlung folgender Objekttypen
-meta#:#meta_oer_target#:#Sammlung in
+meta#:#meta_oer_object_type_selection#:#Veröffentlichung folgender Objekttypen
 meta#:#meta_opera#:#Opera
 meta#:#meta_operating_system#:#Betriebssystem
 meta#:#meta_or_composite#:#... oder zusammengesetzt ...
@@ -12680,6 +12688,12 @@ meta#:#meta_pointofcontact#:#Kontakt
 meta#:#meta_prerequisite#:#Voraussetzung
 meta#:#meta_problem_statement#:#Problemstellung
 meta#:#meta_publisher#:#Herausgeber
+meta#:#meta_publishing_config_cp#:#Lizenzen in Objekten: %s
+meta#:#meta_publishing_config_cron_job_admin#:#Cron Job Administration
+meta#:#meta_publishing_config_disabled#:#Deaktiviert
+meta#:#meta_publishing_config_enabled#:#Aktiviert
+meta#:#meta_publishing_config_harvester#:#OER-Harvester: %s
+meta#:#meta_publishing_config_status#:#Damit das Veröffentlichen von Objekten funktioniert, müssen Lizenzen in Objekten und der OER-Harvester Cron Job aktiviert sein.
 meta#:#meta_purpose#:#Zweck
 meta#:#meta_questionnaire#:#Fragebogen
 meta#:#meta_references#:#Referenzen

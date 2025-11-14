@@ -103,13 +103,13 @@ class Harvester
     {
         $searcher = $this->copyright_search_factory->get()
                                                    ->withRestrictionToRepositoryObjects(true);
-        foreach ($this->settings->getObjectTypesSelectedForHarvesting() as $type) {
+        foreach ($this->settings->getObjectTypesSelectedForPublishing() as $type) {
             $searcher = $searcher->withAdditionalTypeFilter($type);
         }
         $search_results = [];
         foreach ($searcher->search(
             $this->lom_repository,
-            ...$this->settings->getCopyrightEntryIDsSelectedForHarvesting()
+            ...$this->settings->getCopyrightEntryIDsSelectedForPublishing()
         ) as $ressource_id) {
             $search_results[] = $ressource_id->objID();
         }
@@ -168,7 +168,7 @@ class Harvester
     ): int {
         $count = 0;
 
-        $target_ref_id = $this->settings->getContainerRefIDForHarvesting();
+        $target_ref_id = $this->settings->getContainerRefIDForEditorialStep();
         if (!$target_ref_id) {
             return 0;
         }
@@ -218,7 +218,7 @@ class Harvester
     ): int {
         $count = 0;
 
-        $source_ref_id = $this->settings->getContainerRefIDForExposing();
+        $source_ref_id = $this->settings->getContainerRefIDForPublishing();
         if (!$source_ref_id) {
             $this->cleanUpDeletedRecords();
             return 0;

@@ -47,4 +47,9 @@ class Agent extends NullAgent
             new ilDatabaseUpdateStepsMetricsCollectedObjective($storage, new ProgressBlockUpdateSteps11())
         );
     }
+
+    public function getBuildObjective(): Objective
+    {
+        return new BuildTrackingArtifactsObjective();
+    }
 }

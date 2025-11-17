@@ -18,12 +18,18 @@
 
 declare(strict_types=0);
 
+use ILIAS\DI\Container;
+use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
+use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
+
 /**
  * @author     Stefan Meyer <meyer@leifos.com>
  * @ingroup    ServicesTracking
  */
 class ilLPStatusVisits extends ilLPStatus
 {
+    protected TrackingDBFactoryInterface $tracking_db_factory;
+
     public static function _getInProgress(int $a_obj_id): array
     {
         global $DIC;
@@ -117,5 +123,37 @@ class ilLPStatusVisits extends ilLPStatus
             $per = 100;
         }
         return $per;
+    }
+
+    public function init(Container $DIC): void
+    {
+        $this->tracking_db_factory = new TrackingDBFactory($DIC->database());
+    }
+
+    public function getCustomLPSettingsExportXML(
+        int $object_id
+    ): SimpleXMLElement {
+        $xml_root = new SimpleXMLElement('<LPStatusVisits></LPStatusVisits>');
+        $lp_settings = $this->tracking_db_factory->lpSettings()->repository()->readLPSettings($object_id);
+        $visits = is_null($lp_settings)
+            ? ilLPObjSettings::LP_DEFAULT_VISITS
+            : $lp_settings->getVisits();
+        $xml_root->addAttribute('visits', (string) $visits);
+        return $xml_root;
+    }
+
+    public function importCustomLPSettingsExportXML(
+        int $new_object_id,
+        ilImportMapping $a_mapping,
+        SimpleXMLElement $additional_xml_root
+    ): void {
+        $settings = $this->tracking_db_factory->lpSettings()->repository()->readLPSettings($new_object_id);
+        $settings = $settings->withVisits((int) $additional_xml_root->attributes()->visits);
+        $this->tracking_db_factory->lpSettings()->repository()->writeLPSettings($settings);
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_VISITS;
     }
 }

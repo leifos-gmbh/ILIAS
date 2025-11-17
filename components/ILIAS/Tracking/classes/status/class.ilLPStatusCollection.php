@@ -18,6 +18,10 @@
 
 declare(strict_types=1);
 
+use ILIAS\Tracking\View\ProgressBlock\Settings\RepositoryInterface as ProgressBlockSettingsRepositoryInterface;
+use ILIAS\Tracking\View\ProgressBlock\Settings\Repository as ProgressBlockSettingsRepository;
+use ILIAS\DI\Container;
+
 /**
  * @author  Stefan Meyer <meyer@leifos.com>
  * @package ilias-tracking
@@ -26,10 +30,11 @@ class ilLPStatusCollection extends ilLPStatus
 {
     private ilTree $tree;
 
+    protected ProgressBlockSettingsRepositoryInterface $progress_block_settings_repository;
+
     public function __construct(int $a_obj_id)
     {
         global $DIC;
-
         parent::__construct($a_obj_id);
         $this->tree = $DIC->repositoryTree();
     }
@@ -471,7 +476,6 @@ class ilLPStatusCollection extends ilLPStatus
                     $a_obj_id
                 );
                 return $member_obj->getMembers();
-                break;
         }
 
         return array();
@@ -555,5 +559,35 @@ class ilLPStatusCollection extends ilLPStatus
             $percentage = (int) ((100.0 / $status_info["num_collections"]) * $passed);
         }
         return $percentage;
+    }
+
+    public function init(Container $DIC): void
+    {
+        $this->progress_block_settings_repository = new ProgressBlockSettingsRepository($DIC->database());
+    }
+
+    public function getCustomLPSettingsExportXML(
+        int $object_id,
+    ): SimpleXMLElement {
+        $show_block = $this->progress_block_settings_repository->isBlockShownForObject($object_id);
+        $xml_root = new SimpleXMLElement('<LPStatusCollection></LPStatusCollection>');
+        $xml_root->addAttribute('show_progress_block', (string) ((int) $show_block));
+        return $xml_root;
+    }
+
+    public function importCustomLPSettingsExportXML(
+        int $new_object_id,
+        ilImportMapping $a_mapping,
+        SimpleXMLElement $additional_xml_root
+    ): void {
+        $this->progress_block_settings_repository->setShowBlockForObject(
+            $new_object_id,
+            (bool) ((int)$additional_xml_root->attributes()->show_progress_block)
+        );
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_COLLECTION;
     }
 }

@@ -18,6 +18,9 @@
 
 declare(strict_types=0);
 
+use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
+use ILIAS\Tracking\DB\LPSettings\Element\LPSettings as TrackingDBLPSettings;
+
 /**
  * Class ilLPObjSettings
  * @author  Stefan Meyer <meyer@leifos.com>
@@ -25,13 +28,6 @@ declare(strict_types=0);
  */
 class ilLPObjSettings
 {
-    protected int $obj_id;
-    protected string $obj_type;
-    protected int $obj_mode;
-    protected int $visits = self::LP_DEFAULT_VISITS;
-
-    protected bool $is_stored = false;
-
     public const LP_MODE_DEACTIVATED = 0;
     public const LP_MODE_TLT = 1;
     public const LP_MODE_VISITS = 2;
@@ -62,11 +58,10 @@ class ilLPObjSettings
     public const LP_MODE_CMIX_PASSED_WITH_FAILED = 27;
     public const LP_MODE_CMIX_COMPLETED_OR_PASSED = 28;
     public const LP_MODE_CMIX_COMPL_OR_PASSED_WITH_FAILED = 29;
+    public const LP_DEFAULT_VISITS = 30;
     public const LP_MODE_LTI_OUTCOME = 31;
     public const LP_MODE_COURSE_REFERENCE = 32;
     public const LP_MODE_CONTRIBUTION_TO_DISCUSSION = 33;
-
-    public const LP_DEFAULT_VISITS = 30;
 
     protected static array $map = array(
 
@@ -266,23 +261,26 @@ class ilLPObjSettings
         ],
     );
 
-    protected ilDBInterface $db;
     protected ilObjectDataCache $objectDataCache;
+    protected TrackingDBFactory $tracking_db_factory;
+    protected TrackingDBLPSettings $lp_settings;
 
     public function __construct(int $a_obj_id)
     {
         global $DIC;
-
-        $this->db = $DIC->database();
         $this->objectDataCache = $DIC['ilObjDataCache'];
-
-        $this->obj_id = $a_obj_id;
-
-        if (!$this->read()) {
-            $this->obj_type = $this->objectDataCache->lookupType($this->obj_id);
-
-            $olp = ilObjectLP::getInstance($this->obj_id);
-            $this->obj_mode = $olp->getDefaultMode();
+        $this->tracking_db_factory = new TrackingDBFactory($DIC->database());
+        $entry_exists = $this->tracking_db_factory->lpSettings()->repository()->isLPSettingsEntryInDB($a_obj_id);
+        if (!$entry_exists) {
+            $olp = ilObjectLP::getInstance($a_obj_id);
+            $this->lp_settings = $this->tracking_db_factory->lpSettings()->element()->lpSettings()
+                ->withObjectId($a_obj_id)
+                ->withObjType($this->objectDataCache->lookupType($a_obj_id))
+                ->withUMode($olp->getDefaultMode())
+                ->withVisits(self::LP_DEFAULT_VISITS);
+        }
+        if ($entry_exists) {
+            $this->lp_settings = $this->tracking_db_factory->lpSettings()->repository()->readLPSettings($a_obj_id);
         }
     }
 
@@ -293,102 +291,72 @@ class ilLPObjSettings
      */
     public function cloneSettings(int $a_new_obj_id): bool
     {
-        global $DIC;
-
-        $ilDB = $DIC['ilDB'];
-
-        $query = "INSERT INTO ut_lp_settings (obj_id,obj_type,u_mode,visits) " .
-            "VALUES( " .
-            $this->db->quote($a_new_obj_id, 'integer') . ", " .
-            $this->db->quote($this->getObjType(), 'text') . ", " .
-            $this->db->quote($this->getMode(), 'integer') . ", " .
-            $this->db->quote($this->getVisits(), 'integer') .
-            ")";
-        $res = $this->db->manipulate($query);
+        $this->tracking_db_factory->lpSettings()->repository()->writeLPSettings(
+            $this->lp_settings
+                ->withObjectId($a_new_obj_id)
+        );
         return true;
     }
 
     public function getVisits(): int
     {
-        return $this->visits;
-    }
-
-    public function setVisits(int $a_visits): void
-    {
-        $this->visits = $a_visits;
-    }
-
-    public function setMode(int $a_mode): void
-    {
-        $this->obj_mode = $a_mode;
+        return $this->lp_settings->getVisits();
     }
 
     public function getMode(): int
     {
-        return $this->obj_mode;
+        return $this->lp_settings->getUMode();
     }
 
     public function getObjId(): int
     {
-        return $this->obj_id;
+        return $this->lp_settings->getObjectId();
     }
 
     public function getObjType(): string
     {
-        return $this->obj_type;
+        return $this->lp_settings->getObjType();
+    }
+
+    public function setVisits(
+        int $a_visits
+    ): void {
+        $this->lp_settings = $this->lp_settings
+            ->withVisits($a_visits);
+    }
+
+    public function setMode(
+        int $a_mode
+    ): void {
+        $this->lp_settings = $this->lp_settings
+            ->withUMode($a_mode);
     }
 
     public function read(): bool
     {
-        $res = $this->db->query(
-            "SELECT * FROM ut_lp_settings WHERE obj_id = " .
-            $this->db->quote($this->obj_id, 'integer')
-        );
-        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
-            $this->is_stored = true;
-            $this->obj_type = (string) $row->obj_type;
-            $this->obj_mode = (int) $row->u_mode;
-            $this->visits = (int) $row->visits;
-            return true;
+        $new_lp_settings = $this->tracking_db_factory->lpSettings()->repository()->readLPSettings($this->lp_settings->getObjectId());
+        if (is_null($new_lp_settings)) {
+            return false;
         }
-        return false;
-    }
-
-    public function update(bool $a_refresh_lp = true): bool
-    {
-        if (!$this->is_stored) {
-            return $this->insert();
-        }
-        $query = "UPDATE ut_lp_settings SET u_mode = " . $this->db->quote(
-            $this->getMode(),
-            'integer'
-        ) . ", " .
-            "visits = " . $this->db->quote(
-                $this->getVisits(),
-                'integer'
-            ) . " " .
-            "WHERE obj_id = " . $this->db->quote($this->getObjId(), 'integer');
-        $res = $this->db->manipulate($query);
-        $this->read();
-
-        if ($a_refresh_lp) {
-            $this->doLPRefresh();
-        }
+        $this->lp_settings = $new_lp_settings;
         return true;
     }
 
-    public function insert(): bool
-    {
-        $query = "INSERT INTO ut_lp_settings (obj_id,obj_type,u_mode,visits) " .
-            "VALUES(" .
-            $this->db->quote($this->getObjId(), 'integer') . ", " .
-            $this->db->quote($this->getObjType(), 'text') . ", " .
-            $this->db->quote($this->getMode(), 'integer') . ", " .
-            $this->db->quote($this->getVisits(), 'integer') .  // #12482
-            ")";
-        $res = $this->db->manipulate($query);
+    public function update(
+        bool $a_refresh_lp = true
+    ): bool {
+        return $this->insert($a_refresh_lp);
+    }
+
+    public function insert(
+        bool $a_refresh_lp = true
+    ): bool {
+        $new_entry = $this->tracking_db_factory->lpSettings()->repository()->isLPSettingsEntryInDB($this->lp_settings->getObjectId());
+        $this->tracking_db_factory->lpSettings()->repository()->writeLPSettings($this->lp_settings);
         $this->read();
-        $this->doLPRefresh();
+        if ($a_refresh_lp || $new_entry) {
+            $this->doLPRefresh();
+        }
         return true;
     }
 
@@ -398,86 +366,80 @@ class ilLPObjSettings
         ilLPStatusWrapper::_refreshStatus($this->getObjId());
     }
 
-    public static function _delete(int $a_obj_id): bool
-    {
+    public static function _delete(
+        int $a_obj_id
+    ): bool {
         global $DIC;
-
-        $ilDB = $DIC['ilDB'];
-        $query = "DELETE FROM ut_lp_settings WHERE obj_id = " . $ilDB->quote(
-            $a_obj_id,
-            'integer'
-        );
-        $res = $ilDB->manipulate($query);
+        $tracking_db_factory = new TrackingDBFactory($DIC->database());
+        $tracking_db_factory->lpSettings()->repository()->deleteLPSettings($a_obj_id);
         return true;
     }
 
-    public static function _lookupVisits(int $a_obj_id): int
-    {
+    public static function _lookupVisits(
+        int $a_obj_id
+    ): int {
         global $DIC;
-
-        $ilDB = $DIC['ilDB'];
-        $query = "SELECT visits FROM ut_lp_settings " .
-            "WHERE obj_id = " . $ilDB->quote($a_obj_id, 'integer');
-
-        $res = $ilDB->query($query);
-        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
-            return $row->visits;
-        }
-        return self::LP_DEFAULT_VISITS;
+        $tracking_db_factory = new TrackingDBFactory($DIC->database());
+        $lp_settings = $tracking_db_factory->lpSettings()->repository()->readLPSettings($a_obj_id);
+        return is_null($lp_settings)
+            ? self::LP_DEFAULT_VISITS
+            : $lp_settings->getVisits();
     }
 
-    public static function _lookupDBModeForObjects(array $a_obj_ids): array
-    {
+    public static function _lookupDBModeForObjects(
+        array $a_obj_ids
+    ): array {
         global $DIC;
-
-        $ilDB = $DIC['ilDB'];
-        // this does NOT handle default mode!
-        $res = array();
-        $query = "SELECT obj_id, u_mode FROM ut_lp_settings" .
-            " WHERE " . $ilDB->in("obj_id", $a_obj_ids, "", "integer");
-        $set = $ilDB->query($query);
-        while ($row = $set->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
-            $res[(int) $row->obj_id] = (int) $row->u_mode;
+        $tracking_db_factory = new TrackingDBFactory($DIC->database());
+        $lp_settings = $tracking_db_factory->lpSettings()->repository()->readLPSettingsCollection(...$a_obj_ids);
+        $db_modes = [];
+        if (is_null($lp_settings)) {
+            return $db_modes;
         }
-        return $res;
+        foreach ($lp_settings as $lp_setting) {
+            $db_modes[$lp_setting->getObjectId()] = $lp_setting->getUMode();
+        }
+        return $db_modes;
     }
 
-    public static function _lookupDBMode(int $a_obj_id): ?int
-    {
+    public static function _lookupDBMode(
+        int $a_obj_id
+    ): ?int {
         global $DIC;
-
-        $ilDB = $DIC['ilDB'];
-        // this does NOT handle default mode!
-        $query = "SELECT u_mode FROM ut_lp_settings" .
-            " WHERE obj_id = " . $ilDB->quote($a_obj_id, "integer");
-        $res = $ilDB->query($query);
-        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
-            return (int) $row->u_mode;
-        }
-        return null;
+        $tracking_db_factory = new TrackingDBFactory($DIC->database());
+        $lp_settings = $tracking_db_factory->lpSettings()->repository()->readLPSettings($a_obj_id);
+        return is_null($lp_settings)
+            ? null
+            : $lp_settings->getUMode();
     }
 
-    public static function _mode2Text(int $a_mode): string
-    {
+    public static function _mode2Text(
+        int $a_mode
+    ): string {
         global $DIC;
 
         $lng = $DIC->language();
-        if (array_key_exists($a_mode, self::$map) &&
-            is_array(self::$map[$a_mode])) {
+        if (
+            array_key_exists($a_mode, self::$map) &&
+            is_array(self::$map[$a_mode])
+        ) {
             return $lng->txt(self::$map[$a_mode][1]);
         }
         return '';
     }
 
-    public static function _mode2InfoText(int $a_mode): string
-    {
+    public static function _mode2InfoText(
+        int $a_mode
+    ): string {
         global $DIC;
 
         $lng = $DIC->language();
-        if (array_key_exists($a_mode, self::$map) &&
-            is_array(self::$map[$a_mode])) {
+        if (
+            array_key_exists($a_mode, self::$map) &&
+            is_array(self::$map[$a_mode])
+        ) {
             $info = $lng->txt(self::$map[$a_mode][2]);
-            if ($a_mode == self::LP_MODE_TLT) {
+            if ($a_mode === self::LP_MODE_TLT) {
                 // dynamic content
                 $info = sprintf($info, ilObjUserTracking::_getValidTimeSpan());
             }
@@ -488,7 +450,7 @@ class ilLPObjSettings
 
     public static function getClassMap(): array
     {
-        $res = array();
+        $res = [];
         foreach (self::$map as $mode => $item) {
             if ($item) {
                 $res[$mode] = $item[0];
@@ -497,18 +459,14 @@ class ilLPObjSettings
         return $res;
     }
 
-    public static function _deleteByObjId(int $a_obj_id): void
-    {
+    public static function _deleteByObjId(
+        int $a_obj_id
+    ): void {
+        # we are only removing settings for now
+        # invalid ut_lp_collections-entries are filtered
+        # ut_lp_marks is deemed private user data
         global $DIC;
-
-        $ilDB = $DIC['ilDB'];
-        // we are only removing settings for now
-        // invalid ut_lp_collections-entries are filtered
-        // ut_lp_marks is deemed private user data
-
-        $ilDB->manipulate(
-            "DELETE FROM ut_lp_settings" .
-            " WHERE obj_id = " . $ilDB->quote($a_obj_id, "integer")
-        );
+        $tracking_db_factory = new TrackingDBFactory($DIC->database());
+        $tracking_db_factory->lpSettings()->repository()->deleteLPSettings($a_obj_id);
     }
 }

@@ -45,4 +45,9 @@ class NullHandler implements HandlerInterface
     {
         return '';
     }
+
+    public function isReferenceInContainer(int $ref_id, int $container_ref_id): bool
+    {
+        return false;
+    }
 }

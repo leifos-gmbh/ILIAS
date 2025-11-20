@@ -75,4 +75,9 @@ class Handler implements HandlerInterface
     {
         return \ilObject::_lookupType($ref_id, true);
     }
+
+    public function isReferenceInContainer(int $ref_id, int $container_ref_id): bool
+    {
+        return $this->tree->isGrandChild($container_ref_id, $ref_id);
+    }
 }

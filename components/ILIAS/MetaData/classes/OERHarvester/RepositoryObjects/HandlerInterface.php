@@ -35,5 +35,5 @@ interface HandlerInterface
 
     public function deleteReference(int $ref_id): void;
 
-    public function getTypeOfReferencedObject(int $ref_id): string;
+    public function getTypeOfObject(int $obj_id): string;
 }

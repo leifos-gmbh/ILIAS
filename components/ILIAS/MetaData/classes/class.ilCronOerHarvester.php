@@ -19,8 +19,8 @@
 declare(strict_types=1);
 
 use ILIAS\Cron\Job\Schedule\JobScheduleType;
-use ILIAS\MetaData\OERHarvester\Initiator;
-use ILIAS\MetaData\OERHarvester\Results\Wrapper as ResultWrapper;
+use ILIAS\MetaData\OERHarvester\CronJob\Initiator;
+use ILIAS\MetaData\OERHarvester\CronJob\Results\Wrapper as ResultWrapper;
 use ILIAS\Cron\Job\JobResult;
 use ILIAS\Cron\CronJob;
 
@@ -91,7 +91,7 @@ class ilCronOerHarvester extends CronJob
     public function run(): JobResult
     {
         $this->logger->info('Started cron oer harvester.');
-        $harvester = $this->initiator->harvester();
+        $harvester = $this->initiator->automaticPublisher();
         $res = $harvester->run(new ResultWrapper(new JobResult()));
         $this->logger->info('cron oer harvester finished');
 

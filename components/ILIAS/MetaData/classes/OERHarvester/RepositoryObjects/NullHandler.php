@@ -41,7 +41,7 @@ class NullHandler implements HandlerInterface
     {
     }
 
-    public function getTypeOfReferencedObject(int $ref_id): string
+    public function getTypeOfObject(int $obj_id): string
     {
         return '';
     }

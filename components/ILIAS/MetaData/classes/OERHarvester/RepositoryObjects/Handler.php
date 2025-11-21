@@ -67,13 +67,16 @@ class Handler implements HandlerInterface
 
     public function deleteReference(int $ref_id): void
     {
+        if (!\ilObject::_exists($ref_id, true)) {
+            return;
+        }
         $object = \ilObjectFactory::getInstanceByRefId($ref_id);
         $object->delete();
     }
 
-    public function getTypeOfReferencedObject(int $ref_id): string
+    public function getTypeOfObject(int $obj_id): string
     {
-        return \ilObject::_lookupType($ref_id, true);
+        return \ilObject::_lookupType($obj_id);
     }
 
     public function isReferenceInContainer(int $ref_id, int $container_ref_id): bool

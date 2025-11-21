@@ -18,19 +18,24 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ControlCenter\GUI;
+namespace ILIAS\MetaData\OERHarvester\CronJob\Results;
 
-enum Command: string
+use ILIAS\Cron\Job\JobResult;
+
+class NullWrapper implements WrapperInterface
 {
-    case VIEW = 'view';
-    case BLOCK = 'block';
-    case UNBLOCK = 'unblock';
-    case PUBLISH = 'publish';
-    case WITHDRAW = 'withdraw';
-    case CONFIRM_WITHDRAW = 'confirmWithdraw';
-    case SUBMIT = 'submit';
-    case ACCEPT = 'accept';
-    case CONFIRM_ACCEPT = 'confirmAccept';
-    case REJECT = 'reject';
-    case CONFIRM_REJECT = 'confirmReject';
+    public function get(): JobResult
+    {
+        return new JobResult();
+    }
+
+    public function withStatus(int $status): WrapperInterface
+    {
+        return $this;
+    }
+
+    public function withMessage(string $message): WrapperInterface
+    {
+        return $this;
+    }
 }

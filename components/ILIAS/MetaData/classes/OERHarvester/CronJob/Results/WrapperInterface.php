@@ -18,15 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ControlCenter\GUI\Content;
+namespace ILIAS\MetaData\OERHarvester\CronJob\Results;
 
-use ILIAS\UI\Component\Modal\RoundTrip as RoundTripModal;
-use ILIAS\MetaData\OERHarvester\ControlCenter\State\StateInfoInterface;
-use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
+use ILIAS\Cron\Job\JobResult;
 
-interface ContentFactoryInterface
+interface WrapperInterface
 {
-    public function getInfoContent(StateInfoInterface $state_info): RoundTripModal;
+    public function get(): JobResult;
 
-    public function getConfirmationContent(Action $action): RoundTripModal;
+    public function withStatus(int $status): WrapperInterface;
+
+    public function withMessage(string $message): WrapperInterface;
 }

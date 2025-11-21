@@ -18,18 +18,18 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ControlCenter\GUI\Content;
+namespace ILIAS\MetaData\OERHarvester\ControlCenter\Content;
 
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\Status;
 use ILIAS\UI\Component\Modal\RoundTrip as RoundTripModal;
-use ILIAS\MetaData\OERHarvester\ControlCenter\GUI\Command;
+use ILIAS\MetaData\OERHarvester\ControlCenter\Command;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\StateInfoInterface;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
 use ILIAS\UI\Component\Chart\ScaleBar;
 use ILIAS\UI\Component\MessageBox\MessageBox;
 use ILIAS\UI\Component\Button\Button;
-use ILIAS\MetaData\OERHarvester\ControlCenter\GUI\Links\LinkFactoryInterface;
+use ILIAS\MetaData\OERHarvester\ControlCenter\Links\LinkFactoryInterface;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
 use ILIAS\MetaData\Copyright\RepositoryInterface;
 

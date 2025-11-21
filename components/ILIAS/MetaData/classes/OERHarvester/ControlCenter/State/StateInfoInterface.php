@@ -40,6 +40,7 @@ interface StateInfoInterface
      * Returns false both if the action should not be offered at all
      * in the current context, and if the action should be shown as
      * unavailable.
+     * Takes into account access checks.
      */
     public function isActionAvailable(Action $action): bool;
 

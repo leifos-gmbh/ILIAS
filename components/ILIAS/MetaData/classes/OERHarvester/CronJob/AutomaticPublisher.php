@@ -18,9 +18,10 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester;
+namespace ILIAS\MetaData\OERHarvester\CronJob;
 
-use ILIAS\MetaData\OERHarvester\Results\WrapperInterface as Result;
+use ilLogger;
+use ILIAS\MetaData\OERHarvester\CronJob\Results\WrapperInterface as Result;
 use ILIAS\MetaData\OERHarvester\Settings\SettingsInterface;
 use ILIAS\MetaData\OERHarvester\RepositoryObjects\HandlerInterface as ObjectHandler;
 use ILIAS\MetaData\OERHarvester\ResourceStatus\RepositoryInterface as StatusRepository;
@@ -28,40 +29,22 @@ use ILIAS\MetaData\OERHarvester\ExposedRecords\RepositoryInterface as ExposedRec
 use ILIAS\MetaData\Copyright\Search\FactoryInterface as CopyrightSearchFactory;
 use ILIAS\MetaData\Repository\RepositoryInterface as LOMRepository;
 use ILIAS\MetaData\OERHarvester\XML\WriterInterface as SimpleDCXMLWriter;
-use ILIAS\MetaData\OERHarvester\Export\HandlerInterface as ExportHandler;
+use ILIAS\Cron\Job\JobResult;
+use ILIAS\MetaData\OERHarvester\Publisher\PublisherInterface;
 
-class Harvester
+class AutomaticPublisher
 {
-    protected SettingsInterface $settings;
-    protected ObjectHandler $object_handler;
-    protected ExportHandler $export_handler;
-    protected StatusRepository $status_repository;
-    protected ExposedRecordRepository $exposed_record_repository;
-    protected CopyrightSearchFactory $copyright_search_factory;
-    protected LOMRepository $lom_repository;
-    protected SimpleDCXMLWriter $xml_writer;
-    protected \ilLogger $logger;
-
     public function __construct(
-        SettingsInterface $settings,
-        ObjectHandler $object_handler,
-        ExportHandler $export_handler,
-        StatusRepository $status_repository,
-        ExposedRecordRepository $exposed_record_repository,
-        CopyrightSearchFactory $copyright_search_factory,
-        LOMRepository $lom_repository,
-        SimpleDCXMLWriter $xml_writer,
-        \ilLogger $logger
+        protected PublisherInterface $publisher,
+        protected SettingsInterface $settings,
+        protected ObjectHandler $object_handler,
+        protected StatusRepository $status_repository,
+        protected ExposedRecordRepository $exposed_record_repository,
+        protected CopyrightSearchFactory $copyright_search_factory,
+        protected LOMRepository $lom_repository,
+        protected SimpleDCXMLWriter $xml_writer,
+        protected ilLogger $logger
     ) {
-        $this->settings = $settings;
-        $this->object_handler = $object_handler;
-        $this->export_handler = $export_handler;
-        $this->status_repository = $status_repository;
-        $this->exposed_record_repository = $exposed_record_repository;
-        $this->copyright_search_factory = $copyright_search_factory;
-        $this->lom_repository = $lom_repository;
-        $this->xml_writer = $xml_writer;
-        $this->logger = $logger;
     }
 
     public function run(Result $result): Result
@@ -72,29 +55,32 @@ class Harvester
             $harvestable_obj_ids = $this->findHarvestableObjectIDs();
             $currently_harvested_obj_ids = iterator_to_array($this->status_repository->getAllHarvestedObjIDs());
 
-            $deletion_count = $this->deleteDeprecatedReferences(
+            $deletion_count = $this->withdrawDeprecatedObjects(
                 $harvestable_obj_ids,
                 $currently_harvested_obj_ids
             );
-            $messages[] = 'Deleted ' . $deletion_count . ' deprecated references.';
-            $harvest_count = $this->harvestObjects(
-                $harvestable_obj_ids,
-                $currently_harvested_obj_ids
-            );
-            $messages[] = 'Created ' . $harvest_count . ' new references.';
-            $exposure_count = $this->updateExposedRecords(
-                $harvestable_obj_ids
-            );
-            $messages[] = 'Created, updated, or deleted ' . $exposure_count . ' exposed records.';
+            $messages[] = 'Withdrew ' . $deletion_count . ' deprecated objects.';
+
+            $exposure_count = $this->updatePublishedObjects();
+            $messages[] = 'Updated ' . $exposure_count . ' published objects.';
+
+            $harvest_count = 0;
+            if ($this->settings->isAutomaticPublishingEnabled()) {
+                $harvest_count = $this->publishObjects(
+                    $harvestable_obj_ids,
+                    $currently_harvested_obj_ids
+                );
+                $messages[] = 'Published ' . $harvest_count . ' new objects.';
+            }
 
             if ($deletion_count !== 0 || $harvest_count !== 0 || $exposure_count !== 0) {
-                $result = $result->withStatus(\ILIAS\Cron\Job\JobResult::STATUS_OK);
+                $result = $result->withStatus(JobResult::STATUS_OK);
             } else {
-                $result = $result->withStatus(\ILIAS\Cron\Job\JobResult::STATUS_NO_ACTION);
+                $result = $result->withStatus(JobResult::STATUS_NO_ACTION);
             }
             return $result->withMessage(implode('<br>', $messages));
         } catch (\Exception $e) {
-            return $result->withStatus(\ILIAS\Cron\Job\JobResult::STATUS_FAIL)
+            return $result->withStatus(JobResult::STATUS_FAIL)
                           ->withMessage($e->getMessage());
         }
     }
@@ -130,7 +116,7 @@ class Harvester
      * @param int[] $harvestable_obj_ids
      * @param int[] $currently_harvested_obj_ids
      */
-    protected function deleteDeprecatedReferences(
+    protected function withdrawDeprecatedObjects(
         array $harvestable_obj_ids,
         array $currently_harvested_obj_ids
     ): int {
@@ -140,68 +126,51 @@ class Harvester
                 continue;
             }
 
-            $ref_id = $this->status_repository->getHarvestRefID($obj_id);
-            $this->logDebug('Deleting deprecated object with ref_id: ' . $ref_id);
+            $this->logDebug('Withdrawing deprecated object with obj: ' . $obj_id);
             try {
-                $this->object_handler->deleteReference($ref_id);
+                $this->publisher->withdraw($obj_id);
             } catch (\Exception $e) {
                 $this->logError(
-                    'Error when deleting harvested reference with ref_id ' .
-                    $ref_id . ': ' . $e->getMessage()
+                    'Error when withdrawing from publishing object with obj_id ' .
+                    $obj_id . ': ' . $e->getMessage()
                 );
                 continue;
             }
-            $this->status_repository->deleteHarvestRefID($obj_id);
             $count++;
         }
         return $count;
     }
 
     /**
-     * Returns number of harvested objects.
+     * Returns number of published/submitted objects.
      * @param int[] $harvestable_obj_ids
      * @param int[] $currently_harvested_obj_ids
      */
-    protected function harvestObjects(
+    protected function publishObjects(
         array $harvestable_obj_ids,
         array $currently_harvested_obj_ids
     ): int {
         $count = 0;
-
-        $target_ref_id = $this->settings->getContainerRefIDForEditorialStep();
-        if (!$target_ref_id) {
-            return 0;
-        }
 
         foreach ($harvestable_obj_ids as $obj_id) {
             if (in_array($obj_id, $currently_harvested_obj_ids)) {
                 continue;
             }
 
-            $this->logDebug('Creating new reference for object with obj_id: ' . $obj_id);
+            $this->logDebug('Publishing object with obj_id: ' . $obj_id);
             try {
-                $new_ref_id = $this->object_handler->referenceObjectInTargetContainer(
-                    $obj_id,
-                    $target_ref_id
-                );
-            } catch (\Exception $e) {
-                $this->logError(
-                    'Error when creating reference for object with obj_id ' .
-                    $obj_id . ': ' . $e->getMessage()
-                );
-                continue;
-            }
-            $this->status_repository->setHarvestRefID($obj_id, $new_ref_id);
-
-            try {
-                if (!$this->export_handler->hasPublicAccessExport($obj_id)) {
-                    $this->export_handler->createPublicAccessExport($obj_id);
+                if ($this->settings->isEditorialStepEnabled()) {
+                    $this->publisher->submit($obj_id);
+                } else {
+                    $type = $this->object_handler->getTypeOfObject($obj_id);
+                    $this->publisher->publish($obj_id, $type);
                 }
             } catch (\Exception $e) {
                 $this->logError(
-                    'Error when creating export for object with obj_id ' .
+                    'Error when publishing object with obj_id ' .
                     $obj_id . ': ' . $e->getMessage()
                 );
+                continue;
             }
 
             $count++;
@@ -210,12 +179,10 @@ class Harvester
     }
 
     /**
-     * Returns number of changed exposed records.
-     * @param int[] $harvestable_obj_ids
+     * Returns number of changed published records.
      */
-    protected function updateExposedRecords(
-        array $harvestable_obj_ids,
-    ): int {
+    protected function updatePublishedObjects(): int
+    {
         $count = 0;
 
         $source_ref_id = $this->settings->getContainerRefIDForPublishing();
@@ -224,19 +191,17 @@ class Harvester
             return 0;
         }
 
-        $already_exposed = [];
         foreach ($this->exposed_record_repository->getRecords() as $record) {
             $obj_id = $record->infos()->objID();
-            $already_exposed[] = $obj_id;
+            // TODO check if any ref id is in publishing category!!!! Same for withdraw in publisher
+            $ref_id = $this->status_repository->getHarvestRefID($obj_id);
 
-            $ref_id = $this->object_handler->getObjectReferenceIDInContainer($obj_id, $source_ref_id);
-
-            if (!in_array($obj_id, $harvestable_obj_ids) || is_null($ref_id)) {
+            if (!$ref_id || !$this->object_handler->isReferenceInContainer($ref_id, $source_ref_id)) {
                 if ($record->infos()->isDeleted()) {
                     continue;
                 }
-                $this->logDebug('Updating delete status of exposed record for object with obj_id: ' . $obj_id);
-                $this->exposed_record_repository->updateRecord($obj_id, true, null);
+                $this->logDebug('Withdrawing from publishing object taken out of publishing category with obj_id: ' . $obj_id);
+                $this->publisher->withdraw($obj_id);
                 $count++;
                 continue;
             }
@@ -244,44 +209,18 @@ class Harvester
             $simple_dc_xml = $this->xml_writer->writeSimpleDCMetaData(
                 $obj_id,
                 $ref_id,
-                $this->object_handler->getTypeOfReferencedObject($ref_id)
+                $this->object_handler->getTypeOfObject($obj_id)
             );
 
             if (
                 $record->infos()->isDeleted() ||
                 $simple_dc_xml->saveXML() !== $record->metadata()->saveXML()
             ) {
+                // TODO should also be done by the publisher
                 $this->logDebug('Updating exposed record for object with obj_id: ' . $obj_id);
                 $this->exposed_record_repository->updateRecord($obj_id, false, $simple_dc_xml);
                 $count++;
             }
-        }
-
-        foreach ($harvestable_obj_ids as $obj_id) {
-            if (in_array($obj_id, $already_exposed)) {
-                continue;
-            }
-
-            $ref_id = $this->object_handler->getObjectReferenceIDInContainer($obj_id, $source_ref_id);
-            if (is_null($ref_id)) {
-                continue;
-            }
-
-            $type = $this->object_handler->getTypeOfReferencedObject($ref_id);
-
-            $simple_dc_xml = $this->xml_writer->writeSimpleDCMetaData(
-                $obj_id,
-                $ref_id,
-                $type
-            );
-
-            $this->logDebug('Creating exposed record for object with obj_id: ' . $obj_id);
-            $this->exposed_record_repository->createRecord(
-                $obj_id,
-                $this->buildIdentifier($obj_id, $type),
-                $simple_dc_xml
-            );
-            $count++;
         }
 
         $this->cleanUpDeletedRecords();
@@ -304,10 +243,5 @@ class Harvester
     protected function logError(string $message): void
     {
         $this->logger->error($message);
-    }
-
-    protected function buildIdentifier(int $obj_id, string $type): string
-    {
-        return 'il__' . $type . '_' . $obj_id;
     }
 }

@@ -18,13 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\Results;
+namespace ILIAS\MetaData\OERHarvester\ControlCenter\Links;
 
-interface WrapperInterface
+use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
+
+interface LinkFactoryInterface
 {
-    public function get(): \ILIAS\Cron\Job\JobResult;
+    public function getViewLink(): string;
 
-    public function withStatus(int $status): WrapperInterface;
+    public function getLinkForAction(Action $action): string;
 
-    public function withMessage(string $message): WrapperInterface;
+    public function getLinkForConfirmationOfAction(Action $action): string;
 }

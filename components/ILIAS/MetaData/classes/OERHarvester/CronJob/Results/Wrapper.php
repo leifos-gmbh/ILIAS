@@ -18,18 +18,20 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\Results;
+namespace ILIAS\MetaData\OERHarvester\CronJob\Results;
+
+use ILIAS\Cron\Job\JobResult;
 
 class Wrapper implements WrapperInterface
 {
-    protected \ILIAS\Cron\Job\JobResult $result;
+    protected JobResult $result;
 
-    public function __construct(\ILIAS\Cron\Job\JobResult $result)
+    public function __construct(JobResult $result)
     {
         $this->result = $result;
     }
 
-    public function get(): \ILIAS\Cron\Job\JobResult
+    public function get(): JobResult
     {
         return $this->result;
     }

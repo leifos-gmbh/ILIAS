@@ -18,21 +18,19 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ControlCenter\State;
+namespace ILIAS\MetaData\OERHarvester\ControlCenter;
 
-interface StateChangerInterface
+enum Command: string
 {
-    public function block(int $obj_id): void;
-
-    public function unblock(int $obj_id): void;
-
-    public function publish(int $obj_id): void;
-
-    public function withdraw(int $obj_id): void;
-
-    public function submit(int $obj_id): void;
-
-    public function accept(int $obj_id): void;
-
-    public function reject(int $obj_id): void;
+    case VIEW = 'view';
+    case BLOCK = 'block';
+    case UNBLOCK = 'unblock';
+    case PUBLISH = 'publish';
+    case WITHDRAW = 'withdraw';
+    case CONFIRM_WITHDRAW = 'confirmWithdraw';
+    case SUBMIT = 'submit';
+    case ACCEPT = 'accept';
+    case CONFIRM_ACCEPT = 'confirmAccept';
+    case REJECT = 'reject';
+    case CONFIRM_REJECT = 'confirmReject';
 }

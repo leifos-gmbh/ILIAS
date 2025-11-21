@@ -18,16 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ControlCenter\GUI\Links;
+namespace ILIAS\MetaData\OERHarvester\ControlCenter\Content;
 
-use ILIAS\MetaData\OERHarvester\ControlCenter\GUI\Command;
+use ILIAS\UI\Component\Modal\RoundTrip as RoundTripModal;
+use ILIAS\MetaData\OERHarvester\ControlCenter\State\StateInfoInterface;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
 
-interface LinkFactoryInterface
+interface ContentFactoryInterface
 {
-    public function getViewLink(): string;
+    public function getInfoContent(StateInfoInterface $state_info): RoundTripModal;
 
-    public function getLinkForAction(Action $action): string;
-
-    public function getLinkForConfirmationOfAction(Action $action): string;
+    public function getConfirmationContent(Action $action): RoundTripModal;
 }

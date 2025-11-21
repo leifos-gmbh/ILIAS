@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester;
+namespace ILIAS\MetaData\OERHarvester\CronJob;
 
 use ILIAS\DI\Container as GlobalContainer;
 use ILIAS\MetaData\Services\InternalServices;
@@ -30,6 +30,7 @@ use ILIAS\MetaData\OERHarvester\Settings\SettingsInterface;
 use ILIAS\Export\ExportHandler\Factory as ExportService;
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\MetaData\Copyright\RepositoryInterface;
+use ILIAS\MetaData\OERHarvester\CronJob\AutomaticPublisher;
 
 class Initiator
 {
@@ -41,7 +42,7 @@ class Initiator
         $this->services = new InternalServices($dic);
     }
 
-    public function harvester(): Harvester
+    public function automaticPublisher(): AutomaticPublisher
     {
         /*
          * This should be replaced by a proper export API
@@ -49,7 +50,7 @@ class Initiator
          */
         $export_service = new ExportService();
 
-        return new Harvester(
+        return new AutomaticPublisher(
             $this->services->OERHarvester()->settings(),
             new ObjectHandler($this->services->dic()->repositoryTree()),
             new ExportHandler(

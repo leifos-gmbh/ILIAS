@@ -2302,6 +2302,12 @@ class ilObjectListGUI
 
     public function getHeaderAction(?ilGlobalTemplateInterface $main_tpl = null): string
     {
+        global $DIC;
+
+        if ($DIC->ctrl()->isAsynch()) {
+            return '';
+        }
+
         if ($main_tpl == null) {
             $main_tpl = $this->main_tpl;
         }

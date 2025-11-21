@@ -258,6 +258,7 @@ class ilStyleDataSet extends ilDataSet
                     );
             }
         }
+        return [];
     }
 
     /**

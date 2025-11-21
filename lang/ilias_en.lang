@@ -12071,6 +12071,30 @@ meta#:#md_oai_repository_name#:#Repository Name
 meta#:#md_oai_repository_name_info#:#This is returned as the name of this ILIAS installation when queried.
 meta#:#md_obj_types#:#Assigned Objects
 meta#:#md_publishing#:#Publishing
+meta#:#md_publishing_action_accept#:#Accept for Publishing
+meta#:#md_publishing_action_block#:#Block From Publishing
+meta#:#md_publishing_action_publish#:#Publish
+meta#:#md_publishing_action_reject#:#Reject
+meta#:#md_publishing_action_submit#:#Submit for Publishing
+meta#:#md_publishing_action_unblock#:#Unblock
+meta#:#md_publishing_action_withdraw#:#Withdraw
+meta#:#md_publishing_center_title#:#OER Publishing
+meta#:#md_publishing_confirmation_accept#:#Accept for Publishing
+meta#:#md_publishing_confirmation_info_accept#:#Are you sure you want to reject this object for publishing?
+meta#:#md_publishing_confirmation_info_reject#:#Are you sure you want to publish this object?
+meta#:#md_publishing_confirmation_info_withdraw#:#Are you sure you want to withdraw this object from publishing?
+meta#:#md_publishing_confirmation_reject#:#Reject for Publishing
+meta#:#md_publishing_confirmation_withdraw#:#Withdraw From Publishing
+meta#:#md_publishing_control_center#:#OER Publishing (Status: %s)
+meta#:#md_publishing_info_blocked#:#This object is blocked from being automatically published.
+meta#:#md_publishing_info_published#:#This object has been published as an Open Educational Resource.
+meta#:#md_publishing_info_under_review#:#This object was submitted for publishing, and is currently being reviewed by the editorial team.
+meta#:#md_publishing_info_unpublished#:#This object can be published as an Open Educational Resource.
+meta#:#md_publishing_info_wrong_copyright#:#To publish this object as an Open Educational Resource, please close this dialog and select an eligible licence:%s
+meta#:#md_publishing_status_blocked#:#Blocked
+meta#:#md_publishing_status_published#:#Published
+meta#:#md_publishing_status_under_review#:#Under Review
+meta#:#md_publishing_status_unpublished#:#Unpublished
 meta#:#md_publishing_workflow#:#Publishing Workflow
 meta#:#md_publishing_workflow_automatic#:#Automatic
 meta#:#md_publishing_workflow_automatic_info#:#Eligible objects are automatically published by the OER Harvester cron job.
@@ -12667,8 +12691,6 @@ meta#:#meta_obj_type_active#:#Dataset offered
 meta#:#meta_obj_type_inactive#:#Data set not used
 meta#:#meta_obj_type_mandatory#:#Data set always offered
 meta#:#meta_obj_type_optional#:#Data set needs activation
-meta#:#meta_oer_blocked#:#Ignored by OER Harvester
-meta#:#meta_oer_blocked_info#:#Will not be listed automatically as Open Educational Ressource (OER)
 meta#:#meta_oer_copyright_selection#:#Copyright Selection
 meta#:#meta_oer_copyright_selection_info#:#Only objects with one of the selected copyrights will be published.
 meta#:#meta_oer_editorial_category#:#Editorial Category

@@ -12067,6 +12067,30 @@ meta#:#md_oai_repository_name#:#Name des Repositoriums
 meta#:#md_oai_repository_name_info#:#Bei Anfragen über die Schnittstelle wird dies als Name dieser ILIAS-Installation angegeben.
 meta#:#md_obj_types#:#Zugeordnete Objekte
 meta#:#md_publishing#:#Veröffentlichung
+meta#:#md_publishing_action_accept#:#Für Veröffentlichung annehmen
+meta#:#md_publishing_action_block#:#Für Veröffentlichung sperren
+meta#:#md_publishing_action_publish#:#Veröffentlichen
+meta#:#md_publishing_action_reject#:#Ablehnen
+meta#:#md_publishing_action_submit#:#Für Veröffentlichung einreichen
+meta#:#md_publishing_action_unblock#:#Entsperren
+meta#:#md_publishing_action_withdraw#:#Zurückziehen
+meta#:#md_publishing_center_title#:#OER Veröffentlichung
+meta#:#md_publishing_confirmation_accept#:#Annehmen
+meta#:#md_publishing_confirmation_info_accept#:#Sind Sie sicher, dass Sie dieses Objekt für die Veröffentlichung ablehnen wollen?
+meta#:#md_publishing_confirmation_info_reject#:#Sind Sie sicher, dass Sie dieses Objekt veröffentlichen wollen?
+meta#:#md_publishing_confirmation_info_withdraw#:#Sind Sie sicher, dass Sie dieses Objekt von der Veröffentlichung zurückziehen wollen?
+meta#:#md_publishing_confirmation_reject#:#Ablehnen
+meta#:#md_publishing_confirmation_withdraw#:#Zurückziehen
+meta#:#md_publishing_control_center#:#OER Veröffentlichung (Status: %s)
+meta#:#md_publishing_info_blocked#:#Dieses Objekt ist gesperrt und wird nicht automatisch veröffentlicht.
+meta#:#md_publishing_info_published#:#Dieses Objekt ist als Open Educational Resource veröffentlicht.
+meta#:#md_publishing_info_under_review#:#Dieses Objekt wurde zur Veröffentlichung eingereicht, und wird von der Redaktion überprüft.
+meta#:#md_publishing_info_unpublished#:#Dieses Objekt kann als Open Educational Resource veröffentlicht werden.
+meta#:#md_publishing_info_wrong_copyright#:#Um dieses Objekt als Open Educational Resource zu veröffentlichen, schließen Sie bitte diesen Dialog und stellen Sie es unter eine geeignete Lizenz:%s
+meta#:#md_publishing_status_blocked#:#Gesperrt
+meta#:#md_publishing_status_published#:#Veröffentlicht
+meta#:#md_publishing_status_under_review#:#In Prüfung
+meta#:#md_publishing_status_unpublished#:#Nicht veröffentlicht
 meta#:#md_publishing_workflow#:#Ablauf von Veröffentlichungen
 meta#:#md_publishing_workflow_automatic#:#Automatisch
 meta#:#md_publishing_workflow_automatic_info#:#Entsprechend ausgezeichnete Objekte werden automatisch vom OER-Harvester Cron Job veröffentlicht.
@@ -12663,8 +12687,6 @@ meta#:#meta_obj_type_active#:#Datensatz anbieten
 meta#:#meta_obj_type_inactive#:#Datensatz nicht anbieten
 meta#:#meta_obj_type_mandatory#:#Immer zum Ausfüllen anbieten
 meta#:#meta_obj_type_optional#:#Datensatz muss aktiviert werden
-meta#:#meta_oer_blocked#:#Wird vom OER-Harvester ignoriert
-meta#:#meta_oer_blocked_info#:#Wird nicht automatisch als OER (Open Educational Resource) gelistet
 meta#:#meta_oer_copyright_selection#:#Veröffentlichung von Objekten mit folgenden Lizenzen
 meta#:#meta_oer_copyright_selection_info#:#Nur Objekte mit einer der ausgewählten Lizenzen werden veröffentlicht.
 meta#:#meta_oer_editorial_category#:#Redaktionelle Kategorie

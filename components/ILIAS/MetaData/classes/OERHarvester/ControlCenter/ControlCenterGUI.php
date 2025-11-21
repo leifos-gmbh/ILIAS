@@ -27,7 +27,6 @@ use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\StateInfoFetcherInterface;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\StateInfoInterface;
-use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
 use ILIAS\MetaData\OERHarvester\ControlCenter\Content\ContentFactoryInterface;
 use ILIAS\Data\URI;
@@ -137,7 +136,20 @@ class ControlCenterGUI
     protected function confirmWithdraw(): void
     {
         $this->state_changer->withdraw($this->obj_id);
-        echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($this->link_to_parent));
+
+        // TODO clean this up
+        if (\ilObject::_exists($this->ref_id, true)) {
+            $link = $this->link_to_parent;
+        } else {
+            global $DIC;
+            /** @var \ILIAS\StaticURL\Services $static_url */
+            $static_url = $DIC['static_url'];
+            $data_factory = new \ILIAS\Data\Factory();
+            $ref_id = (new \ILIAS\MetaData\Services\InternalServices($DIC))->OERHarvester()->settings()->getContainerRefIDForPublishing();
+            $link = $static_url->builder()->build('cat', $data_factory->refId($ref_id));
+        }
+
+        echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($link));
         exit;
     }
 
@@ -158,7 +170,20 @@ class ControlCenterGUI
     protected function confirmAccept(): void
     {
         $this->state_changer->accept($this->obj_id, $this->type);
-        echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($this->link_to_parent));
+
+        // TODO clean this up
+        if (\ilObject::_exists($this->ref_id, true)) {
+            $link = $this->link_to_parent;
+        } else {
+            global $DIC;
+            /** @var \ILIAS\StaticURL\Services $static_url */
+            $static_url = $DIC['static_url'];
+            $data_factory = new \ILIAS\Data\Factory();
+            $ref_id = (new \ILIAS\MetaData\Services\InternalServices($DIC))->OERHarvester()->settings()->getContainerRefIDForEditorialStep();
+            $link = $static_url->builder()->build('cat', $data_factory->refId($ref_id));
+        }
+
+        echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($link));
         exit;
     }
 
@@ -172,7 +197,20 @@ class ControlCenterGUI
     protected function confirmReject(): void
     {
         $this->state_changer->reject($this->obj_id);
-        echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($this->link_to_parent));
+
+        // TODO clean this up
+        if (\ilObject::_exists($this->ref_id, true)) {
+            $link = $this->link_to_parent;
+        } else {
+            global $DIC;
+            /** @var \ILIAS\StaticURL\Services $static_url */
+            $static_url = $DIC['static_url'];
+            $data_factory = new \ILIAS\Data\Factory();
+            $ref_id = (new \ILIAS\MetaData\Services\InternalServices($DIC))->OERHarvester()->settings()->getContainerRefIDForEditorialStep();
+            $link = $static_url->builder()->build('cat', $data_factory->refId($ref_id));
+        }
+
+        echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($link));
         exit;
     }
 }

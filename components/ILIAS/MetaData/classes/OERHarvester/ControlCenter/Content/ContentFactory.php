@@ -22,14 +22,13 @@ namespace ILIAS\MetaData\OERHarvester\ControlCenter\Content;
 
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\Status;
 use ILIAS\UI\Component\Modal\RoundTrip as RoundTripModal;
-use ILIAS\MetaData\OERHarvester\ControlCenter\Command;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\StateInfoInterface;
 use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
 use ILIAS\UI\Component\Chart\ScaleBar;
 use ILIAS\UI\Component\MessageBox\MessageBox;
 use ILIAS\UI\Component\Button\Button;
-use ILIAS\MetaData\OERHarvester\ControlCenter\Links\LinkFactoryInterface;
+use ILIAS\MetaData\OERHarvester\ControlCenter\Http\LinkFactoryInterface;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
 use ILIAS\MetaData\Copyright\RepositoryInterface;
 
@@ -43,11 +42,15 @@ class ContentFactory implements ContentFactoryInterface
     ) {
     }
 
-    public function getInfoContent(StateInfoInterface $state_info): RoundTripModal
-    {
+    public function getInfoContent(
+        int $ref_id,
+        int $obj_id,
+        string $type,
+        StateInfoInterface $state_info
+    ): RoundTripModal {
         $message = $this->getStatusMessage($state_info);
         $scale = $this->getStatusOverview($state_info);
-        $actions = $this->getActions($state_info);
+        $actions = $this->getActions($ref_id, $obj_id, $type, $state_info);
 
         return $this->ui_factory->modal()->roundtrip(
             $this->presentation_utilities->txt('md_publishing_center_title'),
@@ -97,11 +100,15 @@ class ContentFactory implements ContentFactoryInterface
     /**
      * @return Button[]
      */
-    protected function getActions(StateInfoInterface $state_info): array
-    {
+    protected function getActions(
+        int $ref_id,
+        int $obj_id,
+        string $type,
+        StateInfoInterface $state_info
+    ): array {
         $buttons = [];
         foreach ($state_info->getRelevantActions() as $action) {
-            $link = $this->link_factory->getLinkForAction($action);
+            $link = $this->link_factory->getLinkForAction($action, $ref_id, $obj_id, $type);
             $label = match ($action) {
                 Action::BLOCK => $this->presentation_utilities->txt('md_publishing_action_block'),
                 Action::UNBLOCK => $this->presentation_utilities->txt('md_publishing_action_unblock'),
@@ -111,15 +118,30 @@ class ContentFactory implements ContentFactoryInterface
                 Action::ACCEPT => $this->presentation_utilities->txt('md_publishing_action_accept'),
                 Action::REJECT => $this->presentation_utilities->txt('md_publishing_action_reject')
             };
-            $disabled = $state_info->isActionAvailable($action);
-            $buttons[] = $this->ui_factory->button()->standard($label, $link)
-                                                    ->withUnavailableAction($disabled);
+            $disabled = !$state_info->isActionAvailable($action);
+            /*$buttons[] = $this->ui_factory->button()->standard($label, $link)
+                                                    ->withUnavailableAction($disabled);*/
+            // This is an ugly workaround because prompts don't work correctly
+            $button = $this->ui_factory->button()->standard($label, '#')->withUnavailableAction($disabled);
+            if (!$disabled) {
+                $button = $button->withOnLoadCode(
+                    fn($id) => "$('#$id').on('click', (e)=> {
+                        let promptId = e.target.closest('.il-prompt').id;
+                        il.UI.prompt.get(promptId).show('$link');
+                    });"
+                );
+            }
+            $buttons[] = $button;
         }
         return $buttons;
     }
 
-    public function getConfirmationContent(Action $action): RoundTripModal
-    {
+    public function getConfirmationContent(
+        int $ref_id,
+        int $obj_id,
+        string $type,
+        Action $action
+    ): RoundTripModal {
         $message = match ($action) {
             Action::WITHDRAW => $this->presentation_utilities->txt('md_publishing_confirmation_info_withdraw'),
             Action::ACCEPT => $this->presentation_utilities->txt('md_publishing_confirmation_info_accept'),
@@ -133,10 +155,18 @@ class ContentFactory implements ContentFactoryInterface
             Action::REJECT => $this->presentation_utilities->txt('md_publishing_confirmation_reject'),
             default => ''
         };
-        $action = $this->link_factory->getLinkForConfirmationOfAction($action);
-        $button = $this->ui_factory->button()->standard(
+        $action = $this->link_factory->getLinkForConfirmationOfAction($action, $ref_id, $obj_id, $type);
+        /*$button = $this->ui_factory->button()->standard(
             $this->presentation_utilities->txt('confirm'),
             $action
+        );*/
+        // This is an ugly workaround because prompts don't work correctly
+        $button = $this->ui_factory->button()->standard($this->presentation_utilities->txt('confirm'), '#');
+        $button = $button->withOnLoadCode(
+            fn($id) => "$('#$id').on('click', (e)=> {
+                        let promptId = e.target.closest('.il-prompt').id;
+                        il.UI.prompt.get(promptId).show('$action');
+                    });"
         );
         return $this->ui_factory->modal()->roundtrip($title, $message_box)->withActionButtons([$button]);
     }

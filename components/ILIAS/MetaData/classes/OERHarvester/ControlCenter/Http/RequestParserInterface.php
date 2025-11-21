@@ -18,27 +18,17 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ControlCenter\Links;
+namespace ILIAS\MetaData\OERHarvester\ControlCenter\Http;
 
-use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
-use ilCtrlInterface;
-
-class LinkFactory implements LinkFactoryInterface
+interface RequestParserInterface
 {
-    public function __construct(
-        protected ilCtrlInterface $ctrl
-    ) {
-    }
+    public const string REF_ID_PARAM = 'publish_ref_id';
+    public const string OBJ_ID_PARAM = 'publish_obj_id';
+    public const string TYPE_PARAM = 'publish_type';
 
-    public function getViewLink(): string
-    {
-    }
+    public function fetchRefID(): int;
 
-    public function getLinkForAction(Action $action): string
-    {
-    }
+    public function fetchObjID(): int;
 
-    public function getLinkForConfirmationOfAction(Action $action): string
-    {
-    }
+    public function fetchType(): string;
 }

@@ -20,14 +20,15 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\OERHarvester\ControlCenter\State;
 
-use ILIAS\MetaData\Elements\SetInterface;
-
 interface StateInfoFetcherInterface
 {
+    public function isPublishingRelevantForObject(int $ref_id, string $type, int $obj_id): bool;
+
+    public function getStatusForObject(int $obj_id): Status;
+
     public function getStateInfoForObjectReference(
         int $ref_id,
         int $obj_id,
-        string $type,
-        SetInterface $set
+        string $type
     ): StateInfoInterface;
 }

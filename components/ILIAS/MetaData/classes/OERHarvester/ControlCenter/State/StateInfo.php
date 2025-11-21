@@ -74,6 +74,6 @@ class StateInfo implements StateInfoInterface
      */
     public function getAllEligibleCopyrightEntryIDs(): array
     {
-        return $this->eligible_copyrights;
+        return $this->eligible_copyright_entry_ids;
     }
 }

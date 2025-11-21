@@ -88,14 +88,16 @@ class ilMDPublishingSettingsGUI
                 break;
 
             default:
-                global $DIC;
-                $DIC->logger()->root()->dump($cmd);
                 if (!$cmd || $cmd === 'view') {
                     $cmd = 'showPublishingSettings';
                 }
                 switch ($cmd) {
                     case 'showPublishingSettings':
                         $this->showPublishingSettings();
+                        break;
+
+                    case 'savePublishingSettings':
+                        $this->savePublishingSettings();
                         break;
 
                     default:

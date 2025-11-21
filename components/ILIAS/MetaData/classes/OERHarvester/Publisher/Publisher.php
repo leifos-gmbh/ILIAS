@@ -27,7 +27,7 @@ use ILIAS\MetaData\OERHarvester\RepositoryObjects\HandlerInterface as RepoObject
 use ILIAS\MetaData\OERHarvester\Export\HandlerInterface as ExportHandler;
 use ILIAS\MetaData\OERHarvester\Settings\SettingsInterface as PublishingSettings;
 use ILIAS\MetaData\OERHarvester\XML\WriterInterface as SimpleDCXMLWriter;
-use ILIAS\MetaData\OERHarvester\ExposedRecords\DatabaseRepository as ExposedRecordsRepository;
+use ILIAS\MetaData\OERHarvester\ExposedRecords\RepositoryInterface as ExposedRecordsRepository;
 
 class Publisher implements PublisherInterface
 {
@@ -38,8 +38,7 @@ class Publisher implements PublisherInterface
         protected ExportHandler $export_handler,
         protected PublishingSettings $publishing_settings,
         protected SimpleDCXMLWriter $xml_writer,
-        protected ilAccess $access,
-        protected ilLogger $logger
+        protected ilAccess $access
     ) {
     }
 
@@ -169,11 +168,19 @@ class Publisher implements PublisherInterface
             $ref_id,
             $type
         );
-        $this->exposed_repo->createRecord(
-            $obj_id,
-            $this->buildIdentifier($obj_id, $type),
-            $simple_dc_xml
-        );
+        if ($this->exposed_repo->doesRecordExistForObjID($obj_id)) {
+            $this->exposed_repo->updateRecord(
+                $obj_id,
+                false,
+                $simple_dc_xml
+            );
+        } else {
+            $this->exposed_repo->createRecord(
+                $obj_id,
+                $this->buildIdentifier($obj_id, $type),
+                $simple_dc_xml
+            );
+        }
     }
 
     protected function buildIdentifier(int $obj_id, string $type): string

@@ -32,31 +32,33 @@ use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
 use ILIAS\MetaData\OERHarvester\ControlCenter\Content\ContentFactoryInterface;
 use ILIAS\Data\URI;
 use ILIAS\MetaData\OERHarvester\Publisher\PublisherInterface;
+use ILIAS\MetaData\OERHarvester\ControlCenter\Http\RequestParserInterface;
 
 class ControlCenterGUI
 {
-    protected ilCtrlInterface $ctrl;
-    protected UIFactory $ui_factory;
-    protected UIRenderer $ui_renderer;
-    protected ContentFactoryInterface $content_factory;
-    protected PresentationUtilities $presentation_utilities;
-    protected StateInfoFetcherInterface $state_info_fetcher;
-    protected PublisherInterface $state_changer;
-
+    protected int $ref_id;
+    protected int $obj_id;
+    protected string $type;
     protected StateInfoInterface $state_info;
 
     public function __construct(
         protected URI $link_to_parent,
-        protected int $ref_id,
-        protected int $obj_id,
-        protected string $type,
-        SetInterface $set
+        protected ilCtrlInterface $ctrl,
+        protected UIFactory $ui_factory,
+        protected UIRenderer $ui_renderer,
+        protected RequestParserInterface $request_parser,
+        protected ContentFactoryInterface $content_factory,
+        protected PresentationUtilities $presentation_utilities,
+        protected StateInfoFetcherInterface $state_info_fetcher,
+        protected PublisherInterface $state_changer
     ) {
+        $this->ref_id = $this->request_parser->fetchRefID();
+        $this->obj_id = $this->request_parser->fetchObjID();
+        $this->type = $this->request_parser->fetchType();
         $this->state_info = $this->state_info_fetcher->getStateInfoForObjectReference(
-            $ref_id,
-            $obj_id,
-            $type,
-            $set
+            $this->ref_id,
+            $this->obj_id,
+            $this->type
         );
     }
 
@@ -99,7 +101,7 @@ class ControlCenterGUI
 
     protected function view(): void
     {
-        $content = $this->content_factory->getInfoContent($this->state_info);
+        $content = $this->content_factory->getInfoContent($this->ref_id, $this->obj_id, $this->type, $this->state_info);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->show($content));
         exit;
     }
@@ -127,7 +129,7 @@ class ControlCenterGUI
 
     protected function withdraw(): void
     {
-        $content = $this->content_factory->getConfirmationContent(Action::WITHDRAW);
+        $content = $this->content_factory->getConfirmationContent($this->ref_id, $this->obj_id, $this->type, Action::WITHDRAW);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->show($content));
         exit;
     }
@@ -148,7 +150,7 @@ class ControlCenterGUI
 
     protected function accept(): void
     {
-        $content = $this->content_factory->getConfirmationContent(Action::ACCEPT);
+        $content = $this->content_factory->getConfirmationContent($this->ref_id, $this->obj_id, $this->type, Action::ACCEPT);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->show($content));
         exit;
     }
@@ -162,7 +164,7 @@ class ControlCenterGUI
 
     protected function reject(): void
     {
-        $content = $this->content_factory->getConfirmationContent(Action::REJECT);
+        $content = $this->content_factory->getConfirmationContent($this->ref_id, $this->obj_id, $this->type, Action::REJECT);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->show($content));
         exit;
     }

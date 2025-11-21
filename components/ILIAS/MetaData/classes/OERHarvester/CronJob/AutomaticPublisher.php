@@ -193,7 +193,6 @@ class AutomaticPublisher
 
         foreach ($this->exposed_record_repository->getRecords() as $record) {
             $obj_id = $record->infos()->objID();
-            // TODO check if any ref id is in publishing category!!!! Same for withdraw in publisher
             $ref_id = $this->status_repository->getHarvestRefID($obj_id);
 
             if (!$ref_id || !$this->object_handler->isReferenceInContainer($ref_id, $source_ref_id)) {

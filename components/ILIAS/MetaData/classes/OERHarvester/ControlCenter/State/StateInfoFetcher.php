@@ -21,14 +21,15 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\OERHarvester\ControlCenter\State;
 
 use ilAccess;
-use ILIAS\MetaData\OERHarvester\ExposedRecords\DatabaseRepository as ExposedRecordsRepository;
-use ILIAS\MetaData\OERHarvester\ResourceStatus\DatabaseRepository as ResourceStatusRepository;
+use ILIAS\MetaData\OERHarvester\ExposedRecords\RepositoryInterface as ExposedRecordsRepository;
+use ILIAS\MetaData\OERHarvester\ResourceStatus\RepositoryInterface as ResourceStatusRepository;
 use ILIAS\MetaData\OERHarvester\Settings\SettingsInterface as PublishingSettings;
-use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\OERHarvester\RepositoryObjects\HandlerInterface as RepoObjectHandler;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface as CopyrightIdentifierHandler;
 use ILIAS\MetaData\Paths\Navigator\NavigatorFactoryInterface;
 use ILIAS\MetaData\Paths\FactoryInterface as PathFactory;
+use ILIAS\MetaData\OERHarvester\Publisher\PublisherInterface;
+use ILIAS\MetaData\Repository\RepositoryInterface;
 
 class StateInfoFetcher implements StateInfoFetcherInterface
 {
@@ -40,6 +41,7 @@ class StateInfoFetcher implements StateInfoFetcherInterface
         protected RepoObjectHandler $repo_object_handler,
         protected CopyrightIdentifierHandler $copyright_identifier_handler,
         protected PublisherInterface $state_changer,
+        protected RepositoryInterface $repository,
         protected NavigatorFactoryInterface $navigator_factory,
         protected PathFactory $path_factory
     ) {
@@ -48,8 +50,7 @@ class StateInfoFetcher implements StateInfoFetcherInterface
     public function getStateInfoForObjectReference(
         int $ref_id,
         int $obj_id,
-        string $type,
-        SetInterface $set
+        string $type
     ): StateInfoInterface {
         $is_publishing_relevant = $this->isPublishingRelevantForObject($ref_id, $type, $obj_id);
         if (!$is_publishing_relevant) {
@@ -63,12 +64,12 @@ class StateInfoFetcher implements StateInfoFetcherInterface
             $current_status,
             $this->getAllPossibleStatuses(),
             $relevant_actions,
-            $this->getUnavailableActions($ref_id, $type, $obj_id, $current_status, $relevant_actions, $set, $eligible_copyright_entry_ids),
+            $this->getUnavailableActions($ref_id, $type, $obj_id, $relevant_actions, $eligible_copyright_entry_ids),
             $eligible_copyright_entry_ids
         );
     }
 
-    protected function isPublishingRelevantForObject(int $ref_id, string $type, int $obj_id): bool
+    public function isPublishingRelevantForObject(int $ref_id, string $type, int $obj_id): bool
     {
         return $this->access->checkAccess('write', '', $ref_id, $type, $obj_id) &&
             (
@@ -80,7 +81,7 @@ class StateInfoFetcher implements StateInfoFetcherInterface
 
     public function getStatusForObject(int $obj_id): Status
     {
-        if ($this->exposed_repo->doesRecordExistForObjID($obj_id)) {
+        if ($this->exposed_repo->doesUndeletedRecordExistForObjID($obj_id)) {
             return Status::PUBLISHED;
         }
         if ($this->status_repo->isAlreadyHarvested($obj_id)) {
@@ -177,35 +178,34 @@ class StateInfoFetcher implements StateInfoFetcherInterface
         int $ref_id,
         string $type,
         int $obj_id,
-        Status $current_status,
         array $relevant_actions,
-        SetInterface $set,
         array $eligible_copyright_entry_ids
     ): array {
         $unavailable_actions = [];
         foreach ($relevant_actions as $action) {
-            $unavailable = match ($action) {
+            $available = match ($action) {
                 Action::BLOCK => $this->state_changer->checkPermissionsForBlock($ref_id, $type, $obj_id),
                 Action::UNBLOCK => $this->state_changer->checkPermissionsForUnblock($ref_id, $type, $obj_id),
                 Action::PUBLISH =>
                     $this->state_changer->checkPermissionsForPublish($ref_id, $type, $obj_id) &&
-                    $this->isCopyrightEligibleForPublishing($set, $eligible_copyright_entry_ids),
+                    $this->isCopyrightEligibleForPublishing($obj_id, $type, $eligible_copyright_entry_ids),
                 Action::WITHDRAW => $this->state_changer->checkPermissionsForWithdraw($ref_id, $type, $obj_id),
                 Action::SUBMIT =>
                     $this->state_changer->checkPermissionsForSubmit($ref_id, $type, $obj_id) &&
-                    $this->isCopyrightEligibleForPublishing($set, $eligible_copyright_entry_ids),
+                    $this->isCopyrightEligibleForPublishing($obj_id, $type, $eligible_copyright_entry_ids),
                 Action::ACCEPT => $this->state_changer->checkPermissionsForAccept($ref_id, $type, $obj_id),
                 Action::REJECT => $this->state_changer->checkPermissionsForReject($ref_id, $type, $obj_id),
             };
-            if ($unavailable) {
-                $unavailable_actions[] = $unavailable;
+            if (!$available) {
+                $unavailable_actions[] = $action;
             }
         }
         return $unavailable_actions;
     }
 
     protected function isCopyrightEligibleForPublishing(
-        SetInterface $set,
+        int $obj_id,
+        string $type,
         array $eligible_copyright_entry_ids
     ): bool {
         $copyright_path = $this->path_factory
@@ -214,10 +214,11 @@ class StateInfoFetcher implements StateInfoFetcherInterface
             ->withNextStep('description')
             ->withNextStep('string')
             ->get();
+        $set = $this->repository->getMD($obj_id, $obj_id, $type);
         $copyright_string  = $this->navigator_factory->navigator($copyright_path, $set->getRoot())
                                                      ->lastElementAtFinalStep()
-                                                     ->getData()
-                                                     ->value();
+                                                     ?->getData()
+                                                     ?->value() ?? '';
         if (!$this->copyright_identifier_handler->isIdentifierValid($copyright_string)) {
             return false;
         }

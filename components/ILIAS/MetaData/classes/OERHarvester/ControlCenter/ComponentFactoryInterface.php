@@ -20,23 +20,19 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\OERHarvester\ControlCenter\Content;
 
-use ILIAS\UI\Component\Modal\RoundTrip as RoundTripModal;
-use ILIAS\MetaData\OERHarvester\ControlCenter\State\StateInfoInterface;
-use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
+use ILIAS\UI\Component\Button\Standard as StandardButton;
+use ILIAS\MetaData\OERHarvester\ControlCenter\State\Status;
+use ILIAS\UI\Component\Prompt\Prompt;
 
-interface ContentFactoryInterface
+interface ComponentFactoryInterface
 {
-    public function getInfoContent(
+    /**
+     * @return array{0:StandardButton, 1:Prompt}
+     */
+    public function getButtonToControlCenter(
+        Status $status,
         int $ref_id,
         int $obj_id,
-        string $type,
-        StateInfoInterface $state_info
-    ): RoundTripModal;
-
-    public function getConfirmationContent(
-        int $ref_id,
-        int $obj_id,
-        string $type,
-        Action $action
-    ): RoundTripModal;
+        string $type
+    ): array;
 }

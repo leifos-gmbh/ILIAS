@@ -38,9 +38,13 @@ use ILIAS\MetaData\Editor\Full\Services\Tables\Table;
 use ILIAS\MetaData\Editor\Digest\DigestInitiator;
 use ILIAS\MetaData\Editor\Digest\Digest;
 use ILIAS\MetaData\XML\Writer\WriterInterface as XMLWriter;
+use ILIAS\MetaData\OERHarvester\ControlCenter\Initiator as ControlCenterInitiator;
+use ILIAS\MetaData\OERHarvester\ControlCenter\ControlCenterGUI;
 
 /**
  * @author       Stefan Meyer <smeyer.ilias@gmx.de>
+ *
+ * @ilCtrl_Calls ilMDEditorGUI: ILIAS\MetaData\OERHarvester\ControlCenter\ControlCenterGUI
  */
 class ilMDEditorGUI
 {
@@ -49,6 +53,7 @@ class ilMDEditorGUI
 
     protected FullEditorInitiator $full_editor_initiator;
     protected DigestInitiator $digest_initiator;
+    protected ControlCenterInitiator $control_center_initiator;
 
     protected ilCtrl $ctrl;
     protected ilGlobalTemplateInterface $tpl;
@@ -67,14 +72,16 @@ class ilMDEditorGUI
     protected int $obj_id;
     protected int $sub_id;
     public string $type;
+    protected int $ref_id;
 
-    public function __construct(int $obj_id, int $sub_id, string $type)
+    public function __construct(int $obj_id, int $sub_id, string $type, int $ref_id = 0)
     {
         global $DIC;
 
         $services = new InternalServices($DIC);
         $this->full_editor_initiator = new FullEditorInitiator($services);
         $this->digest_initiator = new DigestInitiator($services);
+        $this->control_center_initiator = new ControlCenterInitiator($services);
 
         $this->ctrl = $services->dic()->ctrl();
         $this->tpl = $services->dic()->ui()->mainTemplate();
@@ -92,6 +99,7 @@ class ilMDEditorGUI
 
         $this->obj_id = $obj_id;
         $this->sub_id = $sub_id === 0 ? $obj_id : $sub_id;
+        $this->ref_id = $ref_id;
         $this->type = $type;
     }
 
@@ -101,6 +109,12 @@ class ilMDEditorGUI
 
         $cmd = $this->ctrl->getCmd();
         switch ($next_class) {
+            case strtolower(ControlCenterGUI::class):
+                $back_link = $this->ctrl->getLinkTarget($this, 'listQuickEdit');
+                $gui = $this->control_center_initiator->controlCenterGUI($back_link);
+                $this->ctrl->forwardCommand($gui);
+                break;
+
             default:
                 if (!$cmd) {
                     $cmd = "listQuickEdit";
@@ -196,6 +210,7 @@ class ilMDEditorGUI
             }
         }
         $this->addButtonToFullEditor();
+        $this->addButtonToControlCenter();
         $this->tpl->setContent($this->ui_renderer->render($template_content));
     }
 
@@ -400,27 +415,41 @@ class ilMDEditorGUI
         }
     }
 
+    protected function addButtonToControlCenter(): void
+    {
+        // will also exclude subtypes
+        if (!$this->control_center_initiator->stateInfoFetcher()->isPublishingRelevantForObject(
+            $this->ref_id,
+            $this->type,
+            $this->obj_id
+        )) {
+            return;
+        }
+        $status = $this->control_center_initiator->stateInfoFetcher()->getStatusForObject($this->obj_id);
+        $components = $this->control_center_initiator->componentFactory()->getButtonToControlCenter(
+            $status,
+            $this->ref_id,
+            $this->obj_id,
+            $this->type
+        );
+        $this->toolbar->addComponent($components[0]);
+        $this->toolbar->addComponent($components[1]);
+    }
+
     protected function checkAccess(): void
     {
         // if there is no fixed parent (e.g. mob), then skip
-        if ($this->obj_id === 0) {
+        if ($this->obj_id === 0 || $this->ref_id === 0) {
             return;
         }
-        $ref_ids = ilObject::_getAllReferences($this->obj_id);
-        // if there are no references (e.g. in workspace), then skip
-        if (empty($ref_ids)) {
+        if ($this->access->checkAccess(
+            'write',
+            '',
+            $this->ref_id,
+            '',
+            $this->obj_id
+        )) {
             return;
-        }
-        foreach ($ref_ids as $ref_id) {
-            if ($this->access->checkAccess(
-                'write',
-                '',
-                $ref_id,
-                '',
-                $this->obj_id
-            )) {
-                return;
-            }
         }
         throw new ilPermissionException($this->presenter->utilities()->txt('permission_denied'));
     }

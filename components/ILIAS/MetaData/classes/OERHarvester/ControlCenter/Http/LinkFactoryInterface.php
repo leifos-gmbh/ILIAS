@@ -18,15 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ControlCenter\Links;
+namespace ILIAS\MetaData\OERHarvester\ControlCenter\Http;
 
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\Action;
 
 interface LinkFactoryInterface
 {
-    public function getViewLink(): string;
+    public function getViewLink(int $ref_id, int $obj_id, string $type): string;
 
-    public function getLinkForAction(Action $action): string;
+    public function getLinkForAction(Action $action, int $ref_id, int $obj_id, string $type): string;
 
-    public function getLinkForConfirmationOfAction(Action $action): string;
+    public function getLinkForConfirmationOfAction(Action $action, int $ref_id, int $obj_id, string $type): string;
 }

@@ -383,24 +383,7 @@ class ContentAssembler
 
             $identifier = $this->copyright_handler->createIdentifierForID($entry->id());
 
-            //give the option to block harvesting
-            $sub_inputs = [];
-            if (
-                $this->copyright_handler->isObjectTypeHarvested($set->getRessourceID()->type()) &&
-                $this->copyright_handler->isCopyrightTemplateActive($entry)
-            ) {
-                $sub_inputs[self::OER_BLOCKED] = $ff
-                    ->checkbox(
-                        $this->presenter->utilities()->txt('meta_oer_blocked'),
-                        $this->presenter->utilities()->txt('meta_oer_blocked_info')
-                    )
-                    ->withValue(
-                        $this->copyright_handler->isOerHarvesterBlocked($set->getRessourceID()->objID())
-                    );
-                $potential_oer_values[] = $identifier;
-            }
-
-            $option = $ff->group($sub_inputs, $entry->title(), $entry->description());
+            $option = $ff->group([], $entry->title(), $entry->description());
 
             // outdated entries throw an error when selected
             if ($entry->isOutdated()) {

@@ -16,19 +16,15 @@
  *
  *********************************************************************/
 
-declare(strict_types=0);
-/**
- * @author  Jörg Lützenkirchen <luetzenkirchen@leifos.com>
- * @package ilias-tracking
- */
+declare(strict_types=1);
+
 class ilLPStatusCollectionManual extends ilLPStatus
 {
     public static function _getInProgress(int $a_obj_id): array
     {
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
-
         // find any completed item
-        $users = array();
+        $users = [];
         if (isset($status_info['completed'])) {
             foreach ($status_info['completed'] as $in_progress) {
                 $users = array_merge($users, $in_progress);
@@ -42,9 +38,8 @@ class ilLPStatusCollectionManual extends ilLPStatus
     public static function _getCompleted(int $a_obj_id): array
     {
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
-
         $counter = 0;
-        $users = array();
+        $users = [];
         foreach ($status_info['items'] as $item_id) {
             $tmp_users = $status_info['completed'][$item_id];
 
@@ -59,18 +54,15 @@ class ilLPStatusCollectionManual extends ilLPStatus
 
     public static function _getStatusInfo(int $a_obj_id): array
     {
-        $status_info = array();
-
+        $status_info = [];
         $olp = ilObjectLP::getInstance($a_obj_id);
         $collection = $olp->getCollectionInstance();
         if ($collection) {
             // @todo check if obj_id can be removed
             $status_info["items"] = $collection->getItems($a_obj_id);
-
             foreach ($status_info["items"] as $item_id) {
-                $status_info["completed"][$item_id] = array();
+                $status_info["completed"][$item_id] = [];
             }
-
             $ref_ids = ilObject::_getAllReferences($a_obj_id);
             $ref_id = end($ref_ids);
             $possible_items = $collection->getPossibleItems($ref_id);
@@ -78,10 +70,8 @@ class ilLPStatusCollectionManual extends ilLPStatus
                 array_keys($possible_items),
                 $status_info["items"]
             );
-
             // fix order (adapt from possible items)
             $status_info["items"] = $chapter_ids;
-
             if ($chapter_ids) {
                 $status = self::_getObjectStatus($a_obj_id);
 
@@ -107,7 +97,6 @@ class ilLPStatusCollectionManual extends ilLPStatus
         ?object $a_obj = null
     ): int {
         $info = self::_getStatusInfo($a_obj_id);
-
         if (isset($info["completed"])) {
             $completed = true;
             $in_progress = false;
@@ -136,11 +125,8 @@ class ilLPStatusCollectionManual extends ilLPStatus
         $a_user_id = null
     ): array {
         global $DIC;
-
         $ilDB = $DIC['ilDB'];
-
-        $res = array();
-
+        $res = [];
         $sql = "SELECT subitem_id, completed, usr_id, last_change" .
             " FROM ut_lp_coll_manual" .
             " WHERE obj_id = " . $ilDB->quote($a_obj_id, "integer");
@@ -166,20 +152,15 @@ class ilLPStatusCollectionManual extends ilLPStatus
         ?array $a_completed = null
     ): void {
         global $DIC;
-
         $ilDB = $DIC['ilDB'];
-
         $now = time();
-
         if (!$a_completed) {
-            $a_completed = array();
+            $a_completed = [];
         }
-
         $olp = ilObjectLP::getInstance($a_obj_id);
         $collection = $olp->getCollectionInstance();
         if ($collection) {
             $existing = self::_getObjectStatus($a_obj_id, $a_user_id);
-
             foreach ($collection->getItems() as $item_id) {
                 if (isset($existing[$item_id])) {
                     // value changed
@@ -228,7 +209,11 @@ class ilLPStatusCollectionManual extends ilLPStatus
                 }
             }
         }
-
         ilLPStatusWrapper::_updateStatus($a_obj_id, $a_user_id);
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_MANUAL;
     }
 }

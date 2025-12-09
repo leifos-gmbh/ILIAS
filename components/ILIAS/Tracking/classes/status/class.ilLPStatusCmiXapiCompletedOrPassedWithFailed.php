@@ -16,14 +16,8 @@
  *
  *********************************************************************/
 
-declare(strict_types=0);
+declare(strict_types=1);
 
-/**
- * Class ilLPStatusCmiXapiCompletedOrPassedWithFailed
- * @author      Uwe Kohnle <kohnle@internetlehrer-gmbh.de>
- * @author      Björn Heyser <info@bjoernheyser.de>
- * @author      Stefan Schneider <info@eqsoft.de>
- */
 class ilLPStatusCmiXapiCompletedOrPassedWithFailed extends ilLPStatusCmiXapiCompletedOrPassed
 {
     protected function resultSatisfyFailed(ilCmiXapiResult $result): bool
@@ -31,7 +25,11 @@ class ilLPStatusCmiXapiCompletedOrPassedWithFailed extends ilLPStatusCmiXapiComp
         if ($result->getStatus() === 'failed') {
             return true;
         }
-
         return false;
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_CMIX_COMPL_OR_PASSED_WITH_FAILED;
     }
 }

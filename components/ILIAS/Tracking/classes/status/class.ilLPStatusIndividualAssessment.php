@@ -93,4 +93,9 @@ class ilLPStatusIndividualAssessment extends ilLPStatus
                 return self::LP_STATUS_NOT_ATTEMPTED_NUM;
         }
     }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_INDIVIDUAL_ASSESSMENT;
+    }
 }

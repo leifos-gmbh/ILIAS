@@ -33,6 +33,12 @@ interface LPMarkCollectionInterface extends Iterator, Countable
         int ...$user_ids
     ): LPMarkCollectionInterface;
 
+    public function getSubCollectionOfElementsByCompletedStatus(
+        bool $completed
+    ): LPMarkCollectionInterface;
+
+    public function getSubCollectionOfElementsWithDistinctUsers(): LPMarkCollectionInterface;
+
     public function withChangedStatusDirtyOfAllElements(
         int $status_dirty
     ): LPMarkCollectionInterface;

@@ -16,14 +16,8 @@
  *
  *********************************************************************/
 
-declare(strict_types=0);
+declare(strict_types=1);
 
-/**
- * Class ilLPStatusCmiXapiCompleted
- * @author      Uwe Kohnle <kohnle@internetlehrer-gmbh.de>
- * @author      Björn Heyser <info@bjoernheyser.de>
- * @author      Stefan Schneider <info@eqsoft.de>
- */
 class ilLPStatusCmiXapiCompleted extends ilLPStatusCmiXapiAbstract
 {
     protected function resultSatisfyCompleted(ilCmiXapiResult $result): bool
@@ -31,12 +25,16 @@ class ilLPStatusCmiXapiCompleted extends ilLPStatusCmiXapiAbstract
         if ($result->getStatus() === 'completed') {
             return true;
         }
-
         return false;
     }
 
     protected function resultSatisfyFailed(ilCmiXapiResult $result): bool
     {
         return false;
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_CMIX_COMPLETED;
     }
 }

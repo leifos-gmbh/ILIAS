@@ -16,29 +16,20 @@
  *
  *********************************************************************/
 
-declare(strict_types=0);
+declare(strict_types=1);
 
 use ILIAS\DI\Container;
 use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
 use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
 
-/**
- * @author     Stefan Meyer <meyer@leifos.com>
- * @ingroup    ServicesTracking
- */
 class ilLPStatusVisits extends ilLPStatus
 {
     protected TrackingDBFactoryInterface $tracking_db_factory;
 
     public static function _getInProgress(int $a_obj_id): array
     {
-        global $DIC;
-
-        $ilDB = $DIC['ilDB'];
-
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
         $required_visits = $status_info['visits'];
-
         $all = ilChangeEvent::_lookupReadEvents($a_obj_id);
         $user_ids = [];
         foreach ($all as $event) {
@@ -51,13 +42,8 @@ class ilLPStatusVisits extends ilLPStatus
 
     public static function _getCompleted(int $a_obj_id): array
     {
-        global $DIC;
-
-        $ilDB = $DIC['ilDB'];
-
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
         $required_visits = $status_info['visits'];
-
         $all = ilChangeEvent::_lookupReadEvents($a_obj_id);
         $user_ids = [];
         foreach ($all as $event) {
@@ -79,30 +65,21 @@ class ilLPStatusVisits extends ilLPStatus
         int $a_usr_id,
         ?object $a_obj = null
     ): int {
-        global $DIC;
-
-        $ilObjDataCache = $DIC['ilObjDataCache'];
-        $ilDB = $DIC['ilDB'];
-
         $status = self::LP_STATUS_NOT_ATTEMPTED_NUM;
-        switch ($this->ilObjDataCache->lookupType($a_obj_id)) {
-            case 'lm':
-                if (ilChangeEvent::hasAccessed($a_obj_id, $a_usr_id)) {
-                    $status = self::LP_STATUS_IN_PROGRESS_NUM;
-
-                    // completed?
-                    $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
-                    $required_visits = $status_info['visits'];
-
-                    $re = ilChangeEvent::_lookupReadEvents(
-                        $a_obj_id,
-                        $a_usr_id
-                    );
-                    if (($re[0]['read_count'] ?? 0) >= $required_visits) {
-                        $status = self::LP_STATUS_COMPLETED_NUM;
-                    }
-                }
-                break;
+        if (
+            strcmp($this->ilObjDataCache->lookupType($a_obj_id), 'lm') === 0 &&
+            ilChangeEvent::hasAccessed($a_obj_id, $a_usr_id)
+        ) {
+            $status = self::LP_STATUS_IN_PROGRESS_NUM;
+            $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
+            $required_visits = $status_info['visits'];
+            $re = ilChangeEvent::_lookupReadEvents(
+                $a_obj_id,
+                $a_usr_id
+            );
+            if (($re[0]['read_count'] ?? 0) >= $required_visits) {
+                $status = self::LP_STATUS_COMPLETED_NUM;
+            }
         }
         return $status;
     }
@@ -113,10 +90,8 @@ class ilLPStatusVisits extends ilLPStatus
         ?object $a_obj = null
     ): int {
         $reqv = ilLPObjSettings::_lookupVisits($a_obj_id);
-
         $re = ilChangeEvent::_lookupReadEvents($a_obj_id, $a_usr_id);
         $rc = (int) ($re[0]["read_count"] ?? 0);
-
         if ($reqv > 0 && $rc) {
             $per = (int) min(100, 100 / $reqv * $rc);
         } else {

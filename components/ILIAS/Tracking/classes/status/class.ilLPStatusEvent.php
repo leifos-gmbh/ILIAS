@@ -16,19 +16,14 @@
  *
  *********************************************************************/
 
-declare(strict_types=0);
-/**
- * @author  Stefan Meyer <meyer@leifos.com>
- * @package ilias-tracking
- */
+declare(strict_types=1);
+
 class ilLPStatusEvent extends ilLPStatus
 {
     public static function _getNotAttempted(int $a_obj_id): array
     {
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
-
-        $users = array();
-
+        $users = [];
         $members = self::getMembers($status_info['crs_id'], true);
         if ($members) {
             // diff in progress and completed (use stored result in LPStatusWrapper)
@@ -41,67 +36,58 @@ class ilLPStatusEvent extends ilLPStatus
                 ilLPStatusWrapper::_getCompleted($a_obj_id)
             );
         }
-
         return $users;
     }
 
     public static function _getInProgress(int $a_obj_id): array
     {
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
-
         // If registration is disabled in_progress is not available
         if (!$status_info['registration']) {
-            return array();
+            return [];
         }
         // If event has occured in_progress is impossible
         if ($status_info['starting_time'] < time()) {
-            return array();
+            return [];
         }
-
         // Otherwise all users who registered will get the status in progress
-        return $status_info['registered_users'] ?: array();
+        return $status_info['registered_users'] ?: [];
     }
 
     public static function _getCompleted(int $a_obj_id): array
     {
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
-        return $status_info['participated_users'] ?: array();
+        return $status_info['participated_users'] ?: [];
     }
 
     public static function _getStatusInfo(int $a_obj_id): array
     {
         $tree = $GLOBALS['DIC']->repositoryTree();
-
         $references = ilObject::_getAllReferences($a_obj_id);
         $ref_id = end($references);
-
         $member_ref_id = null;
         if ($id = $tree->checkForParentType($ref_id, 'grp')) {
             $member_ref_id = $id;
         } elseif ($id = $tree->checkForParentType($ref_id, 'crs')) {
             $member_ref_id = $id;
         }
-
-        $status_info = array();
+        $status_info = [];
         $status_info['crs_id'] = ilObject::_lookupObjId($member_ref_id);
         $status_info['registration'] = ilObjSession::_lookupRegistrationEnabled(
             $a_obj_id
         );
         $status_info['title'] = ilObject::_lookupTitle($a_obj_id);
         $status_info['description'] = ilObject::_lookupDescription($a_obj_id);
-
         $time_info = ilSessionAppointment::_lookupAppointment($a_obj_id);
         $status_info['starting_time'] = $time_info['start'];
         $status_info['ending_time'] = $time_info['end'];
         $status_info['fullday'] = $time_info['fullday'];
-
         $status_info['registered_users'] = ilEventParticipants::_getRegistered(
             $a_obj_id
         );
         $status_info['participated_users'] = ilEventParticipants::_getParticipated(
             $a_obj_id
         );
-
         return $status_info;
     }
 
@@ -110,46 +96,35 @@ class ilLPStatusEvent extends ilLPStatus
         int $a_usr_id,
         ?object $a_obj = null
     ): int {
-        global $DIC;
-
-        $ilObjDataCache = $DIC['ilObjDataCache'];
-
         $status = self::LP_STATUS_NOT_ATTEMPTED_NUM;
-        switch ($this->ilObjDataCache->lookupType($a_obj_id)) {
-            case 'sess':
-
-                $time_info = ilSessionAppointment::_lookupAppointment(
-                    $a_obj_id
-                );
-                $registration = ilObjSession::_lookupRegistrationEnabled(
-                    $a_obj_id
-                );
-
-                // If registration is disabled in_progress is not available
-                // If event has occured in_progress is impossible
-                if ($registration && $time_info['start'] >= time()) {
-                    // is user registered -> in progress
-                    if (ilEventParticipants::_isRegistered(
-                        $a_usr_id,
-                        $a_obj_id
-                    )) {
-                        $status = self::LP_STATUS_IN_PROGRESS_NUM;
-                    }
-                }
-                if (ilEventParticipants::_hasParticipated(
+        if (strcmp($this->ilObjDataCache->lookupType($a_obj_id), 'sess') === 0) {
+            $time_info = ilSessionAppointment::_lookupAppointment(
+                $a_obj_id
+            );
+            $registration = ilObjSession::_lookupRegistrationEnabled(
+                $a_obj_id
+            );
+            // If registration is disabled in_progress is not available
+            // If event has occured in_progress is impossible
+            if ($registration && $time_info['start'] >= time()) {
+                // is user registered -> in progress
+                if (ilEventParticipants::_isRegistered(
                     $a_usr_id,
                     $a_obj_id
                 )) {
-                    $status = self::LP_STATUS_COMPLETED_NUM;
+                    $status = self::LP_STATUS_IN_PROGRESS_NUM;
                 }
-                break;
+            }
+            if (ilEventParticipants::_hasParticipated(
+                $a_usr_id,
+                $a_obj_id
+            )) {
+                $status = self::LP_STATUS_COMPLETED_NUM;
+            }
         }
         return $status;
     }
 
-    /**
-     * Get members for object
-     */
     protected static function getMembers(
         int $a_obj_id,
         bool $a_is_crs_id = false
@@ -158,8 +133,6 @@ class ilLPStatusEvent extends ilLPStatus
             $tree = $GLOBALS['DIC']->repositoryTree();
             $references = ilObject::_getAllReferences($a_obj_id);
             $ref_id = end($references);
-
-            $member_ref_id = null;
             if ($id = $tree->checkForParentType($ref_id, 'grp')) {
                 $member_ref_id = $id;
             } elseif ($id = $tree->checkForParentType($ref_id, 'crs')) {
@@ -171,7 +144,6 @@ class ilLPStatusEvent extends ilLPStatus
         } else {
             $member_obj_id = $a_obj_id;
         }
-
         $member_obj = ilParticipants::getInstanceByObjId($member_obj_id);
         return $member_obj->getMembers();
     }
@@ -186,7 +158,7 @@ class ilLPStatusEvent extends ilLPStatus
         if (!$a_user_ids) {
             $a_user_ids = self::getMembers($a_obj_id);
             if (!$a_user_ids) {
-                return array();
+                return [];
             }
         }
         return self::_lookupStatusForObject(
@@ -203,7 +175,7 @@ class ilLPStatusEvent extends ilLPStatus
         int $a_obj_id,
         ?array $a_user_ids = null
     ): array {
-        return array();
+        return [];
     }
 
     /**
@@ -216,7 +188,7 @@ class ilLPStatusEvent extends ilLPStatus
         if (!$a_user_ids) {
             $a_user_ids = self::getMembers($a_obj_id);
             if (!$a_user_ids) {
-                return array();
+                return [];
             }
         }
         return self::_lookupStatusForObject(
@@ -224,5 +196,10 @@ class ilLPStatusEvent extends ilLPStatus
             self::LP_STATUS_IN_PROGRESS_NUM,
             $a_user_ids
         );
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_EVENT;
     }
 }

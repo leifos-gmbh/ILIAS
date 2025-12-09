@@ -16,31 +16,23 @@
  *
  *********************************************************************/
 
-declare(strict_types=0);
+declare(strict_types=1);
 
-/**
- * Class ilLPStatusContributionToDiscussion
- * @author Michael Jansen <mjansen@databay.de>
- */
 class ilLPStatusContributionToDiscussion extends ilLPStatus
 {
     public static function _getCompleted(int $a_obj_id): array
     {
         $userIds = [];
-
         $frm_properties = ilForumProperties::getInstance($a_obj_id);
         $num_required_postings = $frm_properties->getLpReqNumPostings();
-
         if (null === $num_required_postings) {
             return $userIds;
         }
-
         $frm = new ilForum();
         $frm->setForumId($frm_properties->getObjId());
         $statistics = $frm->getUserStatistics(
             $frm_properties->isPostActivationEnabled()
         );
-
         return array_map(
             static function (array $statisic): int {
                 return (int) $statisic['pos_author_id'];
@@ -59,20 +51,16 @@ class ilLPStatusContributionToDiscussion extends ilLPStatus
     public static function _getInProgress(int $a_obj_id): array
     {
         $userIds = [];
-
         $frm_properties = ilForumProperties::getInstance($a_obj_id);
         $num_required_postings = $frm_properties->getLpReqNumPostings();
-
         if (null === $num_required_postings) {
             return $userIds;
         }
-
         $frm = new ilForum();
         $frm->setForumId($frm_properties->getObjId());
         $statistics = $frm->getUserStatistics(
             $frm_properties->isPostActivationEnabled()
         );
-
         return array_map(
             static function (array $statisic): int {
                 return (int) $statisic['pos_author_id'];
@@ -95,17 +83,13 @@ class ilLPStatusContributionToDiscussion extends ilLPStatus
         ?object $a_obj = null
     ): int {
         $status = self::LP_STATUS_NOT_ATTEMPTED_NUM;
-
         $frm_properties = ilForumProperties::getInstance($a_obj_id);
         $num_required_postings = $frm_properties->getLpReqNumPostings();
-
-        if (null === $num_required_postings) {
+        if (is_null($num_required_postings)) {
             return $status;
         }
-
         $frm = new ilForum();
         $frm->setForumId($frm_properties->getObjId());
-
         $num_postings = $frm->getNumberOfPublishedUserPostings(
             $a_usr_id,
             $frm_properties->isPostActivationEnabled()
@@ -115,7 +99,11 @@ class ilLPStatusContributionToDiscussion extends ilLPStatus
         } elseif ($num_postings > 0) {
             $status = self::LP_STATUS_IN_PROGRESS_NUM;
         }
-
         return $status;
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_CONTRIBUTION_TO_DISCUSSION;
     }
 }

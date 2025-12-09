@@ -16,42 +16,30 @@
  *
  *********************************************************************/
 
-declare(strict_types=0);
-/**
- * Class ilLPStatusCourseReference
- * @author Stefan Meyer <smeyer.ilias@gmx.de>
- */
+declare(strict_types=1);
+
 class ilLPStatusCourseReference extends ilLPStatus
 {
     /**
-     * @var \ilLPStatusCourseReference[]
+     * @var ilLPStatusCourseReference[]
      */
-    private static $instances = [];
-
+    private static array $instances = [];
     private int $target_obj_id = 0;
     private array $status_info = [];
 
     public function __construct(int $a_obj_id)
     {
-        global $DIC;
-
         parent::__construct($a_obj_id);
         $this->readTargetObjId($a_obj_id);
         $this->readStatusInfo($a_obj_id);
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function _getCountNotAttempted(int $a_obj_id): int
     {
         $self = self::getInstanceByObjId($a_obj_id);
         return count($self->getNotAttempted());
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function _getNotAttempted(int $a_obj_id): array
     {
         $self = self::getInstanceByObjId($a_obj_id);
@@ -61,23 +49,17 @@ class ilLPStatusCourseReference extends ilLPStatus
     /**
      * @return int[]
      */
-    public function getNotAttempted()
+    public function getNotAttempted(): array
     {
         return $this->status_info[\ilLPStatus::LP_STATUS_NOT_ATTEMPTED_NUM];
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function _getCountInProgress(int $a_obj_id): int
     {
         $self = self::getInstanceByObjId($a_obj_id);
         return count($self->getInProgress());
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function _getInProgress(int $a_obj_id): array
     {
         $self = self::getInstanceByObjId($a_obj_id);
@@ -87,23 +69,17 @@ class ilLPStatusCourseReference extends ilLPStatus
     /**
      * @return int[]
      */
-    public function getInProgress()
+    public function getInProgress(): array
     {
         return $this->status_info[\ilLPStatus::LP_STATUS_IN_PROGRESS_NUM];
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function _getCountCompleted(int $a_obj_id): int
     {
         $self = self::getInstanceByObjId($a_obj_id);
         return count($self->getCompleted());
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function _getCompleted(int $a_obj_id): array
     {
         $self = self::getInstanceByObjId($a_obj_id);
@@ -113,32 +89,25 @@ class ilLPStatusCourseReference extends ilLPStatus
     /**
      * @return int[]
      */
-    public function getCompleted()
+    public function getCompleted(): array
     {
         return $this->status_info[\ilLPStatus::LP_STATUS_COMPLETED_NUM];
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function _getStatusInfo(int $a_obj_id): array
     {
         $self = self::getInstanceByObjId($a_obj_id);
         return $self->getStatusInfo();
     }
 
-    public function getStatusInfo()
+    public function getStatusInfo(): array
     {
         return $this->status_info;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function readStatusInfo(int $a_obj_id): void
     {
         global $DIC;
-
         $database = $DIC->database();
         $query = 'select status,usr_id from ut_lp_marks ' .
             'where obj_id = ' . $database->quote(
@@ -146,7 +115,6 @@ class ilLPStatusCourseReference extends ilLPStatus
                 \ilDBConstants::T_INTEGER
             );
         $res = $database->query($query);
-
         $info = [
             \ilLPStatus::LP_STATUS_NOT_ATTEMPTED_NUM => [],
             \ilLPStatus::LP_STATUS_IN_PROGRESS_NUM => [],
@@ -161,9 +129,6 @@ class ilLPStatusCourseReference extends ilLPStatus
         $this->status_info = $info;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function determineStatus(
         int $a_obj_id,
         int $a_usr_id,
@@ -196,5 +161,10 @@ class ilLPStatusCourseReference extends ilLPStatus
         $this->target_obj_id = ilObject::_lookupObjId(
             (int) ilObjCourseReference::_lookupTargetRefId($a_obj_id)
         );
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_COURSE_REFERENCE;
     }
 }

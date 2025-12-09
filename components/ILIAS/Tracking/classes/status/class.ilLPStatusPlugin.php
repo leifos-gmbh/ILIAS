@@ -16,21 +16,14 @@
  *
  *********************************************************************/
 
-declare(strict_types=0);
-/**
- * LP handler class for plugins
- * @author  Jörg Lützenkirchen <luetzenkirchen@leifos.com>
- * @package ServicesTracking
- */
+declare(strict_types=1);
+
 class ilLPStatusPlugin extends ilLPStatus
 {
     /**
-     * Get ilObjectPlugin for object id
-     * @param int $a_obj_id
-     * @return ilObjectPlugin|int
      * @todo refactor return type
      */
-    protected static function initPluginObj(int $a_obj_id)
+    protected static function initPluginObj(int $a_obj_id): ilObjectPlugin|int
     {
         $olp = ilObjectLP::getInstance($a_obj_id);
         return $olp->getPluginInstance();
@@ -50,7 +43,7 @@ class ilLPStatusPlugin extends ilLPStatus
                 );
             }
         }
-        return array();
+        return [];
     }
 
     public static function _getInProgress(int $a_obj_id): array
@@ -67,7 +60,7 @@ class ilLPStatusPlugin extends ilLPStatus
                 );
             }
         }
-        return array();
+        return [];
     }
 
     public static function _getCompleted(int $a_obj_id): array
@@ -84,7 +77,7 @@ class ilLPStatusPlugin extends ilLPStatus
                 );
             }
         }
-        return array();
+        return [];
     }
 
     public static function _getFailed(int $a_obj_id): array
@@ -101,7 +94,7 @@ class ilLPStatusPlugin extends ilLPStatus
                 );
             }
         }
-        return array();
+        return [];
     }
 
     public function determineStatus(
@@ -142,18 +135,13 @@ class ilLPStatusPlugin extends ilLPStatus
         return 0;
     }
 
-    /**
-     * Read existing LP status data
-     */
     protected static function getLPStatusData(
         int $a_obj_id,
         int $a_status
     ): array {
         global $DIC;
-
         $ilDB = $DIC['ilDB'];
-
-        $all = array();
+        $all = [];
         $set = $ilDB->query(
             "SELECT usr_id" .
             " FROM ut_lp_marks" .
@@ -166,17 +154,12 @@ class ilLPStatusPlugin extends ilLPStatus
         return $all;
     }
 
-    /**
-     * Read existing LP status data for user
-     */
     protected static function getLPDataForUser(
         int $a_obj_id,
         int $a_user_id
     ): int {
         global $DIC;
-
         $ilDB = $DIC['ilDB'];
-
         $set = $ilDB->query(
             "SELECT status" .
             " FROM ut_lp_marks" .
@@ -196,9 +179,7 @@ class ilLPStatusPlugin extends ilLPStatus
         int $a_user_id
     ): int {
         global $DIC;
-
         $ilDB = $DIC['ilDB'];
-
         $set = $ilDB->query(
             "SELECT percentage" .
             " FROM ut_lp_marks" .
@@ -207,5 +188,10 @@ class ilLPStatusPlugin extends ilLPStatus
         );
         $row = $ilDB->fetchAssoc($set);
         return (int) ($row["percentage"] ?? 0);
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_PLUGIN;
     }
 }

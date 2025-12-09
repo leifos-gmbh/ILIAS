@@ -84,7 +84,6 @@ class ilLPStatusStudyProgramme extends ilLPStatus
             ilLPStatus::LP_STATUS_COMPLETED_NUM => [],
             ilLPStatus::LP_STATUS_FAILED_NUM => []
         ];
-
         $user_centric = [];
         foreach ($assignments as $ass) {
             $usr_id = $ass->getUserId();
@@ -97,7 +96,6 @@ class ilLPStatusStudyProgramme extends ilLPStatus
             $status = self::getStatusForAssignments($assignments, $prg_obj_id);
             $matrix[$status][] = $usr_id;
         }
-
         return $matrix;
     }
 
@@ -133,9 +131,14 @@ class ilLPStatusStudyProgramme extends ilLPStatus
         return $matrix[ilLPStatus::LP_STATUS_FAILED_NUM];
     }
 
-    public function determineStatus($a_obj_id, $a_user_id, $a_obj = null): int
+    public function determineStatus($a_obj_id, $a_usr_id, $a_obj = null): int
     {
-        $assignments = self::getAssignments((int) $a_obj_id, (int) $a_user_id);
+        $assignments = self::getAssignments((int) $a_obj_id, (int) $a_usr_id);
         return self::getStatusForAssignments($assignments, (int) $a_obj_id);
+    }
+
+    public function getLPStatusId(): string
+    {
+        return (string) ilLPObjSettings::LP_MODE_STUDY_PROGRAMME;
     }
 }

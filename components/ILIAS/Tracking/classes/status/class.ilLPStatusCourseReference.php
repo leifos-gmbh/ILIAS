@@ -18,6 +18,9 @@
 
 declare(strict_types=1);
 
+use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
+use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
+
 class ilLPStatusCourseReference extends ilLPStatus
 {
     /**
@@ -26,12 +29,15 @@ class ilLPStatusCourseReference extends ilLPStatus
     private static array $instances = [];
     private int $target_obj_id = 0;
     private array $status_info = [];
+    protected TrackingDBFactoryInterface $db_factory;
 
     public function __construct(int $a_obj_id)
     {
+        global $DIC;
         parent::__construct($a_obj_id);
         $this->readTargetObjId($a_obj_id);
         $this->readStatusInfo($a_obj_id);
+        $this->db_factory = new TrackingDBFactory($DIC->database());
     }
 
     public static function _getCountNotAttempted(int $a_obj_id): int
@@ -107,23 +113,16 @@ class ilLPStatusCourseReference extends ilLPStatus
 
     public function readStatusInfo(int $a_obj_id): void
     {
-        global $DIC;
-        $database = $DIC->database();
-        $query = 'select status,usr_id from ut_lp_marks ' .
-            'where obj_id = ' . $database->quote(
-                $this->target_obj_id,
-                \ilDBConstants::T_INTEGER
-            );
-        $res = $database->query($query);
+        $collection = $this->db_factory->lpMarks()->repository()->readAllEntriesOfObject($this->target_obj_id);
         $info = [
-            \ilLPStatus::LP_STATUS_NOT_ATTEMPTED_NUM => [],
-            \ilLPStatus::LP_STATUS_IN_PROGRESS_NUM => [],
-            \ilLPStatus::LP_STATUS_COMPLETED_NUM => [],
-            \ilLPStatus::LP_STATUS_FAILED_NUM => []
+            ilLPStatus::LP_STATUS_NOT_ATTEMPTED_NUM => [],
+            ilLPStatus::LP_STATUS_IN_PROGRESS_NUM => [],
+            ilLPStatus::LP_STATUS_COMPLETED_NUM => [],
+            ilLPStatus::LP_STATUS_FAILED_NUM => []
         ];
-        while ($row = $res->fetchRow(\ilDBConstants::FETCHMODE_OBJECT)) {
-            if (array_key_exists((int) $row->status, $info)) {
-                $info[(int) $row->status][] = (int) $row->usr_id;
+        foreach ($collection as $lp_mark) {
+            if (array_key_exists($lp_mark->getStatus(), $info)) {
+                $info[$lp_mark->getStatus()][] = $lp_mark->getUserId();
             }
         }
         $this->status_info = $info;

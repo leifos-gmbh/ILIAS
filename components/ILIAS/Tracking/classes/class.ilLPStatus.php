@@ -297,10 +297,9 @@ class ilLPStatus implements LPStatusInterface
         // anyway. But the status on the session itself may not be correct.
         $valid_user_array =  is_array($a_users) && count($a_users) > 0;
         $db_repository = (new TrackingFactory())->db()->lpMarks()->repository();
-        $collection = $db_repository->readByStatusDirty(
+        $collection = $db_repository->readAllEntriesOfObject(
             $a_obj_id,
-            1
-        );
+        )->getSubCollectionOfElementsByStatusDirty(1);
         if ($valid_user_array) {
             $collection = $collection->getSubCollectionOfElementsByUserIds(...$a_users);
         }
@@ -308,7 +307,7 @@ class ilLPStatus implements LPStatusInterface
         // check if any records are missing
         $missing = false;
         if (!$dirty && $valid_user_array) {
-            $collection = $db_repository->read($a_obj_id)->getSubCollectionOfElementsByUserIds(...$a_users);
+            $collection = $db_repository->readAllEntriesOfObject($a_obj_id)->getSubCollectionOfElementsByUserIds(...$a_users);
             $missing = count($collection) < count($a_users);
         }
         // refresh status, if records are dirty or missing
@@ -438,7 +437,7 @@ class ilLPStatus implements LPStatusInterface
         $update_dependencies = false;
         $db_repository = (new TrackingFactory())->db()->lpMarks()->repository();
         $db_element_factory = (new TrackingFactory())->db()->lpMarks()->element();
-        $lp_mark_old = $db_repository->readByUserId($a_obj_id, $a_user_id);
+        $lp_mark_old = $db_repository->readEntryForUserOfObject($a_obj_id, $a_user_id);
         $lp_mark_new = $db_element_factory->lpMark()
             ->withStatus($a_status)
             ->withUserId($a_user_id)
@@ -563,7 +562,7 @@ class ilLPStatus implements LPStatusInterface
         int $a_obj_id,
         int $a_user_id
     ): void {
-        $lp_mark = (new TrackingFactory())->db()->lpMarks()->repository()->readByUserId($a_obj_id, $a_user_id);
+        $lp_mark = (new TrackingFactory())->db()->lpMarks()->repository()->readEntryForUserOfObject($a_obj_id, $a_user_id);
         $needs_update = is_null($lp_mark) || $lp_mark->getStatus() === self::LP_STATUS_NOT_ATTEMPTED_NUM;
         if ($needs_update) {
             ilLPStatusWrapper::_updateStatus($a_obj_id, $a_user_id);
@@ -584,7 +583,7 @@ class ilLPStatus implements LPStatusInterface
     public static function setDirty(int $a_obj_id): void
     {
         $db_repository = (new TrackingFactory())->db()->lpMarks()->repository();
-        $collection = $db_repository->read($a_obj_id);
+        $collection = $db_repository->readAllEntriesOfObject($a_obj_id);
         $collection = $collection->withChangedStatusDirtyOfAllElements(1);
         $db_repository->writeCollection($collection);
     }
@@ -598,7 +597,7 @@ class ilLPStatus implements LPStatusInterface
         bool $a_create = true
     ): ?int {
         $db_repository = (new TrackingFactory())->db()->lpMarks()->repository();
-        $lp_mark = $db_repository->readByUserId($a_obj_id, $a_user_id);
+        $lp_mark = $db_repository->readEntryForUserOfObject($a_obj_id, $a_user_id);
         if (
             !is_null($lp_mark) &&
             $lp_mark->getStatusDirty() === 0
@@ -607,7 +606,7 @@ class ilLPStatus implements LPStatusInterface
         }
         if ($a_create) {
             ilLPStatusWrapper::_updateStatus($a_obj_id, $a_user_id);
-            $lp_mark = $db_repository->readByUserId($a_obj_id, $a_user_id);
+            $lp_mark = $db_repository->readEntryForUserOfObject($a_obj_id, $a_user_id);
             if (
                 !is_null($lp_mark) &&
                 $lp_mark->getStatusDirty() === 0
@@ -626,7 +625,7 @@ class ilLPStatus implements LPStatusInterface
         int $a_user_id
     ): ?int {
         $db_repository = (new TrackingFactory())->db()->lpMarks()->repository();
-        $lp_mark = $db_repository->readByUserId($a_obj_id, $a_user_id);
+        $lp_mark = $db_repository->readEntryForUserOfObject($a_obj_id, $a_user_id);
         if (!is_null($lp_mark) && $lp_mark->getStatusDirty() === 0) {
             return $lp_mark->getPercentage();
         }
@@ -654,12 +653,12 @@ class ilLPStatus implements LPStatusInterface
         int $a_user_id
     ): ?string {
         $db_repository = (new TrackingFactory())->db()->lpMarks()->repository();
-        $lp_mark = $db_repository->readByUserId($a_obj_id, $a_user_id);
+        $lp_mark = $db_repository->readEntryForUserOfObject($a_obj_id, $a_user_id);
         if (!is_null($lp_mark) && $lp_mark->getStatusDirty() === 0) {
             return $lp_mark->getStatusChanged();
         }
         ilLPStatusWrapper::_updateStatus($a_obj_id, $a_user_id);
-        $lp_mark = $db_repository->readByUserId($a_obj_id, $a_user_id);
+        $lp_mark = $db_repository->readEntryForUserOfObject($a_obj_id, $a_user_id);
         if (!is_null($lp_mark) && $lp_mark->getStatusDirty() === 0) {
             return $lp_mark->getStatusChanged();
         }
@@ -675,7 +674,7 @@ class ilLPStatus implements LPStatusInterface
         ?array $a_user_ids = null
     ): array {
         $db_repository = (new TrackingFactory())->db()->lpMarks()->repository();
-        $collection = $db_repository->readByUserIdAndStatus($a_obj_id, $a_status);
+        $collection = $db_repository->readAllEntriesWithStatusOfObject($a_obj_id, $a_status);
         if (!is_null($a_user_ids) && count($a_user_ids) > 0) {
             $collection = $collection->getSubCollectionOfElementsByUserIds(...$a_user_ids);
         }
@@ -809,7 +808,7 @@ class ilLPStatus implements LPStatusInterface
         int $a_user_id,
         array $a_obj_ids
     ): array {
-        $collection = (new TrackingFactory())->db()->lpMarks()->repository()->readByUserIdAndObjectIds(
+        $collection = (new TrackingFactory())->db()->lpMarks()->repository()->readEntriesForUserOfObjects(
             $a_user_id,
             ...$a_obj_ids
         );

@@ -16,6 +16,8 @@
  *
  *********************************************************************/
 
+use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
+
 declare(strict_types=1);
 
 class ilLPStatusPlugin extends ilLPStatus
@@ -140,18 +142,8 @@ class ilLPStatusPlugin extends ilLPStatus
         int $a_status
     ): array {
         global $DIC;
-        $ilDB = $DIC['ilDB'];
-        $all = [];
-        $set = $ilDB->query(
-            "SELECT usr_id" .
-            " FROM ut_lp_marks" .
-            " WHERE obj_id = " . $ilDB->quote($a_obj_id, "integer") .
-            " AND status = " . $ilDB->quote($a_status, "integer")
-        );
-        while ($row = $ilDB->fetchAssoc($set)) {
-            $all[] = (int) $row["usr_id"];
-        }
-        return $all;
+        return (new TrackingDBFactory($DIC->database()))->lpMarks()->repository()->readAllEntriesWithStatusOfObject($a_obj_id, $a_status)
+            ->asUserIdArray();
     }
 
     protected static function getLPDataForUser(
@@ -159,19 +151,8 @@ class ilLPStatusPlugin extends ilLPStatus
         int $a_user_id
     ): int {
         global $DIC;
-        $ilDB = $DIC['ilDB'];
-        $set = $ilDB->query(
-            "SELECT status" .
-            " FROM ut_lp_marks" .
-            " WHERE obj_id = " . $ilDB->quote($a_obj_id, "integer") .
-            " AND usr_id = " . $ilDB->quote($a_user_id, "integer")
-        );
-        $row = $ilDB->fetchAssoc($set);
-        $status = $row["status"];
-        if (!$status) {
-            $status = self::LP_STATUS_NOT_ATTEMPTED_NUM;
-        }
-        return $status;
+        $lp_mark = (new TrackingDBFactory($DIC->database()))->lpMarks()->repository()->readEntryForUserOfObject($a_obj_id, $a_user_id);
+        return is_null($lp_mark) ? self::LP_STATUS_NOT_ATTEMPTED_NUM: $lp_mark->getStatus();
     }
 
     protected static function getPercentageForUser(
@@ -179,15 +160,8 @@ class ilLPStatusPlugin extends ilLPStatus
         int $a_user_id
     ): int {
         global $DIC;
-        $ilDB = $DIC['ilDB'];
-        $set = $ilDB->query(
-            "SELECT percentage" .
-            " FROM ut_lp_marks" .
-            " WHERE obj_id = " . $ilDB->quote($a_obj_id, "integer") .
-            " AND usr_id = " . $ilDB->quote($a_user_id, "integer")
-        );
-        $row = $ilDB->fetchAssoc($set);
-        return (int) ($row["percentage"] ?? 0);
+        $lp_mark = (new TrackingDBFactory($DIC->database()))->lpMarks()->repository()->readEntryForUserOfObject($a_obj_id, $a_user_id);
+        return is_null($lp_mark) ? 0: $lp_mark->getPercentage();
     }
 
     public function getLPStatusId(): string

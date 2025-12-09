@@ -28,6 +28,10 @@ interface RepositoryInterface
         int $object_id
     ): LPCollectionInterface|null;
 
+    public function readLPCollectionWithReferenceInObjectReference(
+        int $object_id
+    ): LPCollectionInterface|null;
+
     public function writeLPCollection(
         LPCollectionInterface $lp_collection
     ): void;

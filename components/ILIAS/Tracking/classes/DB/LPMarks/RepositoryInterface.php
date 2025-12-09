@@ -36,29 +36,28 @@ interface RepositoryInterface
         LPMarkCollectionInterface $lp_mark_collection
     ): void;
 
-    public function read(
+    public function readAllEntriesOfObject(
         int $object_id
     ): LPMarkCollectionInterface;
 
-    public function readByUserIdAndObjectIds(
+    public function readAllEntriesWithStatusChangedAfter(
+        string $timestamp
+    ): LPMarkCollectionInterface;
+
+    public function readAllEntriesWithStatusOfObject(
+        int $object_id,
+        int $status
+    ): LPMarkCollectionInterface;
+
+    public function readEntriesForUserOfObjects(
         int $user_id,
         int ...$object_ids
     ): LPMarkCollectionInterface;
 
-    public function readByStatusDirty(
-        int $object_id,
-        int $status_dirty
-    ): LPMarkCollectionInterface;
-
-    public function readByUserId(
+    public function readEntryForUserOfObject(
         int $object_id,
         int $user_id
     ): LPMarkInterface|null;
-
-    public function readByUserIdAndStatus(
-        int $user_id,
-        int $status
-    ): LPMarkCollectionInterface;
 
     public function readByUserIdAndStatusAndTimeInterval(
         int $user_id,

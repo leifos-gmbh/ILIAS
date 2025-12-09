@@ -77,7 +77,7 @@ class Repository implements RepositoryInterface
         $this->db->manipulate($query);
     }
 
-    public function read(
+    public function readAllEntriesOfObject(
         int $object_id
     ): LPMarkCollectionInterface {
         $query = "SELECT * FROM ut_lp_marks WHERE obj_id = " . $this->db->quote($object_id, ilDBConstants::T_INTEGER);
@@ -89,7 +89,35 @@ class Repository implements RepositoryInterface
         return $this->element_factory->lpMarkCollection(...$elements);
     }
 
-    public function readByUserIdAndObjectIds(
+    public function readAllEntriesWithStatusChangedAfter(
+        string $timestamp
+    ): LPMarkCollectionInterface {
+        $query = "SELECT * FROM ut_lp_marks " .
+            " WHERE status_changed >= " . $this->db->quote($timestamp, ilDBConstants::T_TIMESTAMP);
+        $res = $this->db->query($query);
+        $elements = [];
+        while ($row = $this->db->fetchAssoc($res)) {
+            $elements[] = $this->lpMarkFromRow($row);
+        }
+        return $this->element_factory->lpMarkCollection(...$elements);
+    }
+
+    public function readAllEntriesWithStatusOfObject(
+        int $object_id,
+        int $status
+    ): LPMarkCollectionInterface {
+        $query = "SELECT * FROM ut_lp_marks "
+            . "WHERE obj_id = " . $this->db->quote($object_id, ilDBConstants::T_INTEGER) . " "
+            . "AND status = " . $this->db->quote($status, ilDBConstants::T_INTEGER);
+        $res = $this->db->query($query);
+        $elements = [];
+        while ($row = $this->db->fetchAssoc($res)) {
+            $elements[] = $this->lpMarkFromRow($row);
+        }
+        return $this->element_factory->lpMarkCollection(...$elements);
+    }
+
+    public function readEntriesForUserOfObjects(
         int $user_id,
         int ...$object_ids
     ): LPMarkCollectionInterface {
@@ -107,22 +135,7 @@ class Repository implements RepositoryInterface
         return $this->element_factory->lpMarkCollection(...$elements);
     }
 
-    public function readByStatusDirty(
-        int $object_id,
-        int $status_dirty
-    ): LPMarkCollectionInterface {
-        $query = "SELECT * FROM ut_lp_marks WHERE " .
-            " obj_id = " . $this->db->quote($object_id, ilDBConstants::T_INTEGER) . " AND " .
-            " status_dirty = " . $this->db->quote($status_dirty, ilDBConstants::T_INTEGER);
-        $res = $this->db->query($query);
-        $elements = [];
-        while ($row = $this->db->fetchAssoc($res)) {
-            $elements[] = $this->lpMarkFromRow($row);
-        }
-        return $this->element_factory->lpMarkCollection(...$elements);
-    }
-
-    public function readByUserId(
+    public function readEntryForUserOfObject(
         int $object_id,
         int $user_id
     ): LPMarkInterface|null {
@@ -148,21 +161,6 @@ class Repository implements RepositoryInterface
             " AND status = " . $this->db->quote($status, ilDBConstants::T_INTEGER) .
             " AND status_changed >= " . $this->db->quote($from, ilDBConstants::T_TIMESTAMP) .
             " AND status_changed <= " . $this->db->quote($to, ilDBConstants::T_TIMESTAMP);
-        $res = $this->db->query($query);
-        $elements = [];
-        while ($row = $this->db->fetchAssoc($res)) {
-            $elements[] = $this->lpMarkFromRow($row);
-        }
-        return $this->element_factory->lpMarkCollection(...$elements);
-    }
-
-    public function readByUserIdAndStatus(
-        int $user_id,
-        int $status
-    ): LPMarkCollectionInterface {
-        $query = "SELECT * FROM ut_lp_marks " .
-            "WHERE usr_id = " . $this->db->quote($user_id, ilDBConstants::T_INTEGER) .
-            " AND status = " . $this->db->quote($status, ilDBConstants::T_INTEGER);
         $res = $this->db->query($query);
         $elements = [];
         while ($row = $this->db->fetchAssoc($res)) {

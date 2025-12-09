@@ -74,7 +74,7 @@ class ilLPStatusManualByTutor extends ilLPStatus
     public static function _getCompleted(int $a_obj_id): array
     {
         global $DIC;
-        $usr_ids = (new TrackingDBFactory($DIC->database()))->lpMarks()->repository()->read($a_obj_id)
+        $usr_ids = (new TrackingDBFactory($DIC->database()))->lpMarks()->repository()->readAllEntriesOfObject($a_obj_id)
             ->getSubCollectionOfElementsByCompletedStatus(true)
             ->getSubCollectionOfElementsWithDistinctUsers()
             ->asUserIdArray();
@@ -92,7 +92,7 @@ class ilLPStatusManualByTutor extends ilLPStatus
     ): int {
         $status = self::LP_STATUS_NOT_ATTEMPTED_NUM;
         if (in_array($this->ilObjDataCache->lookupType($a_obj_id), ['crs', 'grp'])) {
-            $lp_mark = $this->tracking_db_factory->lpMarks()->repository()->readByUserId(
+            $lp_mark = $this->tracking_db_factory->lpMarks()->repository()->readEntryForUserOfObject(
                 $a_obj_id,
                 $a_usr_id
             );

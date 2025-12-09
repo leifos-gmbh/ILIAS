@@ -82,6 +82,22 @@ class LPMarkCollection implements LPMarkCollectionInterface
         return $clone;
     }
 
+    public function getSubCollectionOfElementsByStatus(
+        int $status
+    ): LPMarkCollectionInterface {
+        $clone = clone $this;
+        $clone->elements = array_filter($clone->elements, fn(LPMarkInterface $element) => $element->getStatus() === $status);
+        return $clone;
+    }
+
+    public function getSubCollectionOfElementsByStatusDirty(
+        int $status_dirty
+    ): LPMarkCollectionInterface {
+        $clone = clone $this;
+        $clone->elements = array_filter($clone->elements, fn(LPMarkInterface $element) => $element->getStatusDirty() === $status_dirty);
+        return $clone;
+    }
+
     public function getSubCollectionOfElementsWithDistinctUsers(): LPMarkCollectionInterface {
         $ids = [];
         $elements = [];

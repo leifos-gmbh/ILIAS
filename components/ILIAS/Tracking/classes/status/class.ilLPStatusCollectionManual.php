@@ -18,6 +18,8 @@
 
 declare(strict_types=1);
 
+use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
+
 class ilLPStatusCollectionManual extends ilLPStatus
 {
     public static function _getInProgress(int $a_obj_id): array
@@ -125,22 +127,13 @@ class ilLPStatusCollectionManual extends ilLPStatus
         $a_user_id = null
     ): array {
         global $DIC;
-        $ilDB = $DIC['ilDB'];
         $res = [];
-        $sql = "SELECT subitem_id, completed, usr_id, last_change" .
-            " FROM ut_lp_coll_manual" .
-            " WHERE obj_id = " . $ilDB->quote($a_obj_id, "integer");
-        if ($a_user_id) {
-            $sql .= " AND usr_id = " . $ilDB->quote($a_user_id, "integer");
-        }
-        $set = $ilDB->query($sql);
-        while ($row = $ilDB->fetchAssoc($set)) {
+        $collection = (new TrackingDBFactory($DIC->database()))->lpCollectionManual()->repository()->readEntriesOfObject($a_obj_id);
+        foreach ($collection as $entry) {
             if (!$a_user_id) {
-                $res[(int) $row["subitem_id"]][(int) $row["usr_id"]] = (int) $row["completed"];
+                $res[$entry->getSubitemId()][$entry->getUserId()] = (int) $entry->isCompleted();
             } else {
-                $res[(int) $row["subitem_id"]] = array((int) $row["completed"],
-                                                       $row["last_change"]
-                );
+                $res[$entry->getSubitemId()] = [(int) $entry->isCompleted(), $entry->getLastChanged()];
             }
         }
         return $res;
@@ -152,60 +145,36 @@ class ilLPStatusCollectionManual extends ilLPStatus
         ?array $a_completed = null
     ): void {
         global $DIC;
-        $ilDB = $DIC['ilDB'];
-        $now = time();
-        if (!$a_completed) {
-            $a_completed = [];
-        }
+        $a_completed = is_null($a_completed) ? [] : $a_completed;
         $olp = ilObjectLP::getInstance($a_obj_id);
         $collection = $olp->getCollectionInstance();
+        $db_factory = (new TrackingDBFactory($DIC->database()))->lpCollectionManual();
         if ($collection) {
             $existing = self::_getObjectStatus($a_obj_id, $a_user_id);
             foreach ($collection->getItems() as $item_id) {
-                if (isset($existing[$item_id])) {
-                    // value changed
-                    if ((!$existing[$item_id][0] && in_array(
-                        $item_id,
-                        $a_completed
-                    )) ||
-                        ($existing[$item_id][0] && !in_array(
-                            $item_id,
-                            $a_completed
-                        ))) {
-                        $ilDB->manipulate(
-                            "UPDATE ut_lp_coll_manual SET " .
-                            " completed = " . $ilDB->quote(
-                                in_array($item_id, $a_completed),
-                                "integer"
-                            ) .
-                            " , last_change = " . $ilDB->quote(
-                                $now,
-                                "integer"
-                            ) .
-                            " WHERE obj_id = " . $ilDB->quote(
-                                $a_obj_id,
-                                "integer"
-                            ) .
-                            " AND usr_id = " . $ilDB->quote(
-                                $a_user_id,
-                                "integer"
-                            ) .
-                            " AND subitem_id = " . $ilDB->quote(
-                                $item_id,
-                                "integer"
-                            )
-                        );
-                    }
-                } elseif (in_array($item_id, $a_completed)) {
-                    $ilDB->manipulate(
-                        "INSERT INTO ut_lp_coll_manual" .
-                        "(obj_id,usr_id,subitem_id,completed,last_change)" .
-                        " VALUES (" . $ilDB->quote($a_obj_id, "integer") .
-                        " , " . $ilDB->quote($a_user_id, "integer") .
-                        " , " . $ilDB->quote($item_id, "integer") .
-                        " , " . $ilDB->quote(1, "integer") .
-                        " , " . $ilDB->quote($now, "integer") . ")"
-                    );
+                // value changed
+                $completed = in_array($item_id, $a_completed);
+                if (
+                    isset($existing[$item_id]) &&
+                    (!$existing[$item_id][0] && $completed) ||
+                    ($existing[$item_id][0] && !$completed)
+                ) {
+                    $entry = $db_factory->repository()->readEntryForUserOfSubitemOfObject(
+                        $a_obj_id,
+                        $a_user_id,
+                        $item_id
+                    )
+                        ->withCompletedStatus($completed)
+                        ->withLastChanged(time());
+                    $db_factory->repository()->write($entry);
+                } elseif ($completed) {
+                    $entry = $db_factory->element()->lpCollectionManualEntry()
+                        ->withObjectId($a_obj_id)
+                        ->withUserId($a_user_id)
+                        ->withSubitemId($item_id)
+                        ->withCompletedStatus($completed)
+                        ->withLastChanged(time());
+                    $db_factory->repository()->write($entry);
                 }
             }
         }

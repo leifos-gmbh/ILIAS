@@ -23,6 +23,7 @@ namespace ILIAS\Tracking\DB;
 use ILIAS\Tracking\DB\LPCollection\FactoryInterface as LPCollectionFactoryInterface;
 use ILIAS\Tracking\DB\LPSettings\FactoryInterface as LPSettingsFactoryInterface;
 use ILIAS\Tracking\DB\LPMarks\FactoryInterface as LPMarksFactoryInterface;
+use ILIAS\Tracking\DB\LPCollectionManual\FactoryInterface as LPCollectionManualFactoryInterface;
 
 interface FactoryInterface
 {
@@ -31,6 +32,8 @@ interface FactoryInterface
     public function lpCollection(): LPCollectionFactoryInterface;
 
     public function lpMarks(): LPMarksFactoryInterface;
+
+    public function lpCollectionManual(): LPCollectionManualFactoryInterface;
 
     public function manager(): ManagerInterface;
 }

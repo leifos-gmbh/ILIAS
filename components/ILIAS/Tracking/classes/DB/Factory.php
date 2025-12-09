@@ -20,10 +20,11 @@ declare(strict_types=1);
 
 namespace ILIAS\Tracking\DB;
 
-
 use ilDBInterface;
 use ILIAS\Tracking\DB\LPCollection\FactoryInterface as LPCollectionFactoryInterface;
 use ILIAS\Tracking\DB\LPCollection\Factory as LPCollectionFactory;
+use ILIAS\Tracking\DB\LPCollectionManual\FactoryInterface as LPCollectionManualFactoryInterface;
+use ILIAS\Tracking\DB\LPCollectionManual\Factory as LPCollectionManualFactory;
 use ILIAS\Tracking\DB\LPMarks\FactoryInterface as LPMarksFactoryInterface;
 use ILIAS\Tracking\DB\LPMarks\Factory as LPMarksFactory;
 use ILIAS\Tracking\DB\LPSettings\FactoryInterface as LPSettingsFactoryInterface;
@@ -53,6 +54,13 @@ class Factory implements FactoryInterface
     public function lpMarks(): LPMarksFactoryInterface
     {
         return new LPMarksFactory(
+            $this->db
+        );
+    }
+
+    public function lpCollectionManual(): LPCollectionManualFactoryInterface
+    {
+        return new LPCollectionManualFactory(
             $this->db
         );
     }

@@ -118,34 +118,13 @@ class ilLPMarks
     public function update(): void
     {
         $this->tracking_factory->db()->lpMarks()->repository()->write($this->lp_mark);
-        /*
-        if (!$this->has_entry) {
-            $this->__add();
-        }
-        $query = "UPDATE ut_lp_marks " .
-            "SET mark = " . $this->db->quote($this->getMark(), 'text') . ", " .
-            "u_comment = " . $this->db->quote(
-                $this->getComment(),
-                'text'
-            ) . ", " .
-            "completed = " . $this->db->quote(
-                $this->getCompleted(),
-                'integer'
-            ) . " " .
-            "WHERE obj_id = " . $this->db->quote(
-                $this->getObjId(),
-                'integer'
-            ) . " " .
-            "AND usr_id = " . $this->db->quote($this->getUserId(), 'integer');
-        $res = $this->db->manipulate($query);
-        */
     }
 
     public static function _hasCompleted(
         int $a_usr_id,
         int $a_obj_id
     ): bool {
-        return (new TrackingFactory())->db()->lpMarks()->repository()->readByUserId(
+        return (new TrackingFactory())->db()->lpMarks()->repository()->readEntryForUserOfObject(
             $a_obj_id,
             $a_usr_id
         )->isCompleted();
@@ -169,7 +148,7 @@ class ilLPMarks
         int $a_usr_id,
         int $a_obj_id
     ): string {
-        $lp_mark = (new TrackingFactory())->db()->lpMarks()->repository()->readByUserId(
+        $lp_mark = (new TrackingFactory())->db()->lpMarks()->repository()->readEntryForUserOfObject(
             $a_obj_id,
             $a_usr_id
         );
@@ -180,7 +159,7 @@ class ilLPMarks
         int $a_usr_id,
         int $a_obj_id
     ): string {
-        $lp_mark = (new TrackingFactory())->db()->lpMarks()->repository()->readByUserId(
+        $lp_mark = (new TrackingFactory())->db()->lpMarks()->repository()->readEntryForUserOfObject(
             $a_obj_id,
             $a_usr_id
         );
@@ -189,7 +168,7 @@ class ilLPMarks
 
     public function __read(): bool
     {
-        $new_lp_mark = $this->tracking_factory->db()->lpMarks()->repository()->readByUserId(
+        $new_lp_mark = $this->tracking_factory->db()->lpMarks()->repository()->readEntryForUserOfObject(
             $this->lp_mark->getObjectId(),
             $this->lp_mark->getUserId()
         );
@@ -212,7 +191,7 @@ class ilLPMarks
 
     public static function _getAllUserIds(int $a_obj_id): array
     {
-        $collection = (new TrackingFactory())->db()->lpMarks()->repository()->read($a_obj_id);
+        $collection = (new TrackingFactory())->db()->lpMarks()->repository()->readAllEntriesOfObject($a_obj_id);
         return $collection->asUserIdArray();
     }
 }

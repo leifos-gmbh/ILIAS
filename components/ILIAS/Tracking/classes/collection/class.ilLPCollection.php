@@ -18,14 +18,9 @@
 
 declare(strict_types=1);
 
-use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
 use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
+use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
 
-/**
- * LP collection base class
- * @author  Jörg Lützenkirchen <luetzenkirchen@leifos.com>
- * @ingroup ServicesTracking
- */
 abstract class ilLPCollection
 {
     protected array $items;

@@ -20,11 +20,11 @@ declare(strict_types=1);
 
 namespace ILIAS\Tracking\Setup;
 
-use ILIAS\Tracking\Status\LPStatusInterface;
 use ILIAS\Setup;
 use ILIAS\Setup\Artifact\ArrayArtifact as ilSetupArrayArtifact;
 use ILIAS\Setup\Artifact\BuildArtifactObjective as ilBuildArtifactObjective;
 use ILIAS\Setup\ImplementationOfInterfaceFinder as ilSetupImplementationOfInterfaceFinder;
+use ILIAS\Tracking\Status\LPStatusInterface;
 
 class BuildTrackingArtifactsObjective extends ilBuildArtifactObjective
 {

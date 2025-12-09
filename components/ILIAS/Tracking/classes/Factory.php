@@ -21,16 +21,15 @@ declare(strict_types=1);
 namespace ILIAS\Tracking;
 
 use ilDBInterface;
-
 use ILIAS\DI\Container;
-use ILIAS\Tracking\DB\FactoryInterface as DBFactoryInterface;
 use ILIAS\Tracking\DB\Factory as DBFactory;
-use ILIAS\Tracking\Status\FactoryInterface as StatusFactoryInterface;
-use ILIAS\Tracking\Status\Factory as StatusFactory;
-use ILIAS\Tracking\View\FactoryInterface as ViewFactoryInterface;
-use ILIAS\Tracking\View\Factory as ViewFactory;
-use ILIAS\Tracking\Export\FactoryInterface as ExportFactoryInterface;
+use ILIAS\Tracking\DB\FactoryInterface as DBFactoryInterface;
 use ILIAS\Tracking\Export\Factory as ExportFactory;
+use ILIAS\Tracking\Export\FactoryInterface as ExportFactoryInterface;
+use ILIAS\Tracking\Status\Factory as StatusFactory;
+use ILIAS\Tracking\Status\FactoryInterface as StatusFactoryInterface;
+use ILIAS\Tracking\View\Factory as ViewFactory;
+use ILIAS\Tracking\View\FactoryInterface as ViewFactoryInterface;
 
 class Factory implements FactoryInterface
 {

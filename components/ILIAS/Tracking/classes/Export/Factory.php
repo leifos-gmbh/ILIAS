@@ -22,8 +22,8 @@ namespace ILIAS\Tracking\Export;
 
 use ILIAS\Tracking\DB\LPCollection\Element\FactoryInterface as LPCollectionElementFactoryInterface;
 use ILIAS\Tracking\DB\LPSettings\Element\FactoryInterface as LPSettingsElementFactoryInterface;
-use ILIAS\Tracking\Export\XML\FactoryInterface as XMLFactoryInterface;
 use ILIAS\Tracking\Export\XML\Factory as XMLFactory;
+use ILIAS\Tracking\Export\XML\FactoryInterface as XMLFactoryInterface;
 use ILIAS\Tracking\Status\FactoryInterface as LPStatusFactoryInterface;
 
 class Factory implements FactoryInterface

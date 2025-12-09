@@ -21,9 +21,9 @@ declare(strict_types=1);
 namespace ILIAS\Tracking\DB;
 
 use ILIAS\Tracking\DB\LPCollection\FactoryInterface as LPCollectionFactoryInterface;
-use ILIAS\Tracking\DB\LPSettings\FactoryInterface as LPSettingsFactoryInterface;
-use ILIAS\Tracking\DB\LPMarks\FactoryInterface as LPMarksFactoryInterface;
 use ILIAS\Tracking\DB\LPCollectionManual\FactoryInterface as LPCollectionManualFactoryInterface;
+use ILIAS\Tracking\DB\LPMarks\FactoryInterface as LPMarksFactoryInterface;
+use ILIAS\Tracking\DB\LPSettings\FactoryInterface as LPSettingsFactoryInterface;
 
 interface FactoryInterface
 {

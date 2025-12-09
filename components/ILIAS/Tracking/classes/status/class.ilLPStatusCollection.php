@@ -18,9 +18,9 @@
 
 declare(strict_types=1);
 
-use ILIAS\Tracking\View\ProgressBlock\Settings\RepositoryInterface as ProgressBlockSettingsRepositoryInterface;
-use ILIAS\Tracking\View\ProgressBlock\Settings\Repository as ProgressBlockSettingsRepository;
 use ILIAS\DI\Container;
+use ILIAS\Tracking\View\ProgressBlock\Settings\Repository as ProgressBlockSettingsRepository;
+use ILIAS\Tracking\View\ProgressBlock\Settings\RepositoryInterface as ProgressBlockSettingsRepositoryInterface;
 
 class ilLPStatusCollection extends ilLPStatus
 {

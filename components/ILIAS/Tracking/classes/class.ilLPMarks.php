@@ -18,9 +18,9 @@
 
 declare(strict_types=1);
 
-use ILIAS\Tracking\FactoryInterface as TrackingFactoryInterface;
-use ILIAS\Tracking\Factory as TrackingFactory;
 use ILIAS\Tracking\DB\LPMarks\Element\LPMarkInterface;
+use ILIAS\Tracking\Factory as TrackingFactory;
+use ILIAS\Tracking\FactoryInterface as TrackingFactoryInterface;
 
 /**
  * Class ilLPMarks

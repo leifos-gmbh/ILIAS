@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace ILIAS\Tracking\Status;
 
-use Iterator;
 use Countable;
+use Iterator;
 
 interface CollectionInterface extends Iterator, Countable
 {

@@ -22,9 +22,9 @@ namespace ILIAS\Tracking\DB\LPMarks;
 
 use ilDBConstants;
 use ilDBInterface;
+use ILIAS\Tracking\DB\LPMarks\Element\FactoryInterface as ElementFactoryInterface;
 use ILIAS\Tracking\DB\LPMarks\Element\LPMarkCollectionInterface;
 use ILIAS\Tracking\DB\LPMarks\Element\LPMarkInterface;
-use ILIAS\Tracking\DB\LPMarks\Element\FactoryInterface as ElementFactoryInterface;
 
 class Repository implements RepositoryInterface
 {

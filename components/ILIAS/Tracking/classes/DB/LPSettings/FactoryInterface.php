@@ -20,7 +20,9 @@ declare(strict_types=1);
 
 namespace ILIAS\Tracking\DB\LPSettings;
 
-use ILIAS\Tracking\DB\LPSettings\Element\FactoryInterface as ElementFactoryInterface;;
+use ILIAS\Tracking\DB\LPSettings\Element\FactoryInterface as ElementFactoryInterface;
+
+;
 
 interface FactoryInterface
 {

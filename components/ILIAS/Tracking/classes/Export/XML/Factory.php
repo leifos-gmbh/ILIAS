@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace ILIAS\Tracking\Export\XML;
 
-use ILIAS\Tracking\DB\LPSettings\Element\FactoryInterface as LPSettingsElementFactoryInterface;
 use ILIAS\Tracking\DB\LPCollection\Element\FactoryInterface as LPCollectionElementFactoryInterface;
+use ILIAS\Tracking\DB\LPSettings\Element\FactoryInterface as LPSettingsElementFactoryInterface;
 use ILIAS\Tracking\Status\FactoryInterface as LPStatusFactoryInterface;
 
 class Factory implements FactoryInterface

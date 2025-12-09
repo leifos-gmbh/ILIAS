@@ -21,8 +21,8 @@ declare(strict_types=1);
 namespace ILIAS\Tracking\DB\LPCollection;
 
 use ilDBInterface;
-use ILIAS\Tracking\DB\LPCollection\Element\FactoryInterface as LPCollectionElementFactoryInterface;
 use ILIAS\Tracking\DB\LPCollection\Element\Factory as LPCollectionElementFactory;
+use ILIAS\Tracking\DB\LPCollection\Element\FactoryInterface as LPCollectionElementFactoryInterface;
 
 class Factory implements FactoryInterface
 {

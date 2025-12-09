@@ -16,9 +16,9 @@
  *
  *********************************************************************/
 
-use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
-
 declare(strict_types=1);
+
+use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
 
 class ilLPStatusPlugin extends ilLPStatus
 {

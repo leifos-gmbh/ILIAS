@@ -21,9 +21,9 @@ declare(strict_types=1);
 namespace ILIAS\Tracking;
 
 use ILIAS\Tracking\DB\FactoryInterface as DBFactoryInterface;
+use ILIAS\Tracking\Export\FactoryInterface as ExportFactoryInterface;
 use ILIAS\Tracking\Status\FactoryInterface as StatusFactoryInterface;
 use ILIAS\Tracking\View\FactoryInterface as ViewFactoryInterface;
-use ILIAS\Tracking\Export\FactoryInterface as ExportFactoryInterface;
 
 interface FactoryInterface
 {

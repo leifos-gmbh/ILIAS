@@ -21,11 +21,11 @@ declare(strict_types=1);
 namespace ILIAS\Tracking\Export\XML;
 
 use Exception;
-use ILIAS\Tracking\Export\InfoInterface;
-use SimpleXMLElement;
-use ILIAS\Tracking\DB\LPSettings\Element\FactoryInterface as LPSettingsElementFactoryInterface;
 use ILIAS\Tracking\DB\LPCollection\Element\FactoryInterface as LPCollectionElementFactoryInterface;
+use ILIAS\Tracking\DB\LPSettings\Element\FactoryInterface as LPSettingsElementFactoryInterface;
+use ILIAS\Tracking\Export\InfoInterface;
 use ILIAS\Tracking\Status\FactoryInterface as LPStatusFactoryInterface;
+use SimpleXMLElement;
 
 class Reader implements ReaderInterface
 {

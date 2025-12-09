@@ -22,9 +22,9 @@ namespace ILIAS\Tracking\DB\LPCollectionManual;
 
 use ilDBConstants;
 use ilDBInterface;
+use ILIAS\Tracking\DB\LPCollectionManual\Element\FactoryInterface as ElementFactoryInterface;
 use ILIAS\Tracking\DB\LPCollectionManual\Element\LPCollectionManualEntryInterface;
 use ILIAS\Tracking\DB\LPCollectionManual\Element\LPCollectionManualInterface;
-use ILIAS\Tracking\DB\LPCollectionManual\Element\FactoryInterface as ElementFactoryInterface;
 
 class Repository implements RepositoryInterface
 {

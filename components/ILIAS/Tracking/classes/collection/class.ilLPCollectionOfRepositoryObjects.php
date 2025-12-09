@@ -20,11 +20,7 @@ declare(strict_types=0);
 
 use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
 
-/**
- * LP collection of repository objects
- * @author  Jörg Lützenkirchen <luetzenkirchen@leifos.com>
- * @ingroup ServicesTracking
- */
+
 class ilLPCollectionOfRepositoryObjects extends ilLPCollection
 {
     protected static array $possible_items = [];

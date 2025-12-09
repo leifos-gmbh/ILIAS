@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace ILIAS\Tracking\DB\LPMarks\Element;
 
-use Iterator;
 use Countable;
+use Iterator;
 
 interface LPMarkCollectionInterface extends Iterator, Countable
 {

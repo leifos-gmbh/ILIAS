@@ -18,8 +18,8 @@
 
 declare(strict_types=0);
 
-use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
 use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
+use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
 
 class ilLPStatusManualByTutor extends ilLPStatus
 {

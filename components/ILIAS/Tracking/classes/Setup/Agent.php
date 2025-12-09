@@ -23,10 +23,10 @@ namespace ILIAS\Tracking\Setup;
 use ilDatabaseUpdateStepsExecutedObjective;
 use ilDatabaseUpdateStepsMetricsCollectedObjective;
 use ILIAS\Setup\Agent\NullAgent;
-use ILIAS\Setup\ObjectiveCollection;
-use ILIAS\Setup\Objective;
 use ILIAS\Setup\Config;
 use ILIAS\Setup\Metrics\Storage;
+use ILIAS\Setup\Objective;
+use ILIAS\Setup\ObjectiveCollection;
 
 class Agent extends NullAgent
 {

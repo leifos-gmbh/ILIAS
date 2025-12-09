@@ -18,8 +18,8 @@
 
 declare(strict_types=1);
 
-use ILIAS\Tracking\FactoryInterface as TrackingFactoryInterface;
 use ILIAS\Tracking\Factory as TrackingFactory;
+use ILIAS\Tracking\FactoryInterface as TrackingFactoryInterface;
 
 class ilTrackingExporter extends ilXmlExporter
 {

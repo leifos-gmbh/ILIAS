@@ -406,13 +406,6 @@ class ilMDEditorGUI
             $this->ctrl->getLinkTarget($this, 'fullEditor')
         );
         $this->toolbar->addComponent($editor);
-        if (DEVMODE) {
-            $debug = $this->ui_factory->button()->standard(
-                'Debug',
-                $this->ctrl->getLinkTarget($this, 'debug')
-            );
-            $this->toolbar->addComponent($debug);
-        }
     }
 
     protected function addButtonToControlCenter(): void

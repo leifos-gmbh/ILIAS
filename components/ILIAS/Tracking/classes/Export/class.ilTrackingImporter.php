@@ -41,11 +41,20 @@ class ilTrackingImporter extends ilXmlImporter
         string $a_xml,
         ilImportMapping $a_mapping
     ): void {
-        $new_id = $a_mapping->getMapping("components/ILIAS/Container", "objs", $a_id);
-        if (is_null($new_id)) {
-            throw new TrackingExportException(sprintf("Object id of tracking import (%s) not found in mapping", $a_id));
+        if (strcmp($a_entity, "lpsettings") === 0) {
+            $this->importLPSettings($a_id, $a_xml, $a_mapping);
         }
-        $new_id = (int) $new_id;
+    }
+
+    /**
+     * @throws TrackingExportException
+     */
+    protected function importLPSettings(
+        string $a_id,
+        string $a_xml,
+        ilImportMapping $a_mapping
+    ): void {
+        $new_id = $this->getNewId($a_id, $a_mapping);
         $export_factory = $this->tracking_factory->export();
         $db_factory = $this->tracking_factory->db();
         $reader = $export_factory->xml()->reader();
@@ -64,6 +73,31 @@ class ilTrackingImporter extends ilXmlImporter
                     $xml_root
                 );
         }
+    }
+
+    /**
+     * @throws TrackingExportException
+     */
+    protected function getNewId(
+        string $id,
+        ilImportMapping $a_mapping
+    ): int {
+        $new_id = $a_mapping->getMapping("components/ILIAS/Container", "objs", $id);
+        if (is_null($new_id)) {
+            $new_id = $a_mapping->getMapping("components/ILIAS/Container", "refs", $id);
+            $new_id = is_null($new_id) ? null : ilObject::_lookupObjId((int) $new_id);
+        }
+        if (is_null($new_id)) {
+            $new_id = $a_mapping->getMapping("components/ILIAS/ILIASObject", "obj", $id);
+        }
+        if (is_null($new_id)) {
+            $new_id = $a_mapping->getMapping("components/ILIAS/ILIASObject", "ref", $id);
+            $new_id = is_null($new_id) ? null : ilObject::_lookupObjId((int) $new_id);
+        }
+        if (is_null($new_id)) {
+            throw new TrackingExportException(sprintf("Object id (%s) during tracking import not found in mapping", $id));
+        }
+        return (int) $new_id;
     }
 
     protected function applyMappings(

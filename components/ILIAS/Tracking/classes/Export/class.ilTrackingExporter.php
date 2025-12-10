@@ -39,6 +39,9 @@ class ilTrackingExporter extends ilXmlExporter
         $export_factory = $this->tracking_factory->export();
         $lp_status_factory = $this->tracking_factory->status();
         $lp_settings = $db_factory->lpSettings()->repository()->readLPSettings((int) $a_id);
+        if (is_null($lp_settings)) {
+            return "";
+        }
         $lp_collection = $db_factory->lpCollection()->repository()->readLPCollection((int) $a_id);
         $lp_collection = is_null($lp_collection) ? $db_factory->lpCollection()->element()->lpCollection() : $lp_collection;
         $lp_status_collection = $lp_status_factory->allLPStatusImplementations()->getElementsByStatusIds(((string) $lp_settings->getUMode()));

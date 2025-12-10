@@ -34,10 +34,10 @@ class ilLPStatusCourseReference extends ilLPStatus
     public function __construct(int $a_obj_id)
     {
         global $DIC;
+        $this->db_factory = new TrackingDBFactory($DIC->database());
         parent::__construct($a_obj_id);
         $this->readTargetObjId($a_obj_id);
         $this->readStatusInfo($a_obj_id);
-        $this->db_factory = new TrackingDBFactory($DIC->database());
     }
 
     public static function _getCountNotAttempted(int $a_obj_id): int

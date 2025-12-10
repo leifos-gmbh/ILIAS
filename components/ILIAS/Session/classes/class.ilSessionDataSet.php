@@ -337,6 +337,7 @@ class ilSessionDataSet extends ilDataSet
                     $newObj = new ilObjSession();
                     $newObj->setType("sess");
                     $newObj->create(true);
+                    $a_mapping->addMapping("components/ILIAS/ILIASObject", "obj", $a_rec["Id"], (string) $newObj->getId());
                 }
                 $newObj->setTitle((string) ($a_rec["Title"] ?? ''));
                 $newObj->setDescription((string) ($a_rec["Description"] ?? ''));

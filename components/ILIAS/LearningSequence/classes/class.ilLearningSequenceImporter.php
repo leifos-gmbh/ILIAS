@@ -59,6 +59,12 @@ class ilLearningSequenceImporter extends ilXmlImporter
             LSOPageType::EXTRO->value . ':' . $a_id,
             LSOPageType::EXTRO->value . ':' . (string) $this->obj->getId()
         );
+        $a_mapping->addMapping(
+            "components/ILIAS/Tracking",
+            "obj",
+            (string) $a_id,
+            (string) $this->obj->getId()
+        );
     }
 
     public function finalProcessing(ilImportMapping $a_mapping): void

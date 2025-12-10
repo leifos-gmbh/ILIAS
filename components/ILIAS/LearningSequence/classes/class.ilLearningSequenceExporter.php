@@ -118,6 +118,12 @@ class ilLearningSequenceExporter extends ilXmlExporter
             }
         }
 
+        $res[] = [
+            "component" => "components/ILIAS/Tracking",
+            "entity" => "lpsettings",
+            "ids" => $a_ids
+        ];
+
         return $res;
     }
 }

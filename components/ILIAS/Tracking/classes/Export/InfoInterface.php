@@ -26,21 +26,21 @@ use ILIAS\Tracking\Status\CollectionInterface as LPStatusCollectionInterface;
 
 interface InfoInterface
 {
-    public function getLPStatusCollection(): LPStatusCollectionInterface;
+    public function getLPStatusCollection(): LPStatusCollectionInterface|null;
 
-    public function getLPSettings(): LPSettingsInterface;
+    public function getLPSettings(): LPSettingsInterface|null;
 
-    public function getLPCollection(): LPCollectionInterface;
+    public function getLPCollection(): LPCollectionInterface|null;
 
     public function withLPStatusCollection(
-        LPStatusCollectionInterface $lp_status_collection
+        LPStatusCollectionInterface|null $lp_status_collection
     ): InfoInterface;
 
     public function withLPSettings(
-        LPSettingsInterface $lp_settings
+        LPSettingsInterface|null $lp_settings
     ): InfoInterface;
 
     public function withLPCollection(
-        LPCollectionInterface $lp_collection
+        LPCollectionInterface|null $lp_collection
     ): InfoInterface;
 }

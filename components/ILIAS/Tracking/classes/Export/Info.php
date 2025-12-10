@@ -26,31 +26,31 @@ use ILIAS\Tracking\Status\CollectionInterface as LPStatusCollectionInterface;
 
 class Info implements InfoInterface
 {
-    protected LPCollectionInterface $lp_collection;
-    protected LPSettingsInterface $lp_settings;
-    protected LPStatusCollectionInterface $lp_status_collection;
+    protected LPCollectionInterface|null $lp_collection;
+    protected LPSettingsInterface|null $lp_settings;
+    protected LPStatusCollectionInterface|null $lp_status_collection;
 
     public function __construct()
     {
     }
 
-    public function getLPStatusCollection(): LPStatusCollectionInterface
+    public function getLPStatusCollection(): LPStatusCollectionInterface|null
     {
         return $this->lp_status_collection;
     }
 
-    public function getLPSettings(): LPSettingsInterface
+    public function getLPSettings(): LPSettingsInterface|null
     {
         return $this->lp_settings;
     }
 
-    public function getLPCollection(): LPCollectionInterface
+    public function getLPCollection(): LPCollectionInterface|null
     {
         return $this->lp_collection;
     }
 
     public function withLPStatusCollection(
-        LPStatusCollectionInterface $lp_status_collection
+        LPStatusCollectionInterface|null $lp_status_collection
     ): InfoInterface {
         $clone = clone $this;
         $clone->lp_status_collection = $lp_status_collection;
@@ -58,7 +58,7 @@ class Info implements InfoInterface
     }
 
     public function withLPSettings(
-        LPSettingsInterface $lp_settings
+        LPSettingsInterface|null $lp_settings
     ): InfoInterface {
         $clone = clone $this;
         $clone->lp_settings = $lp_settings;
@@ -66,7 +66,7 @@ class Info implements InfoInterface
     }
 
     public function withLPCollection(
-        LPCollectionInterface $lp_collection
+        LPCollectionInterface|null $lp_collection
     ): InfoInterface {
         $clone = clone $this;
         $clone->lp_collection = $lp_collection;

@@ -20,8 +20,11 @@ declare(strict_types=1);
 
 namespace ILIAS\Tracking\Export\XML;
 
+use ILIAS\Tracking\DB\LPCollection\Element\LPCollectionInterface;
+use ILIAS\Tracking\DB\LPSettings\Element\LPSettingsInterface;
 use ILIAS\Tracking\Export\Info;
 use ILIAS\Tracking\Status\LPStatusInterface;
+use ILIAS\Tracking\Status\CollectionInterface as LPStatusCollectionInterface;
 use SimpleXMLElement;
 
 class Writer implements WriterInterface
@@ -36,15 +39,45 @@ class Writer implements WriterInterface
     public function writeXMLByExportInfo(
         Info $info
     ): void {
-        $info_lp_settings = $info->getLPSettings();
-        $info_lp_collection = $info->getLPCollection();
-        $this->xml_root = new SimpleXMLElement('<Tracking></Tracking>');
-        $this->xml_root->addAttribute('object_id', (string) $info_lp_settings->getObjectId());
-        $this->xml_root->addAttribute('object_type', $info_lp_settings->getObjType());
-        $this->xml_root->addAttribute('u_mode', (string) $info_lp_settings->getUMode());
-        $this->xml_root->addAttribute('visits', (string) $info_lp_settings->getVisits());
-        $lp_collections = $this->xml_root->addChild('LPCollection');
-        foreach ($info_lp_collection as $info_lp_collection_element) {
+        $xml_root = new SimpleXMLElement('<Tracking></Tracking>');
+        $this->addLPSettings(
+            $info->getLPSettings(),
+            $xml_root
+        );
+        $this->addLPCollection(
+            $info->getLPCollection(),
+            $xml_root
+        );
+        $this->addLPStatus(
+            $info->getLPStatusCollection(),
+            $info->getLPSettings(),
+            $xml_root
+        );
+        $this->xml_root = $xml_root;
+    }
+
+    protected function addLPSettings(
+        LPSettingsInterface|null $lp_settings,
+        SimpleXMLElement $xml_root
+    ): void {
+        if (is_null($lp_settings)) {
+            return;
+        }
+        $xml_root->addAttribute('object_id', (string) $lp_settings->getObjectId());
+        $xml_root->addAttribute('object_type', $lp_settings->getObjType());
+        $xml_root->addAttribute('u_mode', (string) $lp_settings->getUMode());
+        $xml_root->addAttribute('visits', (string) $lp_settings->getVisits());
+    }
+
+    protected function addLPCollection(
+        LPCollectionInterface|null $lp_collection,
+        SimpleXMLElement $xml_root
+    ): void {
+        $lp_collections = $xml_root->addChild('LPCollection');
+        if (is_null($lp_collection)) {
+            return;
+        }
+        foreach ($lp_collection as $info_lp_collection_element) {
             $lp_collection = $lp_collections->addChild('LPCollectionElement');
             $lp_collection->addAttribute('item_id', (string) $info_lp_collection_element->getItemId());
             $lp_collection->addAttribute('grouping_id', (string) $info_lp_collection_element->getGroupingId());
@@ -52,9 +85,22 @@ class Writer implements WriterInterface
             $lp_collection->addAttribute('active', (string) ((int) $info_lp_collection_element->isActive()));
             $lp_collection->addAttribute('lp_mode', (string) $info_lp_collection_element->getLpMode());
         }
-        $xml_root_lp_status = $this->xml_root->addChild('LPStatusCollection');
-        foreach ($info->getLPStatusCollection() as $lp_status) {
-            $this->addLPStatusData($info->getLPSettings()->getObjectId(), $xml_root_lp_status, $lp_status);
+    }
+
+    protected function addLPStatus(
+        LPStatusCollectionInterface|null $lp_status_collection,
+        LPSettingsInterface|null $lp_settings,
+        SimpleXMLElement $xml_root
+    ): void {
+        $xml_root_lp_status = $xml_root->addChild('LPStatusCollection');
+        if (
+            is_null($lp_status_collection) ||
+            is_null($lp_settings)
+        ) {
+            return;
+        }
+        foreach ($lp_status_collection as $lp_status) {
+            $this->addLPStatusData($lp_settings->getObjectId(), $xml_root_lp_status, $lp_status);
         }
     }
 

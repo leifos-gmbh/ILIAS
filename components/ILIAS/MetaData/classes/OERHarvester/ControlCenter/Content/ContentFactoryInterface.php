@@ -39,4 +39,6 @@ interface ContentFactoryInterface
         string $type,
         Action $action
     ): RoundTripModal;
+
+    public function getSuccessMessage(Action $action): string;
 }

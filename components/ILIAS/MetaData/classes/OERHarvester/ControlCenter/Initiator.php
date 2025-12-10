@@ -64,6 +64,7 @@ class Initiator
         return $this->control_center_gui ??= new ControlCenterGUI(
             $link_to_parent,
             $this->services->dic()->ctrl(),
+            $this->services->dic()->ui()->mainTemplate(),
             $this->services->dic()->ui()->factory(),
             $this->services->dic()->ui()->renderer(),
             new RequestParser(

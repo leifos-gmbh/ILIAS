@@ -170,4 +170,17 @@ class ContentFactory implements ContentFactoryInterface
         );
         return $this->ui_factory->modal()->roundtrip($title, $message_box)->withActionButtons([$button]);
     }
+
+    public function getSuccessMessage(Action $action): string
+    {
+        return match ($action) {
+            Action::BLOCK => $this->presentation_utilities->txt('md_publishing_success_block'),
+            Action::UNBLOCK => $this->presentation_utilities->txt('md_publishing_success_unblock'),
+            Action::PUBLISH => $this->presentation_utilities->txt('md_publishing_success_publish'),
+            Action::WITHDRAW => $this->presentation_utilities->txt('md_publishing_success_withdraw'),
+            Action::SUBMIT => $this->presentation_utilities->txt('md_publishing_success_submit'),
+            Action::ACCEPT => $this->presentation_utilities->txt('md_publishing_success_accept'),
+            Action::REJECT => $this->presentation_utilities->txt('md_publishing_success_reject')
+        };
+    }
 }

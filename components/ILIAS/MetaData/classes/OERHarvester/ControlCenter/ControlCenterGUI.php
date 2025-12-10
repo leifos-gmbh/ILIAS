@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\OERHarvester\ControlCenter;
 
 use ilPermissionException;
+use ilGlobalTemplateInterface;
 use ilCtrlInterface;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Renderer as UIRenderer;
@@ -32,6 +33,7 @@ use ILIAS\MetaData\OERHarvester\ControlCenter\Content\ContentFactoryInterface;
 use ILIAS\Data\URI;
 use ILIAS\MetaData\OERHarvester\Publisher\PublisherInterface;
 use ILIAS\MetaData\OERHarvester\ControlCenter\Http\RequestParserInterface;
+use ILIAS\UICore\GlobalTemplate;
 
 class ControlCenterGUI
 {
@@ -43,6 +45,7 @@ class ControlCenterGUI
     public function __construct(
         protected URI $link_to_parent,
         protected ilCtrlInterface $ctrl,
+        protected ilGlobalTemplateInterface $tpl,
         protected UIFactory $ui_factory,
         protected UIRenderer $ui_renderer,
         protected RequestParserInterface $request_parser,
@@ -108,6 +111,7 @@ class ControlCenterGUI
     protected function block(): void
     {
         $this->state_changer->block($this->obj_id);
+        $this->showSuccessMessageAfterRedirect(Action::BLOCK);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($this->link_to_parent));
         exit;
     }
@@ -115,6 +119,7 @@ class ControlCenterGUI
     protected function unblock(): void
     {
         $this->state_changer->unblock($this->obj_id);
+        $this->showSuccessMessageAfterRedirect(Action::UNBLOCK);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($this->link_to_parent));
         exit;
     }
@@ -122,6 +127,7 @@ class ControlCenterGUI
     protected function publish(): void
     {
         $this->state_changer->publish($this->obj_id, $this->type);
+        $this->showSuccessMessageAfterRedirect(Action::PUBLISH);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($this->link_to_parent));
         exit;
     }
@@ -149,6 +155,7 @@ class ControlCenterGUI
             $link = $static_url->builder()->build('cat', $data_factory->refId($ref_id));
         }
 
+        $this->showSuccessMessageAfterRedirect(Action::WITHDRAW);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($link));
         exit;
     }
@@ -156,6 +163,7 @@ class ControlCenterGUI
     protected function submit(): void
     {
         $this->state_changer->submit($this->obj_id);
+        $this->showSuccessMessageAfterRedirect(Action::SUBMIT);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($this->link_to_parent));
         exit;
     }
@@ -183,6 +191,7 @@ class ControlCenterGUI
             $link = $static_url->builder()->build('cat', $data_factory->refId($ref_id));
         }
 
+        $this->showSuccessMessageAfterRedirect(Action::SUBMIT);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($link));
         exit;
     }
@@ -210,7 +219,17 @@ class ControlCenterGUI
             $link = $static_url->builder()->build('cat', $data_factory->refId($ref_id));
         }
 
+        $this->showSuccessMessageAfterRedirect(Action::REJECT);
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($link));
         exit;
+    }
+
+    protected function showSuccessMessageAfterRedirect(Action $action): void
+    {
+        $this->tpl->setOnScreenMessage(
+            GlobalTemplate::MESSAGE_TYPE_SUCCESS,
+            $this->content_factory->getSuccessMessage($action),
+            true
+        );
     }
 }

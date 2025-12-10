@@ -12080,8 +12080,8 @@ meta#:#md_publishing_action_unblock#:#Unblock
 meta#:#md_publishing_action_withdraw#:#Withdraw
 meta#:#md_publishing_center_title#:#OER Publishing
 meta#:#md_publishing_confirmation_accept#:#Accept for Publishing
-meta#:#md_publishing_confirmation_info_accept#:#Are you sure you want to reject this object for publishing?
-meta#:#md_publishing_confirmation_info_reject#:#Are you sure you want to publish this object?
+meta#:#md_publishing_confirmation_info_accept#:#Are you sure you want to publish this object?
+meta#:#md_publishing_confirmation_info_reject#:#Are you sure you want to reject this object for publishing?
 meta#:#md_publishing_confirmation_info_withdraw#:#Are you sure you want to withdraw this object from publishing?
 meta#:#md_publishing_confirmation_reject#:#Reject for Publishing
 meta#:#md_publishing_confirmation_withdraw#:#Withdraw From Publishing
@@ -12095,6 +12095,13 @@ meta#:#md_publishing_status_blocked#:#Blocked
 meta#:#md_publishing_status_published#:#Published
 meta#:#md_publishing_status_under_review#:#Under Review
 meta#:#md_publishing_status_unpublished#:#Unpublished
+meta#:#md_publishing_success_accept#:#Object successfully published.
+meta#:#md_publishing_success_block#:#Object successfully blocked from publishing.
+meta#:#md_publishing_success_publish#:#Object successfully published.
+meta#:#md_publishing_success_reject#:#Object successfully rejected.
+meta#:#md_publishing_success_submit#:#Object successfully submitted for review.
+meta#:#md_publishing_success_unblock#:#Object successfully unblocked.
+meta#:#md_publishing_success_withdraw#:#Object successfully withdrawn.
 meta#:#md_publishing_workflow#:#Publishing Workflow
 meta#:#md_publishing_workflow_automatic#:#Automatic
 meta#:#md_publishing_workflow_automatic_info#:#Eligible objects are automatically published by the OER Harvester cron job.

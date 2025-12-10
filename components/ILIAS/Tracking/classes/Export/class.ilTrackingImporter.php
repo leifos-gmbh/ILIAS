@@ -91,6 +91,9 @@ class ilTrackingImporter extends ilXmlImporter
             $new_id = $a_mapping->getMapping("components/ILIAS/ILIASObject", "obj", $id);
         }
         if (is_null($new_id)) {
+            $new_id = $a_mapping->getMapping("components/ILIAS/ILIASObject", "objs", $id);
+        }
+        if (is_null($new_id)) {
             $new_id = $a_mapping->getMapping("components/ILIAS/ILIASObject", "ref", $id);
             $new_id = is_null($new_id) ? null : ilObject::_lookupObjId((int) $new_id);
         }

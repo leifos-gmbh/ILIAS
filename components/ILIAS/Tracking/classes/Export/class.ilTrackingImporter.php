@@ -82,21 +82,7 @@ class ilTrackingImporter extends ilXmlImporter
         string $id,
         ilImportMapping $a_mapping
     ): int {
-        $new_id = $a_mapping->getMapping("components/ILIAS/Container", "objs", $id);
-        if (is_null($new_id)) {
-            $new_id = $a_mapping->getMapping("components/ILIAS/Container", "refs", $id);
-            $new_id = is_null($new_id) ? null : ilObject::_lookupObjId((int) $new_id);
-        }
-        if (is_null($new_id)) {
-            $new_id = $a_mapping->getMapping("components/ILIAS/ILIASObject", "obj", $id);
-        }
-        if (is_null($new_id)) {
-            $new_id = $a_mapping->getMapping("components/ILIAS/ILIASObject", "objs", $id);
-        }
-        if (is_null($new_id)) {
-            $new_id = $a_mapping->getMapping("components/ILIAS/ILIASObject", "ref", $id);
-            $new_id = is_null($new_id) ? null : ilObject::_lookupObjId((int) $new_id);
-        }
+        $new_id = $a_mapping->getMapping("components/ILIAS/Tracking", "obj", $id);
         if (is_null($new_id)) {
             throw new TrackingExportException(sprintf("Object id (%s) during tracking import not found in mapping", $id));
         }

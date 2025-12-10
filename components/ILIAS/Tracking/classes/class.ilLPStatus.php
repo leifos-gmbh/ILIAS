@@ -499,7 +499,7 @@ class ilLPStatus implements LPStatusInterface
             while ($rec = $ilDB->fetchAssoc($set)) {
                 if (in_array(
                     ilObject::_lookupType($rec["obj_id"]),
-                    array("crs", "grp", "fold")
+                    ["crs", "grp", "fold"]
                 )) {
                     $log->debug(
                         'Calling update status for collection obj_id: ' . $rec['obj_id']

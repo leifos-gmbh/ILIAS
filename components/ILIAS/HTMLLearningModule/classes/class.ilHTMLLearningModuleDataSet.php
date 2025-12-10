@@ -121,6 +121,7 @@ class ilHTMLLearningModuleDataSet extends ilDataSet
                     $newObj = new ilObjFileBasedLM();
                     $newObj->setType("htlm");
                     $newObj->create(true);
+                    $a_mapping->addMapping("components/ILIAS/ILIASObject", "obj", $a_rec["Id"], $newObj->getId());
                 }
 
                 $newObj->setTitle($a_rec["Title"]);

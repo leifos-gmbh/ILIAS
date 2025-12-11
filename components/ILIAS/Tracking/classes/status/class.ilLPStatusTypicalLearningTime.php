@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusTypicalLearningTime extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_tlt';
+    protected const string LNG_TEXT_INFO = 'trac_mode_tlt_info';
+    protected ilLanguage $lng;
+
     public static function _getInProgress(int $a_obj_id): array
     {
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
@@ -105,8 +111,25 @@ class ilLPStatusTypicalLearningTime extends ilLPStatus
         return $per;
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        parent::init($DIC);
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_TLT;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return sprintf($this->lng->txt(self::LNG_TEXT_INFO), ilObjUserTracking::_getValidTimeSpan());
     }
 }

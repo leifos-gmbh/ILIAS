@@ -18,11 +18,16 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
 use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
 use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
 
 class ilLPStatusManual extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_manual';
+    protected const string LNG_TEXT_INFO = 'trac_mode_manual_info';
+    protected ilLanguage $lng;
+
     protected TrackingDBFactoryInterface $tracking_db_factory;
 
     public function __construct(int $a_obj_id)
@@ -74,8 +79,24 @@ class ilLPStatusManual extends ilLPStatus
         return [];
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_MANUAL;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

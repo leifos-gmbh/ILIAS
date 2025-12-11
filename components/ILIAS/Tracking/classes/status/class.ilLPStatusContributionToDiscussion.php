@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusContributionToDiscussion extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_contribution_to_discussion';
+    protected const string LNG_TEXT_INFO = 'trac_mode_contribution_to_discussion_info';
+    protected ilLanguage $lng;
+
     public static function _getCompleted(int $a_obj_id): array
     {
         $userIds = [];
@@ -121,8 +127,24 @@ class ilLPStatusContributionToDiscussion extends ilLPStatus
         $forum_properties->update();
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_CONTRIBUTION_TO_DISCUSSION;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

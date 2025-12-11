@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusCmiXapiCompletedOrPassed extends ilLPStatusCmiXapiAbstract
 {
+    protected const string LNG_TEXT = 'trac_mode_cmix_completed_or_passed';
+    protected const string LNG_TEXT_INFO = 'trac_mode_cmix_completed_or_passed_info';
+    protected ilLanguage $lng;
+
     protected function resultSatisfyCompleted(ilCmiXapiResult $result): bool
     {
         if ($result->getStatus() === 'completed') {
@@ -36,8 +42,24 @@ class ilLPStatusCmiXapiCompletedOrPassed extends ilLPStatusCmiXapiAbstract
         return false;
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_CMIX_COMPLETED_OR_PASSED;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

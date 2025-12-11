@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusEvent extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_event';
+    protected const string LNG_TEXT_INFO = 'trac_mode_event_info';
+    protected ilLanguage $lng;
+
     public static function _getNotAttempted(int $a_obj_id): array
     {
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
@@ -70,6 +76,9 @@ class ilLPStatusEvent extends ilLPStatus
             $member_ref_id = $id;
         } elseif ($id = $tree->checkForParentType($ref_id, 'crs')) {
             $member_ref_id = $id;
+        }
+        if (is_null($member_ref_id)) {
+            throw new Exception('Could not determine member reference id of obj: ' . $a_obj_id);
         }
         $status_info = [];
         $status_info['crs_id'] = ilObject::_lookupObjId($member_ref_id);
@@ -198,8 +207,25 @@ class ilLPStatusEvent extends ilLPStatus
         );
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_EVENT;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

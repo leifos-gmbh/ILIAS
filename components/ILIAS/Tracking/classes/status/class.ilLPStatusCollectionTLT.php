@@ -18,12 +18,18 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 /**
  * @author  Jörg Lützenkirchen <luetzenkirchen@leifos.com>
  * @package ilias-tracking
  */
 class ilLPStatusCollectionTLT extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_collection_tlt';
+    protected const string LNG_TEXT_INFO = 'trac_mode_collection_tlt_info';
+    protected ilLanguage $lng;
+
     public static function _getInProgress(int $a_obj_id): array
     {
         $status_info = ilLPStatusWrapper::_getStatusInfo($a_obj_id);
@@ -146,8 +152,25 @@ class ilLPStatusCollectionTLT extends ilLPStatus
         return self::LP_STATUS_NOT_ATTEMPTED_NUM;
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_COLLECTION_TLT;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

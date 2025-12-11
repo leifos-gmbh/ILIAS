@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusTestFinished extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_test_finished';
+    protected const string LNG_TEXT_INFO = 'trac_mode_test_finished_info';
+    protected ilLanguage $lng;
+
     public static function _getInProgress(int $a_obj_id): array
     {
         global $DIC;
@@ -131,8 +137,24 @@ class ilLPStatusTestFinished extends ilLPStatus
         return $status;
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_TEST_FINISHED;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

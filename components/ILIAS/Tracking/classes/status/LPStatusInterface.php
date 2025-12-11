@@ -41,4 +41,8 @@ interface LPStatusInterface
     ): void;
 
     public function getLPStatusId(): string;
+
+    public function getLabel(): string;
+
+    public function getInfo(): string;
 }

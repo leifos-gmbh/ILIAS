@@ -27,4 +27,8 @@ interface FactoryInterface
     ): CollectionInterface;
 
     public function allLPStatusImplementations(): CollectionInterface;
+
+    public function getLPStatusImplementation(
+        string $lp_status_id
+    ): LPStatusInterface;
 }

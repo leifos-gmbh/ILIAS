@@ -24,7 +24,10 @@ use ILIAS\Tracking\View\ProgressBlock\Settings\RepositoryInterface as ProgressBl
 
 class ilLPStatusCollection extends ilLPStatus
 {
-    private ilTree $tree;
+    protected const string LNG_TEXT = 'trac_mode_collection';
+    protected const string LNG_TEXT_INFO = 'trac_mode_collection_info';
+    protected ilLanguage $lng;
+    protected ilTree $tree;
     protected ProgressBlockSettingsRepositoryInterface $progress_block_settings_repository;
 
     public function __construct(int $a_obj_id)
@@ -503,6 +506,7 @@ class ilLPStatusCollection extends ilLPStatus
     public function init(Container $DIC): void
     {
         $this->progress_block_settings_repository = new ProgressBlockSettingsRepository($DIC->database());
+        $this->lng = $DIC->language();
     }
 
     public function getCustomLPSettingsExportXML(
@@ -528,5 +532,15 @@ class ilLPStatusCollection extends ilLPStatus
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_COLLECTION;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusStudyProgramme extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_study_programme';
+    protected const string LNG_TEXT_INFO = '';
+    protected ilLanguage $lng;
+
     protected static function getAssignments(int $obj_id, ?int $usr_id = null): array
     {
         $dic = ilStudyProgrammeDIC::dic();
@@ -137,8 +143,24 @@ class ilLPStatusStudyProgramme extends ilLPStatus
         return self::getStatusForAssignments($assignments, (int) $a_obj_id);
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_STUDY_PROGRAMME;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

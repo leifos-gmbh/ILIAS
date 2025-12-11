@@ -19,25 +19,13 @@
 declare(strict_types=1);
 
 use ILIAS\DI\Container;
+use ILIAS\Tracking\Status\LPStatusInterface;
 
-class ilLPStatusCmiXapiPassed extends ilLPStatusCmiXapiAbstract
+class ilLPStatusDeactivated implements LPStatusInterface
 {
-    protected const string LNG_TEXT = 'trac_mode_cmix_passed';
-    protected const string LNG_TEXT_INFO = 'trac_mode_cmix_passed_info';
+    protected const string LNG_TEXT = 'trac_mode_deactivated';
+    protected const string LNG_TEXT_INFO = 'trac_mode_deactivated_info_new';
     protected ilLanguage $lng;
-
-    protected function resultSatisfyCompleted(ilCmiXapiResult $result): bool
-    {
-        if ($result->getStatus() === 'passed') {
-            return true;
-        }
-        return false;
-    }
-
-    protected function resultSatisfyFailed(ilCmiXapiResult $result): bool
-    {
-        return false;
-    }
 
     public function init(
         Container $DIC
@@ -45,9 +33,23 @@ class ilLPStatusCmiXapiPassed extends ilLPStatusCmiXapiAbstract
         $this->lng = $DIC->language();
     }
 
+    public function getCustomLPSettingsExportXML(
+        int $object_id
+    ): SimpleXMLElement {
+        return new SimpleXMLElement('<LPStatusDeactivated></LPStatusDeactivated>');
+    }
+
+    public function importCustomLPSettingsExportXML(
+        int $new_object_id,
+        ilImportMapping $a_mapping,
+        SimpleXMLElement $additional_xml_root
+    ): void {
+
+    }
+
     public function getLPStatusId(): string
     {
-        return (string) ilLPObjSettings::LP_MODE_CMIX_PASSED;
+        return (string) ilLPObjSettings::LP_MODE_DEACTIVATED;
     }
 
     public function getLabel(): string

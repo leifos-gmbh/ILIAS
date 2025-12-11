@@ -924,4 +924,14 @@ class ilLPStatus implements LPStatusInterface
     {
         return (string) ilLPObjSettings::LP_MODE_UNDEFINED;
     }
+
+    public function getLabel(): string
+    {
+        return '';
+    }
+
+    public function getInfo(): string
+    {
+        return '';
+    }
 }

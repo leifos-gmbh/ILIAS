@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusExerciseReturned extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_exercise_returned';
+    protected const string LNG_TEXT_INFO = 'trac_mode_exercise_returned_info';
+    protected ilLanguage $lng;
+
     public static function _getNotAttempted(int $a_obj_id): array
     {
         $users = [];
@@ -161,8 +167,25 @@ class ilLPStatusExerciseReturned extends ilLPStatus
         );
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_EXERCISE_RETURNED;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusVisitedPages extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_visited_pages';
+    protected const string LNG_TEXT_INFO = 'trac_mode_visited_pages_info';
+    protected ilLanguage $lng;
+
     public static function _getInProgress(int $a_obj_id): array
     {
         $users = ilChangeEvent::lookupUsersInProgress($a_obj_id);
@@ -135,8 +141,24 @@ class ilLPStatusVisitedPages extends ilLPStatus
         return $res;
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_VISITED_PAGES;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

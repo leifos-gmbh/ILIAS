@@ -24,7 +24,10 @@ use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
 
 class ilLPStatusVisits extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_visits';
+    protected const string LNG_TEXT_INFO = 'trac_mode_visits_info';
     protected TrackingDBFactoryInterface $tracking_db_factory;
+    protected ilLanguage $lng;
 
     public static function _getInProgress(int $a_obj_id): array
     {
@@ -100,8 +103,10 @@ class ilLPStatusVisits extends ilLPStatus
         return $per;
     }
 
-    public function init(Container $DIC): void
-    {
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
         $this->tracking_db_factory = new TrackingDBFactory($DIC->database());
     }
 
@@ -130,5 +135,15 @@ class ilLPStatusVisits extends ilLPStatus
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_VISITS;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

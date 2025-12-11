@@ -18,10 +18,15 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
 use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
 
 class ilLPStatusPlugin extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_plugin';
+    protected const string LNG_TEXT_INFO = '';
+    protected ilLanguage $lng;
+
     /**
      * @todo refactor return type
      */
@@ -164,8 +169,24 @@ class ilLPStatusPlugin extends ilLPStatus
         return is_null($lp_mark) ? 0: $lp_mark->getPercentage();
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_PLUGIN;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

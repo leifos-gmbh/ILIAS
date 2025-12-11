@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusLtiOutcome extends ilLPStatus
 {
+    protected const string LNG_TEXT = 'trac_mode_lti_outcome';
+    protected const string LNG_TEXT_INFO = 'trac_mode_lti_outcome_info';
+    protected ilLanguage $lng;
+
     private static array $userResultCache = [];
 
     private function getLtiUserResult(
@@ -73,8 +79,24 @@ class ilLPStatusLtiOutcome extends ilLPStatus
         return 0;
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_LTI_OUTCOME;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

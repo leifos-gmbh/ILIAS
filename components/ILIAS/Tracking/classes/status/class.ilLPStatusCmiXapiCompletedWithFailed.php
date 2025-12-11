@@ -18,8 +18,14 @@
 
 declare(strict_types=1);
 
+use ILIAS\DI\Container;
+
 class ilLPStatusCmiXapiCompletedWithFailed extends ilLPStatusCmiXapiCompleted
 {
+    protected const string LNG_TEXT = 'trac_mode_cmix_compl_with_failed';
+    protected const string LNG_TEXT_INFO = 'trac_mode_cmix_compl_with_failed_info';
+    protected ilLanguage $lng;
+
     protected function resultSatisfyFailed(ilCmiXapiResult $result): bool
     {
         if ($result->getStatus() === 'failed') {
@@ -28,8 +34,24 @@ class ilLPStatusCmiXapiCompletedWithFailed extends ilLPStatusCmiXapiCompleted
         return false;
     }
 
+    public function init(
+        Container $DIC
+    ): void {
+        $this->lng = $DIC->language();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_CMIX_COMPL_WITH_FAILED;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT);
+    }
+
+    public function getInfo(): string
+    {
+        return $this->lng->txt(self::LNG_TEXT_INFO);
     }
 }

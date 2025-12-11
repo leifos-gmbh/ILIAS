@@ -102,6 +102,25 @@ class ilLPStatusContributionToDiscussion extends ilLPStatus
         return $status;
     }
 
+    public function getCustomLPSettingsExportXML(
+        int $object_id
+    ): SimpleXMLElement {
+        $num_postings = ilForumProperties::getInstance($object_id)->getLpReqNumPostings();
+        $xml_root = new SimpleXMLElement('<LPStatusContributionToDiscussion></LPStatusContributionToDiscussion>');
+        $xml_root->addAttribute('num_postings', (string) $num_postings);
+        return $xml_root;
+    }
+
+    public function importCustomLPSettingsExportXML(
+        int $new_object_id,
+        ilImportMapping $a_mapping,
+        SimpleXMLElement $additional_xml_root
+    ): void {
+        $forum_properties = ilForumProperties::getInstance($new_object_id);
+        $forum_properties->setLpReqNumPostings((int) $additional_xml_root->attributes()->num_postings);
+        $forum_properties->update();
+    }
+
     public function getLPStatusId(): string
     {
         return (string) ilLPObjSettings::LP_MODE_CONTRIBUTION_TO_DISCUSSION;

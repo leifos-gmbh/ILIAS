@@ -96,7 +96,10 @@ class ilLPStatusManualByTutor extends ilLPStatus
                 $a_obj_id,
                 $a_usr_id
             );
-            if ($lp_mark->isCompleted()) {
+            if (
+                !is_null($lp_mark) &&
+                $lp_mark->isCompleted()
+            ) {
                 $status = self::LP_STATUS_COMPLETED_NUM;
             } else {
                 if (ilChangeEvent::hasAccessed($a_obj_id, $a_usr_id)) {

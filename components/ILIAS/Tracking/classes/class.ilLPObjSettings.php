@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 use ILIAS\Tracking\Factory as TrackingFactory;
 use ILIAS\Tracking\FactoryInterface as TrackingFactoryInterface;
-use ILIAS\Tracking\DB\Factory as TrackingDBFactory;
 use ILIAS\Tracking\DB\FactoryInterface as TrackingDBFactoryInterface;
 use ILIAS\Tracking\DB\LPSettings\Element\LPSettingsInterface as TrackingDBLPSettingsInterface;
+use ILIAS\Tracking\Status\CollectionInterface as LPStatusCollectionInterface;
 
 class ilLPObjSettings
 {
@@ -62,15 +62,16 @@ class ilLPObjSettings
     public const int LP_MODE_CONTRIBUTION_TO_DISCUSSION = 33;
 
     protected ilObjectDataCache $objectDataCache;
-    protected TrackingFactoryInterface $trackingFactory;
+    protected static TrackingFactoryInterface $tracking_factory;
+    protected static LPStatusCollectionInterface $status_collection;
     protected TrackingDBFactoryInterface $tracking_db_factory;
     protected TrackingDBLPSettingsInterface $lp_settings;
 
     public function __construct(int $a_obj_id)
     {
         global $DIC;
-        $this->trackingFactory = new TrackingFactory();
-        $this->tracking_db_factory = $this->trackingFactory->db();
+        self::initTrackingFactory();
+        $this->tracking_db_factory = self::$tracking_factory->db();
         $this->objectDataCache = $DIC['ilObjDataCache'];
         $entry_exists = $this->tracking_db_factory->lpSettings()->repository()->isLPSettingsEntryInDB($a_obj_id);
         if (!$entry_exists) {
@@ -83,6 +84,21 @@ class ilLPObjSettings
         }
         if ($entry_exists) {
             $this->lp_settings = $this->tracking_db_factory->lpSettings()->repository()->readLPSettings($a_obj_id);
+        }
+    }
+
+    protected static function initTrackingFactory(): void
+    {
+        if (!isset(self::$tracking_factory)) {
+            self::$tracking_factory = new TrackingFactory();
+        }
+    }
+
+    protected static function initStatusCollection(): void
+    {
+        self::initTrackingFactory();
+        if (!isset(self::$status_collection)) {
+            self::$status_collection = self::$tracking_factory->status()->allLPStatusImplementations();
         }
     }
 
@@ -160,8 +176,8 @@ class ilLPObjSettings
     public static function _lookupVisits(
         int $a_obj_id
     ): int {
-        global $DIC;
-        $tracking_db_factory = new TrackingDBFactory($DIC->database());
+        self::initTrackingFactory();
+        $tracking_db_factory = self::$tracking_factory->db();
         $lp_settings = $tracking_db_factory->lpSettings()->repository()->readLPSettings($a_obj_id);
         return is_null($lp_settings)
             ? self::LP_DEFAULT_VISITS
@@ -171,8 +187,8 @@ class ilLPObjSettings
     public static function _lookupDBModeForObjects(
         array $a_obj_ids
     ): array {
-        global $DIC;
-        $tracking_db_factory = new TrackingDBFactory($DIC->database());
+        self::initTrackingFactory();
+        $tracking_db_factory = self::$tracking_factory->db();
         $lp_settings = $tracking_db_factory->lpSettings()->repository()->readLPSettingsCollection(...$a_obj_ids);
         $db_modes = [];
         if (is_null($lp_settings)) {
@@ -187,8 +203,8 @@ class ilLPObjSettings
     public static function _lookupDBMode(
         int $a_obj_id
     ): ?int {
-        global $DIC;
-        $tracking_db_factory = new TrackingDBFactory($DIC->database());
+        self::initTrackingFactory();
+        $tracking_db_factory = self::$tracking_factory->db();
         $lp_settings = $tracking_db_factory->lpSettings()->repository()->readLPSettings($a_obj_id);
         return is_null($lp_settings)
             ? null
@@ -198,24 +214,24 @@ class ilLPObjSettings
     public static function _mode2Text(
         int $a_mode
     ): string {
-        $statuses = (new TrackingFactory())->status()->allLPStatusImplementations();
-        $status = $statuses->getElementByStatusId((string) $a_mode);
+        self::initStatusCollection();
+        $status = self::$status_collection->getElementByStatusId((string) $a_mode);
         return is_null($status) ? '' : $status->getLabel();
     }
 
     public static function _mode2InfoText(
         int $a_mode
     ): string {
-        $statuses = (new TrackingFactory())->status()->allLPStatusImplementations();
-        $status = $statuses->getElementByStatusId((string) $a_mode);
+        self::initStatusCollection();
+        $status = self::$status_collection->getElementByStatusId((string) $a_mode);
         return is_null($status) ? '' : $status->getInfo();
     }
 
     public static function getClassMap(): array
     {
-        $statuses = (new TrackingFactory())->status()->allLPStatusImplementations();
+        self::initStatusCollection();
         $res = [];
-        foreach ($statuses as $status) {
+        foreach (self::$status_collection as $status) {
             $res[$status->getLPStatusId()] = $status::class;
         }
         return $res;
@@ -224,8 +240,8 @@ class ilLPObjSettings
     public static function _deleteByObjId(
         int $a_obj_id
     ): void {
-        global $DIC;
-        $tracking_db_factory = new TrackingDBFactory($DIC->database());
+        self::initTrackingFactory();
+        $tracking_db_factory = self::$tracking_factory->db();
         $tracking_db_factory->lpSettings()->repository()->deleteLPSettings($a_obj_id);
     }
 

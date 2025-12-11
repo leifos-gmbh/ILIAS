@@ -47,10 +47,4 @@ class Factory implements FactoryInterface
         }
         return $this->collection(...$elements);
     }
-
-    public function getLPStatusImplementation(
-        string $lp_status_id
-    ): LPStatusInterface {
-        // TODO: Implement getLPStatusImplementation() method.
-    }
 }

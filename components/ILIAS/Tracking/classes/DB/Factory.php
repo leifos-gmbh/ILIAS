@@ -64,9 +64,4 @@ class Factory implements FactoryInterface
             $this->db
         );
     }
-
-    public function manager(): ManagerInterface
-    {
-        return new Manager();
-    }
 }

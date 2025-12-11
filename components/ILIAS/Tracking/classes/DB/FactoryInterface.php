@@ -35,5 +35,4 @@ interface FactoryInterface
 
     public function lpCollectionManual(): LPCollectionManualFactoryInterface;
 
-    public function manager(): ManagerInterface;
 }

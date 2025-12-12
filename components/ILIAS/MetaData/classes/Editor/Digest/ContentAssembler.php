@@ -322,40 +322,24 @@ class ContentAssembler
         if (!$this->copyright_handler->isCPSelectionActive()) {
             return;
         }
-        $modal = $this->getChangeCopyrightModal(false);
-        $modal_with_oer_warning = $this->getChangeCopyrightModal(true);
-        $signal = $modal->getShowSignal();
-        $signal_with_oer_warning = $modal_with_oer_warning->getShowSignal();
+        $modal = $this->getChangeCopyrightModal();
 
         yield ContentType::MODAL => $modal;
-        yield ContentType::MODAL => $modal_with_oer_warning;
         yield ContentType::JS_SOURCE => 'assets/js/ilMetaCopyrightListener.js';
-        yield ContentType::FORM => $this->getCopyrightSection(
-            $set,
-            $signal,
-            $signal_with_oer_warning
-        );
+        yield ContentType::FORM => $this->getCopyrightSection($set);
     }
 
-    protected function getChangeCopyrightModal(bool $with_oer_warning): InterruptiveModal
+    protected function getChangeCopyrightModal(): InterruptiveModal
     {
-        $message = $this->presenter->utilities()->txt("meta_copyright_change_info");
-        if ($with_oer_warning) {
-            $message .= "<br/><br/>" . $this->presenter->utilities()->txt("meta_copyright_change_oer_info");
-        }
-        $modal = $this->ui_factory->modal()->interruptive(
+        return $this->ui_factory->modal()->interruptive(
             $this->presenter->utilities()->txt("meta_copyright_change_warning_title"),
-            $message,
+            $this->presenter->utilities()->txt("meta_copyright_change_info"),
             (string) $this->link_factory->custom(Command::UPDATE_DIGEST)->get()
         );
-
-        return $modal;
     }
 
     protected function getCopyrightSection(
-        SetInterface $set,
-        Signal $signal,
-        Signal $signal_with_oer_warning
+        SetInterface $set
     ): Section {
         $ff = $this->ui_factory->input()->field();
 
@@ -382,6 +366,12 @@ class ContentAssembler
             }
 
             $identifier = $this->copyright_handler->createIdentifierForID($entry->id());
+            if (
+                $this->copyright_handler->isObjectTypePublished($set->getRessourceID()->type()) &&
+                $this->copyright_handler->isCopyrightEntryPublished($entry)
+            ) {
+                $potential_oer_values[] = $identifier;
+            }
 
             $option = $ff->group([], $entry->title(), $entry->description());
 
@@ -419,10 +409,14 @@ class ContentAssembler
             )
             ->withValue($value)
             ->withAdditionalOnLoadCode(
-                function ($id) use ($signal, $signal_with_oer_warning, $potential_oer_values) {
+                function ($id) use ($potential_oer_values) {
+                    $cp_change_message = $this->presenter->utilities()->txt("meta_copyright_change_info");
+                    $cp_change_message_with_warning = $cp_change_message . "<br/><br/>" .
+                        $this->presenter->utilities()->txt("meta_copyright_change_oer_info");
+
                     return 'il.MetaDataCopyrightListener.init(\'' .
-                        $signal . '\',\'' .
-                        $signal_with_oer_warning . '\',\'' .
+                        $cp_change_message . '\',\'' .
+                        $cp_change_message_with_warning . '\',\'' .
                         json_encode($potential_oer_values) . '\',\'' .
                         $id . '\');';
                 }

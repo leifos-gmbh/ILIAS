@@ -24,26 +24,21 @@ use ILIAS\MetaData\Copyright\RepositoryInterface as CopyrightRepository;
 use ILIAS\MetaData\Copyright\EntryInterface;
 use ILIAS\MetaData\Settings\SettingsInterface as Settings;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface as CopyrightIDHandler;
+use ILIAS\MetaData\OERHarvester\Settings\SettingsInterface as OERHarvesterSettings;
 
 class CopyrightHandler
 {
-    protected CopyrightRepository $repository;
-    protected Settings $settings;
-    protected CopyrightIDHandler $copyright_id_handler;
-
     /**
      * @var EntryInterface[]
      */
     protected array $entries;
 
     public function __construct(
-        CopyrightRepository $repository,
-        Settings $settings,
-        CopyrightIDHandler $copyright_id_handler
+        protected CopyrightRepository $repository,
+        protected Settings $settings,
+        protected OERHarvesterSettings $harvester_settings,
+        protected CopyrightIDHandler $copyright_id_handler
     ) {
-        $this->repository = $repository;
-        $this->settings = $settings;
-        $this->copyright_id_handler = $copyright_id_handler;
     }
 
     public function isCPSelectionActive(): bool
@@ -81,5 +76,15 @@ class CopyrightHandler
     public function createIdentifierForID(int $entry_id): string
     {
         return $this->copyright_id_handler->buildIdentifierFromEntryID($entry_id);
+    }
+
+    public function isObjectTypePublished(string $type): bool
+    {
+        return $this->harvester_settings->isObjectTypeSelectedForPublishing($type);
+    }
+
+    public function isCopyrightEntryPublished(EntryInterface $entry): bool
+    {
+        return $this->harvester_settings->isCopyrightEntryIDSelectedForPublishing($entry->id());
     }
 }

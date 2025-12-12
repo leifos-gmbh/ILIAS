@@ -47,6 +47,7 @@ class DigestInitiator
                 $copyright_handler = new CopyrightHandler(
                     $this->services->copyright()->repository(),
                     \ilMDSettings::_getInstance(),
+                    $this->services->OERHarvester()->settings(),
                     $this->services->copyright()->identifiersHandler()
                 ),
                 $this->services->dataHelper()->dataHelper(),

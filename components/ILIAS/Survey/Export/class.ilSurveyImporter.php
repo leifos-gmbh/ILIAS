@@ -91,6 +91,12 @@ class ilSurveyImporter extends ilXmlImporter
                 $newObj->create(true);
             }
             $a_mapping->addMapping('components/ILIAS/Survey', 'svy', $a_id, (string) $newObj->getId());
+            $a_mapping->addMapping(
+                "components/ILIAS/Tracking",
+                "obj",
+                $a_id,
+                (string) $newObj->getId()
+            );
             $this->setSurvey($newObj);
 
 
@@ -118,12 +124,6 @@ class ilSurveyImporter extends ilXmlImporter
                 "md",
                 $a_id . ":0:svy",
                 $newObj->getId() . ":0:svy"
-            );
-            $a_mapping->addMapping(
-                "components/ILIAS/Tracking",
-                "obj",
-                $a_id,
-                (string) $newObj->getId()
             );
         } else {
             $parser = new ilDataSetImportParser(

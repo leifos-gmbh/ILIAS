@@ -19,9 +19,8 @@
 declare(strict_types=1);
 
 use ILIAS\DI\Container;
-use ILIAS\Tracking\Status\LPStatusInterface;
 
-class ilLPStatusDeactivated implements LPStatusInterface
+class ilLPStatusDeactivated extends ilLPStatus
 {
     protected const string LNG_TEXT = 'trac_mode_deactivated';
     protected const string LNG_TEXT_INFO = 'trac_mode_deactivated_info_new';

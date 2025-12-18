@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Editor\Digest;
 
+use Generator;
 use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
 use ILIAS\MetaData\Elements\SetInterface;
 use ILIAS\MetaData\Editor\Http\RequestForFormInterface;
@@ -39,7 +40,7 @@ class Digest
     }
 
     /**
-     * @return StandardForm[]|InterruptiveModal[]|string[]
+     * @return Generator<StandardForm|InterruptiveModal|string>
      */
     public function getContent(
         SetInterface $set,

@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\Editor\Tree;
 
+use Generator;
 use ILIAS\GlobalScreen\Scope\Tool\Provider\AbstractDynamicToolProvider;
 use ILIAS\GlobalScreen\Scope\Tool\Factory\Tool;
 use ILIAS\UI\Component\Tree\Tree;
@@ -132,9 +133,9 @@ class MDEditorToolProvider extends AbstractDynamicToolProvider
     }
 
     /**
-     * @return ElementInterface[]
+     * @return Generator<ElementInterface>
      */
-    protected function getElements(SetInterface $set, PathInterface $path): \Generator
+    protected function getElements(SetInterface $set, PathInterface $path): Generator
     {
         yield from $this->services->paths()->navigatorFactory()->navigator(
             $path,

@@ -30,7 +30,6 @@ use ILIAS\MetaData\OERHarvester\Settings\SettingsInterface;
 use ILIAS\Export\ExportHandler\Factory as ExportService;
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\MetaData\Copyright\RepositoryInterface;
-use ILIAS\MetaData\OERHarvester\CronJob\AutomaticPublisher;
 
 class Initiator
 {

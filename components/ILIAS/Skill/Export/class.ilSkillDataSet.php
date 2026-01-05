@@ -743,33 +743,44 @@ class ilSkillDataSet extends ilDataSet
                 $profile_id = (int) $a_mapping->getMapping("components/ILIAS/Skill", "skl_prof", $a_rec["ProfileId"])
                     ? (int) $a_mapping->getMapping("components/ILIAS/Skill", "skl_prof", $a_rec["ProfileId"])
                     : (int) $a_mapping->getMapping("components/ILIAS/Skill", "skl_local_prof", $a_rec["ProfileId"]);
-                if ($profile_id > 0) {
-                    $level_id_data = ilBasicSkill::getLevelIdForImportId((int) $this->getCurrentInstallationId(), (int) $a_rec["LevelId"]);
-                    $skill_data = ilBasicSkill::getCommonSkillIdForImportId((int) $this->getCurrentInstallationId(), (int) $a_rec["BaseSkillId"], (int) $a_rec["TrefId"]);
-                    $level_id = $tref_id = $base_skill = 0;
-                    foreach ($level_id_data as $l) {
-                        reset($skill_data);
-                        foreach ($skill_data as $s) {
-                            //		echo "<br>=".ilBasicSkill::lookupLevelSkillId($l["level_id"])."=".$s["skill_id"]."=";
+                if ($profile_id === 0) {
+                    break;
+                }
 
-                            if ($level_id == 0 && ilBasicSkill::lookupLevelSkillId($l["level_id"]) == $s["skill_id"]) {
-                                $level_id = $l["level_id"];
-                                $base_skill = $s["skill_id"];
-                                $tref_id = $s["tref_id"];
-                            }
+                $level_id_data = ilBasicSkill::getLevelIdForImportId((int) $this->getCurrentInstallationId(), (int) $a_rec["LevelId"]);
+                $skill_data = ilBasicSkill::getCommonSkillIdForImportId((int) $this->getCurrentInstallationId(), (int) $a_rec["BaseSkillId"], (int) $a_rec["TrefId"]);
+
+                if (count($level_id_data) === 0) { // import was not found for level id data, use local ids
+                    $level_id_data = [['level_id' => (int) $a_rec["LevelId"]]];
+                }
+                if (count($skill_data) === 0) { // import was not found for skill data, use local ids
+                    $skill_data = [['skill_id' => (int) $a_rec["BaseSkillId"], 'tref_id' => (int) $a_rec["TrefId"]]];
+                }
+
+                $level_id = $tref_id = $base_skill = 0;
+                foreach ($level_id_data as $l) {
+                    foreach ($skill_data as $s) {
+                        if ($level_id !== 0) {
+                            break;
+                        }
+                        if (ilBasicSkill::lookupLevelSkillId($l["level_id"]) == $s["skill_id"]) {
+                            $level_id = $l["level_id"];
+                            $base_skill = $s["skill_id"];
+                            $tref_id = $s["tref_id"];
                         }
                     }
-                    if ($level_id > 0) {
-                        $level = $this->skill_factory->profile()->profileLevel(
-                            $profile_id,
-                            $base_skill,
-                            $tref_id,
-                            $level_id,
-                            (int) $a_rec["OrderNr"]
-                        );
-                        $this->skill_manager->getProfileManager()->addSkillLevel($level);
-                    }
                 }
+                if ($level_id === 0) {
+                    break;
+                }
+                $level = $this->skill_factory->profile()->profileLevel(
+                    $profile_id,
+                    $base_skill,
+                    $tref_id,
+                    $level_id,
+                    (int) $a_rec["OrderNr"]
+                );
+                $this->skill_manager->getProfileManager()->addSkillLevel($level);
                 break;
         }
     }

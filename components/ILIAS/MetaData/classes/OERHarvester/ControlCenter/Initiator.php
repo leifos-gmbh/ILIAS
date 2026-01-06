@@ -22,8 +22,6 @@ namespace ILIAS\MetaData\OERHarvester\ControlCenter;
 
 use ILIAS\MetaData\Services\InternalServices;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\StateInfoFetcherInterface;
-use ILIAS\MetaData\OERHarvester\ControlCenter\Content\ComponentFactoryInterface;
-use ILIAS\MetaData\OERHarvester\ControlCenter\Content\ComponentFactory;
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\MetaData\OERHarvester\ControlCenter\Http\LinkFactoryInterface;
 use ILIAS\MetaData\OERHarvester\ControlCenter\Http\LinkFactory;
@@ -34,7 +32,6 @@ use ILIAS\MetaData\OERHarvester\Export\Handler as ExportHandler;
 use ILIAS\Export\ExportHandler\Factory as ExportService;
 use ILIAS\MetaData\OERHarvester\Publisher\Publisher;
 use ILIAS\MetaData\OERHarvester\XML\Writer;
-use ILIAS\Data\URI;
 use ILIAS\MetaData\OERHarvester\ControlCenter\Http\RequestParser;
 use ILIAS\MetaData\OERHarvester\ControlCenter\Content\ContentFactory;
 use ILIAS\MetaData\OERHarvester\Publisher\PublisherInterface;

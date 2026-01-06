@@ -12081,7 +12081,8 @@ meta#:#md_publishing_confirmation_info_reject#:#Sind Sie sicher, dass Sie dieses
 meta#:#md_publishing_confirmation_info_withdraw#:#Sind Sie sicher, dass Sie dieses Objekt von der Veröffentlichung zurückziehen wollen?
 meta#:#md_publishing_confirmation_reject#:#Ablehnen
 meta#:#md_publishing_confirmation_withdraw#:#Zurückziehen
-meta#:#md_publishing_control_center#:#OER Veröffentlichung (Status: %s)
+meta#:#md_publishing_control_center#:#OER Veröffentlichung
+meta#:#md_publishing_current_status#:#OER Veröffentlichung dieses Objekts: <strong>%s</strong>
 meta#:#md_publishing_info_blocked#:#Dieses Objekt ist gesperrt und wird nicht automatisch veröffentlicht.
 meta#:#md_publishing_info_published#:#Dieses Objekt ist als Open Educational Resource veröffentlicht.
 meta#:#md_publishing_info_under_review#:#Dieses Objekt wurde zur Veröffentlichung eingereicht, und wird von der Redaktion überprüft.

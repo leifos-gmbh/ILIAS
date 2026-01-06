@@ -18,9 +18,9 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ControlCenter\Content;
+namespace ILIAS\MetaData\OERHarvester\ControlCenter;
 
-use ILIAS\UI\Component\Button\Standard as StandardButton;
+use ILIAS\UI\Component\MessageBox\MessageBox;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\Status;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\Data\Factory as DataFactory;
@@ -39,7 +39,7 @@ class ComponentFactory implements ComponentFactoryInterface
     }
 
     /**
-     * @return array{0:StandardButton, 1:Prompt}
+     * @return array{0:MessageBox, 1:Prompt}
      */
     public function getButtonToControlCenter(
         Status $status,
@@ -52,11 +52,17 @@ class ComponentFactory implements ComponentFactoryInterface
             ltrim($this->link_factory->getViewLink($ref_id, $obj_id, $type), '/')
         );
         $prompt = $this->ui_factory->prompt()->standard($view_link);
-        $button = $this->ui_factory->button()->standard($this->getButtonLabel($status), $prompt->getShowSignal());
-        return [$button, $prompt];
+        $button = $this->ui_factory->button()->standard($this->getButtonLabel(), $prompt->getShowSignal());
+        $message = $this->ui_factory->messageBox()->info($this->getStatusInfo($status))->withButtons([$button]);
+        return [$message, $prompt];
     }
 
-    protected function getButtonLabel(Status $status): string
+    protected function getButtonLabel(): string
+    {
+        return $this->presentation_utilities->txt('md_publishing_control_center');
+    }
+
+    protected function getStatusInfo(Status $status): string
     {
         $status_label = match ($status) {
             Status::UNPUBLISHED => $this->presentation_utilities->txt('md_publishing_status_unpublished'),
@@ -64,6 +70,6 @@ class ComponentFactory implements ComponentFactoryInterface
             Status::UNDER_REVIEW => $this->presentation_utilities->txt('md_publishing_status_under_review'),
             Status::PUBLISHED => $this->presentation_utilities->txt('md_publishing_status_published')
         };
-        return $this->presentation_utilities->txtFill('md_publishing_control_center', $status_label);
+        return $this->presentation_utilities->txtFill('md_publishing_current_status', $status_label);
     }
 }

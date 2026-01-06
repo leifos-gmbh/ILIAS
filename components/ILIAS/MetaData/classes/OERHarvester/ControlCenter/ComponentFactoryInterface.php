@@ -18,16 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\MetaData\OERHarvester\ControlCenter\Content;
+namespace ILIAS\MetaData\OERHarvester\ControlCenter;
 
-use ILIAS\UI\Component\Button\Standard as StandardButton;
+use ILIAS\UI\Component\MessageBox\MessageBox;
 use ILIAS\MetaData\OERHarvester\ControlCenter\State\Status;
 use ILIAS\UI\Component\Prompt\Prompt;
 
 interface ComponentFactoryInterface
 {
     /**
-     * @return array{0:StandardButton, 1:Prompt}
+     * @return array{0:MessageBox, 1:Prompt}
      */
     public function getButtonToControlCenter(
         Status $status,

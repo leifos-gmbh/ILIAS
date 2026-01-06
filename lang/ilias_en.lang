@@ -12085,7 +12085,8 @@ meta#:#md_publishing_confirmation_info_reject#:#Are you sure you want to reject 
 meta#:#md_publishing_confirmation_info_withdraw#:#Are you sure you want to withdraw this object from publishing?
 meta#:#md_publishing_confirmation_reject#:#Reject for Publishing
 meta#:#md_publishing_confirmation_withdraw#:#Withdraw From Publishing
-meta#:#md_publishing_control_center#:#OER Publishing (Status: %s)
+meta#:#md_publishing_control_center#:#OER Publishing
+meta#:#md_publishing_current_status#:#Publishing this object as OER: <strong>%s</strong>
 meta#:#md_publishing_info_blocked#:#This object is blocked from being automatically published.
 meta#:#md_publishing_info_published#:#This object has been published as an Open Educational Resource.
 meta#:#md_publishing_info_under_review#:#This object was submitted for publishing, and is currently being reviewed by the editorial team.

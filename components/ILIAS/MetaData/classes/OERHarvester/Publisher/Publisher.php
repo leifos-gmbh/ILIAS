@@ -65,8 +65,8 @@ class Publisher implements PublisherInterface
     public function publish(int $obj_id, string $type): void
     {
         $target_ref_id = $this->publishing_settings->getContainerRefIDForPublishing();
-        $this->harvestObject($obj_id, $target_ref_id);
-        $this->publishObjectToOAIPMH($obj_id, $type, $target_ref_id);
+        $new_ref_id = $this->harvestObject($obj_id, $target_ref_id);
+        $this->publishObjectToOAIPMH($obj_id, $type, $new_ref_id);
     }
 
     public function checkPermissionsForPublish(int $ref_id, string $type, int $obj_id): bool
@@ -148,7 +148,7 @@ class Publisher implements PublisherInterface
             $this->access->checkAccess('delete', '', $harvested_ref_id, $type, $obj_id);
     }
 
-    protected function harvestObject(int $obj_id, int $target_ref_id): void
+    protected function harvestObject(int $obj_id, int $target_ref_id): int
     {
         $new_ref_id = $this->repo_object_handler->referenceObjectInTargetContainer(
             $obj_id,
@@ -159,6 +159,7 @@ class Publisher implements PublisherInterface
         if (!$this->export_handler->hasPublicAccessExport($obj_id)) {
             $this->export_handler->createPublicAccessExport($obj_id);
         }
+        return $new_ref_id;
     }
 
     protected function publishObjectToOAIPMH(int $obj_id, string $type, int $ref_id): void

@@ -40,6 +40,8 @@ use ILIAS\MetaData\Editor\Digest\Digest;
 use ILIAS\MetaData\XML\Writer\WriterInterface as XMLWriter;
 use ILIAS\MetaData\OERHarvester\ControlCenter\Initiator as ControlCenterInitiator;
 use ILIAS\MetaData\OERHarvester\ControlCenter\ControlCenterGUI;
+use ILIAS\UI\Component\MessageBox\MessageBox;
+use ILIAS\UI\Component\Prompt\Prompt;
 
 /**
  * @author       Stefan Meyer <smeyer.ilias@gmx.de>
@@ -196,7 +198,7 @@ class ilMDEditorGUI
         ?RequestForFormInterface $request = null
     ): void {
         $content = $digest->getContent($set, $request);
-        $template_content = [];
+        $template_content = $this->getButtonToControlCenter();
         foreach ($content as $type => $entity) {
             switch ($type) {
                 case DigestContentType::FORM:
@@ -210,7 +212,6 @@ class ilMDEditorGUI
             }
         }
         $this->addButtonToFullEditor();
-        $this->addButtonToControlCenter();
         $this->tpl->setContent($this->ui_renderer->render($template_content));
     }
 
@@ -408,7 +409,10 @@ class ilMDEditorGUI
         $this->toolbar->addComponent($editor);
     }
 
-    protected function addButtonToControlCenter(): void
+    /**
+     * @return array{0:MessageBox, 1:Prompt}
+     */
+    protected function getButtonToControlCenter(): array
     {
         // will also exclude subtypes
         if (!$this->control_center_initiator->stateInfoFetcher()->isPublishingRelevantForObject(
@@ -416,17 +420,15 @@ class ilMDEditorGUI
             $this->type,
             $this->obj_id
         )) {
-            return;
+            return [];
         }
         $status = $this->control_center_initiator->stateInfoFetcher()->getStatusForObject($this->obj_id);
-        $components = $this->control_center_initiator->componentFactory()->getButtonToControlCenter(
+        return $this->control_center_initiator->componentFactory()->getButtonToControlCenter(
             $status,
             $this->ref_id,
             $this->obj_id,
             $this->type
         );
-        $this->toolbar->addComponent($components[0]);
-        $this->toolbar->addComponent($components[1]);
     }
 
     protected function checkAccess(): void

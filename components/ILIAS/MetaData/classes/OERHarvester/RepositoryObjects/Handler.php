@@ -20,18 +20,22 @@ declare(strict_types=1);
 
 namespace ILIAS\MetaData\OERHarvester\RepositoryObjects;
 
+use ilObject;
+use ilObjectFactory;
+use ilTree;
+
 class Handler implements HandlerInterface
 {
-    protected \ilTree $tree;
+    protected ilTree $tree;
 
-    public function __construct(\ilTree $tree)
+    public function __construct(ilTree $tree)
     {
         $this->tree = $tree;
     }
 
     public function referenceObjectInTargetContainer(int $obj_id, int $container_ref_id): int
     {
-        $object = \ilObjectFactory::getInstanceByObjId($obj_id);
+        $object = ilObjectFactory::getInstanceByObjId($obj_id);
         $new_ref_id = $object->createReference();
 
         $object->putInTree($container_ref_id);
@@ -42,7 +46,7 @@ class Handler implements HandlerInterface
 
     public function getObjectReferenceIDInContainer(int $obj_id, int $container_ref_id): ?int
     {
-        $ref_ids = \ilObject::_getAllReferences($obj_id);
+        $ref_ids = ilObject::_getAllReferences($obj_id);
         foreach ($ref_ids as $ref_id) {
             if ($this->tree->isDeleted($ref_id)) {
                 continue;
@@ -57,7 +61,7 @@ class Handler implements HandlerInterface
     public function isObjectDeleted(int $obj_id): bool
     {
         $exists = false;
-        foreach (\ilObject::_getAllReferences($obj_id) as $ref_id => $tmp) {
+        foreach (ilObject::_getAllReferences($obj_id) as $ref_id => $tmp) {
             if (!$this->tree->isDeleted($ref_id)) {
                 $exists = true;
             }
@@ -67,20 +71,25 @@ class Handler implements HandlerInterface
 
     public function deleteReference(int $ref_id): void
     {
-        if (!\ilObject::_exists($ref_id, true)) {
+        if (!ilObject::_exists($ref_id, true)) {
             return;
         }
-        $object = \ilObjectFactory::getInstanceByRefId($ref_id);
+        $object = ilObjectFactory::getInstanceByRefId($ref_id);
         $object->delete();
     }
 
     public function getTypeOfObject(int $obj_id): string
     {
-        return \ilObject::_lookupType($obj_id);
+        return ilObject::_lookupType($obj_id);
     }
 
     public function isReferenceInContainer(int $ref_id, int $container_ref_id): bool
     {
         return $this->tree->isGrandChild($container_ref_id, $ref_id);
+    }
+
+    public function doesReferenceExist(int $ref_id): bool
+    {
+        return ilObject::_exists($ref_id, true);
     }
 }

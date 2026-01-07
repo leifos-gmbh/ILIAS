@@ -34,6 +34,10 @@ use ILIAS\Data\URI;
 use ILIAS\MetaData\OERHarvester\Publisher\PublisherInterface;
 use ILIAS\MetaData\OERHarvester\ControlCenter\Http\RequestParserInterface;
 use ILIAS\UICore\GlobalTemplate;
+use ILIAS\MetaData\OERHarvester\Settings\SettingsInterface as PublishingSettings;
+use ILIAS\StaticURL\Services as StaticURL;
+use ILIAS\Data\Factory as DataFactory;
+use ILIAS\MetaData\OERHarvester\RepositoryObjects\Handler as ObjectHandler;
 
 class ControlCenterGUI
 {
@@ -52,7 +56,11 @@ class ControlCenterGUI
         protected ContentFactoryInterface $content_factory,
         protected PresentationUtilities $presentation_utilities,
         protected StateInfoFetcherInterface $state_info_fetcher,
-        protected PublisherInterface $state_changer
+        protected PublisherInterface $state_changer,
+        protected PublishingSettings $publishing_settings,
+        protected StaticURL $static_url,
+        protected DataFactory $data_factory,
+        protected ObjectHandler $object_handler
     ) {
         $this->ref_id = $this->request_parser->fetchRefID();
         $this->obj_id = $this->request_parser->fetchObjID();
@@ -143,19 +151,8 @@ class ControlCenterGUI
     {
         $this->state_changer->withdraw($this->obj_id);
 
-        // TODO clean this up
-        if (\ilObject::_exists($this->ref_id, true)) {
-            $link = $this->link_to_parent;
-        } else {
-            global $DIC;
-            /** @var \ILIAS\StaticURL\Services $static_url */
-            $static_url = $DIC['static_url'];
-            $data_factory = new \ILIAS\Data\Factory();
-            $ref_id = (new \ILIAS\MetaData\Services\InternalServices($DIC))->OERHarvester()->settings()->getContainerRefIDForPublishing();
-            $link = $static_url->builder()->build('cat', $data_factory->refId($ref_id));
-        }
-
         $this->showSuccessMessageAfterRedirect(Action::WITHDRAW);
+        $link = $this->getRedirectTargetAfterDeletion($this->publishing_settings->getContainerRefIDForPublishing());
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($link));
         exit;
     }
@@ -179,19 +176,8 @@ class ControlCenterGUI
     {
         $this->state_changer->accept($this->obj_id, $this->type);
 
-        // TODO clean this up
-        if (\ilObject::_exists($this->ref_id, true)) {
-            $link = $this->link_to_parent;
-        } else {
-            global $DIC;
-            /** @var \ILIAS\StaticURL\Services $static_url */
-            $static_url = $DIC['static_url'];
-            $data_factory = new \ILIAS\Data\Factory();
-            $ref_id = (new \ILIAS\MetaData\Services\InternalServices($DIC))->OERHarvester()->settings()->getContainerRefIDForEditorialStep();
-            $link = $static_url->builder()->build('cat', $data_factory->refId($ref_id));
-        }
-
-        $this->showSuccessMessageAfterRedirect(Action::SUBMIT);
+        $this->showSuccessMessageAfterRedirect(Action::ACCEPT);
+        $link = $this->getRedirectTargetAfterDeletion($this->publishing_settings->getContainerRefIDForEditorialStep());
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($link));
         exit;
     }
@@ -207,21 +193,18 @@ class ControlCenterGUI
     {
         $this->state_changer->reject($this->obj_id);
 
-        // TODO clean this up
-        if (\ilObject::_exists($this->ref_id, true)) {
-            $link = $this->link_to_parent;
-        } else {
-            global $DIC;
-            /** @var \ILIAS\StaticURL\Services $static_url */
-            $static_url = $DIC['static_url'];
-            $data_factory = new \ILIAS\Data\Factory();
-            $ref_id = (new \ILIAS\MetaData\Services\InternalServices($DIC))->OERHarvester()->settings()->getContainerRefIDForEditorialStep();
-            $link = $static_url->builder()->build('cat', $data_factory->refId($ref_id));
-        }
-
         $this->showSuccessMessageAfterRedirect(Action::REJECT);
+        $link = $this->getRedirectTargetAfterDeletion($this->publishing_settings->getContainerRefIDForEditorialStep());
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->redirect($link));
         exit;
+    }
+
+    protected function getRedirectTargetAfterDeletion(int $fallback_ref_id): URI
+    {
+        if ($this->object_handler->doesReferenceExist($this->ref_id)) {
+            return $this->link_to_parent;
+        }
+        return $this->static_url->builder()->build('cat', $this->data_factory->refId($fallback_ref_id));
     }
 
     protected function showSuccessMessageAfterRedirect(Action $action): void

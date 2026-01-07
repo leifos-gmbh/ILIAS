@@ -109,7 +109,11 @@ class Services
             ),
             $this->presentation_services->utilities(),
             $this->stateInfoFetcher(),
-            $this->publisher()
+            $this->publisher(),
+            $this->settings(),
+            $this->dic['static_url'],
+            $data_factory,
+            $this->repositoryObjectHandler()
         );
     }
 

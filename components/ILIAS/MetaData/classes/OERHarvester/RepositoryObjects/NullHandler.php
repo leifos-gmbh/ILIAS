@@ -50,4 +50,9 @@ class NullHandler implements HandlerInterface
     {
         return false;
     }
+
+    public function doesReferenceExist(int $ref_id): bool
+    {
+        return false;
+    }
 }

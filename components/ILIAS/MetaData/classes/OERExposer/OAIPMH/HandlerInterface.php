@@ -16,17 +16,11 @@
  *
  *********************************************************************/
 
-use ILIAS\MetaData\Services\InternalServices;
+declare(strict_types=1);
 
-/*
- * Handles OAI-PMH request according to https://www.openarchives.org/OAI/openarchivesprotocol.html
- */
+namespace ILIAS\MetaData\OERExposer\OAIPMH;
 
-require_once '../vendor/composer/vendor/autoload.php';
-require_once(__DIR__ . '/../artifacts/bootstrap_default.php');
-entry_point('ILIAS Legacy Initialisation Adapter');
-
-global $DIC;
-$internal_services = new InternalServices($DIC);
-$handler = $internal_services->OERExposer()->OAIPMHHandler();
-$handler->sendResponseToRequest();
+interface HandlerInterface
+{
+    public function sendResponseToRequest(): void;
+}

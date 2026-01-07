@@ -16,17 +16,24 @@
  *
  *********************************************************************/
 
-use ILIAS\MetaData\Services\InternalServices;
+declare(strict_types=1);
 
-/*
- * Handles OAI-PMH request according to https://www.openarchives.org/OAI/openarchivesprotocol.html
- */
+namespace ILIAS\MetaData\Editor\Full\Components\Actions;
 
-require_once '../vendor/composer/vendor/autoload.php';
-require_once(__DIR__ . '/../artifacts/bootstrap_default.php');
-entry_point('ILIAS Legacy Initialisation Adapter');
+use ILIAS\UI\Component\Signal as Signal;
 
-global $DIC;
-$internal_services = new InternalServices($DIC);
-$handler = $internal_services->OERExposer()->OAIPMHHandler();
-$handler->sendResponseToRequest();
+class FlexibleSignal
+{
+    protected string|Signal $flexible_signal;
+
+    public function __construct(
+        string|Signal $flexible_signal
+    ) {
+        $this->flexible_signal = $flexible_signal;
+    }
+
+    public function get(): Signal|string
+    {
+        return $this->flexible_signal;
+    }
+}

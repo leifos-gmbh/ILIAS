@@ -19,10 +19,12 @@
 declare(strict_types=1);
 
 use ILIAS\Cron\Job\Schedule\JobScheduleType;
-use ILIAS\MetaData\OERHarvester\CronJob\Initiator;
+use ILIAS\MetaData\OERHarvester\Services\Services as PublishingServices;
 use ILIAS\MetaData\OERHarvester\CronJob\Results\Wrapper as ResultWrapper;
 use ILIAS\Cron\Job\JobResult;
 use ILIAS\Cron\CronJob;
+use ILIAS\MetaData\Services\InternalServices;
+use ILIAS\MetaData\Presentation\UtilitiesInterface as PresentationUtilities;
 
 /**
  * Cron job for definition for oer harvesting
@@ -34,18 +36,18 @@ class ilCronOerHarvester extends CronJob
     protected const int DEFAULT_SCHEDULE_VALUE = 1;
 
     private ilLogger $logger;
-    private ilLanguage $lng;
-    private Initiator $initiator;
+    private PresentationUtilities $presentation_utilities;
+    private PublishingServices $publishing_services;
 
     public function __construct()
     {
         global $DIC;
 
-        $this->logger = $DIC->logger()->meta();
-        $this->lng = $DIC->language();
-        $this->lng->loadLanguageModule('meta');
+        $internal_services = new InternalServices($DIC);
 
-        $this->initiator = new Initiator($DIC);
+        $this->logger = $internal_services->dic()->logger()->meta();
+        $this->presentation_utilities = $internal_services->presentation()->utilities();
+        $this->publishing_services = $internal_services->OERHarvester();
     }
 
     public function usesLegacyForms(): bool
@@ -55,12 +57,12 @@ class ilCronOerHarvester extends CronJob
 
     public function getTitle(): string
     {
-        return $this->lng->txt('meta_oer_harvester');
+        return $this->presentation_utilities->txt('meta_oer_harvester');
     }
 
     public function getDescription(): string
     {
-        return $this->lng->txt('meta_oer_harvester_desc');
+        return $this->presentation_utilities->txt('meta_oer_harvester_desc');
     }
 
     public function getId(): string
@@ -91,8 +93,8 @@ class ilCronOerHarvester extends CronJob
     public function run(): JobResult
     {
         $this->logger->info('Started cron oer harvester.');
-        $harvester = $this->initiator->automaticPublisher();
-        $res = $harvester->run(new ResultWrapper(new JobResult()));
+        $automatic_publisher = $this->publishing_services->automaticPublisher();
+        $res = $automatic_publisher->run(new ResultWrapper(new JobResult()));
         $this->logger->info('cron oer harvester finished');
 
         return $res->get();
@@ -106,8 +108,8 @@ class ilCronOerHarvester extends CronJob
                 $a_fields['meta_oer_harvester'] =
                     (
                         $a_is_active ?
-                        $this->lng->txt('enabled') :
-                        $this->lng->txt('disabled')
+                        $this->presentation_utilities->txt('enabled') :
+                        $this->presentation_utilities->txt('disabled')
                     );
                 break;
         }

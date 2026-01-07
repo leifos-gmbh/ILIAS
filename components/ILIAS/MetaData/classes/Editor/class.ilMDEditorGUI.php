@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 use ILIAS\MetaData\Editor\Http\Parameter;
 use ILIAS\MetaData\Services\InternalServices;
-use ILIAS\MetaData\Editor\Full\FullEditorInitiator;
+use ILIAS\MetaData\Editor\Full\Services\Services as FullEditorServices;
 use ILIAS\UI\Renderer;
 use ILIAS\MetaData\Editor\Presenter\PresenterInterface;
 use ILIAS\MetaData\Editor\Http\RequestParserInterface;
@@ -34,14 +34,15 @@ use ILIAS\MetaData\Paths\PathInterface;
 use ILIAS\MetaData\Editor\Full\FullEditor;
 use ILIAS\MetaData\Editor\Full\ContentType as FullContentType;
 use ILIAS\MetaData\Editor\Digest\ContentType as DigestContentType;
-use ILIAS\MetaData\Editor\Full\Services\Tables\Table;
-use ILIAS\MetaData\Editor\Digest\DigestInitiator;
+use ILIAS\MetaData\Editor\Full\Components\Tables\Table;
+use ILIAS\MetaData\Editor\Digest\Services\Services as DigestServices;
 use ILIAS\MetaData\Editor\Digest\Digest;
 use ILIAS\MetaData\XML\Writer\WriterInterface as XMLWriter;
-use ILIAS\MetaData\OERHarvester\ControlCenter\Initiator as ControlCenterInitiator;
+use ILIAS\MetaData\OERHarvester\Services\Services as PublishingServices;
 use ILIAS\MetaData\OERHarvester\ControlCenter\ControlCenterGUI;
 use ILIAS\UI\Component\MessageBox\MessageBox;
 use ILIAS\UI\Component\Prompt\Prompt;
+use ILIAS\MetaData\Editor\Http\Command;
 
 /**
  * @author       Stefan Meyer <smeyer.ilias@gmx.de>
@@ -53,9 +54,9 @@ class ilMDEditorGUI
     public const string SET_FOR_TREE = 'md_set_for_tree';
     public const string PATH_FOR_TREE = 'md_path_for_tree';
 
-    protected FullEditorInitiator $full_editor_initiator;
-    protected DigestInitiator $digest_initiator;
-    protected ControlCenterInitiator $control_center_initiator;
+    protected FullEditorServices $full_editor_services;
+    protected DigestServices $digest_services;
+    protected PublishingServices $publishing_services;
 
     protected ilCtrl $ctrl;
     protected ilGlobalTemplateInterface $tpl;
@@ -81,17 +82,18 @@ class ilMDEditorGUI
         global $DIC;
 
         $services = new InternalServices($DIC);
-        $this->full_editor_initiator = new FullEditorInitiator($services);
-        $this->digest_initiator = new DigestInitiator($services);
-        $this->control_center_initiator = new ControlCenterInitiator($services);
+
+        $this->full_editor_services = $services->editor()->fullEditor();
+        $this->digest_services = $services->editor()->digest();
+        $this->publishing_services = $services->OERHarvester();
 
         $this->ctrl = $services->dic()->ctrl();
         $this->tpl = $services->dic()->ui()->mainTemplate();
         $this->ui_renderer = $services->dic()->ui()->renderer();
-        $this->presenter = $services->editor()->presenter();
-        $this->request_parser = $services->editor()->requestParser();
+        $this->presenter = $services->editor()->internal()->presenter();
+        $this->request_parser = $services->editor()->internal()->requestParser();
         $this->repository = $services->repository()->repository();
-        $this->observer_handler = $services->editor()->observerHandler();
+        $this->observer_handler = $services->editor()->internal()->observerHandler();
         $this->access = $services->dic()->access();
         $this->toolbar = $services->dic()->toolbar();
         $this->global_screen = $services->dic()->globalScreen();
@@ -113,15 +115,13 @@ class ilMDEditorGUI
         switch ($next_class) {
             case strtolower(ControlCenterGUI::class):
                 $back_link = $this->ctrl->getLinkTarget($this, 'listQuickEdit');
-                $gui = $this->control_center_initiator->controlCenterGUI($back_link);
+                $gui = $this->publishing_services->controlCenterGUI($back_link);
                 $this->ctrl->forwardCommand($gui);
                 break;
 
             default:
-                if (!$cmd) {
-                    $cmd = "listQuickEdit";
-                }
-                $this->$cmd();
+                $valid_cmd = (Command::tryFrom($cmd) ?? Command::SHOW_DIGEST)->value;
+                $this->$valid_cmd();
                 break;
         }
     }
@@ -146,7 +146,7 @@ class ilMDEditorGUI
 
     public function listQuickEdit(): void
     {
-        $digest = $this->digest_initiator->init();
+        $digest = $this->digest_services->digest();
         $set = $this->repository->getMD(
             $this->obj_id,
             $this->sub_id,
@@ -160,7 +160,8 @@ class ilMDEditorGUI
     {
         $this->checkAccess();
 
-        $digest = $this->digest_initiator->init();
+        $digest = $this->digest_services->digest();
+        $manipulator = $this->digest_services->manipulatorAdapter();
         $set = $this->repository->getMD(
             $this->obj_id,
             $this->sub_id,
@@ -168,7 +169,7 @@ class ilMDEditorGUI
         );
 
         $request = $this->request_parser->fetchRequestForForm(false);
-        if (!$digest->updateMD($set, $request)) {
+        if (!$manipulator->update($set, $request)) {
             $this->tpl->setOnScreenMessage(
                 'failure',
                 $this->presenter->utilities()->txt('msg_form_save_error'),
@@ -239,12 +240,13 @@ class ilMDEditorGUI
             $this->sub_id,
             $this->type
         );
-        $editor = $this->full_editor_initiator->init();
-        $set = $editor->manipulateMD()->prepare($set, $base_path);
+        $editor = $this->full_editor_services->fullEditor();
+        $manipulator = $this->full_editor_services->manipulatorAdapter();
+        $set = $manipulator->prepare($set, $base_path);
 
         // update or create
         $request = $this->request_parser->fetchRequestForForm(true);
-        $success = $editor->manipulateMD()->createOrUpdate(
+        $success = $manipulator->createOrUpdate(
             $set,
             $base_path,
             $action_path,
@@ -295,10 +297,11 @@ class ilMDEditorGUI
             $this->sub_id,
             $this->type
         );
-        $editor = $this->full_editor_initiator->init();
+        $editor = $this->full_editor_services->fullEditor();
+        $manipulator = $this->full_editor_services->manipulatorAdapter();
 
         // delete
-        $base_path = $editor->manipulateMD()->deleteAndTrimBasePath(
+        $base_path = $manipulator->deleteAndTrimBasePath(
             $set,
             $base_path,
             $delete_path
@@ -334,8 +337,9 @@ class ilMDEditorGUI
             $this->sub_id,
             $this->type
         );
-        $editor = $this->full_editor_initiator->init();
-        $set = $editor->manipulateMD()->prepare($set, $base_path);
+        $editor = $this->full_editor_services->fullEditor();
+        $manipulator = $this->full_editor_services->manipulatorAdapter();
+        $set = $manipulator->prepare($set, $base_path);
 
         // add content for element
         $this->renderFullEditor($set, $base_path, $editor);
@@ -415,15 +419,15 @@ class ilMDEditorGUI
     protected function getButtonToControlCenter(): array
     {
         // will also exclude subtypes
-        if (!$this->control_center_initiator->stateInfoFetcher()->isPublishingRelevantForObject(
+        if (!$this->publishing_services->stateInfoFetcher()->isPublishingRelevantForObject(
             $this->ref_id,
             $this->type,
             $this->obj_id
         )) {
             return [];
         }
-        $status = $this->control_center_initiator->stateInfoFetcher()->getStatusForObject($this->obj_id);
-        return $this->control_center_initiator->componentFactory()->getButtonToControlCenter(
+        $status = $this->publishing_services->stateInfoFetcher()->getStatusForObject($this->obj_id);
+        return $this->publishing_services->controlCenterComponentFactory()->getButtonToControlCenter(
             $status,
             $this->ref_id,
             $this->obj_id,

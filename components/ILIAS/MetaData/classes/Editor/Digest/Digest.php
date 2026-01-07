@@ -29,14 +29,11 @@ use ILIAS\UI\Component\Modal\Interruptive as InterruptiveModal;
 class Digest
 {
     protected ContentAssembler $content_assembler;
-    protected ManipulatorAdapter $manipulator_adapter;
 
     public function __construct(
-        ContentAssembler $content_assembler,
-        ManipulatorAdapter $manipulator_adapter
+        ContentAssembler $content_assembler
     ) {
         $this->content_assembler = $content_assembler;
-        $this->manipulator_adapter = $manipulator_adapter;
     }
 
     /**
@@ -45,14 +42,7 @@ class Digest
     public function getContent(
         SetInterface $set,
         ?RequestForFormInterface $request = null
-    ): \Generator {
+    ): Generator {
         yield from $this->content_assembler->get($set, $request);
-    }
-
-    public function updateMD(
-        SetInterface $set,
-        RequestForFormInterface $request
-    ): bool {
-        return $this->manipulator_adapter->update($set, $request);
     }
 }

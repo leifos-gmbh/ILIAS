@@ -12092,6 +12092,7 @@ meta#:#md_publishing_info_published#:#This object has been published as an Open 
 meta#:#md_publishing_info_under_review#:#This object was submitted for publishing, and is currently being reviewed by the editorial team.
 meta#:#md_publishing_info_unpublished#:#This object can be published as an Open Educational Resource.
 meta#:#md_publishing_info_wrong_copyright#:#To publish this object as an Open Educational Resource, please close this dialog and select an eligible licence:%s
+meta#:#md_publishing_last_reference_info#:#Please note that this object will not be removed, because there are no other references to it in the repository.
 meta#:#md_publishing_status_blocked#:#Blocked
 meta#:#md_publishing_status_published#:#Published
 meta#:#md_publishing_status_under_review#:#Under Review
@@ -12722,11 +12723,11 @@ meta#:#meta_pointofcontact#:#Point(s) of Contact
 meta#:#meta_prerequisite#:#Prerequisite
 meta#:#meta_problem_statement#:#Problem Statement
 meta#:#meta_publisher#:#Publisher
-meta#:#meta_publishing_config_cp#:#Copyright Selection: %s
+meta#:#meta_publishing_config_cp#:#Copyright Selection: <strong>%s</strong>
 meta#:#meta_publishing_config_cron_job_admin#:#Cron Job Administration
 meta#:#meta_publishing_config_disabled#:#Disabled
 meta#:#meta_publishing_config_enabled#:#Enabled
-meta#:#meta_publishing_config_harvester#:#OER Harvester: %s
+meta#:#meta_publishing_config_harvester#:#OER Harvester: <strong>%s</strong>
 meta#:#meta_publishing_config_status#:#For publishing to function, copyright selection and the OER Harvester cron job have to be enabled.
 meta#:#meta_purpose#:#Purpose
 meta#:#meta_questionnaire#:#Questionnaire

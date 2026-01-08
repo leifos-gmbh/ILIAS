@@ -38,4 +38,6 @@ interface HandlerInterface
     public function getTypeOfObject(int $obj_id): string;
 
     public function doesReferenceExist(int $ref_id): bool;
+
+    public function isOnlyReference(int $ref_id): bool;
 }

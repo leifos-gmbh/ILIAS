@@ -142,7 +142,13 @@ class ControlCenterGUI
 
     protected function withdraw(): void
     {
-        $content = $this->content_factory->getConfirmationContent($this->ref_id, $this->obj_id, $this->type, Action::WITHDRAW);
+        $content = $this->content_factory->getConfirmationContent(
+            $this->ref_id,
+            $this->obj_id,
+            $this->type,
+            Action::WITHDRAW,
+            $this->object_handler->isOnlyReference($this->ref_id)
+        );
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->show($content));
         exit;
     }
@@ -167,7 +173,13 @@ class ControlCenterGUI
 
     protected function accept(): void
     {
-        $content = $this->content_factory->getConfirmationContent($this->ref_id, $this->obj_id, $this->type, Action::ACCEPT);
+        $content = $this->content_factory->getConfirmationContent(
+            $this->ref_id,
+            $this->obj_id,
+            $this->type,
+            Action::ACCEPT,
+            $this->object_handler->isOnlyReference($this->ref_id)
+        );
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->show($content));
         exit;
     }
@@ -184,7 +196,13 @@ class ControlCenterGUI
 
     protected function reject(): void
     {
-        $content = $this->content_factory->getConfirmationContent($this->ref_id, $this->obj_id, $this->type, Action::REJECT);
+        $content = $this->content_factory->getConfirmationContent(
+            $this->ref_id,
+            $this->obj_id,
+            $this->type,
+            Action::REJECT,
+            $this->object_handler->isOnlyReference($this->ref_id)
+        );
         echo $this->ui_renderer->renderAsync($this->ui_factory->prompt()->state()->show($content));
         exit;
     }

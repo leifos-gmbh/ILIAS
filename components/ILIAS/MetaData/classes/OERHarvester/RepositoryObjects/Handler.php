@@ -92,4 +92,19 @@ class Handler implements HandlerInterface
     {
         return ilObject::_exists($ref_id, true);
     }
+
+    public function isOnlyReference(int $ref_id): bool
+    {
+        $other_references_count = 0;
+        foreach (ilObject::_getAllReferences(ilObject::_lookupObjId($ref_id)) as $other_ref_id) {
+            if ($other_ref_id === $ref_id) {
+                continue;
+            }
+            if (ilObject::_isInTrash($other_ref_id)) {
+                continue;
+            }
+            $other_references_count++;
+        }
+        return $other_references_count === 0;
+    }
 }

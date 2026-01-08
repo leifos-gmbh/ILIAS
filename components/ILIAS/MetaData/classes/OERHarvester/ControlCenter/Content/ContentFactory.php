@@ -140,21 +140,33 @@ class ContentFactory implements ContentFactoryInterface
         int $ref_id,
         int $obj_id,
         string $type,
-        Action $action
+        Action $action,
+        bool $is_last_reference
     ): RoundTripModal {
+        $modal_content = [];
         $message = match ($action) {
             Action::WITHDRAW => $this->presentation_utilities->txt('md_publishing_confirmation_info_withdraw'),
             Action::ACCEPT => $this->presentation_utilities->txt('md_publishing_confirmation_info_accept'),
             Action::REJECT => $this->presentation_utilities->txt('md_publishing_confirmation_info_reject'),
             default => ''
         };
-        $message_box = $this->ui_factory->messageBox()->confirmation($message);
+        $modal_content[] = $this->ui_factory->messageBox()->confirmation($message);
         $title = match ($action) {
             Action::WITHDRAW => $this->presentation_utilities->txt('md_publishing_confirmation_withdraw'),
             Action::ACCEPT => $this->presentation_utilities->txt('md_publishing_confirmation_accept'),
             Action::REJECT => $this->presentation_utilities->txt('md_publishing_confirmation_reject'),
             default => ''
         };
+
+        if (
+            ($action === Action::REJECT || $action === Action::WITHDRAW) &&
+            $is_last_reference
+        ) {
+            $modal_content[] = $this->ui_factory->messageBox()->info(
+                $this->presentation_utilities->txt('md_publishing_last_reference_info')
+            );
+        }
+
         $action = $this->link_factory->getLinkForConfirmationOfAction($action, $ref_id, $obj_id, $type);
         /*$button = $this->ui_factory->button()->standard(
             $this->presentation_utilities->txt('confirm'),
@@ -168,7 +180,7 @@ class ContentFactory implements ContentFactoryInterface
                         il.UI.prompt.get(promptId).show('$action');
                     });"
         );
-        return $this->ui_factory->modal()->roundtrip($title, $message_box)->withActionButtons([$button]);
+        return $this->ui_factory->modal()->roundtrip($title, $modal_content)->withActionButtons([$button]);
     }
 
     public function getSuccessMessage(Action $action): string

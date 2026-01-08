@@ -81,7 +81,7 @@ class Publisher implements PublisherInterface
         $this->exposed_repo->updateRecord($obj_id, true, null);
 
         $ref_id = $this->status_repo->getHarvestRefID($obj_id);
-        $this->repo_object_handler->deleteReference($ref_id);
+        $this->deleteReferenceIfOthersExist($ref_id);
         $this->status_repo->deleteHarvestRefID($obj_id);
 
         if ($this->publishing_settings->isEditorialStepEnabled()) {
@@ -112,11 +112,12 @@ class Publisher implements PublisherInterface
     public function accept(int $obj_id, string $type): void
     {
         $harvested_ref_id = $this->status_repo->getHarvestRefID($obj_id);
-        $this->repo_object_handler->deleteReference($harvested_ref_id);
 
         $publishing_ref_id = $this->publishing_settings->getContainerRefIDForPublishing();
         $ref_id_in_publishing = $this->repo_object_handler->referenceObjectInTargetContainer($obj_id, $publishing_ref_id);
         $this->status_repo->setHarvestRefID($obj_id, $ref_id_in_publishing);
+
+        $this->deleteReferenceIfOthersExist($harvested_ref_id);
 
         $this->publishObjectToOAIPMH($obj_id, $type, $ref_id_in_publishing);
     }
@@ -133,7 +134,7 @@ class Publisher implements PublisherInterface
     public function reject(int $obj_id): void
     {
         $ref_id = $this->status_repo->getHarvestRefID($obj_id);
-        $this->repo_object_handler->deleteReference($ref_id);
+        $this->deleteReferenceIfOthersExist($ref_id);
         $this->status_repo->deleteHarvestRefID($obj_id);
 
         if ($this->publishing_settings->isEditorialStepEnabled()) {
@@ -182,6 +183,14 @@ class Publisher implements PublisherInterface
                 $simple_dc_xml
             );
         }
+    }
+
+    protected function deleteReferenceIfOthersExist(int $ref_id): void
+    {
+        if ($this->repo_object_handler->isOnlyReference($ref_id)) {
+            return;
+        }
+        $this->repo_object_handler->deleteReference($ref_id);
     }
 
     protected function buildIdentifier(int $obj_id, string $type): string

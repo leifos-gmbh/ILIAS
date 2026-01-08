@@ -55,4 +55,9 @@ class NullHandler implements HandlerInterface
     {
         return false;
     }
+
+    public function isOnlyReference(int $ref_id): bool
+    {
+        return false;
+    }
 }

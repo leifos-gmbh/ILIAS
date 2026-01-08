@@ -37,7 +37,8 @@ interface ContentFactoryInterface
         int $ref_id,
         int $obj_id,
         string $type,
-        Action $action
+        Action $action,
+        bool $is_last_reference
     ): RoundTripModal;
 
     public function getSuccessMessage(Action $action): string;

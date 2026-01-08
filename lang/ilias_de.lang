@@ -12088,6 +12088,7 @@ meta#:#md_publishing_info_published#:#Dieses Objekt ist als Open Educational Res
 meta#:#md_publishing_info_under_review#:#Dieses Objekt wurde zur Veröffentlichung eingereicht, und wird von der Redaktion überprüft.
 meta#:#md_publishing_info_unpublished#:#Dieses Objekt kann als Open Educational Resource veröffentlicht werden.
 meta#:#md_publishing_info_wrong_copyright#:#Um dieses Objekt als Open Educational Resource zu veröffentlichen, schließen Sie bitte diesen Dialog und stellen Sie es unter eine geeignete Lizenz:%s
+meta#:#md_publishing_last_reference_info#:#Dieses Objekt wird nicht entfernt, weil es keine weiteren Referenzen im Magazin hat.
 meta#:#md_publishing_status_blocked#:#Gesperrt
 meta#:#md_publishing_status_published#:#Veröffentlicht
 meta#:#md_publishing_status_under_review#:#In Prüfung
@@ -12718,11 +12719,11 @@ meta#:#meta_pointofcontact#:#Kontakt
 meta#:#meta_prerequisite#:#Voraussetzung
 meta#:#meta_problem_statement#:#Problemstellung
 meta#:#meta_publisher#:#Herausgeber
-meta#:#meta_publishing_config_cp#:#Lizenzen in Objekten: %s
+meta#:#meta_publishing_config_cp#:#Lizenzen in Objekten: <strong>%s</strong>
 meta#:#meta_publishing_config_cron_job_admin#:#Cron Job Administration
 meta#:#meta_publishing_config_disabled#:#Deaktiviert
 meta#:#meta_publishing_config_enabled#:#Aktiviert
-meta#:#meta_publishing_config_harvester#:#OER-Harvester: %s
+meta#:#meta_publishing_config_harvester#:#OER-Harvester: <strong>%s</strong>
 meta#:#meta_publishing_config_status#:#Damit das Veröffentlichen von Objekten funktioniert, müssen Lizenzen in Objekten und der OER-Harvester Cron Job aktiviert sein.
 meta#:#meta_purpose#:#Zweck
 meta#:#meta_questionnaire#:#Fragebogen

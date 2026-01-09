@@ -70,7 +70,7 @@ class AutomaticPublisher
                     $harvestable_obj_ids,
                     $currently_harvested_obj_ids
                 );
-                $messages[] = 'Published ' . $harvest_count . ' new objects.';
+                $messages[] = 'Published or submitted for review' . $harvest_count . ' new objects.';
             }
 
             if ($deletion_count !== 0 || $harvest_count !== 0 || $exposure_count !== 0) {

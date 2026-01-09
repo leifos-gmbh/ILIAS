@@ -191,6 +191,7 @@ class ilMDPublishingSettingsGUI
             $this->lng->txt('md_publishing_workflow_mode'),
             'mode'
         );
+        $mode->setInfo($this->lng->txt('md_publishing_workflow_mode_info'));
         $checked = [];
         $manual_checkbox = new ilCheckboxOption(
             $this->lng->txt('md_publishing_workflow_manual'),

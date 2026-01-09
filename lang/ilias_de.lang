@@ -12106,6 +12106,7 @@ meta#:#md_publishing_workflow_automatic_info#:#Entsprechend ausgezeichnete Objek
 meta#:#md_publishing_workflow_manual#:#Manuell
 meta#:#md_publishing_workflow_manual_info#:#Objekte können auf ihrem Metadaten-Reiter über einen Button veröffentlicht werden.
 meta#:#md_publishing_workflow_mode#:#Veröffentlichung aktivieren
+meta#:#md_publishing_workflow_mode_info#:#Zur Veröffentlichung eines Objekts wird es einer definierten Kategorie hinzugefügt, und eine dazugehörige Exportdatei generiert. Zusätzlich wird ein Eintrag angelegt, der (wenn aktiviert) über eine OAI-PMH Schnittstelle ausgelesen werden kann.
 meta#:#md_record_export_table#:#Exportdateien
 meta#:#md_record_list_table#:#Benutzerdefinierte Metadatensätze
 meta#:#md_separated_by#:#Getrennt mit %s
@@ -12699,13 +12700,13 @@ meta#:#meta_obj_type_optional#:#Datensatz muss aktiviert werden
 meta#:#meta_oer_copyright_selection#:#Veröffentlichung von Objekten mit folgenden Lizenzen
 meta#:#meta_oer_copyright_selection_info#:#Nur Objekte mit einer der ausgewählten Lizenzen werden veröffentlicht.
 meta#:#meta_oer_editorial_category#:#Redaktionelle Kategorie
-meta#:#meta_oer_editorial_step_info#:#Objekte können vor ihrer Veröffentlichung von einer Redaktion geprüft werden.
+meta#:#meta_oer_editorial_step_info#:#Objekte können vor ihrer Veröffentlichung von einer Redaktion geprüft werden. Objekte werden erst in die redaktionellen Kategorie eingereicht. Erst nach Annahme für die Veröffentlichung werden die Objekte in die Kategorie für veröffentlichte Inhalte bewegt, und Einträge für die OAI-PMH Schnittstelle angelegt.
 meta#:#meta_oer_editorial_step_toggle#:#Redaktionellen Zwischenschritt aktivieren
 meta#:#meta_oer_exposed_source#:#Veröffentlichung in
 meta#:#meta_oer_harvested_licences#:#Lizenzauswahl
 meta#:#meta_oer_harvested_types#:#Auswahl Objekttypen
 meta#:#meta_oer_harvester#:#OER-Harvester
-meta#:#meta_oer_harvester_desc#:#Der OER-Harvester sammelt Objekte ein, die mit vorher ausgewählten Lizenzen ausgezeichnet sind. Welche Objekttypen eingesammelt werden, kann ausgewählt werden. Der Harvester fügt diese Objekte einer definierten Kategorie hinzu und generiert dazugehörige Exportdateien.<br />Für die zur Veröffentlichung bestimmten Objekte werden Einträge angelegt. Diese Einträge können (wenn aktiviert) über eine OAI-PMH Schnittstelle ausgelesen werden. Voraussetzung dafür ist, dass die Lizenz-Auswahl in der Metadaten-Administration aktiviert und konfiguriert wurde.
+meta#:#meta_oer_harvester_desc#:#Der OER-Harvester muss aktiviert sein, um zu gewährleisten, dass die Veröffentlichung von Objekten als OER funktioniert, siehe die Einstellungen zur Veröffentlichung in der Metadaten-Administration.<br/>Einträge von veröffentlichten Objekten in der OAI-PMH Schnittstelle werden aktualisiert, und nicht mehr geeignete Objekte werden von der Veröffentlichung zurückgezogen. Wenn automatische Veröffentlichung aktiviert ist, sammelt der OER-Harvester Objekte anhand der Einstellungen ein, und veröffentlicht sie (oder reicht sie zur Prüfung ein, wenn ein redaktioneller Zwischenschritt aktiviert ist).
 meta#:#meta_oer_object_type_selection#:#Veröffentlichung folgender Objekttypen
 meta#:#meta_opera#:#Opera
 meta#:#meta_operating_system#:#Betriebssystem

@@ -12110,6 +12110,7 @@ meta#:#md_publishing_workflow_automatic_info#:#Eligible objects are automaticall
 meta#:#md_publishing_workflow_manual#:#Manual
 meta#:#md_publishing_workflow_manual_info#:#Add an option to the LOM of objects to publish them with the click of a button.
 meta#:#md_publishing_workflow_mode#:#Enable Publishing
+meta#:#md_publishing_workflow_mode_info#:#When an object is published, it is added to a predefined category and an export file is generated for it. Additionally, a record is compiled that (if activated) can be read out via an OAI-PMH interface.
 meta#:#md_record_export_table#:#Export Files
 meta#:#md_record_list_table#:#Custom Metadata Sets
 meta#:#md_separated_by#:#Separated by %s
@@ -12703,13 +12704,13 @@ meta#:#meta_obj_type_optional#:#Data set needs activation
 meta#:#meta_oer_copyright_selection#:#Copyright Selection
 meta#:#meta_oer_copyright_selection_info#:#Only objects with one of the selected copyrights will be published.
 meta#:#meta_oer_editorial_category#:#Editorial Category
-meta#:#meta_oer_editorial_step_info#:#Add a step in the publishing workflow where objects can be checked by an editorial team before being published.
+meta#:#meta_oer_editorial_step_info#:#Add a step in the publishing workflow where objects can be checked by an editorial team before being published. Objects are first submitted to the Editorial Category. Only after being accepted are they moved to the category for published OER content, and records for the OAI-PMH interface are compiled.
 meta#:#meta_oer_editorial_step_toggle#:#Enable Editorial Step
 meta#:#meta_oer_exposed_source#:#Category for Published OER Content
 meta#:#meta_oer_harvested_licences#:#Licences for Publishing
 meta#:#meta_oer_harvested_types#:#Types of Objects for Publishing
 meta#:#meta_oer_harvester#:#OER Harvester
-meta#:#meta_oer_harvester_desc#:#The OER Harvester collects all resources under selected CC licenses, adds them to a category defined in the cronjob settings, and if necessary generates export files for them. For harvested resource marked for publishing, records are compiled that can then (if enabled) be queried via an OAI-PMH interface. What object types are harvested can be configured. To get results from this cronjob it is necessary to activate and configure the copyright selection in the administration of 'Metadata'.
+meta#:#meta_oer_harvester_desc#:#The OER Harvester needs to be activated for publishing workflows to function properly, see the 'Publishing' configuration in the 'Metadata' administration.<br/>It updates the records of published objects in the OAI-PMH interface, and withdraws objects that are not eliglible for publishing anymore. If automatic publishing is enabled, the OER Harvester also automatically collect objects with eligible type and copyright, and publishes them (or submits them for review, if an editorial step is enabled).
 meta#:#meta_oer_object_type_selection#:#Eligible Object Types
 meta#:#meta_opera#:#Opera
 meta#:#meta_operating_system#:#Operating System

@@ -180,7 +180,7 @@ class SkillProfileCompletionManager
         if ($profile_count == 0) {
             return 0;
         }
-        $progress = $achieved_count / $profile_count * 100;
+        $progress = ((((float) $achieved_count) / ((float) $profile_count)) * 100);
 
         return (int) $progress;
     }

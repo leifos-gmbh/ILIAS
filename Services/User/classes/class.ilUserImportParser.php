@@ -457,12 +457,14 @@ class ilUserImportParser extends ilSaxParser
                 if (isset($a_attribs['Language'])) {
                     $this->containedTags[] = 'Language';
                 }
-                $this->userObj->setLanguage($a_attribs["Language"] ?? '');
+                $this->userObj->setLanguage($a_attribs['Language'] ?? '');
                 // begin-patch bghw veda
                 //$this->userObj->setImportId($a_attribs["Id"]);
                 $this->userObj->setImportId($a_attribs['ImportId'] ?? '');
                 // end-patch bghw veda
-                $this->action = (is_null($a_attribs["Action"])) ? "Insert" : $a_attribs["Action"];
+                $this->action = isset($a_attribs['Action'])
+                    ? $a_attribs['Action']
+                    : 'Insert';
                 $this->currPassword = null;
                 $this->currPasswordType = null;
                 $this->currActive = null;

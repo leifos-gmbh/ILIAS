@@ -192,7 +192,21 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
             }
         }
 
-        $this->tpl->setContent($a_form->getHTML());
+        $this->tpl->addJavaScript("Modules/Exercise/js/exc-auto-saver.js");
+        $this->lng->toJS("exc_auto_saved_minutes_s");
+        $this->lng->toJS("exc_auto_saved_minutes_p");
+        $mbox = $this->gui->ui()->factory()->messageBox()->info(
+            $this->lng->txt("exc_auto_save_info") . "<p>" .
+            $this->lng->txt("exc_auto_last_save") .
+            "<span class='exc-last-save'> -</span></p>"
+        );
+        $auto_save_url = $ilCtrl->getLinkTargetByClass(self::class, "autoSave");
+        $this->tpl->setContent(
+            "<div id='exc_text' data-autosave-url='$auto_save_url'>" .
+            $this->gui->ui()->renderer()->render($mbox) .
+            $a_form->getHTML() .
+            "</div>"
+        );
     }
 
     public function updateAssignmentTextAndReturnObject(): void
@@ -256,6 +270,45 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
 
         $form->setValuesByPost();
         $this->editAssignmentTextObject($form);
+    }
+
+    public function autoSaveObject(): void
+    {
+        $ilCtrl = $this->ctrl;
+
+        if (!$this->submission->canSubmit()) {
+            return;
+        }
+
+        $form = $this->initAssignmentTextForm();
+
+        // we are not using a purifier, so we have to set the valid RTE tags
+        // :TODO:
+        $rte = $form->getItemByPostVar("atxt");
+        $rte->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("exc_ass"));
+
+        if ($form->checkInput()) {
+            $text = trim($form->getInput("atxt"));
+
+            $returned_id = $this->submission->updateTextSubmission(
+                // mob src to mob id
+                ilRTE::_replaceMediaObjectImageSrc($text, 0)
+            );
+
+            // no empty text
+            if ($returned_id) {
+                // mob usage
+                $mobs = ilRTE::_getMediaObjects($text, 0);
+                foreach ($mobs as $mob) {
+                    if (ilObjMediaObject::_exists($mob)) {
+                        ilObjMediaObject::_removeUsage($mob, 'exca~:html', $this->submission->getUserId());
+                        ilObjMediaObject::_saveUsage($mob, 'exca:html', $returned_id);
+                    }
+                }
+            } else {
+                $this->handleRemovedUpload();
+            }
+        }
     }
 
     public function showAssignmentTextObject(): void

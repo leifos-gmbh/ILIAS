@@ -90,7 +90,6 @@
 
         // success
         this.lastContent = content;
-        console.log('Saved content...');
         this.lastSaving = Date.now();
 
         // optionally: show UI feedback
@@ -124,7 +123,6 @@
     init() {
       this.container = document.getElementById('exc_text');
       if (!this.container) return;
-      console.log('2');
       this.form = this.container.querySelector('form');
       this.url = this.container.dataset.autosaveUrl;
       this.textarea = this.form.querySelector('textarea');
@@ -135,7 +133,6 @@
       this.textareaId = this.textarea.id;
       this.lastContent = this.getContent();
       this.lastSaveSpan = this.container.querySelector('.exc-last-save');
-      console.log('3');
 
       window.setInterval(() => {
         this.autoSave();
@@ -147,7 +144,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    console.log('------1-------');
     const autoSaver = new AutoSaver();
     autoSaver.init();
   });

@@ -37,7 +37,7 @@ following objects:
 - Question Pool Survey
 - Question Pool Test
 - Weblink
-- wiki
+- Wiki
 
 In the OER Harvester cron job configuration, these types can be disabled
 individually.

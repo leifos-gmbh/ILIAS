@@ -158,6 +158,7 @@ lazily instantiate an object
 and everything in `Vocabularies\Slots` except `ElementHelper`
 - `XML/Copyright`, `XML/Links`, `XML/Dictionary`, `XML/Writer/SimpleDC`,
 and `XML/Reader/Standard/Legacy`
-- `OERExposer/OAIPMH/HTTP`, `OERExposer/OAIPMH/Initiator`
+- `OERExposer/OAIPMH/HTTP`
 - `OERHarvester/RepositoryObjects`, `OERHarvester/Settings`,
-`OERHarvester/Results`, `OERHarvester/Initiator`
+`OERHarvester/CronJob/Results`, `OERHarvester/Export`,
+`OERHarvester/ControlCenter`

@@ -70,7 +70,7 @@ class AutomaticPublisher
                     $harvestable_obj_ids,
                     $currently_harvested_obj_ids
                 );
-                $messages[] = 'Published or submitted for review' . $harvest_count . ' new objects.';
+                $messages[] = 'Published or submitted for review ' . $harvest_count . ' new objects.';
             }
 
             if ($deletion_count !== 0 || $harvest_count !== 0 || $exposure_count !== 0) {
@@ -151,6 +151,11 @@ class AutomaticPublisher
         array $currently_harvested_obj_ids
     ): int {
         $count = 0;
+
+        $source_ref_id = $this->settings->getContainerRefIDForPublishing();
+        if (!$source_ref_id) {
+            return 0;
+        }
 
         foreach ($harvestable_obj_ids as $obj_id) {
             if (in_array($obj_id, $currently_harvested_obj_ids)) {

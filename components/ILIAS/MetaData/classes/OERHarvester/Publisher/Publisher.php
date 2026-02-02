@@ -84,7 +84,7 @@ class Publisher implements PublisherInterface
         $this->deleteReferenceIfOthersExist($ref_id);
         $this->status_repo->deleteHarvestRefID($obj_id);
 
-        if ($this->publishing_settings->isEditorialStepEnabled()) {
+        if ($this->publishing_settings->isAutomaticPublishingEnabled()) {
             $this->block($obj_id);
         }
     }
@@ -137,7 +137,7 @@ class Publisher implements PublisherInterface
         $this->deleteReferenceIfOthersExist($ref_id);
         $this->status_repo->deleteHarvestRefID($obj_id);
 
-        if ($this->publishing_settings->isEditorialStepEnabled()) {
+        if ($this->publishing_settings->isAutomaticPublishingEnabled()) {
             $this->block($obj_id);
         }
     }

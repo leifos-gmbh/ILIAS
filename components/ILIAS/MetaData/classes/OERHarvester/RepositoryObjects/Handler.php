@@ -44,20 +44,6 @@ class Handler implements HandlerInterface
         return $new_ref_id;
     }
 
-    public function getObjectReferenceIDInContainer(int $obj_id, int $container_ref_id): ?int
-    {
-        $ref_ids = ilObject::_getAllReferences($obj_id);
-        foreach ($ref_ids as $ref_id) {
-            if ($this->tree->isDeleted($ref_id)) {
-                continue;
-            }
-            if ($this->tree->isGrandChild($container_ref_id, $ref_id)) {
-                return $ref_id;
-            }
-        }
-        return null;
-    }
-
     public function isObjectDeleted(int $obj_id): bool
     {
         $exists = false;

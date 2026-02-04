@@ -122,7 +122,10 @@ class AutomaticPublisher
     ): int {
         $count = 0;
         foreach ($currently_harvested_obj_ids as $obj_id) {
-            if (in_array($obj_id, $harvestable_obj_ids)) {
+            if (
+                in_array($obj_id, $harvestable_obj_ids) &&
+                $this->object_handler->doesReferenceExist($this->status_repository->getHarvestRefID($obj_id))
+            ) {
                 continue;
             }
 
@@ -151,11 +154,6 @@ class AutomaticPublisher
         array $currently_harvested_obj_ids
     ): int {
         $count = 0;
-
-        $source_ref_id = $this->settings->getContainerRefIDForPublishing();
-        if (!$source_ref_id) {
-            return 0;
-        }
 
         foreach ($harvestable_obj_ids as $obj_id) {
             if (in_array($obj_id, $currently_harvested_obj_ids)) {
@@ -190,23 +188,11 @@ class AutomaticPublisher
     {
         $count = 0;
 
-        $source_ref_id = $this->settings->getContainerRefIDForPublishing();
-        if (!$source_ref_id) {
-            $this->cleanUpDeletedRecords();
-            return 0;
-        }
-
         foreach ($this->exposed_record_repository->getRecords() as $record) {
             $obj_id = $record->infos()->objID();
             $ref_id = $this->status_repository->getHarvestRefID($obj_id);
 
-            if (!$ref_id || !$this->object_handler->isReferenceInContainer($ref_id, $source_ref_id)) {
-                if ($record->infos()->isDeleted()) {
-                    continue;
-                }
-                $this->logDebug('Withdrawing from publishing object taken out of publishing category with obj_id: ' . $obj_id);
-                $this->publisher->withdraw($obj_id);
-                $count++;
+            if (!$ref_id && $record->infos()->isDeleted()) {
                 continue;
             }
 

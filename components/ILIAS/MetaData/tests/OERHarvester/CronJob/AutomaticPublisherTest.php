@@ -143,18 +143,26 @@ class AutomaticPublisherTest extends TestCase
     protected function getObjectHandler(
         array $deleted_obj_ids = [],
         int $valid_publishing_container = 0,
-        array $ref_ids_in_container = []
+        array $ref_ids_in_container = [],
+        array $deleted_ref_ids = []
     ): ObjectHandler {
         return new class (
             $deleted_obj_ids,
             $valid_publishing_container,
-            $ref_ids_in_container
+            $ref_ids_in_container,
+            $deleted_ref_ids
         ) extends NullObjectHandler {
             public function __construct(
                 protected array $deleted_obj_ids,
                 protected int $valid_publishing_container,
-                protected array $ref_ids_in_container
+                protected array $ref_ids_in_container,
+                protected array $deleted_ref_ids
             ) {
+            }
+
+            public function doesReferenceExist(int $ref_id): bool
+            {
+                return !in_array($ref_id, $this->deleted_ref_ids);
             }
 
             public function isObjectDeleted(int $obj_id): bool
@@ -212,7 +220,7 @@ class AutomaticPublisherTest extends TestCase
 
             public function getHarvestRefID(int $obj_id): int
             {
-                return $this->currently_harvested[$obj_id];
+                return $this->currently_harvested[$obj_id] ?? 0;
             }
         };
     }
@@ -248,7 +256,7 @@ class AutomaticPublisherTest extends TestCase
                         public function __construct(
                             protected int $obj_id,
                             protected bool $is_deleted,
-                            protected string $metadata
+                            protected ?string $metadata
                         ) {
                         }
 
@@ -273,8 +281,11 @@ class AutomaticPublisherTest extends TestCase
                             };
                         }
 
-                        public function metadata(): \DOMDocument
+                        public function metadata(): ?\DOMDocument
                         {
+                            if ($this->metadata === null) {
+                                return null;
+                            }
                             $xml = new \DOMDocument();
                             $xml->loadXML($this->metadata);
                             return $xml;
@@ -493,6 +504,31 @@ class AutomaticPublisherTest extends TestCase
         $this->assertSame([32], $publisher->exposed_withdrawn_objects);
     }
 
+    public function testRunWithdrawDeprecatedReferenceReferenceDeleted(): void
+    {
+        $harvester = new AutomaticPublisher(
+            $publisher = $this->getPublisher(),
+            $this->getSettings(false, false, ['type', 'second type'], [12, 5]),
+            $this->getObjectHandler([], 0, [], [12332]),
+            $this->getStatusRepository([32 => 12332, 45 => 12345]),
+            $this->getExposedRecordRepository(),
+            $this->getSearchFactory(45, 32),
+            new NullLOMRepository(),
+            $this->getXMLWriter(),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(JobResult::STATUS_OK, $result->exposed_status);
+        $this->assertSame(
+            'Withdrew 1 deprecated objects.<br>' .
+            'Updated 0 published objects.',
+            $result->exposed_message
+        );
+        $this->assertSame([32], $publisher->exposed_withdrawn_objects);
+    }
+
     public function testRunWithdrawDeprecatedReferenceContinueDespiteError(): void
     {
         $harvester = new AutomaticPublisher(
@@ -689,32 +725,6 @@ class AutomaticPublisherTest extends TestCase
         $this->assertEmpty($publisher->exposed_published_objects);
     }
 
-    public function testRunDoNotPublishIfNoTargetContainerIsSet(): void
-    {
-        $harvester = new AutomaticPublisher(
-            $publisher = $this->getPublisher(),
-            $this->getSettings(true, false, ['type', 'second type'], [12, 5], 0),
-            $this->getObjectHandler(),
-            $this->getStatusRepository([32 => 12332]),
-            $this->getExposedRecordRepository(),
-            $this->getSearchFactory(32, 45),
-            new NullLOMRepository(),
-            $this->getXMLWriter(),
-            $this->getNullLogger()
-        );
-
-        $result = $harvester->run($this->getCronResultWrapper());
-
-        $this->assertSame(JobResult::STATUS_NO_ACTION, $result->exposed_status);
-        $this->assertSame(
-            'Withdrew 0 deprecated objects.<br>' .
-            'Updated 0 published objects.<br>' .
-            'Published or submitted for review 0 new objects.',
-            $result->exposed_message
-        );
-        $this->assertEmpty($publisher->exposed_published_objects);
-    }
-
     public function testRunPublishObjectContinueDespiteError(): void
     {
         $harvester = new AutomaticPublisher(
@@ -742,56 +752,6 @@ class AutomaticPublisherTest extends TestCase
             [32, 'type_32'],
             [67, 'type_67']
         ], $publisher->exposed_published_objects);
-    }
-
-    public function testRunWithdrawIfNotInSourceContainer(): void
-    {
-        $harvester = new AutomaticPublisher(
-            $publisher = $this->getPublisher(),
-            $this->getSettings(false, false, ['type', 'second type'], [12, 5], 123),
-            $this->getObjectHandler([], 123, [12332]),
-            $this->getStatusRepository([32 => 12332, 45 => 12345]),
-            $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>']),
-            $this->getSearchFactory(32, 45),
-            new NullLOMRepository(),
-            $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
-            $this->getNullLogger()
-        );
-
-        $result = $harvester->run($this->getCronResultWrapper());
-
-        $this->assertSame(JobResult::STATUS_OK, $result->exposed_status);
-        $this->assertSame(
-            'Withdrew 0 deprecated objects.<br>' .
-            'Updated 1 published objects.',
-            $result->exposed_message
-        );
-        $this->assertSame([45], $publisher->exposed_withdrawn_objects);
-    }
-
-    public function testRunDoNotWithdrawIfNotInSourceContainerAndAlreadyMarkedAsDeleted(): void
-    {
-        $harvester = new AutomaticPublisher(
-            $publisher = $this->getPublisher(),
-            $this->getSettings(false, false, ['type', 'second type'], [12, 5], 123),
-            $this->getObjectHandler([], 123, [12332]),
-            $this->getStatusRepository([32 => 12332, 45 => 12345]),
-            $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => '<el>45</el>'], [45]),
-            $this->getSearchFactory(32, 45),
-            new NullLOMRepository(),
-            $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45</el>']),
-            $this->getNullLogger()
-        );
-
-        $result = $harvester->run($this->getCronResultWrapper());
-
-        $this->assertSame(JobResult::STATUS_NO_ACTION, $result->exposed_status);
-        $this->assertSame(
-            'Withdrew 0 deprecated objects.<br>' .
-            'Updated 0 published objects.',
-            $result->exposed_message
-        );
-        $this->assertEmpty($publisher->exposed_withdrawn_objects);
     }
 
     public function testRunUpdateExposedRecord(): void
@@ -840,7 +800,7 @@ class AutomaticPublisherTest extends TestCase
             $this->getSettings(false, false, ['type', 'second type'], [12, 5], 123),
             $this->getObjectHandler([], 123, [12332, 12345]),
             $this->getStatusRepository([32 => 12332, 45 => 12345]),
-            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => ''], [45]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => null], [45]),
             $this->getSearchFactory(32, 45),
             new NullLOMRepository(),
             $writer = $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 changed</el>']),
@@ -869,6 +829,32 @@ class AutomaticPublisherTest extends TestCase
             ],
             $writer->exposed_params
         );
+        $this->assertCount(1, $record_repo->exposed_deletions);
+    }
+
+    public function testRunDoNotUpdateNotHarvestedExposedRecordMarkedAsDeleted(): void
+    {
+        $harvester = new AutomaticPublisher(
+            $this->getPublisher(),
+            $this->getSettings(false, false, ['type', 'second type'], [12, 5], 123),
+            $this->getObjectHandler([], 123, [12332]),
+            $this->getStatusRepository([32 => 12332]),
+            $record_repo = $this->getExposedRecordRepository([32 => '<el>32</el>', 45 => null], [45]),
+            $this->getSearchFactory(32),
+            new NullLOMRepository(),
+            $this->getXMLWriter([32 => '<el>32</el>', 45 => '<el>45 changed</el>']),
+            $this->getNullLogger()
+        );
+
+        $result = $harvester->run($this->getCronResultWrapper());
+
+        $this->assertSame(JobResult::STATUS_NO_ACTION, $result->exposed_status);
+        $this->assertSame(
+            'Withdrew 0 deprecated objects.<br>' .
+            'Updated 0 published objects.',
+            $result->exposed_message
+        );
+        $this->assertEmpty($record_repo->exposed_updates);
         $this->assertCount(1, $record_repo->exposed_deletions);
     }
 

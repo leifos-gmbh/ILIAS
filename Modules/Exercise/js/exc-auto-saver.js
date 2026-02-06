@@ -102,11 +102,10 @@
     }
 
     updateTime() {
-      if (this.lastSaving === 0) {
-        return;
-      }
-      const now = Date.now();
-      const diff = now - this.lastSaving;
+      if (!this.lastSaveSpan) return;
+      if (!this.lastSaving) return;
+
+      const diff = Math.max(0, Date.now() - Number(this.lastSaving));
       const mins = Math.floor(diff / 60000);
       let mess;
 

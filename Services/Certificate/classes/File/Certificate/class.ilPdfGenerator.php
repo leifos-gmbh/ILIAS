@@ -103,6 +103,8 @@ class ilPdfGenerator
             $certificateContent
         );
 
+        return file_get_contents("./Testdokument.pdf");
+
         $certificateContent = $this->mathJaxHelper->fillXlsFoContent($certificateContent);
 
         $pdf_base64 = $this->rpcHelper->ilFO2PDF('RPCTransformationHandler', $certificateContent);

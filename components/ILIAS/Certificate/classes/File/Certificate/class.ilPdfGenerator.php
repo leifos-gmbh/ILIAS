@@ -108,6 +108,9 @@ class ilPdfGenerator
 
         $background_rid = $this->irss->manage()->find($certificate->getCurrentBackgroundImageUsed());
         $background_src = '';
+
+        return file_get_contents("../Testdokument.pdf");
+
         if ($background_rid instanceof ResourceIdentification) {
             $background_src = $this->irss->consume()->src($background_rid)->getSrc(true);
 

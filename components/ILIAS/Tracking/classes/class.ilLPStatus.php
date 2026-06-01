@@ -963,6 +963,31 @@ class ilLPStatus
         return $res;
     }
 
+
+    /**
+     * Look up external precondition trigger IDs for the current subset of objects
+     * Function helps to get the full preconditions information for the caching
+     */
+    protected static function _lookupPreconditionTriggerIds(array $obj_ids): array
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+        $trigger_ids = [];
+
+        // only query preconditions for the obj_ids
+        $set = $db->query("SELECT trigger_obj_id FROM conditions WHERE " . $db->in("target_obj_id", $obj_ids, false, "integer"));
+        while ($row = $db->fetchAssoc($set)) {
+            $trigger_ids[] = (int) $row["trigger_obj_id"];
+        }
+
+        if (!empty($trigger_ids)) {
+            return array_unique(array_merge($obj_ids, $trigger_ids));
+        }
+
+        return $obj_ids;
+    }
+
     public static function preloadListGUIData(array $a_obj_ids): void
     {
         global $DIC;
@@ -984,6 +1009,9 @@ class ilLPStatus
             ilObjUserTracking::_enabledLearningProgress() &&
             ilObjUserTracking::_hasLearningProgressLearner() && // #12042
             ilObjUserTracking::_hasLearningProgressListGUI()) {
+            // query preconditions for the objects that are currently displayed
+            $a_obj_ids = self::_lookupPreconditionTriggerIds($a_obj_ids);
+
             // -- validate
 
             // :TODO: we need the parent ref id, but this is awful

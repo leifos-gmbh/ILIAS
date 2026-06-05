@@ -32,9 +32,45 @@ class Logging implements Component\Component
         array | \ArrayAccess &$pull,
         array | \ArrayAccess &$internal,
     ): void {
-        $contribute[\ILIAS\Setup\Agent::class] = static fn() =>
+        $define[] = Logging\Logger\FactoryInterface::class;
+        $define[] = Logging\Logger\RootFactoryInterface::class;
+        $define[] = Logging\Config\ConfigInterface::class;
+        $define[] = Logging\Config\ByComponentInterface::class;
+
+        $internal[Logging\Logger\InternalFactoryInterface::class] = static fn() =>
+            new Logging\Logger\InternalFactory(
+                $pull[Logging\Config\ConfigInterface::class]
+            );
+        $internal[Logging\Config\LevelsByComponent\RepositoryInterface::class] = static fn() =>
+            new Logging\Config\LevelsByComponent\DBRepository(
+                $pull[\ilDBInterface::class] // TODO change to whatever this is now called
+            );
+        $internal[Logging\Config\Ini\ReaderInterface::class] = static fn() =>
+            null; // TODO implement
+
+        $implement[Logging\Logger\FactoryInterface::class] = static fn() =>
+            new Logging\Logger\Factory(
+                $pull[Logging\Logger\InternalFactoryInterface::class],
+                $pull[Logging\Config\ByComponentInterface::class]
+            );
+        $implement[Logging\Logger\RootFactoryInterface::class] = static fn() =>
+            new Logging\Logger\RootFactory(
+                $pull[Logging\Logger\InternalFactoryInterface::class],
+                $pull[Logging\Config\ConfigInterface::class]
+            );
+        $implement[Logging\Config\ConfigInterface::class] = static fn() =>
+            new Logging\Config\Config(
+                $internal[Logging\Config\Ini\ReaderInterface::class]
+            );
+        $implement[Logging\Config\ByComponentInterface::class] = static fn() =>
+            new Logging\Config\ByComponent(
+                $internal[Logging\Config\LevelsByComponent\RepositoryInterface::class],
+                $pull[Logging\Config\ConfigInterface::class]
+            );
+
+        $contribute[Setup\Agent::class] = static fn() =>
             new \ilLoggingSetupAgent(
-                $pull[\ILIAS\Refinery\Factory::class]
+                $pull[Refinery\Factory::class]
             );
     }
 }

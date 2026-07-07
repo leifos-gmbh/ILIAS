@@ -4,9 +4,9 @@ This documentation does not warrant completeness or correctness. Please report a
 missing or wrong information using the [ILIAS issue tracker](https://mantis.ilias.de)
 or contribute a fix via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).
 
-## Integrated Services
+## Integrated Components
 
-The Staff component aggregates data from various ILIAS services. Please consult the respective privacy documentation:
+The **Staff** component aggregates data from various ILIAS components. Please consult the respective privacy documentation:
 
 - [OrgUnit](../OrgUnit/PRIVACY.md) provides information about accounts' assignment to **organisational units**,
   what accounts they have authority over, and which data this authority grants access to via 
@@ -14,10 +14,10 @@ The Staff component aggregates data from various ILIAS services. Please consult 
 - [Skill](../Skill/PRIVACY.md) provides information about **achieved skill levels**, and a pre-built UI
   showing that information for a given account.
 - **User** handles **account identification**, provides **personal profile data** and whether a profile
-  is **published**, and provides a list of account-specific actions.
+  is **published**, and provides a list of 'User Actions'.
 - **Tree** is used together with **ILIASObject** to check the hierarchy of **organisational units**.
 - [AccessControl](../AccessControl/PRIVACY.md) is used to check permissions to decide whether objects can be linked to.
-- **Tracking** provides information the **learning progress status** of accounts in courses.
+- **Tracking** provides information about the **learning progress status** of accounts in courses.
 - [Course](../Course/PRIVACY.md) together with **Membership** provides information about **enrolment status 
   in courses** of accounts.
 - **ILIASObject** is used to retrieve **titles** of courses.
@@ -26,7 +26,7 @@ The Staff component aggregates data from various ILIAS services. Please consult 
 
 ## General Information
 
-What data is shown in **Staff**, depends heavily on the position access configuration
+What data is shown in **Staff** depends heavily on the position access configuration
 of **OrgUnit**.
 
 The component provides a number of reporting views to give accounts
@@ -64,10 +64,10 @@ all relevant accounts:
 
 - **Profile Picture**
 - **Login**
-- All other **personal profile fields** of type 'Default',
+- All other **personal profile fields** of type 'Default'
   and set to 'Searchable' in the **User** profile administration.
 
-Further, a selection of account-specific actions is available,
+Further, a selection of 'User Actions' is available,
 which exposes the accounts' **user ID**.
 
 ### Course Memberships
@@ -78,7 +78,7 @@ their authority, as granted by position access in the **OrgUnit**
 administration. This permission can be set as a default per position,
 but can also be overwritten locally in individual courses.
 
-It shows a table of those **course enrolments** of accounts where
+The view shows a table of those **course enrolments** of accounts where
 the current account has the 'Manage Members' permission over that
 account in that course. Included is the following data:
 
@@ -86,11 +86,11 @@ account in that course. Included is the following data:
 - **Login** of the account.
 - **First Name**, **Last Name**, **E-Mail**, and **Organisational Units**
   of the account, only if the corresponding **personal profile field** is
-  set to 'Searchable' via the **User** component..
+  set to 'Searchable' via the **User** component.
 - **Member Status** of the account in the course: 'Registered', 'Waiting List',
   'Requested'
-- **Learning Progress** status of the account in the course, only if
-  the learning progress is active on the installation, and the
+- **Learning Progress** status of the account in the course. Only shown if
+  learning progress is active on the installation, and the
   current account has the 'View learning progress of other users'
   position permission over the account in the course.
 
@@ -104,8 +104,8 @@ by position access in the **OrgUnit** administration. This permission
 can be set as a default per position, but can also be overwritten locally in
 individual courses, exercises, and tests.
 
-It presents data related to certificates achieved by accounts in
-courses, exercises, or tests. For a competence to appear,
+The view presents data related to certificates achieved by accounts in
+courses, exercises, or tests. For a certificate to appear,
 the current account must have the 'View certificates of other users'
 permission over that account in that object.
 
@@ -117,7 +117,7 @@ with the following data:
 - **Login** of the account to which the certificate was awarded.
 - **First Name**, **Last Name**, **E-Mail**, and **Organisational Units**
   of the account, only if the corresponding **personal profile field** is
-  set to 'Searchable' via the **User** component..
+  set to 'Searchable' via the **User** component.
 
 ### Competences
 
@@ -127,7 +127,7 @@ activated on the installation. Also, the current account must have the
 or tests over at least one account under their authority, as granted
 by position access in the **OrgUnit** administration. This permission
 can be set as a default per position, but can also be overwritten locally in
-individual courses, groups, surveys, and tests
+individual courses, groups, surveys, and tests.
 
 It presents data related to competences achieved by accounts
 in courses, groups, surveys, or tests. For a competence to appear,

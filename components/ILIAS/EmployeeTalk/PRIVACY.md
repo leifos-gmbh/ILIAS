@@ -161,7 +161,7 @@ to the notification isan ics-file, which includes in addition to the above:
 - **Employee** of the talk by full name, including title if available,
   as given by the **User** component.
 
-With the ics-file, the appointment can be imported into external
+With the ics-file, the talk can be imported as an event into external
 calendar applications.
 
 ## Data being deleted

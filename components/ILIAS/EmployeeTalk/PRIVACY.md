@@ -28,12 +28,6 @@ The **EmployeeTalk** component integrates various ILIAS components. Please consu
 
 ## General Information
 
-Access in **EmployeeTalk** depends mostly on the position access configuration
-of **OrgUnit**, and its concept of authority. The corresponding permissions in the
-**OrgUnit** position administration are 'Read access talk appointments',
-'Create talk appointments / edit talk appointments that you have created yourself',
-and 'Edit Talk appointments'. See [below](#access-to-talks) for details.
-
 Talks carry a 'location' field (handled by **EmployeeTalk** itself),
 a title and description (handled by **ILIASObject**),
 as well as further fields from attached **Custom Metadata**
@@ -45,6 +39,12 @@ Note that talks share their title with the series they are a part of.
 The title is stored redundantly, again by **ILIASObject**.
 
 ### Access to Talks
+
+Access in **EmployeeTalk** depends mostly on the position access configuration
+of **OrgUnit**, and its concept of authority. The corresponding permissions in the
+**OrgUnit** position administration are 'Read access talk appointments',
+'Create talk appointments / edit talk appointments that you have created yourself',
+and 'Edit Talk appointments', and relate to access to talks as follows:
 
 - **Create:** The current account has the 'Create talk appointments / edit talk appointments that you have created yourself'
   permission over the employee. Access to the creation dialogue is granted if
@@ -114,7 +114,12 @@ In the talks themselves, in addition what is included in the
 - **Title** and **Description** of the talk.
 - **Location** of the talk.
 - The attached **Custom Metadata** fields.
-- The **Info Screen** of the talk.
+- The **Info**-tab of the talk. There the superior of the talk
+  is listed as its owner, but only to accounts with the global
+  'Administrator' role (and the superior themselves). They are identified via their login.
+  If their personal profile is published via the User component,
+  their first name, last name, and a link to their profile are
+  also shown.
 
 This data is available to accounts with [read or edit access](#access-to-talks)
 to the talk. Accounts with the latter can also edit these fields
@@ -128,7 +133,7 @@ but the superior themselves.
 ### Calendar Appointments
 
 The employee and superior of a talk have the talk as an appointment
-in their personal calendar, with the following data:
+in their personal calendar, only accessible by them, with the following data:
 
 - **Superior** and **Employee** of the talk, by first and last name.
   If the account's profile is published via the **User** component,
@@ -155,6 +160,9 @@ to the notification isan ics-file, which includes in addition to the above:
 
 - **Employee** of the talk by full name, including title if available,
   as given by the **User** component.
+
+With the ics-file, the appointment can be imported into external
+calendar applications.
 
 ## Data being deleted
 

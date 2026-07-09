@@ -148,20 +148,19 @@ When a talk (series) is created, deleted, or its settings or dates changed,
 a system notification is sent to the employee, with the superior in CC.
 This notification includes the following data:
 
-- **Title** and **Description** of the talk (series).
-- **Location** of the talk.
-- **Superior** of the talk by full name, including title if available,
+- **Title** and **Description** of the talks.
+- **Location** of the talks.
+- **Superior** of the talks by full name, including title if available,
   as given by the **User** component.
-- **Start Date** and **End Date** of the talk (or all in the series),
-  with time if applicable.
+- **Start Date** and **End Date** of the talks, with time if applicable.
 
-The notification also includes a link to the [talk](#talk). Attached
-to the notification isan ics-file, which includes in addition to the above:
+The notification also includes a link to the first [talk](#talk) in the series. Attached
+to the notification is an ics-file, which includes in addition to the above:
 
-- **Employee** of the talk by full name, including title if available,
+- **Employee** of the talks by full name, including title if available,
   as given by the **User** component.
 
-With the ics-file, the talk can be imported as an event into external
+With the ics-file, the talk series can be imported as events into external
 calendar applications.
 
 ## Data being deleted

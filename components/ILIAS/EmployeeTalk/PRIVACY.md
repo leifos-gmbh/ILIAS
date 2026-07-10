@@ -1,8 +1,7 @@
 # EmployeeTalk Privacy
 
-This documentation does not warrant completeness or correctness. Please report any
-missing or wrong information using the [ILIAS issue tracker](https://mantis.ilias.de)
-or contribute a fix via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).
+**Disclaimer: This documentation does not guarantee completeness or accuracy. Please report any missing
+or incorrect information via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).**
 
 ## Integrated Components
 
@@ -57,7 +56,7 @@ and 'Edit Talk appointments', and relate to access to talks as follows:
   'Lock the editing of all appointments in this series' is enabled in
   the series, only the superior can edit.
 - **Delete:** The current account is superior of the talk and has read-access to the talk template
-  administration via RBAC, or they have the global 'Administrator' role.
+  administration via RBAC (AccessControl), or they have the global 'Administrator' role.
 
 Note that the root account can always access every talk, and can always create
 a talk. If position access for 'Employee Talks' is deactivated, only the root
@@ -115,10 +114,10 @@ In the talks themselves, in addition what is included in the
 - **Location** of the talk.
 - The attached **Custom Metadata** fields.
 - The **Info**-tab of the talk. There the superior of the talk
-  is listed as its owner, but only to accounts with the global
-  'Administrator' role (and the superior themselves). They are identified via their login.
+  is listed as its **owner**, but only to accounts with the global
+  'Administrator' role (and the superior themselves). They are identified via their **login**.
   If their personal profile is published via the User component,
-  their first name, last name, and a link to their profile are
+  their **first name**, **last name**, and a **link to their profile** are
   also shown.
 
 This data is available to accounts with [read or edit access](#access-to-talks)

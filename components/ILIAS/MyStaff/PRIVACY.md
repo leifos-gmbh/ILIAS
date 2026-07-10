@@ -1,8 +1,7 @@
 # Staff Privacy
 
-This documentation does not warrant completeness or correctness. Please report any
-missing or wrong information using the [ILIAS issue tracker](https://mantis.ilias.de)
-or contribute a fix via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).
+**Disclaimer: This documentation does not guarantee completeness or accuracy. Please report any missing
+or incorrect information via [Pull Request](../../../docs/development/contributing.md#pull-request-to-the-repositories).**
 
 ## Integrated Components
 
@@ -16,11 +15,11 @@ The **Staff** component aggregates data from various ILIAS components. Please co
 - **User** handles **account identification**, provides **personal profile data** and whether a profile
   is **published**, and provides a list of 'User Actions'.
 - **Tree** is used together with **ILIASObject** to check the hierarchy of **organisational units**.
+- **ILIASObject** is also used to retrieve **titles** of courses.
 - [AccessControl](../AccessControl/PRIVACY.md) is used to check permissions to decide whether objects can be linked to.
 - **Tracking** provides information about the **learning progress status** of accounts in courses.
 - [Course](../Course/PRIVACY.md) together with **Membership** provides information about **enrolment status 
   in courses** of accounts.
-- **ILIASObject** is used to retrieve **titles** of courses.
 - [Certificate](../Certificate/PRIVACY.md) provides information about **awarded certificates**,
   and a pre-built UI showing that information for a given account.
 
@@ -51,7 +50,7 @@ organisational units.
 
 Additionally, views that report individually on single accounts
 under the authority of the current account are also available,
-see [below](#account-specific).
+see [below](#account-specific-views).
 
 All views are only available if 'Enable Main Menu Entry' is
 enabled in the **OrgUnit** settings, and if the current account
@@ -144,7 +143,7 @@ with the following data:
   of the account, only if the corresponding **personal profile field** is
   set to 'Searchable' via the **User** component.
 
-### Account-Specific
+### Account-Specific Views
 
 All account-specific views always show the **profile picture** and the **login**
 of the selected account. They also show their **first name** and

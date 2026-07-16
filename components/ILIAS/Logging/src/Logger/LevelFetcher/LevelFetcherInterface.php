@@ -18,11 +18,19 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Logger;
+namespace ILIAS\Logging\Logger\LevelFetcher;
 
 use ILIAS\Logging\ILIASLogLevel;
 
-interface InternalFactoryInterface
+/**
+ * This exists to encapsulate reading the level of
+ * a logger from the config, to be able to delay it
+ * as much as possible (while keeping dependencies
+ * of {@see \ILIAS\Logging\Logger\DefaultLoggerFactory}
+ * and {@see \ILIAS\Logging\Logger\ComponentLoggerFactory}
+ * independent).
+ */
+interface LevelFetcherInterface
 {
-    public function get(string $component_or_root_id, ILIASLogLevel $level): LoggerInterface;
+    public function fetchLevel(): ILIASLogLevel;
 }

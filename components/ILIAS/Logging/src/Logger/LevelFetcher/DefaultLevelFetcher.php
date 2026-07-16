@@ -18,9 +18,20 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Logger;
+namespace ILIAS\Logging\Logger\LevelFetcher;
 
-interface FactoryInterface
+use ILIAS\Logging\ILIASLogLevel;
+use ILIAS\Logging\Config\Basic\ConfigInterface;
+
+class DefaultLevelFetcher implements LevelFetcherInterface
 {
-    public function forComponent(string $component_id): LoggerInterface;
+    public function __construct(
+        protected ConfigInterface $basic_config
+    ) {
+    }
+
+    public function fetchLevel(): ILIASLogLevel
+    {
+        return $this->basic_config->defaultLevel();
+    }
 }

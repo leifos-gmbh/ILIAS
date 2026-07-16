@@ -18,20 +18,29 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config\LevelsByComponent;
+namespace ILIAS\Logging\Config\Basic;
 
-use ILIAS\Logging\ILIASLogLevel;
+use ilIniFile;
 
-interface RepositoryInterface
+class IniReader implements IniReaderInterface
 {
-    public function addComponent(string $component_id): void;
+    public function __construct(
+        protected ilIniFile $ini_file
+    ) {
+    }
 
-    /**
-     * @return array<string, ?ILIASLogLevel>
-     */
-    public function getLevelsForAllComponents(): array;
+    public function isLoggingEnabled(): string
+    {
+        return $this->ini_file->readVariable('log', 'enabled');
+    }
 
-    public function getLevelForComponent(string $component_id): ?ILIASLogLevel;
+    public function logFile(): string
+    {
+        return $this->ini_file->readVariable('log', 'file');
+    }
 
-    public function updateLevelForComponent(string $component_id, ILIASLogLevel $level): void;
+    public function defaultLevel(): string
+    {
+        return $this->ini_file->readVariable('log', 'level');
+    }
 }

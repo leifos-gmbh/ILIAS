@@ -18,12 +18,12 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config;
+namespace ILIAS\Logging\Config\ByComponent;
 
 use ILIAS\Logging\ILIASLogLevel;
-use ILIAS\Logging\Config\LevelsByComponent\RepositoryInterface;
+use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfigInterface;
 
-class ByComponent implements ByComponentInterface
+class Config implements ConfigInterface
 {
     /**
      * @var array<string, ?ILIASLogLevel>
@@ -32,13 +32,13 @@ class ByComponent implements ByComponentInterface
 
     public function __construct(
         protected RepositoryInterface $repo,
-        protected ConfigInterface $config
+        protected BasicConfigInterface $basic_config
     ) {
     }
 
-    public function getLevel(string $component_id): ILIASLogLevel
+    public function level(string $component_id): ILIASLogLevel
     {
-        return $this->getLevels()[$component_id] ?? $this->config->getDefaultLevel();
+        return $this->getLevels()[$component_id] ?? $this->basic_config->defaultLevel();
     }
 
     /**

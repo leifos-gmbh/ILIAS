@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Logger\Extensions;
+namespace ILIAS\Logging\Logger\Monolog;
 
 use Monolog\LogRecord;
 use ILIAS\Logging\ILIASLogLevel;

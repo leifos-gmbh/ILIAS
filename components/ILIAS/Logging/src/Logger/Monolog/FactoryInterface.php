@@ -18,12 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config;
+namespace ILIAS\Logging\Logger\Monolog;
 
-// TODO maybe move to Init/Error?
-interface ErrorConfigInterface
+use ILIAS\Logging\ILIASLogLevel;
+use Monolog\Logger as MonologLogger;
+
+interface FactoryInterface
 {
-    public function getErrorDirectory(): string;
+    public function logger(string $name, ILIASLogLevel $level, string $file_path): MonologLogger;
 
-    public function getErrorRecipientLogin(): string;
+    public function nullLogger(string $name): MonologLogger;
 }

@@ -18,14 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config;
+namespace ILIAS\Logging\Logger;
 
-use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfigInterface;
-use ILIAS\Logging\Config\ByComponent\ConfigInterface as ByComponentConfigInterface;
-
-interface ConfigInterface
+interface DefaultLoggerFactoryInterface
 {
-    public function basic(): BasicConfigInterface;
-
-    public function byComponent(): ByComponentConfigInterface;
+    /**
+     * Only use this when you need to log something before
+     * the Database component is initialized.
+     *
+     * Otherwise, please use the appropriate component-specific
+     * logger from {@see ComponentLoggerFactoryInterface}.
+     */
+    public function getLazy(): LoggerInterface;
 }

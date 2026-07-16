@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config\LevelsByComponent;
+namespace ILIAS\Logging\Config\ByComponent;
 
 use ilDBInterface;
 use ilDBConstants;

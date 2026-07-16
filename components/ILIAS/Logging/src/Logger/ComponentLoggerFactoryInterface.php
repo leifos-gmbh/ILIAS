@@ -20,21 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Logging\Logger;
 
-use ILIAS\Logging\Config\ConfigInterface;
-
-class RootFactory implements RootFactoryInterface
+interface ComponentLoggerFactoryInterface
 {
-    public function __construct(
-        protected InternalFactory $internal_factory,
-        protected ConfigInterface $config
-    ) {
-    }
-
-    public function get(string $component_id): LoggerInterface
-    {
-        return $this->internal_factory->get(
-            $component_id,
-            $this->config->getLevelForRootLogger()
-        );
-    }
+    public function getLazyForComponent(string $component_id): LoggerInterface;
 }

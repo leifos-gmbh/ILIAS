@@ -18,13 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Logger;
+namespace ILIAS\Logging\Config\Basic;
 
-/**
- * Does not depend on the database, so can be used for
- * logging for components that have to be initiated before.
- */
-interface RootFactoryInterface
+interface IniReaderInterface
 {
-    public function get(string $component_id): LoggerInterface;
+    public function isLoggingEnabled(): string;
+
+    public function logFile(): string;
+
+    public function defaultLevel(): string;
 }

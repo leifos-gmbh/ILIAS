@@ -18,14 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config;
+namespace ILIAS\Logging\Config\ByComponent;
 
-use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfigInterface;
-use ILIAS\Logging\Config\ByComponent\ConfigInterface as ByComponentConfigInterface;
+use ILIAS\Logging\ILIASLogLevel;
 
 interface ConfigInterface
 {
-    public function basic(): BasicConfigInterface;
-
-    public function byComponent(): ByComponentConfigInterface;
+    public function level(string $component_id): ILIASLogLevel;
 }

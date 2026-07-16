@@ -18,14 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config;
+namespace ILIAS\Logging\Logger;
 
-use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfigInterface;
-use ILIAS\Logging\Config\ByComponent\ConfigInterface as ByComponentConfigInterface;
+use ILIAS\Logging\ILIASLogLevel;
+use ILIAS\Logging\Logger\LevelFetcher\LevelFetcherInterface;
 
-interface ConfigInterface
+interface LazyInternalFactoryInterface
 {
-    public function basic(): BasicConfigInterface;
-
-    public function byComponent(): ByComponentConfigInterface;
+    public function getLazyGhost(
+        string $component_or_root_id,
+        LevelFetcherInterface $level_fetcher
+    ): LoggerInterface;
 }

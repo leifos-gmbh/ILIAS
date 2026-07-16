@@ -35,7 +35,7 @@ enum ILIASLogLevel: int
 
     public static function tryFromString(string $value): ?self
     {
-        return match (strtoupper($value)) {
+        return match ($value) {
             'DEBUG' => self::DEBUG,
             'INFO' => self::INFO,
             'NOTICE' => self::NOTICE,

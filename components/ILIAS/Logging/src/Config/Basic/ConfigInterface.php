@@ -18,11 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config;
+namespace ILIAS\Logging\Config\Basic;
 
 use ILIAS\Logging\ILIASLogLevel;
 
-interface ByComponentInterface
+interface ConfigInterface
 {
-    public function getLevel(string $component_id): ILIASLogLevel;
+    public function isLoggingEnabled(): bool;
+
+    public function logFile(): string;
+
+    public function defaultLevel(): ILIASLogLevel;
 }

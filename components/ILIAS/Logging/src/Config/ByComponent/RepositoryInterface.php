@@ -18,14 +18,20 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config;
+namespace ILIAS\Logging\Config\ByComponent;
 
-use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfigInterface;
-use ILIAS\Logging\Config\ByComponent\ConfigInterface as ByComponentConfigInterface;
+use ILIAS\Logging\ILIASLogLevel;
 
-interface ConfigInterface
+interface RepositoryInterface
 {
-    public function basic(): BasicConfigInterface;
+    public function addComponent(string $component_id): void;
 
-    public function byComponent(): ByComponentConfigInterface;
+    /**
+     * @return array<string, ?ILIASLogLevel>
+     */
+    public function getLevelsForAllComponents(): array;
+
+    public function getLevelForComponent(string $component_id): ?ILIASLogLevel;
+
+    public function updateLevelForComponent(string $component_id, ILIASLogLevel $level): void;
 }

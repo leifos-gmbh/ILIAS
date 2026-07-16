@@ -18,26 +18,23 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Logging\Config;
+namespace ILIAS\Logging\Logger\LevelFetcher;
 
+use ILIAS\Logging\Config\ByComponent\ConfigInterface as ConfigByComponentInterface;
 use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfigInterface;
-use ILIAS\Logging\Config\ByComponent\ConfigInterface as ByComponentConfigInterface;
 
-class Config implements ConfigInterface
+class LevelFetcherFactory implements LevelFetcherFactoryInterface
 {
-    public function __construct(
-        protected BasicConfigInterface $basic,
-        protected ByComponentConfigInterface $by_component
-    ) {
+    public function componentLevelFetcher(
+        ConfigByComponentInterface $config_by_component,
+        string $component_id
+    ): LevelFetcherInterface {
+        return new ComponentLevelFetcher($config_by_component, $component_id);
     }
 
-    public function basic(): BasicConfigInterface
-    {
-        return $this->basic;
-    }
-
-    public function byComponent(): ByComponentConfigInterface
-    {
-        return $this->by_component;
+    public function defaultLevelFetcher(
+        BasicConfigInterface $basic_config
+    ): LevelFetcherInterface {
+        return new DefaultLevelFetcher($basic_config);
     }
 }

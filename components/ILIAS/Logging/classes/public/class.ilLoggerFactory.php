@@ -18,15 +18,8 @@
 
 declare(strict_types=1);
 
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\BrowserConsoleHandler;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\FingersCrossedHandler;
-use Monolog\Handler\NullHandler;
-use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
-use ILIAS\DI\Container;
-use Monolog\Processor\PsrLogMessageProcessor;
+use ILIAS\Logging\Logger\DefaultLoggerFactoryInterface;
+use ILIAS\Logging\Logger\ComponentLoggerFactoryInterface;
 
 /**
  * Logging factory
@@ -36,31 +29,24 @@ use Monolog\Processor\PsrLogMessageProcessor;
  */
 class ilLoggerFactory
 {
-    protected const DEFAULT_FORMAT = "[%extra.suid%] [%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
-
     protected const ROOT_LOGGER = 'root';
-    protected const COMPONENT_ROOT = 'log_root';
-    protected const SETUP_LOGGER = 'setup';
 
     private static ?ilLoggerFactory $instance = null;
 
+    private DefaultLoggerFactoryInterface $default_factory;
+    private ComponentLoggerFactoryInterface $component_factory;
     private ilLoggingSettings $settings;
-    protected Container $dic;
-
-    private bool $enabled = false; //ToDo PHP8 Review: This is a private var never read only written and should probably be removed.
 
     /**
      * @var array<string, ilComponentLogger>
      */
-    private array $loggers = array();
+    private array $loggers = [];
 
-    protected function __construct(ilLoggingSettings $settings)
+    protected function __construct()
     {
         global $DIC;
 
-        $this->dic = $DIC;
-        $this->settings = $settings;
-        $this->enabled = $this->getSettings()->isEnabled();
+        // TODO set factories from DIC via bootstrapping, also settings
     }
 
     public static function getInstance(): ilLoggerFactory
@@ -70,16 +56,6 @@ class ilLoggerFactory
             static::$instance = new ilLoggerFactory($settings);
         }
         return static::$instance;
-    }
-
-    public static function newInstance(ilLoggingSettings $settings): ilLoggerFactory
-    {
-        return static::$instance = new self($settings);
-    }
-
-    public function isLoggingEnabled(): bool
-    {
-        return $this->enabled;
     }
 
 
@@ -98,7 +74,7 @@ class ilLoggerFactory
     public static function getRootLogger(): ilLogger
     {
         $factory = self::getInstance();
-        return $factory->getComponentLogger(self::ROOT_LOGGER);
+        return $factory->getComponentLogger('root');
     }
 
 
@@ -107,18 +83,6 @@ class ilLoggerFactory
      */
     public function initUser(string $a_login): void
     {
-        if (!$this->getSettings()->isBrowserLogEnabledForUser($a_login)) {
-            return;
-        }
-
-        foreach ($this->loggers as $a_component_id => $logger) {
-            if ($this->isConsoleAvailable()) {
-                $browser_handler = new BrowserConsoleHandler();
-                $browser_handler->setLevel($this->getSettings()->getLevelByComponent($a_component_id));
-                $browser_handler->setFormatter(new ilLineFormatter(static::DEFAULT_FORMAT, 'Y-m-d H:i:s.u', true, true));
-                $logger->getLogger()->pushHandler($browser_handler);
-            }
-        }
     }
 
     /**
@@ -159,102 +123,15 @@ class ilLoggerFactory
         return $this->settings;
     }
 
-    /**
-     * @return ilComponentLogger[]
-     */
-    protected function getLoggers(): array
-    {
-        return $this->loggers;
-    }
-
     public function getComponentLogger(string $a_component_id): ilLogger
     {
         if (isset($this->loggers[$a_component_id])) {
             return $this->loggers[$a_component_id];
         }
 
-        $loggerNamePrefix = '';
-        if (defined('CLIENT_ID')) {
-            $loggerNamePrefix = CLIENT_ID . '_';
+        if ($a_component_id === 'root') {
+            return $this->loggers['root'] = new ilComponentLogger($this->default_factory->getLazy());
         }
-
-        switch ($a_component_id) {
-            case 'root':
-                $logger = new Logger($loggerNamePrefix . 'root');
-                break;
-
-            default:
-                $logger = new Logger($loggerNamePrefix . $a_component_id);
-                break;
-        }
-
-        if (!$this->isLoggingEnabled()) {
-            $null_handler = new NullHandler();
-            $logger->pushHandler($null_handler);
-
-            return $this->loggers[$a_component_id] = new ilComponentLogger($logger);
-        }
-
-
-        // standard stream handler
-        $stream_handler = new StreamHandler(
-            $this->getSettings()->getLogDir() . '/' . $this->getSettings()->getLogFile(),
-            Logger::DEBUG, // default minimum level, will be overwritten by component log level
-            true
-        );
-
-        if ($a_component_id == self::ROOT_LOGGER) {
-            $stream_handler->setLevel($this->getSettings()->getLevelByComponent(self::COMPONENT_ROOT));
-        } else {
-            $stream_handler->setLevel($this->getSettings()->getLevelByComponent($a_component_id));
-        }
-
-        // format lines
-        $line_formatter = new ilLineFormatter(static::DEFAULT_FORMAT, 'Y-m-d H:i:s.u', true, true);
-        $stream_handler->setFormatter($line_formatter);
-
-        if ($this->getSettings()->isCacheEnabled()) {
-            // add new finger crossed handler
-            $finger_crossed_handler = new FingersCrossedHandler(
-                $stream_handler,
-                new ErrorLevelActivationStrategy($this->getSettings()->getCacheLevel()),
-                1000
-            );
-            $logger->pushHandler($finger_crossed_handler);
-        } else {
-            $logger->pushHandler($stream_handler);
-        }
-
-        if (
-            $this->dic->offsetExists('ilUser') &&
-            $this->dic->user() instanceof ilObjUser
-        ) {
-            if ($this->getSettings()->isBrowserLogEnabledForUser($this->dic->user()->getLogin())) {
-                if ($this->isConsoleAvailable()) {
-                    $browser_handler = new BrowserConsoleHandler();
-                    $browser_handler->setLevel($this->getSettings()->getLevel());
-                    $browser_handler->setFormatter($line_formatter);
-                    $logger->pushHandler($browser_handler);
-                }
-            }
-        }
-
-
-        // suid log
-        $logger->pushProcessor(function ($record) {
-            $record['extra']['suid'] = substr(session_id(), 0, 5);
-            return $record;
-        });
-
-        // append trace
-        $logger->pushProcessor(new ilTraceProcessor(ilLogLevel::DEBUG));
-
-        // Interpolate context variables.
-        $logger->pushProcessor(new PsrLogMessageProcessor());
-
-        // register new logger
-        $this->loggers[$a_component_id] = new ilComponentLogger($logger);
-
-        return $this->loggers[$a_component_id];
+        return $this->loggers[$a_component_id] = new ilComponentLogger($this->component_factory->getLazyForComponent($a_component_id));
     }
 }

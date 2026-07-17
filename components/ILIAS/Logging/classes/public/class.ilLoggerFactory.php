@@ -85,39 +85,6 @@ class ilLoggerFactory
     {
     }
 
-    /**
-     * Check if console handler is available
-     */
-    protected function isConsoleAvailable(): bool
-    {
-        if (ilContext::getType() !== ilContext::CONTEXT_WEB) {
-            return false;
-        }
-
-        if (($this->dic->isDependencyAvailable('ctrl') && $this->dic->ctrl()->isAsynch()) ||
-            (
-                $this->dic->isDependencyAvailable('http') &&
-                strtolower(
-                    $this->dic->http()->request()->getServerParams()['HTTP_X_REQUESTED_WITH'] ?? ''
-                ) === 'xmlhttprequest'
-            )
-        ) {
-            return false;
-        }
-
-        if ($this->dic->isDependencyAvailable('http') &&
-            str_contains($this->dic->http()->request()->getServerParams()['HTTP_ACCEPT'] ?? '', 'text/html')) {
-            return true;
-        }
-
-        if ($this->dic->isDependencyAvailable('http') &&
-            str_contains($this->dic->http()->request()->getServerParams()['HTTP_ACCEPT'] ?? '', 'application/json')) {
-            return false;
-        }
-
-        return true;
-    }
-
     public function getSettings(): ilLoggingSettings
     {
         return $this->settings;

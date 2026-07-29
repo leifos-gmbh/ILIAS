@@ -20,24 +20,24 @@ declare(strict_types=1);
 
 namespace ILIAS\Logging\Logger;
 
-use ILIAS\Logging\Config\ByComponent\ConfigInterface as ConfigByComponentInterface;
-use ILIAS\Logging\Logger\LevelFetcher\ComponentLevelFetcher;
+use ILIAS\Logging\Config\Basic\ConfigInterface;
+use ILIAS\Logging\Logger\LevelFetcher\DefaultLevelFetcher;
 use ILIAS\Logging\Logger\LevelFetcher\LevelFetcherFactoryInterface;
 
-class ComponentLoggerFactory implements ComponentLoggerFactoryInterface
+class DefaultConfigLoggerFactory implements DefaultConfigLoggerFactoryInterface
 {
     public function __construct(
         protected LazyInternalFactoryInterface $internal_factory,
-        protected ConfigByComponentInterface $config_by_component,
+        protected ConfigInterface $basic_config,
         protected LevelFetcherFactoryInterface $level_fetcher_factory
     ) {
     }
 
-    public function getLazyForComponent(string $component_id): LoggerInterface
+    public function getLazy(string $component_id): LoggerInterface
     {
         return $this->internal_factory->getLazyGhost(
             $component_id,
-            $this->level_fetcher_factory->componentLevelFetcher($this->config_by_component, $component_id)
+            $this->level_fetcher_factory->defaultLevelFetcher($this->basic_config)
         );
     }
 }

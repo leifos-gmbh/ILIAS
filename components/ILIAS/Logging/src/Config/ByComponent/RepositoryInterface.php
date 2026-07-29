@@ -27,11 +27,15 @@ interface RepositoryInterface
     public function addComponent(string $component_id): void;
 
     /**
-     * @return array<string, ?ILIASLogLevel>
+     * @return array<string, ILIASLogLevel>
      */
-    public function getLevelsForAllComponents(): array;
+    public function getAllLevelsForComponents(): array;
 
     public function getLevelForComponent(string $component_id): ?ILIASLogLevel;
 
     public function updateLevelForComponent(string $component_id, ILIASLogLevel $level): void;
+
+    public function resetLevelForComponent(string $component_id): void;
+
+    public function resetLevelsForAllComponents(): void;
 }

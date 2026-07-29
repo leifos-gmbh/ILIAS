@@ -41,6 +41,6 @@ class IniReader implements IniReaderInterface
 
     public function defaultLevel(): string
     {
-        return $this->ini_file->readVariable('log', 'level');
+        return $this->ini_file->readVariable('log', 'default_level');
     }
 }

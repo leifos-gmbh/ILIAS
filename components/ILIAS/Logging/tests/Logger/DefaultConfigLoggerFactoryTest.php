@@ -25,10 +25,11 @@ use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfigInterface;
 use ILIAS\Logging\Logger\LevelFetcher\LevelFetcherInterface;
 use ILIAS\Logging\Logger\LevelFetcher\LevelFetcherFactoryInterface;
 
-class DefaultLoggerFactoryTest extends TestCase
+class DefaultConfigLoggerFactoryTest extends TestCase
 {
     public function testGetLazy(): void
     {
+        $expected_component_id = 'comp_id';
         $expected_logger = $this->createStub(LoggerInterface::class);
         $expected_level_fectcher = $this->createStub(LevelFetcherInterface::class);
 
@@ -36,7 +37,7 @@ class DefaultLoggerFactoryTest extends TestCase
         $internal_factory
             ->expects($this->atLeastOnce())
             ->method('getLazyGhost')
-            ->with('default', $expected_level_fectcher)
+            ->with($expected_component_id, $expected_level_fectcher)
             ->willReturn($expected_logger);
 
         $basic_config = $this->createMock(BasicConfigInterface::class);
@@ -51,8 +52,8 @@ class DefaultLoggerFactoryTest extends TestCase
             ->with($basic_config)
             ->willReturn($expected_level_fectcher);
 
-        $factory = new DefaultLoggerFactory($internal_factory, $basic_config, $level_fetcher_factory);
-        $actual_logger = $factory->getLazy();
+        $factory = new DefaultConfigLoggerFactory($internal_factory, $basic_config, $level_fetcher_factory);
+        $actual_logger = $factory->getLazy($expected_component_id);
 
         $this->assertSame(
             $expected_logger,

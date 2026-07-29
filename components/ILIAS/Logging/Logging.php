@@ -32,8 +32,8 @@ class Logging implements Component\Component
         array | \ArrayAccess &$pull,
         array | \ArrayAccess &$internal,
     ): void {
-        /*$define[] = Logging\Logger\ComponentLoggerFactoryInterface::class;
-        $define[] = Logging\Logger\DefaultLoggerFactoryInterface::class;
+        /*$define[] = Logging\Logger\LoggerFactoryInterface::class;
+        $define[] = Logging\Logger\DefaultConfigLoggerFactoryInterface::class;
         $define[] = Logging\Config\ConfigInterface::class;
 
         $internal[Logging\Config\Basic\ConfigInterface::class] = static fn() =>
@@ -57,14 +57,14 @@ class Logging implements Component\Component
                 $internal[Logging\Config\Basic\ConfigInterface::class]
             );
 
-        $implement[Logging\Logger\ComponentLoggerFactoryInterface::class] = static fn() =>
-            new Logging\Logger\ComponentLoggerFactory(
+        $implement[Logging\Logger\LoggerFactoryInterface::class] = static fn() =>
+            new Logging\Logger\LoggerFactory(
                 $internal[Logging\Logger\LazyInternalFactoryInterface::class],
                 $internal[Logging\Config\ByComponent\ConfigInterface::class],
                 $internal[Logging\Logger\LevelFetcher\LevelFetcherFactory::class]
             );
-        $implement[Logging\Logger\DefaultLoggerFactoryInterface::class] = static fn() =>
-            new Logging\Logger\DefaultLoggerFactory(
+        $implement[Logging\Logger\DefaultConfigLoggerFactoryInterface::class] = static fn() =>
+            new Logging\Logger\DefaultConfigLoggerFactory(
                 $internal[Logging\Logger\LazyInternalFactoryInterface::class],
                 $internal[Logging\Config\Basic\ConfigInterface::class],
                 $internal[Logging\Logger\LevelFetcher\LevelFetcherFactory::class]
@@ -76,7 +76,7 @@ class Logging implements Component\Component
             );*/
 
         $contribute[Setup\Agent::class] = static fn() =>
-            new \ilLoggingSetupAgent(
+            new Logging\Setup\Agent(
                 $pull[Refinery\Factory::class]
             );
     }

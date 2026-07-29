@@ -25,7 +25,7 @@ use ILIAS\Logging\Config\ByComponent\ConfigInterface as ConfigByComponentInterfa
 use ILIAS\Logging\Logger\LevelFetcher\LevelFetcherInterface;
 use ILIAS\Logging\Logger\LevelFetcher\LevelFetcherFactoryInterface;
 
-class ComponentLoggerFactoryTest extends TestCase
+class LoggerFactoryTest extends TestCase
 {
     public function testGetLazy(): void
     {
@@ -52,8 +52,8 @@ class ComponentLoggerFactoryTest extends TestCase
             ->with($config_by_component, $expected_component)
             ->willReturn($expected_level_fectcher);
 
-        $factory = new ComponentLoggerFactory($internal_factory, $config_by_component, $level_fetcher_factory);
-        $actual_logger = $factory->getLazyForComponent($expected_component);
+        $factory = new LoggerFactory($internal_factory, $config_by_component, $level_fetcher_factory);
+        $actual_logger = $factory->getLazy($expected_component);
 
         $this->assertSame(
             $expected_logger,

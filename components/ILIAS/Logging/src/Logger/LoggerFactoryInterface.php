@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Logging\Logger;
 
-interface ComponentLoggerFactoryInterface
+interface LoggerFactoryInterface
 {
-    public function getLazyForComponent(string $component_id): LoggerInterface;
+    public function getLazy(string $component_id): LoggerInterface;
 }

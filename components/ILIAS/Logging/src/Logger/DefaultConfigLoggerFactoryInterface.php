@@ -17,27 +17,17 @@
  *********************************************************************/
 
 declare(strict_types=1);
-/**
- * Class ilLoggingUpdateSteps8
- * contains update steps for release 8
- * @author Stefan Meyer <meyer@leifos.de>
- */
-class ilLoggingUpdateSteps8 implements ilDatabaseUpdateSteps
+
+namespace ILIAS\Logging\Logger;
+
+interface DefaultConfigLoggerFactoryInterface
 {
-    protected ilDBInterface $db;
-
-    public function prepare(ilDBInterface $db): void
-    {
-        $this->db = $db;
-    }
-
     /**
-     * Add consent table
+     * Only use this when you need to log something before
+     * the Database component is initialized.
+     *
+     * Otherwise, please get your fully config aware
+     * logger from {@see LoggerFactoryInterface}.
      */
-    public function step_1(): void
-    {
-        $query = 'DELETE from log_components ' .
-            'WHERE component_id = ' . $this->db->quote('lchk', ilDBConstants::T_TEXT);
-        $this->db->manipulate($query);
-    }
+    public function getLazy(string $component_id): LoggerInterface;
 }

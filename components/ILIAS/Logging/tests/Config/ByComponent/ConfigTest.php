@@ -52,7 +52,7 @@ class ConfigTest extends TestCase
 
         $repo
             ->expects($this->once())
-            ->method('getLevelsForAllComponents')
+            ->method('getAllLevelsForComponents')
             ->willReturn([
                 'other_component' => ILIASLogLevel::CRITICAL,
                 'comp_id' => $expected_level
@@ -64,9 +64,7 @@ class ConfigTest extends TestCase
         $this->assertSame($expected_level, $actual_level);
     }
 
-    #[TestWith([['comp_id' => null]], 'invalid or null value persisted')]
-    #[TestWith([[]], 'no value persisted')]
-    public function testLevelWithDefaultBecauseNoValue(array $result_for_component): void
+    public function testLevelWithDefaultBecauseNoValue(): void
     {
         $expected_component = 'comp_id';
         $expected_level = ILIASLogLevel::EMERGENCY;
@@ -76,8 +74,8 @@ class ConfigTest extends TestCase
 
         $repo
             ->expects($this->once())
-            ->method('getLevelsForAllComponents')
-            ->willReturn(array_merge(['other_component' => ILIASLogLevel::CRITICAL], $result_for_component));
+            ->method('getAllLevelsForComponents')
+            ->willReturn(array_merge(['other_component' => ILIASLogLevel::CRITICAL]));
         $basic_config
             ->expects($this->atLeastOnce())
             ->method('defaultLevel')
@@ -105,7 +103,7 @@ class ConfigTest extends TestCase
 
         $repo
             ->expects($this->once())
-            ->method('getLevelsForAllComponents')
+            ->method('getAllLevelsForComponents')
             ->willReturn([
                 $expected_component_1 => $expected_level_1,
                 $expected_component_2 => $expected_level_2

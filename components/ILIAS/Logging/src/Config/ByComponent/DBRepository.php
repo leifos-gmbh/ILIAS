@@ -49,7 +49,7 @@ class DBRepository implements RepositoryInterface
     /**
      * @return array<string, ?ILIASLogLevel>
      */
-    public function getLevelsForAllComponents(): array
+    public function getAllLevelsForComponents(): array
     {
         $levels_by_components = [];
         $res = $this->db->query('SELECT * FROM log_components');
@@ -80,5 +80,19 @@ class DBRepository implements RepositoryInterface
             ['component_id' => [ilDBConstants::T_TEXT, $component_id]],
             ['log_level' => [ilDBConstants::T_INTEGER, $level->value]]
         );
+    }
+
+    public function resetLevelForComponent(string $component_id): void
+    {
+        $this->db->manipulateF(
+            'DELETE FROM log_components WHERE component_id = %s',
+            [ilDBConstants::T_TEXT],
+            [$component_id]
+        );
+    }
+
+    public function resetLevelsForAllComponents(): void
+    {
+        $this->db->manipulate('DELETE FROM log_components');
     }
 }

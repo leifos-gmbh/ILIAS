@@ -22,6 +22,18 @@ namespace ILIAS\Logging;
 
 enum ILIASLogLevel: int
 {
+    protected const array STRING_MAP = [
+        'DEBUG' => self::DEBUG,
+        'INFO' => self::INFO,
+        'NOTICE' => self::NOTICE,
+        'WARNING' => self::WARNING,
+        'ERROR' => self::ERROR,
+        'CRITICAL' => self::CRITICAL,
+        'ALERT' => self::ALERT,
+        'EMERGENCY' => self::EMERGENCY,
+        'OFF' => self::OFF,
+    ];
+
     case DEBUG = 100;
     case INFO = 200;
     case NOTICE = 250;
@@ -35,17 +47,11 @@ enum ILIASLogLevel: int
 
     public static function tryFromString(string $value): ?self
     {
-        return match ($value) {
-            'DEBUG' => self::DEBUG,
-            'INFO' => self::INFO,
-            'NOTICE' => self::NOTICE,
-            'WARNING' => self::WARNING,
-            'ERROR' => self::ERROR,
-            'CRITICAL' => self::CRITICAL,
-            'ALERT' => self::ALERT,
-            'EMERGENCY' => self::EMERGENCY,
-            'OFF' => self::OFF,
-            default => null,
-        };
+        return self::STRING_MAP[$value] ?? null;
+    }
+
+    public function toString(): string
+    {
+        return array_search($this, self::STRING_MAP, true);
     }
 }

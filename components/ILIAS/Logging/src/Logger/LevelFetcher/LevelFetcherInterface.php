@@ -26,8 +26,8 @@ use ILIAS\Logging\ILIASLogLevel;
  * This exists to encapsulate reading the level of
  * a logger from the config, to be able to delay it
  * as much as possible (while keeping dependencies
- * of {@see \ILIAS\Logging\Logger\DefaultLoggerFactory}
- * and {@see \ILIAS\Logging\Logger\ComponentLoggerFactory}
+ * of {@see \ILIAS\Logging\Logger\DefaultConfigLoggerFactory}
+ * and {@see \ILIAS\Logging\Logger\LoggerFactory}
  * independent).
  */
 interface LevelFetcherInterface

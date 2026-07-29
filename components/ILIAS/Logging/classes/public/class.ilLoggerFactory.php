@@ -18,24 +18,22 @@
 
 declare(strict_types=1);
 
-use ILIAS\Logging\Logger\DefaultLoggerFactoryInterface;
-use ILIAS\Logging\Logger\ComponentLoggerFactoryInterface;
+use ILIAS\Logging\Logger\LoggerFactoryInterface;
 
 /**
  * Logging factory
+ *
+ * @deprecated Please use {@see \ILIAS\Logging\Logger\LoggerInterface} via
+ *  {@see \ILIAS\Logging\Logger\LoggerFactoryInterface} instead.
  *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
  *
  */
 class ilLoggerFactory
 {
-    protected const ROOT_LOGGER = 'root';
-
     private static ?ilLoggerFactory $instance = null;
 
-    private DefaultLoggerFactoryInterface $default_factory;
-    private ComponentLoggerFactoryInterface $component_factory;
-    private ilLoggingSettings $settings;
+    private LoggerFactoryInterface $component_logger_factory;
 
     /**
      * @var array<string, ilComponentLogger>
@@ -52,8 +50,7 @@ class ilLoggerFactory
     public static function getInstance(): ilLoggerFactory
     {
         if (!static::$instance instanceof ilLoggerFactory) {
-            $settings = ilLoggingDBSettings::getInstance();
-            static::$instance = new ilLoggerFactory($settings);
+            static::$instance = new ilLoggerFactory();
         }
         return static::$instance;
     }
@@ -73,8 +70,7 @@ class ilLoggerFactory
      */
     public static function getRootLogger(): ilLogger
     {
-        $factory = self::getInstance();
-        return $factory->getComponentLogger('root');
+        return new \ILIAS\components\Logging\NullLogger();
     }
 
 
@@ -87,7 +83,7 @@ class ilLoggerFactory
 
     public function getSettings(): ilLoggingSettings
     {
-        return $this->settings;
+        return ilLoggingDBSettings::getInstance();
     }
 
     public function getComponentLogger(string $a_component_id): ilLogger
@@ -97,8 +93,8 @@ class ilLoggerFactory
         }
 
         if ($a_component_id === 'root') {
-            return $this->loggers['root'] = new ilComponentLogger($this->default_factory->getLazy());
+            return $this->loggers['root'] = new \ILIAS\components\Logging\NullLogger();
         }
-        return $this->loggers[$a_component_id] = new ilComponentLogger($this->component_factory->getLazyForComponent($a_component_id));
+        return $this->loggers[$a_component_id] = new ilComponentLogger($this->component_logger_factory->getLazy($a_component_id));
     }
 }

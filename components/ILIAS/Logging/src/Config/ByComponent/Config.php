@@ -46,6 +46,6 @@ class Config implements ConfigInterface
      */
     protected function getLevels(): array
     {
-        return $this->levels_by_component_id ??= $this->repo->getLevelsForAllComponents();
+        return $this->levels_by_component_id ??= $this->repo->getAllLevelsForComponents();
     }
 }

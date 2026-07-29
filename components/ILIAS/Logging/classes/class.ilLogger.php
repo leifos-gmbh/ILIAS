@@ -23,6 +23,10 @@ use Monolog\Processor\MemoryPeakUsageProcessor;
 
 /**
  * Component logger with individual log levels by component id
+ *
+ * @deprecated Please use {@see \ILIAS\Logging\Logger\LoggerInterface} via
+ *  {@see \ILIAS\Logging\Logger\LoggerFactoryInterface} instead.
+ *
  * @author Stefan Meyer
  */
 abstract class ilLogger

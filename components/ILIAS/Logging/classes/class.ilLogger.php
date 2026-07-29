@@ -132,11 +132,6 @@ abstract class ilLogger
             $level = ilLogLevel::INFO;
         }
 
-
-        try {
-            throw new Exception($message);
-        } catch (Exception $ex) {
-            $this->getLogger()->log($level, $message . "\n" . $ex->getTraceAsString(), $context);
-        }
+        $this->getLogger()->logStack($level, $message, $context);
     }
 }

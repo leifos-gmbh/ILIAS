@@ -29,6 +29,8 @@ use ILIAS\Setup\Objective;
 use ILIAS\Setup\Metrics\Storage;
 use ILIAS\Refinery\Factory;
 use ILIAS\Refinery\Transformation;
+use ilDatabaseUpdateStepsExecutedObjective;
+use ILIAS\Logging\Setup\Steps\DBUpdateSteps12;
 
 class Agent implements AgentInterface
 {
@@ -73,7 +75,10 @@ class Agent implements AgentInterface
             'Update of ILIAS\Logging',
             false,
             $objective,
-            new DefaultLevelMigratedObjective()
+            new DefaultLevelMigratedObjective(),
+            new ilDatabaseUpdateStepsExecutedObjective(
+                new DBUpdateSteps12()
+            )
         );
     }
 

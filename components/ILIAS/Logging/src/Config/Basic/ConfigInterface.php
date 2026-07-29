@@ -26,7 +26,9 @@ interface ConfigInterface
 {
     public function isLoggingEnabled(): bool;
 
-    public function logFile(): string;
+    public function pathToLogFile(): string;
+
+    public function pathToLogDirectory(): string;
 
     public function defaultLevel(): ILIASLogLevel;
 }

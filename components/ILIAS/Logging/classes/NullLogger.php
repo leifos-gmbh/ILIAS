@@ -25,6 +25,9 @@ use ilLogLevel;
 use ILIAS\Logging\Logger\LoggerInterface;
 use Exception;
 
+/**
+ * @deprecated If a null version of the new logger would be handy, let the Logging authorities know.
+ */
 class NullLogger extends ilLogger
 {
     public function __construct()

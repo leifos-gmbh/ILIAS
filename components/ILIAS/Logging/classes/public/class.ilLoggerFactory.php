@@ -19,6 +19,7 @@
 declare(strict_types=1);
 
 use ILIAS\Logging\Logger\LoggerFactoryInterface;
+use ILIAS\Logging\Logger\LegacyInitiator;
 
 /**
  * Logging factory
@@ -33,7 +34,7 @@ class ilLoggerFactory
 {
     private static ?ilLoggerFactory $instance = null;
 
-    private LoggerFactoryInterface $component_logger_factory;
+    private LoggerFactoryInterface $logger_factory;
 
     /**
      * @var array<string, ilComponentLogger>
@@ -42,9 +43,8 @@ class ilLoggerFactory
 
     protected function __construct()
     {
-        global $DIC;
-
-        // TODO set factories from DIC via bootstrapping, also settings
+        $initiator = LegacyInitiator::getInstance();
+        $this->logger_factory = $initiator->loggerFactory();
     }
 
     public static function getInstance(): ilLoggerFactory
@@ -95,6 +95,6 @@ class ilLoggerFactory
         if ($a_component_id === 'root') {
             return $this->loggers['root'] = new \ILIAS\components\Logging\NullLogger();
         }
-        return $this->loggers[$a_component_id] = new ilComponentLogger($this->component_logger_factory->getLazy($a_component_id));
+        return $this->loggers[$a_component_id] = new ilComponentLogger($this->logger_factory->getLazy($a_component_id));
     }
 }

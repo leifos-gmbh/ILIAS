@@ -69,33 +69,76 @@ class ConfigTest extends TestCase
         $this->assertSame($first_result, $second_result, 'Result should be cached and stable.');
     }
 
-    public function testLogFile(): void
-    {
-        $expected_path = '/path/to/log';
-
+    #[TestWith(['/path/to/log', 'file.log', '/path/to/log/file.log'], 'no trailing slashes')]
+    #[TestWith(['/path/to/log/', 'file.log', '/path/to/log/file.log'], 'slash after path')]
+    #[TestWith(['/path/to/log', '/file.log', '/path/to/log/file.log'], 'slash before file')]
+    public function testPathToLogFile(
+        string $expected_path,
+        string $expected_file,
+        string $expected_result
+    ): void {
         $reader = $this->createMock(IniReaderInterface::class);
         $reader
             ->expects($this->once())
             ->method('logFile')
+            ->willReturn($expected_file);
+        $reader
+            ->expects($this->once())
+            ->method('logPath')
             ->willReturn($expected_path);
 
         $config = new Config($reader);
-        $actual_path = $config->logFile();
+        $actual_result = $config->pathToLogFile();
+
+        $this->assertSame($expected_result, $actual_result);
+    }
+
+    public function testPathToLogFileIsCached(): void
+    {
+        $reader = $this->createMock(IniReaderInterface::class);
+        $reader
+            ->expects($this->once())
+            ->method('logFile')
+            ->willReturn('file.log');
+        $reader
+            ->expects($this->once())
+            ->method('logPath')
+            ->willReturn('/path/to/log');
+
+        $config = new Config($reader);
+        $first_result = $config->pathToLogFile();
+        $second_result = $config->pathToLogFile();
+
+        $this->assertSame($first_result, $second_result, 'Result should be cached and stable.');
+    }
+
+    public function testPathToLogDirectory(): void
+    {
+        $expected_path = '/path/to/log/';
+
+        $reader = $this->createMock(IniReaderInterface::class);
+        $reader
+            ->expects($this->once())
+            ->method('logPath')
+            ->willReturn($expected_path);
+
+        $config = new Config($reader);
+        $actual_path = $config->pathToLogDirectory();
 
         $this->assertSame($expected_path, $actual_path);
     }
 
-    public function testLogFileIsCached(): void
+    public function testPathToLogDirectoryIsCached(): void
     {
         $reader = $this->createMock(IniReaderInterface::class);
         $reader
             ->expects($this->once())
-            ->method('logFile')
-            ->willReturn('/path/to/log');
+            ->method('logPath')
+            ->willReturn('/path/to/log/');
 
         $config = new Config($reader);
-        $first_result = $config->logFile();
-        $second_result = $config->logFile();
+        $first_result = $config->pathToLogFile();
+        $second_result = $config->pathToLogFile();
 
         $this->assertSame($first_result, $second_result, 'Result should be cached and stable.');
     }

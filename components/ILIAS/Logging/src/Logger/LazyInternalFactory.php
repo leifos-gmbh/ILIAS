@@ -68,7 +68,7 @@ class LazyInternalFactory implements LazyInternalFactoryInterface
         return $this->monolog_factory->logger(
             $component_or_root_id,
             $level_fetcher->fetchLevel(),
-            $this->basic_config->logFile()
+            $this->basic_config->pathToLogFile()
         );
     }
 }

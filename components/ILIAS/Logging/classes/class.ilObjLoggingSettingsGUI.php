@@ -25,6 +25,7 @@ use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfig;
 use ILIAS\Logging\Config\ByComponent\ConfigInterface as ByComponentConfig;
 use ILIAS\Logging\Config\ByComponent\RepositoryInterface as ComponentConfigRepo;
 use ILIAS\Logging\ILIASLogLevel;
+use ILIAS\Logging\Logger\LegacyInitiator;
 
 /**
 *
@@ -62,7 +63,11 @@ class ilObjLoggingSettingsGUI extends ilObjectGUI
         $this->lng->loadLanguageModule('log');
 
         $this->refinery = $DIC->refinery();
-        // TODO init configs
+
+        $initiator = LegacyInitiator::getInstance();
+        $this->basic_log_config = $initiator->basicConfig();
+        $this->component_config = $initiator->componentConfig();
+        $this->component_config_repo = $initiator->componentConfigRepository();
     }
 
     public function executeCommand(): void

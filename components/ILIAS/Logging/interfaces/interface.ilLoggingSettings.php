@@ -31,8 +31,6 @@ interface ilLoggingSettings
 
     public function getLogDir(): string;
 
-    public function getLogFile(): string;
-
     public function getLevel(): int;
 
     public function getLevelByComponent(string $a_component_id): int;

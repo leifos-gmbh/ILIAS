@@ -26,5 +26,7 @@ interface IniReaderInterface
 
     public function logFile(): string;
 
+    public function logPath(): string;
+
     public function defaultLevel(): string;
 }

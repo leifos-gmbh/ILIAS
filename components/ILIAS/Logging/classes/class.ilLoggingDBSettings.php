@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfig;
 use ILIAS\Logging\Config\ByComponent\ConfigInterface as ComponentConfig;
+use ILIAS\Logging\Logger\LegacyInitiator;
 
 /**
  * @deprecated Please use {@see \ILIAS\Logging\Config\ConfigInterface} instead.
@@ -38,7 +39,9 @@ class ilLoggingDBSettings implements ilLoggingSettings
 
     private function __construct()
     {
-        // TODO init configs
+        $initiator = LegacyInitiator::getInstance();
+        $this->basic_config = $initiator->basicConfig();
+        $this->component_config = $initiator->componentConfig();
     }
 
     public static function getInstance(): self
@@ -66,15 +69,9 @@ class ilLoggingDBSettings implements ilLoggingSettings
         return $this->basic_config->isLoggingEnabled();
     }
 
-    // TODO still used by saml?
     public function getLogDir(): string
     {
-        return ILIAS_LOG_DIR;
-    }
-
-    public function getLogFile(): string
-    {
-        return ILIAS_LOG_FILE;
+        return $this->basic_config->pathToLogDirectory();
     }
 
     public function getLevel(): int

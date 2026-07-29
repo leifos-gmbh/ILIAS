@@ -65,7 +65,7 @@ class LazyInternalFactoryTest extends TestCase
             ->willReturn(true);
         $basic_config
             ->expects($this->atLeastOnce())
-            ->method('logFile')
+            ->method('pathToLogFile')
             ->willReturn($expected_path);
         $monolog_factory
             ->expects($this->atLeastOnce())

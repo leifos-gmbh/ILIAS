@@ -26,6 +26,7 @@ class Config implements ConfigInterface
 {
     protected bool $is_enabled;
     protected string $log_file;
+    protected string $log_directory;
     protected ILIASLogLevel $default_level;
 
     public function __construct(
@@ -38,9 +39,15 @@ class Config implements ConfigInterface
         return $this->is_enabled ??= (bool) $this->reader->isLoggingEnabled();
     }
 
-    public function logFile(): string
+    public function pathToLogFile(): string
     {
-        return $this->log_file ??= $this->reader->logFile();
+        return $this->log_file ??=
+            rtrim($this->reader->logPath(), '/') . '/' . ltrim($this->reader->logFile(), '/');
+    }
+
+    public function pathToLogDirectory(): string
+    {
+        return $this->log_directory ??= $this->reader->logPath();
     }
 
     public function defaultLevel(): ILIASLogLevel

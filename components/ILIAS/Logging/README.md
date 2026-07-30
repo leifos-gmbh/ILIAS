@@ -32,7 +32,7 @@ ILIAS (via Monolog) supports the following log levels defined in [RFC 5424](http
 
 work in progress
 
-Loggers are available via their ID through the [`LoggerFactory`](src/Logger/LoggerFactoryInterface.php)`. To get the
+Loggers are available via their ID through the [`LoggerFactory`](src/Logger/LoggerFactoryInterface.php). To get the
 logger for your component or plugin, with its own log level, use its respective ID. The factory also gives out loggers
 for any other ID, the default log level is then used.
 
@@ -41,7 +41,7 @@ $logger = $factory->getLazy('crs');
 $logger->info('Lorem ipsum');
 ```
 
-Logging also offers a [`DefaultConfigLoggerFactory`](src/Logger/DefaultConfigLoggerFactoryInterface.php)`, which does not
+Logging also offers a [`DefaultConfigLoggerFactory`](src/Logger/DefaultConfigLoggerFactoryInterface.php), which does not
 depend on the Database component. You should only use it if you need to log anything before the database is initialized.
 As a tradeoff, its loggers will always use the default log level, no matter the ID.
 

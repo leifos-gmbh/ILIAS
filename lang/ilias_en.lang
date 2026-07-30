@@ -11068,6 +11068,7 @@ lng#:#lng_switch_language_detection#:#Switch Language Detection
 log#:#log_component_btn_reset#:#Reset Settings
 log#:#log_component_col_component#:#Component
 log#:#log_component_col_level#:#Log-Level
+log#:#log_component_unknown#:#Unknown (%s)
 log#:#log_components#:#Components
 log#:#log_level_alert#:#ALERT
 log#:#log_level_critical#:#CRITICAL

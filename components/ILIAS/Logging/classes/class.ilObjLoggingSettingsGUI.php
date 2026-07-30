@@ -45,7 +45,6 @@ class ilObjLoggingSettingsGUI extends ilObjectGUI
     protected Refinery $refinery;
     protected ilComponentRepository $component_repo;
     protected BasicConfig $basic_log_config;
-    protected ByComponentConfig $component_config;
     protected ComponentConfigRepo $component_config_repo;
 
     public function __construct($a_data, int $a_id, bool $a_call_by_reference, bool $a_prepare_output = true)
@@ -66,7 +65,6 @@ class ilObjLoggingSettingsGUI extends ilObjectGUI
 
         $initiator = LegacyInitiator::getInstance();
         $this->basic_log_config = $initiator->basicConfig();
-        $this->component_config = $initiator->componentConfig();
         $this->component_config_repo = $initiator->componentConfigRepository();
     }
 
@@ -136,12 +134,12 @@ class ilObjLoggingSettingsGUI extends ilObjectGUI
         $this->setSubTabs(static::SUB_SECTION_COMPONENTS);
 
         $table = new ilLogComponentTableGUI(
-            $this,
-            'components',
             $this->checkPermissionBool('write'),
             $this->component_repo,
             $this->basic_log_config,
-            $this->component_config
+            $this->component_config_repo,
+            $this,
+            'components'
         );
         $table->init();
         $table->parse();
@@ -178,6 +176,9 @@ class ilObjLoggingSettingsGUI extends ilObjectGUI
             );
         }
         foreach ($levels as $component_id => $value) {
+            if ($value === 0) {
+                $this->component_config_repo->resetLevelForComponent($component_id);
+            }
             $level = ILIASLogLevel::tryFrom($value);
             if ($level === null) {
                 continue;

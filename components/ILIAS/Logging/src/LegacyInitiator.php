@@ -30,9 +30,13 @@ use ILIAS\Logging\Config\ByComponent\ConfigInterface as ComponentConfigInterface
 use ILIAS\Logging\Config\ByComponent\Config as ComponentConfig;
 use ILIAS\Logging\Logger\LoggerFactoryInterface;
 use ILIAS\Logging\Logger\LoggerFactory;
+use ILIAS\Logging\Logger\LazyInternalFactoryInterface;
 use ILIAS\Logging\Logger\LazyInternalFactory;
 use ILIAS\Logging\Logger\Monolog\Factory as MonologFactory;
 use ILIAS\Logging\Logger\LevelFetcher\LevelFetcherFactory;
+use ILIAS\Logging\Logger\LevelFetcher\LevelFetcherFactoryInterface;
+use ILIAS\Logging\Logger\DefaultConfigLoggerFactoryInterface;
+use ILIAS\Logging\Logger\DefaultConfigLoggerFactory;
 
 class LegacyInitiator
 {
@@ -43,7 +47,10 @@ class LegacyInitiator
     protected BasicConfigInterface $basic_config;
     protected ComponentConfigRepoInterface $component_config_repo;
     protected ComponentConfigInterface $component_config;
+    protected LazyInternalFactoryInterface $lazy_internal_factory;
+    protected LevelFetcherFactoryInterface $level_fetcher_factory;
     protected LoggerFactoryInterface $logger_factory;
+    protected DefaultConfigLoggerFactoryInterface $default_config_logger_factory;
 
     protected function __construct(
     ) {
@@ -71,23 +78,42 @@ class LegacyInitiator
         );
     }
 
-    public function componentConfig(): ComponentConfigInterface
+    protected function componentConfig(): ComponentConfigInterface
     {
-        return $this->component_config_repo ??= new ComponentConfig(
+        return $this->component_config ??= new ComponentConfig(
             $this->componentConfigRepository(),
             $this->basicConfig()
         );
     }
 
+    protected function lazyInternalFactory(): LazyInternalFactoryInterface
+    {
+        return $this->lazy_internal_factory ??= new LazyInternalFactory(
+            new MonologFactory(),
+            $this->basicConfig()
+        );
+    }
+
+    protected function levelFetcherFactory(): LevelFetcherFactoryInterface
+    {
+        return $this->level_fetcher_factory ??= new LevelFetcherFactory();
+    }
+
     public function loggerFactory(): LoggerFactoryInterface
     {
         return $this->logger_factory ??= new LoggerFactory(
-            new LazyInternalFactory(
-                new MonologFactory(),
-                $this->basicConfig()
-            ),
+            $this->lazyInternalFactory(),
             $this->componentConfig(),
-            new LevelFetcherFactory()
+            $this->levelFetcherFactory()
+        );
+    }
+
+    public function defaultConfigLoggerFactory(): DefaultConfigLoggerFactoryInterface
+    {
+        return $this->default_config_logger_factory ??= new DefaultConfigLoggerFactory(
+            $this->lazyInternalFactory(),
+            $this->basicConfig(),
+            $this->levelFetcherFactory()
         );
     }
 }

@@ -19,7 +19,7 @@
 declare(strict_types=1);
 
 use ILIAS\Logging\Config\Basic\ConfigInterface as BasicConfig;
-use ILIAS\Logging\Config\ByComponent\ConfigInterface as ComponentConfig;
+use ILIAS\Logging\Config\ByComponent\RepositoryInterface as ComponentConfigRepo;
 use ILIAS\Logging\ILIASLogLevel;
 
 /**
@@ -28,12 +28,12 @@ use ILIAS\Logging\ILIASLogLevel;
 class ilLogComponentTableGUI extends ilTable2GUI
 {
     public function __construct(
-        object $a_parent_obj,
-        string $a_parent_cmd = "",
         protected bool $editable,
         protected ilComponentRepository $component_repo,
         protected BasicConfig $basic_log_config,
-        protected ComponentConfig $component_config
+        protected ComponentConfigRepo $component_config_repo,
+        object $a_parent_obj,
+        string $a_parent_cmd = ""
     ) {
         $this->setId('il_log_component');
         parent::__construct($a_parent_obj, $a_parent_cmd);
@@ -74,19 +74,34 @@ class ilLogComponentTableGUI extends ilTable2GUI
      */
     public function parse(): void
     {
+        $levels_by_component = $this->component_config_repo->getAllLevelsForComponents();
+
         $rows = [];
         foreach ($this->component_repo->getComponents() as $id => $component) {
             $row = [];
             $row['id'] = $id;
-            $row['component'] = $row['component_sortable'] = $component->getQualifiedName();
-            $row['level'] = $this->component_config->level($id);
+            $row['component'] = $row['component_sortable'] = $component->getName();
+            $row['level'] = $levels_by_component[$id]?->value ?? 0;
+            unset($levels_by_component[$id]);
             $rows[] = $row;
         }
         foreach ($this->component_repo->getPlugins() as $id => $plugin) {
             $row = [];
             $row['id'] = $id;
             $row['component'] = $row['component_sortable'] = $plugin->getName();
-            $row['level'] = $this->component_config->level($id);
+            $row['level'] = $levels_by_component[$id]?->value ?? 0;
+            unset($levels_by_component[$id]);
+            $rows[] = $row;
+        }
+        foreach ($levels_by_component as $id => $level) {
+            $row = [];
+            $row['id'] = $id;
+            $row['component'] = $row['component_sortable'] = sprintf(
+                $this->lng->txt('log_component_unknown'),
+                $id
+            );
+            $row['level'] = $level->value;
+            unset($levels_by_component[$id]);
             $rows[] = $row;
         }
         $this->setMaxCount(count($rows));
@@ -99,26 +114,31 @@ class ilLogComponentTableGUI extends ilTable2GUI
 
         $default_label = sprintf(
             $this->lng->txt('log_level_default'),
-            $this->basic_log_config->defaultLevel()
+            $this->presentableLogLevel($this->basic_log_config->defaultLevel())
         );
         $options = [0 => $default_label];
         foreach (ILIASLogLevel::cases() as $level) {
-            $options[$level->value] = match ($level) {
-                ILIASLogLevel::DEBUG => $this->lng->txt('log_level_debug'),
-                ILIASLogLevel::INFO => $this->lng->txt('log_level_info'),
-                ILIASLogLevel::NOTICE => $this->lng->txt('log_level_notice'),
-                ILIASLogLevel::WARNING => $this->lng->txt('log_level_warning'),
-                ILIASLogLevel::ERROR => $this->lng->txt('log_level_error'),
-                ILIASLogLevel::CRITICAL => $this->lng->txt('log_level_critical'),
-                ILIASLogLevel::ALERT => $this->lng->txt('log_level_alert'),
-                ILIASLogLevel::EMERGENCY => $this->lng->txt('log_level_emergency'),
-                ILIASLogLevel::OFF => $this->lng->txt('log_level_off')
-            };
+            $options[$level->value] = $this->presentableLogLevel($level);
         }
 
         $levels = new ilSelectInputGUI('', 'level[' . $a_set['id'] . ']');
         $levels->setOptions($options);
         $levels->setValue($a_set['level']);
         $this->tpl->setVariable('C_SELECT_LEVEL', $levels->render());
+    }
+
+    protected function presentableLogLevel(ILIASLogLevel $level): string
+    {
+        return match ($level) {
+            ILIASLogLevel::DEBUG => $this->lng->txt('log_level_debug'),
+            ILIASLogLevel::INFO => $this->lng->txt('log_level_info'),
+            ILIASLogLevel::NOTICE => $this->lng->txt('log_level_notice'),
+            ILIASLogLevel::WARNING => $this->lng->txt('log_level_warning'),
+            ILIASLogLevel::ERROR => $this->lng->txt('log_level_error'),
+            ILIASLogLevel::CRITICAL => $this->lng->txt('log_level_critical'),
+            ILIASLogLevel::ALERT => $this->lng->txt('log_level_alert'),
+            ILIASLogLevel::EMERGENCY => $this->lng->txt('log_level_emergency'),
+            ILIASLogLevel::OFF => $this->lng->txt('log_level_off')
+        };
     }
 }

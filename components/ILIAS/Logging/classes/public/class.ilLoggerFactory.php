@@ -19,6 +19,7 @@
 declare(strict_types=1);
 
 use ILIAS\Logging\Logger\LoggerFactoryInterface;
+use ILIAS\Logging\Logger\DefaultConfigLoggerFactoryInterface;
 use ILIAS\Logging\Logger\LegacyInitiator;
 
 /**
@@ -35,6 +36,7 @@ class ilLoggerFactory
     private static ?ilLoggerFactory $instance = null;
 
     private LoggerFactoryInterface $logger_factory;
+    private DefaultConfigLoggerFactoryInterface $default_config_logger_factory;
 
     /**
      * @var array<string, ilComponentLogger>
@@ -45,6 +47,7 @@ class ilLoggerFactory
     {
         $initiator = LegacyInitiator::getInstance();
         $this->logger_factory = $initiator->loggerFactory();
+        $this->default_config_logger_factory = $initiator->defaultConfigLoggerFactory();
     }
 
     public static function getInstance(): ilLoggerFactory
@@ -70,7 +73,8 @@ class ilLoggerFactory
      */
     public static function getRootLogger(): ilLogger
     {
-        return new \ILIAS\components\Logging\NullLogger();
+        $factory = self::getInstance();
+        return $factory->getComponentLogger('root');
     }
 
 
@@ -93,8 +97,12 @@ class ilLoggerFactory
         }
 
         if ($a_component_id === 'root') {
-            return $this->loggers['root'] = new \ILIAS\components\Logging\NullLogger();
+            return $this->loggers['root'] = new ilComponentLogger(
+                $this->default_config_logger_factory->getLazy('legacy_root')
+            );
         }
-        return $this->loggers[$a_component_id] = new ilComponentLogger($this->logger_factory->getLazy($a_component_id));
+        return $this->loggers[$a_component_id] = new ilComponentLogger(
+            $this->logger_factory->getLazy($a_component_id)
+        );
     }
 }

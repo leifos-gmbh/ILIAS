@@ -41,32 +41,32 @@ class LazyInternalFactory implements LazyInternalFactoryInterface
     }
 
     public function getLazyGhost(
-        string $component_or_root_id,
+        string $component_id,
         LevelFetcherInterface $level_fetcher
     ): LoggerInterface {
-        if (isset($this->loggers[$component_or_root_id])) {
-            return $this->loggers[$component_or_root_id];
+        if (isset($this->loggers[$component_id])) {
+            return $this->loggers[$component_id];
         }
 
         /** @var Logger $lazy_logger */
         $lazy_logger = new ReflectionClass(Logger::class)->newLazyGhost(
-            function (Logger $logger) use ($component_or_root_id, $level_fetcher): void {
-                $monolog_logger = $this->buildMonologLogger($component_or_root_id, $level_fetcher);
+            function (Logger $logger) use ($component_id, $level_fetcher): void {
+                $monolog_logger = $this->buildMonologLogger($component_id, $level_fetcher);
                 $logger->__construct($monolog_logger);
             }
         );
-        return $this->loggers[$component_or_root_id] = $lazy_logger;
+        return $this->loggers[$component_id] = $lazy_logger;
     }
 
     protected function buildMonologLogger(
-        string $component_or_root_id,
+        string $component_id,
         LevelFetcherInterface $level_fetcher
     ): MonologLogger {
         if (!$this->basic_config->isLoggingEnabled()) {
-            return $this->monolog_factory->nullLogger($component_or_root_id);
+            return $this->monolog_factory->nullLogger($component_id);
         }
         return $this->monolog_factory->logger(
-            $component_or_root_id,
+            $component_id,
             $level_fetcher->fetchLevel(),
             $this->basic_config->pathToLogFile()
         );

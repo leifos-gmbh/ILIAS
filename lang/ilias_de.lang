@@ -11094,10 +11094,12 @@ lng#:#lng_switch_language_detection#:#Automatische Spracherkennung umschalten
 log#:#log_component_btn_reset#:#Einstellungen zurücksetzen
 log#:#log_component_col_component#:#Komponente
 log#:#log_component_col_level#:#Log-Level
+log#:#log_component_unknown#:#Unbekannt (%s)
 log#:#log_components#:#Komponenten
 log#:#log_level_alert#:#ALERT
 log#:#log_level_critical#:#CRITICAL
 log#:#log_level_debug#:#DEBUG
+log#:#log_level_default#:#Standard (%s)
 log#:#log_level_emergency#:#EMERGENCY
 log#:#log_level_error#:#ERROR
 log#:#log_level_info#:#INFO

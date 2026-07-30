@@ -72,7 +72,10 @@ class DefaultLevelMigratedObjective implements Objective
         $ini->setVariable("log", "default_level", $level->toString());
 
         $settings->delete("level");
-        unset($ini->GROUPS["log"]["level"]);
+        /*
+         * It would be better to also delete the long defunct "level" field in the
+         * ilias.ini.php, but deleting fields is not supported by ilIniFile.
+         */
 
         if (!$ini->write()) {
             throw new UnachievableException("Could not write ilias.ini.php");

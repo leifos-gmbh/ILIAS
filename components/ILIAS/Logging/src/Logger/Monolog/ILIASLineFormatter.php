@@ -25,7 +25,7 @@ use Monolog\LogRecord;
 
 class ILIASLineFormatter extends LineFormatter
 {
-    protected const string DEFAULT_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
+    protected const string DEFAULT_FORMAT = "[%extra.suid%] [%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
     protected const string DEFAULT_DATE_FORMAT = 'Y-m-d H:i:s.u';
 
     public function __construct()

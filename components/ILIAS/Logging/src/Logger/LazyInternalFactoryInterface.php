@@ -26,7 +26,7 @@ use ILIAS\Logging\Logger\LevelFetcher\LevelFetcherInterface;
 interface LazyInternalFactoryInterface
 {
     public function getLazyGhost(
-        string $component_or_root_id,
+        string $component_id,
         LevelFetcherInterface $level_fetcher
     ): LoggerInterface;
 }

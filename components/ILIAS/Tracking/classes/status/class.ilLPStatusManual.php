@@ -67,7 +67,7 @@ class ilLPStatusManual extends ilLPStatus
                 $a_obj_id,
                 $a_usr_id
             );
-            $status = $lp_mark->isCompleted() ? self::LP_STATUS_COMPLETED_NUM : self::LP_STATUS_IN_PROGRESS_NUM;
+            $status = $lp_mark?->isCompleted() ? self::LP_STATUS_COMPLETED_NUM : self::LP_STATUS_IN_PROGRESS_NUM;
         }
         return $status;
     }

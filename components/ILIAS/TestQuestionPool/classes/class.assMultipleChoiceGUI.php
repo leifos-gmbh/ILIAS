@@ -915,7 +915,7 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
         }
 
         if ($answer->getAnswertext() !== '') {
-            $answer_elements[] = $this->ui->factory()->legacy()->content(
+            $answer_elements[] = $this->ui->factory()->legacy(
                 $answer_text . $answer->getAnswertext()
             );
         }
@@ -991,8 +991,7 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
         foreach ($this->aggregateAnswers($relevantAnswers, $this->object->getAnswers()) as $ans) {
             $answers[] = [
                 'answer' => $ans['answertext'],
-                'frequency' => $ans['count_checked'],
-                'sanitized' => true
+                'frequency' => $ans['count_checked']
             ];
         }
 

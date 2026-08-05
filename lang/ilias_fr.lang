@@ -4,7 +4,7 @@
 *
 * @module			language file French
 * @modulegroup		language
-* @author			Marily Vouillamoz <marily.vouillamoz@unibe.ch>, I.E.F Jean-Paul Manigand <jean-paul.manigand@intradef.gouv.fr>, Sébastien Fraysse <sebastien@fraysse.eu>, Laurent Merle <laurent.merle@gmail.com>, Bernard Beron <drhat.tours.ead@gmail.com>
+* @author			Marily Vouillamoz, I.E.F Jean-Paul Manigand <jean-paul.manigand@intradef.gouv.fr>, Sébastien Fraysse <sebastien@fraysse.eu>, Laurent Merle, Bernard Beron <drhat.tours.ead@gmail.com>
 * @version			$Id$
 */
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
@@ -1446,6 +1446,7 @@ assessment#:#tst_eval_total_passed_average_points#:#Moyenne des points obtenus s
 assessment#:#tst_eval_total_passed_average_time#:#Temps moyen passé sur les tests réussis
 assessment#:#tst_eval_total_persons#:#Nombre total de personnes qui ont passé le test
 assessment#:#tst_exam_access_code#:#Access Code###31 10 2023 new variable
+assessment#:#tst_exam_access_code_invalid_message#:#The code you provided is invalid.###26 05 2026 new variable
 assessment#:#tst_exam_access_code_label#:#Enter access code to continue your already started test.###31 10 2023 new variable
 assessment#:#tst_exam_conditions#:#Exam Conditions###31 10 2023 new variable
 assessment#:#tst_exam_conditions_label#:#Check to accept the conditions.###31 10 2023 new variable
@@ -1674,6 +1675,7 @@ assessment#:#tst_objective_oriented_test_pass_without_questions#:#L’essai comm
 assessment#:#tst_objective_progress_header#:#Progression d'Objectif d'Apprentissage
 assessment#:#tst_objectives_progress_header#:#Progression d'Objectif d'Apprentissage
 assessment#:#tst_old_style_rnd_quest_set_broken#:#Ce test aléatoire se trouve dans un état irréparable car un ou plusieurs pools de questions connectés ont été supprimés. Par conséquent, les participants ne peuvent plus passer le test.
+assessment#:#tst_optional_questions_confirmation_fixed_test#:#<b>Questions for already passed learning objectives are already answered.</b><br /><br />The next questions are assigned to already passed learning objectives. Your answers from previous test attempts will carry over.<br /><br />If you continue, you can revise your answers. Doing so may change your results in the related learning objectives.<br /><br />If you do not want to revise your answers, you may go back.###26 05 2026 new variable
 assessment#:#tst_optional_questions_confirmation_non_fixed_test#:#<b>Question related to allready passed learning objectives are optional.</b><br /><br />You want to navigate to a question, that relates to an allready passed learning objective.<br />You can choose:<br /><br />I you proceed, you can work on these questions. Your answers from previous attempts were not adopted, since new random questions were selected for this attempt. With working on this questions you can also degrade your learning objective result.<br /><br />If you decide to not work on these questions, you can go back. In this case these questions won't be considered in the evaluation.
 assessment#:#tst_out_of_time_message#:#You have reached the maximum allowed processing time of the test!###31 10 2023 new variable
 assessment#:#tst_participant#:#Participant
@@ -2911,6 +2913,7 @@ certificate#:#persistent_certificate_mode_instant#:#Instant
 certificate#:#persistent_certificate_mode_instant_info#:#This option is recommended for systems with low up to mediocre user interactions. Systems that tend to big loading times during creation for multiple user certificates should switch to the "Cron Job" option.
 chatroom#:#allow_anonymous#:#Autoriser l'Accès Anonyme
 chatroom#:#allow_custom_usernames#:#Autoriser les Noms d'Utilisateur Personnalisés
+chatroom#:#allow_custom_usernames_info#:#Allow users to enter their own unique session name to use within the chat room. If this option is not selected, users are automatically identified using their usernames (login) when in the chat room.###07 07 2026 new variable
 chatroom#:#anonymous_hint#:#Assurez vous de régler correctement les permissions dans l'onglet "Permissions" pour permettre aux utilisateurs anonymes d'accéder à cet objet.
 chatroom#:#auto_scroll#:#Défiler automatiquement
 chatroom#:#autogen_usernames#:#Noms d'Utilisateur Générés Automatiquement
@@ -2945,9 +2948,12 @@ chatroom#:#chat_https_dhparam_info#:#Veuillez définir un chemin de serveur abso
 chatroom#:#chat_https_key_info#:#Veuillez définir un chemin de serveur absolu pour le fichier clé privé (par ex.: /etc/ssl/privé/serveur.clé).
 chatroom#:#chat_invitation#:#Invitation de [INVITER_NAME] à la salle de Chat [ROOM_NAME]
 chatroom#:#chat_invitation_long#:#[SALUTATION]\n\nVous avez été invité à la salle de Chat :\nTitre de la salle : [ROOM_NAME]\nInvité par : [INVITER_NAME]\nURL: [LINK]\n\nSi vous souhaitez entrer dans cette salle, cliquez sur le lien ci-dessus.
+chatroom#:#chat_invitation_modal_headline#:#Invitation to Chat Room###26 05 2026 new variable
+chatroom#:#chat_invitation_modal_section#:#Invite User###26 05 2026 new variable
 chatroom#:#chat_invitation_nc_inv_x#:#You have %s chat invitations.###31 10 2023 new variable
 chatroom#:#chat_invitation_nc_no_inv#:#You have no chat invitations.###31 10 2023 new variable
 chatroom#:#chat_invitation_short#:#Veuillez cliquer sur le titre pour entrer dans la salle de Chat.
+chatroom#:#chat_invitation_username_input_label#:#Enter Username:###26 05 2026 new variable
 chatroom#:#chat_invitations#:#Chat invitations###31 10 2023 new variable
 chatroom#:#chat_invite#:#Inviter
 chatroom#:#chat_join#:#Rejoindre
@@ -3004,6 +3010,7 @@ chatroom#:#chat_user_action_invite_public_room#:#Inviter au salon de discussion 
 chatroom#:#chat_user_x_is_typing#:#User %s is typing ...###31 10 2023 new variable
 chatroom#:#chat_users_are_typing#:#Multiple users are typing ...###31 10 2023 new variable
 chatroom#:#chat_whisper#:#Discuter en privé
+chatroom#:#chatroom_anonymous_default#:#Anonymous ####07 07 2026 new variable
 chatroom#:#chatroom_auth#:#Authentification
 chatroom#:#chatroom_auth_btn_txt#:#Générer clés
 chatroom#:#chatroom_auth_key#:#Clé d’authentification
@@ -5680,6 +5687,7 @@ common#:#show_content#:#Show Content
 common#:#show_details#:#Afficher Détails
 common#:#show_filter#:#Afficher le filtre
 common#:#show_hidden_sections#:#Afficher plus d'informations &raquo;
+common#:#show_less#:#Show less###07 07 2026 new variable
 common#:#show_list#:#Afficher Liste
 common#:#show_members#:#Afficher Membres
 common#:#show_more#:#Afficher plus
@@ -10689,9 +10697,14 @@ itgr#:#itgr_always_open#:#Toujours ouvert
 itgr#:#itgr_assign_materials#:#Assign Materials###31 10 2023 new variable
 itgr#:#itgr_assigned_materials#:#Ressources Associées
 itgr#:#itgr_assignment#:#Association
-itgr#:#itgr_behaviour#:#Comportement du bloc
-itgr#:#itgr_behaviour_info#:#Le système stockera l’état ouvert/fermé pour l’utilisateur actuel jusqu’à la déconnexion.
 itgr#:#itgr_desc_info#:#La description ne fera pas partie de la présentation des groupes d’articles dans son conteneur.
+itgr#:#itgr_display#:#Display###07 07 2026 new variable
+itgr#:#itgr_display_with_title#:#With Title###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable#:#With Title, Item Group collapsible###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable_initially#:#Initial state###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable_initially_closed#:#initially closed###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable_initially_open#:#initially opened###07 07 2026 new variable
+itgr#:#itgr_display_without_title#:#Without Title###07 07 2026 new variable
 itgr#:#itgr_edit#:#Editer Objets du Groupe
 itgr#:#itgr_expandable_closed#:#Extensible (initialement fermé)
 itgr#:#itgr_expandable_open#:#Extensible (initialement ouvert)
@@ -10701,8 +10714,6 @@ itgr#:#itgr_list_default#:#Default###31 10 2023 new variable
 itgr#:#itgr_list_default_info#:#Inherits value from upper container.###31 10 2023 new variable
 itgr#:#itgr_list_presentation#:#Item Presentation###31 10 2023 new variable
 itgr#:#itgr_materials#:#Ressources
-itgr#:#itgr_show_title#:#Montrer titre
-itgr#:#itgr_show_title_info#:#Montre le titre du groupe d'articles dans la présentation pour l’apprenant.
 itgr#:#itgr_tile#:#Tiles###31 10 2023 new variable
 itgr#:#itgr_tile_size#:#Tile Size###31 10 2023 new variable
 jscalendar#:#about_calendar#:#A propos du calendrier
@@ -14500,6 +14511,9 @@ rbac#:#positions_override_operations#:#Ignorer les paramètres globaux
 rbac#:#precondition_not_obligatory_alt#:#La précondition est optionnelle
 rbac#:#precondition_num_obligatory#:#Nombre de Conditions Requises
 rbac#:#precondition_num_optional_info#:#Veuillez entrer un nombre minimum de préconditions à remplir pour permettre l'accès au cours.
+rbac#:#precondition_number_of_required_materials_bigger_preconditions_number#:#The number of required materials must be less than the total number of preconditions.###26 05 2026 new variable
+rbac#:#precondition_number_of_required_materials_lower_compulsory_items#:#The number of required materials must be greater than the number of compulsory preconditions.###26 05 2026 new variable
+rbac#:#precondition_number_of_required_materials_lower_than_one#:#The number of required materials must be at least 1.###26 05 2026 new variable
 rbac#:#precondition_obligatory#:#Obligatoire
 rbac#:#precondition_obligatory_alt#:#La précondition doit être remplie
 rbac#:#precondition_obligatory_info#:#Les préconditions obligatoires doivent être remplies pour avoir accès.

@@ -19,7 +19,7 @@
 *
 * @module		language file Bulgarian
 * @modulegroup	language
-* @author 		Antony Stoyanov <as@autoexpert.bg>
+* @author 		Antony Stoyanov
 * @version		$Id$
 */
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
@@ -1461,6 +1461,7 @@ assessment#:#tst_eval_total_passed_average_points#:#Средни точки от
 assessment#:#tst_eval_total_passed_average_time#:#Average processing time of all passed tests###22 May 2006 new variable
 assessment#:#tst_eval_total_persons#:#Общ брой хора, влезли в теста###22 May 2006 content changed
 assessment#:#tst_exam_access_code#:#Access Code###26 08 2024 new variable
+assessment#:#tst_exam_access_code_invalid_message#:#The code you provided is invalid.###26 05 2026 new variable
 assessment#:#tst_exam_access_code_label#:#Enter access code to continue your already started test.###26 08 2024 new variable
 assessment#:#tst_exam_conditions#:#Exam Conditions###26 08 2024 new variable
 assessment#:#tst_exam_conditions_label#:#Check to accept the conditions.###26 08 2024 new variable
@@ -1689,6 +1690,7 @@ assessment#:#tst_objective_oriented_test_pass_without_questions#:#The started pa
 assessment#:#tst_objective_progress_header#:#Learning Objective Progress###25 10 2016 new variable
 assessment#:#tst_objectives_progress_header#:#Learning Objectives Progress###25 10 2016 new variable
 assessment#:#tst_old_style_rnd_quest_set_broken#:#This random test is in a irreparable state, because one or more connected question pools have been deleted. Therefor participants cannot take the test any longer.###30 08 2015 new variable
+assessment#:#tst_optional_questions_confirmation_fixed_test#:#<b>Questions for already passed learning objectives are already answered.</b><br /><br />The next questions are assigned to already passed learning objectives. Your answers from previous test attempts will carry over.<br /><br />If you continue, you can revise your answers. Doing so may change your results in the related learning objectives.<br /><br />If you do not want to revise your answers, you may go back.###26 05 2026 new variable
 assessment#:#tst_optional_questions_confirmation_non_fixed_test#:#<b>Question related to allready passed learning objectives are optional.</b><br /><br />You want to navigate to a question, that relates to an allready passed learning objective.<br />You can choose:<br /><br />I you proceed, you can work on these questions. Your answers from previous attempts were not adopted, since new random questions were selected for this attempt. With working on this questions you can also degrade your learning objective result.<br /><br />If you decide to not work on these questions, you can go back. In this case these questions won't be considered in the evaluation.###30 08 2015 new variable
 assessment#:#tst_out_of_time_message#:#You have reached the maximum allowed processing time of the test!###26 08 2024 new variable
 assessment#:#tst_participant#:#Participant###28 08 2012 new variable
@@ -2926,6 +2928,7 @@ certificate#:#persistent_certificate_mode_instant#:#Незабавно###22 06 2
 certificate#:#persistent_certificate_mode_instant_info#:#Тази опция се препоръчва за системи с ниско до средно ниво на взаимодействие с потребителите. Системите, които са склонни към голямо време за зареждане по време на създаването на множество потребителски сертификати, трябва да преминат към опцията "Cron Job".
 chatroom#:#allow_anonymous#:#Позволяване на анонимно влизане
 chatroom#:#allow_custom_usernames#:#Предоставяне на потребителски потребителски имена
+chatroom#:#allow_custom_usernames_info#:#Allow users to enter their own unique session name to use within the chat room. If this option is not selected, users are automatically identified using their usernames (login) when in the chat room.###07 07 2026 new variable
 chatroom#:#anonymous_hint#:#Не забравяйте да зададете правилните разрешения в раздела "Разрешения", за да разрешите достъпа на анонимен потребител до този елемент от хранилището.
 chatroom#:#auto_scroll#:#Превърнете се към дъното
 chatroom#:#autogen_usernames#:#Автоматично генерирани потребителски имена
@@ -2960,9 +2963,12 @@ chatroom#:#chat_https_dhparam_info#:#Поискайте да зададете а
 chatroom#:#chat_https_key_info#:#Поискайте да зададете абсолютен път до сървъра за файла с частния ключ (например..: /etc/ssl/private/server.key).
 chatroom#:#chat_invitation#:#Покана от ##inviter_name## към чат ##room_name
 chatroom#:#chat_invitation_long#:#Поканени сте от ##inviter_name## в чат ##room_name##.  Кликнете върху тази връзка ##link###, за да се присъедините директно към този чат.
+chatroom#:#chat_invitation_modal_headline#:#Invitation to Chat Room###26 05 2026 new variable
+chatroom#:#chat_invitation_modal_section#:#Invite User###26 05 2026 new variable
 chatroom#:#chat_invitation_nc_inv_x#:#You have %s chat invitations.###31 03 2023 new variable
 chatroom#:#chat_invitation_nc_no_inv#:#You have no chat invitations.###31 03 2023 new variable
 chatroom#:#chat_invitation_short#:#Моля, кликнете върху връзката със заглавието, за да влезете в чата.
+chatroom#:#chat_invitation_username_input_label#:#Enter Username:###26 05 2026 new variable
 chatroom#:#chat_invitations#:#Chat invitations###31 03 2023 new variable
 chatroom#:#chat_invite#:#Покана###22 06 2022 new variable
 chatroom#:#chat_join#:#Присъединяване###22 06 2022 new variable
@@ -3019,6 +3025,7 @@ chatroom#:#chat_user_action_invite_public_room#:#Покана за участи�
 chatroom#:#chat_user_x_is_typing#:#User %s is typing ...###31 03 2023 new variable
 chatroom#:#chat_users_are_typing#:#Multiple users are typing ...###31 03 2023 new variable
 chatroom#:#chat_whisper#:#Шепот###22 06 2022 new variable
+chatroom#:#chatroom_anonymous_default#:#Anonymous ####07 07 2026 new variable
 chatroom#:#chatroom_auth#:#Аутентикация
 chatroom#:#chatroom_auth_btn_txt#:#Генериране на ключове
 chatroom#:#chatroom_auth_key#:#Authentication-Key
@@ -5695,6 +5702,7 @@ common#:#show_content#:#Show Content###29 07 2022 new variable
 common#:#show_details#:#показване на детайлите
 common#:#show_filter#:#Show Filter###07 09 2009 new variable
 common#:#show_hidden_sections#:#Show More Information &raquo;###26 09 2014 new variable
+common#:#show_less#:#Show less###07 07 2026 new variable
 common#:#show_list#:#Показване на списъка
 common#:#show_members#:#Визуализиране на членовете
 common#:#show_more#:#Show More###29 07 2022 new variable
@@ -10704,9 +10712,14 @@ itgr#:#itgr_always_open#:#Always Open###31 08 2017 new variable
 itgr#:#itgr_assign_materials#:#Assign Materials###29 07 2022 new variable
 itgr#:#itgr_assigned_materials#:#Assigned Materials###28 08 2012 new variable
 itgr#:#itgr_assignment#:#Assignment###28 08 2012 new variable
-itgr#:#itgr_behaviour#:#Block Behaviour###31 08 2017 new variable
-itgr#:#itgr_behaviour_info#:#The system will store the opened/closed state for the current user until logout.###31 08 2017 new variable
 itgr#:#itgr_desc_info#:#The description will not be a part of the item group's presentation in its container.###25 10 2016 new variable
+itgr#:#itgr_display#:#Display###07 07 2026 new variable
+itgr#:#itgr_display_with_title#:#With Title###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable#:#With Title, Item Group collapsible###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable_initially#:#Initial state###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable_initially_closed#:#initially closed###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable_initially_open#:#initially opened###07 07 2026 new variable
+itgr#:#itgr_display_without_title#:#Without Title###07 07 2026 new variable
 itgr#:#itgr_edit#:#Edit Item Groups###28 08 2012 new variable
 itgr#:#itgr_expandable_closed#:#Expandable (initially closed)###31 08 2017 new variable
 itgr#:#itgr_expandable_open#:#Expandable (initially opened)###31 08 2017 new variable
@@ -10716,8 +10729,6 @@ itgr#:#itgr_list_default#:#Default###29 07 2022 new variable
 itgr#:#itgr_list_default_info#:#Inherits value from upper container.###29 07 2022 new variable
 itgr#:#itgr_list_presentation#:#Item Presentation###29 07 2022 new variable
 itgr#:#itgr_materials#:#Materials###28 08 2012 new variable
-itgr#:#itgr_show_title#:#Show Title###31 08 2017 new variable
-itgr#:#itgr_show_title_info#:#Shows title of item group in presentation for learner.###31 08 2017 new variable
 itgr#:#itgr_tile#:#Tiles###29 07 2022 new variable
 itgr#:#itgr_tile_size#:#Tile Size###29 07 2022 new variable
 jscalendar#:#about_calendar#:#За календара
@@ -14515,6 +14526,9 @@ rbac#:#positions_override_operations#:#Override global Settings###22 11 2017 new
 rbac#:#precondition_not_obligatory_alt#:#Precondition is optional###22 03 2011 new variable
 rbac#:#precondition_num_obligatory#:#Number of Required Materials###12 06 2011 new variable
 rbac#:#precondition_num_optional_info#:#Please enter the minimum number of materials which is required for fullfilling this precondition.###12 06 2011 new variable
+rbac#:#precondition_number_of_required_materials_bigger_preconditions_number#:#The number of required materials must be less than the total number of preconditions.###26 05 2026 new variable
+rbac#:#precondition_number_of_required_materials_lower_compulsory_items#:#The number of required materials must be greater than the number of compulsory preconditions.###26 05 2026 new variable
+rbac#:#precondition_number_of_required_materials_lower_than_one#:#The number of required materials must be at least 1.###26 05 2026 new variable
 rbac#:#precondition_obligatory#:#Obligatory###22 03 2011 new variable
 rbac#:#precondition_obligatory_alt#:#Precondition must be fulfilled###22 03 2011 new variable
 rbac#:#precondition_obligatory_info#:#Obligatory preconditions must be fulfilled, for having access.###22 03 2011 new variable
@@ -17919,4 +17933,3 @@ wsp#:#wsp_type_scov#:#Certificate: SCORM###30 12 2013 new variable
 wsp#:#wsp_type_tstv#:#Verification: Test###12 06 2011 new variable
 wsp#:#wsp_type_webr#:#Weblink###18 07 2011 new variable
 wsp#:#wsp_type_wfld#:#Folder###22 03 2011 new variable
-﻿/**

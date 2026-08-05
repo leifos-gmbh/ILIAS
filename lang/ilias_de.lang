@@ -1461,6 +1461,7 @@ assessment#:#tst_eval_total_passed_average_points#:#Durchschnittliche Punktezahl
 assessment#:#tst_eval_total_passed_average_time#:#Mittlere Bearbeitungsdauer aller bestandenen Tests
 assessment#:#tst_eval_total_persons#:#Gesamtzahl der Personen, die den Test gestartet haben
 assessment#:#tst_exam_access_code#:#Zugangscode
+assessment#:#tst_exam_access_code_invalid_message#:#Der Zugangscode ist ungültig.
 assessment#:#tst_exam_access_code_label#:#Geben Sie den Zugangscode ein, um Ihren bereits begonnenen Test fortzusetzen. Lassen Sie das Feld leer, um einen neuen Testdurchlauf zu starten.
 assessment#:#tst_exam_conditions#:#Prüfungsbedingungen
 assessment#:#tst_exam_conditions_label#:#Ankreuzen, um die Bedingungen zu akzeptieren.
@@ -2927,6 +2928,7 @@ certificate#:#persistent_certificate_mode_instant#:#Direkt
 certificate#:#persistent_certificate_mode_instant_info#:#Diese Option wird für Systeme mit geringer bis zu mittelgroßer Benutzerinteraktion empfohlen. Für Systeme, die zu hoher Last während der Zertifikatserstellung neigen, wird die Option "Cron-Job" empfohlen.
 chatroom#:#allow_anonymous#:#Anonyme Anmeldung erlauben
 chatroom#:#allow_custom_usernames#:#Frei wählbare Chat-Namen
+chatroom#:#allow_custom_usernames_info#:#Erlaube Benutzern einen eigenen Namen innerhalb des Chatraums zu wählen. Falls diese Option nicht selektiert ist, wird der Benutzernamen des Users verwendet.
 chatroom#:#anonymous_hint#:#Bitte beachten Sie, dass für den Zugriff von anonymen Benutzer die entsprechenden Berechtigungen im "Berechtigungen"-Reiter gesetzt sein müssen.
 chatroom#:#auto_scroll#:#Automatisch an das Ende scrollen
 chatroom#:#autogen_usernames#:#Chat-Namen für anonyme Teilnahme
@@ -2961,9 +2963,12 @@ chatroom#:#chat_https_dhparam_info#:#Bitte geben Sie hier den absoluten Serverpf
 chatroom#:#chat_https_key_info#:#Bitte geben Sie den absoluten Serverpfad zum privaten Schlüssel an (bspw.: /etc/ssl/private/server.key).
 chatroom#:#chat_invitation#:#"[INVITER_NAME]" lädt ein in Chatraum "[ROOM_NAME]"
 chatroom#:#chat_invitation_long#:#[SALUTATION][BR][BR]Sie wurden in einen Chatraum eingeladen:[BR]Titel des Chatraums: [ROOM_NAME][BR]Eingeladen von: [INVITER_NAME][BR]URL: [LINK][BR][BR]Zum Betreten des Chatraums folgen Sie bitte der angegebenen URL.
+chatroom#:#chat_invitation_modal_headline#:#Chatraum Einladung
+chatroom#:#chat_invitation_modal_section#:#Benutzer einladen
 chatroom#:#chat_invitation_nc_inv_x#:#Sie haben %s Chateinladungen.
 chatroom#:#chat_invitation_nc_no_inv#:#Sie haben keine Chateinaldungen.
 chatroom#:#chat_invitation_short#:#Klicken Sie auf den Link, um den Chatraum zu betreten.
+chatroom#:#chat_invitation_username_input_label#:#Benutzer eingeben:
 chatroom#:#chat_invitations#:#Chateinladungen
 chatroom#:#chat_invite#:#Einladen
 chatroom#:#chat_join#:#Betreten
@@ -3020,6 +3025,7 @@ chatroom#:#chat_user_action_invite_public_room#:#In öffentlichen Chatraum einla
 chatroom#:#chat_user_x_is_typing#:#Benutzer %s tippt gerade ...
 chatroom#:#chat_users_are_typing#:#Mehrere Benutzer tippen gerade ...
 chatroom#:#chat_whisper#:#Flüstern
+chatroom#:#chatroom_anonymous_default#:#Anonym #
 chatroom#:#chatroom_auth#:#Authentifikation
 chatroom#:#chatroom_auth_btn_txt#:#Schlüssel generieren
 chatroom#:#chatroom_auth_key#:#Authentifikation-Schlüssel
@@ -5577,7 +5583,7 @@ common#:#scorm_login_as_learner_id_info#:#An Stelle der ILIAS-Benutzer-ID wird d
 common#:#scorm_lp_auto_activate#:#Standardeinstellungen für den Lernfortschritt
 common#:#scorm_lp_auto_activate_info#:#Wenn der Lernfortschritt im Allgemeinen aktiviert ist, wird bei neuen SCORM-Lernmodulen der Gesamtstatus des Lernfortschritts bestimmt durch ausgewählte SCORM-Materialien (SCOs) und alle SCOs werden für die Lernfortschritts-Bestimmung ausgewählt. Anpassungen sind weiterhin bei jedem SCORM-Lernmodul möglich.
 common#:#scorm_new#:#Neues SCORM-Lernmodul anlegen
-common#:#scorm_without_session#:#SCORM 2004-Speicherung ohne Session aktivieren
+common#:#scorm_without_session#:#SCORM 2004: Speicherung ohne Session
 common#:#scorm_without_session_info#:#Dies sichert die Speicherung von SCORM 2004-Lernstandsdaten auch bei abgelaufener ILIAS-Session. Bei SCORM 1.2 ist die Speicherung ohne Session immer aktiviert.
 common#:#search#:#Suche
 common#:#search_active#:#Aktive Benutzer
@@ -5696,6 +5702,7 @@ common#:#show_content#:#Inhalt anzeigen
 common#:#show_details#:#Details anzeigen
 common#:#show_filter#:#Filter anzeigen
 common#:#show_hidden_sections#:#Weitere Informationen anzeigen &raquo;
+common#:#show_less#:#Weniger zeigen
 common#:#show_list#:#Auflistung anzeigen
 common#:#show_members#:#Mitglieder anzeigen
 common#:#show_more#:#Mehr zeigen
@@ -7082,7 +7089,7 @@ content#:#cont_sc_stat_running#:#Aktiv
 content#:#cont_sc_store_if_previous_score_was_lower#:#wenn der zuvor erzielte Punktestand höher oder gleich war
 content#:#cont_sc_title#:#Titel
 content#:#cont_sc_usession#:#Automatische Abmeldung aus ILIAS verhindern
-content#:#cont_sc_usession_info#:#Um das automatische Ausloggen und den Verlust von Bearbeitungsdaten zu verhindern, sendet das Lernmodul regelmäßig Anfragen an ILIAS. Die Bearbeitung des SCORM-Lernmoduls würde ansonsten nicht als Aktivität gewertet und die ILIAS-Sitzung beendet werden.
+content#:#cont_sc_usession_info#:#Während das Lernmodul bearbeitet wird, kann eine Abmeldung aus ILIAS als störend empfunden werden und zum Verlust von Bearbeitungsdaten führen. Die SCORM RTE sendet regelmäßig Anfragen an ILIAS, um das automatische Abmelden zu verhindern. Um den Verlust von Bearbeitungsdaten für SCORM 2004 zu verhindern, aktivieren Sie ebenfalls die Option „SCORM 2004: Speicherung ohne Session“. Für SCORM 1.2 ist diese Option dauerhaft aktiviert. Sie finden die Option in der systemweiten Administration von Lernmodulen.
 content#:#cont_sc_version#:#Version des Lernmoduls
 content#:#cont_sc_version_info#:#Die laufende Nummer wird automatisch aus dem Versionsmanagement des Lernmoduls gelesen.
 content#:#cont_scheduled_activation#:#Zeitliche Aktivierung
@@ -10281,6 +10288,7 @@ glo#:#glo_really_remove_from_collection#:#Sind Sie sich sicher, dass Sie das fol
 glo#:#glo_reference#:#Link
 glo#:#glo_reference_terms#:#Begriffe verlinken
 glo#:#glo_referenced_term#:#Verlinkte Begriffe
+glo#:#glo_remove_glossary#:##Sind Sie sich sicher, dass Sie das folgende Glossar aus der Liste der automatisch verlinkten Glossare entfernen wollen?
 glo#:#glo_removed_from_collection_info#:#Das Glossar wurde aus dem Sammelglossar entfernt.
 glo#:#glo_reset_all_boxes#:#Alle Fächer zurücksetzen
 glo#:#glo_save_and_continue#:#Speichern und weiter
@@ -10705,9 +10713,14 @@ itgr#:#itgr_always_open#:#Immer offen
 itgr#:#itgr_assign_materials#:#Objekte auswählen
 itgr#:#itgr_assigned_materials#:#Objekte im Objekteblock
 itgr#:#itgr_assignment#:#Eingebunden
-itgr#:#itgr_behaviour#:#Verhalten
-itgr#:#itgr_behaviour_info#:#Das System merkt sich den Zustand (geöffnet/geschlossen) je Benutzer bis zur Abmeldung (Logout).
 itgr#:#itgr_desc_info#:#Die Beschreibung wird bei der Anzeige des Objekteblocks nicht mit ausgegeben.
+itgr#:#itgr_display#:#Anzeige
+itgr#:#itgr_display_with_title#:#Mit Titel
+itgr#:#itgr_display_with_title_and_toggleable#:#Mit Titel, Objekteblock ein- und ausklappbar
+itgr#:#itgr_display_with_title_and_toggleable_initially#:#Ausgangszustand
+itgr#:#itgr_display_with_title_and_toggleable_initially_closed#:#zunächst geschlossen
+itgr#:#itgr_display_with_title_and_toggleable_initially_open#:#zunächst geöffnet
+itgr#:#itgr_display_without_title#:#Ohne Titel
 itgr#:#itgr_edit#:#Einstellungen des Objekteblocks
 itgr#:#itgr_expandable_closed#:#Ausklappbar (zunächst geschlossen)
 itgr#:#itgr_expandable_open#:#Ausklappbar (zunächst geöffnet)
@@ -10717,8 +10730,6 @@ itgr#:#itgr_list_default#:#Standard
 itgr#:#itgr_list_default_info#:#Übernimmt die Einstellung des übergeordneten Containers.
 itgr#:#itgr_list_presentation#:#Präsentationsansicht für Inhalte
 itgr#:#itgr_materials#:#Objekte
-itgr#:#itgr_show_title#:#Titel anzeigen
-itgr#:#itgr_show_title_info#:#Der Titel des Objekteblocks wird angezeigt.
 itgr#:#itgr_tile#:#Kacheln
 itgr#:#itgr_tile_size#:#Kachelgröße
 jscalendar#:#about_calendar#:#Über den Kalender
@@ -13104,7 +13115,7 @@ obj#:#obj_deactivate_multilang#:#Mehrsprachigkeit deaktivieren
 obj#:#obj_deactivate_multilang_conf#:#Wollen Sie die Unterstützung für mehrsprachige Inhalte wirklich deaktivieren? Nur die Inhalte der Standardsprache werden verfügbar bleiben.
 obj#:#obj_fallback_lang#:#Standardsprache
 obj#:#obj_features#:#Zusätzliche Funktionen
-obj#:#obj_import_file_error#:#Die Datei konnte nicht importiert werden. Bitte stellen Sie sicher, dass es sich um eine ILIAS-Exportdatei (XML-Export) des gleichen Objekttyps handelt und der Dateiname unverändert ist. Fehlermeldung:
+obj#:#obj_import_file_error#:#Die Datei konnte nicht importiert werden. Bitte stellen Sie sicher, dass es sich um eine ILIAS-Exportdatei (XML-Export) des gleichen Objekttyps handelt und der Dateiname unverändert ist.
 obj#:#obj_insert_into_clipboard#:#In Zwischenablage übernehmen
 obj#:#obj_inserted_clipboard#:#Die Objekte wurden in die Zwischenablage übernommen.
 obj#:#obj_master_lang#:#Basissprache
@@ -14516,6 +14527,9 @@ rbac#:#positions_override_operations#:#Globale Einstellungen überschreiben
 rbac#:#precondition_not_obligatory_alt#:#Die Vorbedingung ist optional
 rbac#:#precondition_num_obligatory#:#Geforderte Anzahl Materialien
 rbac#:#precondition_num_optional_info#:#Anzahl von Materialien, die bis zum festgelegten Status / Ergebnis zu bearbeiten sind
+rbac#:#precondition_number_of_required_materials_bigger_preconditions_number#:#Die Anzahl der geforderten Materialien muss kleiner sein als die Anzahl der Vorbedingungen.
+rbac#:#precondition_number_of_required_materials_lower_compulsory_items#:#Die Anzahl der geforderten Materialien muss größer sein als die Anzahl der verpflichtenden Vorbedingungen.
+rbac#:#precondition_number_of_required_materials_lower_than_one#:#Die Anzahl der geforderten Materialien muss mindestens 1 sein.
 rbac#:#precondition_obligatory#:#Verpflichtend
 rbac#:#precondition_obligatory_alt#:#Die Vorbedingung muss erfüllt werden
 rbac#:#precondition_obligatory_info#:#Verpflichtende Vorbedingungen müssen erfüllt werden, um Zugriff zu erhalten.

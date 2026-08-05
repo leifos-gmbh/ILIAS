@@ -1460,6 +1460,7 @@ assessment#:#tst_eval_total_passed_average_points#:#Punteggio medio dei test pas
 assessment#:#tst_eval_total_passed_average_time#:#Tempo medio di esecuzione di tutti i test positivi
 assessment#:#tst_eval_total_persons#:#Numero totale delle persone che hanno iniziato il test
 assessment#:#tst_exam_access_code#:#Access Code###30 04 2024 new variable
+assessment#:#tst_exam_access_code_invalid_message#:#The code you provided is invalid.###26 05 2026 new variable
 assessment#:#tst_exam_access_code_label#:#Enter access code to continue your already started test.###30 04 2024 new variable
 assessment#:#tst_exam_conditions#:#Exam Conditions###30 04 2024 new variable
 assessment#:#tst_exam_conditions_label#:#Check to accept the conditions.###30 04 2024 new variable
@@ -1688,6 +1689,7 @@ assessment#:#tst_objective_oriented_test_pass_without_questions#:#Il passaggio a
 assessment#:#tst_objective_progress_header#:#Progresso dell’obiettivo di apprendimento
 assessment#:#tst_objectives_progress_header#:#Progresso degli obiettivi di apprendimento
 assessment#:#tst_old_style_rnd_quest_set_broken#:#Questo test casuale è in uno stato irreparabile perché una o più raccolte di domande sono state eliminate. Pertanto i partecipanti non possono più effettuare i test.
+assessment#:#tst_optional_questions_confirmation_fixed_test#:#<b>Questions for already passed learning objectives are already answered.</b><br /><br />The next questions are assigned to already passed learning objectives. Your answers from previous test attempts will carry over.<br /><br />If you continue, you can revise your answers. Doing so may change your results in the related learning objectives.<br /><br />If you do not want to revise your answers, you may go back.###26 05 2026 new variable
 assessment#:#tst_optional_questions_confirmation_non_fixed_test#:#<b> La domanda relativa agli obiettivi di apprendimento già superati è facoltativa. </b> <br /> <br /> Desideri passare a una domanda relativa a un obiettivo di apprendimento già superato. <br /> Puoi scegliere: <br /> <br /> se procedi, puoi lavorare su queste domande. Le tue risposte da precedenti tentativi non sono state adottate, poiché per questo tentativo sono state selezionate nuove domande casuali. Lavorando su queste domande puoi anche peggiorare il risultato del tuo obiettivo di apprendimento. <br /> <br /> Se decidi di non lavorare su queste domande, puoi tornare indietro. In questo caso queste domande non saranno prese in considerazione nella valutazione.
 assessment#:#tst_out_of_time_message#:#You have reached the maximum allowed processing time of the test!###30 04 2024 new variable
 assessment#:#tst_participant#:#Participante
@@ -2925,6 +2927,7 @@ certificate#:#persistent_certificate_mode_instant#:#Immediato
 certificate#:#persistent_certificate_mode_instant_info#:#Questa opzione è consigliata per i sistemi con interazioni utente da basse a mediocri. I sistemi che tendono a richiedere maggiori prestazioni durante la creazione di più certificati utente dovrebbero passare all'opzione "Cron Job".
 chatroom#:#allow_anonymous#:#Consenti accesso anonimo
 chatroom#:#allow_custom_usernames#:#Consenti nomi utente personalizzati
+chatroom#:#allow_custom_usernames_info#:#Allow users to enter their own unique session name to use within the chat room. If this option is not selected, users are automatically identified using their usernames (login) when in the chat room.###07 07 2026 new variable
 chatroom#:#anonymous_hint#:#Assicurarsi di impostare le autorizzazioni appropriate nella scheda "Autorizzazioni" per consentire l'accesso degli utenti anonimi.
 chatroom#:#auto_scroll#:#Scorri fino alla fine
 chatroom#:#autogen_usernames#:#Nomi utente generati automaticamente
@@ -2959,9 +2962,12 @@ chatroom#:#chat_https_dhparam_info#:#Si prega di definire un percorso server ass
 chatroom#:#chat_https_key_info#:#Si prega di definire un percorso server assoluto al file di chiave privata (ad es.: /etc/ssl/private/server.key).
 chatroom#:#chat_invitation#:#Invito da
 chatroom#:#chat_invitation_long#:#Sei stato invitato da
+chatroom#:#chat_invitation_modal_headline#:#Invitation to Chat Room###26 05 2026 new variable
+chatroom#:#chat_invitation_modal_section#:#Invite User###26 05 2026 new variable
 chatroom#:#chat_invitation_nc_inv_x#:#You have %s chat invitations.###31 03 2023 new variable
 chatroom#:#chat_invitation_nc_no_inv#:#You have no chat invitations.###31 03 2023 new variable
 chatroom#:#chat_invitation_short#:#Fare clic sul collegamento del titolo per accedere alla chat room.
+chatroom#:#chat_invitation_username_input_label#:#Enter Username:###26 05 2026 new variable
 chatroom#:#chat_invitations#:#Chat invitations###31 03 2023 new variable
 chatroom#:#chat_invite#:#Invita
 chatroom#:#chat_join#:#Partecipa
@@ -3018,6 +3024,7 @@ chatroom#:#chat_user_action_invite_public_room#:#Invita alla chat room pubblica
 chatroom#:#chat_user_x_is_typing#:#User %s is typing ...###31 03 2023 new variable
 chatroom#:#chat_users_are_typing#:#Multiple users are typing ...###31 03 2023 new variable
 chatroom#:#chat_whisper#:#Bisbiglia
+chatroom#:#chatroom_anonymous_default#:#Anonymous ####07 07 2026 new variable
 chatroom#:#chatroom_auth#:#Autenticazione
 chatroom#:#chatroom_auth_btn_txt#:#Genera chiavi
 chatroom#:#chatroom_auth_key#:#Chiave di autenticazione
@@ -5694,6 +5701,7 @@ common#:#show_content#:#Show Content###31 03 2023 new variable
 common#:#show_details#:#Mostra dettagli
 common#:#show_filter#:#Mostra filtro
 common#:#show_hidden_sections#:#Mostra maggiori informazioni &raquo;
+common#:#show_less#:#Show less###07 07 2026 new variable
 common#:#show_list#:#Mostra lista
 common#:#show_members#:#Mostra iscritti
 common#:#show_more#:#Mostra di più
@@ -10703,9 +10711,14 @@ itgr#:#itgr_always_open#:#Sempre aperto
 itgr#:#itgr_assign_materials#:#Assign Materials###31 03 2023 new variable
 itgr#:#itgr_assigned_materials#:#materiali assegnati
 itgr#:#itgr_assignment#:#assegnazione
-itgr#:#itgr_behaviour#:#Comportamento del blocco
-itgr#:#itgr_behaviour_info#:#Il sistema memorizzerà lo stato aperto/chiuso per l'utente attuale fino alla disconnessione.
 itgr#:#itgr_desc_info#:#La descrizione non sarà una parte della voce del gruppo di articoli nel relativo contenitore.
+itgr#:#itgr_display#:#Display###07 07 2026 new variable
+itgr#:#itgr_display_with_title#:#With Title###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable#:#With Title, Item Group collapsible###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable_initially#:#Initial state###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable_initially_closed#:#initially closed###07 07 2026 new variable
+itgr#:#itgr_display_with_title_and_toggleable_initially_open#:#initially opened###07 07 2026 new variable
+itgr#:#itgr_display_without_title#:#Without Title###07 07 2026 new variable
 itgr#:#itgr_edit#:#modifica gruppi di oggetti
 itgr#:#itgr_expandable_closed#:#Espandibile (inizialmente chiuso)
 itgr#:#itgr_expandable_open#:#Espandibile (inizialmente aperto)
@@ -10715,8 +10728,6 @@ itgr#:#itgr_list_default#:#Default###31 03 2023 new variable
 itgr#:#itgr_list_default_info#:#Inherits value from upper container.###31 03 2023 new variable
 itgr#:#itgr_list_presentation#:#Item Presentation###31 03 2023 new variable
 itgr#:#itgr_materials#:#Materiali
-itgr#:#itgr_show_title#:#Mostra titolo
-itgr#:#itgr_show_title_info#:#Mostra il titolo del gruppo di articoli nella presentazione per l’allievo.
 itgr#:#itgr_tile#:#Tiles###31 03 2023 new variable
 itgr#:#itgr_tile_size#:#Tile Size###31 03 2023 new variable
 jscalendar#:#about_calendar#:#Informazioni sul calendario
@@ -14514,6 +14525,9 @@ rbac#:#positions_override_operations#:#Ignora impostazioni globali
 rbac#:#precondition_not_obligatory_alt#:#La condizione preliminare è facoltativa
 rbac#:#precondition_num_obligatory#:#Numero di materiali richiesti
 rbac#:#precondition_num_optional_info#:#Si prega di inserire il numero minimo di materiali che è richiesto per soddisfare questa precondizione.
+rbac#:#precondition_number_of_required_materials_bigger_preconditions_number#:#The number of required materials must be less than the total number of preconditions.###26 05 2026 new variable
+rbac#:#precondition_number_of_required_materials_lower_compulsory_items#:#The number of required materials must be greater than the number of compulsory preconditions.###26 05 2026 new variable
+rbac#:#precondition_number_of_required_materials_lower_than_one#:#The number of required materials must be at least 1.###26 05 2026 new variable
 rbac#:#precondition_obligatory#:#Obbligatorio
 rbac#:#precondition_obligatory_alt#:#La condizione preliminare deve essere soddisfatta
 rbac#:#precondition_obligatory_info#:#Devono essere soddisfatte precondizioni obbligatorie per avere accesso.

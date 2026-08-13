@@ -37,6 +37,10 @@ use ILIAS\Search\Presentation\Result\Object\AccessChecker;
 use ILIAS\Search\GUI\Param;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory as SubitemPropertiesFactory;
 use ILIAS\Search\Presentation\Result\Copyright\Helper as CopyrightHelper;
+use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\SortationInfosImpl;
+use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfosImpl;
 
 class ResultPresenterImpl implements ResultPresenter
 {
@@ -59,7 +63,8 @@ class ResultPresenterImpl implements ResultPresenter
      */
     public function getDirectSearchResultAsPanel(
         ilSearchResult $result,
-        ViewControlInfos $view_control_infos
+        PaginationInfos $pagination_infos,
+        SortationInfos $sortation_infos
     ): array {
         $items = [];
         $subitem_modals = [];
@@ -108,7 +113,7 @@ class ResultPresenterImpl implements ResultPresenter
             ];
         }
 
-        $items = $this->sortObjectItems($view_control_infos->sortation(), ...$items_with_sort_data);
+        $items = $this->sortObjectItems($sortation_infos->sortation(), ...$items_with_sort_data);
 
         if ($items->current() === null) {
             // currently only relevant when the total hits are a multiple of max page size (47885)
@@ -117,7 +122,8 @@ class ResultPresenterImpl implements ResultPresenter
 
         return [
             $this->component_factory->getPanel(
-                $view_control_infos,
+                $pagination_infos,
+                $sortation_infos,
                 ...$items
             ),
             $subitem_modals
@@ -160,7 +166,8 @@ class ResultPresenterImpl implements ResultPresenter
     public function getLuceneSearchResultAsPanel(
         ilLuceneSearchResultFilter $result,
         ?ilLuceneHighlighterResultParser $highlighter,
-        ViewControlInfos $view_control_infos
+        PaginationInfos $pagination_infos,
+        SortationInfos $sortation_infos
     ): array {
         $items = [];
         $subitem_modals = [];
@@ -212,7 +219,7 @@ class ResultPresenterImpl implements ResultPresenter
             ];
         }
 
-        $items = $this->sortObjectItems($view_control_infos->sortation(), ...$items_with_sort_data);
+        $items = $this->sortObjectItems($sortation_infos->sortation(), ...$items_with_sort_data);
 
         if ($items->current() === null) {
             // currently only relevant when the total hits are a multiple of max page size (47885)
@@ -221,7 +228,8 @@ class ResultPresenterImpl implements ResultPresenter
 
         return [
             $this->component_factory->getPanel(
-                $view_control_infos,
+                $pagination_infos,
+                $sortation_infos,
                 ...$items
             ),
             $subitem_modals
@@ -282,25 +290,31 @@ class ResultPresenterImpl implements ResultPresenter
         }
     }
 
-    public function getViewControlInfos(
+    public function getSortationInfos(
         Sortation $sortation,
+        URI $sortation_action,
+        Param $sortation_param_name
+    ): SortationInfos {
+        return new SortationInfosImpl(
+            $sortation,
+            $sortation_action,
+            $sortation_param_name
+        );
+    }
+
+    public function getPaginationInfos(
         int $current_page,
         int $max_pages,
         int $page_size,
         URI $pagination_action,
-        Param $page_param_name,
-        URI $sortation_action,
-        Param $sortation_param_name
-    ): ViewControlInfos {
-        return new ViewControlInfosImpl(
-            $sortation,
+        Param $page_param_name
+    ): PaginationInfos {
+        return new PaginationInfosImpl(
             $current_page,
             $max_pages,
             $page_size,
             $pagination_action,
-            $page_param_name,
-            $sortation_action,
-            $sortation_param_name
+            $page_param_name
         );
     }
 

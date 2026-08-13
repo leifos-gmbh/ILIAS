@@ -18,15 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result;
+namespace ILIAS\Search\Presentation\Result\ViewControls;
 
 use ILIAS\Search\GUI\Param;
 use ILIAS\Data\URI;
 
-interface ViewControlInfos
+interface PaginationInfos
 {
-    public function sortation(): Sortation;
-
     public function currentPage(): int;
 
     public function maxPages(): int;
@@ -36,8 +34,4 @@ interface ViewControlInfos
     public function paginationAction(): URI;
 
     public function pageParam(): Param;
-
-    public function sortationAction(): URI;
-
-    public function sortationParam(): Param;
 }

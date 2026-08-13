@@ -26,12 +26,14 @@ use ILIAS\UI\Component\Panel\Listing\Listing as ListingPanel;
 use DateTimeImmutable;
 use ILIAS\UI\Component\Signal;
 use ILIAS\UI\Component\Modal\Modal;
-use ILIAS\Search\Presentation\Result\ViewControlInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 
 interface ComponentFactory
 {
     public function getPanel(
-        ViewControlInfos $view_control_infos,
+        ?PaginationInfos $pagination_infos,
+        ?SortationInfos $sortation_infos,
         Item ...$items
     ): ListingPanel;
 

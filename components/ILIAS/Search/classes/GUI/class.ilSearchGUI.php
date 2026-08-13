@@ -21,7 +21,8 @@ declare(strict_types=1);
 use ILIAS\Search\GUI\Searcher;
 use ILIAS\Search\GUI\SearchStateHandler;
 use ILIAS\Search\Presentation\Result\ResultPresenter;
-use ILIAS\Search\Presentation\Result\ViewControlInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 use ILIAS\Search\GUI\Actions;
 use ILIAS\Search\Presentation\Result\Sortation;
 use ILIAS\Search\GUI\Param;
@@ -110,8 +111,15 @@ class ilSearchGUI
         $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
-        $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos, $this->state_handler);
+        $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
+        $sortation_infos = $this->buildSortationInfos($sortation);
+        $this->searcher->performSearchAndRenderResults(
+            $this->user->getId(),
+            $cache,
+            $pagination_infos,
+            $sortation_infos,
+            $this->state_handler
+        );
     }
 
     /**
@@ -137,8 +145,15 @@ class ilSearchGUI
         $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
-        $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos, $this->state_handler);
+        $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
+        $sortation_infos = $this->buildSortationInfos($sortation);
+        $this->searcher->performSearchAndRenderResults(
+            $this->user->getId(),
+            $cache,
+            $pagination_infos,
+            $sortation_infos,
+            $this->state_handler
+        );
     }
 
     protected function showSavedResults(): void
@@ -155,8 +170,14 @@ class ilSearchGUI
         $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
-        $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->readSavedResultsAndRenderResults($this->user->getId(), $cache, $view_control_infos);
+        $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
+        $sortation_infos = $this->buildSortationInfos($sortation);
+        $this->searcher->readSavedResultsAndRenderResults(
+            $this->user->getId(),
+            $cache,
+            $pagination_infos,
+            $sortation_infos
+        );
     }
 
     protected function applyFilter(): void
@@ -179,8 +200,15 @@ class ilSearchGUI
         $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
-        $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos, $this->state_handler);
+        $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
+        $sortation_infos = $this->buildSortationInfos($sortation);
+        $this->searcher->performSearchAndRenderResults(
+            $this->user->getId(),
+            $cache,
+            $pagination_infos,
+            $sortation_infos,
+            $this->state_handler
+        );
     }
 
     protected function switchResultPage(): void
@@ -201,8 +229,15 @@ class ilSearchGUI
         $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
-        $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->performSearchAndRenderResults($this->user->getId(), $cache, $view_control_infos, $this->state_handler);
+        $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
+        $sortation_infos = $this->buildSortationInfos($sortation);
+        $this->searcher->performSearchAndRenderResults(
+            $this->user->getId(),
+            $cache,
+            $pagination_infos,
+            $sortation_infos,
+            $this->state_handler
+        );
     }
 
     protected function sortResultPage(): void
@@ -219,8 +254,14 @@ class ilSearchGUI
         $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
-        $view_control_infos = $this->buildViewControlInfos($sortation, $page, $max_page);
-        $this->searcher->readSavedResultsAndRenderResults($this->user->getId(), $cache, $view_control_infos);
+        $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
+        $sortation_infos = $this->buildSortationInfos($sortation);
+        $this->searcher->readSavedResultsAndRenderResults(
+            $this->user->getId(),
+            $cache,
+            $pagination_infos,
+            $sortation_infos
+        );
     }
 
     protected function autoComplete(): void
@@ -288,18 +329,25 @@ class ilSearchGUI
         $this->tpl->setTitle($this->lng->txt("search"));
     }
 
-    protected function buildViewControlInfos(
+    protected function buildPaginationInfos(
         Sortation $sortation,
         int $page,
         int $max_page
-    ): ViewControlInfos {
-        return $this->result_presenter->getViewControlInfos(
-            $sortation,
+    ): PaginationInfos {
+        return $this->result_presenter->getPaginationInfos(
             $page,
             $max_page,
             $this->settings->getMaxHits(),
             $this->actions->switchResultPage($sortation),
-            Param::PAGE_NUMBER,
+            Param::PAGE_NUMBER
+        );
+    }
+
+    protected function buildSortationInfos(
+        Sortation $sortation
+    ): SortationInfos {
+        return $this->result_presenter->getSortationInfos(
+            $sortation,
             $this->actions->sortResultPage(),
             Param::SORTATION
         );

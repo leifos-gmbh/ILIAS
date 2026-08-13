@@ -33,8 +33,9 @@ use ilDateTime;
 use ilDatePresentation;
 use ILIAS\UI\Component\Modal\Modal;
 use ILIAS\Search\Presentation\Result\Sortation;
-use ILIAS\Search\Presentation\Result\ViewControlInfos;
 use ILIAS\Search\GUI\Param;
+use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 
 class ComponentFactoryImpl implements ComponentFactory
 {
@@ -48,24 +49,28 @@ class ComponentFactoryImpl implements ComponentFactory
     }
 
     public function getPanel(
-        ViewControlInfos $view_control_infos,
+        ?PaginationInfos $pagination_infos,
+        ?SortationInfos $sortation_infos,
         Item ...$items
     ): ListingPanel {
         $item_group = $this->ui_factory->item()->group('', $items);
-        $view_controls = [
-            $this->getPaginationViewControl(
-                $view_control_infos->currentPage(),
-                $view_control_infos->maxPages(),
-                $view_control_infos->pageSize(),
-                $view_control_infos->paginationAction(),
-                $view_control_infos->pageParam()
-            ),
-            $this->getSortationViewControl(
-                $view_control_infos->sortation(),
-                $view_control_infos->sortationAction(),
-                $view_control_infos->sortationParam()
-            )
-        ];
+        $view_controls = [];
+        if ($pagination_infos !== null) {
+            $view_controls[] = $this->getPaginationViewControl(
+                $pagination_infos->currentPage(),
+                $pagination_infos->maxPages(),
+                $pagination_infos->pageSize(),
+                $pagination_infos->paginationAction(),
+                $pagination_infos->pageParam()
+            );
+        }
+        if ($sortation_infos !== null) {
+            $view_controls[] = $this->getSortationViewControl(
+                $sortation_infos->sortation(),
+                $sortation_infos->sortationAction(),
+                $sortation_infos->sortationParam()
+            );
+        }
 
         return $this->ui_factory->panel()->listing()->standard(
             $this->lng->txt("search_results"),

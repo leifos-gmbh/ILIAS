@@ -22,7 +22,6 @@ namespace ILIAS\Search\GUI\Direct;
 
 use ILIAS\Search\GUI\Searcher;
 use ilUserSearchCache;
-use ILIAS\Search\Presentation\Result\ViewControlInfos;
 use ilGlobalTemplateInterface;
 use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\Search\Presentation\Result\ResultPresenter;
@@ -36,6 +35,8 @@ use ilSearchSettings;
 use ilObjectSearch;
 use ilDate;
 use ILIAS\Search\GUI\SearchStateHandler;
+use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 
 class SearcherImpl implements Searcher
 {
@@ -51,7 +52,8 @@ class SearcherImpl implements Searcher
     public function performSearchAndRenderResults(
         int $usr_id,
         ilUserSearchCache $cache,
-        ViewControlInfos $view_control_infos,
+        PaginationInfos $pagination_infos,
+        SortationInfos $sortation_infos,
         SearchStateHandler $state_handler
     ): void {
         // Step 1: parse query string
@@ -94,45 +96,45 @@ class SearcherImpl implements Searcher
          * for search results, this should be done by the GUI.
          */
         if (
-            $view_control_infos->currentPage() === $view_control_infos->maxPages() &&
+            $pagination_infos->currentPage() === $pagination_infos->maxPages() &&
             $result->isLimitReached()
         ) {
-            $view_control_infos = $this->presenter->getViewControlInfos(
-                $view_control_infos->sortation(),
-                $view_control_infos->currentPage(),
-                $view_control_infos->maxPages() + 1,
-                $view_control_infos->pageSize(),
-                $view_control_infos->paginationAction(),
-                $view_control_infos->pageParam(),
-                $view_control_infos->sortationAction(),
-                $view_control_infos->sortationParam()
+            $pagination_infos = $this->presenter->getPaginationInfos(
+                $pagination_infos->currentPage(),
+                $pagination_infos->maxPages() + 1,
+                $pagination_infos->pageSize(),
+                $pagination_infos->paginationAction(),
+                $pagination_infos->pageParam()
             );
-            $state_handler->updateMaxPage($view_control_infos->maxPages());
+            $state_handler->updateMaxPage($pagination_infos->maxPages());
         }
 
-        $this->renderResults($result, $cache->getQuery(), $view_control_infos);
+        $this->renderResults($result, $cache->getQuery(), $pagination_infos, $sortation_infos);
     }
 
     public function readSavedResultsAndRenderResults(
         int $usr_id,
         ilUserSearchCache $cache,
-        ViewControlInfos $view_control_infos
+        PaginationInfos $pagination_infos,
+        SortationInfos $sortation_infos
     ): void {
         $results = new ilSearchResult($usr_id);
         $results->read();
         $results->filterResults($cache->getRoot());
-        $this->renderResults($results, $cache->getQuery(), $view_control_infos);
+        $this->renderResults($results, $cache->getQuery(), $pagination_infos, $sortation_infos);
     }
 
     protected function renderResults(
         ilSearchResult $results,
         string $term,
-        ViewControlInfos $view_control_infos
+        PaginationInfos $pagination_infos,
+        SortationInfos $sortation_infos
     ): void {
-        if ($results->getResults() || $view_control_infos->currentPage() > 1) {
+        if ($results->getResults() || $pagination_infos->currentPage() > 1) {
             $result_panel_and_modals = $this->presenter->getDirectSearchResultAsPanel(
                 $results,
-                $view_control_infos
+                $pagination_infos,
+                $sortation_infos
             );
             $this->tpl->setVariable(
                 'SEARCH_RESULTS',

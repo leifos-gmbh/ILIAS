@@ -21,7 +21,8 @@ declare(strict_types=1);
 namespace ILIAS\Search\GUI;
 
 use ilUserSearchCache;
-use ILIAS\Search\Presentation\Result\ViewControlInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
+use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 
 /**
  * Until there is a unified format for search results,
@@ -38,13 +39,15 @@ interface Searcher
     public function performSearchAndRenderResults(
         int $usr_id,
         ilUserSearchCache $cache,
-        ViewControlInfos $view_control_infos,
+        PaginationInfos $pagination_infos,
+        SortationInfos $sortation_infos,
         SearchStateHandler $state_handler
     ): void;
 
     public function readSavedResultsAndRenderResults(
         int $usr_id,
         ilUserSearchCache $cache,
-        ViewControlInfos $view_control_infos
+        PaginationInfos $pagination_infos,
+        SortationInfos $sortation_infos
     ): void;
 }

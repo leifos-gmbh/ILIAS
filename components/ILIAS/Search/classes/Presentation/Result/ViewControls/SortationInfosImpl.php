@@ -18,20 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result;
+namespace ILIAS\Search\Presentation\Result\ViewControls;
 
 use ILIAS\Search\GUI\Param;
 use ILIAS\Data\URI;
+use ILIAS\Search\Presentation\Result\Sortation;
 
-class ViewControlInfosImpl implements ViewControlInfos
+class SortationInfosImpl implements SortationInfos
 {
     public function __construct(
         protected Sortation $sortation,
-        protected int $current_page,
-        protected int $max_pages,
-        protected int $page_size,
-        protected URI $pagination_action,
-        protected Param $page_param,
         protected URI $sortation_action,
         protected Param $sortation_param
     ) {
@@ -40,31 +36,6 @@ class ViewControlInfosImpl implements ViewControlInfos
     public function sortation(): Sortation
     {
         return $this->sortation;
-    }
-
-    public function currentPage(): int
-    {
-        return $this->current_page;
-    }
-
-    public function maxPages(): int
-    {
-        return $this->max_pages;
-    }
-
-    public function pageSize(): int
-    {
-        return $this->page_size;
-    }
-
-    public function paginationAction(): URI
-    {
-        return $this->pagination_action;
-    }
-
-    public function pageParam(): Param
-    {
-        return $this->page_param;
     }
 
     public function sortationAction(): URI

@@ -51,6 +51,11 @@ interface ResultPresenter
         SortationInfos $sortation_infos
     ): array;
 
+    public function getLuceneUserSearchResultAsPanel(
+        PaginationInfos $pagination_infos,
+        int ...$result_user_ids
+    ): ListingPanel;
+
     public function getSortationInfos(
         Sortation $sortation,
         URI $sortation_action,

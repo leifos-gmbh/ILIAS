@@ -31,11 +31,11 @@ interface Actions
 
     public function showSavedResults(): URI;
 
-    public function applyFilter(): URI;
+    public function applyFilter(): URI; // not relevant for user search, should really be part of search
 
-    public function switchResultPage(Sortation $sortation): URI;
+    public function switchResultPage(Sortation $sortation): URI; // merge with sortResultPage as applyViewControls
 
-    public function sortResultPage(): URI;
+    public function sortResultPage(): URI; // merge with switchResultPage as applyViewControls
 
     public function autoComplete(): URI;
 

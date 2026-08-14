@@ -41,6 +41,7 @@ use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
 use ILIAS\Search\Presentation\Result\ViewControls\SortationInfosImpl;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfosImpl;
+use ILIAS\Search\Presentation\Result\User\PropertiesAggregator as UserPropertiesAggregator;
 
 class ResultPresenterImpl implements ResultPresenter
 {
@@ -54,7 +55,8 @@ class ResultPresenterImpl implements ResultPresenter
         protected SubitemPropertiesFactory $subitem_properties_factory,
         protected CopyrightHelper $copyright_helper,
         protected AccessChecker $access,
-        protected Sanitizer $sanitizer
+        protected Sanitizer $sanitizer,
+        protected UserPropertiesAggregator $user_properties
     ) {
     }
 
@@ -288,6 +290,38 @@ class ResultPresenterImpl implements ResultPresenter
         foreach ($items_with_sort_data as $item) {
             yield $item['item'];
         }
+    }
+
+    public function getLuceneUserSearchResultAsPanel(
+        PaginationInfos $pagination_infos,
+        int ...$result_user_ids
+    ): ListingPanel {
+        $items = [];
+
+        // TODO pagination? How should that interact with the 'is profile public' filter?
+
+        $properties_collection = $this->user_properties->fetchForAvailableUsers(...$result_user_ids);
+
+        foreach ($properties_collection as $properties) {
+            $items = $this->component_factory->getItemForUser(
+                $properties->presentableName(),
+                $properties->login(),
+                $properties->linkToProfile(),
+                $properties->avatarPath(),
+                $properties->otherFields()
+            );
+        }
+
+        if ($items === []) {
+            // currently only relevant when the total hits are a multiple of max page size (47885)
+            $items = [$this->component_factory->getNoResultItem()];
+        }
+
+        return $this->component_factory->getPanel(
+            $pagination_infos,
+            null,
+            ...$items
+        );
     }
 
     public function getSortationInfos(

@@ -66,5 +66,16 @@ interface ComponentFactory
         Item ...$items
     ): ?Modal;
 
+    /**
+     * @param array<string, string>    $other_fields
+     */
+    public function getItemForUser(
+        string $presentable_name,
+        string $login,
+        ?URI $link_to_profile,
+        string $avatar_path,
+        array $other_fields
+    ): Item;
+
     public function getNoResultItem(): Item;
 }

@@ -219,6 +219,26 @@ class ComponentFactoryImpl implements ComponentFactory
                                 ->withProperties($properties);
     }
 
+    /**
+     * @param array<string, string>    $other_fields
+     */
+    public function getItemForUser(
+        string $presentable_name,
+        string $login,
+        ?URI $link_to_profile,
+        string $avatar_path,
+        array $other_fields
+    ): Item {
+        if ($link_to_profile !== null) {
+            $presentable_name = $this->ui_factory->link()->standard($presentable_name, (string) $link_to_profile);
+        }
+        $avatar = $this->ui_factory->symbol()->avatar()->picture($avatar_path, '');
+        return $this->ui_factory->item()->standard($presentable_name)
+                                ->withDescription($login)
+                                ->withProperties($other_fields)
+                                ->withLeadAvatar($avatar);
+    }
+
     public function getNoResultItem(): Item
     {
         return $this->ui_factory->item()->shy($this->lng->txt('search_no_further_match'));

@@ -18,53 +18,26 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI\Lucene;
+namespace ILIAS\Search\GUI\Global\Object\Direct;
 
-use ilSearchFilterGUI;
 use ilUserSearchCache;
-use ILIAS\Data\URI;
-use ILIAS\Search\GUI\AbstractSearchStateHandlerImpl;
-use ILIAS\HTTP\Services as HTTP;
-use ILIAS\Refinery\Factory as Refinery;
 use ilSearchSettings;
-use ilLuceneQueryParser;
+use ilSearchFilterGUI;
+use ILIAS\Data\URI;
 use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
+use ILIAS\Search\GUI\Global\Object\FilterHandler;
 
-class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
+class FilterHandlerImpl implements FilterHandler
 {
     public function __construct(
         protected ilSearchSettings $settings,
-        protected LOMServices $lom_services,
-        HTTP $http,
-        Refinery $refinery
+        protected LOMServices $lom_services
     ) {
-        parent::__construct($http, $refinery);
-    }
-
-    public function fetchRequestedRemoteSearchTerm(): string
-    {
-        if ($this->http->wrapper()->post()->has('queryString')) {
-            $term = $this->http->wrapper()->post()->retrieve(
-                'queryString',
-                $this->refinery->kindlyTo()->string()
-            );
-            $qp = new ilLuceneQueryParser($term);
-            $qp->parseAutoWildcard();
-            return $qp->getQuery();
-        }
-        return '';
     }
 
     public function fetchFilter(URI $action): ilSearchFilterGUI
     {
-        return new ilSearchFilterGUI($action, true);
-    }
-
-    public function fetchCache(int $usr_id): ilUserSearchCache
-    {
-        $cache = ilUserSearchCache::_getInstance($usr_id);
-        $cache->switchSearchType(ilUserSearchCache::LUCENE_DEFAULT);
-        return $cache;
+        return new ilSearchFilterGUI($action, false);
     }
 
     public function loadFilterToCache(ilSearchFilterGUI $filter, ilUserSearchCache $cache): void
@@ -84,7 +57,6 @@ class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
         $cache->setCreationFilter($creation_filter);
 
         $types_from_filter = (array) ($search_filter_data['search_type'] ?? []);
-
         $enabled_types = [];
         foreach ($this->settings->getEnabledLuceneItemFilterDefinitions() as $type => $data) {
             if (in_array($type, $types_from_filter)) {
@@ -92,14 +64,6 @@ class SearchStateHandlerImpl extends AbstractSearchStateHandlerImpl
             }
         }
         $cache->setItemFilter($enabled_types);
-
-        $enabled_mime_types = [];
-        foreach ($this->settings->getEnabledLuceneMimeFilterDefinitions() as $mime_type => $data) {
-            if (in_array($mime_type, $types_from_filter)) {
-                $enabled_mime_types[$mime_type] = 1;
-            }
-        }
-        $cache->setMimeFilter($enabled_mime_types);
 
         $copyright_filter = [];
         if (

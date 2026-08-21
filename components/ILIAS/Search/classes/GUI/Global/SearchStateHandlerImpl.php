@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI;
+namespace ILIAS\Search\GUI\Global;
 
 use ILIAS\Search\Presentation\Result\Sortation;
 use ilSearchFilterGUI;
@@ -28,7 +28,7 @@ use ilSession;
 use ILIAS\HTTP\Services as HTTP;
 use ILIAS\Refinery\Factory as Refinery;
 
-abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
+class SearchStateHandlerImpl implements SearchStateHandler
 {
     public function __construct(
         protected HTTP $http,
@@ -76,7 +76,7 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
     }
 
     /**
-     * propably needs to be replaced with a completely
+     * probably needs to be replaced with a completely
      * different mechanism when switching to KS
      */
     public function fetchRequestedSearchTerm(): string
@@ -91,13 +91,22 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
     }
 
     /**
-     * propably needs to be replaced with a completely
+     * probably needs to be replaced with a completely
      * different mechanism when switching to KS
      */
-    abstract public function fetchRequestedRemoteSearchTerm(): string;
+    public function fetchRequestedRemoteSearchTerm(): string
+    {
+        if ($this->http->wrapper()->post()->has('queryString')) {
+            return $this->http->wrapper()->post()->retrieve(
+                'queryString',
+                $this->refinery->kindlyTo()->string()
+            );
+        }
+        return '';
+    }
 
     /**
-     * propably needs to be replaced with a completely
+     * probably needs to be replaced with a completely
      * different mechanism when switching to KS
      */
     public function fetchRequestedAutoCompleteSearchTerm(): string
@@ -112,7 +121,7 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
     }
 
     /**
-     * propably needs to be replaced with a completely
+     * probably needs to be replaced with a completely
      * different mechanism when switching to KS
      */
     public function fetchRequestedRemoteScope(): int
@@ -125,10 +134,4 @@ abstract class AbstractSearchStateHandlerImpl implements SearchStateHandler
         }
         return ROOT_FOLDER_ID;
     }
-
-    abstract public function fetchCache(int $usr_id): ilUserSearchCache;
-
-    abstract public function fetchFilter(URI $action): ilSearchFilterGUI;
-
-    abstract public function loadFilterToCache(ilSearchFilterGUI $filter, ilUserSearchCache $cache): void;
 }

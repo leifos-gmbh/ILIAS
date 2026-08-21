@@ -18,11 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI;
+namespace ILIAS\Search\GUI\Global;
 
 use ilUserSearchCache;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
 use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
+use ILIAS\Data\URI;
+use ilSearchFilterGUI;
 
 /**
  * Until there is a unified format for search results,
@@ -50,4 +52,8 @@ interface Searcher
         PaginationInfos $pagination_infos,
         SortationInfos $sortation_infos
     ): void;
+
+    public function decorateRemoteSearchTerm(string $term): string;
+
+    public function fetchCache(int $usr_id): ilUserSearchCache;
 }

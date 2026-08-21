@@ -22,12 +22,12 @@ namespace ILIAS\Search\Service;
 
 use ILIAS\DI\Container;
 use ILIAS\Search\Presentation\Service\Service as PresentationService;
-use ILIAS\Search\GUI\Service\Service as GUIService;
+use ILIAS\Search\GUI\Global\Service\Service as GlobalGUIService;
 
 class Service
 {
     protected PresentationService $presentation;
-    protected GUIService $gui;
+    protected GlobalGUIService $gui;
 
     public function __construct(
         protected Container $dic
@@ -37,7 +37,7 @@ class Service
         $this->presentation = new PresentationService(
             $this->dic
         );
-        $this->gui = new GUIService(
+        $this->gui = new GlobalGUIService(
             $this->dic,
             $this->presentation
         );
@@ -53,7 +53,7 @@ class Service
         return $this->presentation;
     }
 
-    public function gui(): GUIService
+    public function gui(): GlobalGUIService
     {
         return $this->gui;
     }

@@ -18,9 +18,9 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI\Direct;
+namespace ILIAS\Search\GUI\Global\Object\Direct;
 
-use ILIAS\Search\GUI\Searcher;
+use ILIAS\Search\GUI\Global\Searcher;
 use ilUserSearchCache;
 use ilGlobalTemplateInterface;
 use ILIAS\UI\Renderer as UIRenderer;
@@ -34,7 +34,7 @@ use ilObjectSearchFactory;
 use ilSearchSettings;
 use ilObjectSearch;
 use ilDate;
-use ILIAS\Search\GUI\SearchStateHandler;
+use ILIAS\Search\GUI\Global\SearchStateHandler;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
 use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 
@@ -391,5 +391,15 @@ class SearcherImpl implements Searcher
             }
         }
         return $filter;
+    }
+
+    public function decorateRemoteSearchTerm(string $term): string
+    {
+        return $term;
+    }
+
+    public function fetchCache(int $usr_id): ilUserSearchCache
+    {
+        return ilUserSearchCache::_getInstance($usr_id);
     }
 }

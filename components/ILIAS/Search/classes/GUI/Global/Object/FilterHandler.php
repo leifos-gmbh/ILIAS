@@ -18,35 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI;
+namespace ILIAS\Search\GUI\Global\Object;
 
-use ILIAS\Search\Presentation\Result\Sortation;
-use ilSearchFilterGUI;
 use ilUserSearchCache;
 use ILIAS\Data\URI;
+use ilSearchFilterGUI;
 
-interface SearchStateHandler
+interface FilterHandler
 {
-    public function fetchMaxPage(): int;
-
-    public function resetMaxPage(): void;
-
-    public function updateMaxPage(int $max_page): void;
-
-    public function fetchRequestedPage(): int;
-
-    public function fetchSortation(): Sortation;
-
-    public function fetchRequestedSearchTerm(): string;
-
-    public function fetchRequestedRemoteSearchTerm(): string;
-
-    public function fetchRequestedAutoCompleteSearchTerm(): string;
-
-    public function fetchRequestedRemoteScope(): int;
-
-    public function fetchCache(int $usr_id): ilUserSearchCache;
-
     public function fetchFilter(URI $action): ilSearchFilterGUI;
 
     public function loadFilterToCache(ilSearchFilterGUI $filter, ilUserSearchCache $cache): void;

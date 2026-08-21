@@ -26,7 +26,7 @@ use ilLuceneHighlighterResultParser;
 use ILIAS\Data\URI;
 use ILIAS\UI\Component\Modal\Modal;
 use ILIAS\UI\Component\Panel\Listing\Listing as ListingPanel;
-use ILIAS\Search\GUI\Param;
+use ILIAS\Search\GUI\Global\Param;
 use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
 

@@ -31,6 +31,8 @@ use ILIAS\Search\Presentation\Result\UI\SanitizerImpl;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactoryImpl as SubitemPropertiesFactoryImpl;
 use ILIAS\Search\Presentation\Result\Object\AccessCheckerImpl;
 use ILIAS\Search\Presentation\Result\Copyright\HelperImpl as CopyrightHelperImpl;
+use ILIAS\Search\Presentation\Result\User\PropertiesAggregator;
+use ILIAS\Search\Presentation\Result\User\PropertiesCollection;
 
 class Service
 {
@@ -68,7 +70,13 @@ class Service
             $subitem_properties_factory,
             new CopyrightHelperImpl($this->dic->learningObjectMetadata()),
             $access_checker,
-            $sanitizer
+            $sanitizer,
+            new class () implements PropertiesAggregator {
+                public function fetchForAvailableUsers(int ...$user_ids): PropertiesCollection
+                {
+                    return null;
+                }
+            }
         );
     }
 }

@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Search\Presentation\Result\ViewControls;
 
-use ILIAS\Search\GUI\Param;
+use ILIAS\Search\GUI\Global\Param;
 use ILIAS\Data\URI;
 use ILIAS\Search\Presentation\Result\Sortation;
 

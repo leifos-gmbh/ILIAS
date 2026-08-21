@@ -18,20 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result\ViewControls;
+namespace ILIAS\Search\GUI\Global;
 
-use ILIAS\Search\GUI\Global\Param;
-use ILIAS\Data\URI;
-
-interface PaginationInfos
+enum Param: string
 {
-    public function currentPage(): int;
-
-    public function maxPages(): int;
-
-    public function pageSize(): int;
-
-    public function paginationAction(): URI;
-
-    public function pageParam(): Param;
+    case SORTATION = 'sortation';
+    case MAX_PAGE = 'max_page';
+    case PAGE_NUMBER = 'page_number';
 }

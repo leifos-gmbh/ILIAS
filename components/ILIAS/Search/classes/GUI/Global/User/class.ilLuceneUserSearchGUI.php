@@ -38,8 +38,6 @@ class ilLuceneUserSearchGUI
     protected ilObjUser $user;
     protected GlobalHttpState $http;
     protected Refinery $refinery;
-    protected ilTabsGUI $tabs;
-    protected ilHelpGUI $help;
 
     /**
      * Constructor
@@ -48,8 +46,6 @@ class ilLuceneUserSearchGUI
     {
         global $DIC;
 
-        $this->tabs = $DIC->tabs();
-        $this->help = $DIC->help();
         $this->ctrl = $DIC->ctrl();
         $this->lng = $DIC->language();
         $this->lng->loadLanguageModule('search');
@@ -68,7 +64,6 @@ class ilLuceneUserSearchGUI
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
 
-        $this->prepareOutput();
         switch ($next_class) {
             case strtolower(PublicProfileGUI::class):
 
@@ -94,33 +89,6 @@ class ilLuceneUserSearchGUI
                 break;
         }
     }
-
-    protected function prepareOutput(): void
-    {
-        $this->tpl->loadStandardTemplate();
-
-        $this->tpl->setTitleIcon(
-            ilObject::_getIcon(0, "big", "src"),
-            ""
-        );
-        $this->tpl->setTitle($this->lng->txt("search"));
-
-        $this->getTabs();
-    }
-
-    protected function getTabs(): void
-    {
-        $this->help->setScreenIdComponent('src_luc');
-
-        $this->tabs->addTarget('search', $this->ctrl->getLinkTargetByClass(ilSearchGUI::class));
-
-        if (ilSearchSettings::getInstance()->isLuceneUserSearchEnabled()) {
-            $this->tabs->addTarget('search_user', $this->ctrl->getLinkTargetByClass(ilLuceneUserSearchGUI::class));
-        }
-
-        $this->tabs->setTabActive('search_user');
-    }
-
 
     /**
      * Search from main menu
@@ -154,7 +122,7 @@ class ilLuceneUserSearchGUI
             return;
         }
 
-        $this->showSearchForm();
+        $this->renderSearchInput();
     }
 
     /**
@@ -177,7 +145,7 @@ class ilLuceneUserSearchGUI
         $searcher->setType(ilLuceneSearcher::TYPE_USER);
         $searcher->search();
 
-        $this->showSearchForm();
+        $this->renderSearchInput();
 
         $user_table = new ilRepositoryUserResultTableGUI(
             $this,
@@ -208,7 +176,7 @@ class ilLuceneUserSearchGUI
         }
     }
 
-    protected function showSearchForm()
+    protected function renderSearchInput()
     {
         $this->tpl->addBlockFile('ADM_CONTENT', 'adm_content', 'tpl.lucene_usr_search.html', 'components/ILIAS/Search');
         $this->tpl->addJavascript("assets/js/Search.js");

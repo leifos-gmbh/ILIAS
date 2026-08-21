@@ -18,11 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI;
+namespace ILIAS\Search\GUI\Global;
 
-enum Param: string
+interface AccessChecker
 {
-    case SORTATION = 'sortation';
-    case MAX_PAGE = 'max_page';
-    case PAGE_NUMBER = 'page_number';
+    public function canAccessObjectSearch(): bool;
+
+    public function canAccessUserSearch(): bool;
 }

@@ -34,7 +34,7 @@ use ILIAS\Search\Presentation\Result\UI\ComponentFactory;
 use ILIAS\Search\Presentation\Result\UI\Sanitizer;
 use ILIAS\Search\Presentation\Result\Object\PropertiesAggregator as ObjectPropertiesAggregator;
 use ILIAS\Search\Presentation\Result\Object\AccessChecker;
-use ILIAS\Search\GUI\Param;
+use ILIAS\Search\GUI\Global\Param;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactory as SubitemPropertiesFactory;
 use ILIAS\Search\Presentation\Result\Copyright\Helper as CopyrightHelper;
 use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;

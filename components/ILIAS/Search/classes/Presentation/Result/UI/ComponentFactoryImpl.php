@@ -33,7 +33,7 @@ use ilDateTime;
 use ilDatePresentation;
 use ILIAS\UI\Component\Modal\Modal;
 use ILIAS\Search\Presentation\Result\Sortation;
-use ILIAS\Search\GUI\Param;
+use ILIAS\Search\GUI\Global\Param;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
 use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 

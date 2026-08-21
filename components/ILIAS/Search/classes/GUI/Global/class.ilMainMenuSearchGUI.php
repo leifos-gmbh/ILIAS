@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory;
+use ILIAS\Search\Service\Service;
+use ILIAS\Search\GUI\Global\Object\Actions as ObjectSearchActions;
+use ILIAS\Search\GUI\Global\AccessChecker;
 
 /**
  * Add a search box to main menu
@@ -37,7 +40,8 @@ class ilMainMenuSearchGUI
     protected ilCtrl $ctrl;
     protected ilObjUser $user;
     protected ilGlobalTemplateInterface $global_template;
-
+    protected ObjectSearchActions $object_search_actions;
+    protected AccessChecker $access_checker;
     private GlobalHttpState $http;
     private Factory $refinery;
 
@@ -48,15 +52,18 @@ class ilMainMenuSearchGUI
     {
         global $DIC;
 
+        $service = new Service($DIC);
+
         $this->lng = $DIC->language();
         $this->lng->loadLanguageModule("search");
         $this->tree = $DIC->repositoryTree();
         $this->ctrl = $DIC->ctrl();
         $this->user = $DIC->user();
-
         $this->http = $DIC->http();
         $this->refinery = $DIC->refinery();
         $this->global_template = $DIC->ui()->mainTemplate();
+        $this->object_search_actions = $service->gui()->objectSearchActions();
+        $this->access_checker = $service->gui()->accessChecker();
 
         $this->initRefIdFromQuery();
     }
@@ -100,7 +107,8 @@ class ilMainMenuSearchGUI
             }
         }
 
-        if ($this->user->getId() != ANONYMOUS_USER_ID && ilSearchSettings::getInstance()->isLuceneUserSearchEnabled()) {
+        // TODO use access class
+        if ($this->access_checker->canAccessUserSearch()) {
             $this->tpl->setCurrentBlock('usr_search');
             $this->tpl->setVariable('TXT_USR_SEARCH', $this->lng->txt('search_users'));
             $this->tpl->setVariable('USER_SEARCH_ID', ilSearchControllerGUI::TYPE_USER_SEARCH);
@@ -108,7 +116,7 @@ class ilMainMenuSearchGUI
         }
         $this->tpl->setVariable(
             'FORMACTION',
-            $this->buildSearchLink('remoteSearch')
+            (string) $this->object_search_actions->remoteSearch()
         );
         $this->tpl->setVariable('BTN_SEARCH', $this->lng->txt('btn_search'));
         $this->tpl->setVariable('SEARCH_INPUT_LABEL', $this->lng->txt('search_field'));
@@ -121,7 +129,7 @@ class ilMainMenuSearchGUI
         if ($this->user->getId() != ANONYMOUS_USER_ID) {
             $this->tpl->setVariable(
                 'HREF_SEARCH_LINK',
-                $this->buildSearchLink('')
+                (string) $this->object_search_actions->showSavedResults()
             );
             $this->tpl->setVariable('TXT_SEARCH_LINK', $this->lng->txt("last_search_result"));
         }
@@ -129,34 +137,18 @@ class ilMainMenuSearchGUI
         return $this->tpl->get();
     }
 
-    protected function buildSearchLink(string $cmd): string
-    {
-        return $this->ctrl->getLinkTargetByClass(
-            [strtolower(ilSearchControllerGUI::class), strtolower(ilSearchGUI::class)],
-            $cmd
-        );
-    }
-
     public function getStandardSearchAction(): string
     {
-        return $this->buildSearchLink('remoteSearch');
+        return (string) $this->object_search_actions->remoteSearch();
     }
 
     public function getUserSearchAction(): string
     {
-        return $this->ctrl->getLinkTargetByClass(
-            [strtolower(ilSearchControllerGUI::class), strtolower(ilLuceneUserSearchGUI::class)],
-            'remoteSearch'
-        );
+        return ''; // TODO from user search actions
     }
 
     public function getAutocompleteSource(): string
     {
-        return $this->ctrl->getLinkTargetByClass(
-            [strtolower(ilSearchControllerGUI::class)],
-            'autoComplete',
-            null,
-            true
-        );
+        return (string) $this->object_search_actions->autoComplete();
     }
 }

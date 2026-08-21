@@ -18,26 +18,27 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI;
+namespace ILIAS\Search\GUI\Global;
 
-use ILIAS\Data\URI;
 use ILIAS\Search\Presentation\Result\Sortation;
 
-interface Actions
+interface SearchStateHandler
 {
-    public function search(): URI;
+    public function fetchMaxPage(): int;
 
-    public function remoteSearch(): URI;
+    public function resetMaxPage(): void;
 
-    public function showSavedResults(): URI;
+    public function updateMaxPage(int $max_page): void;
 
-    public function applyFilter(): URI; // not relevant for user search, should really be part of search
+    public function fetchRequestedPage(): int;
 
-    public function switchResultPage(Sortation $sortation): URI; // merge with sortResultPage as applyViewControls
+    public function fetchSortation(): Sortation;
 
-    public function sortResultPage(): URI; // merge with switchResultPage as applyViewControls
+    public function fetchRequestedSearchTerm(): string;
 
-    public function autoComplete(): URI;
+    public function fetchRequestedRemoteSearchTerm(): string;
 
-    public function isValidCommand(string $cmd): bool;
+    public function fetchRequestedAutoCompleteSearchTerm(): string;
+
+    public function fetchRequestedRemoteScope(): int;
 }

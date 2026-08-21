@@ -18,13 +18,15 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI;
+namespace ILIAS\Search\GUI\Global\Object;
 
 use ILIAS\Data\URI;
 use ILIAS\Search\Presentation\Result\Sortation;
 use ilCtrlInterface;
 use ILIAS\Data\Factory as DataFactory;
 use ilSearchGUI;
+use ilSearchControllerGUI;
+use ILIAS\Search\GUI\Global\Param;
 
 class ActionsImpl implements Actions
 {
@@ -45,7 +47,7 @@ class ActionsImpl implements Actions
     public function search(): URI
     {
         $ctrl_target = $this->ctrl->getLinkTargetByClass(
-            ilSearchGUI::class,
+            [ilSearchControllerGUI::class, ilSearchGUI::class],
             self::SEARCH_CMD
         );
         return $this->ctrlToURI($ctrl_target);
@@ -54,7 +56,7 @@ class ActionsImpl implements Actions
     public function remoteSearch(): URI
     {
         $ctrl_target = $this->ctrl->getLinkTargetByClass(
-            ilSearchGUI::class,
+            [ilSearchControllerGUI::class, ilSearchGUI::class],
             self::REMOTE_SEARCH_CMD
         );
         return $this->ctrlToURI($ctrl_target);
@@ -63,7 +65,7 @@ class ActionsImpl implements Actions
     public function showSavedResults(): URI
     {
         $ctrl_target = $this->ctrl->getLinkTargetByClass(
-            ilSearchGUI::class,
+            [ilSearchControllerGUI::class, ilSearchGUI::class],
             self::SHOW_SAVED_RESULTS_CMD
         );
         return $this->ctrlToURI($ctrl_target);
@@ -72,7 +74,7 @@ class ActionsImpl implements Actions
     public function applyFilter(): URI
     {
         $ctrl_target = $this->ctrl->getLinkTargetByClass(
-            ilSearchGUI::class,
+            [ilSearchControllerGUI::class, ilSearchGUI::class],
             self::APPLY_FILTER_CMD
         );
         return $this->ctrlToURI($ctrl_target);
@@ -82,7 +84,7 @@ class ActionsImpl implements Actions
     {
         $this->ctrl->setParameterByClass(ilSearchGUI::class, Param::SORTATION->value, $sortation->value);
         $ctrl_target = $this->ctrl->getLinkTargetByClass(
-            ilSearchGUI::class,
+            [ilSearchControllerGUI::class, ilSearchGUI::class],
             self::SWITCH_RESULT_PAGE_CMD
         );
         $this->ctrl->clearParameterByClass(ilSearchGUI::class, Param::SORTATION->value);
@@ -92,7 +94,7 @@ class ActionsImpl implements Actions
     public function sortResultPage(): URI
     {
         $ctrl_target = $this->ctrl->getLinkTargetByClass(
-            ilSearchGUI::class,
+            [ilSearchControllerGUI::class, ilSearchGUI::class],
             self::SORT_RESULT_PAGE_CMD
         );
         return $this->ctrlToURI($ctrl_target);
@@ -101,7 +103,7 @@ class ActionsImpl implements Actions
     public function autoComplete(): URI
     {
         $ctrl_target = $this->ctrl->getLinkTargetByClass(
-            ilSearchGUI::class,
+            [ilSearchControllerGUI::class, ilSearchGUI::class],
             self::AUTO_COMPLETE_CMD,
             null,
             true
@@ -125,7 +127,7 @@ class ActionsImpl implements Actions
     protected function ctrlToURI(string $ctrl_target): URI
     {
         return $this->data_factory->uri(
-            rtrim(ILIAS_HTTP_PATH, '/') . '/' . $ctrl_target
+            rtrim(ILIAS_HTTP_PATH, '/') . 'ActionsImpl.php/' . $ctrl_target
         );
     }
 }

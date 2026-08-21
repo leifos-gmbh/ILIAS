@@ -18,20 +18,26 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result\ViewControls;
+namespace ILIAS\Search\GUI\Global\Object;
 
-use ILIAS\Search\GUI\Global\Param;
 use ILIAS\Data\URI;
+use ILIAS\Search\Presentation\Result\Sortation;
 
-interface PaginationInfos
+interface Actions
 {
-    public function currentPage(): int;
+    public function search(): URI;
 
-    public function maxPages(): int;
+    public function remoteSearch(): URI;
 
-    public function pageSize(): int;
+    public function showSavedResults(): URI;
 
-    public function paginationAction(): URI;
+    public function applyFilter(): URI;
 
-    public function pageParam(): Param;
+    public function switchResultPage(Sortation $sortation): URI;
+
+    public function sortResultPage(): URI;
+
+    public function autoComplete(): URI;
+
+    public function isValidCommand(string $cmd): bool;
 }

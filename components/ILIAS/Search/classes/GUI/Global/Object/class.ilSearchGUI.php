@@ -18,15 +18,16 @@
 
 declare(strict_types=1);
 
-use ILIAS\Search\GUI\Searcher;
-use ILIAS\Search\GUI\SearchStateHandler;
+use ILIAS\Search\GUI\Global\Searcher;
+use ILIAS\Search\GUI\Global\SearchStateHandler;
 use ILIAS\Search\Presentation\Result\ResultPresenter;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
 use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
-use ILIAS\Search\GUI\Actions;
+use ILIAS\Search\GUI\Global\Object\Actions;
 use ILIAS\Search\Presentation\Result\Sortation;
-use ILIAS\Search\GUI\Param;
+use ILIAS\Search\GUI\Global\Param;
 use ILIAS\Search\Service\Service;
+use ILIAS\Search\GUI\Global\Object\FilterHandler;
 
 /**
  * @ilCtrl_IsCalledBy ilSearchGUI: ilSearchControllerGUI
@@ -37,12 +38,11 @@ class ilSearchGUI
     protected ilObjUser $user;
     protected ilLanguage $lng;
     protected ilCtrlInterface $ctrl;
-    protected ilTabsGUI $tabs;
-    protected ilHelpGUI $help;
     protected ilSearchSettings $settings;
     protected ResultPresenter $result_presenter;
     protected Actions $actions;
     protected Searcher $searcher;
+    protected FilterHandler $filter_handler;
     protected SearchStateHandler $state_handler;
 
     public function __construct()
@@ -55,25 +55,23 @@ class ilSearchGUI
         $this->user = $service->dic()->user();
         $this->lng = $service->dic()->language();
         $this->ctrl = $service->dic()->ctrl();
-        $this->tabs = $service->dic()->tabs();
-        $this->help = $service->dic()->help();
         $this->settings = ilSearchSettings::getInstance();
         $this->result_presenter = $service->presentation()->result();
-        $this->actions = $service->gui()->actions();
+        $this->actions = $service->gui()->objectSearchActions();
+        $this->state_handler = $service->gui()->searchStateHandler();
 
         $this->initByMode($service);
-        $this->tpl->loadStandardTemplate();
         $this->tpl->addBlockFile('ADM_CONTENT', 'adm_content', 'tpl.search.html', 'components/ILIAS/Search');
     }
 
     protected function initByMode(Service $service): void
     {
         if ($this->settings->enabledLucene()) {
-            $this->searcher = $service->gui()->luceneSearcher();
-            $this->state_handler = $service->gui()->luceneSearchStateHandler();
+            $this->searcher = $service->gui()->luceneObjectSearcher();
+            $this->filter_handler = $service->gui()->luceneObjectSearchFilterHandler();
         } else {
-            $this->searcher = $service->gui()->directSearcher();
-            $this->state_handler = $service->gui()->directSearchStateHandler();
+            $this->searcher = $service->gui()->directObjectSearcher();
+            $this->filter_handler = $service->gui()->directObjectSearchFilterHandler();
         }
     }
 
@@ -94,8 +92,8 @@ class ilSearchGUI
 
     protected function search(): void
     {
-        $cache = $this->state_handler->fetchCache($this->user->getId());
-        $filter = $this->state_handler->fetchFilter($this->actions->applyFilter());
+        $cache = $this->searcher->fetchCache($this->user->getId());
+        $filter = $this->filter_handler->fetchFilter($this->actions->applyFilter());
 
         $term = $this->state_handler->fetchRequestedSearchTerm();
         $scope = $cache->getRoot();
@@ -108,7 +106,6 @@ class ilSearchGUI
         $cache->setQuery($term);
         $cache->save();
 
-        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
@@ -127,10 +124,12 @@ class ilSearchGUI
      */
     protected function remoteSearch(): void
     {
-        $cache = $this->state_handler->fetchCache($this->user->getId());
-        $filter = $this->state_handler->fetchFilter($this->actions->applyFilter());
+        $cache = $this->searcher->fetchCache($this->user->getId());
+        $filter = $this->filter_handler->fetchFilter($this->actions->applyFilter());
 
-        $term = $this->state_handler->fetchRequestedRemoteSearchTerm();
+        $term = $this->searcher->decorateRemoteSearchTerm(
+            $this->state_handler->fetchRequestedRemoteSearchTerm()
+        );
         $scope = $this->state_handler->fetchRequestedRemoteScope();
         $sortation = Sortation::RELEVANCE_DESC;
         $page = 1;
@@ -142,7 +141,6 @@ class ilSearchGUI
         $cache->setRoot($scope);
         $cache->save();
 
-        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
@@ -158,8 +156,8 @@ class ilSearchGUI
 
     protected function showSavedResults(): void
     {
-        $cache = $this->state_handler->fetchCache($this->user->getId());
-        $filter = $this->state_handler->fetchFilter($this->actions->applyFilter());
+        $cache = $this->searcher->fetchCache($this->user->getId());
+        $filter = $this->filter_handler->fetchFilter($this->actions->applyFilter());
 
         $term = $cache->getQuery();
         $scope = $cache->getRoot();
@@ -167,7 +165,6 @@ class ilSearchGUI
         $page = $cache->getResultPageNumber();
         $max_page = $this->state_handler->fetchMaxPage();
 
-        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
@@ -182,10 +179,10 @@ class ilSearchGUI
 
     protected function applyFilter(): void
     {
-        $cache = $this->state_handler->fetchCache($this->user->getId());
-        $filter = $this->state_handler->fetchFilter($this->actions->applyFilter());
+        $cache = $this->searcher->fetchCache($this->user->getId());
+        $filter = $this->filter_handler->fetchFilter($this->actions->applyFilter());
 
-        $this->state_handler->loadFilterToCache($filter, $cache);
+        $this->filter_handler->loadFilterToCache($filter, $cache);
 
         $term = $cache->getQuery();
         $scope = $cache->getRoot();
@@ -197,7 +194,6 @@ class ilSearchGUI
         $cache->deleteCachedEntries();
         $cache->save();
 
-        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
@@ -213,8 +209,8 @@ class ilSearchGUI
 
     protected function switchResultPage(): void
     {
-        $cache = $this->state_handler->fetchCache($this->user->getId());
-        $filter = $this->state_handler->fetchFilter($this->actions->applyFilter());
+        $cache = $this->searcher->fetchCache($this->user->getId());
+        $filter = $this->filter_handler->fetchFilter($this->actions->applyFilter());
 
         $term = $cache->getQuery();
         $scope = $cache->getRoot();
@@ -226,7 +222,6 @@ class ilSearchGUI
         $cache->setResultPageNumber($page);
         $cache->save();
 
-        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
@@ -242,8 +237,8 @@ class ilSearchGUI
 
     protected function sortResultPage(): void
     {
-        $cache = $this->state_handler->fetchCache($this->user->getId());
-        $filter = $this->state_handler->fetchFilter($this->actions->applyFilter());
+        $cache = $this->searcher->fetchCache($this->user->getId());
+        $filter = $this->filter_handler->fetchFilter($this->actions->applyFilter());
 
         $term = $cache->getQuery();
         $scope = $cache->getRoot();
@@ -251,7 +246,6 @@ class ilSearchGUI
         $page = $cache->getResultPageNumber();
         $max_page = $this->state_handler->fetchMaxPage();
 
-        $this->fillHeaderAndTabs();
         $this->renderSearchInput($term);
         $this->renderFilter($filter, $scope);
         $pagination_infos = $this->buildPaginationInfos($sortation, $page, $max_page);
@@ -295,38 +289,6 @@ class ilSearchGUI
         $this->tpl->setVariable("SEARCH_FILTER", $filter_html);
         // scope in filter must be manipulated by JS if search is triggered in meta bar
         $this->tpl->addOnLoadCode("il.Search.syncFilterScope('" . $filter_id . "', '" . $scope . "');");
-    }
-
-    protected function fillHeaderAndTabs(): void
-    {
-        // tabs
-        $this->tabs->addTab(
-            'search',
-            $this->lng->txt('search_tab_content'),
-            (string) $this->actions->showSavedResults()
-        );
-        if ($this->settings->enabledLucene() && $this->settings->isLuceneUserSearchEnabled()) {
-            $this->tabs->addTarget(
-                'search_tab_user',
-                $this->ctrl->getLinkTargetByClass(ilLuceneUserSearchGUI::class)
-            );
-        }
-        $this->tabs->activateTab('search');
-
-        // help
-        if ($this->settings->enabledLucene()) {
-            $this->help->setScreenIdComponent('src_luc');
-        } else {
-            $this->help->setScreenIdComponent('src');
-
-        }
-
-        // header
-        $this->tpl->setTitleIcon(
-            ilObject::_getIcon(0, "big", "src"),
-            ""
-        );
-        $this->tpl->setTitle($this->lng->txt("search"));
     }
 
     protected function buildPaginationInfos(

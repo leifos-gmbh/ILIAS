@@ -18,9 +18,9 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI\Lucene;
+namespace ILIAS\Search\GUI\Global\Object\Lucene;
 
-use ILIAS\Search\GUI\Searcher;
+use ILIAS\Search\GUI\GLobal\Searcher;
 use ilUserSearchCache;
 use ilGlobalTemplateInterface;
 use ILIAS\UI\Renderer as UIRenderer;
@@ -34,14 +34,13 @@ use ilLuceneQueryParser;
 use ilLuceneSearcher;
 use ilLucenePathFilter;
 use ilDate;
-use ILIAS\Search\GUI\SearchStateHandler;
+use ILIAS\Search\GUI\Global\SearchStateHandler;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
 use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 
 class SearcherImpl implements Searcher
 {
     public function __construct(
-        protected ilSearchSettings $settings,
         protected ilGlobalTemplateInterface $tpl,
         protected UIRenderer $ui_renderer,
         protected ResultPresenter $presenter,
@@ -248,5 +247,22 @@ class SearcherImpl implements Searcher
             $conditions[] = 'lomCopyright:"' . $identifier . '"';
         }
         return '+(' . implode(' OR ', $conditions) . ')';
+    }
+
+    public function decorateRemoteSearchTerm(string $term): string
+    {
+        if ($term === '') {
+            return '';
+        }
+        $qp = new ilLuceneQueryParser($term);
+        $qp->parseAutoWildcard();
+        return $qp->getQuery();
+    }
+
+    public function fetchCache(int $usr_id): ilUserSearchCache
+    {
+        $cache = ilUserSearchCache::_getInstance($usr_id);
+        $cache->switchSearchType(ilUserSearchCache::LUCENE_DEFAULT);
+        return $cache;
     }
 }

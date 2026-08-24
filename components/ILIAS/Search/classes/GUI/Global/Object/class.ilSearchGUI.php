@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-use ILIAS\Search\GUI\Global\Searcher;
+use ILIAS\Search\GUI\Global\Object\Searcher;
 use ILIAS\Search\GUI\Global\SearchStateHandler;
 use ILIAS\Search\Presentation\Result\ResultPresenter;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;

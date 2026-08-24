@@ -22,6 +22,7 @@ use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory;
 use ILIAS\Search\Service\Service;
 use ILIAS\Search\GUI\Global\Object\Actions as ObjectSearchActions;
+use ILIAS\Search\GUI\Global\User\Actions as UserSearchActions;
 use ILIAS\Search\GUI\Global\AccessChecker;
 
 /**
@@ -41,6 +42,7 @@ class ilMainMenuSearchGUI
     protected ilObjUser $user;
     protected ilGlobalTemplateInterface $global_template;
     protected ObjectSearchActions $object_search_actions;
+    protected UserSearchActions $user_search_actions;
     protected AccessChecker $access_checker;
     private GlobalHttpState $http;
     private Factory $refinery;
@@ -63,6 +65,7 @@ class ilMainMenuSearchGUI
         $this->refinery = $DIC->refinery();
         $this->global_template = $DIC->ui()->mainTemplate();
         $this->object_search_actions = $service->gui()->objectSearchActions();
+        $this->user_search_actions = $service->gui()->userSearchActions();
         $this->access_checker = $service->gui()->accessChecker();
 
         $this->initRefIdFromQuery();
@@ -107,7 +110,6 @@ class ilMainMenuSearchGUI
             }
         }
 
-        // TODO use access class
         if ($this->access_checker->canAccessUserSearch()) {
             $this->tpl->setCurrentBlock('usr_search');
             $this->tpl->setVariable('TXT_USR_SEARCH', $this->lng->txt('search_users'));
@@ -144,7 +146,7 @@ class ilMainMenuSearchGUI
 
     public function getUserSearchAction(): string
     {
-        return ''; // TODO from user search actions
+        return (string) $this->user_search_actions->remoteSearch();
     }
 
     public function getAutocompleteSource(): string

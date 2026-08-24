@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Search\GUI\Global\Object\Lucene;
 
-use ILIAS\Search\GUI\GLobal\Searcher;
+use ILIAS\Search\GUI\Global\Object\Searcher;
 use ilUserSearchCache;
 use ilGlobalTemplateInterface;
 use ILIAS\UI\Renderer as UIRenderer;

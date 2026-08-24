@@ -22,6 +22,7 @@ use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory;
 use ILIAS\Search\Service\Service;
 use ILIAS\Search\GUI\Global\Object\Actions as ObjectSearchActions;
+use ILIAS\Search\GUI\Global\User\Actions as UserSearchActions;
 use ILIAS\Search\GUI\Global\AccessChecker;
 
 /**
@@ -46,6 +47,7 @@ class ilSearchControllerGUI implements ilCtrlBaseClassInterface
 
     protected ilSearchSettings $settings;
     protected ObjectSearchActions $object_search_actions;
+    protected UserSearchActions $user_search_actions;
     protected AccessChecker $access_checker;
 
     public function __construct()
@@ -66,6 +68,7 @@ class ilSearchControllerGUI implements ilCtrlBaseClassInterface
         $this->settings = ilSearchSettings::getInstance();
         $this->access_checker = $service->gui()->accessChecker();
         $this->object_search_actions = $service->gui()->objectSearchActions();
+        $this->user_search_actions = $service->gui()->userSearchActions();
     }
 
     public function executeCommand(): void
@@ -110,7 +113,7 @@ class ilSearchControllerGUI implements ilCtrlBaseClassInterface
         if ($this->access_checker->canAccessUserSearch()) {
             $this->tabs->addTarget(
                 'search_tab_user',
-                '' // TODO fill from user search actions
+                (string) $this->user_search_actions->showSavedResults()
             );
         }
 

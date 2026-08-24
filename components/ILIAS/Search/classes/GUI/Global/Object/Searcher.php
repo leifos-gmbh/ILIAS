@@ -18,13 +18,14 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\GUI\Global;
+namespace ILIAS\Search\GUI\Global\Object;
 
 use ilUserSearchCache;
 use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
 use ILIAS\Search\Presentation\Result\ViewControls\SortationInfos;
 use ILIAS\Data\URI;
 use ilSearchFilterGUI;
+use ILIAS\Search\GUI\Global\SearchStateHandler;
 
 /**
  * Until there is a unified format for search results,

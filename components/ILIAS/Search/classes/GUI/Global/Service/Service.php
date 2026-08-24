@@ -26,7 +26,7 @@ use ILIAS\Search\GUI\Global\Object\Actions as ObjectActions;
 use ILIAS\Search\GUI\Global\Object\ActionsImpl as ObjectActionsImpl;
 use ILIAS\Search\GUI\Global\SearchStateHandler;
 use ILIAS\Search\GUI\Global\SearchStateHandlerImpl;
-use ILIAS\Search\GUI\Global\Searcher as ObjectSearcher;
+use ILIAS\Search\GUI\Global\Object\Searcher as ObjectSearcher;
 use ILIAS\Search\GUI\Global\Object\Lucene\SearcherImpl as LuceneObjectSearcherImpl;
 use ILIAS\Search\GUI\Global\Object\Direct\SearcherImpl as DirectObjectSearcherImpl;
 use ILIAS\Data\Factory as DataFactory;
@@ -36,6 +36,8 @@ use ILIAS\Search\GUI\Global\Object\Direct\FilterHandlerImpl as DirectObjectSearc
 use ILIAS\Search\GUI\Global\Object\Lucene\FilterHandlerImpl as LuceneObjectSearchFilterHandlerImpl;
 use ILIAS\Search\GUI\Global\AccessChecker;
 use ILIAS\Search\GUI\Global\AccessCheckerImpl;
+use ILIAS\Search\GUI\Global\User\Actions as UserActions;
+use ILIAS\Search\GUI\Global\User\ActionsImpl as UserActionsImpl;
 
 class Service
 {
@@ -45,6 +47,7 @@ class Service
     protected ObjectSearcher $lucene_object_searcher;
     protected ObjectSearchFilterHandler $direct_object_filter;
     protected ObjectSearchFilterHandler $lucene_object_filter;
+    protected UserActions $user_actions;
 
     public function __construct(
         protected Container $dic,
@@ -111,6 +114,14 @@ class Service
         return $this->lucene_object_filter ??= new LuceneObjectSearchFilterHandlerImpl(
             ilSearchSettings::getInstance(),
             $this->dic->learningObjectMetadata()
+        );
+    }
+
+    public function userSearchActions(): UserActions
+    {
+        return $this->user_actions ??= new UserActionsImpl(
+            $this->dic->ctrl(),
+            new DataFactory()
         );
     }
 }

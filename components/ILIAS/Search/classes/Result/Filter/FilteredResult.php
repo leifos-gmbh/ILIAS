@@ -18,11 +18,13 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result\User;
+namespace ILIAS\Search\Result\Filter;
 
 use Iterator;
 
-interface PropertiesCollection extends Iterator
+interface FilteredResult extends Iterator
 {
-    public function current(): Properties;
+    public function current(): int;
+
+    public function isResultComplete(): bool;
 }

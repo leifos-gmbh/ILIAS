@@ -29,6 +29,9 @@ use ILIAS\Search\Presentation\Result\ViewControls\PaginationInfos;
 use ILIAS\Search\GUI\Global\Param;
 use ILIAS\UICore\GlobalTemplate;
 use ILIAS\UI\Renderer as UIRenderer;
+use ILIAS\Search\Result\Filter\FilteredResult;
+use ILIAS\Search\Result\Filter\Filter as ResultFilter;
+use ILIAS\Search\Result\Filter\Criterion\Criterion;
 
 /**
  * @author Stefan Meyer <meyer@leifos.com>
@@ -41,6 +44,7 @@ class ilLuceneUserSearchGUI
     protected ilCtrl $ctrl;
     protected ilLanguage $lng;
     protected ilGlobalTemplateInterface $tpl;
+    protected ilTabsGUI $tabs;
     protected UIRenderer $ui_renderer;
     protected ilObjUser $user;
     protected GlobalHttpState $http;
@@ -49,6 +53,8 @@ class ilLuceneUserSearchGUI
     protected ResultPresenter $result_presenter;
     protected Actions $actions;
     protected SearchStateHandler $state_handler;
+    protected ResultFilter $result_filter;
+    protected Criterion $user_public_criterion;
 
     public function __construct()
     {
@@ -60,6 +66,7 @@ class ilLuceneUserSearchGUI
         $this->lng = $DIC->language();
         $this->lng->loadLanguageModule('search');
         $this->tpl = $DIC->ui()->mainTemplate();
+        $this->tabs = $DIC->tabs();
         $this->ui_renderer = $DIC->ui()->renderer();
         $this->user = $DIC->user();
         $this->http = $DIC->http();
@@ -68,6 +75,8 @@ class ilLuceneUserSearchGUI
         $this->result_presenter = $service->presentation()->result();
         $this->actions = $service->gui()->userSearchActions();
         $this->state_handler = $service->gui()->searchStateHandler();
+        $this->result_filter = $service->result()->resultFilter();
+        $this->user_public_criterion = $service->result()->userIsPublicCriterion();
     }
 
     public function executeCommand(): void
@@ -77,7 +86,11 @@ class ilLuceneUserSearchGUI
 
         switch ($next_class) {
             case strtolower(PublicProfileGUI::class):
-
+                $this->tabs->clearTargets();
+                $this->tabs->setBackTarget(
+                    $this->lng->txt('back'),
+                    (string) $this->actions->showSavedResults()
+                );
                 $user_id = 0;
                 if ($this->http->wrapper()->query()->has('user_id')) {
                     $user_id = $this->http->wrapper()->query()->retrieve(
@@ -86,7 +99,6 @@ class ilLuceneUserSearchGUI
                     );
                 }
                 $profile = new PublicProfileGUI($user_id);
-                $profile->setBackUrl((string) $this->actions->showSavedResults());
                 $ret = $this->ctrl->forwardCommand($profile);
                 $this->tpl->setContent($ret);
                 break;
@@ -109,15 +121,19 @@ class ilLuceneUserSearchGUI
         $page = 1;
         $max_page = 1;
 
-        $this->state_handler->resetMaxPage();
+
+        $result = $this->performSearch($term, $page);
+        if ($page >= $max_page && !$result->isResultComplete()) {
+            $max_page = $page + 1;
+        }
+
+        $this->state_handler->updateMaxPage($max_page);
         $cache->deleteCachedEntries();
         $cache->setQuery($term);
         $cache->save();
 
         $this->renderSearchInput($term);
         $pagination_infos = $this->buildPaginationInfos($page, $max_page);
-
-        $result = $this->performSearch($term);
         $this->renderResults($result, $pagination_infos, $term);
     }
 
@@ -128,19 +144,22 @@ class ilLuceneUserSearchGUI
     {
         $cache = $this->fetchCache();
 
-        $term = $this->state_handler->fetchRequestedSearchTerm();
+        $term = $this->state_handler->fetchRequestedRemoteSearchTerm();
         $page = 1;
         $max_page = 1;
 
-        $this->state_handler->resetMaxPage();
+        $result = $this->performSearch($term, $page);
+        if ($page >= $max_page && !$result->isResultComplete()) {
+            $max_page = $page + 1;
+        }
+
+        $this->state_handler->updateMaxPage($max_page);
         $cache->deleteCachedEntries();
         $cache->setQuery($term);
         $cache->save();
 
         $this->renderSearchInput($term);
         $pagination_infos = $this->buildPaginationInfos($page, $max_page);
-
-        $result = $this->performSearch($term);
         $this->renderResults($result, $pagination_infos, $term);
     }
 
@@ -152,10 +171,15 @@ class ilLuceneUserSearchGUI
         $page = $cache->getResultPageNumber();
         $max_page = $this->state_handler->fetchMaxPage();
 
+        $result = $this->performSearch($term, $page);
+        if ($page >= $max_page && !$result->isResultComplete()) {
+            $max_page = $page + 1;
+        }
+
+        $this->state_handler->updateMaxPage($max_page);
+
         $this->renderSearchInput($term);
         $pagination_infos = $this->buildPaginationInfos($page, $max_page);
-
-        $result = $this->performSearch($term);
         $this->renderResults($result, $pagination_infos, $term);
     }
 
@@ -167,26 +191,36 @@ class ilLuceneUserSearchGUI
         $page = $this->state_handler->fetchRequestedPage();
         $max_page = max($this->state_handler->fetchMaxPage(), $page);
 
+        $result = $this->performSearch($term, $page);
+        if ($page >= $max_page && !$result->isResultComplete()) {
+            $max_page = $page + 1;
+        }
+
         $this->state_handler->updateMaxPage($max_page);
         $cache->setResultPageNumber($page);
         $cache->save();
 
         $this->renderSearchInput($term);
         $pagination_infos = $this->buildPaginationInfos($page, $max_page);
-
-        $result = $this->performSearch($term);
         $this->renderResults($result, $pagination_infos, $term);
     }
 
-    protected function performSearch(string $term): ilLuceneSearchResult
-    {
+    protected function performSearch(
+        string $term,
+        int $current_page
+    ): FilteredResult {
         $qp = new ilLuceneQueryParser($term);
         $qp->parse();
         $searcher = ilLuceneSearcher::getInstance($qp);
         $searcher->setType(ilLuceneSearcher::TYPE_USER);
         $searcher->search();
 
-        return $searcher->getResult();
+        return $this->result_filter->filter(
+            $this->user_public_criterion,
+            ($current_page - 1) * $this->settings->getMaxHits(),
+            $this->settings->getMaxHits(),
+            ...$searcher->getResult()->getCandidates()
+        );
     }
 
     protected function fetchCache(): ilUserSearchCache
@@ -197,14 +231,14 @@ class ilLuceneUserSearchGUI
     }
 
     protected function renderResults(
-        ilLuceneSearchResult $result,
+        FilteredResult $result,
         PaginationInfos $pagination_infos,
         string $term
     ): void {
-        if ($result->getCandidates() || $pagination_infos->currentPage() > 1) {
+        if ($result->valid() || $pagination_infos->currentPage() > 1) {
             $result_panel = $this->result_presenter->getLuceneUserSearchResultAsPanel(
                 $pagination_infos,
-                ...$result->getCandidates()
+                ...$result
             );
             $this->tpl->setVariable(
                 'SEARCH_RESULTS',
@@ -231,11 +265,11 @@ class ilLuceneUserSearchGUI
         $this->tpl->addBlockFile('ADM_CONTENT', 'adm_content', 'tpl.lucene_usr_search.html', 'components/ILIAS/Search');
         $this->tpl->addJavascript("assets/js/Search.js");
 
-        $this->tpl->setVariable("FORM_ACTION", $this->ctrl->getFormAction($this, "performSearch"));
+        $this->tpl->setVariable("FORM_ACTION", $this->ctrl->getFormAction($this, "search"));
         $this->tpl->setVariable("TERM", ilLegacyFormElementsUtil::prepareFormOutput($term));
         $this->tpl->setVariable("SEARCH_LABEL", $this->lng->txt("search"));
         $btn = ilSubmitButton::getInstance();
-        $btn->setCommand("performSearch");
+        $btn->setCommand("search");
         $btn->setCaption("search");
         $this->tpl->setVariable("SUBMIT_BTN", $btn->render());
     }

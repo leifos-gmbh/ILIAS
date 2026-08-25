@@ -234,7 +234,6 @@ class ComponentFactoryImpl implements ComponentFactory
         }
         $avatar = $this->ui_factory->symbol()->avatar()->picture($avatar_path, '');
         return $this->ui_factory->item()->standard($presentable_name)
-                                ->withDescription($login)
                                 ->withProperties($other_fields)
                                 ->withLeadAvatar($avatar);
     }

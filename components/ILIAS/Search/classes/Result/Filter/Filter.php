@@ -18,11 +18,16 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result\User;
+namespace ILIAS\Search\Result\Filter;
 
-use Iterator;
+use ILIAS\Search\Result\Filter\criterion\Criterion;
 
-interface PropertiesCollection extends Iterator
+interface Filter
 {
-    public function current(): Properties;
+    public function filter(
+        Criterion $criterion,
+        int $offset,
+        int $limit,
+        int ...$raw_ids
+    ): FilteredResult;
 }

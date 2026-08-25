@@ -18,30 +18,29 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result\User;
+namespace ILIAS\Search\Result\Filter;
 
-use ILIAS\Search\Presentation\Result\Subitem\PropertiesImpl;
-
-class PropertiesCollectionImpl implements PropertiesCollection
+class FilteredResultImpl implements FilteredResult
 {
     /**
-     * @var Properties[]
+     * @var int[]
      */
-    protected array $properties;
+    protected array $result;
     protected int $pointer = 0;
 
     /**
-     * @param Properties[] $properties
+     * @param int[] $result
      */
     public function __construct(
-        array $properties
+        protected bool $is_complete,
+        array $result
     ) {
-        $this->properties = array_values($properties);
+        $this->result = array_values($result);
     }
 
-    public function current(): Properties
+    public function current(): int
     {
-        return $this->properties[$this->pointer];
+        return $this->result[$this->pointer];
     }
 
     public function next(): void
@@ -56,11 +55,16 @@ class PropertiesCollectionImpl implements PropertiesCollection
 
     public function valid(): bool
     {
-        return isset($this->properties[$this->pointer]);
+        return isset($this->result[$this->pointer]);
     }
 
     public function rewind(): void
     {
         $this->pointer = 0;
+    }
+
+    public function isResultComplete(): bool
+    {
+        return $this->is_complete;
     }
 }

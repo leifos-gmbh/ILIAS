@@ -298,12 +298,10 @@ class ResultPresenterImpl implements ResultPresenter
     ): ListingPanel {
         $items = [];
 
-        // TODO pagination? How should that interact with the 'is profile public' filter?
-
-        $properties_collection = $this->user_properties->fetchForAvailableUsers(...$result_user_ids);
+        $properties_collection = $this->user_properties->fetchForUsers(...$result_user_ids);
 
         foreach ($properties_collection as $properties) {
-            $items = $this->component_factory->getItemForUser(
+            $items[] = $this->component_factory->getItemForUser(
                 $properties->presentableName(),
                 $properties->login(),
                 $properties->linkToProfile(),
@@ -313,7 +311,6 @@ class ResultPresenterImpl implements ResultPresenter
         }
 
         if ($items === []) {
-            // currently only relevant when the total hits are a multiple of max page size (47885)
             $items = [$this->component_factory->getNoResultItem()];
         }
 

@@ -18,11 +18,9 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Presentation\Result\User;
+namespace ILIAS\Search\Result\Filter\criterion;
 
-use Iterator;
-
-interface PropertiesCollection extends Iterator
+interface Criterion
 {
-    public function current(): Properties;
+    public function doesFulfill(int $id): bool;
 }

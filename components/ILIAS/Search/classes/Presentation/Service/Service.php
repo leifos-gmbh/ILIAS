@@ -31,8 +31,8 @@ use ILIAS\Search\Presentation\Result\UI\SanitizerImpl;
 use ILIAS\Search\Presentation\Result\Subitem\PropertiesFactoryImpl as SubitemPropertiesFactoryImpl;
 use ILIAS\Search\Presentation\Result\Object\AccessCheckerImpl;
 use ILIAS\Search\Presentation\Result\Copyright\HelperImpl as CopyrightHelperImpl;
-use ILIAS\Search\Presentation\Result\User\PropertiesAggregator;
-use ILIAS\Search\Presentation\Result\User\PropertiesCollection;
+use ILIAS\Search\Presentation\Result\User\PropertiesAggregatorImpl as UserPropertiesAggregatorImpl;
+use ILIAS\User\Profile\Data;
 
 class Service
 {
@@ -47,6 +47,7 @@ class Service
     {
         $lng = $this->dic->language();
         $lng->loadLanguageModule('search');
+        $data_factory = new DataFactory();
         $sanitizer = new SanitizerImpl($this->dic->refinery());
         $access_checker = new AccessCheckerImpl($this->dic->access());
         $subitem_properties_factory = new SubitemPropertiesFactoryImpl();
@@ -61,7 +62,7 @@ class Service
                 $this->dic['objDefinition'],
                 $lng,
                 $this->dic['static_url'],
-                new DataFactory()
+                $data_factory
             ),
             new SubitemPropertiesAggregatorImpl(
                 $this->dic,
@@ -71,12 +72,12 @@ class Service
             new CopyrightHelperImpl($this->dic->learningObjectMetadata()),
             $access_checker,
             $sanitizer,
-            new class () implements PropertiesAggregator {
-                public function fetchForAvailableUsers(int ...$user_ids): PropertiesCollection
-                {
-                    return null;
-                }
-            }
+            new UserPropertiesAggregatorImpl(
+                $lng,
+                $this->dic['user']->getProfile(),
+                $this->dic->ctrl(),
+                $data_factory
+            )
         );
     }
 }

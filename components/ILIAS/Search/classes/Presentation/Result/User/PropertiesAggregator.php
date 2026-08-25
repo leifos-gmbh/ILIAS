@@ -20,9 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Search\Presentation\Result\User;
 
-use ILIAS\Data\URI;
-
 interface PropertiesAggregator
 {
-    public function fetchForAvailableUsers(int ...$user_ids): PropertiesCollection;
+    public function fetchForUsers(int ...$user_ids): PropertiesCollection;
 }

@@ -4827,7 +4827,7 @@ common#:#msg_no_perm_paste#:#次のオブジェクトを貼り付けるアクセ
 common#:#msg_no_perm_paste_object_in_folder#:#フォルダ %sの中のオブジェクト%sを貼り付けるアクセス権限がありません。
 common#:#msg_no_perm_perm#:#アクセス権限設定の編集アクセス権限がありません
 common#:#msg_no_perm_read#:#このアイテムアクセスへのアクセス権限がありません。
-common#:#msg_no_perm_read_item#:#アイテム '%s'へのアクセス権限がありません。
+common#:#msg_no_perm_read_item#:#アイテムへのアクセス権限がありません。
 common#:#msg_no_perm_read_lm#:#このラーニングモジュールを読み込むアクセス権限がありません。
 common#:#msg_no_perm_view_roles_of_user#:#このユーザの役割割当を見る権限がありません。
 common#:#msg_no_perm_write#:#書込みアクセス権限がありません
@@ -5380,6 +5380,7 @@ common#:#preconditions_optional_hint#:#次の前提条件<b>%s</b>の中から�
 common#:#predefined_template#:#事前定義の役割テンプレート
 common#:#preferences#:#プレファレンス
 common#:#presentation_table_more#:#詳しく見る
+common#:#presenter#:#Presenter###11 08 2026 new variable
 common#:#preview#:#プレビュー
 common#:#preview_create#:#プレビューを作成
 common#:#preview_delete#:#プレビューを削除
@@ -10288,6 +10289,7 @@ glo#:#glo_really_remove_from_collection#:#収集中の用語集か次の用語�
 glo#:#glo_reference#:#参照
 glo#:#glo_reference_terms#:#参照用語
 glo#:#glo_referenced_term#:#参照の用語
+glo#:#glo_remove_glossary#:##Are you sure you want to remove the following glossary from the list of auto-linked glossaries?###11 08 2026 new variable
 glo#:#glo_removed_from_collection_info#:#収集の用語集から用語が削除されました。
 glo#:#glo_reset_all_boxes#:#全ボックスをリセット
 glo#:#glo_save_and_continue#:#保存して続ける

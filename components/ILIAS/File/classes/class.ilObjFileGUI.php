@@ -328,7 +328,10 @@ class ilObjFileGUI extends ilObject2GUI
                     $this->stakeholder,
                     new URI($goto_link),
                     $capability->getCapability() === Capabilities::VIEW_EXTERNAL,
-                    $this->lng->getLangKey()
+                    $this->lng->getLangKey(),
+                    // the permission of the user, not the mode of this session: the
+                    // content tab is a viewer even for someone who may edit the file
+                    $this->capabilities->get(Capabilities::EDIT_EXTERNAL)->isUnlocked()
                 );
 
                 $this->ctrl->forwardCommand(
@@ -1001,7 +1004,13 @@ class ilObjFileGUI extends ilObject2GUI
             }
         }
 
-        $info->hideFurtherSections(false);
+        // only the kiosk mode is meant to be that lean: outside of it the sections added
+        // while rendering, e.g. the read statistics of ilInfoScreenGUI::addObjectSections(),
+        // would be hidden without any way to unfold them,
+        // see https://mantis.ilias.de/view.php?id=45051
+        if ($kiosk_mode) {
+            $info->hideFurtherSections(false);
+        }
 
         return $info;
     }

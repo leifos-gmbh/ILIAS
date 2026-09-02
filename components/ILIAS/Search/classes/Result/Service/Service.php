@@ -43,6 +43,9 @@ class Service
 
     public function userIsPublicCriterion(): ResultFiltercriterion
     {
-        return new UserIsPublic($this->dic['user']->getSettings());
+        return new UserIsPublic(
+            $this->dic['user']->getSettings(),
+            $this->dic['user']->getProfile()
+        );
     }
 }

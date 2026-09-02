@@ -36,14 +36,14 @@ class UserIsPublic implements Criterion
 
     public function preloadData(int ...$ids): void
     {
-        foreach ($this->user_profile->getDataForMultiple($ids) as $id => $data) {
+        foreach ($this->user_profile->getDataForMultiple($ids) as $data) {
             $system_info = $data->getSystemInformation();
+            $id = $data->getId();
             $this->preloaded_profile_data[$id]['active'] = $system_info['active'];
             $this->preloaded_profile_data[$id]['time_limit_unlimited'] = $system_info['time_limit_unlimited'];
             $this->preloaded_profile_data[$id]['time_limit_from'] = $system_info['time_limit_from'];
             $this->preloaded_profile_data[$id]['time_limit_until'] = $system_info['time_limit_until'];
         }
-        $this->preloaded_profile_data = iterator_to_array($this->user_profile->getDataForMultiple($ids));
     }
 
     public function doesFulfill(int $id): bool

@@ -47,6 +47,7 @@ class Service
     {
         $lng = $this->dic->language();
         $lng->loadLanguageModule('search');
+        $lng->loadLanguageModule('user');
         $data_factory = new DataFactory();
         $sanitizer = new SanitizerImpl($this->dic->refinery());
         $access_checker = new AccessCheckerImpl($this->dic->access());

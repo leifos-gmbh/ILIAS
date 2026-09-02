@@ -230,11 +230,18 @@ class ComponentFactoryImpl implements ComponentFactory
         array $other_fields
     ): Item {
         if ($link_to_profile !== null) {
-            $presentable_name = $this->ui_factory->link()->standard($presentable_name, (string) $link_to_profile);
+            $presentable_name = $this->ui_factory->link()->standard(
+                $this->sanitizer->sanitize($presentable_name),
+                (string) $link_to_profile
+            );
         }
         $avatar = $this->ui_factory->symbol()->avatar()->picture($avatar_path, '');
+        $sanitized_other_fields = [];
+        foreach ($other_fields as $label => $value) {
+            $sanitized_other_fields[$this->sanitizer->sanitize($label)] = $this->sanitizer->sanitize($value);
+        }
         return $this->ui_factory->item()->standard($presentable_name)
-                                ->withProperties($other_fields)
+                                ->withProperties($sanitized_other_fields)
                                 ->withLeadAvatar($avatar);
     }
 

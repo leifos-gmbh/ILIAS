@@ -28,6 +28,8 @@ use ILIAS\User\Profile\Fields\Standard\LastName;
 use ilLanguage;
 use ILIAS\User\Profile\Fields\Standard\Alias;
 use ILIAS\User\Profile\Fields\Standard\Roles;
+use ILIAS\User\Profile\Fields\Standard\Avatar;
+use ILIAS\User\Profile\Fields\Standard\Location;
 use ilUserUtil;
 use ILIAS\User\Profile\Fields\Standard\OrganisationalUnits;
 use ILIAS\Data\URI;
@@ -36,9 +38,24 @@ use ilCtrlInterface;
 use ilSearchControllerGUI;
 use ilLuceneUserSearchGUI;
 use ILIAS\User\Profile\PublicProfileGUI;
+use org\bovigo\vfs\vfsStreamExLockTestCase;
+use ILIAS\User\Profile\Fields\Standard\Birthday;
+use ilDatePresentation;
+use ilDate;
+use ILIAS\User\Profile\Fields\Standard\Gender;
 
 class PropertiesAggregatorImpl implements PropertiesAggregator
 {
+    protected const array EXCLUDED_EXTRA_FIELDS = [
+        FirstName::class,
+        LastName::class,
+        Alias::class,
+        Roles::class,
+        OrganisationalUnits::class,
+        Avatar::class,
+        Location::class
+    ];
+
     public function __construct(
         protected ilLanguage $lng,
         protected UserProfile $user_profile,
@@ -51,7 +68,7 @@ class PropertiesAggregatorImpl implements PropertiesAggregator
     {
         $fields = $this->user_profile->getFields(
             [],
-            [FirstName::class, LastName::class, Alias::class, Roles::class, OrganisationalUnits::class]
+            self::EXCLUDED_EXTRA_FIELDS
         );
         $result = [];
         foreach ($user_ids as $user_id) {
@@ -74,7 +91,7 @@ class PropertiesAggregatorImpl implements PropertiesAggregator
             if (!$field->isPublishedByUser($user)) {
                 continue;
             }
-            $other_fields[$field->getLabel($this->lng)] = $field->retrieveValueFromUser($user);
+            $other_fields[$field->getLabel($this->lng)] = $this->getPresentableFieldValueForUser($field, $user);
         }
         return new PropertiesImpl(
             $user_id,
@@ -97,5 +114,24 @@ class PropertiesAggregatorImpl implements PropertiesAggregator
         return $this->data_factory->uri(
             rtrim(ILIAS_HTTP_PATH, '/') . '/' . $ctrl_target
         );
+    }
+
+    protected function getPresentableFieldValueForUser(Field $field, ilObjUser $user): string
+    {
+        $value = $field->retrieveValueFromUser($user);
+
+        if ($field->getIdentifier() === 'birthday') {
+            $relative_dates = ilDatePresentation::useRelativeDates();
+            ilDatePresentation::setUseRelativeDates(false);
+            $presentable_date = ilDatePresentation::formatDate(new ilDate($value, IL_CAL_DATE));
+            ilDatePresentation::setUseRelativeDates($relative_dates);
+            return $presentable_date;
+        }
+
+        if ($field->getIdentifier() === 'gender') {
+            return $this->lng->txt('gender_' . $value);
+        }
+
+        return is_array($value) ? implode(', ', $value) : (string) $value;
     }
 }

@@ -1238,7 +1238,7 @@ class ilObjectListGUI
         if ($this->context != self::CONTEXT_WORKSPACE && $this->context != self::CONTEXT_WORKSPACE_SHARING) {
             // add learning progress custom property
             $lp = ilLPStatus::getListGUIStatus($this->obj_id);
-            if ($lp) {
+            if ($lp && !$this->isMode(self::IL_LIST_AS_TRIGGER)) {
                 $props[] = [
                     'alert' => false,
                     'property' => $this->lng->txt('learning_progress'),

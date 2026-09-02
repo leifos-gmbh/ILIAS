@@ -38,11 +38,8 @@ use ilCtrlInterface;
 use ilSearchControllerGUI;
 use ilLuceneUserSearchGUI;
 use ILIAS\User\Profile\PublicProfileGUI;
-use org\bovigo\vfs\vfsStreamExLockTestCase;
-use ILIAS\User\Profile\Fields\Standard\Birthday;
 use ilDatePresentation;
 use ilDate;
-use ILIAS\User\Profile\Fields\Standard\Gender;
 
 class PropertiesAggregatorImpl implements PropertiesAggregator
 {

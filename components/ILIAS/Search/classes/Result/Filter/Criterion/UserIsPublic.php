@@ -18,16 +18,32 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Result\Filter\criterion;
+namespace ILIAS\Search\Result\Filter\Criterion;
 
 use ILIAS\User\Settings\Settings as UserPreferences;
 use ilObjUser;
+use ILIAS\User\Profile\Profile as UserProfile;
 
 class UserIsPublic implements Criterion
 {
+    protected array $preloaded_profile_data = [];
+
     public function __construct(
-        protected UserPreferences $user_preferences
+        protected UserPreferences $user_preferences,
+        protected UserProfile $user_profile
     ) {
+    }
+
+    public function preloadData(int ...$ids): void
+    {
+        foreach ($this->user_profile->getDataForMultiple($ids) as $id => $data) {
+            $system_info = $data->getSystemInformation();
+            $this->preloaded_profile_data[$id]['active'] = $system_info['active'];
+            $this->preloaded_profile_data[$id]['time_limit_unlimited'] = $system_info['time_limit_unlimited'];
+            $this->preloaded_profile_data[$id]['time_limit_from'] = $system_info['time_limit_from'];
+            $this->preloaded_profile_data[$id]['time_limit_until'] = $system_info['time_limit_until'];
+        }
+        $this->preloaded_profile_data = iterator_to_array($this->user_profile->getDataForMultiple($ids));
     }
 
     public function doesFulfill(int $id): bool
@@ -35,11 +51,26 @@ class UserIsPublic implements Criterion
         if ($id === ANONYMOUS_USER_ID) {
             return false;
         }
+
         $public_profile = $this->user_preferences->getSettingValueFor($id, 'public_profile') ?? '';
         if ($public_profile !== 'y' && $public_profile !== 'g') {
             return false;
         }
-        $user = new ilObjUser($id);
-        return $user->getActive() && $user->checkTimeLimit();
+
+        if (!($this->preloaded_profile_data[$id]['active'] ?? false)) {
+            return false;
+        }
+
+        if (
+            !($this->preloaded_profile_data[$id]['time_limit_unlimited'] ?? false) &&
+            (
+                ($this->preloaded_profile_data[$id]['time_limit_from'] ?? 0) >= time() ||
+                ($this->preloaded_profile_data[$id]['time_limit_until'] ?? 0) <= time()
+            )
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

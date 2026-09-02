@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Search\Result\Filter;
 
-use ILIAS\Search\Result\Filter\criterion\Criterion;
+use ILIAS\Search\Result\Filter\Criterion\Criterion;
 
 interface Filter
 {

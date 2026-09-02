@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace ILIAS\Search\Result\Filter;
 
-use ILIAS\Search\Result\Filter\criterion\Criterion;
+use ILIAS\Search\Result\Filter\Criterion\Criterion;
 
 class FilterImpl implements Filter
 {
@@ -31,13 +31,15 @@ class FilterImpl implements Filter
         int ...$raw_ids
     ): FilteredResult {
         $filtered = [];
-        $is_completed = false;
+        $is_completed = true;
+        $criterion->preloadData(...$raw_ids);
         foreach ($raw_ids as $id) {
             if ($criterion->doesFulfill($id)) {
                 $filtered[] = $id;
             }
-            if (count($filtered) <= $offset + $limit) {
-                $is_completed = true;
+            // always look for one more valid result find out whether the result is complete
+            if (count($filtered) > $offset + $limit) {
+                $is_completed = false;
                 break;
             }
         }

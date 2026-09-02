@@ -23,8 +23,8 @@ namespace ILIAS\Search\Result\Service;
 use ILIAS\DI\Container;
 use ILIAS\Search\Result\Filter\Filter as ResultFilter;
 use ILIAS\Search\Result\Filter\FilterImpl as ResultFilterImpl;
-use ILIAS\Search\Result\Filter\criterion\Criterion as ResultFiltercriterion;
-use ILIAS\Search\Result\Filter\criterion\UserIsPublic;
+use ILIAS\Search\Result\Filter\Criterion\Criterion as ResultFiltercriterion;
+use ILIAS\Search\Result\Filter\Criterion\UserIsPublic;
 
 class Service
 {

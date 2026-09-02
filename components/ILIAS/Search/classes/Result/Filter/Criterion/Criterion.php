@@ -18,9 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\Search\Result\Filter\criterion;
+namespace ILIAS\Search\Result\Filter\Criterion;
 
 interface Criterion
 {
     public function doesFulfill(int $id): bool;
+
+    public function preloadData(int ...$ids): void;
 }

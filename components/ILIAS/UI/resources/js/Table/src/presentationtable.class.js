@@ -65,7 +65,7 @@ export default class PresentationTable {
    * @param {array} signalData
    */
   expandAll(signalData) {
-    const rows = this.#component.querySelectorAll('.il-table-presentation-row');
+    const rows = Array.from(this.#component.querySelectorAll('.il-table-presentation-row'));
     if (signalData.options.expand) {
       rows.forEach((row) => this.expandRow(row.id));
     } else {

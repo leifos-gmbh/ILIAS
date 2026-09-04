@@ -74,7 +74,7 @@ export default class OrderingTable {
   }
 
   #initInputHandling() {
-    this.#table.querySelectorAll('input[type="number"]').forEach((input) => {
+    Array.from(this.#table.querySelectorAll('input[type="number"]')).forEach((input) => {
       input.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
@@ -231,7 +231,7 @@ export default class OrderingTable {
 
   #renumberAfterDrag() {
     let pos = 10;
-    this.#table.querySelectorAll('input[type="number"]').forEach((input) => {
+    Array.from(this.#table.querySelectorAll('input[type="number"]')).forEach((input) => {
       input.value = pos;
       pos += 10;
     });

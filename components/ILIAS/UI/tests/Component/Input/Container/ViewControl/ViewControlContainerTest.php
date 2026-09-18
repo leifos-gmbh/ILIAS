@@ -82,6 +82,24 @@ class ViewControlContainerTest extends ILIAS_UI_TestBase
         $this->assertInstanceOf(I\Signal::class, $vc->getSubmissionSignal());
     }
 
+    public function testViewControlContainerActionAndPreservedQueryParameters(): void
+    {
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->expects($this->once())
+            ->method('getQueryParams')
+            ->willReturn(['preserved' => 'value']);
+
+        $control = $this->buildVCFactory()->fieldSelection(['a1' => 'A']);
+        $vc = $this->buildContainerFactory()->standard([$control], '/section')
+            ->withRequest($request);
+
+        $this->assertSame('/section', $vc->getAction());
+        $html = $this->getDefaultRenderer()->render($vc);
+
+        $this->assertStringContainsString('method="get" action="/section"', $html);
+        $this->assertStringContainsString('name="preserved" value="value"', $html);
+    }
+
     public function testViewControlContainerWithControls(): void
     {
         $c_factory = $this->buildVCFactory();

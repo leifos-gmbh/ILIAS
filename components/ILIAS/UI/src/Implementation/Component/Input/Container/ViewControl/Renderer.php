@@ -65,6 +65,7 @@ class Renderer extends AbstractComponentRenderer
     protected function renderStandard(ViewControl\Standard $component, RendererInterface $default_renderer): string
     {
         $tpl = $this->getTemplate("tpl.viewcontrol_container.html", true, true);
+        $tpl->setVariable('ACTION', $component->getAction());
 
         $submission_signal = $component->getSubmissionSignal();
         $component = $component->withAdditionalOnLoadCode(

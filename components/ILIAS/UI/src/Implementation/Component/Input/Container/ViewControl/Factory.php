@@ -34,13 +34,14 @@ class Factory implements V\Factory
         $this->signal_generator = $signal_generator;
     }
 
-    public function standard(array $controls): Standard
+    public function standard(array $controls, string $action = ''): Standard
     {
         return new Standard(
             $this->signal_generator,
             new Input\FormInputNameSource(),
             $this->view_control_factory,
-            $controls
+            $controls,
+            $action
         );
     }
 }

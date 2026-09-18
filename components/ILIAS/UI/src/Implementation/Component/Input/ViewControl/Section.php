@@ -22,47 +22,80 @@ namespace ILIAS\UI\Implementation\Component\Input\ViewControl;
 
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\Refinery\Factory as Refinery;
-use ILIAS\UI\Component\Button\Button;
-use ILIAS\UI\Component\Button\Month;
-use ILIAS\UI\Component\Dropdown\Standard as StandardDropdown;
 use ILIAS\UI\Component\Input\ViewControl as ViewControlInterface;
+use ILIAS\UI\Component\Signal;
+use ILIAS\UI\Implementation\Component\Input\Field\Factory as FieldFactory;
+use ILIAS\UI\Implementation\Component\SignalGeneratorInterface;
+use ILIAS\Refinery\Transformation;
 
-class Section extends ViewControlInput implements ViewControlInterface\Section
+class Section extends ViewControlInput implements ViewControlInterface\Section, HasInputGroup
 {
-    protected Button $previous_action;
-    protected Button|Month|StandardDropdown $button;
-    protected Button $next_action;
+    use GroupDecorator;
+
+    private const SELECT_INDEX = 0;
+
+    /** @var array<string|int, string> */
+    protected array $options;
+    protected Signal $internal_selection_signal;
 
     public function __construct(
+        FieldFactory $field_factory,
         DataFactory $data_factory,
         Refinery $refinery,
-        Button $previous_action,
-        Button|Month|StandardDropdown $button,
-        Button $next_action
+        SignalGeneratorInterface $signal_generator,
+        array $options
     ) {
         parent::__construct($data_factory, $refinery);
-        $this->previous_action = $previous_action;
-        $this->button = $button;
-        $this->next_action = $next_action;
+
+        $keys = array_keys($options);
+        $this->checkArg('options', count($options) > 0, 'At least one section must be provided.');
+        $this->checkArgListElements('options', $keys, ['string', 'int']);
+        $this->checkArgListElements('options', $options, 'string');
+        $this->options = $options;
+
+        $this->setInputGroup(
+            $field_factory->group([
+                $field_factory->select('', $options)->withValue(array_key_first($options)),
+            ])->withAdditionalTransformation($this->getSectionTransformation())
+        );
+        $this->internal_selection_signal = $signal_generator->create();
     }
 
     protected function isClientSideValueOk($value): bool
     {
-        return $value === null;
+        return (is_string($value) || is_int($value)) && array_key_exists($value, $this->options);
     }
 
-    public function getPreviousActions(): Button
+    public function withValue($value): self
     {
-        return $this->previous_action;
+        $this->checkArg('value', $value === null || $this->isClientSideValueOk($value), 'Display value does not match input type.');
+        $clone = clone $this;
+        $clone->setInputGroup($clone->getInputGroup()->withValue([$value]));
+        return $clone;
     }
 
-    public function getNextActions(): Button
+    public function getValue()
     {
-        return $this->next_action;
+        return $this->getInputGroup()->getValue()[self::SELECT_INDEX] ?? null;
     }
 
-    public function getSelectorButton(): Button|Month|StandardDropdown
+    protected function getSectionTransformation(): Transformation
     {
-        return $this->button;
+        return $this->refinery->custom()->transformation(
+            static fn(array $value) => $value[self::SELECT_INDEX] ?? null
+        );
+    }
+
+    /**
+     * @return array<string|int, string>
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    public function getInternalSignal(): Signal
+    {
+        return $this->internal_selection_signal;
     }
 }

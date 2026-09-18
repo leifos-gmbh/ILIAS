@@ -46,7 +46,8 @@ interface Factory
      *     2: The View Control Container SHOULD not contain more than one View Control of each kind.
      * ---
      * @param array<string,\ILIAS\UI\Component\Input\Container\ViewControl\ViewControl> $controls
+     * @param string $action the URL the form submits to
      * @return \ILIAS\UI\Component\Input\Container\ViewControl\Standard
      */
-    public function standard(array $controls): Standard;
+    public function standard(array $controls, string $action = ''): Standard;
 }

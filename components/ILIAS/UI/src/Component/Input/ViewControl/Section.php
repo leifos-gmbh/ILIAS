@@ -20,19 +20,18 @@ declare(strict_types=1);
 
 namespace ILIAS\UI\Component\Input\ViewControl;
 
-use ILIAS\UI\Component\Button\Button;
-use ILIAS\UI\Component\Button\Month;
-use ILIAS\UI\Component\Dropdown\Standard as StandardDropdown;
 use ILIAS\UI\Component\Input\Container\ViewControl\ViewControlInput;
+use ILIAS\UI\Component\Signal;
 
 /**
  * This describes a Section View Control.
  */
 interface Section extends ViewControlInput
 {
-    public function getPreviousActions(): Button;
+    /**
+     * @return array<string|int, string>
+     */
+    public function getOptions(): array;
 
-    public function getNextActions(): Button;
-
-    public function getSelectorButton(): Button|Month|StandardDropdown;
+    public function getInternalSignal(): Signal;
 }

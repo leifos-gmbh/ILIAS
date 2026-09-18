@@ -24,31 +24,28 @@ require_once('ViewControlTestBase.php');
 
 class ViewControlSectionTest extends ViewControlTestBase
 {
-    public function testSectionAcceptsDropdown(): void
+    public function testSectionAcceptsOrderedOptions(): void
     {
-        $previous = $this->getUIFactory()->button()->standard('previous', '#');
-        $dropdown = (new \ILIAS\UI\Implementation\Component\Dropdown\Standard([]))
-            ->withLabel('section');
-        $next = $this->getUIFactory()->button()->standard('next', '#');
-
-        $section = $this->buildVCFactory()->section($previous, $dropdown, $next);
+        $options = ['first' => 'First section', 'second' => 'Second section'];
+        $section = $this->buildVCFactory()->section($options);
 
         $this->assertInstanceOf(Control\Section::class, $section);
-        $this->assertSame($previous, $section->getPreviousActions());
-        $this->assertSame($dropdown, $section->getSelectorButton());
-        $this->assertSame($next, $section->getNextActions());
+        $this->assertSame($options, $section->getOptions());
+        $this->assertSame('first', $section->getValue());
+        $this->assertSame('second', $section->withValue('second')->getValue());
     }
 
-    public function testSectionDropdownRendering(): void
+    public function testSectionSelectRendering(): void
     {
-        $previous = $this->getUIFactory()->button()->standard('previous', '#');
-        $dropdown = (new \ILIAS\UI\Implementation\Component\Dropdown\Standard([]))
-            ->withLabel('section');
-        $next = $this->getUIFactory()->button()->standard('next', '#');
-        $section = $this->buildVCFactory()->section($previous, $dropdown, $next);
+        $section = $this->buildVCFactory()->section([
+            'first' => 'First section',
+            'second' => 'Second section',
+        ]);
 
-        $html = $this->getDefaultRenderer(null, [$dropdown])->render($section);
+        $html = $this->getDefaultRenderer()->render($section);
 
-        $this->assertStringContainsString($dropdown->getCanonicalName(), $html);
+        $this->assertStringContainsString('<select', $html);
+        $this->assertStringContainsString('First section', $html);
+        $this->assertStringContainsString('Second section', $html);
     }
 }

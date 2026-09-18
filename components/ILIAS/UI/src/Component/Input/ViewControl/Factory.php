@@ -189,15 +189,9 @@ interface Factory
      *     1: Dropdowns MUST NOT be used for any other purpose than skipping a section of the
      *        navigation (e.g. jumping from Chapter 1 to Chapter 5).
      * ---
-     * @param Button                         $previous_action Button to be placed on the left.
-     * @param Button|Month|StandardDropdown   $button          Button to be placed in the middle.
-     * @param Button                         $next_action     Button to be placed on the right.
+     * @param array<string|int, string> $sections Ordered section keys and labels.
      * @return \ILIAS\UI\Component\Input\ViewControl\Section
      */
-    public function section(
-        Button $previous_action,
-        Button|Month|StandardDropdown $button,
-        Button $next_action
-    ): Section;
+    public function section(array $sections): Section;
 
 }

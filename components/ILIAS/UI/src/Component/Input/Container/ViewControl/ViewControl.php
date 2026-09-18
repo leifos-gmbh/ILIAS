@@ -28,4 +28,5 @@ use ILIAS\UI\Component\Input\Container\Container;
  */
 interface ViewControl extends Container, JavaScriptBindable
 {
+    public function getAction(): string;
 }

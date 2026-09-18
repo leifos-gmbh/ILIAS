@@ -42,6 +42,7 @@ abstract class ViewControl extends Container implements I\ViewControl
     use JavaScriptBindable;
 
     protected Signal $submit_signal;
+    protected string $action;
     protected ?ServerRequestInterface $request = null;
     protected Input\ArrayInputData $stored_input;
 
@@ -52,12 +53,19 @@ abstract class ViewControl extends Container implements I\ViewControl
         SignalGeneratorInterface $signal_generator,
         Input\NameSource $name_source,
         C\Input\ViewControl\Factory $view_control_factory,
-        array $controls
+        array $controls,
+        string $action = ''
     ) {
         parent::__construct($name_source);
         $this->setInputGroup($view_control_factory->group($controls)->withDedicatedName('view_control'));
         $this->submit_signal = $signal_generator->create();
+        $this->action = $action;
         $this->stored_input = new Input\ArrayInputData([]);
+    }
+
+    public function getAction(): string
+    {
+        return $this->action;
     }
 
     public function getSubmissionSignal(): Signal

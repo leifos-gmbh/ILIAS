@@ -19,6 +19,7 @@ import FieldSelection from './fieldselection.js';
 import Sortation from './sortation.js';
 import Pagination from './pagination.js';
 import Mode from './mode.js';
+import Section from './section.js';
 import JQueryEventDispatcher from '../../../Core/src/jqueryeventdispatcher.js';
 
 const eventDispatcher = new JQueryEventDispatcher($);
@@ -30,3 +31,4 @@ il.UI.Input.Viewcontrols.FieldSelection = new FieldSelection(eventDispatcher);
 il.UI.Input.Viewcontrols.Sortation = new Sortation(eventDispatcher);
 il.UI.Input.Viewcontrols.Pagination = new Pagination(eventDispatcher);
 il.UI.Input.Viewcontrols.Mode = new Mode(eventDispatcher);
+il.UI.Input.Viewcontrols.Section = new Section(eventDispatcher);

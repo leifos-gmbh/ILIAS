@@ -21,9 +21,6 @@ declare(strict_types=1);
 namespace ILIAS\UI\Implementation\Component\Input\ViewControl;
 
 use ILIAS\UI\Component\Input\ViewControl as VCInterface;
-use ILIAS\UI\Component\Button\Button;
-use ILIAS\UI\Component\Button\Month;
-use ILIAS\UI\Component\Dropdown\Standard as StandardDropdown;
 use ILIAS\UI\Implementation\Component\SignalGeneratorInterface;
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\Refinery\Factory as Refinery;
@@ -100,17 +97,14 @@ class Factory implements VCInterface\Factory
         );
     }
 
-    public function section(
-        Button $previous_action,
-        Button|Month|StandardDropdown $button,
-        Button $next_action
-    ): Section {
+    public function section(array $sections): Section
+    {
         return new Section(
+            $this->field_factory,
             $this->data_factory,
             $this->refinery,
-            $previous_action,
-            $button,
-            $next_action
+            $this->signal_generator,
+            $sections
         );
     }
 }

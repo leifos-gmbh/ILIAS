@@ -131,13 +131,15 @@ class ilSoapUtils extends ilSoapAdministration
     /**
      * @return bool|int|soap_fault|SoapFault|null
      */
-    public function ilClone(string $sid, int $copy_identifier)
+    public function ilClone(string $sid, int $copy_identifier, bool $is_initialized = false)
     {
-        $this->initAuth($sid);
-        $this->initIlias();
+        if (!$is_initialized) {
+            $this->initAuth($sid);
+            $this->initIlias();
 
-        if (!$this->checkSession($sid)) {
-            ilLoggerFactory::getLogger('obj')->error('Object cloning failed. Invalid session given: ' . $this->getMessage());
+            if (!$this->checkSession($sid)) {
+                ilLoggerFactory::getLogger('obj')->error('Object cloning failed. Invalid session given: ' . $this->getMessage());
+            }
         }
 
         global $DIC;
@@ -258,12 +260,16 @@ class ilSoapUtils extends ilSoapAdministration
             $soap_client = new ilSoapClient();
             $soap_client->setResponseTimeout(1);
             $soap_client->enableWSDL(true);
-            $soap_client->init();
-            $soap_client->call('ilClone', array($sid, $cp_options->getCopyId()));
+            if ($soap_client->init()) {
+                $soap_client->call('ilClone', array($sid, $cp_options->getCopyId()));
+                return;
+            }
+
+            $cp_options->disableSOAP();
+            $this->ilClone($sid, $cp_options->getCopyId(), true);
         } else {
             ilLoggerFactory::getLogger('obj')->warning('SOAP clone call failed. Calling clone method manually');
-            $cp_options->read();
-            $res = ilSoapFunctions::ilClone($sid, $cp_options->getCopyId());
+            $this->ilClone($sid, $cp_options->getCopyId(), true);
         }
     }
 
@@ -276,12 +282,16 @@ class ilSoapUtils extends ilSoapAdministration
             $soap_client = new ilSoapClient();
             $soap_client->setResponseTimeout(1);
             $soap_client->enableWSDL(true);
-            $soap_client->init();
-            $soap_client->call('ilCloneDependencies', array($sid, $cp_options->getCopyId()));
+            if ($soap_client->init()) {
+                $soap_client->call('ilCloneDependencies', array($sid, $cp_options->getCopyId()));
+                return;
+            }
+
+            $cp_options->disableSOAP();
+            $this->ilCloneDependencies($sid, $cp_options->getCopyId(), true);
         } else {
             ilLoggerFactory::getLogger('obj')->warning('SOAP clone call failed. Calling clone method manually');
-            $cp_options->read();
-            $res = ilSoapFunctions::ilCloneDependencies($sid, $cp_options->getCopyId());
+            $this->ilCloneDependencies($sid, $cp_options->getCopyId(), true);
         }
     }
 

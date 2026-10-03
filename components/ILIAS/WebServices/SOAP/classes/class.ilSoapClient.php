@@ -202,6 +202,11 @@ class ilSoapClient
     {
         $this->log->debug('Calling webservice: ' . $a_operation);
 
+        if ($this->client === null) {
+            $this->log->error('Calling webservice failed: SOAP client is not initialized.');
+            return false;
+        }
+
         $this->setSocketTimeout(false);
         try {
             return $this->client->__call($a_operation, $a_params);

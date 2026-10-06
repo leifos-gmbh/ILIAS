@@ -87,16 +87,30 @@ export default class Dropdown {
     }
   }
 
+  #getOverflowHiddenContainer = () => {
+    let container = this.#element.parentElement;
+    while (container !== null) {
+      const style = this.#document.defaultView.getComputedStyle(container);
+      if (style.overflowX === 'hidden' || style.overflowY === 'hidden') {
+        return container;
+      }
+      container = container.parentElement;
+    }
+    return null;
+  };
+
   #align = () => {
-    const availableWidth = this.#document.documentElement.clientWidth;
-    const buttonPosition = this.#button.getBoundingClientRect().left;
-    const listWidth = this.#list.getBoundingClientRect().width;
-    if (buttonPosition + listWidth > availableWidth) {
+    this.#list.classList.remove('dropdown-menu__left');
+    this.#list.classList.add('dropdown-menu__right');
+
+    const container = this.#getOverflowHiddenContainer();
+    const containerBounds = container?.getBoundingClientRect();
+    const listBounds = this.#list.getBoundingClientRect();
+    const right = containerBounds?.right ?? this.#document.documentElement.clientWidth;
+
+    if (listBounds.right > right) {
       this.#list.classList.remove('dropdown-menu__right');
       this.#list.classList.add('dropdown-menu__left');
-    } else {
-      this.#list.classList.remove('dropdown-menu__left');
-      this.#list.classList.add('dropdown-menu__right');
     }
   };
 

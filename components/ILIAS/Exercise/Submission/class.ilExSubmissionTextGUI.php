@@ -175,7 +175,7 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
             }
         }
 
-        $this->tpl->addJavaScript("Modules/Exercise/js/exc-auto-saver.js");
+        $this->tpl->addJavaScript("assets/js/exc-auto-saver.js");
         $this->lng->toJS("exc_auto_saved_minutes_s");
         $this->lng->toJS("exc_auto_saved_minutes_p");
         $mbox = $this->gui->ui()->factory()->messageBox()->info(
@@ -268,7 +268,7 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
         // we are not using a purifier, so we have to set the valid RTE tags
         // :TODO:
         $rte = $form->getItemByPostVar("atxt");
-        $rte->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("exc_ass"));
+        $rte->setRteTags(ilRTESettings::_getUsedHTMLTags("exc_ass"));
 
         if ($form->checkInput()) {
             $text = trim($form->getInput("atxt"));

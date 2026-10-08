@@ -44,5 +44,7 @@ class Exercise implements Component\Component
             new Component\Resource\ComponentJS($this, "ilExcPeerReview.js");
         $contribute[Component\Resource\PublicAsset::class] = fn() =>
             new Component\Resource\ComponentJS($this, "exc-text-more.js");
+        $contribute[Component\Resource\PublicAsset::class] = fn() =>
+            new Component\Resource\ComponentJS($this, "exc-auto-saver.js");
     }
 }

@@ -99,9 +99,10 @@ class ilIntLinkRepItemExplorerGUI extends ilRepositorySelectorExplorerGUI
         if (!str_contains($a_parent_node_id, "#") && in_array($node["type"], ["crs", "cat", "grp", "fold"])) {
             $obj_id = ilObject::_lookupObjId($ref_id);
             foreach (ilPCParagraph::_readAnchors("cont", $obj_id, "") as $anchor) {
-                $node["child"] .= "#" . $anchor;
-                $node["title"] = "#" . $anchor;
-                $childs[] = $node;
+                $anchor_node = $node;
+                $anchor_node["child"] = $ref_id . "#" . $anchor;
+                $anchor_node["title"] = "#" . $anchor;
+                $childs[] = $anchor_node;
             }
         }
         $parent_childs = parent::getChildsOfNode($ref_id);

@@ -178,18 +178,15 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
         $this->tpl->addJavaScript("assets/js/exc-auto-saver.js");
         $this->lng->toJS("exc_auto_saved_minutes_s");
         $this->lng->toJS("exc_auto_saved_minutes_p");
-        $mbox = $this->gui->ui()->factory()->messageBox()->info(
-            $this->lng->txt("exc_auto_save_info") . "<p>" .
-            $this->lng->txt("exc_auto_last_save") .
-            "<span class='exc-last-save'> -</span></p>"
-        );
-        $auto_save_url = $ilCtrl->getLinkTargetByClass(self::class, "autoSave");
-        $this->tpl->setContent(
-            "<div id='exc_text' data-autosave-url='$auto_save_url'>" .
-            $this->gui->ui()->renderer()->render($mbox) .
-            $a_form->getHTML() .
-            "</div>"
-        );
+        $mess_tpl = new ilTemplate("tpl.exc_auto_save_mess.html", true, true, "components/ILIAS/Exercise");
+        $mess_tpl->setVariable("MESS", $this->lng->txt("exc_auto_save_info"));
+        $mess_tpl->setVariable("MESS_LAST_SAVE", $this->lng->txt("exc_auto_last_save"));
+        $mbox = $this->gui->ui()->factory()->messageBox()->info($mess_tpl->get());
+        $sec_tpl = new ilTemplate("tpl.exc_auto_save_section.html", true, true, "components/ILIAS/Exercise");
+        $sec_tpl->setVariable("AUTO_SAVE_URL", $ilCtrl->getLinkTargetByClass(self::class, "autoSave"));
+        $sec_tpl->setVariable("MBOX", $this->gui->ui()->renderer()->render($mbox));
+        $sec_tpl->setVariable("FORM", $a_form->getHTML());
+        $this->tpl->setContent($sec_tpl->get());
     }
 
     public function updateAssignmentTextAndReturnObject(): void

@@ -187,7 +187,7 @@ final class TranslationGettextRepository implements TranslationRepository
                 $module,
                 MigratedLanguageFilePaths::buildKeysFile($build_directory, $module)
             ));
-        } elseif (!NativeGettext::activate(MigratedLanguageFilePaths::buildLocaleDirectory($build_directory))) {
+        } elseif (!NativeGettext::activateForBuild(MigratedLanguageFilePaths::buildLocaleDirectory($build_directory))) {
             MigratedTranslations::reportActivationProblem((string) NativeGettext::getProblem());
         } elseif (!NativeGettext::bind($domain, $build_directory) || !NativeGettext::isLoaded($domain)) {
             MigratedTranslations::reportProblem(sprintf(

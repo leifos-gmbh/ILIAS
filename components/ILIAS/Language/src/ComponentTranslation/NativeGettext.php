@@ -47,6 +47,7 @@ namespace ILIAS\Language\ComponentTranslation;
 final class NativeGettext
 {
     public const string LOCALE_NAME = 'ilias_messages';
+    public const string SYSTEM_LOCALE_NAME = 'C.UTF-8';
 
     /** The value of LANGUAGE: the directory below a bound directory the catalogs are looked up in. */
     public const string CATALOG_LANGUAGE = 'messages';
@@ -59,6 +60,8 @@ final class NativeGettext
     private const int MAX_MESSAGE_LENGTH = 4096;
 
     private static ?string $locale_directory = null;
+
+    private static ?string $active_locale_name = null;
 
     /**
      * LANGUAGE and LC_MESSAGES before the first activate() since the last restore() (`false`: not
@@ -96,11 +99,37 @@ final class NativeGettext
         self::$thread_safe_for_tests = $thread_safe;
     }
 
-    /**
-     * Activates the locale LOCALE_NAME of $locale_directory for LC_MESSAGES and sets LANGUAGE; if it
-     * fails, getProblem() tells why.
-     */
+    /** Activates the copied locale LOCALE_NAME of $locale_directory for LC_MESSAGES and sets LANGUAGE. */
     public static function activate(string $locale_directory): bool
+    {
+        if (!self::isExtensionLoaded()) {
+            self::$problem = 'the PHP extension "gettext" is not loaded in this PHP (the web server needs it like the CLI that ran the build)';
+            return false;
+        }
+        if (!is_dir($locale_directory . '/' . self::LOCALE_NAME)) {
+            self::$problem = sprintf('the locale "%s" is missing in "%s"', self::LOCALE_NAME, $locale_directory);
+            return false;
+        }
+        return self::activateLocale($locale_directory, self::LOCALE_NAME, true);
+    }
+
+    /** Activates the system C.UTF-8 locale, which cannot be copied as a glibc locale on macOS. */
+    public static function activateSystemLocale(): bool
+    {
+        return self::activateLocale('', self::SYSTEM_LOCALE_NAME, false);
+    }
+
+    public static function activateForBuild(string $locale_directory): bool
+    {
+        if (is_dir($locale_directory . '/' . self::LOCALE_NAME)) {
+            return self::activate($locale_directory);
+        }
+        return PHP_OS_FAMILY === 'Darwin'
+            ? self::activateSystemLocale()
+            : self::activate($locale_directory);
+    }
+
+    private static function activateLocale(string $locale_directory, string $locale_name, bool $copied): bool
     {
         if (!self::isExtensionLoaded()) {
             self::$problem = 'the PHP extension "gettext" is not loaded in this PHP (the web server needs it like the CLI that ran the build)';
@@ -109,24 +138,24 @@ final class NativeGettext
         if (self::$locale_directory === $locale_directory && self::isActive()) {
             return true;
         }
-        if (!is_dir($locale_directory . '/' . self::LOCALE_NAME)) {
-            self::$problem = sprintf('the locale "%s" is missing in "%s"', self::LOCALE_NAME, $locale_directory);
-            return false;
-        }
-
         self::$previous ??= ['language' => getenv('LANGUAGE'), 'messages' => setlocale(LC_MESSAGES, '0')];
         $locpath = getenv('LOCPATH');
-        putenv('LOCPATH=' . $locale_directory);
-        $locale = setlocale(LC_MESSAGES, self::LOCALE_NAME);
-        // as long as LOCPATH is set, setlocale() finds no locale of the system (e.g. for LC_TIME)
-        putenv($locpath === false ? 'LOCPATH' : 'LOCPATH=' . $locpath);
-        if ($locale !== self::LOCALE_NAME) {
-            self::$problem = sprintf('the locale "%s" of "%s" cannot be activated', self::LOCALE_NAME, $locale_directory);
+        if ($copied) {
+            putenv('LOCPATH=' . $locale_directory);
+        }
+        $locale = setlocale(LC_MESSAGES, $locale_name);
+        if ($copied) {
+            // as long as LOCPATH is set, setlocale() finds no locale of the system (e.g. for LC_TIME)
+            putenv($locpath === false ? 'LOCPATH' : 'LOCPATH=' . $locpath);
+        }
+        if ($locale === false || !in_array($locale, [$locale_name, self::SYSTEM_LOCALE_NAME, 'C.utf8'], true)) {
+            self::$problem = sprintf('the locale "%s" cannot be activated', $locale_name);
             return false;
         }
         putenv('LANGUAGE=' . self::CATALOG_LANGUAGE);
 
         self::$locale_directory = $locale_directory;
+        self::$active_locale_name = $locale;
         self::$problem = null;
 
         return true;
@@ -139,7 +168,7 @@ final class NativeGettext
     public static function isActive(): bool
     {
         return self::$locale_directory !== null
-            && setlocale(LC_MESSAGES, '0') === self::LOCALE_NAME
+            && setlocale(LC_MESSAGES, '0') === self::$active_locale_name
             && getenv('LANGUAGE') === self::CATALOG_LANGUAGE;
     }
 
@@ -155,7 +184,7 @@ final class NativeGettext
             return false;
         }
 
-        return self::activate(self::$locale_directory);
+        return self::$locale_directory === '' ? self::activateSystemLocale() : self::activate(self::$locale_directory);
     }
 
     /**
@@ -169,7 +198,7 @@ final class NativeGettext
         if (self::$previous === null || self::isThreadSafe()) {
             return;
         }
-        if (self::$previous['messages'] !== false && setlocale(LC_MESSAGES, '0') === self::LOCALE_NAME) {
+        if (self::$previous['messages'] !== false && setlocale(LC_MESSAGES, '0') === self::$active_locale_name) {
             setlocale(LC_MESSAGES, self::$previous['messages']);
         }
         if (getenv('LANGUAGE') === self::CATALOG_LANGUAGE) {
@@ -246,6 +275,7 @@ final class NativeGettext
         self::$thread_safe_for_tests = null;
         self::restore();
         self::$locale_directory = null;
+        self::$active_locale_name = null;
         self::$previous = null;
         self::$problem = null;
     }

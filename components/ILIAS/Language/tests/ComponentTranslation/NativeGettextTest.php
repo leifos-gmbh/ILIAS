@@ -87,7 +87,7 @@ class NativeGettextTest extends TestCase
 
     private function activateBuild(): void
     {
-        $this->assertTrue(NativeGettext::activate($this->locale_directory), (string) NativeGettext::getProblem());
+        $this->assertTrue(NativeGettext::activateForBuild($this->locale_directory), (string) NativeGettext::getProblem());
         $this->assertTrue(NativeGettext::bind(self::DOMAIN, $this->build_directory));
     }
 

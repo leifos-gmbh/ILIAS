@@ -30,17 +30,17 @@ use RuntimeException;
  * only, never by the web server (it does not write `artifacts/`; "merge" only writes the shipped `.po`, see
  * ShippedPoMerger).
  *
- * Requirement: the locale is copied from the C library of the build host and checked in that (CLI) process
- * only. The web server must use the same C library (glibc with `C.utf8`) and have the PHP extension "gettext";
- * with separate CLI/web images or a musl based system (which ignores LOCPATH) the runtime serves `-identifier-`
- * and reports why (see MigratedTranslations::getProblem()).
+ * On Linux, the locale is copied from the C library of the build host and checked in that (CLI) process only.
+ * On macOS, the system `C.UTF-8` locale is used directly because macOS has no copyable glibc locale tree.
+ * The web server must have the PHP extension "gettext" and use a compatible locale setup; otherwise the
+ * runtime serves `-identifier-` and reports why (see MigratedTranslations::getProblem()).
  *
  * Layout below `artifacts/language/` (see MigratedLanguageFilePaths):
  * - `<build>/messages/LC_MESSAGES/<module>.<lang>.mo`: the shipped state of a module, see
  *   ShippedTranslations::compile();
  * - `<build>/keys/<module>.php`: all identifiers of the module's `.po` files and template, the same for every
  *   language, as a PHP file for the opcache;
- * - `<build>/locale/`: the locale native gettext is activated with (see NativeGettext), a copy of "C.utf8";
+ * - `<build>/locale/`: on Linux, the locale native gettext is activated with (see NativeGettext), a copy of "C.utf8";
  * - `<build>/manifest.json`: size and hash of every file, to tell an intact build, the hash of each built `.po`
  *   (see servesShippedPo()), the warnings and collisions;
  * - `current.json`: the build the runtime serves, its languages per module and every contributed module
@@ -376,7 +376,9 @@ final class ShippedTranslationsBuild
                 throw new RuntimeException('No migrated module has a single translated value - nothing to check native gettext with.');
             }
 
-            $this->copyLocale($locale_source, MigratedLanguageFilePaths::buildLocaleDirectory($temporary) . '/' . NativeGettext::LOCALE_NAME, $temporary, $files);
+            if ($locale_source !== NativeGettext::SYSTEM_LOCALE_NAME) {
+                $this->copyLocale($locale_source, MigratedLanguageFilePaths::buildLocaleDirectory($temporary) . '/' . NativeGettext::LOCALE_NAME, $temporary, $files);
+            }
             ksort($files, SORT_STRING);
             [$collisions, $collision_summary] = $this->findCollisions($values_per_language);
             $manifest = [
@@ -546,7 +548,9 @@ final class ShippedTranslationsBuild
      */
     private function assertNativeGettextServes(string $build_directory, array $sample): void
     {
-        if (!NativeGettext::activate(MigratedLanguageFilePaths::buildLocaleDirectory($build_directory))) {
+        $locale_directory = MigratedLanguageFilePaths::buildLocaleDirectory($build_directory);
+        $activated = NativeGettext::activateForBuild($locale_directory);
+        if (!$activated) {
             throw new RuntimeException(sprintf('Native gettext is not available: %s.', (string) NativeGettext::getProblem()));
         }
         $domain = MigratedLanguageFilePaths::shippedDomain($sample['module'], $sample['lang']);
@@ -686,6 +690,9 @@ final class ShippedTranslationsBuild
      */
     private function directoryFingerprint(string $directory): string
     {
+        if ($directory === NativeGettext::SYSTEM_LOCALE_NAME) {
+            return hash('sha256', $directory . '|' . (string) setlocale(LC_MESSAGES, '0'));
+        }
         $parts = [];
         foreach ($this->listFiles($directory) as $relative => $file) {
             $parts[] = $relative . '|' . (string) @hash_file('sha256', $file);
@@ -727,6 +734,13 @@ final class ShippedTranslationsBuild
             if (is_file($candidate . '/LC_MESSAGES/SYS_LC_MESSAGES') || is_file($candidate . '/LC_CTYPE')) {
                 return $candidate;
             }
+        }
+
+        if ($this->locale_source === null
+            && PHP_OS_FAMILY === 'Darwin'
+            && setlocale(LC_MESSAGES, NativeGettext::SYSTEM_LOCALE_NAME) !== false
+        ) {
+            return NativeGettext::SYSTEM_LOCALE_NAME;
         }
 
         throw new RuntimeException(sprintf(

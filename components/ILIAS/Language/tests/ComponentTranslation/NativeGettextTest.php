@@ -42,7 +42,7 @@ class NativeGettextTest extends TestCase
     private string $locale_directory;
 
     /**
-     * @var array{language: string|false, locpath: string|false, messages: string|false}
+     * @var array{language: string|false, locpath: string|false, messages: string|false, all_env: string|false, messages_env: string|false}
      */
     private array $process_state;
 
@@ -53,6 +53,8 @@ class NativeGettextTest extends TestCase
             'language' => getenv('LANGUAGE'),
             'locpath' => getenv('LOCPATH'),
             'messages' => setlocale(LC_MESSAGES, '0'),
+            'all_env' => getenv('LC_ALL'),
+            'messages_env' => getenv('LC_MESSAGES'),
         ];
         $this->root = sys_get_temp_dir() . '/ilias_native_gettext_' . bin2hex(random_bytes(6));
         mkdir($this->root, 0775, true);
@@ -78,6 +80,8 @@ class NativeGettextTest extends TestCase
         // whatever a test did to the process, the next one starts as this one did
         putenv($this->process_state['language'] === false ? 'LANGUAGE' : 'LANGUAGE=' . $this->process_state['language']);
         putenv($this->process_state['locpath'] === false ? 'LOCPATH' : 'LOCPATH=' . $this->process_state['locpath']);
+        putenv($this->process_state['all_env'] === false ? 'LC_ALL' : 'LC_ALL=' . $this->process_state['all_env']);
+        putenv($this->process_state['messages_env'] === false ? 'LC_MESSAGES' : 'LC_MESSAGES=' . $this->process_state['messages_env']);
         if ($this->process_state['messages'] !== false) {
             setlocale(LC_MESSAGES, $this->process_state['messages']);
         }
@@ -112,7 +116,7 @@ class NativeGettextTest extends TestCase
         $this->activateBuild();
 
         $this->assertTrue(NativeGettext::isActive());
-        $this->assertSame(NativeGettext::LOCALE_NAME, setlocale(LC_MESSAGES, '0'));
+        $this->assertSame(PHP_OS_FAMILY === 'Darwin' ? NativeGettext::SYSTEM_LOCALE_NAME : NativeGettext::LOCALE_NAME, setlocale(LC_MESSAGES, '0'));
         $this->assertSame(NativeGettext::CATALOG_LANGUAGE, getenv('LANGUAGE'));
         $this->assertSame($locpath, getenv('LOCPATH'), 'LOCPATH only lives for the setlocale() call (no system locale is found while it is set)');
         $this->assertSame('Hallo', NativeGettext::translate(self::DOMAIN, 'greeting'));
@@ -123,7 +127,65 @@ class NativeGettextTest extends TestCase
         $this->assertSame($messages_before, setlocale(LC_MESSAGES, '0'));
         $this->assertSame($language, getenv('LANGUAGE'));
         $this->assertSame($locpath, getenv('LOCPATH'));
-        $this->assertSame('greeting', NativeGettext::translate(self::DOMAIN, 'greeting'), 'without the locale native gettext answers with the message id');
+        if (PHP_OS_FAMILY !== 'Darwin') {
+            $this->assertSame('greeting', NativeGettext::translate(self::DOMAIN, 'greeting'), 'without the locale native gettext answers with the message id');
+        }
+    }
+
+    /** @return iterable<string, array{string|false, string|false}> */
+    public static function systemLocaleEnvironments(): iterable
+    {
+        yield 'C overrides a translated locale' => ['C', 'de_DE.UTF-8'];
+        yield 'C.UTF-8 overrides C' => ['C.UTF-8', 'C'];
+        yield 'POSIX' => ['POSIX', false];
+        yield 'category only' => [false, 'C.UTF-8'];
+        yield 'no overrides' => [false, false];
+    }
+
+    #[DataProvider('systemLocaleEnvironments')]
+    public function testSystemLocaleTranslatesAndRestoresEnvironment(string|false $all, string|false $messages): void
+    {
+        if (PHP_OS_FAMILY !== 'Darwin') {
+            $this->markTestSkipped('Only macOS needs environment overrides for the system locale.');
+        }
+        NativeGettext::resetForTests();
+        setlocale(LC_MESSAGES, 'C');
+        $time = setlocale(LC_TIME, '0');
+        $numeric = setlocale(LC_NUMERIC, '0');
+        putenv($all === false ? 'LC_ALL' : 'LC_ALL=' . $all);
+        putenv($messages === false ? 'LC_MESSAGES' : 'LC_MESSAGES=' . $messages);
+        putenv('LANGUAGE=de');
+
+        $this->activateBuild();
+
+        $this->assertSame('Hallo', NativeGettext::translate(self::DOMAIN, 'greeting'));
+        $this->assertSame('Einträge', NativeGettext::translatePlural(self::DOMAIN, ShippedTranslations::PLURAL_CONTEXT . "\x04item", 2));
+        $this->assertSame($time, setlocale(LC_TIME, '0'));
+        $this->assertSame($numeric, setlocale(LC_NUMERIC, '0'));
+        $this->assertFalse(getenv('LC_ALL'));
+        $this->assertSame(NativeGettext::SYSTEM_LOCALE_NAME, getenv('LC_MESSAGES'));
+
+        NativeGettext::restore();
+
+        $this->assertSame('C', setlocale(LC_MESSAGES, '0'));
+        $this->assertSame($all, getenv('LC_ALL'));
+        $this->assertSame($messages, getenv('LC_MESSAGES'));
+        $this->assertSame('de', getenv('LANGUAGE'));
+    }
+
+    public function testRestoreLeavesForeignSystemEnvironmentChangesAlone(): void
+    {
+        if (PHP_OS_FAMILY !== 'Darwin') {
+            $this->markTestSkipped('Only macOS changes the system locale environment.');
+        }
+        $this->activateBuild();
+        putenv('LC_ALL=fr_FR.UTF-8');
+        putenv('LC_MESSAGES=de_DE.UTF-8');
+
+        NativeGettext::restore();
+
+        $this->assertSame('fr_FR.UTF-8', getenv('LC_ALL'));
+        $this->assertSame('de_DE.UTF-8', getenv('LC_MESSAGES'));
     }
 
     public function testRestoreLeavesASettingOtherCodeChangedSinceAsItIs(): void
@@ -190,6 +252,14 @@ class NativeGettextTest extends TestCase
         yield 'LANGUAGE changed' => [static function (): void {
             putenv('LANGUAGE=de');
         }];
+        if (PHP_OS_FAMILY === 'Darwin') {
+            yield 'LC_ALL environment reset to C' => [static function (): void {
+                putenv('LC_ALL=C');
+            }];
+            yield 'LC_MESSAGES environment reset to C' => [static function (): void {
+                putenv('LC_MESSAGES=C');
+            }];
+        }
         yield 'LANGUAGE removed' => [static function (): void {
             putenv('LANGUAGE');
         }];
@@ -201,7 +271,10 @@ class NativeGettextTest extends TestCase
         $this->activateBuild();
         $change();
         $this->assertFalse(NativeGettext::isActive(), 'precondition');
-        $this->assertSame('greeting', NativeGettext::translate(self::DOMAIN, 'greeting'), 'precondition: nothing is translated now');
+        // macOS libintl may retain a cached translation after a foreign locale/environment change.
+        if (PHP_OS_FAMILY !== 'Darwin') {
+            $this->assertSame('greeting', NativeGettext::translate(self::DOMAIN, 'greeting'), 'precondition: nothing is translated now');
+        }
 
         $this->assertTrue(NativeGettext::reactivateIfLost());
 
@@ -262,6 +335,9 @@ class NativeGettextTest extends TestCase
 
     public function testReactivateIfLostFailsWithAProblemWhenTheLocaleIsGone(): void
     {
+        if (PHP_OS_FAMILY === 'Darwin') {
+            $this->markTestSkipped('macOS uses a system locale, not a removable copy in the build.');
+        }
         $this->activateBuild();
         setlocale(LC_MESSAGES, 'C');
         MigratedPoFixture::removeDirectory($this->locale_directory . '/' . NativeGettext::LOCALE_NAME);

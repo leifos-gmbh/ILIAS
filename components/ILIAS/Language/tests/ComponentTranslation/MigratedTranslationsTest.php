@@ -321,6 +321,9 @@ class MigratedTranslationsTest extends TestCase
      */
     public function testLostNativeGettextServesNothingNotEvenTheIdentifierForAnOverlayValue(): void
     {
+        if (PHP_OS_FAMILY === 'Darwin') {
+            $this->markTestSkipped('macOS uses a system locale, not a removable copy in the build.');
+        }
         $this->build();
         $plural = MigratedPoFixture::catalog('mtr', ['greeting' => 'Servus', 'same' => 'same']);
         $plural->setHeader('Plural-Forms', 'nplurals=2; plural=(n != 1);');

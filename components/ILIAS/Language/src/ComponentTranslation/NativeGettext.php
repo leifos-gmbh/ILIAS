@@ -25,11 +25,13 @@ namespace ILIAS\Language\ComponentTranslation;
  * migrated modules, and the one place that calls it.
  *
  * Native gettext only translates while LC_MESSAGES is not "C"/"POSIX" and finds a catalog as
- * `<bound directory>/<language>/LC_MESSAGES/<domain>.mo`. ILIAS depends neither on system locales nor on
- * the locale's language:
- * - the build ships its own locale (a copy of "C.utf8", see ShippedTranslationsBuild) named LOCALE_NAME;
+ * `<bound directory>/<language>/LC_MESSAGES/<domain>.mo`. The catalog language is independent of the
+ * active locale's language:
+ * - on Linux the build ships its own locale (a copy of "C.utf8", see ShippedTranslationsBuild) named LOCALE_NAME;
  *   activate() loads it via LOCPATH and removes LOCPATH again right away (while it is set, setlocale()
  *   finds no system locale);
+ * - on macOS a non-C system locale is used instead, with LC_ALL unset and LC_MESSAGES set in the
+ *   environment for libintl; these environment changes are saved and restored along with the locale;
  * - LANGUAGE is CATALOG_LANGUAGE, so "<language>" is always "messages"; the language of a catalog is part
  *   of its domain ("<module>.<lang>", see MigratedLanguageFilePaths), as the C library caches per process
  *   and a later LANGUAGE change would not reliably switch catalogs;
@@ -47,7 +49,7 @@ namespace ILIAS\Language\ComponentTranslation;
 final class NativeGettext
 {
     public const string LOCALE_NAME = 'ilias_messages';
-    public const string SYSTEM_LOCALE_NAME = 'C.UTF-8';
+    public const string SYSTEM_LOCALE_NAME = 'en_US.UTF-8';
 
     /** The value of LANGUAGE: the directory below a bound directory the catalogs are looked up in. */
     public const string CATALOG_LANGUAGE = 'messages';
@@ -70,6 +72,9 @@ final class NativeGettext
      * @var array{language: string|false, messages: string|false}|null
      */
     private static ?array $previous = null;
+
+    /** @var array<string, string|false>|null Environment overrides needed by macOS libintl only. */
+    private static ?array $previous_system_environment = null;
 
     private static ?bool $thread_safe_for_tests = null;
 
@@ -106,6 +111,9 @@ final class NativeGettext
             self::$problem = 'the PHP extension "gettext" is not loaded in this PHP (the web server needs it like the CLI that ran the build)';
             return false;
         }
+        if (self::$locale_directory === $locale_directory && self::isActive()) {
+            return true;
+        }
         if (!is_dir($locale_directory . '/' . self::LOCALE_NAME)) {
             self::$problem = sprintf('the locale "%s" is missing in "%s"', self::LOCALE_NAME, $locale_directory);
             return false;
@@ -113,9 +121,13 @@ final class NativeGettext
         return self::activateLocale($locale_directory, self::LOCALE_NAME, true);
     }
 
-    /** Activates the system C.UTF-8 locale, which cannot be copied as a glibc locale on macOS. */
+    /** Activates a non-C system locale on macOS, where glibc locale trees cannot be loaded. */
     public static function activateSystemLocale(): bool
     {
+        if (PHP_OS_FAMILY !== 'Darwin') {
+            self::$problem = 'the system locale fallback is only supported on macOS';
+            return false;
+        }
         return self::activateLocale('', self::SYSTEM_LOCALE_NAME, false);
     }
 
@@ -148,9 +160,21 @@ final class NativeGettext
             // as long as LOCPATH is set, setlocale() finds no locale of the system (e.g. for LC_TIME)
             putenv($locpath === false ? 'LOCPATH' : 'LOCPATH=' . $locpath);
         }
-        if ($locale === false || !in_array($locale, [$locale_name, self::SYSTEM_LOCALE_NAME, 'C.utf8'], true)) {
-            self::$problem = sprintf('the locale "%s" cannot be activated', $locale_name);
+        if ($locale !== $locale_name) {
+            self::$problem = $copied
+                ? sprintf('the locale "%s" of "%s" cannot be activated', $locale_name, $locale_directory)
+                : sprintf('the system locale "%s" cannot be activated', $locale_name);
             return false;
+        }
+        if (!$copied) {
+            // macOS libintl can determine the locale from the environment rather than setlocale().
+            // LC_ALL takes precedence over LC_MESSAGES; only change the environment, not other C categories.
+            self::$previous_system_environment ??= [
+                'LC_ALL' => getenv('LC_ALL'),
+                'LC_MESSAGES' => getenv('LC_MESSAGES'),
+            ];
+            putenv('LC_ALL');
+            putenv('LC_MESSAGES=' . $locale_name);
         }
         putenv('LANGUAGE=' . self::CATALOG_LANGUAGE);
 
@@ -169,7 +193,9 @@ final class NativeGettext
     {
         return self::$locale_directory !== null
             && setlocale(LC_MESSAGES, '0') === self::$active_locale_name
-            && getenv('LANGUAGE') === self::CATALOG_LANGUAGE;
+            && getenv('LANGUAGE') === self::CATALOG_LANGUAGE
+            && (self::$locale_directory !== ''
+                || (getenv('LC_ALL') === false && getenv('LC_MESSAGES') === self::SYSTEM_LOCALE_NAME));
     }
 
     /**
@@ -188,8 +214,9 @@ final class NativeGettext
     }
 
     /**
-     * Takes LANGUAGE and LC_MESSAGES back to the state before the first activate(); settings changed by
-     * other code since stay. Only for long-running processes (e.g. Setup's build after its check), a web
+     * Takes LANGUAGE, LC_MESSAGES and the macOS environment overrides back to the state before the first
+     * activate(); settings changed by other code since stay. Only for long-running processes (e.g.
+     * Setup's build after its check), a web
      * request needs no call. No-op in a thread-safe PHP, where other threads may use them. The activated
      * directory is kept, so reactivateIfLost() can activate it again.
      */
@@ -203,6 +230,15 @@ final class NativeGettext
         }
         if (getenv('LANGUAGE') === self::CATALOG_LANGUAGE) {
             putenv(self::$previous['language'] === false ? 'LANGUAGE' : 'LANGUAGE=' . self::$previous['language']);
+        }
+        if (self::$previous_system_environment !== null) {
+            foreach (self::$previous_system_environment as $name => $value) {
+                $active = $name === 'LC_ALL' ? false : self::SYSTEM_LOCALE_NAME;
+                if (getenv($name) === $active) {
+                    putenv($value === false ? $name : $name . '=' . $value);
+                }
+            }
+            self::$previous_system_environment = null;
         }
         self::$previous = null;
     }
@@ -276,6 +312,7 @@ final class NativeGettext
         self::restore();
         self::$locale_directory = null;
         self::$active_locale_name = null;
+        self::$previous_system_environment = null;
         self::$previous = null;
         self::$problem = null;
     }

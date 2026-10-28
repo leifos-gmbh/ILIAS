@@ -46,6 +46,32 @@ class ShippedTranslationsBuildTest extends TestCase
         $this->artifacts = MigratedLanguageFilePaths::shippedArtifactDirectory($this->root);
     }
 
+    public function testSystemLocaleDiscoveryPreservesOriginalStateAndBuildIdentity(): void
+    {
+        if (PHP_OS_FAMILY !== 'Darwin') {
+            $this->markTestSkipped('Only macOS builds without a copied locale.');
+        }
+        $messages = setlocale(LC_MESSAGES, '0');
+        try {
+            $this->ship('mfa', 'de', ['greeting' => 'Hallo']);
+            setlocale(LC_MESSAGES, 'C');
+            $first = $this->build(['mfa']);
+            NativeGettext::restore();
+            $this->assertSame('C', setlocale(LC_MESSAGES, '0'), 'discovery must not overwrite the original locale');
+
+            setlocale(LC_MESSAGES, 'de_DE.UTF-8');
+            $second = $this->build(['mfa']);
+            $this->assertSame($first['build'], $second['build'], 'build identity must not depend on the original process locale');
+            $this->assertTrue($second['unchanged']);
+            $this->assertSame(0, $second['compiled']);
+        } finally {
+            NativeGettext::restore();
+            if ($messages !== false) {
+                setlocale(LC_MESSAGES, $messages);
+            }
+        }
+    }
+
     protected function tearDown(): void
     {
         MigratedPoFixture::removeDirectory($this->root);

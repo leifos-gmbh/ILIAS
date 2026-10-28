@@ -31,7 +31,7 @@ use RuntimeException;
  * ShippedPoMerger).
  *
  * On Linux, the locale is copied from the C library of the build host and checked in that (CLI) process only.
- * On macOS, the system `C.UTF-8` locale is used directly because macOS has no copyable glibc locale tree.
+ * On macOS, the system `en_US.UTF-8` locale is used directly because macOS has no copyable glibc locale tree.
  * The web server must have the PHP extension "gettext" and use a compatible locale setup; otherwise the
  * runtime serves `-identifier-` and reports why (see MigratedTranslations::getProblem()).
  *
@@ -691,7 +691,7 @@ final class ShippedTranslationsBuild
     private function directoryFingerprint(string $directory): string
     {
         if ($directory === NativeGettext::SYSTEM_LOCALE_NAME) {
-            return hash('sha256', $directory . '|' . (string) setlocale(LC_MESSAGES, '0'));
+            return hash('sha256', $directory);
         }
         $parts = [];
         foreach ($this->listFiles($directory) as $relative => $file) {
@@ -736,10 +736,8 @@ final class ShippedTranslationsBuild
             }
         }
 
-        if ($this->locale_source === null
-            && PHP_OS_FAMILY === 'Darwin'
-            && setlocale(LC_MESSAGES, NativeGettext::SYSTEM_LOCALE_NAME) !== false
-        ) {
+        if ($this->locale_source === null && PHP_OS_FAMILY === 'Darwin') {
+            // Activation checks availability later, after saving the original process state.
             return NativeGettext::SYSTEM_LOCALE_NAME;
         }
 

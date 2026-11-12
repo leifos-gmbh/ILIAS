@@ -21,12 +21,12 @@ declare(strict_types=1);
 namespace ILIAS\MetaData\Services\CopyrightHelper\Input;
 
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
-use ILIAS\MetaData\Copyright\Input\Builder;
+use ILIAS\MetaData\Copyright\Input\BuilderInterface;
 
 class InputBuilder implements InputBuilderInterface
 {
     public function __construct(
-        protected Builder $internal_builder
+        protected BuilderInterface $internal_builder
     ) {
     }
 

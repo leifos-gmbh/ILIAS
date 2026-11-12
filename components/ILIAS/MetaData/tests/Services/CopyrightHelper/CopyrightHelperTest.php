@@ -48,6 +48,7 @@ use ILIAS\MetaData\Elements\Data\DataInterface;
 use ILIAS\MetaData\Elements\Data\NullData;
 use ILIAS\MetaData\Services\Manipulator\ManipulatorInterface;
 use ILIAS\MetaData\Services\Manipulator\NullManipulator;
+use ILIAS\MetaData\Copyright\Input\NullFactory as NullInputFactory;
 
 class CopyrightHelperTest extends TestCase
 {
@@ -279,7 +280,8 @@ class CopyrightHelperTest extends TestCase
             $copyright_repo,
             $this->getIdentifierHandler(),
             new NullRenderer(),
-            $this->getClauseFactory()
+            $this->getClauseFactory(),
+            new NullInputFactory()
         ) extends CopyrightHelper {
             protected function getCopyrightEntryWrapper(EntryInterface $entry): CopyrightInterface
             {

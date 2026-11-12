@@ -75,6 +75,9 @@ class CopyrightHelper implements CopyrightHelperInterface
             return $this->getNullCopyrightEntryWrapper();
         }
         $entry = $this->readCopyrightEntry($reader);
+        if (is_null($entry)) {
+            return $this->getNullCopyrightEntryWrapper();
+        }
         return $this->getCopyrightEntryWrapper($entry);
     }
 
@@ -203,7 +206,7 @@ class CopyrightHelper implements CopyrightHelperInterface
                                   ->get();
     }
 
-    protected function readCopyrightEntry(ReaderInterface $reader): EntryInterface
+    protected function readCopyrightEntry(ReaderInterface $reader): ?EntryInterface
     {
         $raw = $this->getRawCopyright($reader);
 
@@ -212,7 +215,7 @@ class CopyrightHelper implements CopyrightHelperInterface
             $entry = $this->copyright_repo->getEntry(
                 $this->identifier_handler->parseEntryIDFromIdentifier($raw)
             );
-        } else {
+        } elseif ($raw === '') {
             $entry = $this->copyright_repo->getDefaultEntry();
         }
 
@@ -239,10 +242,8 @@ class CopyrightHelper implements CopyrightHelperInterface
         if ($value === null) {
             return new InputBuilder($internal_builder);
         }
-        if ($this->hasPresetCopyright($value)) {
-            $internal_builder = $internal_builder->withPresetValue(
-                $this->readCopyrightEntry($value)
-            );
+        if ($this->hasPresetCopyright($value) && ($entry = $this->readCopyrightEntry($value)) !== null) {
+            $internal_builder = $internal_builder->withPresetValue($entry);
         }
         return new InputBuilder($internal_builder);
     }

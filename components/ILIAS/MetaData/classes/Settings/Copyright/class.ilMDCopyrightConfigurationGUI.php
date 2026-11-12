@@ -18,23 +18,29 @@
 
 declare(strict_types=1);
 
-use ILIAS\Refinery\Factory;
+use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\UI\Renderer as UIRenderer;
-use ILIAS\UI\Component\Modal\RoundTrip;
-use ILIAS\MetaData\Copyright\RendererInterface;
+use ILIAS\UI\Component\Input\Container\Form\Standard as Form;
+use ILIAS\MetaData\Copyright\RendererInterface as CopyrightRenderer;
 use ILIAS\MetaData\Copyright\RepositoryInterface;
 use ILIAS\MetaData\Copyright\Renderer;
 use ILIAS\MetaData\Copyright\DatabaseRepository;
 use ILIAS\Data\URI;
+use ILIAS\Data\Factory as DataFactory;
 use ILIAS\MetaData\Copyright\EntryInterface;
 use ILIAS\FileUpload\MimeType;
 use ILIAS\ResourceStorage\Services as IRSS;
 use ILIAS\MetaData\Copyright\Database\Wrapper;
+use ILIAS\MetaData\Settings\GUI\Copyright\ComponentFactory;
+use ILIAS\MetaData\Services\InternalServices;
+use ILIAS\MetaData\Settings\GUI\Copyright\ImageUpload\HandlerGUI as ImageUploadHandlerGUI;
+use ILIAS\MetaData\Settings\GUI\Copyright\ImageUpload\Stakeholder as ImageUploadStakeholder;
 
 /**
- * @ilCtrl_Calls ilMDCopyrightConfigurationGUI: ilMDCopyrightUsageGUI, ilMDCopyrightImageUploadHandlerGUI
+ * @ilCtrl_Calls ilMDCopyrightConfigurationGUI: ILIAS\MetaData\Settings\GUI\Copyright\ImageUpload\HandlerGUI
+ * @ilCtrl_Calls ilMDCopyrightConfigurationGUI: ilMDCopyrightUsageGUI
  */
 class ilMDCopyrightConfigurationGUI
 {
@@ -43,15 +49,16 @@ class ilMDCopyrightConfigurationGUI
     protected ilLanguage $lng;
     protected ilToolbarGUI $toolbar_gui;
     protected GlobalHttpState $http;
-    protected Factory $refinery;
+    protected Refinery $refinery;
     protected UIFactory $ui_factory;
     protected UIRenderer $ui_renderer;
     protected IRSS $irss;
 
     protected ilObjMDSettingsGUI $parent_obj_gui;
     protected ilMDSettingsAccessService $access_service;
-    protected RendererInterface $renderer;
+    protected CopyrightRenderer $renderer;
     protected RepositoryInterface $repository;
+    protected ComponentFactory $component_factory;
 
     public function __construct(ilObjMDSettingsGUI $parent_obj_gui)
     {
@@ -72,11 +79,15 @@ class ilMDCopyrightConfigurationGUI
             $this->parent_obj_gui->getRefId(),
             $DIC->access()
         );
-        $this->renderer = new Renderer(
+        $internal = new InternalServices($DIC);
+        $this->renderer = $internal->copyright()->renderer();
+        $this->repository = $internal->copyright()->repository();
+        $this->component_factory = new ComponentFactory(
+            $internal->presentation()->utilities(),
             $DIC->ui()->factory(),
-            $DIC->resourceStorage()
+            $DIC->refinery(),
+            new DataFactory()
         );
-        $this->repository = new DatabaseRepository(new Wrapper($DIC->database()));
 
         $this->lng->loadLanguageModule("meta");
     }
@@ -99,10 +110,10 @@ class ilMDCopyrightConfigurationGUI
                 $this->ctrl->forwardCommand($gui);
                 break;
 
-            case strtolower(ilMDCopyrightImageUploadHandlerGUI::class):
+            case strtolower(ImageUploadHandlerGUI::class):
                 $entry = $this->repository->getEntry($this->initEntryIdFromQuery());
                 $file_id = empty($entry?->copyrightData()?->imageFile()) ? '' : $entry?->copyrightData()?->imageFile();
-                $handler = new ilMDCopyrightImageUploadHandlerGUI($file_id);
+                $handler = new ImageUploadHandlerGUI($file_id);
                 $this->ctrl->forwardCommand($handler);
 
                 // no break
@@ -116,10 +127,8 @@ class ilMDCopyrightConfigurationGUI
         }
     }
 
-    public function showCopyrightSelection(
-        int $current_id = 0,
-        ?RoundTrip $current_modal = null
-    ): void {
+    public function showCopyrightSelection(): void
+    {
         $has_write = $this->access_service->hasCurrentUserWriteAccess();
 
         $table_gui = new ilMDCopyrightTableGUI(
@@ -132,25 +141,37 @@ class ilMDCopyrightConfigurationGUI
         $table_gui->setTitle($this->lng->txt("md_copyright_selection"));
         $table_gui->parseSelections();
 
-        $edit_modals = [];
+        $edit_prompts = [];
         if ($has_write) {
-            foreach ($this->repository->getAllEntries() as $entry) {
-                if ($entry->id() === $current_id) {
-                    $modal = $current_modal;
-                } else {
-                    $modal = $this->initCopyrightEditModal($entry);
-                }
-                $table_gui->setEditModalSignal($entry->id(), $modal->getShowSignal());
-                $edit_modals[] = $modal;
-            }
-            if ($current_id === 0 && !is_null($current_modal)) {
-                $add_modal = $current_modal;
+
+            if (!isset($entry)) {
+                $title = $this->lng->txt('md_copyright_add');
+                $post_url = $this->ctrl->getLinkTarget($this, 'saveEntry');
             } else {
-                $add_modal = $this->initCopyrightEditModal();
+                $title = $this->lng->txt('md_copyright_edit');
+                $this->ctrl->setParameter($this, 'entry_id', $entry->id());
+                $post_url = $this->ctrl->getLinkTarget($this, 'updateEntry');
+                $this->ctrl->clearParameters($this);
             }
+
+            foreach ($this->repository->getAllEntries() as $entry) {
+                $this->ctrl->setParameter($this, 'entry_id', $entry->id());
+                $async_target = $this->ctrl->getLinkTarget($this, 'showEditEntry');
+                $this->ctrl->clearParameters($this);
+                $prompt = $this->component_factory->prompt(
+                    $this->lng->txt('md_copyright_edit'),
+                    $async_target
+                );
+                $table_gui->setEditDialogSignal($entry->id(), $prompt->getShowSignal());
+                $edit_prompts[] = $prompt;
+            }
+            $add_prompt = $this->component_factory->prompt(
+                $this->lng->txt('md_copyright_add'),
+                $this->ctrl->getLinkTarget($this, 'showCreateEntry')
+            );
             $this->toolbar_gui->addComponent($this->ui_factory->button()->standard(
                 $this->lng->txt('md_copyright_add'),
-                $add_modal->getShowSignal()
+                $add_prompt->getShowSignal()
             ));
 
             $table_gui->addMultiCommand("confirmDeleteEntries", $this->lng->txt("delete"));
@@ -159,32 +180,61 @@ class ilMDCopyrightConfigurationGUI
 
         $this->tpl->setContent(
             $table_gui->getHTML() .
-            (isset($add_modal) ? $this->ui_renderer->render($add_modal) : '') .
-            $this->ui_renderer->render($edit_modals)
+            (isset($add_prompt) ? $this->ui_renderer->render($add_prompt) : '') .
+            $this->ui_renderer->render($edit_prompts)
         );
     }
 
-    public function saveEntry(): void
+    protected function showCreateEntry(): never
     {
-        $modal = $this
-            ->initCopyrightEditModal(null, true)
+        $form = $this->component_factory->copyrightEditForm(
+            $this->ctrl->getLinkTarget($this, 'saveEntry')
+        );
+        $state = $this->component_factory->showPromptState($form);
+        echo $this->ui_renderer->renderAsync($state);
+        exit;
+    }
+
+    protected function showEditEntry(): never
+    {
+        $this->ctrl->saveParameter($this, 'entry_id');
+        $entry = $this->repository->getEntry($this->initEntryIdFromQuery());
+        $form = $this->component_factory->copyrightEditForm(
+            $this->ctrl->getLinkTarget($this, 'updateEntry'),
+            $entry
+        );
+        $state = $this->component_factory->showPromptState($form);
+        echo $this->ui_renderer->renderAsync($state);
+        exit;
+    }
+
+    public function saveEntry(): never
+    {
+        $form = $this->component_factory
+            ->copyrightEditForm($this->ctrl->getLinkTarget($this, 'saveEntry'))
             ->withRequest($this->http->request());
 
-        if ($data = $modal->getData()) {
+        if ($data = $form->getData()) {
             $this->repository->createEntry(
                 $data['title'],
                 $data['description'],
-                (bool) $data['outdated'],
+                $data['usage_status'] === 'outdated',
+                $data['usage_status'] === 'featured',
                 $data['copyright']['full_name'],
                 $data['copyright']['link'],
-                $this->extractImageFromData($data),
+                $data['copyright']['image'],
                 $data['copyright']['alt_text']
             );
             $this->tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'), true);
-
-            $this->ctrl->redirect($this, 'showCopyrightSelection');
+            $state = $this->component_factory->redirectPromptState(
+                $this->ctrl->getLinkTarget($this, 'showCopyrightSelection')
+            );
+            echo $this->ui_renderer->renderAsync($state);
+            exit;
         }
-        $this->showCopyrightSelection(0, $modal);
+        $state = $this->component_factory->showPromptState($form);
+        echo $this->ui_renderer->renderAsync($state);
+        exit;
     }
 
     public function confirmDeleteEntries(): void
@@ -230,152 +280,36 @@ class ilMDCopyrightConfigurationGUI
         return true;
     }
 
-    public function updateEntry(): void
+    public function updateEntry(): never
     {
         $entry = $this->repository->getEntry($this->initEntryIdFromQuery());
-        $modal = $this
-            ->initCopyrightEditModal($entry, true)
+        $form = $this->component_factory
+            ->copyrightEditForm($this->ctrl->getLinkTarget($this, 'updateEntry'), $entry)
             ->withRequest($this->http->request());
 
-        if ($data = $modal->getData()) {
+        if ($data = $form->getData()) {
             $this->deleteFileIfChanged($entry, $data);
             $this->repository->updateEntry(
                 $entry->id(),
                 $data['title'],
                 $data['description'],
-                (bool) $data['outdated'],
+                $data['usage_status'] === 'outdated',
+                $data['usage_status'] === 'featured',
                 $data['copyright']['full_name'],
                 $data['copyright']['link'],
-                $this->extractImageFromData($data),
+                $data['copyright']['image'],
                 $data['copyright']['alt_text']
             );
             $this->tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'), true);
-
-            $this->ctrl->redirect($this, 'showCopyrightSelection');
-        }
-        $this->showCopyrightSelection($entry->id(), $modal);
-    }
-
-    protected function initCopyrightEditModal(
-        ?EntryInterface $entry = null,
-        bool $open_on_load = false
-    ): RoundTrip {
-        $inputs = [];
-        $ff = $this->ui_factory->input()->field();
-
-        $title = $ff
-            ->text($this->lng->txt('title'))
-            ->withValue($entry?->title() ?? '')
-            ->withRequired(true)
-            ->withMaxLength(255);
-        $inputs['title'] = $title;
-
-        $des = $ff
-            ->textarea($this->lng->txt('description'))
-            ->withValue($entry?->description() ?? '');
-        $inputs['description'] = $des;
-
-        $usage = $ff
-            ->radio($this->lng->txt('meta_copyright_usage'))
-            ->withOption('0', $this->lng->txt('meta_copyright_in_use'))
-            ->withOption('1', $this->lng->txt('meta_copyright_outdated'))
-            ->withValue((int) $entry?->isOutdated());
-        $inputs['outdated'] = $usage;
-
-        $cp_data = $entry?->copyrightData();
-
-        $full_name = $ff
-            ->text($this->lng->txt('md_copyright_full_name'))
-            ->withValue($cp_data?->fullName() ?? '');
-
-        $link = $ff
-            ->url(
-                $this->lng->txt('md_copyright_link'),
-                $this->lng->txt('md_copyright_link_info')
-            )
-            ->withValue((string) $cp_data?->link())
-            ->withAdditionalTransformation(
-                $this->refinery->custom()->transformation(fn($v) => $v instanceof URI ? $v : null)
+            $state = $this->component_factory->redirectPromptState(
+                $this->ctrl->getLinkTarget($this, 'showCopyrightSelection')
             );
-
-        $image_link = $ff
-            ->url($this->lng->txt('md_copyright_image_link'))
-            ->withValue((string) $cp_data?->imageLink())
-            ->withAdditionalTransformation($this->refinery->custom()->transformation(
-                fn($v) => $v instanceof URI ? $v : null
-            ));
-
-        $file_id = empty($cp_data?->imageFile()) ? '' : $cp_data?->imageFile();
-        $image_file = $ff
-            ->file(
-                new ilMDCopyrightImageUploadHandlerGUI($file_id),
-                $this->lng->txt('md_copyright_image_file')
-            )
-            ->withMaxFiles(1)
-            ->withAcceptedMimeTypes([MimeType::IMAGE__PNG, MimeType::IMAGE__JPEG]);
-        if ($file_id !== '') {
-            $image_file = $image_file->withValue([$file_id]);
-        };
-
-        $image_value = 'link_group';
-        if (!is_null($cp_data) && !$cp_data->isImageLink()) {
-            $image_value = 'file_group';
+            echo $this->ui_renderer->renderAsync($state);
+            exit;
         }
-        $image = $ff
-            ->switchableGroup(
-                [
-                    'link_group' => $ff->group(
-                        ['image_link' => $image_link],
-                        $this->lng->txt('md_copyright_image_is_link')
-                    ),
-                    'file_group' => $ff->group(
-                        ['image_file' => $image_file],
-                        $this->lng->txt('md_copyright_image_is_file')
-                    ),
-                ],
-                $this->lng->txt('md_copyright_image')
-            )
-            ->withValue($image_value);
-
-        $alt_text = $ff
-            ->text(
-                $this->lng->txt('md_copyright_alt_text'),
-                $this->lng->txt('md_copyright_alt_text_info')
-            )
-            ->withValue($cp_data?->altText() ?? '');
-
-        $cop = $ff
-            ->section(
-                [
-                    'full_name' => $full_name,
-                    'link' => $link,
-                    'image' => $image,
-                    'alt_text' => $alt_text
-                ],
-                $this->lng->txt('md_copyright_value')
-            );
-        $inputs['copyright'] = $cop;
-
-        if (!isset($entry)) {
-            $title = $this->lng->txt('md_copyright_add');
-            $post_url = $this->ctrl->getLinkTarget($this, 'saveEntry');
-        } else {
-            $title = $this->lng->txt('md_copyright_edit');
-            $this->ctrl->setParameter($this, 'entry_id', $entry->id());
-            $post_url = $this->ctrl->getLinkTarget($this, 'updateEntry');
-            $this->ctrl->clearParameters($this);
-        }
-
-        $modal = $this->ui_factory->modal()->roundtrip(
-            $title,
-            null,
-            $inputs,
-            $post_url
-        );
-        if ($open_on_load) {
-            $modal = $modal->withOnLoad($modal->getShowSignal());
-        }
-        return $modal;
+        $state = $this->component_factory->showPromptState($form);
+        echo $this->ui_renderer->renderAsync($state);
+        exit;
     }
 
     public function saveCopyrightPosition(): bool
@@ -408,7 +342,7 @@ class ilMDCopyrightConfigurationGUI
             return;
         }
         if ($id = $this->irss->manage()->find($image_file)) {
-            $this->irss->manage()->remove($id, new ilMDCopyrightImageStakeholder());
+            $this->irss->manage()->remove($id, new ImageUploadStakeholder());
         }
     }
 
@@ -420,24 +354,11 @@ class ilMDCopyrightConfigurationGUI
             return;
         }
         if (
-            $data['copyright']['image'][0] === 'file_group' &&
-            $image_file === ($data['copyright']['image'][1]['image_file'][0] ?? '')
+            $image_file === ($data['copyright']['image'] ?? null)
         ) {
             return;
         }
         $this->deleteFile($entry);
-    }
-
-    protected function extractImageFromData(array $data): string|URI
-    {
-        $v = $data['copyright']['image'];
-        if ($v[0] === 'link_group') {
-            return empty($link = $v[1]['image_link']) ? '' : $link;
-        }
-        if ($v[0] === 'file_group') {
-            return $v[1]['image_file'][0] ?? '';
-        }
-        return '';
     }
 
     protected function initEntryIdFromQuery(): int

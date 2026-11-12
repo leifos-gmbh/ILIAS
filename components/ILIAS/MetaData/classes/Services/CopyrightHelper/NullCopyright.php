@@ -36,6 +36,11 @@ class NullCopyright implements CopyrightInterface
         return false;
     }
 
+    public function isFeatured(): bool
+    {
+        return false;
+    }
+
     public function identifier(): string
     {
         return '';

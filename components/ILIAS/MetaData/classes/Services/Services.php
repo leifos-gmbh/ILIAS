@@ -157,7 +157,8 @@ class Services implements ServicesInterface
             $this->internal_services->copyright()->repository(),
             $this->internal_services->copyright()->identifiersHandler(),
             $this->internal_services->copyright()->renderer(),
-            $this->internal_services->search()->searchClauseFactory()
+            $this->internal_services->search()->searchClauseFactory(),
+            $this->internal_services->copyright()->inputFactory()
         );
     }
 

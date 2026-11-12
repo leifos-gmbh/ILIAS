@@ -37,6 +37,7 @@ class DatabaseRepositoryTest extends TestCase
         'description' => 'description default',
         'is_default' => 1,
         'outdated' => 0,
+        'featured' => 1,
         'position' => 0,
         'full_name' => 'full name default',
         'link' => 'link default',
@@ -51,6 +52,7 @@ class DatabaseRepositoryTest extends TestCase
         'description' => 'description 1',
         'is_default' => 0,
         'outdated' => 1,
+        'featured' => 0,
         'position' => 1,
         'full_name' => 'full name 1',
         'link' => 'link 1',
@@ -65,6 +67,7 @@ class DatabaseRepositoryTest extends TestCase
         'description' => '',
         'is_default' => 0,
         'outdated' => 0,
+        'featured' => 0,
         'position' => 0,
         'full_name' => 'full name 2',
         'link' => '',
@@ -166,6 +169,7 @@ class DatabaseRepositoryTest extends TestCase
         $this->assertSame(self::ROW_1['description'], $entry->description());
         $this->assertSame((bool) self::ROW_1['is_default'], $entry->isDefault());
         $this->assertSame((bool) self::ROW_1['outdated'], $entry->isOutdated());
+        $this->assertSame((bool) self::ROW_1['featured'], $entry->isFeatured());
         $this->assertSame(self::ROW_1['position'], $entry->position());
         $this->assertSame(self::ROW_1['full_name'], $entry->copyrightData()->fullName());
         $this->assertSame(self::ROW_1['link'], (string) $entry->copyrightData()->link());
@@ -278,6 +282,7 @@ class DatabaseRepositoryTest extends TestCase
             'new title',
             'new description',
             true,
+            false,
             'new full name',
             $uri,
             $img_uri,
@@ -301,6 +306,7 @@ class DatabaseRepositoryTest extends TestCase
                 'description' => [\ilDBConstants::T_TEXT, 'new description'],
                 'is_default' => [\ilDBConstants::T_INTEGER, 0],
                 'outdated' => [\ilDBConstants::T_INTEGER, 1],
+                'featured' => [\ilDBConstants::T_INTEGER, 0],
                 'position' => [\ilDBConstants::T_INTEGER, 6],
                 'full_name' => [\ilDBConstants::T_TEXT, 'new full name'],
                 'link' => [\ilDBConstants::T_TEXT, 'new link'],
@@ -324,6 +330,7 @@ class DatabaseRepositoryTest extends TestCase
             'new title',
             'new description',
             false,
+            true,
             'new full name',
             null,
             'new image file',
@@ -347,6 +354,7 @@ class DatabaseRepositoryTest extends TestCase
                 'description' => [\ilDBConstants::T_TEXT, 'new description'],
                 'is_default' => [\ilDBConstants::T_INTEGER, 0],
                 'outdated' => [\ilDBConstants::T_INTEGER, 0],
+                'featured' => [\ilDBConstants::T_INTEGER, 1],
                 'position' => [\ilDBConstants::T_INTEGER, 6],
                 'full_name' => [\ilDBConstants::T_TEXT, 'new full name'],
                 'link' => [\ilDBConstants::T_TEXT, ''],
@@ -381,6 +389,7 @@ class DatabaseRepositoryTest extends TestCase
             'new title',
             'new description',
             true,
+            false,
             'new full name',
             $uri,
             $img_uri,
@@ -395,6 +404,7 @@ class DatabaseRepositoryTest extends TestCase
                 'title' => [\ilDBConstants::T_TEXT, 'new title'],
                 'description' => [\ilDBConstants::T_TEXT, 'new description'],
                 'outdated' => [\ilDBConstants::T_INTEGER, 1],
+                'featured' => [\ilDBConstants::T_INTEGER, 0],
                 'full_name' => [\ilDBConstants::T_TEXT, 'new full name'],
                 'link' => [\ilDBConstants::T_TEXT, 'new link'],
                 'image_link' => [\ilDBConstants::T_TEXT, 'new image link'],
@@ -423,6 +433,7 @@ class DatabaseRepositoryTest extends TestCase
             'new title',
             'new description',
             false,
+            false,
             'new full name',
             $uri,
             'new image file',
@@ -437,6 +448,7 @@ class DatabaseRepositoryTest extends TestCase
                 'title' => [\ilDBConstants::T_TEXT, 'new title'],
                 'description' => [\ilDBConstants::T_TEXT, 'new description'],
                 'outdated' => [\ilDBConstants::T_INTEGER, 0],
+                'featured' => [\ilDBConstants::T_INTEGER, 0],
                 'full_name' => [\ilDBConstants::T_TEXT, 'new full name'],
                 'link' => [\ilDBConstants::T_TEXT, 'new link'],
                 'image_link' => [\ilDBConstants::T_TEXT, ''],

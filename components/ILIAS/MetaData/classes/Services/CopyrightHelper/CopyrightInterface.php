@@ -30,6 +30,8 @@ interface CopyrightInterface
 
     public function isOutdated(): bool;
 
+    public function isFeatured(): bool;
+
     public function identifier(): string;
 
     public function title(): string;

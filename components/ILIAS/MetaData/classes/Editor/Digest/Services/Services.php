@@ -93,7 +93,8 @@ class Services
             $this->copyright_services->repository(),
             ilMDSettings::_getInstance(),
             $this->publishing_services->settings(),
-            $this->copyright_services->identifiersHandler()
+            $this->copyright_services->identifiersHandler(),
+            $this->copyright_services->inputFactory()
         );
     }
 

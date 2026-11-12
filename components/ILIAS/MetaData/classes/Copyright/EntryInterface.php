@@ -32,6 +32,8 @@ interface EntryInterface
 
     public function isOutdated(): bool;
 
+    public function isFeatured(): bool;
+
     public function position(): int;
 
     public function copyrightData(): CopyrightDataInterface;

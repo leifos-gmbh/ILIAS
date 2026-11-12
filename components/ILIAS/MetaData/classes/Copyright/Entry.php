@@ -22,28 +22,22 @@ namespace ILIAS\MetaData\Copyright;
 
 class Entry implements EntryInterface
 {
-    protected int $id;
-    protected string $title;
-    protected string $description;
-    protected bool $is_default;
-    protected bool $is_outdated;
-    protected int $position;
-    protected CopyrightDataInterface $data;
-
     public function __construct(
-        int $id,
-        string $title,
-        string $description,
-        bool $is_default,
-        bool $is_outdated,
-        int $position,
-        CopyrightDataInterface $data
+        protected int $id,
+        protected string $title,
+        protected string $description,
+        protected bool $is_default,
+        protected bool $is_outdated,
+        protected bool $is_featured,
+        protected int $position,
+        protected CopyrightDataInterface $data
     ) {
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
         $this->is_default = $is_default;
         $this->is_outdated = $is_outdated;
+        $this->is_featured = $is_featured;
         $this->position = $position;
         $this->data = $data;
     }
@@ -71,6 +65,11 @@ class Entry implements EntryInterface
     public function isOutdated(): bool
     {
         return $this->is_outdated;
+    }
+
+    public function isFeatured(): bool
+    {
+        return $this->is_featured;
     }
 
     public function position(): int

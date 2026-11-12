@@ -24,6 +24,8 @@ use ILIAS\MetaData\Services\Reader\ReaderInterface;
 use ILIAS\MetaData\Services\Manipulator\ManipulatorInterface;
 use ILIAS\MetaData\Search\Clauses\ClauseInterface as SearchClause;
 use ILIAS\MetaData\Search\Clauses\NullClause;
+use ILIAS\MetaData\Services\CopyrightHelper\Input\InputBuilderInterface;
+use ILIAS\MetaData\Services\CopyrightHelper\Input\NullInputBuilder;
 
 class NullCopyrightHelper implements CopyrightHelperInterface
 {
@@ -87,5 +89,10 @@ class NullCopyrightHelper implements CopyrightHelperInterface
         string ...$further_copyright_ids
     ): SearchClause {
         return new NullClause();
+    }
+
+    public function getCopyrightInputBuilder(?ReaderInterface $value = null): InputBuilderInterface
+    {
+        return new NullInputBuilder();
     }
 }

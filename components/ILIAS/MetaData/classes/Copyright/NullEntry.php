@@ -47,6 +47,11 @@ class NullEntry implements EntryInterface
         return false;
     }
 
+    public function isFeatured(): bool
+    {
+        return false;
+    }
+
     public function position(): int
     {
         return 0;

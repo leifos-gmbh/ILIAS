@@ -18,6 +18,8 @@
 
 declare(strict_types=1);
 
+namespace ILIAS\MetaData\Settings\GUI\Copyright\ImageUpload;
+
 use ILIAS\FileUpload\Handler\AbstractCtrlAwareUploadHandler;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\ResourceStorage\Services;
@@ -27,9 +29,9 @@ use ILIAS\FileUpload\DTO\UploadResult;
 use ILIAS\FileUpload\Handler\BasicHandlerResult;
 use ILIAS\FileUpload\Handler\BasicFileInfoResult;
 
-class ilMDCopyrightImageUploadHandlerGUI extends AbstractCtrlAwareUploadHandler
+class HandlerGUI extends AbstractCtrlAwareUploadHandler
 {
-    protected ilMDCopyrightImageStakeholder $stakeholder;
+    protected Stakeholder $stakeholder;
     protected Services $storage;
     protected string $identification;
 
@@ -37,7 +39,7 @@ class ilMDCopyrightImageUploadHandlerGUI extends AbstractCtrlAwareUploadHandler
     {
         global $DIC;
 
-        $this->stakeholder = new ilMDCopyrightImageStakeholder();
+        $this->stakeholder = new Stakeholder();
         $this->storage = $DIC->resourceStorage();
         $this->identification = $identification;
 

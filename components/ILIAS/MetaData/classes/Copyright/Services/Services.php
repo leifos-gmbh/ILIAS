@@ -30,46 +30,37 @@ use ILIAS\MetaData\Copyright\Renderer;
 use ILIAS\MetaData\Copyright\Database\Wrapper;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface;
 use ILIAS\MetaData\Copyright\Identifiers\Handler;
-use ILIAS\MetaData\Copyright\Search\Factory;
-use ILIAS\MetaData\Copyright\Search\FactoryInterface;
+use ILIAS\MetaData\Copyright\Search\Factory as SearcherFactory;
+use ILIAS\MetaData\Copyright\Search\FactoryInterface as SearcherFactoryInterface;
+use ILIAS\MetaData\Copyright\Input\Factory as InputFactory;
+use ILIAS\MetaData\Copyright\Input\FactoryInterface as InputFactoryInterface;
+use ILIAS\MetaData;
 
 class Services
 {
     protected RepositoryInterface $repository;
     protected RendererInterface $renderer;
     protected HandlerInterface $handler;
-    protected FactoryInterface $searcher_factory;
-
-    protected GlobalContainer $dic;
-    protected SearchServices $search_services;
-    protected PathsServices $paths_services;
+    protected SearcherFactoryInterface $searcher_factory;
+    protected InputFactoryInterface $input_factory;
 
     public function __construct(
-        GlobalContainer $dic,
-        SearchServices $repository_services,
-        PathsServices $paths_services,
+        protected GlobalContainer $dic,
+        protected SearchServices $search_services,
+        protected PathsServices $paths_services
     ) {
-        $this->dic = $dic;
-        $this->search_services = $repository_services;
-        $this->paths_services = $paths_services;
     }
 
     public function repository(): RepositoryInterface
     {
-        if (isset($this->repository)) {
-            return $this->repository;
-        }
-        return $this->repository = new DatabaseRepository(
+        return $this->repository ??= new DatabaseRepository(
             new Wrapper($this->dic->database())
         );
     }
 
     public function renderer(): RendererInterface
     {
-        if (isset($this->renderer)) {
-            return $this->renderer;
-        }
-        return $this->renderer = new Renderer(
+        return $this->renderer ??= new Renderer(
             $this->dic->ui()->factory(),
             $this->dic->resourceStorage()
         );
@@ -77,22 +68,31 @@ class Services
 
     public function identifiersHandler(): HandlerInterface
     {
-        if (isset($this->handler)) {
-            return $this->handler;
-        }
-        return $this->handler = new Handler();
+        return $this->handler ??= new Handler();
     }
 
-    public function searcherFactory(): FactoryInterface
+    public function searcherFactory(): SearcherFactoryInterface
     {
-        if (isset($this->searcher_factory)) {
-            return $this->searcher_factory;
-        }
-        return $this->searcher_factory = new Factory(
+        return $this->searcher_factory ??= new SearcherFactory(
             $this->search_services->searchFilterFactory(),
             $this->search_services->searchClauseFactory(),
             $this->paths_services->pathFactory(),
             $this->identifiersHandler()
+        );
+    }
+
+    public function inputFactory(): InputFactoryInterface
+    {
+        return $this->input_factory ??= new InputFactory(
+            $this->repository(),
+            $this->identifiersHandler(),
+            new \ILIAS\MetaData\Presentation\Utilities(
+                $this->dic->language(),
+                $this->dic->user(),
+                $this->dic->refinery()
+            ),
+            $this->dic->ui()->factory(),
+            $this->dic->refinery()
         );
     }
 }

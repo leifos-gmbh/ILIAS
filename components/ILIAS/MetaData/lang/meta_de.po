@@ -1439,11 +1439,32 @@ msgstr "Die Lizenz, die Sie ausgewählt haben, zeichnet das Object als Open Educ
 msgid "meta_copyright_change_warning_title"
 msgstr "Lizenz ändern"
 
+msgid "meta_non_featured_licences_group_label"
+msgstr "Andere Lizenz"
+
+msgid "meta_non_featured_licences_select_label"
+msgstr "Lizenz"
+
+msgid "meta_custom_cp_description"
+msgstr "Beschreibung"
+
 msgid "meta_copyright_in_use"
 msgstr "Aktuell"
 
+msgid "meta_copyright_in_use_info"
+msgstr "Diese Lizenz kann für Objekte ausgewählt werden, aber ist nur nach Auswahl von ‘Andere Lizenz’ verfügbar."
+
 msgid "meta_copyright_outdated"
 msgstr "Veraltet"
+
+msgid "meta_copyright_outdated_info"
+msgstr "Diese Lizenz kann für Objekte nicht mehr ausgewählt werden, wird aber noch angezeigt wo bereits ausgewählt."
+
+msgid "meta_copyright_featured"
+msgstr "Hervorgehoben"
+
+msgid "meta_copyright_featured_info"
+msgstr "Bei der Auswahl von Lizenzen für Objekte wird diese Lizenz als einzelne Option angeboten, und werden damit über ‘Aktuelle’ Lizenzen hervorgehoben."
 
 msgid "meta_copyright_outdated_error"
 msgstr "Die ausgewählt Lizenz ist veraltet und darf nicht mehr benutzt werden."
@@ -1470,7 +1491,7 @@ msgid "meta_coverage_plural"
 msgstr "Anwendungsbereiche"
 
 msgid "meta_cp_own"
-msgstr "Eigene Angabe:"
+msgstr "Eigene Angabe"
 
 msgid "meta_creator"
 msgstr "Ersteller"

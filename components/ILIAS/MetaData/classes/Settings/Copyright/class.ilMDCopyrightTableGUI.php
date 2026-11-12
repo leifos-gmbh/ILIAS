@@ -38,11 +38,11 @@ class ilMDCopyrightTableGUI extends ilTable2GUI
     protected bool $has_write;
 
     /**
-     * Rendering the modals into the table leads to a mess
+     * Rendering the prompts into the table leads to a mess
      * in the css, since the table is also a form.
      * @var Signal[]
      */
-    protected array $edit_modal_signals = [];
+    protected array $edit_dialog_signals = [];
 
     public function __construct(
         RepositoryInterface $repository,
@@ -107,12 +107,7 @@ class ilMDCopyrightTableGUI extends ilTable2GUI
         $this->tpl->setVariable('VAL_USAGE', $a_set['used']);
         $this->tpl->setVariable('VAL_PREVIEW', $a_set['preview']);
 
-        $status = [];
-        if ($a_set['status']) {
-            $status[] = $this->lng->txt('meta_copyright_outdated');
-        } else {
-            $status[] = $this->lng->txt('meta_copyright_in_use');
-        }
+        $status = [$a_set['status']];
         if ($a_set['default']) {
             $status[] = $this->lng->txt('md_copyright_default');
         }
@@ -127,9 +122,9 @@ class ilMDCopyrightTableGUI extends ilTable2GUI
         }
     }
 
-    public function setEditModalSignal(int $entry_id, Signal $signal): void
+    public function setEditDialogSignal(int $entry_id, Signal $signal): void
     {
-        $this->edit_modal_signals[$entry_id] = $signal;
+        $this->edit_dialog_signals[$entry_id] = $signal;
     }
 
     public function parseSelections(): void
@@ -148,7 +143,15 @@ class ilMDCopyrightTableGUI extends ilTable2GUI
                 $this->renderer->toUIComponents($entry->copyrightData())
             );
             $tmp_arr['default'] = $entry->isDefault();
-            $tmp_arr['status'] = $entry->isOutdated();
+
+            $status = $this->lng->txt('meta_copyright_in_use');
+            if ($entry->isOutdated()) {
+                $status = $this->lng->txt('meta_copyright_outdated');
+            } elseif ($entry->isFeatured()) {
+                $status = $this->lng->txt('meta_copyright_featured');
+            }
+            $tmp_arr['status'] = $status;
+
             $tmp_arr['position'] = ($position += 10);
 
             $entry_arr[] = $tmp_arr;
@@ -163,7 +166,7 @@ class ilMDCopyrightTableGUI extends ilTable2GUI
 
         $buttons[] = $this->ui_factory->button()->shy(
             $this->lng->txt('edit'),
-            $this->edit_modal_signals[$id]
+            $this->edit_dialog_signals[$id]
         );
 
         if ($with_usages) {

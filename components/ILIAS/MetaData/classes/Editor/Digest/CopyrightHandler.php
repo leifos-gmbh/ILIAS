@@ -25,6 +25,8 @@ use ILIAS\MetaData\Copyright\EntryInterface;
 use ILIAS\MetaData\Settings\SettingsInterface as Settings;
 use ILIAS\MetaData\Copyright\Identifiers\HandlerInterface as CopyrightIDHandler;
 use ILIAS\MetaData\OERHarvester\Settings\SettingsInterface as OERHarvesterSettings;
+use ILIAS\MetaData\Copyright\Input\FactoryInterface as CopyrightInputFactory;
+use ILIAS\MetaData\Copyright\Input\BuilderInterface as CopyrightInputBuilder;
 
 class CopyrightHandler
 {
@@ -37,54 +39,47 @@ class CopyrightHandler
         protected CopyrightRepository $repository,
         protected Settings $settings,
         protected OERHarvesterSettings $harvester_settings,
-        protected CopyrightIDHandler $copyright_id_handler
+        protected CopyrightIDHandler $copyright_id_handler,
+        protected CopyrightInputFactory $copyright_input_factory
     ) {
     }
 
     public function isCPSelectionActive(): bool
     {
-        return $this->settings->isCopyrightSelectionActive() && $this->hasCPEntries();
+        return $this->settings->isCopyrightSelectionActive();
     }
 
-    protected function hasCPEntries(): bool
+    public function getCopyrightInputBuilder(): CopyrightInputBuilder
     {
-        $this->initCPEntries();
-        return !empty($this->entries);
+        return $this->copyright_input_factory->buildInput()->withCustomInput()->withNonFeaturedEntries();
+    }
+
+    public function isCopyrightIdentifier(string $value): bool
+    {
+        return $this->copyright_id_handler->isIdentifierValid($value);
+    }
+
+    public function getCopyrightEntry(string $identifier): EntryInterface
+    {
+        return $this->repository->getEntry(
+            $this->copyright_id_handler->parseEntryIDFromIdentifier($identifier)
+        );
     }
 
     /**
-     * @return EntryInterface[]
+     * @return string[]
      */
-    public function getCPEntries(): \Generator
+    public function getPublishedCopyrightEntryIdentifiers(): array
     {
-        $this->initCPEntries();
-        yield from $this->entries;
-    }
-
-    protected function initCPEntries(): void
-    {
-        if (!isset($this->entries)) {
-            $this->entries = iterator_to_array($this->repository->getAllEntries());
+        $res = [];
+        foreach ($this->harvester_settings->getCopyrightEntryIDsSelectedForPublishing() as $id) {
+            $res[] = $this->copyright_id_handler->buildIdentifierFromEntryID($id);
         }
-    }
-
-    public function extractCPEntryID(string $description): int
-    {
-        return $this->copyright_id_handler->parseEntryIDFromIdentifier($description);
-    }
-
-    public function createIdentifierForID(int $entry_id): string
-    {
-        return $this->copyright_id_handler->buildIdentifierFromEntryID($entry_id);
+        return $res;
     }
 
     public function isObjectTypePublished(string $type): bool
     {
         return $this->harvester_settings->isObjectTypeSelectedForPublishing($type);
-    }
-
-    public function isCopyrightEntryPublished(EntryInterface $entry): bool
-    {
-        return $this->harvester_settings->isCopyrightEntryIDSelectedForPublishing($entry->id());
     }
 }

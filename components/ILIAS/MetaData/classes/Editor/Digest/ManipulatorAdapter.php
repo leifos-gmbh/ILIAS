@@ -82,7 +82,7 @@ class ManipulatorAdapter
             $this->copyright_handler->isCPSelectionActive() &&
             isset($data[ContentAssembler::RIGHTS])
         ) {
-            $set = $this->prepareRights($set, $data[ContentAssembler::RIGHTS][0]);
+            $set = $this->prepareRights($set, $data[ContentAssembler::RIGHTS]);
         }
 
         $this->manipulator->execute($set);
@@ -199,9 +199,6 @@ class ManipulatorAdapter
         array $data
     ): SetInterface {
         $description = $data[0];
-        if ($description === ContentAssembler::CUSTOM_CP) {
-            $description = $data[1][ContentAssembler::CUSTOM_CP_DESCRIPTION];
-        }
 
         if ($description === '' || $description === null) {
             $set = $this->manipulator->prepareCreateOrUpdate(

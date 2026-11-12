@@ -19,14 +19,14 @@
 declare(strict_types=1);
 
 use ILIAS\UI\Factory;
-use ILIAS\UI\Implementation\Component\Input\Field\Radio;
+use ILIAS\UI\Component\Input\Container\Form\FormInput;
 
 /**
  * @author Lukas Zehnder <lukas@sr.solutions>
  */
 trait ilObjFileCopyrightInput
 {
-    public function getCopyrightSelectionInput(string $lang_var_title): Radio
+    public function getCopyrightSelectionInput(string $lang_var_title): FormInput
     {
         static $copyright_input;
         // we chache the input field to avoid multiple creation in lists
@@ -34,18 +34,12 @@ trait ilObjFileCopyrightInput
             return $copyright_input;
         }
 
-        $copyright_input = $this->getUIFactory()->input()->field()->radio($this->getLanguage()->txt($lang_var_title));
-        foreach ($this->lom_services->copyrightHelper()->getNonOutdatedCopyrightPresets() as $copyright_option) {
-            $copyright_input = $copyright_input->withOption(
-                $copyright_option->identifier(),
-                $copyright_option->title(),
-                $copyright_option->description()
-            );
-            if ($copyright_option->isDefault()) {
-                $copyright_input = $copyright_input->withValue($copyright_option->identifier());
-            }
-        }
-
+        $copyright_input = $this->lom_services->copyrightHelper()
+            ->getCopyrightInputBuilder()
+            ->withNonFeaturedEntries()
+            ->withCustomInput()
+            ->get()
+            ->withLabel($this->getLanguage()->txt($lang_var_title));
         return $copyright_input;
     }
 

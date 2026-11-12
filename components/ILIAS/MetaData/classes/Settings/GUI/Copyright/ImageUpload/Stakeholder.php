@@ -18,9 +18,11 @@
 
 declare(strict_types=1);
 
+namespace ILIAS\MetaData\Settings\GUI\Copyright\ImageUpload;
+
 use ILIAS\ResourceStorage\Stakeholder\AbstractResourceStakeholder;
 
-class ilMDCopyrightImageStakeholder extends AbstractResourceStakeholder
+class Stakeholder extends AbstractResourceStakeholder
 {
     public function getId(): string
     {

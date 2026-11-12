@@ -55,6 +55,11 @@ class Copyright implements CopyrightInterface
         return $this->entry->isOutdated();
     }
 
+    public function isFeatured(): bool
+    {
+        return $this->entry->isFeatured();
+    }
+
     public function identifier(): string
     {
         return $this->identifier_handler->buildIdentifierFromEntryID($this->entry->id());

@@ -1439,11 +1439,32 @@ msgstr "The copyright licence you have selected makes this object eligible to be
 msgid "meta_copyright_change_warning_title"
 msgstr "Changing a Copyright"
 
+msgid "meta_non_featured_licences_group_label"
+msgstr "Other Licence"
+
+msgid "meta_non_featured_licences_select_label"
+msgstr "Licence"
+
+msgid "meta_custom_cp_description"
+msgstr "Description"
+
 msgid "meta_copyright_in_use"
 msgstr "In use"
 
+msgid "meta_copyright_in_use_info"
+msgstr "This licence can be selected for objects, but is only available when first selecting ‘Other Licence’."
+
 msgid "meta_copyright_outdated"
 msgstr "Outdated / No longer in use"
+
+msgid "meta_copyright_outdated_info"
+msgstr "This licence can not be selected for objects anymore, but is still displayed where already selected."
+
+msgid "meta_copyright_featured"
+msgstr "Featured"
+
+msgid "meta_copyright_featured_info"
+msgstr "When selecting licences for objects, this licence is offered as an option on its own. Users are encouraged to select it over ‘In use’ licences."
 
 msgid "meta_copyright_outdated_error"
 msgstr "The chosen copyright is outdated and no longer in use."
@@ -1470,7 +1491,7 @@ msgid "meta_coverage_plural"
 msgstr "Coverage"
 
 msgid "meta_cp_own"
-msgstr "Own Copyright Information:"
+msgstr "Custom Copyright Information"
 
 msgid "meta_creator"
 msgstr "Creator"

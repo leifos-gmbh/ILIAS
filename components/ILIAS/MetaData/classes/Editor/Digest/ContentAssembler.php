@@ -62,9 +62,6 @@ class ContentAssembler
     public const string PUBLISHER = 'publisher';
 
     public const string RIGHTS = 'rights';
-    public const string CUSTOM_CP = 'custom_cp';
-    public const string CUSTOM_CP_DESCRIPTION = 'custom_cp_description';
-    public const string OER_BLOCKED = 'oer_blocked_';
 
     protected PathFactory $path_factory;
     protected NavigatorFactoryInterface $navigator_factory;
@@ -341,98 +338,37 @@ class ContentAssembler
     protected function getCopyrightSection(
         SetInterface $set
     ): Section {
-        $ff = $this->ui_factory->input()->field();
-
         $cp_description_el = $this->navigator_factory->navigator(
             $this->path_collection->copyright(),
             $set->getRoot()
         )->lastElementAtFinalStep();
-        $cp_description = $cp_description_el?->getData()->value();
+        $cp_description = (string) $cp_description_el?->getData()->value();
 
-        $current_id = $this->copyright_handler->extractCPEntryID((string) $cp_description);
-        $default_id = 0;
-        $options = [];
-        $outdated = [];
-        $potential_oer_values = [];
-        $current_id_exists = false;
-        $is_custom = !is_null($cp_description) && !$current_id;
-
-        foreach ($this->copyright_handler->getCPEntries() as $entry) {
-            if ($entry->isDefault()) {
-                $default_id = $entry->id();
-            }
-            if ($current_id === $entry->id()) {
-                $current_id_exists = true;
-            }
-
-            $identifier = $this->copyright_handler->createIdentifierForID($entry->id());
-            if (
-                $this->copyright_handler->isObjectTypePublished($set->getRessourceID()->type()) &&
-                $this->copyright_handler->isCopyrightEntryPublished($entry)
-            ) {
-                $potential_oer_values[] = $identifier;
-            }
-
-            $option = $ff->group([], $entry->title(), $entry->description());
-
-            // outdated entries throw an error when selected
-            if ($entry->isOutdated()) {
-                $option = $option->withLabel(
-                    '(' . $this->presenter->utilities()->txt('meta_copyright_outdated') .
-                    ') ' . $entry->title()
-                )->withDisabled(true);
-                $outdated[] = $identifier;
-            }
-            $options[$identifier] = $option;
+        $builder = $this->copyright_handler->getCopyrightInputBuilder();
+        if ($this->copyright_handler->isCopyrightIdentifier($cp_description)) {
+            $builder = $builder->withPresetValue($this->copyright_handler->getCopyrightEntry($cp_description));
+        } else {
+            $builder = $builder->withCustomValue($cp_description);
         }
 
-        //custom input as the last option
-        $custom_text = $ff
-            ->textarea($this->presenter->utilities()->txt('meta_description'))
-            ->withValue($is_custom ? (string) $cp_description : '');
-        $custom = $ff->group(
-            [self::CUSTOM_CP_DESCRIPTION => $custom_text],
-            $this->presenter->utilities()->txt('meta_cp_own')
+        $potential_oer_values = $this->copyright_handler->isObjectTypePublished($set->getRessourceID()->type()) ?
+            $this->copyright_handler->getPublishedCopyrightEntryIdentifiers() : [];
+
+        $copyright = $builder->get()->withAdditionalOnLoadCode(
+            function ($id) use ($potential_oer_values) {
+                $cp_change_message = $this->presenter->utilities()->txt("meta_copyright_change_info");
+                $cp_change_message_with_warning = $cp_change_message . "<br/><br/>" .
+                    $this->presenter->utilities()->txt("meta_copyright_change_oer_info");
+
+                return 'il.MetaDataCopyrightListener.init(\'' .
+                    $cp_change_message . '\',\'' .
+                    $cp_change_message_with_warning . '\',\'' .
+                    json_encode($potential_oer_values) . '\',\'' .
+                    $id . '\');';
+            }
         );
-        $options[self::CUSTOM_CP] = $custom;
 
-        $value = self::CUSTOM_CP;
-        if (!$is_custom) {
-            $id = ($current_id && $current_id_exists) ? $current_id : $default_id;
-            $value = $this->copyright_handler->createIdentifierForID($id);
-        }
-
-        $copyright = $ff
-            ->switchableGroup(
-                $options,
-                $this->presenter->utilities()->txt('meta_copyright')
-            )
-            ->withValue($value)
-            ->withAdditionalOnLoadCode(
-                function ($id) use ($potential_oer_values) {
-                    $cp_change_message = $this->presenter->utilities()->txt("meta_copyright_change_info");
-                    $cp_change_message_with_warning = $cp_change_message . "<br/><br/>" .
-                        $this->presenter->utilities()->txt("meta_copyright_change_oer_info");
-
-                    return 'il.MetaDataCopyrightListener.init(\'' .
-                        $cp_change_message . '\',\'' .
-                        $cp_change_message_with_warning . '\',\'' .
-                        json_encode($potential_oer_values) . '\',\'' .
-                        $id . '\');';
-                }
-            )->withAdditionalTransformation(
-                $this->refinery->custom()->constraint(
-                    function ($v) use ($outdated) {
-                        if (in_array($v[0], $outdated, true)) {
-                            return false;
-                        }
-                        return true;
-                    },
-                    $this->presenter->utilities()->txt('meta_copyright_outdated_error')
-                )
-            );
-
-        return $ff->section(
+        return $this->ui_factory->input()->field()->section(
             [$copyright],
             $this->presenter->utilities()->txt('meta_rights')
         );

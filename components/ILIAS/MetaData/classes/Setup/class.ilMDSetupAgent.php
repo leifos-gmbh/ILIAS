@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 use ILIAS\Setup;
 use ILIAS\Setup\Config;
+use ILIAS\MetaData\Setup\DBUpdate\Steps13;
 
 class ilMDSetupAgent extends Setup\Agent\NullAgent
 {
@@ -32,7 +33,8 @@ class ilMDSetupAgent extends Setup\Agent\NullAgent
             new ilDatabaseUpdateStepsExecutedObjective(new ilMDCopyrightUpdateSteps()),
             new ilDatabaseUpdateStepsExecutedObjective(new ilMDUpdateSteps10()),
             new ilDatabaseUpdateStepsExecutedObjective(new ilMDControlledVocabsUpdateSteps()),
-            new ilDatabaseUpdateStepsExecutedObjective(new ilMDUpdateSteps11())
+            new ilDatabaseUpdateStepsExecutedObjective(new ilMDUpdateSteps11()),
+            new ilDatabaseUpdateStepsExecutedObjective(new Steps13())
         );
     }
 

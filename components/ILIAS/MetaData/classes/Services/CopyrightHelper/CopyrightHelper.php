@@ -33,30 +33,21 @@ use ILIAS\MetaData\Copyright\RendererInterface;
 use ILIAS\MetaData\Search\Clauses\FactoryInterface as SearchClauseFactory;
 use ILIAS\MetaData\Search\Clauses\Mode;
 use ILIAS\MetaData\Search\Clauses\Operator;
+use ILIAS\MetaData\Services\CopyrightHelper\Input\InputBuilderInterface;
+use ILIAS\MetaData\Copyright\Input\FactoryInterface as InputFactory;
+use ILIAS\MetaData\Services\CopyrightHelper\Input\InputBuilder;
 
 class CopyrightHelper implements CopyrightHelperInterface
 {
-    protected SettingsInterface $settings;
-    protected PathFactory $path_factory;
-    protected IdentifierHandler $identifier_handler;
-    protected CopyrightRepository $copyright_repo;
-    protected RendererInterface $renderer;
-    protected SearchClauseFactory $search_clause_factory;
-
     public function __construct(
-        SettingsInterface $settings,
-        PathFactory $path_factory,
-        CopyrightRepository $copyright_repo,
-        IdentifierHandler $identifier_handler,
-        RendererInterface $renderer,
-        SearchClauseFactory $search_clause_factory
+        protected SettingsInterface $settings,
+        protected PathFactory $path_factory,
+        protected CopyrightRepository $copyright_repo,
+        protected IdentifierHandler $identifier_handler,
+        protected RendererInterface $renderer,
+        protected SearchClauseFactory $search_clause_factory,
+        protected InputFactory $input_factory
     ) {
-        $this->settings = $settings;
-        $this->path_factory = $path_factory;
-        $this->copyright_repo = $copyright_repo;
-        $this->identifier_handler = $identifier_handler;
-        $this->renderer = $renderer;
-        $this->search_clause_factory = $search_clause_factory;
     }
 
     public function isCopyrightSelectionActive(): bool
@@ -83,20 +74,7 @@ class CopyrightHelper implements CopyrightHelperInterface
         if (!$this->isCopyrightSelectionActive()) {
             return $this->getNullCopyrightEntryWrapper();
         }
-        $raw = $this->getRawCopyright($reader);
-
-        $entry = null;
-        if ($this->identifier_handler->isIdentifierValid($raw)) {
-            $entry = $this->copyright_repo->getEntry(
-                $this->identifier_handler->parseEntryIDFromIdentifier($raw)
-            );
-        } elseif ($raw === '') {
-            $entry = $this->copyright_repo->getDefaultEntry();
-        }
-
-        if (is_null($entry)) {
-            return $this->getNullCopyrightEntryWrapper();
-        }
+        $entry = $this->readCopyrightEntry($reader);
         return $this->getCopyrightEntryWrapper($entry);
     }
 
@@ -225,6 +203,22 @@ class CopyrightHelper implements CopyrightHelperInterface
                                   ->get();
     }
 
+    protected function readCopyrightEntry(ReaderInterface $reader): EntryInterface
+    {
+        $raw = $this->getRawCopyright($reader);
+
+        $entry = null;
+        if ($this->identifier_handler->isIdentifierValid($raw)) {
+            $entry = $this->copyright_repo->getEntry(
+                $this->identifier_handler->parseEntryIDFromIdentifier($raw)
+            );
+        } else {
+            $entry = $this->copyright_repo->getDefaultEntry();
+        }
+
+        return $entry;
+    }
+
     protected function getCopyrightEntryWrapper(EntryInterface $entry): CopyrightInterface
     {
         return new Copyright(
@@ -237,5 +231,19 @@ class CopyrightHelper implements CopyrightHelperInterface
     protected function getNullCopyrightEntryWrapper(): CopyrightInterface
     {
         return new NullCopyright();
+    }
+
+    public function getCopyrightInputBuilder(?ReaderInterface $value = null): InputBuilderInterface
+    {
+        $internal_builder = $this->input_factory->buildInput();
+        if ($value === null) {
+            return new InputBuilder($internal_builder);
+        }
+        if ($this->hasPresetCopyright($value)) {
+            $internal_builder = $internal_builder->withPresetValue(
+                $this->readCopyrightEntry($value)
+            );
+        }
+        return new InputBuilder($internal_builder);
     }
 }

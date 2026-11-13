@@ -95,4 +95,12 @@ class NullCopyrightHelper implements CopyrightHelperInterface
     {
         return new NullInputBuilder();
     }
+
+
+    public function prepareCreateOrUpdateOfCopyrightFromInput(
+        ManipulatorInterface $manipulator,
+        string $input_value
+    ): ManipulatorInterface {
+        return $manipulator;
+    }
 }

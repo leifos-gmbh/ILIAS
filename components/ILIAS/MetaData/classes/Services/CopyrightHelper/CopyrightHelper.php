@@ -247,4 +247,11 @@ class CopyrightHelper implements CopyrightHelperInterface
         }
         return new InputBuilder($internal_builder);
     }
+
+    public function prepareCreateOrUpdateOfCopyrightFromInput(
+        ManipulatorInterface $manipulator,
+        string $input_value
+    ): ManipulatorInterface {
+        return $this->prepareCreateOrUpdateOfCopyright($manipulator, $input_value);
+    }
 }

@@ -134,4 +134,9 @@ interface CopyrightHelperInterface
     ): SearchClause;
 
     public function getCopyrightInputBuilder(?ReaderInterface $value = null): InputBuilderInterface;
+
+    public function prepareCreateOrUpdateOfCopyrightFromInput(
+        ManipulatorInterface $manipulator,
+        string $input_value
+    ): ManipulatorInterface;
 }

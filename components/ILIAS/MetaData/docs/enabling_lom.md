@@ -169,3 +169,10 @@ To make sure that when searching ILIAS via Lucene your object's LOM
 can also be searched, include the following line in your `LuceneObjectDefinition`:
 
     <xi:include href="../../../components/ILIAS/MetaData/LuceneDataSource.xml" />
+
+### Copyright Notice in the Page Editor
+
+If your ILIAS object contains pages via the COPage component, you can enable adding the copyright information of the
+object as a page component. To do so, add the following line to the `init` method of your inheritor of `ilPageConfig`:
+
+    $this->setEnablePCType(ilPCCopyrightNotice::BASE_NAME, true);

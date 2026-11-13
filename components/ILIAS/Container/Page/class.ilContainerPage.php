@@ -34,6 +34,10 @@ class ilContainerPage extends ilPageObject
         return "cont";
     }
 
+    public function afterConstructor(): void
+    {
+        $this->getPageConfig()->configureByObjectId($this->getParentId());
+    }
 
     public function addMissingContainerBlocks(?\ILIAS\Container\Content\ItemPresentationManager $manager): void
     {

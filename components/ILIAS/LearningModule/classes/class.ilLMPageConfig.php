@@ -58,6 +58,7 @@ class ilLMPageConfig extends ilPageConfig
             $this->setEnablePCType("ContentInclude", true);
         }
         $this->setLayoutTemplateType(ilPageLayout::MODULE_LM);
+        $this->setEnablePCType(ilPCCopyrightNotice::BASE_NAME, true);
     }
 
     /**

@@ -32,5 +32,6 @@ class ilGlossaryDefPageConfig extends ilPageConfig
         $this->setEnableInternalLinks(true);
         $this->setIntLinkHelpDefaultType("GlossaryItem");
         $this->setIntLinkHelpDefaultId($ref_id);
+        $this->setEnablePCType(ilPCCopyrightNotice::BASE_NAME, true);
     }
 }

@@ -42,6 +42,7 @@ class ilWikiPageConfig extends ilPageConfig
         if ($mset->get("mep_activate_pages")) {
             $this->setEnablePCType("ContentInclude", true);
         }
+        $this->setEnablePCType(ilPCCopyrightNotice::BASE_NAME, true);
     }
 
     /**

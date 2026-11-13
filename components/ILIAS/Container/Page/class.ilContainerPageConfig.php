@@ -51,4 +51,17 @@ class ilContainerPageConfig extends ilPageConfig
             $this->setEnablePCType("ContentInclude", true);
         }
     }
+
+    /**
+     * Object specific configuration
+     */
+    public function configureByObjectId(int $a_obj_id): void
+    {
+        if ($a_obj_id > 0) {
+            $type = ilObject::_lookupType($a_obj_id);
+            if (in_array($type, ['crs', 'grp'])) { // Folder and Category don't have LOM
+                $this->setEnablePCType(ilPCCopyrightNotice::BASE_NAME, true);
+            }
+        }
+    }
 }

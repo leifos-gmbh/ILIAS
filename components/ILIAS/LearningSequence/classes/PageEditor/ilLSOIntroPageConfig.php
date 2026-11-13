@@ -26,4 +26,8 @@ declare(strict_types=1);
  */
 class ilLSOIntroPageConfig extends ilPageConfig
 {
+    public function init(): void
+    {
+        $this->setEnablePCType(ilPCCopyrightNotice::BASE_NAME, true);
+    }
 }

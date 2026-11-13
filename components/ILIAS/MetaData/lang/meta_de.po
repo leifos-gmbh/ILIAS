@@ -2533,3 +2533,6 @@ msgstr "Standort"
 
 msgid "udf_type_selectmulti"
 msgstr "Auswahlliste (Mehrfachauswahl)"
+
+msgid "cont_ed_insert_cpnotice"
+msgstr "Copyright Hinweis des Objekts einfügen"

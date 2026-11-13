@@ -33,4 +33,9 @@ class ilContainerStartObjectsPage extends ilPageObject
     {
         return "cstr";
     }
+
+    public function afterConstructor(): void
+    {
+        $this->getPageConfig()->configureByObjectId($this->getParentId());
+    }
 }

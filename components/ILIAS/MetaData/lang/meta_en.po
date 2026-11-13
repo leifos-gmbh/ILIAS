@@ -2533,3 +2533,6 @@ msgstr "Location"
 
 msgid "udf_type_selectmulti"
 msgstr "Selection List (Multiple Choice)"
+
+msgid "cont_ed_insert_cpnotice"
+msgstr "Insert Copyright Notice of Object"

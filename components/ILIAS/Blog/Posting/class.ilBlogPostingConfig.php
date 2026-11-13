@@ -34,6 +34,7 @@ class ilBlogPostingConfig extends ilPageConfig
         $this->setEnableInternalLinks($req->getRefId() > 0); // #15668
         $this->setPreventHTMLUnmasking(false);
         $this->setEnableActivation(true);
+        $this->setEnablePCType(ilPCCopyrightNotice::BASE_NAME, true);
 
         $blga_set = new ilSetting("blga");
         $this->setPreventHTMLUnmasking(!$blga_set->get("mask", "0"));

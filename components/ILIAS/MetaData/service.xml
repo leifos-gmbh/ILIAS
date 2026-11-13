@@ -12,4 +12,7 @@
 	<crons>
 		<cron id="meta_oer_harvester" class="ilCronOerHarvester" />
 	</crons>
+	<copage>
+		<pagecontent pc_type="cpnotice" name="CopyrightNotice" directory="classes/Copyright\PageComponent" int_links="0" style_classes="0" xsl="0" def_enabled="0" top_item="1" order_nr="300"/>
+	</copage>
 </service>

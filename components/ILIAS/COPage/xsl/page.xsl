@@ -2983,6 +2983,11 @@
 	[[[PRG_ACTION_NOTE]]]
 </xsl:template>
 
+<!-- CopyrightNotice -->
+<xsl:template match="CopyrightNotice">
+    [[[COPYRIGHT_NOTICE]]]
+</xsl:template>
+
 <!-- helper functions -->
 
 <xsl:template name="substring-before-last">

@@ -30,6 +30,7 @@ class ilContentPagePageConfig extends ilPageConfig
         $this->setUsePageContainer(false);
         $this->setEnableAnchors(true);
         $this->setEnablePCType('Map', true);
+        $this->setEnablePCType(ilPCCopyrightNotice::BASE_NAME, true);
 
         $mediaPoolSettings = new ilSetting('mobs');
         if ($mediaPoolSettings->get('mep_activate_pages', '0')) {

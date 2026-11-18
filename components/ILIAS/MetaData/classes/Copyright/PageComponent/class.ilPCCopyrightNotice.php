@@ -19,6 +19,8 @@
 use ILIAS\MetaData\Services\ServicesInterface as LOMServices;
 use ILIAS\UI\Renderer as UIRenderer;
 use ILIAS\Refinery\Factory as Refinery;
+use ILIAS\MetaData\Services\CopyrightHelper\CopyrightInterface;
+use ILIAS\UI\Component\Component;
 
 class ilPCCopyrightNotice extends ilPageContent
 {
@@ -61,7 +63,7 @@ class ilPCCopyrightNotice extends ilPageContent
         }
         $type = ilObject::_lookupType($obj_id);
 
-        $copyright = $this->renderCopyrightNotice($obj_id, $type);
+        $copyright = $this->renderCopyrightNotice($a_mode, $obj_id, $type);
         $a_output = str_replace(
             '[[[COPYRIGHT_NOTICE]]]',
             '<div>' . $copyright . '</div>',
@@ -71,8 +73,11 @@ class ilPCCopyrightNotice extends ilPageContent
         return $a_output;
     }
 
-    public function renderCopyrightNotice(int $obj_id, string $type): string
-    {
+    public function renderCopyrightNotice(
+        string $mode,
+        int $obj_id,
+        string $type
+    ): string {
         $reader = $this->lom_services->read(
             $obj_id,
             $obj_id,
@@ -83,13 +88,30 @@ class ilPCCopyrightNotice extends ilPageContent
         $cp_helper = $this->lom_services->copyrightHelper();
         $copyright = '';
         if ($cp_helper->hasPresetCopyright($reader)) {
-            return $this->ui_renderer->render(
-                $cp_helper->readPresetCopyright($reader)->presentAsUIComponents()
-            );
+            $copyright = $cp_helper->readPresetCopyright($reader);
+            $components = $this->prepareAsComponents($mode, $copyright);
+            return $this->ui_renderer->render($components);
         } else {
             return nl2br($this->refinery->encode()->htmlSpecialCharsAsEntities()->transform(
                 $cp_helper->readCustomCopyright($reader)
             ));
         }
+    }
+
+    /**
+     * @return Component[]
+     */
+    protected function prepareAsComponents(string $mode, CopyrightInterface $copyright): array
+    {
+        $components = $copyright->presentAsUIComponents();
+        if ($mode !== 'edit') {
+            return $components;
+        }
+        foreach ($components as $key => $component) {
+            if ($component instanceof \ILIAS\UI\Component\Link\Link) {
+                $components[$key] = $component->withDisabled(true);
+            }
+        }
+        return $components;
     }
 }

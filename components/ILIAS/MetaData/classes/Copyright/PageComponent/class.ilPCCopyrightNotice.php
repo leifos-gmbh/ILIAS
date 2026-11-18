@@ -66,11 +66,18 @@ class ilPCCopyrightNotice extends ilPageContent
         $copyright = $this->renderCopyrightNotice($a_mode, $obj_id, $type);
         $a_output = str_replace(
             '[[[COPYRIGHT_NOTICE]]]',
-            '<div>' . $copyright . '</div>',
+            '<div class="copg-cpnotice-container">' . $copyright . '</div>',
             $a_output
         );
 
         return $a_output;
+    }
+
+    public function getCssFiles(string $a_mode): array
+    {
+        return [
+            'assets/css/PCCopyrightNotice.css'
+        ];
     }
 
     public function renderCopyrightNotice(

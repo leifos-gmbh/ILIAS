@@ -42,6 +42,8 @@ class MetaData implements Component\Component
 
         $contribute[Component\Resource\PublicAsset::class] = fn() =>
             new Component\Resource\ComponentJS($this, 'ilMetaCopyrightListener.js');
+        $contribute[Component\Resource\PublicAsset::class] = fn() =>
+        new Component\Resource\ComponentCSS($this, 'PCCopyrightNotice.css');
 
         $contribute[Component\Resource\PublicAsset::class] = fn() =>
             new Component\Resource\Endpoint($this, "oai.php");

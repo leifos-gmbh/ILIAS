@@ -283,8 +283,9 @@ class ilGlossaryDataSet extends ilDataSet
                 $newObj->setSnippetLength((int) ($a_rec["SnippetLength"] ?? 0));
                 $newObj->setActiveGlossaryMenu((bool) ($a_rec["GloMenuActive"] ?? false));
                 $newObj->setShowTaxonomy((bool) ($a_rec["ShowTax"] ?? false));
-                $newObj->setActiveFlashcards((bool) ($a_rec["FlashActive"] ?? false));
-                $newObj->setFlashcardsMode($a_rec["FlashMode"] ?? "");
+                $newObj->setActiveFlashcard((bool) ($a_rec["FlashActive"] ?? false));
+                $newObj->setFlashcardModeDefault($a_rec["FlashModeDefault"] ?? "");
+                $newObj->setFlashcardModeChange((bool) ($a_rec["FlashModeChange"] ?? false));
                 if ($this->getCurrentInstallationId() > 0) {
                     $newObj->setImportId("il_" . $this->getCurrentInstallationId() . "_glo_" . $a_rec["Id"]);
                 }

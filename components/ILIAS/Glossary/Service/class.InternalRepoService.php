@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\Glossary;
 
 use ILIAS\Glossary\Settings\SettingsDBRepository;
+use ILIAS\Glossary\Settings\UserSettingsDBRepository;
 
 class InternalRepoService implements InternalRepoServiceInterface
 {
@@ -60,6 +61,14 @@ class InternalRepoService implements InternalRepoServiceInterface
     public function settings(): SettingsDBRepository
     {
         return self::$instance["settings"] ??= new SettingsDBRepository(
+            $this->db,
+            $this->data
+        );
+    }
+
+    public function userSettings(): UserSettingsDBRepository
+    {
+        return self::$instance["userSettings"] ??= new UserSettingsDBRepository(
             $this->db,
             $this->data
         );

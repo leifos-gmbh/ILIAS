@@ -31,7 +31,8 @@ class Settings
         protected int $show_tax,
         protected int $snippet_length,
         protected bool $flash_active,
-        protected string $flash_mode
+        protected string $flash_mode_default,
+        protected bool $flash_mode_change
     ) {
     }
 
@@ -71,13 +72,18 @@ class Settings
         return $this->snippet_length;
     }
 
-    public function getActiveFlashcards(): bool
+    public function getActiveFlashcard(): bool
     {
         return $this->flash_active;
     }
 
-    public function getFlashcardsMode(): string
+    public function getFlashcardModeDefault(): string
     {
-        return $this->flash_mode;
+        return $this->flash_mode_default;
+    }
+
+    public function getFlashcardModeChange(): bool
+    {
+        return $this->flash_mode_change;
     }
 }

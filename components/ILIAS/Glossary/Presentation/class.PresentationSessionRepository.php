@@ -25,7 +25,7 @@ namespace ILIAS\Glossary\Presentation;
  */
 class PresentationSessionRepository
 {
-    public const KEY_BASE = "glo_presentation_";
+    public const string KEY_BASE = "glo_presentation_";
 
     public function __construct()
     {

@@ -48,8 +48,8 @@ final class ilGlossarySetupAgent implements Setup\Agent
         return new Setup\ObjectiveCollection(
             'Glossary',
             false,
-            new ilDatabaseUpdateStepsExecutedObjective(new ilGlossaryDBUpdateSteps()),
-            new ilDatabaseUpdateStepsExecutedObjective(new ilGlossaryDBUpdateSteps11())
+            new ilDatabaseUpdateStepsExecutedObjective(new ilGlossaryDBUpdateSteps11()),
+            new ilDatabaseUpdateStepsExecutedObjective(new ilGlossaryDBUpdateSteps13()),
         );
     }
 
@@ -63,16 +63,14 @@ final class ilGlossarySetupAgent implements Setup\Agent
         return new Setup\ObjectiveCollection(
             'Glossary',
             true,
-            new ilDatabaseUpdateStepsMetricsCollectedObjective($storage, new ilGlossaryDBUpdateSteps()),
             new ilDatabaseUpdateStepsMetricsCollectedObjective($storage, new ilGlossaryDBUpdateSteps11()),
+            new ilDatabaseUpdateStepsMetricsCollectedObjective($storage, new ilGlossaryDBUpdateSteps13()),
         );
     }
 
     public function getMigrations(): array
     {
         return [
-            new ilGlossaryDefinitionMigration(),
-            new ilGlossaryCollectionMigration(),
             new ilGlossaryDeleteLOMOfDefinitionsMigration()
         ];
     }

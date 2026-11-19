@@ -26,6 +26,8 @@ namespace ILIAS\Glossary\Flashcard;
  */
 class FlashcardBox
 {
-    public const FIRST_BOX = 1;
-    public const LAST_BOX = 5;
+    public const int FIRST_BOX = 1;
+    public const int LAST_BOX = 5;
+    public const string MODE_TERM = "term";
+    public const string MODE_DEFINITION = "def";
 }

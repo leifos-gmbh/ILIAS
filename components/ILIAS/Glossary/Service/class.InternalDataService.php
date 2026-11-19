@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\Glossary;
 
 use ILIAS\Glossary\Settings\Settings;
+use ILIAS\Glossary\Settings\UserSettings;
 
 class InternalDataService
 {
@@ -59,7 +60,8 @@ class InternalDataService
         int $show_tax,
         int $snippet_length,
         bool $flash_active,
-        string $flash_mode
+        string $flash_mode_default,
+        bool $flash_mode_change
     ): Settings {
         return new Settings(
             $id,
@@ -70,8 +72,20 @@ class InternalDataService
             $show_tax,
             $snippet_length,
             $flash_active,
-            $flash_mode
+            $flash_mode_default,
+            $flash_mode_change
         );
     }
 
+    public function userSettings(
+        int $user_id,
+        int $glossary_id,
+        string $flash_mode
+    ): UserSettings {
+        return new UserSettings(
+            $user_id,
+            $glossary_id,
+            $flash_mode
+        );
+    }
 }

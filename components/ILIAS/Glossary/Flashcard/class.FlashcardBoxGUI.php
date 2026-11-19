@@ -18,52 +18,57 @@
 
 declare(strict_types=1);
 
+namespace ILIAS\Glossary\Flashcard;
+
 use ILIAS\UI;
+use ILIAS\Glossary;
 use ILIAS\Glossary\Presentation;
-use ILIAS\Glossary\Flashcard;
+use ILIAS\Glossary\Settings;
 
 /**
  * GUI class for glossary flashcard boxes
  * @author Thomas Famula <famula@leifos.de>
  */
-class ilGlossaryFlashcardBoxGUI
+class FlashcardBoxGUI
 {
-    protected ilCtrl $ctrl;
-    protected ilLanguage $lng;
-    protected ilGlobalTemplateInterface $tpl;
+    protected \ilCtrl $ctrl;
+    protected \ilLanguage $lng;
+    protected \ilGlobalTemplateInterface $tpl;
     protected UI\Factory $ui_fac;
     protected UI\Renderer $ui_ren;
     protected Presentation\PresentationGUIRequest $request;
-    protected Flashcard\FlashcardManager $manager;
+    protected int $ref_id;
+    protected FlashcardManager $flashcard_manager;
+    protected Settings\UserSettingsManager $user_settings_manager;
     protected int $box_nr = 0;
     protected array $initial_terms_in_box = [];
     protected array $terms_in_box = [];
-    protected ?Flashcard\Term $current_term;
-    protected ilObjGlossary $glossary;
+    protected ?Term $current_term;
+    protected \ilObjGlossary $glossary;
+    protected int $user_id;
 
-    public function __construct()
-    {
-        global $DIC;
-
-        $this->ctrl = $DIC->ctrl();
-        $this->lng = $DIC->language();
-        $this->tpl = $DIC->ui()->mainTemplate();
-        $this->ui_fac = $DIC->ui()->factory();
-        $this->ui_ren = $DIC->ui()->renderer();
-        $this->request = $DIC->glossary()
-                             ->internal()
-                             ->gui()
-                             ->presentation()
-                             ->request();
-        $gs = $DIC->glossary()->internal();
-        $this->manager = $gs->domain()->flashcard($this->request->getRefId());
+    public function __construct(
+        protected Glossary\InternalDataService $data,
+        protected Glossary\InternalDomainService $domain,
+        protected Glossary\InternalGUIService $gui,
+    ) {
+        $this->ctrl = $this->gui->ctrl();
+        $this->lng = $this->domain->lng();
+        $this->tpl = $this->gui->ui()->mainTemplate();
+        $this->ui_fac = $this->gui->ui()->factory();
+        $this->ui_ren = $this->gui->ui()->renderer();
+        $this->request = $this->gui->presentation()->request();
+        $this->ref_id = $this->request->getRefId();
+        $this->flashcard_manager = $this->domain->flashcard($this->ref_id);
+        $this->user_settings_manager = $this->domain->userSettings();
 
         $this->ctrl->saveParameter($this, ["box_id"]);
         $this->box_nr = $this->request->getBoxId();
-        $this->initial_terms_in_box = $this->manager->getSessionInitialTerms($this->box_nr);
-        $this->terms_in_box = $this->manager->getSessionTerms($this->box_nr);
+        $this->initial_terms_in_box = $this->flashcard_manager->getSessionInitialTerms($this->box_nr);
+        $this->terms_in_box = $this->flashcard_manager->getSessionTerms($this->box_nr);
         $this->current_term = $this->terms_in_box[0] ?? null;
-        $this->glossary = new ilObjGlossary($this->request->getRefId());
+        $this->glossary = new \ilObjGlossary($this->ref_id);
+        $this->user_id = $this->domain->user()->getId();
     }
 
     public function executeCommand(): void
@@ -81,24 +86,24 @@ class ilGlossaryFlashcardBoxGUI
 
     public function show(): void
     {
-        if ($this->box_nr === Flashcard\FlashcardBox::FIRST_BOX) {
-            $cnt_all = count($this->manager->getUserTermsForBox($this->box_nr))
-                + count($this->manager->getAllTermsWithoutEntry());
-            $cnt_remaining = count($this->manager->getNonTodayUserTermsForBox($this->box_nr))
-                + count($this->manager->getAllTermsWithoutEntry());
+        if ($this->box_nr === FlashcardBox::FIRST_BOX) {
+            $cnt_all = count($this->flashcard_manager->getUserTermsForBox($this->box_nr))
+                + count($this->flashcard_manager->getAllTermsWithoutEntry());
+            $cnt_remaining = count($this->flashcard_manager->getNonTodayUserTermsForBox($this->box_nr))
+                + count($this->flashcard_manager->getAllTermsWithoutEntry());
         } else {
-            $cnt_all = count($this->manager->getUserTermsForBox($this->box_nr));
-            $cnt_remaining = count($this->manager->getNonTodayUserTermsForBox($this->box_nr));
+            $cnt_all = count($this->flashcard_manager->getUserTermsForBox($this->box_nr));
+            $cnt_remaining = count($this->flashcard_manager->getNonTodayUserTermsForBox($this->box_nr));
         }
-        $cnt_today = count($this->manager->getTodayUserTermsForBox($this->box_nr));
+        $cnt_today = count($this->flashcard_manager->getTodayUserTermsForBox($this->box_nr));
 
-        if (($this->box_nr === Flashcard\FlashcardBox::FIRST_BOX
-                && !$this->manager->getAllTermsWithoutEntry()
-                && !$this->manager->getNonTodayUserTermsForBox($this->box_nr)
-                && $this->manager->getTodayUserTermsForBox($this->box_nr))
-            || ($this->box_nr !== Flashcard\FlashcardBox::FIRST_BOX
-                && !$this->manager->getNonTodayUserTermsForBox($this->box_nr)
-                && $this->manager->getTodayUserTermsForBox($this->box_nr))) {
+        if (($this->box_nr === FlashcardBox::FIRST_BOX
+                && !$this->flashcard_manager->getAllTermsWithoutEntry()
+                && !$this->flashcard_manager->getNonTodayUserTermsForBox($this->box_nr)
+                && $this->flashcard_manager->getTodayUserTermsForBox($this->box_nr))
+            || ($this->box_nr !== FlashcardBox::FIRST_BOX
+                && !$this->flashcard_manager->getNonTodayUserTermsForBox($this->box_nr)
+                && $this->flashcard_manager->getTodayUserTermsForBox($this->box_nr))) {
             $all_button = $this->ui_fac->button()->standard(
                 sprintf($this->lng->txt("glo_use_all_flashcards"), $cnt_all),
                 $this->ctrl->getLinkTarget($this, "showAllItems")
@@ -107,7 +112,7 @@ class ilGlossaryFlashcardBoxGUI
                 sprintf($this->lng->txt("glo_flashcards_from_today_only_info"), $cnt_all)
             )->withButtons([$all_button]);
             $this->tpl->setContent($this->ui_ren->render($cbox));
-        } elseif ($this->manager->getTodayUserTermsForBox($this->box_nr)) {
+        } elseif ($this->flashcard_manager->getTodayUserTermsForBox($this->box_nr)) {
             $remaining_button = $this->ui_fac->button()->standard(
                 sprintf($this->lng->txt("glo_use_remaining_flashcards"), $cnt_remaining),
                 $this->ctrl->getLinkTarget($this, "showRemainingItems")
@@ -138,18 +143,27 @@ class ilGlossaryFlashcardBoxGUI
     public function showItems(bool $all): void
     {
         if ($all) {
-            $terms = $this->manager->getUserTermsForBox($this->box_nr);
+            $terms = $this->flashcard_manager->getUserTermsForBox($this->box_nr);
         } else {
-            $terms = $this->manager->getNonTodayUserTermsForBox($this->box_nr);
+            $terms = $this->flashcard_manager->getNonTodayUserTermsForBox($this->box_nr);
         }
-        if ($this->box_nr === Flashcard\FlashcardBox::FIRST_BOX) {
-            $terms_without_entry = $this->manager->getAllTermsWithoutEntry();
+        if ($this->box_nr === FlashcardBox::FIRST_BOX) {
+            $terms_without_entry = $this->flashcard_manager->getAllTermsWithoutEntry();
             $terms = array_merge($terms_without_entry, $terms);
         }
-        $this->manager->setSessionInitialTerms($this->box_nr, $terms);
-        $this->manager->setSessionTerms($this->box_nr, $terms);
-        $this->manager->createOrUpdateBoxAccessEntry($this->box_nr);
+        $this->flashcard_manager->setSessionInitialTerms($this->box_nr, $terms);
+        $this->flashcard_manager->setSessionTerms($this->box_nr, $terms);
+        $this->flashcard_manager->createOrUpdateBoxAccessEntry($this->box_nr);
         $this->ctrl->redirect($this, "showHidden");
+    }
+
+    protected function getApplicableFlashcardMode(): string
+    {
+        if ($this->glossary->isFlashcardModeChange()
+            && $settings = $this->user_settings_manager->getByUserAndGlossary($this->user_id, $this->glossary->getId())) {
+            return $settings->getFlashcardMode();
+        }
+        return $this->glossary->getFlashcardModeDefault();
     }
 
     public function showHidden(): void
@@ -161,15 +175,20 @@ class ilGlossaryFlashcardBoxGUI
 
         $this->setFlashcardTitleAndDescription();
 
-        if ($this->glossary->getFlashcardsMode() === "term") {
+        if ($this->getApplicableFlashcardMode() === FlashcardBox::MODE_TERM) {
             $flashcard = $this->ui_fac->panel()->standard(
                 sprintf($this->lng->txt("glo_what_means_term"), $this->getTermText()),
                 $this->ui_fac->legacy()->content("???")
             );
-        } else {
+        } elseif ($this->getApplicableFlashcardMode() === FlashcardBox::MODE_DEFINITION) {
             $flashcard = $this->ui_fac->panel()->standard(
                 $this->lng->txt("glo_what_means_definition"),
                 $this->ui_fac->legacy()->content($this->getDefinitionPage())
+            );
+        } else {
+            $flashcard = $this->ui_fac->panel()->standard(
+                "",
+                $this->ui_fac->legacy()->content("Invalid flashcard mode")
             );
         }
 
@@ -241,9 +260,9 @@ class ilGlossaryFlashcardBoxGUI
 
     public function answer(bool $correct): void
     {
-        $this->manager->createOrUpdateUserTermEntry($this->current_term?->getTermId(), $correct);
+        $this->flashcard_manager->createOrUpdateUserTermEntry($this->current_term?->getTermId(), $correct);
         array_shift($this->terms_in_box);
-        $this->manager->setSessionTerms($this->box_nr, $this->terms_in_box);
+        $this->flashcard_manager->setSessionTerms($this->box_nr, $this->terms_in_box);
         if ($this->terms_in_box) {
             $this->ctrl->redirect($this, "showHidden");
         }
@@ -253,18 +272,18 @@ class ilGlossaryFlashcardBoxGUI
 
     protected function getTermText(): string
     {
-        $text = ilGlossaryTerm::_lookGlossaryTerm($this->current_term?->getTermId());
+        $text = \ilGlossaryTerm::_lookGlossaryTerm($this->current_term?->getTermId());
         return $text;
     }
 
     protected function getDefinitionPage(): string
     {
         $this->ctrl->setParameterByClass(
-            ilGlossaryPresentationGUI::class,
+            \ilGlossaryPresentationGUI::class,
             "pg_id",
             $this->current_term?->getTermId()
         );
-        $page_gui = new ilGlossaryDefPageGUI($this->current_term?->getTermId());
+        $page_gui = new \ilGlossaryDefPageGUI($this->current_term?->getTermId());
         return $page_gui->showPage();
     }
 }

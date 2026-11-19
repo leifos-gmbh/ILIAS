@@ -27,7 +27,7 @@ namespace ILIAS\Glossary\Term;
  */
 class TermSessionRepository
 {
-    public const KEY_BASE = "glo_term_";
+    public const string KEY_BASE = "glo_term_";
 
     public function __construct()
     {

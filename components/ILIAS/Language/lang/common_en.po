@@ -2321,9 +2321,6 @@ msgstr "Glossary added"
 msgid "glo_import"
 msgstr "Import Glossary"
 
-msgid "glo_mode"
-msgstr "Mode"
-
 msgid "glo_mode_desc"
 msgstr "A virtual glossary works like a normal glossary. Additionally it contains the terms from all glossaries that are located on the same level in the repository like the virtual glossary (level) respectively from all glossaries that are located downwards in the repository from the position of the virtual glossary (subtree)."
 

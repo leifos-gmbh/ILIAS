@@ -89,6 +89,15 @@ msgstr "Erklärung vs. Begriff"
 msgid "glo_def_vs_term_info"
 msgstr "Zeige zuerst eine Erklärung, der Lernende muss den Begriff erraten."
 
+msgid "glo_flashcard_mode_change"
+msgstr "Moduswechsel"
+
+msgid "glo_flashcard_mode_change_info"
+msgstr "Ermöglicht es dem Benutzer, zwischen den Modi zu wechseln"
+
+msgid "glo_flashcard_mode_default"
+msgstr "Standardmodus"
+
 msgid "glo_flashcard_training"
 msgstr "Lernkarten Training"
 

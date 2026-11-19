@@ -18,44 +18,49 @@
 
 declare(strict_types=1);
 
+namespace ILIAS\Glossary\Flashcard;
+
 use ILIAS\UI;
+use ILIAS\Glossary;
 use ILIAS\Glossary\Presentation;
-use ILIAS\Glossary\Flashcard;
+use ILIAS\Glossary\Settings;
 
 /**
  * GUI class for glossary flashcards
  * @author Thomas Famula <famula@leifos.de>
- * @ilCtrl_Calls ilGlossaryFlashcardGUI: ilGlossaryFlashcardBoxGUI
  */
-class ilGlossaryFlashcardGUI
+class FlashcardGUI
 {
-    protected ilCtrl $ctrl;
-    protected ilLanguage $lng;
-    protected ilGlobalTemplateInterface $tpl;
-    protected ilTabsGUI $tabs_gui;
+    protected \ilCtrl $ctrl;
+    protected \ilLanguage $lng;
+    protected \ilGlobalTemplateInterface $tpl;
+    protected \ilTabsGUI $tabs_gui;
     protected UI\Factory $ui_fac;
     protected UI\Renderer $ui_ren;
     protected Presentation\PresentationGUIRequest $request;
-    protected Flashcard\FlashcardManager $manager;
+    protected int $ref_id;
+    protected \ilObjGlossary $glossary;
+    protected int $user_id;
+    protected FlashcardManager $flashcard_manager;
+    protected Settings\UserSettingsManager $user_settings_manager;
 
-    public function __construct()
-    {
-        global $DIC;
-
-        $this->ctrl = $DIC->ctrl();
-        $this->lng = $DIC->language();
-        $this->tpl = $DIC->ui()->mainTemplate();
-        $this->tabs_gui = $DIC->tabs();
-        $this->ui_fac = $DIC->ui()->factory();
-        $this->ui_ren = $DIC->ui()->renderer();
-
-        $this->request = $DIC->glossary()
-                             ->internal()
-                             ->gui()
-                             ->presentation()
-                             ->request();
-        $gs = $DIC->glossary()->internal();
-        $this->manager = $gs->domain()->flashcard($this->request->getRefId());
+    public function __construct(
+        protected Glossary\InternalDataService $data,
+        protected Glossary\InternalDomainService $domain,
+        protected Glossary\InternalGUIService $gui,
+    ) {
+        $this->ctrl = $this->gui->ctrl();
+        $this->lng = $this->domain->lng();
+        $this->tpl = $this->gui->ui()->mainTemplate();
+        $this->tabs_gui = $this->gui->tabs();
+        $this->ui_fac = $this->gui->ui()->factory();
+        $this->ui_ren = $this->gui->ui()->renderer();
+        $this->request = $this->gui->presentation()->request();
+        $this->ref_id = $this->request->getRefId();
+        $this->glossary = new \ilObjGlossary($this->ref_id);
+        $this->user_id = $this->domain->user()->getId();
+        $this->flashcard_manager = $this->domain->flashcard($this->ref_id);
+        $this->user_settings_manager = $this->domain->userSettings();
     }
 
     public function executeCommand(): void
@@ -64,8 +69,8 @@ class ilGlossaryFlashcardGUI
         $cmd = $this->ctrl->getCmd();
 
         switch ($next_class) {
-            case "ilglossaryflashcardboxgui":
-                $flash_boxes = new ilGlossaryFlashcardBoxGUI();
+            case strtolower(FlashcardBoxGUI::class):
+                $flash_boxes = $this->gui->flashcard()->flashcardBoxGUI();
                 $this->ctrl->forwardCommand($flash_boxes);
                 break;
 
@@ -78,13 +83,29 @@ class ilGlossaryFlashcardGUI
 
     public function listBoxes(): void
     {
-        $flashcard_tpl = new ilTemplate("tpl.flashcard_overview.html", true, true, "components/ILIAS/Glossary");
+        $flashcard_tpl = new \ilTemplate("tpl.flashcard_overview.html", true, true, "components/ILIAS/Glossary");
 
         $reset_btn = $this->ui_fac->button()->standard(
             $this->lng->txt("glo_reset_all_boxes"),
             $this->ctrl->getLinkTarget($this, "confirmResetBoxes")
         );
         $flashcard_tpl->setVariable("RESET_BUTTON", $this->ui_ren->render($reset_btn));
+
+        if ($this->glossary->isFlashcardModeChange()) {
+            $mode_control = $this->ui_fac->input()->viewControl()->mode(
+                [
+                    FlashcardBox::MODE_TERM => $this->lng->txt("glo_term_vs_def"),
+                    FlashcardBox::MODE_DEFINITION => $this->lng->txt("glo_def_vs_term"),
+                ]
+            )->withValue($this->getCurrentFlashcardMode());
+            $vc_container = $this->ui_fac->input()->container()->viewControl()->standard([$mode_control])
+                                         ->withRequest($this->gui->http()->request());
+            $flashcard_tpl->setVariable("MODE_CONTROL", $this->ui_ren->render($vc_container));
+
+            if ($vc_data = $vc_container->getData()) {
+                $this->setFlashcardMode($vc_data);
+            }
+        }
 
         $intro_box = $this->ui_fac->panel()->standard(
             $this->lng->txt("glo_introduction"),
@@ -107,24 +128,44 @@ class ilGlossaryFlashcardGUI
         $this->tpl->setContent($flashcard_tpl->get());
     }
 
+    protected function getCurrentFlashcardMode(): string
+    {
+        if ($settings = $this->user_settings_manager->getByUserAndGlossary($this->user_id, $this->glossary->getId())) {
+            return $settings->getFlashcardMode();
+        }
+        return $this->glossary->getFlashcardModeDefault();
+    }
+
+    protected function setFlashcardMode(array $vc_data): void
+    {
+        $mode = $vc_data[0];
+        $user_settings = $this->data->userSettings($this->user_id, $this->glossary->getId(), $mode);
+
+        if ($this->user_settings_manager->getByUserAndGlossary($this->user_id, $this->glossary->getId())) {
+            $this->user_settings_manager->update($user_settings);
+        } else {
+            $this->user_settings_manager->create($user_settings);
+        }
+    }
+
     protected function getItemBox(int $nr): \ILIAS\UI\Component\Item\Item
     {
-        $item_cnt = $this->manager->getItemsForBoxCount($nr);
-        $last_access = $this->manager->getLastAccessForBoxAsDaysText($nr);
+        $item_cnt = $this->flashcard_manager->getItemsForBoxCount($nr);
+        $last_access = $this->flashcard_manager->getLastAccessForBoxAsDaysText($nr);
 
-        if (($this->manager->getUserTermsForBox($nr) && $nr !== Flashcard\FlashcardBox::LAST_BOX)
-            || ($this->manager->getAllTermsWithoutEntry() && $nr === Flashcard\FlashcardBox::FIRST_BOX)) {
-            $this->ctrl->setParameterByClass("ilglossaryflashcardboxgui", "box_id", $nr);
+        if (($this->flashcard_manager->getUserTermsForBox($nr) && $nr !== FlashcardBox::LAST_BOX)
+            || ($this->flashcard_manager->getAllTermsWithoutEntry() && $nr === FlashcardBox::FIRST_BOX)) {
+            $this->ctrl->setParameterByClass(strtolower(FlashcardBoxGUI::class), "box_id", $nr);
             $title = $this->ui_fac->link()->standard(
                 $this->lng->txt("glo_box") . " " . $nr,
-                $this->ctrl->getLinkTargetByClass('ilglossaryflashcardboxgui', 'show')
+                $this->ctrl->getLinkTargetByClass(strtolower(FlashcardBoxGUI::class), "show")
             );
         } else {
             $title = $this->lng->txt("glo_box") . " " . $nr;
         }
 
         $box = $this->ui_fac->item()->standard($title);
-        if ($nr === Flashcard\FlashcardBox::LAST_BOX) {
+        if ($nr === FlashcardBox::LAST_BOX) {
             $box = $box->withProperties([
                 $this->lng->txt("glo_flashcards") => (string) $item_cnt
             ]);
@@ -160,7 +201,7 @@ class ilGlossaryFlashcardGUI
 
     public function resetBoxes(): void
     {
-        $this->manager->resetEntries();
+        $this->flashcard_manager->resetEntries();
         $this->tpl->setOnScreenMessage('success', $this->lng->txt("glo_boxes_reset"), true);
         $this->ctrl->redirectByClass("ilglossarypresentationgui", "showFlashcards");
     }

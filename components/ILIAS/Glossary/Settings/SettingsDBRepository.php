@@ -42,8 +42,9 @@ class SettingsDBRepository
                 'pres_mode' => ['text', $settings->getPresentationMode()],
                 'show_tax' => ['integer', $settings->getShowTaxonomy()],
                 'snippet_length' => ['integer', $settings->getSnippetLength()],
-                'flash_active' => ['text', $this->boolToText($settings->getActiveFlashcards())],
-                'flash_mode' => ['text', $settings->getFlashcardsMode()]
+                'flash_active' => ['text', $this->boolToText($settings->getActiveFlashcard())],
+                'flash_mode_default' => ['text', $settings->getFlashcardModeDefault()],
+                'flash_mode_change' => ['text', $this->boolToText($settings->getFlashcardModeChange())],
             ],
             [
                 'id' => ['integer', $settings->getId()]
@@ -69,9 +70,14 @@ class SettingsDBRepository
 
     protected function getSettingsFromRecord(array $record): Settings
     {
-        $flash_mode = ($record['flash_mode'] == "")
+        $flash_mode_default = ($record['flash_mode_default'] == "")
             ? "term"
-            : $record['flash_mode'];
+            : (string) $record['flash_mode_default'];
+
+        $flash_mode_change = ($record['flash_mode_change'] == "")
+            ? "n"
+            : $record['flash_mode_change'];
+
         return $this->data->settings(
             (int) $record['id'],
             $this->textToBool($record['is_online']),
@@ -81,7 +87,8 @@ class SettingsDBRepository
             (int) $record['show_tax'],
             (int) $record['snippet_length'],
             $this->textToBool($record['flash_active']),
-            (string) $flash_mode
+            $flash_mode_default,
+            $this->textToBool($flash_mode_change)
         );
     }
 

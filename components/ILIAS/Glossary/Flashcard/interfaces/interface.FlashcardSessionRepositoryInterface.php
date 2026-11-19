@@ -22,7 +22,7 @@ namespace ILIAS\Glossary\Flashcard;
 
 interface FlashcardSessionRepositoryInterface
 {
-    public const KEY_BASE = "glo_flashcard_";
+    public const string KEY_BASE = "glo_flashcard_";
 
     public function setInitialTerms(int $glo_id, int $user_id, int $box_nr, array $initial_terms): void;
 

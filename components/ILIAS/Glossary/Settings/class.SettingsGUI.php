@@ -24,6 +24,7 @@ use ILIAS\Glossary\InternalDomainService;
 use ILIAS\Glossary\InternalGUIService;
 use ILIAS\Repository\Form\FormAdapterGUI;
 use ILIAS\Glossary\InternalDataService;
+use ILIAS\Glossary\Flashcard\FlashcardBox;
 
 /**
  * @ilCtrl_Calls ILIAS\Glossary\Settings\SettingsGUI: ilDidacticTemplateGUI
@@ -149,20 +150,27 @@ class SettingsGUI
                 $lng->txt("glo_full_definitions_info")
             )
             ->end()
-            ->checkbox(
+            ->optional(
                 "flash_active",
                 $lng->txt("glo_flashcard_training"),
                 $lng->txt("glo_flashcard_training_info"),
-                $settings->getActiveFlashcards()
+                $settings->getActiveFlashcard()
             )
             ->radio(
-                "flash_mode",
-                $lng->txt("glo_mode"),
+                "flash_mode_default",
+                $lng->txt("glo_flashcard_mode_default"),
                 "",
-                $settings->getFlashcardsMode()
+                $settings->getFlashcardModeDefault()
             )
-            ->radioOption("term", $lng->txt("glo_term_vs_def"), $lng->txt("glo_term_vs_def_info"))
-            ->radioOption("def", $lng->txt("glo_def_vs_term"), $lng->txt("glo_def_vs_term_info"));
+            ->radioOption(FlashcardBox::MODE_TERM, $lng->txt("glo_term_vs_def"), $lng->txt("glo_term_vs_def_info"))
+            ->radioOption(FlashcardBox::MODE_DEFINITION, $lng->txt("glo_def_vs_term"), $lng->txt("glo_def_vs_term_info"))
+            ->checkbox(
+                "flash_mode_change",
+                $lng->txt("glo_flashcard_mode_change"),
+                $lng->txt("glo_flashcard_mode_change_info"),
+                $settings->getFlashcardModeChange()
+            )
+            ->end();
 
         $form = $form->addAdditionalFeatures(
             $this->obj_id,
@@ -219,7 +227,8 @@ class SettingsGUI
                 $old_settings->getShowTaxonomy(),
                 (int) $form->getData("snippet_length") ?: 200,
                 (bool) $form->getData("flash_active"),
-                $form->getData("flash_mode")
+                $form->getData("flash_mode_default") ?? $old_settings->getFlashcardModeDefault(),
+                (bool) $form->getData("flash_mode_change") ?? $old_settings->getFlashcardModeChange()
             );
 
             $this->domain->glossarySettings()->update($settings);

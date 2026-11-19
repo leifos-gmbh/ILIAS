@@ -30,6 +30,7 @@ use ILIAS\Glossary\Taxonomy\TaxonomyManager;
 use ILIAS\components\ILIAS\Glossary\Table\TableManager;
 use ILIAS\Glossary\Metadata\MetadataManager;
 use ILIAS\Glossary\Settings\SettingsManager;
+use ILIAS\Glossary\Settings\UserSettingsManager;
 
 class InternalDomainService
 {
@@ -116,6 +117,15 @@ class InternalDomainService
     public function glossarySettings(): SettingsManager
     {
         return self::$instance["settings"] ??= new SettingsManager(
+            $this->data_service,
+            $this->repo_service,
+            $this
+        );
+    }
+
+    public function userSettings(): UserSettingsManager
+    {
+        return self::$instance["userSettings"] ??= new UserSettingsManager(
             $this->data_service,
             $this->repo_service,
             $this

@@ -62,4 +62,13 @@ class InternalGUIService
             $this
         );
     }
+
+    public function flashcard(): Flashcard\GUIService
+    {
+        return self::$instance["flashcard"] ??= new Flashcard\GUIService(
+            $this->data_service,
+            $this->domain_service,
+            $this
+        );
+    }
 }

@@ -2321,9 +2321,6 @@ msgstr "Glossar angelegt"
 msgid "glo_import"
 msgstr "Glossar importieren"
 
-msgid "glo_mode"
-msgstr "Modus"
-
 msgid "glo_mode_desc"
 msgstr "Ein Sammelglossar funktioniert wie ein normales Glossar. Zusätzlich umfasst es aber auch alle Begriffserklärungen von allen Glossaren, die sich auf der gleichen Ebene im Magazin befinden (nur diese Ebene) bzw. auch alle Begriffserklärungen aus Glossaren, die sich auch in nachfolgenden Ebenen befinden (ganzer Teilbaum)."
 

@@ -34,8 +34,9 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
     protected string $pres_mode = "";
     protected bool $virtual = false;
     protected string $virtual_mode = "";
-    protected bool $flashcards_active = false;
-    protected string $flashcards_mode = "";
+    protected bool $flashcard_active = false;
+    protected string $flashcard_mode_default = "";
+    protected bool $flashcard_mode_change = false;
     protected ilGlobalTemplateInterface $tpl;
     public array $auto_glossaries = array();
     protected ilObjUser $user;
@@ -100,8 +101,9 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         $this->setPresentationMode((string) $gl_rec["pres_mode"]);
         $this->setSnippetLength((int) $gl_rec["snippet_length"]);
         $this->setShowTaxonomy((bool) $gl_rec["show_tax"]);
-        $this->setActiveFlashcards(ilUtil::yn2tf($gl_rec["flash_active"]));
-        $this->setFlashcardsMode($gl_rec["flash_mode"]);
+        $this->setActiveFlashcard(ilUtil::yn2tf($gl_rec["flash_active"]));
+        $this->setFlashcardModeDefault($gl_rec["flash_mode_default"]);
+        $this->setFlashcardModeChange(ilUtil::yn2tf($gl_rec["flash_mode_change"]));
 
         // read auto glossaries
         $set = $this->db->query(
@@ -232,24 +234,34 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         return $this->show_tax;
     }
 
-    public function setActiveFlashcards(bool $a_flash): void
+    public function setActiveFlashcard(bool $a_flash): void
     {
-        $this->flashcards_active = $a_flash;
+        $this->flashcard_active = $a_flash;
     }
 
-    public function isActiveFlashcards(): bool
+    public function isActiveFlashcard(): bool
     {
-        return $this->flashcards_active;
+        return $this->flashcard_active;
     }
 
-    public function setFlashcardsMode(string $a_flash): void
+    public function setFlashcardModeDefault(string $flashcards_mode_default): void
     {
-        $this->flashcards_mode = $a_flash;
+        $this->flashcard_mode_default = $flashcards_mode_default;
     }
 
-    public function getFlashcardsMode(): string
+    public function getFlashcardModeDefault(): string
     {
-        return $this->flashcards_mode;
+        return $this->flashcard_mode_default;
+    }
+
+    public function setFlashcardModeChange(bool $flashcards_mode_change): void
+    {
+        $this->flashcard_mode_change = $flashcards_mode_change;
+    }
+
+    public function isFlashcardModeChange(): bool
+    {
+        return $this->flashcard_mode_change;
     }
 
     /**
@@ -305,8 +317,9 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
                 'pres_mode' => array('text', $this->getPresentationMode()),
                 'show_tax' => array('integer', $this->getShowTaxonomy()),
                 'snippet_length' => array('integer', $this->getSnippetLength()),
-                'flash_active' => array('text', ilUtil::tf2yn($this->isActiveFlashcards())),
-                'flash_mode' => array('text', $this->getFlashcardsMode())
+                'flash_active' => array('text', ilUtil::tf2yn($this->isActiveFlashcard())),
+                'flash_mode_default' => array('text', $this->getFlashcardModeDefault()),
+                'flash_mode_change' => array('text', ilUtil::tf2yn($this->isFlashcardModeChange())),
             ),
             array(
                 'id' => array('integer', $this->getId())
@@ -550,8 +563,9 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         $new_obj->setPresentationMode($this->getPresentationMode());
         $new_obj->setSnippetLength($this->getSnippetLength());
         $new_obj->setAutoGlossaries($this->getAutoGlossaries());
-        $new_obj->setActiveFlashcards($this->isActiveFlashcards());
-        $new_obj->setFlashcardsMode($this->getFlashcardsMode());
+        $new_obj->setActiveFlashcard($this->isActiveFlashcard());
+        $new_obj->setFlashcardModeDefault($this->getFlashcardModeDefault());
+        $new_obj->setFlashcardModeChange($this->isFlashcardModeChange());
         $new_obj->update();
 
         // set/copy stylesheet

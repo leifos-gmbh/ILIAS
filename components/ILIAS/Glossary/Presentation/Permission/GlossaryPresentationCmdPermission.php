@@ -21,16 +21,18 @@ declare(strict_types=1);
 namespace ILIAS\Glossary\Presentation\Permission;
 
 use ILIAS\Glossary\Presentation\PresentationGUIRequest;
+use ILIAS\Glossary\Flashcard\FlashcardGUI;
+use ILIAS\Glossary\Flashcard\FlashcardBoxGUI;
 use ILIAS\Repository\Permission\CmdEntity;
 use ILIAS\Repository\Permission\CmdPermission;
 
 class GlossaryPresentationCmdPermission extends CmdPermission
 {
-    protected const GLOSSARY = "glossary";
-    protected const DEFINITION_PAGE = "definition_page";
-    protected const INFO_SCREEN = "info_screen";
-    protected const MEDIA_OBJECT = "media_object";
-    protected const NOTE = "note";
+    protected const string GLOSSARY = "glossary";
+    protected const string DEFINITION_PAGE = "definition_page";
+    protected const string INFO_SCREEN = "info_screen";
+    protected const string MEDIA_OBJECT = "media_object";
+    protected const string NOTE = "note";
 
     public function __construct(
         \ilLanguage $lng,
@@ -112,14 +114,14 @@ class GlossaryPresentationCmdPermission extends CmdPermission
     public function getDefaultCommand(): string
     {
         if ($this->isClass(\ilGlossaryPresentationGUI::class)) {
-            return $this->glossary->isActiveFlashcards() ? "showFlashcards" : "listTerms";
+            return $this->glossary->isActiveFlashcard() ? "showFlashcards" : "listTerms";
         }
         if ($this->isClass(\ilPresentationFullGUI::class) ||
             $this->isClass(\ilPresentationTableGUI::class) ||
-            $this->isClass(\ilGlossaryFlashcardBoxGUI::class)) {
+            $this->isClass(FlashcardBoxGUI::class)) {
             return "show";
         }
-        if ($this->isClass(\ilGlossaryFlashcardGUI::class)) {
+        if ($this->isClass(FlashcardGUI::class)) {
             return "listBoxes";
         }
         if ($this->isClass(\ilNoteGUI::class)) {
@@ -163,8 +165,8 @@ class GlossaryPresentationCmdPermission extends CmdPermission
         if ($this->isClass(\ilGlossaryPresentationGUI::class) ||
             $this->isClass(\ilPresentationFullGUI::class) ||
             $this->isClass(\ilPresentationTableGUI::class) ||
-            $this->isClass(\ilGlossaryFlashcardGUI::class) ||
-            $this->isClass(\ilGlossaryFlashcardBoxGUI::class)) {
+            $this->isClass(FlashcardGUI::class) ||
+            $this->isClass(FlashcardBoxGUI::class)) {
             return $this->cmdEntity(self::GLOSSARY);
         }
         return null;
@@ -200,8 +202,8 @@ class GlossaryPresentationCmdPermission extends CmdPermission
             \ilPresentationFullGUI::class,
             \ilPresentationTableGUI::class,
             \ilGlossaryDefPageGUI::class,
-            \ilGlossaryFlashcardGUI::class,
-            \ilGlossaryFlashcardBoxGUI::class,
+            FlashcardGUI::class,
+            FlashcardBoxGUI::class,
         ], true)) {
             return false;
         }

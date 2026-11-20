@@ -175,6 +175,11 @@ class ilGlossaryExporter extends ilXmlExporter
     public function getValidSchemaVersions(string $a_entity): array
     {
         return array(
+            "13.0" => array(
+                "namespace" => "https://www.ilias.de/Modules/Glossary/htlm/13",
+                "uses_dataset" => true,
+                "min" => "13.0",
+                "max" => ""),
             "9.0.0" => array(
                 "namespace" => "https://www.ilias.de/Modules/Glossary/htlm/9_0",
                 "xsd_file" => "ilias_glo_9_0.xsd",

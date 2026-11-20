@@ -45,7 +45,7 @@ class ilGlossaryDataSet extends ilDataSet
 
     public function getSupportedVersions(): array
     {
-        return array("5.1.0", "5.4.0", "9.0.0");
+        return array("5.1.0", "5.4.0", "9.0.0", "13.0");
     }
 
     protected function getXmlNamespace(string $a_entity, string $a_schema_version): string
@@ -68,7 +68,23 @@ class ilGlossaryDataSet extends ilDataSet
                         "PresMode" => "text",
                         "SnippetLength" => "integer",
                         "GloMenuActive" => "text",
-                        "ShowTax" => "integer"
+                        "ShowTax" => "integer",
+                        "FlashActive" => "text",
+                        "FlashMode" => "text"
+                    );
+                case "13.0":
+                    return array(
+                        "Id" => "integer",
+                        "Title" => "text",
+                        "Description" => "text",
+                        "Virtual" => "text",
+                        "PresMode" => "text",
+                        "SnippetLength" => "integer",
+                        "GloMenuActive" => "text",
+                        "ShowTax" => "integer",
+                        "FlashActive" => "text",
+                        "FlashModeDefault" => "text",
+                        "FlashModeChange" => "text"
                     );
             }
         }
@@ -78,6 +94,7 @@ class ilGlossaryDataSet extends ilDataSet
                 case "5.1.0":
                 case "5.4.0":
                 case "9.0.0":
+                case "13.0":
                     return array(
                         "Id" => "integer",
                         "GloId" => "integer",
@@ -109,6 +126,7 @@ class ilGlossaryDataSet extends ilDataSet
                 case "5.1.0":
                 case "5.4.0":
                 case "9.0.0":
+                case "13.0":
                     return array(
                         "GloId" => "integer",
                         "FieldId" => "text",
@@ -121,6 +139,7 @@ class ilGlossaryDataSet extends ilDataSet
             switch ($a_version) {
                 case "5.4.0":
                 case "9.0.0":
+                case "13.0":
                     return array(
                         "GloId" => "integer",
                         "AutoGloId" => "text"
@@ -139,7 +158,13 @@ class ilGlossaryDataSet extends ilDataSet
                 case "5.1.0":
                 case "5.4.0":
                 case "9.0.0":
-                    $this->getDirectDataFromQuery("SELECT o.title, o.description, g.id, g.virtual, pres_mode, snippet_length, show_tax, glo_menu_active" .
+                    $this->getDirectDataFromQuery("SELECT o.title, o.description, g.id, g.virtual, pres_mode, snippet_length, show_tax, glo_menu_active, flash_active, flash_mode" .
+                        " FROM glossary g JOIN object_data o " .
+                        " ON (g.id = o.obj_id) " .
+                        " WHERE " . $ilDB->in("g.id", $a_ids, false, "integer"));
+                    break;
+                case "13.0":
+                    $this->getDirectDataFromQuery("SELECT o.title, o.description, g.id, g.virtual, pres_mode, snippet_length, show_tax, glo_menu_active, flash_active, flash_mode_default, flash_mode_change" .
                         " FROM glossary g JOIN object_data o " .
                         " ON (g.id = o.obj_id) " .
                         " WHERE " . $ilDB->in("g.id", $a_ids, false, "integer"));
@@ -173,6 +198,7 @@ class ilGlossaryDataSet extends ilDataSet
                     }
                     break;
                 case "9.0.0":
+                case "13.0":
                     $this->getDirectDataFromQuery("SELECT id, glo_id, term, language" .
                         " FROM glossary_term " .
                         " WHERE " . $ilDB->in("glo_id", $a_ids, false, "integer"));
@@ -211,6 +237,7 @@ class ilGlossaryDataSet extends ilDataSet
                 case "5.1.0":
                 case "5.4.0":
                 case "9.0.0":
+                case "13.0":
                     $this->getDirectDataFromQuery("SELECT glo_id, field_id, order_nr" .
                         " FROM glo_advmd_col_order " .
                         " WHERE " . $ilDB->in("glo_id", $a_ids, false, "integer"));
@@ -222,6 +249,7 @@ class ilGlossaryDataSet extends ilDataSet
             switch ($a_version) {
                 case "5.4.0":
                 case "9.0.0":
+                case "13.0":
                     $set = $ilDB->query("SELECT * FROM glo_glossaries " .
                         " WHERE " . $ilDB->in("id", $a_ids, false, "integer"));
                     $this->data = [];
@@ -283,9 +311,9 @@ class ilGlossaryDataSet extends ilDataSet
                 $newObj->setSnippetLength((int) ($a_rec["SnippetLength"] ?? 0));
                 $newObj->setActiveGlossaryMenu((bool) ($a_rec["GloMenuActive"] ?? false));
                 $newObj->setShowTaxonomy((bool) ($a_rec["ShowTax"] ?? false));
-                $newObj->setActiveFlashcard((bool) ($a_rec["FlashActive"] ?? false));
+                $newObj->setActiveFlashcard((($a_rec["FlashActive"] ?? "n") === "y") ? true : false);
                 $newObj->setFlashcardModeDefault($a_rec["FlashModeDefault"] ?? "");
-                $newObj->setFlashcardModeChange((bool) ($a_rec["FlashModeChange"] ?? false));
+                $newObj->setFlashcardModeChange((($a_rec["FlashModeChange"] ?? "n") === "y") ? true : false);
                 if ($this->getCurrentInstallationId() > 0) {
                     $newObj->setImportId("il_" . $this->getCurrentInstallationId() . "_glo_" . $a_rec["Id"]);
                 }

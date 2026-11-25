@@ -29,6 +29,7 @@ use ILIAS\COPage\PC\PCDefinition;
 use ILIAS\COPage\Link\LinkManager;
 use ILIAS\COPage\Style\StyleManager;
 use ILIAS\COPage\WordDiff\WordDiff;
+use ILIAS\COPage\Service\BootstrapToLegacyAdapter;
 
 class InternalDomainService
 {
@@ -49,12 +50,14 @@ class InternalDomainService
         $this->initDomainServices($DIC);
     }
 
+    // TODO no $def as parameter
     public function pc(?PCDefinition $def = null): PC\DomainService
     {
         return new PC\DomainService(
             $this->data_service,
             $this->repo_service,
             $this,
+            $this->DIC[BootstrapToLegacyAdapter::class],
             $def
         );
     }

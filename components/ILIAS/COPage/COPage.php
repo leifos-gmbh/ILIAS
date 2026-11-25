@@ -27,7 +27,7 @@ class COPage implements Component\Component
 {
     public static function getEditorAssetVersion(): string
     {
-        return \ILIAS\COPage\Setup\EditorAssetVersionObjective::getVersion();
+        return COPage\Setup\EditorAssetVersionObjective::getVersion();
     }
 
     public function init(
@@ -40,9 +40,22 @@ class COPage implements Component\Component
         array | \ArrayAccess &$pull,
         array | \ArrayAccess &$internal,
     ): void {
-        $contribute[\ILIAS\Setup\Agent::class] = static fn() =>
-            new \ILIAS\COPage\Setup\Agent(
-                $pull[\ILIAS\Refinery\Factory::class]
+        $internal[COPage\PC\Definition\Manager::class] = fn() =>
+            new COPage\PC\Definition\Manager(
+                new COPage\PC\Definition\Repository($seek[COPage\PC\Definition\DefinitionInterface::class]),
+                new COPage\PC\Definition\Legacy\Repository($pull[Database\Connection::class]),
+            );
+
+        // TODO currently there is no other way to connect this to the legacy (internal) COPage Services
+        //  than via AllModernComponents, how lazily is this initialized?
+        $provide[COPage\Service\BootstrapToLegacyAdapter::class] = static fn() =>
+            new COPage\Service\BootstrapToLegacyAdapter(
+                $internal[COPage\Service\BootstrapToLegacyAdapter::class]
+            );
+
+        $contribute[Setup\Agent::class] = static fn() =>
+            new COPage\Setup\Agent(
+                $pull[Refinery\Factory::class]
             );
 
         // This is included via anonymous classes as a testament to the fact, that
@@ -55,7 +68,7 @@ class COPage implements Component\Component
             }
             public function getTarget(): string
             {
-                $asset_version = \ILIAS\COPage\Setup\EditorAssetVersionObjective::getVersionFromSource();
+                $asset_version = COPage\Setup\EditorAssetVersionObjective::getVersionFromSource();
                 return "components/ILIAS/COPage/" . $asset_version . "/PC/InteractiveImage/js";
             }
         };
@@ -76,7 +89,7 @@ class COPage implements Component\Component
             }
             public function getTarget(): string
             {
-                $asset_version = \ILIAS\COPage\Setup\EditorAssetVersionObjective::getVersionFromSource();
+                $asset_version = COPage\Setup\EditorAssetVersionObjective::getVersionFromSource();
                 return "components/ILIAS/COPage/" . $asset_version . "/Editor/js";
             }
         };

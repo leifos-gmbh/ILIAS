@@ -45,6 +45,7 @@ use ILIAS\AccessControl\PublicInterface\Access;
 use ILIAS\AccessControl\PublicInterface\RBAC;
 use ILIAS\DI\RBACServices;
 use ILIAS\Logging;
+use ILIAS\COPage;
 
 /**
  * This entry point can be thought of as a list of all modern components.
@@ -158,7 +159,8 @@ class AllModernComponents implements \ILIAS\Component\EntryPoint
         protected \ILIAS\Language\Activities\AddLanguageEntry $add_language_entry,
         protected \ILIAS\Language\Activities\SetLanguageDetectionEnabled $set_language_detection_enabled,
         protected \ILIAS\Language\Activities\SetLanguageTranslationEnabled $set_language_translation_enabled,
-        protected BackgroundTasksRegistry $background_tasks_registry
+        protected BackgroundTasksRegistry $background_tasks_registry,
+        protected COPage\Service\BootstrapToLegacyAdapter $copage_adapter
     ) {
     }
 
@@ -282,6 +284,7 @@ class AllModernComponents implements \ILIAS\Component\EntryPoint
         $DIC[\ILIAS\Language\Activities\SetLanguageDetectionEnabled::class] = fn(): \ILIAS\Language\Activities\SetLanguageDetectionEnabled => $this->set_language_detection_enabled;
         $DIC[\ILIAS\Language\Activities\SetLanguageTranslationEnabled::class] = fn(): \ILIAS\Language\Activities\SetLanguageTranslationEnabled => $this->set_language_translation_enabled;
         $DIC[BackgroundTasksRegistry::class] = fn(): BackgroundTasksRegistry => $this->background_tasks_registry;
+        $DIC[COPage\Service\BootstrapToLegacyAdapter::class] = fn(): COPage\Service\BootstrapToLegacyAdapter => $this->copage_adapter;
     }
 
     public function getName(): string

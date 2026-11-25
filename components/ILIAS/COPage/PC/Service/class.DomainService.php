@@ -33,6 +33,8 @@ use ILIAS\COPage\PC\Resources\ResourcesManager;
 use ILIAS\COPage\PC\Plugged\PluggedManager;
 use ILIAS\COPage\PC\Grid\GridCellRetrieval;
 use ILIAS\COPage\PC\MediaObject\ImageMapRetrieval;
+use ILIAS\COPage\Service\BootstrapToLegacyAdapter;
+use ILIAS\COPage\PC\Definition\Manager as DefinitionManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -44,11 +46,13 @@ class DomainService
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
     protected InternalDomainService $domain_service;
+    protected BootstrapToLegacyAdapter $bootstrap_to_legacy_adapter;
 
     public function __construct(
         InternalDataService $data_service,
         InternalRepoService $repo_service,
         InternalDomainService $domain_service,
+        BootstrapToLegacyAdapter $bootstrap_to_legacy_adapter,
         ?PCDefinition $pc_definition = null
     ) {
         $this->repo_service = $repo_service;
@@ -67,9 +71,9 @@ class DomainService
         return $this->pc_factory->getByNode($node, $page_object);
     }
 
-    public function definition(): PCDefinition
+    public function definition(): DefinitionManager
     {
-        return $this->def ?? new PCDefinition();
+        return $this->bootstrap_to_legacy_adapter->PCDefinitionManager();
     }
 
     public function paragraph(): ParagraphManager

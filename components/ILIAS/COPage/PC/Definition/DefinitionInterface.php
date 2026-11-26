@@ -21,7 +21,9 @@ declare(strict_types=1);
 namespace ILIAS\COPage\PC\Definition;
 
 use ILIAS\COPage\PC\Definition\Domain\DomainDefinitionInterface;
+use ILIAS\COPage\PC\Definition\Domain\Environment\EnvironmentInterface as DomainEnvironmentInterface;
 use ILIAS\COPage\PC\Definition\GUI\GUIDefinitionInterface;
+use ILIAS\COPage\PC\Definition\GUI\Environment\EnvironmentInterface as GUIEnvironmentInterface;
 
 interface DefinitionInterface
 {
@@ -32,9 +34,9 @@ interface DefinitionInterface
 
     public function orderIndex(): int;
 
-    // TODO maybe rather a bespoke gui environment?
-    public function GUI(EnvironmentInterface $environment): GUIDefinitionInterface;
+    public function GUI(GUIEnvironmentInterface $environment): GUIDefinitionInterface;
 
-    // TODO maybe rather a bespoke domain environment?
-    public function domain(EnvironmentInterface $environment): DomainDefinitionInterface;
+    public function domain(DomainEnvironmentInterface $environment): DomainDefinitionInterface;
+
+    // TODO maybe rendering as third layer
 }

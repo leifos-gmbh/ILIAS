@@ -41,6 +41,8 @@ class Service
      */
     public function internal(): InternalService
     {
+        // TODO maybe instead of the bootstrap adapter, move the whole service to bootstrap
+        //  in that case: lazy init InternalService, with call to DIC here in the initialization.
         return $this->internal;
     }
 }

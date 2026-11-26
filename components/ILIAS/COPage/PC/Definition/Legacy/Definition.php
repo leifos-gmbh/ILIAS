@@ -21,8 +21,9 @@ declare(strict_types=1);
 namespace ILIAS\COPage\PC\Definition\Legacy;
 
 use ILIAS\COPage\PC\Definition\Domain\DomainDefinitionInterface;
+use ILIAS\COPage\PC\Definition\Domain\Environment\EnvironmentInterface as DomainEnvironmentInterface;
 use ILIAS\COPage\PC\Definition\GUI\GUIDefinitionInterface;
-use ILIAS\COPage\PC\Definition\EnvironmentInterface;
+use ILIAS\COPage\PC\Definition\GUI\Environment\EnvironmentInterface as GUIEnvironmentInterface;
 use ILIAS\COPage\PC\Definition\DefinitionInterface;
 use ilLanguage;
 
@@ -56,10 +57,9 @@ class Definition implements DefinitionInterface
         return $this->oder_nr;
     }
 
-    public function GUI(EnvironmentInterface $environment): GUIDefinitionInterface
+    public function GUI(GUIEnvironmentInterface $environment): GUIDefinitionInterface
     {
         return $this->gui = new GUIDefinition(
-            $environment,
             $this->lng,
             $this->name,
             $this->pc_type,
@@ -67,7 +67,7 @@ class Definition implements DefinitionInterface
         );
     }
 
-    public function domain(EnvironmentInterface $environment): DomainDefinitionInterface
+    public function domain(DomainEnvironmentInterface $environment): DomainDefinitionInterface
     {
         return $this->domain = new DomainDefinition(
             $environment,

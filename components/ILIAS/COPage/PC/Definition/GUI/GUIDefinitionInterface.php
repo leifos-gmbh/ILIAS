@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace ILIAS\COPage\PC\Definition\GUI;
 
-use ILIAS\COPage\PC\Definition\EnvironmentInterface;
 use ILIAS\COPage\Editor\Components\PageComponentEditor;
 
 interface GUIDefinitionInterface

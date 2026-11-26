@@ -26,9 +26,9 @@ interface PageContentGUIInterface
     public function executeCommand(): void;
 
     // TODO instead of "top_item" flag
-    public function hasCreateCommand(): bool;
+    public function hasInsertCommand(): bool;
 
-    public function getCreateCommand(): string;
+    public function getInsertCommand(): string;
 
     // TODO don't link components without edit command in edit mode
     public function hasEditCommand(): bool;

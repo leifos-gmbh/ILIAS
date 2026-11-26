@@ -25,7 +25,7 @@ use stdClass;
 use ilPageObject;
 use ILIAS\COPage\PC\Definition\Domain\HandlerInterface;
 use ilPageContent;
-use ILIAS\COPage\PC\Definition\EnvironmentInterface;
+use ILIAS\COPage\PC\Definition\Domain\Environment\EnvironmentInterface;
 
 // TODO maybe move this out of definition?
 class DomainHandler implements HandlerInterface
@@ -40,8 +40,8 @@ class DomainHandler implements HandlerInterface
     {
         return $this->content->modifyPageContentPostXsl(
             $output,
-            $this->environment->outputMode()->value,
-            $this->environment->abstractOnly()
+            $this->environment->context()->outputMode()->value,
+            $this->environment->context()->abstractOnly()
         );
     }
 

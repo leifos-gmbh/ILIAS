@@ -25,7 +25,7 @@ use ILIAS\COPage\Editor\Components\PageComponentModelProvider;
 use ILIAS\COPage\PC\Definition\Domain\HandlerInterface;
 use ILIAS\COPage\PC\Definition\Domain\DomainDefinitionInterface;
 use ilPageContent;
-use ILIAS\COPage\PC\Definition\EnvironmentInterface;
+use ILIAS\COPage\PC\Definition\Domain\Environment\EnvironmentInterface;
 
 class DomainDefinition implements DomainDefinitionInterface
 {
@@ -46,7 +46,7 @@ class DomainDefinition implements DomainDefinitionInterface
     public function resources(): ResourcesInterface
     {
         return new Resources(
-            $this->environment->outputMode(),
+            $this->environment->context()->outputMode(),
             $this->getLegacyContent()
         );
     }

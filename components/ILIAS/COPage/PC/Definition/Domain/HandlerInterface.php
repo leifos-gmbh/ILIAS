@@ -44,7 +44,7 @@ interface HandlerInterface
      * TODO clean up parameters
      */
     public function afterPageCreateOrUpdate(
-        ilPageObject $page,
+        ilPageObject $page, // TODO should already be handled by the PageContentManager
         DOMDocument $domdoc,
         string $xml,
         bool $creation

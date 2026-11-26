@@ -18,19 +18,11 @@
 
 declare(strict_types=1);
 
-namespace ILIAS\COPage\PC\Definition;
-
-use ILIAS\COPage\Page\OutputMode;
-use ILIAS\COPage\Page\PageContentManager;
+namespace ILIAS\COPage\PC\Definition\Domain\Environment;
 
 interface EnvironmentInterface
 {
-    public function outputMode(): OutputMode;
+    public function context(): ContextInterface;
 
-    public function repositoryRefID(): ?int;
-
-    public function abstractOnly(): bool;
-
-    // TODO Would be better to return an interface
-    public function pageContentManager(): PageContentManager;
+    public function services(): ServicesInterface;
 }

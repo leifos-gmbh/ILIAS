@@ -36,12 +36,12 @@ class PageContentGUIWrapper implements PageContentGUIInterface
         $this->content_gui->executeCommand();
     }
 
-    public function hasCreateCommand(): bool
+    public function hasInsertCommand(): bool
     {
         return $this->top_item;
     }
 
-    public function getCreateCommand(): string
+    public function getInsertCommand(): string
     {
         return 'insert';
     }

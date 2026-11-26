@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace ILIAS\COPage\PC\Definition\Legacy;
 
-use ILIAS\COPage\PC\Definition\EnvironmentInterface;
 use ILIAS\COPage\Editor\Components\PageComponentEditor;
 use ILIAS\COPage\PC\Definition\GUI\PageContentGUIInterface;
 use ILIAS\COPage\PC\Definition\GUI\GUIDefinitionInterface;
@@ -31,7 +30,6 @@ class GUIDefinition implements GUIDefinitionInterface
     protected PageContentGUIInterface $gui_wrapper;
 
     public function __construct(
-        protected EnvironmentInterface $environment,
         protected ilLanguage $lng,
         protected string $name,
         protected string $pc_type,

@@ -20,13 +20,13 @@ declare(strict_types=1);
 
 namespace ILIAS\COPage\PC\Definition;
 
-use ILIAS\COPage\PC\Definition\Legacy\Repository;
+use ILIAS\COPage\PC\Definition\Legacy\Repository as LegacyRepository;
 
 class Manager
 {
     public function __construct(
         protected Repository $repository,
-        protected Repository $legacy_repository
+        protected LegacyRepository $legacy_repository
     ) {
     }
 
